@@ -20,12 +20,6 @@ local scene_ = nil
 local cameraNode = nil
 local vehicleNode = nil
 
-local cache = GetCache()
-local fileSystem = GetFileSystem()
-local input = GetInput()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
 
     -- Execute the common startup for samples

@@ -8,16 +8,6 @@ local yaw = 0
 local pitch = 0
 local drawDebug = 0
 
-local audio = GetAudio()
-local cache = GetCache()
-local engine = GetEngine()
-local fileSystem = GetFileSystem()
-local graphics = GetGraphics()
-local input = GetInput()
-local network = GetNetwork()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     if not engine:IsHeadless() then
         InitConsole()
@@ -63,11 +53,11 @@ end
 function InitConsole()
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
 
-    local debugHud = engine:CreateDebugHud()
+    engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
     debugHud.mode = DEBUGHUD_SHOW_ALL
 
-    local console = engine:CreateConsole()
+    engine:CreateConsole()
     console.defaultStyle = uiStyle
 end
 
@@ -257,13 +247,11 @@ function HandleKeyDown(eventType, eventData)
         if ui:GetFocusElement() == nil then
             engine:Exit()
         else
-            local console = GetConsole()
             console:SetVisible(false)
         end
     end
 
     if key == KEY_F1 then
-        local console = GetConsole()
         console:Toggle()
     end
     
@@ -341,7 +329,6 @@ function HandleKeyDown(eventType, eventData)
         end
 
         if key == KEY_T then
-            local debugHud = GetDebugHud()
             debugHud:Toggle(DEBUGHUD_SHOW_PROFILER)
         end
         

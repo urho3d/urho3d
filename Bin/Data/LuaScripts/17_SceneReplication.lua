@@ -29,13 +29,6 @@ local yaw = 0.0
 local pitch = 1.0
 local clientObjectID = 0
 
-local cache = GetCache()
-local input = GetInput()
-local graphics = GetGraphics()
-local network = GetNetwork()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
