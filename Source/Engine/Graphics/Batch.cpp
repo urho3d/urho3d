@@ -348,7 +348,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         {
             Vector3 worldFogHeightVec = zoneNode->GetWorldTransform() * Vector3(0.0f, zone_->GetFogHeight(), 0.0f);
             fogParams.z_ = worldFogHeightVec.y_;
-            fogParams.w_ = zone_->GetFogHeightScale() / zoneNode->GetWorldScale().y_;
+            fogParams.w_ = zone_->GetFogHeightScale() / Max(zoneNode->GetWorldScale().y_, M_EPSILON);
         }
         
         graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
