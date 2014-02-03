@@ -1,4 +1,4 @@
-Urho3D - cross-platform rendering and game engine
+﻿Urho3D - cross-platform rendering and game engine
 -------------------------------------------------
 
 http://urho3d.github.io/
@@ -189,7 +189,11 @@ process has two steps:
 
 If using MinGW to compile, DirectX headers may need to be acquired separately.
 They can be copied to the MinGW installation eg. from the following package:
-http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
+http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz. These will
+be missing some of the headers related to shader compilation, so a MinGW build 
+will use OpenGL by default. To build in Direct3D9 mode, the MinGW-w64 port is 
+necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D9 can be 
+enabled with the CMake option -DUSE_OPENGL=0.
 
 After the build is complete, the programs can be run from the Bin directory.
 These include the Urho3D player application, which can run application scripts,

@@ -72,9 +72,6 @@ if (DIRECT3D_FOUND)
     FIND_PACKAGE_MESSAGE (Direct3D "Found DirectX SDK: ${DIRECT3D_LIBRARIES} ${DIRECT3D_INCLUDE_DIRS}" "[${DIRECT3D_LIBRARIES}][${DIRECT3D_INCLUDE_DIRS}]")
 else ()
     message (STATUS "DirectX SDK not found. This is not fatal if a recent Windows SDK is installed")
-    # Set non-absolute fallback library names and assume they are found in default library directories
-    set (DIRECT3D_LIBRARIES d3d9)
-    set (DIRECT3D_COMPILER_LIBRARIES d3dcompiler)
 endif ()
 
 mark_as_advanced (DIRECT3D_INCLUDE_DIRS DIRECT3D_LIBRARIES DIRECT3D_COMPILER_LIBRARIES)
