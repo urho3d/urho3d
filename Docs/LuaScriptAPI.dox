@@ -5372,22 +5372,10 @@ Properties:
 - int DRAG_RESIZE_LEFT
 
 \section LuaScriptAPI_GlobalFunctions Global functions
+- Audio* GetAudio()
 - Context* GetContext()
 - Object* GetEventSender()
 - EventHandler* GetEventHandler() const
-- Audio* GetAudio()
-- Console* GetConsole()
-- DebugHud* GetDebugHud()
-- Engine* GetEngine()
-- FileSystem* GetFileSystem()
-- Graphics* GetGraphics()
-- Input* GetInput()
-- Log* GetLog()
-- Network* GetNetwork()
-- Renderer* GetRenderer()
-- ResourceCache* GetCache()
-- Time* GetTime()
-- UI* GetUI()
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
 - void OpenConsoleWindow()
@@ -5415,6 +5403,12 @@ Properties:
 - bool IsDigit(unsigned ch)
 - unsigned ToUpper(unsigned ch)
 - unsigned ToLower(unsigned ch)
+- Time* GetTime()
+- Console* GetConsole()
+- DebugHud* GetDebugHud()
+- Engine* GetEngine()
+- Graphics* GetGraphics()
+- Renderer* GetRenderer()
 - String GetPath(const String fullPath)
 - String GetFileName(const String fullPath)
 - String GetExtension(const String fullPath, bool lowercaseExtension = true)
@@ -5426,6 +5420,9 @@ Properties:
 - String GetInternalPath(const String pathName)
 - String GetNativePath(const String pathName)
 - bool IsAbsolutePath(const String pathName)
+- FileSystem * GetFileSystem()
+- Log* GetLog()
+- Input* GetInput()
 - void SendEvent(const String eventName, VariantMap& eventData)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void UnsubscribeFromEvent(const String eventName)
@@ -5449,13 +5446,21 @@ Properties:
 - void SetRandomSeed(unsigned seed)
 - unsigned GetRandomSeed()
 - int Rand()
+- Network* GetNetwork()
+- ResourceCache* GetCache()
+- UI* GetUI()
 
 \section LuaScriptAPI_GlobalConstants Global constants
+- tolua_readonly tolua_property__get_set Audio* audio
+- tolua_readonly tolua_property__get_set Time* time
+- tolua_readonly tolua_property__get_set Console* console
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_STATS
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_PROFILER
 - unsigned DEBUGHUD_SHOW_ALL
+- tolua_readonly tolua_property__get_set DebugHud* debugHud
+- tolua_readonly tolua_property__get_set Engine* engine
 - int QUALITY_LOW
 - int QUALITY_MEDIUM
 - int QUALITY_HIGH
@@ -5484,16 +5489,21 @@ Properties:
 - unsigned VO_LOW_MATERIAL_QUALITY
 - unsigned VO_DISABLE_SHADOWS
 - unsigned VO_DISABLE_OCCLUSION
+- tolua_readonly tolua_property__get_set Graphics* graphics
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
+- tolua_readonly tolua_property__get_set Renderer* renderer
 - unsigned SCAN_FILES
 - unsigned SCAN_DIRS
 - unsigned SCAN_HIDDEN
+- tolua_readonly tolua_property__get_set FileSystem* fileSystem
 - int LOG_DEBUG
 - int LOG_INFO
 - int LOG_WARNING
 - int LOG_ERROR
 - int LOG_NONE
+- tolua_readonly tolua_property__get_set Log* log
+- tolua_readonly tolua_property__get_set Input* input
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
 - int MOUSEB_RIGHT
@@ -5653,6 +5663,8 @@ Properties:
 - float M_RADTODEG
 - unsigned NUM_FRUSTUM_PLANES
 - unsigned NUM_FRUSTUM_VERTICES
+- tolua_readonly tolua_property__get_set Network* network
+- tolua_readonly tolua_property__get_set ResourceCache* cache
 - unsigned FIRST_REPLICATED_ID
 - unsigned LAST_REPLICATED_ID
 - unsigned FIRST_LOCAL_ID
@@ -5661,6 +5673,7 @@ Properties:
 - unsigned DD_SOURCE
 - unsigned DD_TARGET
 - unsigned DD_SOURCE_AND_TARGET
+- tolua_readonly tolua_property__get_set UI* ui
 
 \section LuaScriptAPI_RenameTypes Rename types
 - SharedPtr<HttpRequest> becomes HttpRequestSPtr
