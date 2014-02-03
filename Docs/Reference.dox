@@ -990,7 +990,7 @@ Pixel shader:
 
 Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
 
-To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the required include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
+To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the shader include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
 
 Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code verbatim:
 
@@ -1008,7 +1008,7 @@ vec3 worldPos = GetWorldPos(modelMatrix);
 gl_Position = GetClipPos(worldPos);
 \endcode
 
-On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the default shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time. When compiling for %Shader %Model 3 on Direct3D9, the compilation define "SM3" is present: this can be used to separate code which would not compile on SM2.
+On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time. When compiling for %Shader %Model 3 on Direct3D9, the compilation define "SM3" is present: this can be used to separate code which would not compile on SM2.
 
 The uniforms must be prefixed in a certain way so that the engine understands them:
 
