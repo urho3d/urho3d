@@ -104,6 +104,18 @@ public:
     /// Reset to null and release the object reference.
     void Reset() { ReleaseRef(); }
     
+    /// Detach without destroying the object even if the refcount goes zero. To be used for scripting language interoperation.
+    void Detach()
+    {
+        if (ptr_)
+        {
+            RefCount* refCount = RefCountPtr();
+            ++refCount->refs_; // 2 refs
+            Reset(); // 1 ref
+            --refCount->refs_; // 0 refs
+        }
+    }
+    
     /// Perform a static cast from a shared pointer of another type.
     template <class U> void StaticCast(const SharedPtr<U>& rhs)
     {

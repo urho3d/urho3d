@@ -53,12 +53,9 @@ static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
     else
     {
         // Need to safely detach the object from the shared pointer so that the Lua script can manually
-        // delete the object once done. The refcount needs to be set zero or else the destructor will assert
+        // delete the object once done. The refcount needs to be zero or else the destructor will assert
         File* fileRaw = file.Get();
-        fileRaw->AddRef();
-        file.Reset();
-        RefCount* refCount = fileRaw->RefCountPtr();
-        refCount->refs_ = 0;
+        file.Detach();
         return fileRaw;
     }
 }

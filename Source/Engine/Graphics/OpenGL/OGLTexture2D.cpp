@@ -289,6 +289,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
             break;
         }
         
+        SetNumLevels(0); // Determine number of levels after creation
         SetSize(levelWidth, levelHeight, format);
         if (!object_)
             return false;
