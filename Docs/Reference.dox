@@ -909,7 +909,7 @@ To control whether the backbuffer should use sRGB conversion on write, call \ref
 A technique definition looks like this:
 
 \code
-<technique vs="VertexShaderName" ps="VertexShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" >
+<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" >
     <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow"
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
@@ -922,7 +922,13 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-The "sm3" attribute in the technique root element determines whether the technique requires %Shader %Model 3 hardware.
+The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.)
+
+Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
+
+Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
+
+The technique definition does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead the engine will add certain hardcoded compilation defines for these. See \ref Shaders "Shaders" for details.
 
 The purposes of the different passes are:
 
@@ -947,15 +953,6 @@ The optional "litbase" pass reduces draw call count by combining ambient lightin
 "Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
 
 The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
-
-\section Materials_TechniqueShaders Specifying shaders
-
-Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
-
-Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
-
-The technique definition does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead the engine will add certain hardcoded compilation defines for these. See \ref Shaders "Shaders" for details.
-
 
 \page Shaders Shaders
 
@@ -1254,7 +1251,11 @@ A Zone controls ambient lighting and fogging. Each geometry object determines th
 
 The viewport will be initially cleared to the fog color of the zone found at the camera's far clip distance. If no zone is found either for the far clip or an object, a default zone with black ambient and fog color will be used.
 
-Zones have two special flags: override mode and ambient gradient. If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect. When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
+Zones have three special flags: height fog mode, override mode and ambient gradient. 
+
+- When height fog mode is enabled, objects inside the zone receive height fog in addition of distance fog. The fog's \ref Zone::SetFogHeight "height level" is specified relative to the zone's world position. The width of the fog band on the Y-axis is specified by the \ref Zone::SetFogHeightScale "fog height scale" parameter.
+- If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect.
+- When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
 
 Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 

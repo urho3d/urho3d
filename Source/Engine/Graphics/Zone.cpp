@@ -47,6 +47,7 @@ extern const char* SCENE_CATEGORY;
 Zone::Zone(Context* context) :
     Drawable(context, DRAWABLE_ZONE),
     inverseWorldDirty_(true),
+    heightFog_(false),
     override_(false),
     ambientGradient_(false),
     ambientColor_(DEFAULT_AMBIENT_COLOR),
@@ -78,6 +79,7 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Height", fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Height Scale", fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_BOOL, "Height Fog Mode", heightFog_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
@@ -163,6 +165,12 @@ void Zone::SetFogHeightScale(float scale)
 void Zone::SetPriority(int priority)
 {
     priority_ = priority;
+    MarkNetworkUpdate();
+}
+
+void Zone::SetHeightFog(bool enable)
+{
+    heightFog_ = enable;
     MarkNetworkUpdate();
 }
 
