@@ -7,8 +7,9 @@ end
 pkgFiles = {}
 enums = {}
 classes = {}
-globalConstants = {}
 globalFunctions = {}
+globalProperties = {}
+globalConstants = {}
 renamings = {}
 
 -- trim string.
@@ -122,6 +123,8 @@ function handleLine(line)
         
         if line:find(")") ~= nil then -- global function.
             table.insert(globalFunctions, line)
+        elseif line:find("tolua_property") ~= nil then -- global properties
+            table.insert(globalProperties, line)
         else
             local i, _, oldName, newName = line:find("$renaming%s+(.-)%s*@%s*(.-)%s*$") 
             if i ~= nill then -- renaming types.
@@ -188,6 +191,21 @@ function writeGlobalFunctions(ofile)
         ofile:write("- ", line, "\n")
     end
     
+    ofile:write("\n")
+end
+
+function writeGlobalProperties(ofile)
+    ofile:write("\\\section LuaScriptAPI_GlobalProperties Global properties\n")
+    for _, line in ipairs(globalProperties) do
+        line = line:gsub("tolua_property__get_set ", "")
+        line = line:gsub(";", "")
+        if line:find("tolua_readonly") == nil then
+            ofile:write("- ", line, "\n")
+        else
+            line = line:gsub("tolua_readonly ", "")
+            ofile:write("- ", line, " (readonly)\n")
+        end
+    end
     ofile:write("\n")
 end
 
@@ -284,6 +302,7 @@ ofile:write("\n")
 writeClasses(ofile)
 writeEnums(ofile)
 writeGlobalFunctions(ofile)
+writeGlobalProperties(ofile)
 writeGlobalConstants(ofile)
 writeRenamings(ofile)
 
