@@ -47,12 +47,10 @@ class Text : public UIElement
     
     void SetEffectDepthBias(float bias);
     float GetEffectDepthBias() const;
-    void SetFontAttr(ResourceRef value);
-    ResourceRef GetFontAttr() const;
     
     tolua_property__get_set Font* font;
     tolua_readonly tolua_property__get_set int fontSize;
-    tolua_property__get_set String& text;
+    tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set float rowSpacing;
     tolua_property__get_set bool wordwrap;
@@ -64,7 +62,6 @@ class Text : public UIElement
     tolua_property__get_set Color& effectColor;
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
-    tolua_property__get_set ResourceRef fontAttr;
 };
 
 ${

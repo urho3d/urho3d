@@ -1,3 +1,4 @@
+$#include "File.h"
 $#include "UIElement.h"
 
 enum HorizontalAlignment
@@ -64,6 +65,9 @@ class UIElement : public Serializable
 
     bool LoadXML(Deserializer& source);
     bool SaveXML(Serializer& dest) const;
+    tolua_outside bool UIElementLoadXML @ LoadXML(const String fileName);
+    tolua_outside bool UIElementSaveXML @ SaveXML(const String fileName) const;
+
     bool FilterAttributes(XMLElement& dest) const;
 
     void SetName(const String name);
@@ -130,7 +134,7 @@ class UIElement : public Serializable
     void AddChild(UIElement* element);
     void InsertChild(unsigned index, UIElement* element);
     void RemoveChild(UIElement* element, unsigned index = 0);
-    void RemoveChildAtIndex @ RemoveChild(unsigned index);
+    void RemoveChildAtIndex(unsigned index);
     void RemoveAllChildren();
     void Remove();
     unsigned FindChild(UIElement* element) const;
@@ -205,13 +209,13 @@ class UIElement : public Serializable
     int GetIndentWidth() const;
     void SetChildOffset(const IntVector2& offset);
     void SetHovering(bool enable);
-    const Color& GetColorAttr() const;
+    const Color& GetColorAttr @ GetColor() const;
     TraversalMode GetTraversalMode() const;
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
     
     tolua_readonly tolua_property__get_set IntVector2& screenPosition;
-    tolua_property__get_set String& name;
+    tolua_property__get_set String name;
     tolua_property__get_set IntVector2& position;
     tolua_property__get_set IntVector2 size;
     tolua_property__get_set int width;
@@ -229,7 +233,7 @@ class UIElement : public Serializable
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
     tolua_property__get_set VerticalAlignment verticalAlignment;
     tolua_property__get_set IntRect clipBorder;
-    tolua_property__get_set Color& color; // Write only property.
+    tolua_property__get_set Color& colorAttr @ color;
     tolua_property__get_set int priority;
     tolua_property__get_set float opacity;
     tolua_readonly tolua_property__get_set float derivedOpacity;
@@ -248,7 +252,7 @@ class UIElement : public Serializable
     tolua_readonly tolua_property__has_set bool colorGradient;
     tolua_property__get_set FocusMode focusMode;
     tolua_property__get_set unsigned dragDropMode;
-    tolua_property__get_set String& style;
+    tolua_property__get_set String style;
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_property__get_set LayoutMode layoutMode;
     tolua_property__get_set int layoutSpacing;
@@ -262,7 +266,6 @@ class UIElement : public Serializable
     tolua_property__get_set int indent;
     tolua_property__get_set int indentSpacing;
     tolua_readonly tolua_property__get_set int indentWidth;
-    tolua_property__get_set Color& colorAttr;
     tolua_property__get_set TraversalMode traversalMode;
     tolua_property__is_set bool elementEventSender;
 };
@@ -278,6 +281,30 @@ static int tolua_UILuaAPI_UIElement_new00(lua_State* tolua_S)
 static int tolua_UILuaAPI_UIElement_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<UIElement>(tolua_S);
+}
+
+static bool UIElementLoadXML(UIElement* element, const String& fileName)
+{
+    if (!element)
+        return false;
+
+    File file(element->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return element->LoadXML(file);
+}
+
+static bool UIElementSaveXML(const UIElement* element, const String& fileName)
+{
+    if (!element)
+        return false;
+
+    File file(element->GetContext());
+    if (!file.Open(fileName, FILE_WRITE))
+        return false;
+
+    return element->SaveXML(file);
 }
 
 // Disable generated CreateChild function.
@@ -386,7 +413,5 @@ tolua_lerror:
 }
 
 #define GetStyle GetAppliedStyle
-
-#define TOLUA_DISABLE_tolua_get_UIElement_color_ref
-#define tolua_get_UIElement_color_ref NULL
+#define SetColorAttr SetColor
 $}

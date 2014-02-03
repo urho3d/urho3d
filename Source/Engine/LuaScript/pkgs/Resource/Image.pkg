@@ -19,7 +19,7 @@ class Image : public Resource
     ~Image();
     
     bool LoadColorLUT(Deserializer& source);
-    tolua_outside bool ImageLoadColorLUT @ LoadColorLUT(const String& fileName);
+    tolua_outside bool ImageLoadColorLUT @ LoadColorLUT(const String fileName);
 
     void FlipVertical();
     bool SaveBMP(const String fileName);

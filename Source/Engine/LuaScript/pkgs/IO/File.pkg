@@ -118,7 +118,7 @@ class File : public Object
     tolua_readonly tolua_property__is_set bool packaged;
     
     // From Deserializer
-    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_readonly tolua_property__get_set unsigned position;
     tolua_readonly tolua_property__get_set unsigned size;

@@ -7,7 +7,6 @@ class Text3D : public Drawable
     
     bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(Font* font);
     
     void SetMaterial(Material* material);
     
@@ -48,16 +47,10 @@ class Text3D : public Drawable
     float GetOpacity() const;
     bool GetFaceCamera() const;
     
-    void SetFontAttr(ResourceRef value);
-    ResourceRef GetFontAttr() const;
-    void SetMaterialAttr(ResourceRef value);
-    ResourceRef GetMaterialAttr() const;
-    const Color& GetColorAttr() const;
-    
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set int fontSize;
-    tolua_property__get_set String& text;
+    tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
     tolua_property__get_set VerticalAlignment verticalAlignment;
@@ -72,9 +65,6 @@ class Text3D : public Drawable
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_property__get_set float opacity;
     tolua_property__get_set bool faceCamera;
-    tolua_property__get_set ResourceRef fontAttr;
-    tolua_property__get_set ResourceRef materialAttr;
-    tolua_readonly tolua_property__get_set Color& colorAttr;
 };
 
 ${
@@ -90,7 +80,6 @@ static int tolua_UILuaAPI_Text3D_new00_local(lua_State* tolua_S)
     return ToluaNewObjectGC<Text3D>(tolua_S);
 }
 
-#define SetColorAttr SetColor
 #define TOLUA_DISABLE_tolua_get_Text3D_color_ref
 #define tolua_get_Text3D_color_ref NULL
 $}

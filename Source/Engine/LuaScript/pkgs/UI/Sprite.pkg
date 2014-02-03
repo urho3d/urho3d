@@ -27,8 +27,6 @@ class Sprite : public UIElement
     Texture* GetTexture() const;
     const IntRect& GetImageRect() const;
     BlendMode GetBlendMode() const;
-    void SetTextureAttr(ResourceRef value);
-    ResourceRef GetTextureAttr() const;
     const Matrix3x4& GetTransform() const;
     
     tolua_property__get_set Vector2& position;
@@ -38,7 +36,6 @@ class Sprite : public UIElement
     tolua_property__get_set Texture* texture;
     tolua_property__get_set IntRect& imageRect;
     tolua_property__get_set BlendMode blendMode;
-    tolua_property__get_set ResourceRef textureAttr;
     tolua_readonly tolua_property__get_set Matrix3x4& transform;
 };
 

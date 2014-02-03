@@ -41,7 +41,7 @@ class Animation : public Resource
     const AnimationTrack* GetTrack(StringHash nameHash) const;
     unsigned GetNumTriggers() const;
     
-    tolua_readonly tolua_property__get_set String& animationName;
+    tolua_readonly tolua_property__get_set String animationName;
     tolua_readonly tolua_property__get_set StringHash animationNameHash;
     tolua_readonly tolua_property__get_set float length;
     tolua_readonly tolua_property__get_set unsigned numTracks;

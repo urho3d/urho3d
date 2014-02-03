@@ -12,7 +12,7 @@ class Resource
     StringHash GetNameHash() const;
     unsigned GetMemoryUse() const;
     
-    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_readonly tolua_property__get_set unsigned memoryUse;
 };

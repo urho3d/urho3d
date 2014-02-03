@@ -22,7 +22,7 @@ class Skeleton
 {
     unsigned GetNumBones() const;
     Bone* GetRootBone();
-    Bone* GetBone(String& name);
+    Bone* GetBone(const String name);
     Bone* GetBone(unsigned index);
     
     tolua_readonly tolua_property__get_set unsigned numBones;
