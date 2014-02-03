@@ -1,14 +1,27 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
-
-uniform float cBloomThreshold;
-uniform vec2 cBloomMix;
-uniform vec2 cHBlurInvSize;
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
 
 varying vec2 vTexCoord;
 varying vec2 vScreenPos;
 
-void main()
+#ifdef COMPILEPS
+uniform float cBloomThreshold;
+uniform vec2 cBloomMix;
+uniform vec2 cHBlurInvSize;
+#endif
+
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetQuadTexCoord(gl_Position);
+    vScreenPos = GetScreenPosPreDiv(gl_Position);
+}
+
+void PS()
 {
     #ifdef BRIGHT
     vec3 rgb = texture2D(sDiffMap, vScreenPos).rgb;
@@ -41,3 +54,4 @@ void main()
     gl_FragColor = vec4(original + bloom, 1.0);
     #endif
 }
+

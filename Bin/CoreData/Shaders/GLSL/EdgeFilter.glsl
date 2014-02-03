@@ -6,13 +6,26 @@
 
 // Adapted for Urho3D from http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
-#include "Uniforms.frag"
-#include "Samplers.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
 
-uniform vec3 cEdgeFilterParams;
 varying vec2 vScreenPos;
 
-void main()
+#ifdef COMPILEPS
+uniform vec3 cEdgeFilterParams;
+#endif
+
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vScreenPos = GetScreenPosPreDiv(gl_Position);
+}
+
+void PS()
 {
     float FXAA_SUBPIX_SHIFT = 1.0/4.0; // Not used
     float FXAA_SPAN_MAX = 8.0;
@@ -72,3 +85,4 @@ void main()
     else
         gl_FragColor = vec4(rgbM, 1.0);
 }
+
