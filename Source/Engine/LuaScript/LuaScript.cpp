@@ -272,13 +272,17 @@ int LuaScript::Loader(lua_State* L)
     // Get module name.
     const char* name = luaL_checkstring(L, 1);
 
+    // Get Luc file from module name.
+    LuaFile* lucFile = cache->GetResource<LuaFile>(String(name) + ".luc");
+    if (lucFile)
+        return lucFile->LoadChunk(L) ? 1 : 0;
+
     // Get Lua file from module name.
     LuaFile* luaFile = cache->GetResource<LuaFile>(String(name) + ".lua");
-    if (!luaFile)
-        return false;
+    if (luaFile)
+        return luaFile->LoadChunk(L) ? 1 : 0;
 
-    // Load Lua file to Lua chunk.
-    return luaFile->LoadChunk(L) ? 1 : 0;
+    return false;
 }
 
 void LuaScript::ReplacePrint()
