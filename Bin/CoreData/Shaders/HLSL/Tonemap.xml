@@ -1,8 +1,0 @@
-<shaders>
-    <shader type="vs" />
-    <shader type="ps">
-        <variation name="ReinhardEq3" define="REINHARDEQ3" />
-        <variation name="ReinhardEq4" define="REINHARDEQ4" />
-        <variation name="Uncharted2" define="UNCHARTED2" />
-    </shader>
-</shaders>

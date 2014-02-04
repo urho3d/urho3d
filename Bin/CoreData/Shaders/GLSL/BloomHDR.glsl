@@ -7,15 +7,6 @@
 varying vec2 vTexCoord;
 varying vec2 vScreenPos;
 
-void VS()
-{
-    mat4 modelMatrix = iModelMatrix;
-    vec3 worldPos = GetWorldPos(modelMatrix);
-    gl_Position = GetClipPos(worldPos);
-    vTexCoord = GetQuadTexCoord(gl_Position);
-    vScreenPos = GetScreenPosPreDiv(gl_Position);
-}
-
 #ifdef COMPILEPS
 uniform float cBloomHDRThreshold;
 uniform float cBloomHDRBlurSigma;
@@ -29,6 +20,15 @@ uniform vec2 cBright16InvSize;
 
 const int BlurKernelSize = 5;
 #endif
+
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetQuadTexCoord(gl_Position);
+    vScreenPos = GetScreenPosPreDiv(gl_Position);
+}
 
 void PS()
 {

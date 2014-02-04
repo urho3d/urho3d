@@ -7,15 +7,6 @@
 varying vec2 vTexCoord;
 varying vec2 vScreenPos;
 
-void VS()
-{
-    mat4 modelMatrix = iModelMatrix;
-    vec3 worldPos = GetWorldPos(modelMatrix);
-    gl_Position = GetClipPos(worldPos);
-    vTexCoord = GetQuadTexCoord(gl_Position);
-    vScreenPos = GetScreenPosPreDiv(gl_Position);
-}
-
 #ifdef COMPILEPS
 uniform float cAutoExposureAdaptRate;
 uniform float cAutoExposureMiddleGrey;
@@ -35,6 +26,15 @@ float GatherAvgLum(sampler2D texSampler, vec2 texCoord, vec2 texelSize)
     return lumAvg / 4.0;
 }
 #endif
+
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetQuadTexCoord(gl_Position);
+    vScreenPos = GetScreenPosPreDiv(gl_Position);
+}
 
 void PS()
 {
