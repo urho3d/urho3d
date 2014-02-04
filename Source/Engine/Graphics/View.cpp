@@ -1745,11 +1745,8 @@ void View::AllocateScreenBuffers()
     // Allocate screen buffers with filtering active in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    if (needSubstitute)
-    {
-        substituteRenderTarget_ = needSubstitute ? 
-            renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB)->GetRenderSurface() : (RenderSurface*)0;
-    }
+    substituteRenderTarget_ = needSubstitute ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, 
+        sRGB)->GetRenderSurface() : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
         viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB) :
