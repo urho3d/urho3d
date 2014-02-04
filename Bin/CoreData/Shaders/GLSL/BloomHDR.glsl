@@ -1,7 +1,22 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
-#include "PostProcess.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
+#include "PostProcess.glsl"
 
+varying vec2 vTexCoord;
+varying vec2 vScreenPos;
+
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetQuadTexCoord(gl_Position);
+    vScreenPos = GetScreenPosPreDiv(gl_Position);
+}
+
+#ifdef COMPILEPS
 uniform float cBloomHDRThreshold;
 uniform float cBloomHDRBlurSigma;
 uniform float cBloomHDRBlurRadius;
@@ -12,12 +27,10 @@ uniform vec2 cBright4InvSize;
 uniform vec2 cBright8InvSize;
 uniform vec2 cBright16InvSize;
 
-varying vec2 vTexCoord;
-varying vec2 vScreenPos;
-
 const int BlurKernelSize = 5;
+#endif
 
-void main()
+void PS()
 {
     #ifdef BRIGHT
     vec3 color = texture2D(sDiffMap, vScreenPos).rgb;

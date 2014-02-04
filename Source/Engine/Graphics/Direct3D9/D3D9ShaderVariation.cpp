@@ -220,6 +220,7 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
 
 bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
 {
+    const String& sourceCode = owner_->GetSourceCode(type_);
     Vector<String> defines = defines_.Split(' ');
     
     // Set the entrypoint, profile and flags according to the shader being compiled
@@ -274,6 +275,12 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         macro.Name = defines[i].CString();
         macro.Definition = defineValues[i].CString();
         macros.Push(macro);
+
+        // In debug mode, check that all defines are referenced by the shader code
+        #ifdef _DEBUG
+        if (sourceCode.Find(defines[i]) == String::NPOS)
+            LOGWARNING("Shader " + GetName() + " does not use the define " + defineCheck);
+        #endif
     }
     
     D3D_SHADER_MACRO endMacro;
@@ -282,7 +289,7 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
     macros.Push(endMacro);
     
     // Compile using D3DCompile
-    const String& sourceCode = owner_->GetSourceCode(type_);
+
     LPD3DBLOB shaderCode = 0;
     LPD3DBLOB errorMsgs = 0;
     

@@ -1,4 +1,4 @@
-
+#ifdef COMPILEPS
 const float PI = 3.14159265;
 
 vec2 Noise(vec2 coord)
@@ -11,7 +11,7 @@ vec2 Noise(vec2 coord)
 // Adapted: http://callumhay.blogspot.com/2010/09/gaussian-blur-shader-glsl.html
 vec4 GaussianBlur(int blurKernelSize, vec2 blurDir, vec2 blurRadius, float sigma, sampler2D texSampler, vec2 texCoord)
 {
-    const int blurKernelSizeHalfSize = blurKernelSize / 2;
+    int blurKernelSizeHalfSize = blurKernelSize / 2;
 
     // Incremental Gaussian Coefficent Calculation (See GPU Gems 3 pp. 877 - 889)
     vec3 gaussCoeff;
@@ -84,3 +84,4 @@ vec3 ToInverseGamma(vec3 color)
 {
     return vec3(pow(color.r, InverseGamma), pow(color.g, InverseGamma), pow(color.b, InverseGamma));
 }
+#endif

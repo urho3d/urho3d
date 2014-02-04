@@ -37,6 +37,31 @@
 namespace Urho3D
 {
 
+void CommentOutFunction(String& code, const String& signature)
+{
+    unsigned startPos = code.Find(signature);
+    unsigned braceLevel = 0;
+    if (startPos == String::NPOS)
+        return;
+    
+    code.Insert(startPos, "/*");
+    
+    for (unsigned i = startPos + 2 + signature.Length(); i < code.Length(); ++i)
+    {
+        if (code[i] == '{')
+            ++braceLevel;
+        else if (code[i] == '}')
+        {
+            --braceLevel;
+            if (braceLevel == 0)
+            {
+                code.Insert(i + 1, "*/");
+                return;
+            }
+        }
+    }
+}
+
 Shader::Shader(Context* context) :
     Resource(context),
     timeStamp_(0)
@@ -69,40 +94,21 @@ bool Shader::Load(Deserializer& source)
     if (!ProcessSource(shaderCode, source))
         return false;
     
-    // Customize the vertex & pixel shader source code to not include the unnecessary shader,
-    // and on OpenGL, rename either VS() or PS() to main()
+    // OpenGL: customize the vertex & pixel shader source code to not include the unnecessary shader,
+    // and rename either VS() or PS() to main()
     #ifdef USE_OPENGL
     vsSourceCode_ = shaderCode;
     vsSourceCode_.Replace("uniform sampler", "// uniform sampler");
     vsSourceCode_.Replace("void VS(", "void main(");
-    if (vsSourceCode_.Find("void PS(") != String::NPOS)
-    {
-        vsSourceCode_.Replace("void PS(", "/* void PS(");
-        vsSourceCode_ += "*/\n";
-    }
-    
+    CommentOutFunction(vsSourceCode_, "void PS(");
+
     psSourceCode_ = shaderCode;
     psSourceCode_.Replace("attribute ", "// attribute ");
     psSourceCode_.Replace("void PS(", "void main(");
-    if (psSourceCode_.Find("void VS(") != String::NPOS)
-    {
-        psSourceCode_.Replace("void VS(", "/* void VS(");
-        psSourceCode_.Replace("void main(", "*/\nvoid main(");
-    }
+    CommentOutFunction(psSourceCode_, "void VS(");
     #else
     vsSourceCode_ = shaderCode;
-    if (vsSourceCode_.Find("void PS(") != String::NPOS)
-    {
-        vsSourceCode_.Replace("void PS(", "/* void PS(");
-        vsSourceCode_ += "*/\n";
-    }
-    
     psSourceCode_ = shaderCode;
-    if (psSourceCode_.Find("void VS(") != String::NPOS)
-    {
-        psSourceCode_.Replace("void VS(", "/* void VS(");
-        psSourceCode_.Replace("void PS(", "*/\nvoid PS(");
-    }
     #endif
     
     // If variations had already been created, release them and require recompile

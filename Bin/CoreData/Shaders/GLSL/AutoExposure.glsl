@@ -1,7 +1,22 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
-#include "PostProcess.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
+#include "PostProcess.glsl"
 
+varying vec2 vTexCoord;
+varying vec2 vScreenPos;
+
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetQuadTexCoord(gl_Position);
+    vScreenPos = GetScreenPosPreDiv(gl_Position);
+}
+
+#ifdef COMPILEPS
 uniform float cAutoExposureAdaptRate;
 uniform float cAutoExposureMiddleGrey;
 uniform float cAutoExposureSensitivity;
@@ -9,9 +24,6 @@ uniform vec2 cHDR128InvSize;
 uniform vec2 cLum64InvSize;
 uniform vec2 cLum16InvSize;
 uniform vec2 cLum4InvSize;
-
-varying vec2 vTexCoord;
-varying vec2 vScreenPos;
 
 float GatherAvgLum(sampler2D texSampler, vec2 texCoord, vec2 texelSize)
 {
@@ -22,8 +34,9 @@ float GatherAvgLum(sampler2D texSampler, vec2 texCoord, vec2 texelSize)
     lumAvg += texture2D(texSampler, texCoord + vec2(1.0, -1.0) * texelSize).r;
     return lumAvg / 4.0;
 }
+#endif
 
-void main()
+void PS()
 {
     #ifdef LUMINANCE64
     float logLumSum = 1e-5;
