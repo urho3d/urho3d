@@ -279,7 +279,7 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         // In debug mode, check that all defines are referenced by the shader code
         #ifdef _DEBUG
         if (sourceCode.Find(defines[i]) == String::NPOS)
-            LOGWARNING("Shader " + GetName() + " does not use the define " + defineCheck);
+            LOGWARNING("Shader " + GetName() + " does not use the define " + defines[i]);
         #endif
     }
     
