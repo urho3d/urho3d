@@ -94,21 +94,18 @@ bool Shader::Load(Deserializer& source)
     if (!ProcessSource(shaderCode, source))
         return false;
     
-    // OpenGL: customize the vertex & pixel shader source code to not include the unnecessary shader,
-    // and rename either VS() or PS() to main()
-    #ifdef USE_OPENGL
+    // Comment out the unneeded shader function
     vsSourceCode_ = shaderCode;
+    psSourceCode_ = shaderCode;
+    CommentOutFunction(vsSourceCode_, "void PS(");
+    CommentOutFunction(psSourceCode_, "void VS(");
+    
+    // OpenGL: rename either VS() or PS() to main()
+    #ifdef USE_OPENGL
     vsSourceCode_.Replace("uniform sampler", "// uniform sampler");
     vsSourceCode_.Replace("void VS(", "void main(");
-    CommentOutFunction(vsSourceCode_, "void PS(");
-
-    psSourceCode_ = shaderCode;
     psSourceCode_.Replace("attribute ", "// attribute ");
     psSourceCode_.Replace("void PS(", "void main(");
-    CommentOutFunction(psSourceCode_, "void VS(");
-    #else
-    vsSourceCode_ = shaderCode;
-    psSourceCode_ = shaderCode;
     #endif
     
     // If variations had already been created, release them and require recompile
