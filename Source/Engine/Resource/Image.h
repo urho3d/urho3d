@@ -101,25 +101,41 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Set 2D size and number of color components.
-    void SetSize(int width, int height, unsigned components);
-    /// Set 3D size and number of color components.
-    void SetSize(int width, int height, int depth, unsigned components);
-    /// Set data.
+    /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
+    bool SetSize(int width, int height, unsigned components);
+    /// Set 3D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
+    bool SetSize(int width, int height, int depth, unsigned components);
+    /// Set new image data.
     void SetData(const unsigned char* pixelData);
+    /// Set a 2D pixel.
+    void SetPixel(int x, int y, const Color& color);
+    /// Set a 3D pixel.
+    void SetPixel(int x, int y, int z, const Color& color);
     /// Load as color LUT. Return true if successful.
     bool LoadColorLUT(Deserializer& source);
     /// Flip image vertically.
     void FlipVertical();
+    /// Resize image by bilinear resampling. Return true if successful.
+    bool Resize(int width, int height);
+    /// Clear the image with a color.
+    void Clear(const Color& color);
     /// Save in BMP format. Return true if successful.
-    bool SaveBMP(const String& fileName);
+    bool SaveBMP(const String& fileName) const;
     /// Save in PNG format. Return true if successful.
-    bool SavePNG(const String& fileName);
+    bool SavePNG(const String& fileName) const;
     /// Save in TGA format. Return true if successful.
-    bool SaveTGA(const String& fileName);
+    bool SaveTGA(const String& fileName) const;
     /// Save in JPG format with compression quality. Return true if successful.
-    bool SaveJPG(const String& fileName, int quality);
+    bool SaveJPG(const String& fileName, int quality) const;
     
+    /// Return a 2D pixel color.
+    Color GetPixel(int x, int y) const;
+    /// Return a 3D pixel color.
+    Color GetPixel(int x, int y, int z) const;
+    /// Get a bilinearly interpolated 2D pixel color. X and Y have the range 0-1.
+    Color GetPixelBilinear(float x, float y) const;
+    /// Get a trilinearly interpolated 3D pixel color. X, Y and Z have the range 0-1.
+    Color GetPixelTrilinear(float x, float y, float z) const;
     /// Return width.
     int GetWidth() const { return width_; }
     /// Return height.

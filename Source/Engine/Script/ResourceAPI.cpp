@@ -139,14 +139,25 @@ static bool ImageLoadColorLUT(File* file, Serializable* ptr)
 static void RegisterImage(asIScriptEngine* engine)
 {
     RegisterResource<Image>(engine, "Image");
+    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixel(int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixel(int, int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, int, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool LoadColorLUT(File@+)", asFUNCTION(ImageLoadColorLUT), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Image", "void FlipVertical()", asMETHOD(Image, FlipVertical), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in)", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SavePNG(const String&in)", asMETHOD(Image, SavePNG), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SaveTGA(const String&in)", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SaveJPG(const String&in, int)", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void Resize(int, int)", asMETHOD(Image, Resize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void Clear(const Color&in)", asMETHOD(Image, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in) const", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SavePNG(const String&in) const", asMETHOD(Image, SavePNG), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SaveTGA(const String&in) const", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SaveJPG(const String&in, int) const", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", asMETHODPR(Image, GetPixel, (int, int) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", asMETHODPR(Image, GetPixel, (int, int, int) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixelBilinear(float, float) const", asMETHODPR(Image, GetPixelBilinear, (float, float) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixelTrilinear(float, float, float) const", asMETHODPR(Image, GetPixelTrilinear, (float, float, float) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "int get_width() const", asMETHOD(Image, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "int get_height() const", asMETHOD(Image, GetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int get_depth() const", asMETHOD(Image, GetDepth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_components() const", asMETHOD(Image, GetComponents), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool get_compressed() const", asMETHOD(Image, IsCompressed), asCALL_THISCALL);
 }
