@@ -1453,8 +1453,7 @@ static Octree* GetOctree()
 static void RegisterOctree(asIScriptEngine* engine)
 {
     engine->RegisterEnum("RayQueryLevel");
-    engine->RegisterEnumValue("RayQueryLevel", "RAY_AABB_NOSUBOBJECTS", RAY_AABB_NOSUBOBJECTS);
-    engine->RegisterEnumValue("RayQueryLevel", "RAY_AABB", RAY_AABB_NOSUBOBJECTS);
+    engine->RegisterEnumValue("RayQueryLevel", "RAY_AABB", RAY_AABB);
     engine->RegisterEnumValue("RayQueryLevel", "RAY_OBB", RAY_OBB);
     engine->RegisterEnumValue("RayQueryLevel", "RAY_TRIANGLE", RAY_TRIANGLE);
     

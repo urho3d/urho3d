@@ -167,7 +167,6 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     float distance;
     switch (query.level_)
     {
-    case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         return;

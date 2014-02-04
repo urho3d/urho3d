@@ -31,6 +31,7 @@
 #include "Material.h"
 #include "MemoryBuffer.h"
 #include "Node.h"
+#include "OctreeQuery.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Sort.h"
@@ -98,6 +99,49 @@ void BillboardSet::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(BillboardSet, Drawable);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+}
+
+void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+{
+    // If no billboard-level testing, use the Drawable test
+    if (query.level_ < RAY_TRIANGLE)
+    {
+        Drawable::ProcessRayQuery(query, results);
+        return;
+    }
+
+    // Check ray hit distance to AABB before proceeding with billboard-level tests
+    if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)
+        return;
+    
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
+    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
+    
+    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    {
+        if (!billboards_[i].enabled_)
+            continue;
+        
+        // Approximate the billboards as spheres for raycasting
+        float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
+        Vector3 center = billboardTransform * billboards_[i].position_;
+        Sphere billboardSphere(center, size);
+        
+        float distance = query.ray_.HitDistance(billboardSphere);
+        if (distance < query.maxDistance_)
+        {
+            // If the code reaches here then we have a hit
+            RayQueryResult result;
+            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+            result.normal_ = -query.ray_.direction_;
+            result.distance_ = distance;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.subObject_ = i;
+            results.Push(result);
+        }
+    }
 }
 
 void BillboardSet::UpdateBatches(const FrameInfo& frame)

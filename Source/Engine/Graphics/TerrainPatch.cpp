@@ -77,7 +77,6 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
     
     switch (level)
     {
-    case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         break;

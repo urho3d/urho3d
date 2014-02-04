@@ -170,8 +170,7 @@ struct URHO3D_API OctreeQueryResult
 /// Graphics raycast detail level.
 enum RayQueryLevel
 {
-    RAY_AABB_NOSUBOBJECTS = 0,
-    RAY_AABB,
+    RAY_AABB = 0,
     RAY_OBB,
     RAY_TRIANGLE
 };
