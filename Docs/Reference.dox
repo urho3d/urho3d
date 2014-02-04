@@ -1021,6 +1021,14 @@ uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
 \endcode
 
+\section Shaders_Migration Migration of old shaders
+
+In Urho3D version 1.3 and before an XML description file was used for shaders, which would enumerate the compilation defines used by shaders into named "options" or "variations".
+The shader would then be referred to with these option names, for example a pixel shader LitSolid_Diff would use the LitSolid source code and the define DIFFMAP. To convert to the
+current system, look up the defines from the description files and add them directly to the technique or renderpath XML descriptions ("vsdefines" or "psdefines" attributes). Also make sure the shader references ("vs" and "ps" attributes) are just the bare shader names with no underscore or option names attached. Finally, delete the shader XML description files.
+
+GLSL shaders in 1.3 and before used separate .vert and .frag files for the vertex and pixel shader source code. Now these are combined into .glsl files that include both shaders. Include files are likewise merged into .glsl files instead of separate vertex and pixel shader includes. To merge your shader code, append the pixel shader source into the vertex shader source file without the varyings definition (which should already be in the vertex shader code). Merge and fix include statements: change the file extension to .glsl. Note that some include files depend on each other so it is safest to always include Uniforms.glsl and Samplers.glsl first. Finally change the file extension of the vertex shader source file from .vert to .glsl and delete the .frag file. If you have pieces of pixel shader code (for example additional functions or variables) that produce errors when included in the vertex shader compile, wrap these with #ifdef COMPILEPS, and vice versa for vertex shader code.
+
 \page RenderPaths Render path
 
 %Scene rendering and any post-processing on a Viewport is defined by its RenderPath object, which can either be read from an XML file or be created programmatically.
