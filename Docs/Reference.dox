@@ -1502,6 +1502,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - Slider: a horizontal or vertical slider bar
 - Sprite: a texture image which supports subpixel positioning, scaling and rotating.
 - Text: static text that can be multiline
+- ToolTip: a popup which automatically displays itself when the cursor hovers on its parent element.
 - UIElement: container for other elements, renders nothing by itself
 - View3D: a window that renders a 3D viewport
 - Window: a movable and resizable window
@@ -1511,6 +1512,19 @@ The root %UI element can be queried from the UI subsystem. It is an empty canvas
 Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
 
 To allow the elements react to mouse input, either a mouse cursor element must be defined using \ref UI::SetCursor "SetCursor()" or the operating system mouse cursor must be set visible from the Input subsystem.
+
+\section UI_Textures UI textures
+
+The BorderImage and elements deriving from it specify a texture and an absolute pixel rect within it to use for rendering; see \ref BorderImage::SetTexture "SetTexture()" and \ref BorderImage::SetImageRect "SetImageRect()". The texture is modulated with the element's color. To allow for more versatile scaling the element can be divided into 9 sub-quads or patches by specifying the width of each of its borders, see \ref BorderImage::SetBorder "SetBorder()". Setting zero borders (the default) causes the element to be drawn as one quad.
+
+The absolute pixel rects interact poorly with the Renderer's texture quality setting, which reduces texture sizes by skipping the topmost mipmaps. Generating mipmaps is also often unnecessary for %UI textures, as they are usually displayed with 1:1 ratio on the screen. Therefore it's a good practice to use the following accompanying settings XML file for %UI textures to disable quality reduction and mipmaps:
+
+\code
+<texture>
+    <mipmap enable="false" />
+    <quality low="0" />
+</texture>
+\endcode
 
 \section UI_Defining Defining UI elements in XML
 
