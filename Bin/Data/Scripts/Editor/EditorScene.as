@@ -122,7 +122,11 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
         cache.ReleaseAllResources(false);
         renderer.ReloadShaders();
 
-        if (!sceneResourcePath.empty && !sceneResourcePath.Contains(fileSystem.programDir))
+        String check = AddTrailingSlash(sceneResourcePath);
+        bool isDefaultResourcePath = check.Compare(fileSystem.programDir + "Data/", false) == 0 ||
+            check.Compare(fileSystem.programDir + "CoreData/", false) == 0;
+
+        if (!sceneResourcePath.empty && !isDefaultResourcePath)
             cache.RemoveResourceDir(sceneResourcePath);
     }
 

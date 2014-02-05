@@ -1073,8 +1073,10 @@ void HandleRunScript(StringHash eventType, VariantMap& eventData)
 
 void HandleResourcePath(StringHash eventType, VariantMap& eventData)
 {
+    String pathName = uiFileSelector.path;
     CloseFileSelector();
-    SetResourcePath(ExtractFileName(eventData), false);
+    if (eventData["OK"].GetBool())
+        SetResourcePath(pathName, false);
 }
 
 void HandleOpenUILayoutFile(StringHash eventType, VariantMap& eventData)
