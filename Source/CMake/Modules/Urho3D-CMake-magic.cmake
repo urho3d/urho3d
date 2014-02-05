@@ -400,7 +400,7 @@ macro (setup_target)
         file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
         get_target_property (LOCATION ${TARGET_NAME} LOCATION)
         string (REGEX REPLACE "^.*\\$\\(CONFIGURATION\\)" $(CONFIGURATION) SYMLINK ${LOCATION})
-        get_filename_component (DIRECTORY ${SYMLINK} DIRECTORY)
+        get_filename_component (DIRECTORY ${SYMLINK} PATH)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND mkdir -p ${DIRECTORY} && ln -s -f $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
