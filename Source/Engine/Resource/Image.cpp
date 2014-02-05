@@ -834,8 +834,8 @@ Color Image::GetPixel(int x, int y, int z) const
 
 Color Image::GetPixelBilinear(float x, float y) const
 {
-    x = Clamp(x, 0.0f, 1.0f) * (width_ - 1);
-    y = Clamp(y, 0.0f, 1.0f) * (height_ - 1);
+    x = Clamp(x * width_ - 0.5f, 0.0f, (float)(width_ - 1));
+    y = Clamp(y * height_ - 0.5f, 0.0f, (float)(height_ - 1));
     
     int xI = (int)x;
     int yI = (int)y;
@@ -852,9 +852,9 @@ Color Image::GetPixelTrilinear(float x, float y, float z) const
     if (depth_ < 2)
         return GetPixelBilinear(x, y);
     
-    x = Clamp(x, 0.0f, 1.0f) * (width_ - 1);
-    y = Clamp(y, 0.0f, 1.0f) * (height_ - 1);
-    z = Clamp(z, 0.0f, 1.0f) * (depth_ - 1);
+    x = Clamp(x * width_ - 0.5f, 0.0f, (float)(width_ - 1));
+    y = Clamp(y * height_ - 0.5f, 0.0f, (float)(height_ - 1));
+    z = Clamp(z * depth_ - 0.5f, 0.0f, (float)(depth_ - 1));
     
     int xI = (int)x;
     int yI = (int)y;

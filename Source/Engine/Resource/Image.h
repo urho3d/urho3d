@@ -132,9 +132,9 @@ public:
     Color GetPixel(int x, int y) const;
     /// Return a 3D pixel color.
     Color GetPixel(int x, int y, int z) const;
-    /// Get a bilinearly interpolated 2D pixel color. X and Y have the range 0-1.
+    /// Return a bilinearly sampled 2D pixel color. X and Y have the range 0-1.
     Color GetPixelBilinear(float x, float y) const;
-    /// Get a trilinearly interpolated 3D pixel color. X, Y and Z have the range 0-1.
+    /// Return a trilinearly sampled 3D pixel color. X, Y and Z have the range 0-1.
     Color GetPixelTrilinear(float x, float y, float z) const;
     /// Return width.
     int GetWidth() const { return width_; }
