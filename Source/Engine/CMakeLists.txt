@@ -27,10 +27,11 @@ set (TARGET_NAME Urho3D)
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
 if (GIT_EXIT_CODE EQUAL 0)
     # On Windows determine whether we can execute sh to see which version of the command to use
-    if (CMAKE_HOST_WIN32)
+    # Visual Studio will not use sh
+    if (NOT MSVC AND CMAKE_HOST_WIN32)
         execute_process (COMMAND sh --version RESULT_VARIABLE SH_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
     endif ()
-    if (CMAKE_HOST_WIN32 AND NOT SH_EXIT_CODE EQUAL 0)
+    if (MSVC OR (CMAKE_HOST_WIN32 AND NOT SH_EXIT_CODE EQUAL 0))
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
             COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
