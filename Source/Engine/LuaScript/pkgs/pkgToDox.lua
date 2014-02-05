@@ -195,7 +195,7 @@ function writeGlobalFunctions(ofile)
 end
 
 function writeGlobalProperties(ofile)
-    ofile:write("\\\section LuaScriptAPI_GlobalProperties Global properties\n")
+    ofile:write("\\section LuaScriptAPI_GlobalProperties Global properties\n")
     for _, line in ipairs(globalProperties) do
         line = line:gsub("tolua_property__get_set ", "")
         line = line:gsub(";", "")
