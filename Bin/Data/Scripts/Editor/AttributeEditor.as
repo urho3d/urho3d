@@ -24,6 +24,9 @@ Color nonEditableTextColor(0.7f, 0.7f, 0.7f);
 String sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 bool rememberResourcePath = true;
 
+// Exceptions for string attributes that should not be continuously edited
+Array<String> noTextChangedAttrs = {"Class Name", "Script Object Type"};
+
 WeakHandle testAnimState;
 
 UIElement@ SetEditable(UIElement@ element, bool editable)
@@ -131,7 +134,9 @@ UIElement@ CreateStringAttributeEditor(ListView@ list, Array<Serializable@>@ ser
     UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
     LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
     attrEdit.dragDropMode = DD_TARGET;
-    SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
+    // Do not subscribe to continuous edits of certain attributes (script class names) to prevent unnecessary errors getting printed
+    if (noTextChangedAttrs.Find(info.name) == -1)
+        SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
     SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
 
     return parent;
