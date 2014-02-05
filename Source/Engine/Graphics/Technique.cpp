@@ -123,6 +123,18 @@ void Pass::SetPixelShader(const String& name)
     ReleaseShaders();
 }
 
+void Pass::SetVertexShaderDefines(const String& defines)
+{
+    vertexShaderDefines_ = defines;
+    ReleaseShaders();
+}
+
+void Pass::SetPixelShaderDefines(const String& defines)
+{
+    pixelShaderDefines_ = defines;
+    ReleaseShaders();
+}
+
 void Pass::ReleaseShaders()
 {
     vertexShaders_.Clear();
@@ -161,6 +173,19 @@ bool Technique::Load(Deserializer& source)
     if (rootElem.HasAttribute("sm3"))
         isSM3_ = rootElem.GetBool("sm3");
     
+    String globalVS = rootElem.GetAttribute("vs");
+    String globalPS = rootElem.GetAttribute("ps");
+    String globalVSDefines = rootElem.GetAttribute("vsdefines");
+    String globalPSDefines = rootElem.GetAttribute("psdefines");
+    // End with space so that the pass-specific defines can be appended
+    if (!globalVSDefines.Empty())
+        globalVSDefines += ' ';
+    if (!globalPSDefines.Empty())
+        globalPSDefines += ' ';
+    bool globalAlphaMask = false;
+    if (rootElem.HasAttribute("alphamask"))
+        globalAlphaMask = rootElem.GetBool("alphamask");
+    
     unsigned numPasses = 0;
     
     XMLElement passElem = rootElem.GetChild("pass");
@@ -172,11 +197,27 @@ bool Technique::Load(Deserializer& source)
             Pass* newPass = CreatePass(nameHash);
             ++numPasses;
             
+            // Append global defines only when pass does not redefine the shader
             if (passElem.HasAttribute("vs"))
+            {
                 newPass->SetVertexShader(passElem.GetAttribute("vs"));
-            
+                newPass->SetVertexShaderDefines(passElem.GetAttribute("vsdefines"));
+            }
+            else
+            {
+                newPass->SetVertexShader(globalVS);
+                newPass->SetVertexShaderDefines(globalVSDefines + passElem.GetAttribute("vsdefines"));
+            }
             if (passElem.HasAttribute("ps"))
+            {
                 newPass->SetPixelShader(passElem.GetAttribute("ps"));
+                newPass->SetPixelShaderDefines(passElem.GetAttribute("psdefines"));
+            }
+            else
+            {
+                newPass->SetPixelShader(globalPS);
+                newPass->SetPixelShaderDefines(globalPSDefines + passElem.GetAttribute("psdefines"));
+            }
             
             if (passElem.HasAttribute("lighting"))
             {
@@ -205,6 +246,8 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("alphamask"))
                 newPass->SetAlphaMask(passElem.GetBool("alphamask"));
+            else
+                newPass->SetAlphaMask(globalAlphaMask);
         }
         else
             LOGERROR("Missing pass name");

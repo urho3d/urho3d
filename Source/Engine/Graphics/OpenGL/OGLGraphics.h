@@ -260,8 +260,8 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether Shader Model 3 is supported. Always false on OpenGL.
-    bool GetSM3Support() const { return false; }
+    /// Return whether Shader Model 3 is supported. Has no meaning on OpenGL, so is assumed to be true.
+    bool GetSM3Support() const { return true; }
     /// Return whether hardware instancing is supported.
     bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.

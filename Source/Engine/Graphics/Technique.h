@@ -62,6 +62,10 @@ public:
     void SetVertexShader(const String& name);
     /// Set pixel shader name.
     void SetPixelShader(const String& name);
+    /// Set vertex shader defines.
+    void SetVertexShaderDefines(const String& defines);
+    /// Set pixel shader defines.
+    void SetPixelShaderDefines(const String& defines);
     /// Reset shader pointers.
     void ReleaseShaders();
     /// Mark shaders loaded this frame.
@@ -85,6 +89,10 @@ public:
     const String& GetVertexShader() const { return vertexShaderName_; }
     /// Return pixel shader name.
     const String& GetPixelShader() const { return pixelShaderName_; }
+    /// Return vertex shader defines.
+    const String& GetVertexShaderDefines() const { return vertexShaderDefines_; }
+    /// Return pixel shader defines.
+    const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
     /// Return vertex shaders.
     Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
     /// Return pixel shaders.
@@ -109,6 +117,10 @@ private:
     String vertexShaderName_;
     /// Pixel shader name.
     String pixelShaderName_;
+    /// Vertex shader defines.
+    String vertexShaderDefines_;
+    /// Pixel shader defines.
+    String pixelShaderDefines_;
     /// Vertex shaders.
     Vector<SharedPtr<ShaderVariation> > vertexShaders_;
     /// Pixel shaders.

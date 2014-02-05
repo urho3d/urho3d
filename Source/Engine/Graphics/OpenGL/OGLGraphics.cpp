@@ -1339,14 +1339,12 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
 bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
 {
     return shaderProgram_ && shaderProgram_->HasParameter(param);
-
 }
 
 bool Graphics::HasTextureUnit(TextureUnit unit)
 {
     return shaderProgram_ && shaderProgram_->HasTextureUnit(unit);
 }
-
 
 void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {

@@ -203,18 +203,6 @@ private:
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Vertex shader for no texture.
-    SharedPtr<ShaderVariation> noTextureVS_;
-    /// Vertex shader for diffuse texture.
-    SharedPtr<ShaderVariation> diffTextureVS_;
-    /// Pixel shader for no texture.
-    SharedPtr<ShaderVariation> noTexturePS_;
-    /// Pixel shader for diffuse texture.
-    SharedPtr<ShaderVariation> diffTexturePS_;
-    /// Pixel shader for diffuse texture masking.
-    SharedPtr<ShaderVariation> diffMaskTexturePS_;
-    /// Pixel shader for alpha texture.
-    SharedPtr<ShaderVariation> alphaTexturePS_;
     /// UI root element.
     SharedPtr<UIElement> rootElement_;
     /// UI root modal element.

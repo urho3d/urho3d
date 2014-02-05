@@ -1,3 +1,4 @@
+#ifdef COMPILEPS
 float3 GetFog(float3 color, float fogFactor)
 {
     return lerp(cFogColor, color, fogFactor);
@@ -18,5 +19,6 @@ float GetHeightFogFactor(float depth, float height)
     float fogFactor = GetFogFactor(depth);
     float heightFogFactor = (height - cFogParams.z) * cFogParams.w;
     heightFogFactor = 1.0 - saturate(exp(-(heightFogFactor * heightFogFactor)));
-	return min(heightFogFactor, fogFactor);
+    return min(heightFogFactor, fogFactor);
 }
+#endif

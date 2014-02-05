@@ -1,9 +1,0 @@
-<shaders>
-    <shader type="vs" />
-    <shader type="ps">
-    	<variation name="Blur3" define="BLUR3" />
-        <variation name="Blur5" define="BLUR5" />
-        <variation name="Blur7" define="BLUR7" />
-        <variation name="Blur9" define="BLUR9" />
-    </shader>
-</shaders>

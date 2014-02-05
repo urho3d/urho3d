@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -83,7 +83,8 @@ add_definitions (-DENABLE_LOGGING)
 # If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
 # with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
 # enabled, but Windows graphics card drivers are usually better optimized for Direct3D. Direct3D can
-# be manually enabled for MinGW with -DUSE_OPENGL=0, but is likely to fail due to missing headers.
+# be manually enabled for MinGW with -DUSE_OPENGL=0, but is likely to fail due to missing headers
+# and libraries, unless the MinGW-w64 distribution is used.
 if (NOT MSVC)
     if (NOT WIN32 OR NOT DEFINED USE_OPENGL)
         set (USE_OPENGL 1)
@@ -134,13 +135,12 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
-# Find DirectX SDK include & library directories if applicable
-# Note: if a recent Windows SDK is installed instead, it will be possible to compile without;
-# therefore do not log a fatal error in that case
-if (WIN32)
+# Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
+# without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
+# incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
+if (MSVC)
     find_package (Direct3D)
-    if (MSVC AND DIRECT3D_FOUND)
-        # The headers in the SDK will be incompatible with MinGW, so only add the include directories when using Visual Studio
+    if (DIRECT3D_FOUND)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
 endif ()
@@ -599,10 +599,11 @@ macro (define_dependency_libs TARGET)
                 list (APPEND LINK_LIBS_ONLY GL)
             endif ()
         else ()
-            if (IS_ABSOLUTE ${DIRECT3D_LIBRARIES})
-                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
+            if (DIRECT3D_FOUND)
+                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES} ${DIRECT3D_COMPILER_LIBRARIES})
             else ()
-                list (APPEND LINK_LIBS_ONLY ${DIRECT3D_LIBRARIES})
+                # If SDK not found, assume the libraries are found from default directories
+                list (APPEND LINK_LIBS_ONLY d3d9 d3dcompiler)
             endif ()
         endif ()
 

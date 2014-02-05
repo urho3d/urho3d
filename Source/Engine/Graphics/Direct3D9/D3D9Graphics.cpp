@@ -1026,18 +1026,16 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
         
         // Create the shader now if not yet created. If already attempted, do not retry
-        if (vs && !vs->IsCreated())
+        if (vs && !vs->IsCompiled())
         {
-            if (!vs->IsFailed())
+            if (vs->GetCompilerOutput().Empty())
             {
-                PROFILE(CreateVertexShader);
-                
+                PROFILE(CompileVertexShader);
+
                 bool success = vs->Create();
-                if (success)
-                    LOGDEBUG("Created vertex shader " + vs->GetName());
-                else
+                if (!success)
                 {
-                    LOGERROR("Failed to create vertex shader " + vs->GetName());
+                    LOGERROR("Failed to compile vertex shader " + vs->GetName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -1071,18 +1069,16 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 i->second_.register_ = M_MAX_UNSIGNED;
         }
         
-        if (ps && !ps->IsCreated())
+        if (ps && !ps->IsCompiled())
         {
-            if (!ps->IsFailed())
+            if (ps->GetCompilerOutput().Empty())
             {
-                PROFILE(CreatePixelShader);
-                
+                PROFILE(CompilePixelShader);
+
                 bool success = ps->Create();
-                if (success)
-                    LOGDEBUG("Created pixel shader " + ps->GetName());
-                else
+                if (!success)
                 {
-                    LOGERROR("Failed to create pixel shader " + ps->GetName());
+                    LOGERROR("Failed to compile pixel shader " + ps->GetName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }
@@ -1987,6 +1983,16 @@ TextureUnit Graphics::GetTextureUnit(const String& name)
         return i->second_;
     else
         return MAX_TEXTURE_UNITS;
+}
+
+const String& Graphics::GetTextureUnitName(TextureUnit unit)
+{
+    for (HashMap<String, TextureUnit>::Iterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
+    {
+        if (i->second_ == unit)
+            return i->first_;
+    }
+    return String::EMPTY;
 }
 
 Texture* Graphics::GetTexture(unsigned index) const

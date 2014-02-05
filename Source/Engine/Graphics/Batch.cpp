@@ -338,18 +338,19 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         float farClip = camera_->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
         float fogEnd = Min(zone_->GetFogEnd(), farClip);
-        float fogHeight = zone_->GetFogHeight();
-        float fogHeightScale = zone_->GetFogHeightScale();
-
         if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
             fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
         float fogRange = Max(fogEnd - fogStart, M_EPSILON);
-
-        float fogHeightY = box.min_.y_;
-        if (fogHeight < 0.0f)
-            fogHeightY = box.max_.y_;
+        Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
         
-        Vector4 fogParams(fogEnd / farClip, farClip / fogRange, fogHeightY + fogHeight, fogHeightScale);
+        Node* zoneNode = zone_->GetNode();
+        if (zone_->GetHeightFog() && zoneNode)
+        {
+            Vector3 worldFogHeightVec = zoneNode->GetWorldTransform() * Vector3(0.0f, zone_->GetFogHeight(), 0.0f);
+            fogParams.z_ = worldFogHeightVec.y_;
+            fogParams.w_ = zone_->GetFogHeightScale() / Max(zoneNode->GetWorldScale().y_, M_EPSILON);
+        }
+        
         graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
     }
     
@@ -415,6 +416,9 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     
     if (light && graphics->NeedParameterUpdate(SP_LIGHT, light))
     {
+        // Deferred light volume batches operate in a camera-centered space. Detect from material, zone & pass all being null
+        bool isLightVolume = !material_ && !pass_ && !zone_;
+        
         Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
         Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
 
@@ -479,7 +483,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         
         graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor(), light->GetSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraEffectivePos, atten));
+        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4((isLightVolume ? (lightNode->GetWorldPosition() -
+            cameraEffectivePos) : lightNode->GetWorldPosition()), atten));
         
         if (graphics->HasShaderParameter(PS, PSP_LIGHTMATRICES))
         {
@@ -490,8 +495,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraEffectivePos);
-                    
+                    {
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, isLightVolume ? cameraEffectivePos :
+                            Vector3::ZERO);
+                    }
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
                 break;
@@ -503,7 +510,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraEffectivePos);
+                    {
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, isLightVolume ? cameraEffectivePos :
+                            Vector3::ZERO);
+                    }
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }

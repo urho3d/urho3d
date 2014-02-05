@@ -360,17 +360,16 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.vertexLights_ = command.vertexLights_;
             
             // Check scenepass metadata for defining custom passes which interact with lighting
-            String metadata = command.metadata_.Trimmed().ToLower();
-            if (!metadata.Empty())
+            if (!command.metadata_.Empty())
             {
-                if (metadata == "gbuffer")
+                if (command.metadata_ == "gbuffer")
                     gBufferPassName_ = command.pass_;
-                else if (metadata == "base")
+                else if (command.metadata_ == "base" && command.pass_ != "base")
                 {
                     basePassName_ = command.pass_;
                     litBasePassName_ = "lit" + command.pass_;
                 }
-                else if (metadata == "alpha")
+                else if (command.metadata_ == "alpha" && command.pass_ != "alpha")
                 {
                     alphaPassName_ = command.pass_;
                     litAlphaPassName_ = "lit" + command.pass_;
@@ -384,16 +383,15 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             
             scenePasses_.Push(info);
         }
-        else if (command.type_ == CMD_FORWARDLIGHTS)
-        {
-            if (!command.pass_.Trimmed().Empty())
-                lightPassName_ = command.pass_;
-        }
+        // Allow a custom forward light pass
+        else if (command.type_ == CMD_FORWARDLIGHTS && !command.pass_.Empty())
+            lightPassName_ = command.pass_;
     }
     
-    // Get light volume shaders according to the renderpath, if it needs them
+    // Go through commands to check for deferred rendering
     deferred_ = false;
     deferredAmbient_ = false;
+    
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
@@ -409,14 +407,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         
         if (command.type_ == CMD_LIGHTVOLUMES)
         {
-            renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.pixelShaderName_);
+            lightVolumeVSName_ = command.vertexShaderName_;
+            lightVolumePSName_ = command.pixelShaderName_;
             deferred_ = true;
         }
-    }
-    if (!deferred_)
-    {
-        lightVS_.Clear();
-        lightPS_.Clear();
     }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
@@ -922,7 +916,7 @@ void View::GetBatches()
                     volumeBatch.material_ = 0;
                     volumeBatch.pass_ = 0;
                     volumeBatch.zone_ = 0;
-                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVS_, lightPS_);
+                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVolumeVSName_, lightVolumePSName_);
                     lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }
@@ -1551,10 +1545,11 @@ void View::SetTextures(RenderPathCommand& command)
 void View::RenderQuad(RenderPathCommand& command)
 {
     // If shader can not be found, clear it from the command to prevent redundant attempts
-    ShaderVariation* vs = renderer_->GetVertexShader(command.vertexShaderName_);
+    /// \todo Do not re-query each frame, as it involves string manipulation
+    ShaderVariation* vs = renderer_->GetShader(VS, command.vertexShaderName_, command.vertexShaderDefines_);
     if (!vs)
         command.vertexShaderName_ = String::EMPTY;
-    ShaderVariation* ps = renderer_->GetPixelShader(command.pixelShaderName_);
+    ShaderVariation* ps = renderer_->GetShader(PS, command.pixelShaderName_, command.pixelShaderDefines_);
     if (!ps)
         command.pixelShaderName_ = String::EMPTY;
     
@@ -1750,11 +1745,8 @@ void View::AllocateScreenBuffers()
     // Allocate screen buffers with filtering active in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    if (needSubstitute)
-    {
-        substituteRenderTarget_ = needSubstitute ? 
-            renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB)->GetRenderSurface() : (RenderSurface*)0;
-    }
+    substituteRenderTarget_ = needSubstitute ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, 
+        sRGB)->GetRenderSurface() : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
         viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB) :
@@ -1810,7 +1802,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetViewport(viewRect_);
     
     String shaderName = "CopyFramebuffer";
-    graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
+    graphics_->SetShaders(renderer_->GetShader(VS, shaderName), renderer_->GetShader(PS, shaderName));
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
@@ -2492,13 +2484,8 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
             const TechniqueEntry& entry = techniques[i];
             Technique* tech = entry.technique_;
 
-            #ifdef USE_OPENGL
-            if (!tech || materialQuality_ < entry.qualityLevel_)
-                continue;
-            #else
             if (!tech || (tech->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
                 continue;
-            #endif
             if (lodDistance >= entry.lodDistance_)
                 return tech;
         }

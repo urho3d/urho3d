@@ -141,6 +141,20 @@ struct RenderPathCommand
     String pass_;
     /// Command/pass metadata.
     String metadata_;
+    /// Vertex shader name.
+    String vertexShaderName_;
+    /// Pixel shader name.
+    String pixelShaderName_;
+    /// Vertex shader defines.
+    String vertexShaderDefines_;
+    /// Pixel shader defines.
+    String pixelShaderDefines_;
+    /// Textures.
+    String textureNames_[MAX_TEXTURE_UNITS];
+    /// %Shader parameters.
+    HashMap<StringHash, Variant> shaderParameters_;
+    /// Output rendertarget names.
+    Vector<String> outputNames_;
     /// Clear flags.
     unsigned clearFlags_;
     /// Clear color.
@@ -161,16 +175,6 @@ struct RenderPathCommand
     bool useScissor_;
     /// Vertex lights flag.
     bool vertexLights_;
-    /// Vertex shader name.
-    String vertexShaderName_;
-    /// Pixel shader name.
-    String pixelShaderName_;
-    /// Textures.
-    String textureNames_[MAX_TEXTURE_UNITS];
-    /// %Shader parameters.
-    HashMap<StringHash, Variant> shaderParameters_;
-    /// Output rendertarget names.
-    Vector<String> outputNames_;
 };
 
 /// Rendering path definition.
