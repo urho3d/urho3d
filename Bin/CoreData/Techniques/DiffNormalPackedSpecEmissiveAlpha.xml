@@ -1,5 +1,5 @@
-<technique>
-    <pass name="alpha" vs="LitSolid" ps="LitSolid_DiffEmissive" depthwrite="false" blend="alpha" />
-    <pass name="litalpha" vs="LitSolid_Normal" ps="LitSolid_DiffNormalPackedSpecMap" depthwrite="false" blend="addalpha" />
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="alpha" psdefines="EMISSIVEMAP" depthwrite="false" blend="alpha" />
+    <pass name="litalpha" vsdefines="NORMALMAP" psdefines="NORMALMAP PACKEDNORMAL SPECMAP" depthwrite="false" blend="addalpha" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

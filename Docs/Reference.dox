@@ -671,7 +671,7 @@ When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
-- Is hardware instancing supported? This requires shader model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
+- Is hardware instancing supported? This requires %Shader %Model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
 
@@ -761,7 +761,7 @@ The default render paths supplied with Urho3D implement forward, light pre-pass 
 
 Forward rendering begins with an ambient light pass for the objects; this also adds any per-vertex lights. Then, the objects are re-rendered for each per-pixel light affecting them (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
 
-Materials can also define an optimization pass for forward rendering where the ambient light and the first per-pixel light are combined. This pass can not be used, however, if there are per-vertex lights affecting the object, or if the ambient light has a per-vertex gradient.
+Materials can also define an optimization pass, called "litbase", for forward rendering where the ambient light and the first per-pixel light are combined. This pass can not be used, however, if there are per-vertex lights affecting the object, or if the ambient light has a per-vertex gradient.
 
 \section RenderingModes_Prepass Light pre-pass rendering
 
@@ -842,15 +842,15 @@ OpenGL ES 2.0 has further limitations:
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
 
-A material defines the textures, shader parameters and culling mode to use, and refers to techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
+A material defines the textures, shader parameters and culling mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
 A material definition looks like this:
 
 \code
 <material>
-    <technique name="TechniqueName" quality="q" loddistance="d" sm3="true|false" />
+    <technique name="TechniqueName" quality="q" loddistance="d" />
     <texture unit="diffuse|normal|specular|emissive|environment" name="TextureName" />
     <texture ... />
     <parameter name="name" value="x y z w" />
@@ -861,9 +861,9 @@ A material definition looks like this:
 </material>
 \endcode
 
-%Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
+Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". It is also possible for a technique to require %Shader %Model 3, in this case it will be skipped on SM2 hardware.
 
-When a material defines several techniques for different LOD levels and quality settings, they must appear in a specific order:
+The techniques for different LOD levels and quality settings must appear in a specific order:
 
 - Most distant & highest quality
 - ...
@@ -871,7 +871,7 @@ When a material defines several techniques for different LOD levels and quality 
 - Second most distant & highest quality
 - ...
 
-%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. Note that a built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
+%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. A built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
@@ -909,14 +909,26 @@ To control whether the backbuffer should use sRGB conversion on write, call \ref
 A technique definition looks like this:
 
 \code
-<technique>
-    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" vs="VertexShaderName" ps="PixelShaderName"
-        lighting="unlit|pervertex|perpixel" alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
-        depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" alphamask="true|false" />
+<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" >
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow"
+        vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
+        lighting="unlit|pervertex|perpixel"
+        blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha" 
+        depthtest="always|equal|less|lessequal|greater|greaterequal"
+        depthwrite="true|false" 
+        alphamask="true|false" />
     <pass ... />
     <pass ... />
 </technique>
 \endcode
+
+The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.)
+
+Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
+
+Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
+
+The technique definition does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead the engine will add certain hardcoded compilation defines for these. See \ref Shaders "Shaders" for details.
 
 The purposes of the different passes are:
 
@@ -934,11 +946,7 @@ The purposes of the different passes are:
 - depth: Renders linear depth to a rendertarget for post-processing effects.
 - shadow: Renders to a hardware shadow map (depth only) for shadow map generation.
 
-More custom passes can be defined and referred to in the \ref RenderPaths "render path definition". For the built-in passes listed above, the lighting shader combinations to load (unlit, per-vertex or per-pixel) are recognized automatically, but for custom passes they need to be explicitly specified. The default is unlit.
-
-By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
-
-Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See \ref Shaders "Shaders" for details.
+More custom passes can be defined and referred to in the \ref RenderPaths "render path definition". For the built-in passes listed above, the lighting shader permutations to load (unlit, per-vertex or per-pixel) are recognized automatically, but for custom passes they need to be explicitly specified. The default is unlit.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
 
@@ -946,79 +954,41 @@ The optional "litbase" pass reduces draw call count by combining ambient lightin
 
 The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
 
-
 \page Shaders Shaders
 
-Urho3D uses an ubershader-like approach: permutations of each shader will be built with different defines, to produce eg. static or skinned, deferred or forward or shadowed/unshadowed rendering.
+Urho3D uses an ubershader-like approach: permutations of each shader will be built with different compilation defines, to produce eg. static or skinned, deferred or forward or shadowed/unshadowed rendering.
 
-The building of these variations is controlled by an XML shader definition file, which always accompanies the shader source code.
+The building of these permutations happens on demand: technique and renderpath definition files both refer to shaders and the compilation defines to use with them. In addition the engine will add inbuilt defines related to geometry type and lighting. It is not generally possible to enumerate beforehand all the possible permutations that can be built out of a single shader.
 
-For example, the Basic shader in Bin/CoreData/Shaders/HLSL has the following definition file:
+On Direct3D9 compiled shader bytecode is saved to disk in a "Cache" subdirectory next to the shader source code, so that the possibly time-consuming compile can be skipped on the next time the shader permutation is needed. On OpenGL such mechanism is not available.
 
-\code
-<shaders>
-    <shader type="vs">
-        <option name="Diff" define="DIFFMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />
-        <variation name="" />
-        <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" require="SM3" />
-        <variation name="Billboard" define="BILLBOARD" />
-    </shader>
-    <shader type="ps">
-        <option name="Diff" define="DIFFMAP" exclude="Alpha" />
-        <option name="Alpha" define="ALPHAMAP" exclude="Diff" />
-        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />
-    </shader>
-</shaders>
-\endcode
+\section Shaders_InbuiltDefines Inbuilt compilation defines
 
-Permutations can be defined separately for both the vertex and the pixel shader. There exist two different mechanisms for adding permutations: a "variation" and an "option". A variation always excludes other variations within the same "variation group" and is most often used to define the geometry types for the vertex shader. In contrast, an
-option does not exclude other options by default.
-
-For both variations and options, a name is required, and one or more defines to be passed to the shader compiler. If there is only one define, it can be listed as an attribute of the permutation, as shown. If many defines are needed, they can be included as child elements of the permutation, eg. (from the LitSolid shader)
-
-\code
-<variation name="Dir">
-    <define name="DIRLIGHT" />
-    <define name="PERPIXEL" />
-</variation>
-\endcode
-
-A variation or option can "require" other defines, for example in HLSL shaders instancing requires the SM3 define which tells that we are compiling for %Shader %Model 3. Like defines, requires can be listed either as an attribute (if only one) or as a child element (if many.)
-
-Additionally, an option can "include" or "exclude" other options. Use this mechanism instead of variations if complex dependencies between options is required, instead of simple exclusion. Again, includes or excludes can be listed either as attributes or child elements.
-
-The final name of a shader permutation is formed by taking the shader's name, adding an underscore (if there are active variations/options) and then listing the names of all active variations/options in top-to-bottom order. For example the Basic vertex shader with vertex color and skinning active would be
-Basic_VColSkinned. This final name is used to request shaders from the Renderer subsystem.
-
-\section Shaders_Required Required shader permutations
-
-When rendering scene objects, the engine expects certain shader permutations to exist for different geometry types and lighting conditions. These must appear in the specific order listed below. Use the LitSolid shader for reference.
+When rendering scene objects, the engine expects certain shader permutations to exist for different geometry types and lighting conditions. These correspond to the following compilation defines:
 
 Vertex shader:
 
-- 1VL, 2VL, 3VL, 4VL: number of vertex lights influencing the object
-- Dir, Spot, Point: a per-pixel forward light is being used
-- Spec: the per-pixel forward light has specular calculations
-- Shadow: the per-pixel forward light has shadowing
-- Skinned, Instanced, %Billboard: choosing the geometry type
+- NUMVERTEXLIGHTS=1,2,3 or 4: number of vertex lights influencing the object
+- DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
+- SPEC: the per-pixel forward light has specular calculations
+- SHADOW: the per-pixel forward light has shadowing
+- SKINNED, INSTANCED, BILLBOARD: choosing the geometry type
 
 Pixel shader:
 
-- Dir, Spot, Point: a per-pixel forward light is being used
-- Mask: the point light has a cube map mask
-- Spec: the per-pixel forward light has specular calculations
-- Shadow: the per-pixel forward light has shadowing
-- LQ: use low-quality shadowing (1 hardware PCF sample instead of 4)
-- HW: use hardware shadow depth compare, Direct3D9 only
+- DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
+- CUBEMASK: the point light has a cube map mask
+- SPEC: the per-pixel forward light has specular calculations
+- SHADOW: the per-pixel forward light has shadowing
+- LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
+- HWSHADOW: use hardware shadow depth compare, Direct3D9 only
 
 \section Shaders_Writing Writing shaders
 
 Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
 
-To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the required include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
+To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the shader include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
+
 Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code verbatim:
 
 For HLSL:
@@ -1035,9 +1005,9 @@ vec3 worldPos = GetWorldPos(modelMatrix);
 gl_Position = GetClipPos(worldPos);
 \endcode
 
-Note that for HLSL shaders both the vertex and the pixel shader are written into the same file, and the functions must be called VS() and PS(), while for GLSL they are put into separate .vert and .frag files, and are called main().
+On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time. When compiling for %Shader %Model 3 on Direct3D9, the compilation define "SM3" is present: this can be used to separate code which would not compile on SM2.
 
-The uniforms must be prefixed in a certain way so that the shader compiler and the engine understand them:
+The uniforms must be prefixed in a certain way so that the engine understands them:
 
 - c for uniform constants, for example cMatDiffColor. The c is stripped when referred to inside the engine, so it would be called "MatDiffColor" in eg. \ref Material::SetShaderParameter "SetShaderParameter()"
 - s for texture samplers, for example sDiffMap.
@@ -1051,6 +1021,14 @@ uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
 \endcode
 
+\section Shaders_Migration Migration of old shaders
+
+In Urho3D version 1.3 and before an XML description file was used for shaders, which would enumerate the compilation defines used by shaders into named "options" or "variations".
+The shader would then be referred to with these option names, for example a pixel shader LitSolid_Diff would use the LitSolid source code and the define DIFFMAP. To convert to the
+current system, look up the defines from the description files and add them directly to the technique or renderpath XML descriptions ("vsdefines" or "psdefines" attributes). Also make sure the shader references ("vs" and "ps" attributes) are just the bare shader names with no underscore or option names attached. Finally, delete the shader XML description files.
+
+GLSL shaders in 1.3 and before used separate .vert and .frag files for the vertex and pixel shader source code. Now these are combined into .glsl files that include both shaders. Include files are likewise merged into .glsl files instead of separate vertex and pixel shader includes. To merge your shader code, append the pixel shader source into the vertex shader source file without the varyings definition (which should already be in the vertex shader code). Merge and fix include statements: change the file extension to .glsl. Note that some include files depend on each other so it is safest to always include Uniforms.glsl and Samplers.glsl first. Finally change the file extension of the vertex shader source file from .vert to .glsl and delete the .frag file. If you have pieces of pixel shader code (for example additional functions or variables) that produce errors when included in the vertex shader compile, wrap these with #ifdef COMPILEPS, and vice versa for vertex shader code.
+
 \page RenderPaths Render path
 
 %Scene rendering and any post-processing on a Viewport is defined by its RenderPath object, which can either be read from an XML file or be created programmatically.
@@ -1063,13 +1041,13 @@ The available commands are:
 
 - clear: Clear any of color, depth and stencil. Color clear can optionally use the fog color from the Zone visible at the far clip distance.
 - scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a 2D texture resource identified with its pathname.
-- quad: Render a viewport-sized quad using the specified shaders. Textures can be bound and additionally shader parameters can be specified.
+- quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters can be specified.
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
-It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before the first command which samples it.
+It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before sampling it.
 
 The render path XML definition looks like this:
 
@@ -1084,7 +1062,7 @@ The render path XML definition looks like this:
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
-    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
+    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <parameter name="ParameterName" value="x y z w" />
     </command>
@@ -1281,7 +1259,11 @@ A Zone controls ambient lighting and fogging. Each geometry object determines th
 
 The viewport will be initially cleared to the fog color of the zone found at the camera's far clip distance. If no zone is found either for the far clip or an object, a default zone with black ambient and fog color will be used.
 
-Zones have two special flags: override mode and ambient gradient. If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect. When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
+Zones have three special flags: height fog mode, override mode and ambient gradient. 
+
+- When height fog mode is enabled, objects inside the zone receive height fog in addition of distance fog. The fog's \ref Zone::SetFogHeight "height level" is specified relative to the zone's world position. The width of the fog band on the Y-axis is specified by the \ref Zone::SetFogHeightScale "fog height scale" parameter.
+- If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect.
+- When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
 
 Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 
@@ -1844,31 +1826,6 @@ ScriptCompiler -dumpapi <Doxygen output file> [C header output file]
 The output files are saved with the extension .asc (compiled AngelScript.) Binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
 
 The script API dump mode can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
-
-\section Tools_ShaderCompiler ShaderCompiler
-
-Compiles HLSL shaders using an XML definition file that describes the shader permutations, and their associated HLSL preprocessor defines.
-
-The output consists of shader bytecode for each permutation, as well as information of the constant parameters and texture units used. See \ref FileFormats_Shader "Binary shader format" for details.
-
-Usage:
-
-\verbatim
-ShaderCompiler <definitionfile> <outputpath> [options]
-
-Options:
--t <VS|PS>  Compile only vertex or pixel shaders, by default compile both
--v <name>   Compile only the shader variation with name
--d <define> Add a define. Add SM3 to compile for Shader Model 3
-
-If output path is not specified, shader binaries will be output into the same
-directory as the definition file. Specify a wildcard to compile multiple
-shaders.
-\endverbatim
-
-The D3DX library from the DirectX runtime or SDK needs to be installed. Note that when running in Direct3D9 mode, the engine will automatically invoke ShaderCompiler if it can not find a shader in binary form. Depending on shader complexity this can take a substantial amount of time. To avoid this, execute the file CompileAllShaders.bat in the Bin directory to precompile all shader permutations. It is also highly recommended to not ship ShaderCompiler with Urho3D applications, but to instead precompile all shaders. After precompiling you can delete all .hlsl files from the CoreData directory of the shipping build.
-
-Note that GLSL shaders in the Bin/CoreData/Shaders/GLSL directory also use similar XML definition files, but no precompiling tool exists for them; they are always compiled during runtime.
 
 \page Unicode Unicode support
 

@@ -22,8 +22,55 @@
 
 #pragma once
 
-#ifdef USE_OPENGL
-#include "OpenGL/OGLShader.h"
-#else
-#include "Direct3D9/D3D9Shader.h"
-#endif
+#include "ArrayPtr.h"
+#include "Resource.h"
+
+namespace Urho3D
+{
+
+class ShaderVariation;
+
+/// %Shader resource consisting of several shader variations.
+class URHO3D_API Shader : public Resource
+{
+    OBJECT(Shader);
+    
+public:
+    /// Construct.
+    Shader(Context* context);
+    /// Destruct.
+    virtual ~Shader();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
+    
+    /// Load resource. Return true if successful.
+    virtual bool Load(Deserializer& source);
+    
+    /// Return a variation with defines, which should be processed with SanitateDefines() if possible.
+    ShaderVariation* GetVariation(ShaderType type, const String& defines);
+    /// Return a variation with defines, which should be processed with SanitateDefines() if possible.
+    ShaderVariation* GetVariation(ShaderType type, const char* defines);
+    /// Return either vertex or pixel shader source code.
+    const String& GetSourceCode(ShaderType type) const { return type == VS ? vsSourceCode_ : psSourceCode_; }
+    /// Return the latest timestamp of the shader code and its includes.
+    unsigned GetTimeStamp() const { return timeStamp_; }
+    /// Remove extra spaces from a define string to ensure that the same defines are not compiled twice.
+    static String SanitateDefines(const String& definesIn);
+    
+private:
+    /// Process source code and include files. Return true if successful.
+    bool ProcessSource(String& code, Deserializer& file);
+    
+    /// Source code adapted for vertex shader.
+    String vsSourceCode_;
+    /// Source code adapted for pixel shader.
+    String psSourceCode_;
+    /// Vertex shader variations.
+    HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
+    /// Pixel shader variations.
+    HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
+    /// Source code timestamp.
+    unsigned timeStamp_;
+};
+
+}

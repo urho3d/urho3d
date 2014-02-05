@@ -224,6 +224,8 @@ private:
     HashSet<int> keyPress_;
     /// Active finger touches.
     HashMap<int, TouchState> touches_;
+    /// String for text input.
+    String textInput_;
     /// Opened joysticks.
     Vector<JoystickState> joysticks_;
     /// Mouse buttons' down state.

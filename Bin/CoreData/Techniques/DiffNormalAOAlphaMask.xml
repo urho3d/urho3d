@@ -1,9 +1,9 @@
-<technique>
-    <pass name="base" vs="LitSolid_AO" ps="LitSolid_DiffAOAlphaMask" alphamask="true" />
-    <pass name="light" vs="LitSolid_Normal" ps="LitSolid_DiffNormalAlphaMask" depthtest="equal" depthwrite="false" blend="add" alphamask="true" />
-    <pass name="prepass" vs="LitSolid_Normal" ps="LitSolid_DiffNormalAlphaMaskPrepass" alphamask="true" />
-    <pass name="material" vs="LitSolid_AO" ps="LitSolid_DiffAOAlphaMaskMaterial" depthtest="equal" depthwrite="false" alphamask="true" />
-    <pass name="deferred" vs="LitSolid_NormalAO" ps="LitSolid_DiffNormalAOAlphaMaskDeferred" alphamask="true" />
-    <pass name="depth" vs="Depth" ps="Depth_AlphaMask" alphamask="true" />
-    <pass name="shadow" vs="Shadow" ps="Shadow_AlphaMask" alphamask="true" />
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP ALPHAMASK" alphamask="true" >
+    <pass name="base" vsdefines="AO" psdefines="AO" />
+    <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP" />
+    <pass name="material" vsdefines="AO" psdefines="MATERIAL AO" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="NORMALMAP AO" psdefines="DEFERRED NORMALMAP AO" />
+    <pass name="depth" vs="Depth" ps="Depth" psdefines="ALPHAMASK" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" psdefines="ALPHAMASK" />
 </technique>

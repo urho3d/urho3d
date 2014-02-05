@@ -289,6 +289,9 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
             break;
         }
         
+        // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+        if (IsCompressed() && requestedLevels_ > 1)
+            requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
         if (!object_)
             return false;

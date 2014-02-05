@@ -290,6 +290,8 @@ public:
     ShaderVariation* GetPixelShader() const { return pixelShader_; }
     /// Return texture unit index by name.
     TextureUnit GetTextureUnit(const String& name);
+    /// Return texture unit name by index.
+    const String& GetTextureUnitName(TextureUnit unit);
     /// Return current texture by texture unit index.
     Texture* GetTexture(unsigned index) const;
     /// Return default texture filtering mode.

@@ -652,8 +652,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_TEXTINPUT:
         {
-            String text(&evt.text.text[0]);
-            unsigned unicode = text.AtUTF8(0);
+            textInput_ = &evt.text.text[0];
+            unsigned unicode = textInput_.AtUTF8(0);
             if (unicode)
             {
                 using namespace Char;

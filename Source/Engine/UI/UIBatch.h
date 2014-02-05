@@ -32,7 +32,6 @@ namespace Urho3D
 class PixelShader;
 class Graphics;
 class Matrix3x4;
-class ShaderVariation;
 class Texture;
 class UIElement;
 

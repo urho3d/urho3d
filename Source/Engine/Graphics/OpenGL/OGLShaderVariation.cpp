@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
+#include "Log.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
@@ -34,8 +35,8 @@ namespace Urho3D
 
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
-    shaderType_(type),
-    sourceCodeLength_(0),
+    owner_(owner),
+    type_(type),
     compiled_(false)
 {
 }
@@ -65,7 +66,7 @@ void ShaderVariation::Release()
         
         if (!graphics_->IsDeviceLost())
         {
-            if (shaderType_ == VS)
+            if (type_ == VS)
             {
                 if (graphics_->GetVertexShader() == this)
                     graphics_->SetShaders(0, 0);
@@ -91,38 +92,41 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if (!sourceCode_ || !sourceCodeLength_)
+    if (!owner_)
+    {
+        compilerOutput_ = "Owner shader has expired";
         return false;
+    }
     
-    object_ = glCreateShader(shaderType_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+    object_ = glCreateShader(type_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
     if (!object_)
     {
         compilerOutput_ = "Could not create shader object";
         return false;
     }
     
+    const String& originalShaderCode = owner_->GetSourceCode(type_);
+    String shaderCode;
+    // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
+    shaderCode += type_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
+    
     // Prepend the defines to the shader code
-    // Check if there is a version definition; it must stay in the beginning
-    String shaderCode(sourceCode_.Get(), sourceCodeLength_);
-    String defines;
-    
-    for (unsigned i = 0; i < defines_.Size(); ++i)
-        defines += "#define " + defines_[i] + " " + defineValues_[i] + "\n";
-    
-    if (!defines_.Empty())
-        defines += "\n";
-    
-    unsigned pos = 0;
-    if (shaderCode.StartsWith("#version"))
+    Vector<String> defineVec = defines_.Split(' ');
+    for (unsigned i = 0; i < defineVec.Size(); ++i)
     {
-        pos = shaderCode.Find('\n');
-        if (pos != String::NPOS)
-            ++pos;
-        else
-            pos = 0;
+        // Add extra space for the checking code below
+        String defineString = "#define " + defineVec[i].Replaced('=', ' ') + " \n";
+        shaderCode += defineString;
+        
+        // In debug mode, check that all defines are referenced by the shader code
+        #ifdef _DEBUG
+        String defineCheck = defineString.Substring(8, defineString.Find(' ', 8) - 8);
+        if (originalShaderCode.Find(defineCheck) == String::NPOS)
+            LOGWARNING("Shader " + GetName() + " does not use the define " + defineCheck);
+        #endif
     }
     
-    shaderCode.Insert(pos, defines);
+    shaderCode += originalShaderCode;
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);
@@ -146,22 +150,12 @@ bool ShaderVariation::Create()
 
 void ShaderVariation::SetName(const String& name)
 {
-    name_ = name;
+    name_ = name.Trimmed().Replaced(' ', '_');
 }
 
-void ShaderVariation::SetSourceCode(const SharedArrayPtr<char>& code, unsigned length)
+void ShaderVariation::SetDefines(const String& defines)
 {
-    sourceCode_ = code;
-    sourceCodeLength_ = length;
-}
-
-void ShaderVariation::SetDefines(const Vector<String>& defines, const Vector<String>& defineValues)
-{
-    if (defines.Size() == defineValues.Size())
-    {
-        defines_ = defines;
-        defineValues_ = defineValues;
-    }
+    defines_ = defines;
 }
 
 }

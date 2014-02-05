@@ -1,9 +1,9 @@
-<technique>
-    <pass name="base" vs="LitSolid_EnvCube" ps="LitSolid_DiffEnvCube" />
-    <pass name="light" vs="LitSolid" ps="LitSolid_Diff" depthtest="equal" depthwrite="false" blend="add" />
-    <pass name="prepass" vs="LitSolid" ps="LitSolid_DiffPrepass" />
-    <pass name="material" vs="LitSolid_EnvCube" ps="LitSolid_DiffEnvCubeMaterial" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" vs="LitSolid_EnvCube" ps="LitSolid_DiffEnvCubeDeferred" />
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="base" vsdefines="ENVCUBEMAP" psdefines="ENVCUBEMAP" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" vsdefines="ENVCUBEMAP" psdefines="MATERIAL ENVCUBEMAP" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="ENVCUBEMAP" psdefines="DEFERRED ENVCUBEMAP" />
     <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

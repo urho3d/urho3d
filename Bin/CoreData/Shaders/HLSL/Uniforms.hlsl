@@ -1,3 +1,4 @@
+#ifdef COMPILEVS
 // Vertex shader uniforms
 uniform float3 cAmbientStartColor;
 uniform float3 cAmbientEndColor;
@@ -25,7 +26,9 @@ uniform float4x4 cLightMatrices[4];
 #ifdef NUMVERTEXLIGHTS
     uniform float4 cVertexLights[4*3];
 #endif
+#endif
 
+#ifdef COMPILEPS
 // Pixel shader uniforms
 uniform float3 cAmbientColor;
 uniform float cDeltaTimePS;
@@ -51,4 +54,5 @@ uniform float4 cShadowSplits;
     uniform float4x4 cLightMatricesPS[4];
 #else
     uniform float4x4 cLightMatricesPS[3];
+#endif
 #endif
