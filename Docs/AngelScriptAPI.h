@@ -2562,15 +2562,25 @@ int weakRefs;
 class Image
 {
 // Methods:
+void Clear(const Color&);
 void FlipVertical();
+Color GetPixel(int, int) const;
+Color GetPixel(int, int, int) const;
+Color GetPixelBilinear(float, float) const;
+Color GetPixelTrilinear(float, float, float) const;
 bool Load(File);
 bool LoadColorLUT(File);
+void Resize(int, int);
 bool Save(File) const;
-void SaveBMP(const String&);
-void SaveJPG(const String&, int);
-void SavePNG(const String&);
-void SaveTGA(const String&);
+void SaveBMP(const String&) const;
+void SaveJPG(const String&, int) const;
+void SavePNG(const String&) const;
+void SaveTGA(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetPixel(int, int, const Color&);
+void SetPixel(int, int, int, const Color&);
+bool SetSize(int, int, int, uint);
+bool SetSize(int, int, uint);
 
 // Properties:
 /* (readonly) */
@@ -2581,6 +2591,8 @@ String category;
 uint components;
 /* (readonly) */
 bool compressed;
+/* (readonly) */
+int depth;
 /* (readonly) */
 int height;
 /* (readonly) */
@@ -8525,7 +8537,6 @@ LINE_LIST,
 
 enum RayQueryLevel
 {
-RAY_AABB_NOSUBOBJECTS,
 RAY_AABB,
 RAY_OBB,
 RAY_TRIANGLE,

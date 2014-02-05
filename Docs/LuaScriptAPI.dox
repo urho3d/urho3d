@@ -3519,13 +3519,23 @@ Methods:
 
 - Image()
 - ~Image()
+- bool SetSize(int width, int height, unsigned components)
+- bool SetSize(int width, int height, int depth, unsigned components)
+- void SetPixel(int x, int y, const Color& color)
+- void SetPixel(int x, int y, int z, const Color& color)
 - bool LoadColorLUT(Deserializer& source)
 - bool LoadColorLUT(const String fileName)
 - void FlipVertical()
-- bool SaveBMP(const String fileName)
-- bool SavePNG(const String fileName)
-- bool SaveTGA(const String fileName)
-- bool SaveJPG(const String fileName, int quality)
+- bool Resize(int width, int height)
+- void Clear(const Color& color)
+- bool SaveBMP(const String fileName) const
+- bool SavePNG(const String fileName) const
+- bool SaveTGA(const String fileName) const
+- bool SaveJPG(const String fileName, int quality) const
+- Color GetPixel(int x, int y) const
+- Color GetPixel(int x, int y, int z) const
+- Color GetPixelBilinear(float x, float y) const
+- Color GetPixelTrilinear(float x, float y, float z) const
 - int GetWidth() const
 - int GetHeight() const
 - int GetDepth() const
@@ -5084,7 +5094,6 @@ Properties:
 
 ### RayQueryLevel
 
-- int RAY_AABB_NOSUBOBJECTS
 - int RAY_AABB
 - int RAY_OBB
 - int RAY_TRIANGLE
@@ -5450,17 +5459,27 @@ Properties:
 - ResourceCache* GetCache()
 - UI* GetUI()
 
+\section LuaScriptAPI_GlobalProperties Global properties
+- Audio* audio (readonly)
+- Time* time (readonly)
+- Console* console (readonly)
+- DebugHud* debugHud (readonly)
+- Engine* engine (readonly)
+- Graphics* graphics (readonly)
+- Renderer* renderer (readonly)
+- FileSystem* fileSystem (readonly)
+- Log* log (readonly)
+- Input* input (readonly)
+- Network* network (readonly)
+- ResourceCache* cache (readonly)
+- UI* ui (readonly)
+
 \section LuaScriptAPI_GlobalConstants Global constants
-- tolua_readonly tolua_property__get_set Audio* audio
-- tolua_readonly tolua_property__get_set Time* time
-- tolua_readonly tolua_property__get_set Console* console
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_STATS
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_PROFILER
 - unsigned DEBUGHUD_SHOW_ALL
-- tolua_readonly tolua_property__get_set DebugHud* debugHud
-- tolua_readonly tolua_property__get_set Engine* engine
 - int QUALITY_LOW
 - int QUALITY_MEDIUM
 - int QUALITY_HIGH
@@ -5489,21 +5508,16 @@ Properties:
 - unsigned VO_LOW_MATERIAL_QUALITY
 - unsigned VO_DISABLE_SHADOWS
 - unsigned VO_DISABLE_OCCLUSION
-- tolua_readonly tolua_property__get_set Graphics* graphics
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
-- tolua_readonly tolua_property__get_set Renderer* renderer
 - unsigned SCAN_FILES
 - unsigned SCAN_DIRS
 - unsigned SCAN_HIDDEN
-- tolua_readonly tolua_property__get_set FileSystem* fileSystem
 - int LOG_DEBUG
 - int LOG_INFO
 - int LOG_WARNING
 - int LOG_ERROR
 - int LOG_NONE
-- tolua_readonly tolua_property__get_set Log* log
-- tolua_readonly tolua_property__get_set Input* input
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
 - int MOUSEB_RIGHT
@@ -5663,8 +5677,6 @@ Properties:
 - float M_RADTODEG
 - unsigned NUM_FRUSTUM_PLANES
 - unsigned NUM_FRUSTUM_VERTICES
-- tolua_readonly tolua_property__get_set Network* network
-- tolua_readonly tolua_property__get_set ResourceCache* cache
 - unsigned FIRST_REPLICATED_ID
 - unsigned LAST_REPLICATED_ID
 - unsigned FIRST_LOCAL_ID
@@ -5673,7 +5685,6 @@ Properties:
 - unsigned DD_SOURCE
 - unsigned DD_TARGET
 - unsigned DD_SOURCE_AND_TARGET
-- tolua_readonly tolua_property__get_set UI* ui
 
 \section LuaScriptAPI_RenameTypes Rename types
 - SharedPtr<HttpRequest> becomes HttpRequestSPtr
