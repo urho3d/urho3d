@@ -100,12 +100,11 @@ bool Shader::Load(Deserializer& source)
     CommentOutFunction(vsSourceCode_, "void PS(");
     CommentOutFunction(psSourceCode_, "void VS(");
     
-    // OpenGL: rename either VS() or PS() to main()
+    // OpenGL: rename either VS() or PS() to main(), comment out vertex attributes in pixel shaders
     #ifdef USE_OPENGL
-    vsSourceCode_.Replace("uniform sampler", "// uniform sampler");
     vsSourceCode_.Replace("void VS(", "void main(");
-    psSourceCode_.Replace("attribute ", "// attribute ");
     psSourceCode_.Replace("void PS(", "void main(");
+    psSourceCode_.Replace("attribute ", "// attribute ");
     #endif
     
     // If variations had already been created, release them and require recompile
