@@ -409,7 +409,9 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         // Create the texture when face 0 is being loaded, check that rest of the faces are same size & format
         if (!face)
         {
-            SetNumLevels(0); // Determine number of levels after creation
+            // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+            if (IsCompressed() && requestedLevels_ > 1)
+                requestedLevels_ = 0;
             SetSize(levelWidth, format);
         }
         else

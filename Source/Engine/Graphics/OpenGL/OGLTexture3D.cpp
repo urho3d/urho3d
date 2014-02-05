@@ -335,7 +335,9 @@ bool Texture3D::Load(SharedPtr<Image> image, bool useAlpha)
             break;
         }
         
-        SetNumLevels(0); // Determine number of levels after creation
+        // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+        if (IsCompressed() && requestedLevels_ > 1)
+            requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, levelDepth, format);
         if (!object_)
             return false;
