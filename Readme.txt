@@ -34,6 +34,7 @@ Urho3D development, contributions and bugfixes by:
 - Nick Royer
 - Miika Santala
 - Joshua Tippetts
+- Daniel Wiberg
 - Steven Zhang
 - Firegorilla
 - Magic.Lixin
