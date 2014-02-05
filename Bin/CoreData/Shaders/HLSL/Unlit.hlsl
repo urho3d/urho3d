@@ -51,6 +51,14 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
+    #ifdef PREPASS
+        out float4 oDepth : COLOR1,
+    #endif
+    #ifdef DEFERRED
+        out float4 oAlbedo : COLOR1,
+        out float4 oNormal : COLOR2,
+        out float4 oDepth : COLOR3,
+    #endif
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
@@ -68,10 +76,22 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
 
     #ifdef HEIGHTFOG
-            float fogFactor = GetHeightFogFactor(iDepth, iWorldPos.y);
-        #else
-            float fogFactor = GetFogFactor(iDepth);
-        #endif
+        float fogFactor = GetHeightFogFactor(iDepth, iWorldPos.y);
+    #else
+        float fogFactor = GetFogFactor(iDepth);
+    #endif
 
-    oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
+    #if defined(PREPASS)
+        // Fill light pre-pass G-Buffer
+        oColor = float4(0.5, 0.5, 0.5, 1.0);
+        oDepth = iDepth;
+    #elif defined(DEFERRED)
+        // Fill deferred G-buffer
+        oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
+        oAlbedo = float4(0.0, 0.0, 0.0, 0.0);
+        oNormal = float4(0.5, 0.5, 0.5, 1.0);
+        oDepth = iDepth;
+    #else
+        oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
+    #endif
 }

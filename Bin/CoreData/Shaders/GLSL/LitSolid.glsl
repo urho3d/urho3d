@@ -250,8 +250,6 @@ void PS()
         gl_FragData[1] = fogFactor * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
         gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
-
-
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
