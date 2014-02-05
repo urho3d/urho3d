@@ -3535,8 +3535,10 @@ Properties:
 - bool depthWrite
 - PassLightingMode lightingMode
 - String pixelShader
+- String pixelShaderDefines
 - int refs (readonly)
 - String vertexShader
+- String vertexShaderDefines
 - int weakRefs (readonly)
 
 
@@ -3797,6 +3799,7 @@ Properties:
 - uint numOutputs
 - String[] outputNames
 - String pass
+- String pixelShaderDefines
 - String pixelShaderName
 - Variant[] shaderParameters
 - RenderCommandSortMode sortMode
@@ -3807,6 +3810,7 @@ Properties:
 - bool useLitBase
 - bool useScissor
 - bool vertexLights
+- String vertexShaderDefines
 - String vertexShaderName
 
 
@@ -3856,6 +3860,9 @@ Properties:
 
 - ShortStringHash baseType (readonly)
 - String category (readonly)
+- Material@ defaultLightRamp (readonly)
+- Material@ defaultLightSpot (readonly)
+- Material@ defaultMaterial (readonly)
 - RenderPath@ defaultRenderPath
 - Zone@ defaultZone (readonly)
 - bool drawShadows
@@ -7001,6 +7008,7 @@ Properties:
 - float fogHeight
 - float fogHeightScale
 - float fogStart
+- bool heightFog
 - uint id (readonly)
 - bool inView (readonly)
 - Matrix3x4 inverseWorldTransform (readonly)

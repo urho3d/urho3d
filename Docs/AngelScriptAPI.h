@@ -4237,9 +4237,11 @@ CompareMode depthTestMode;
 bool depthWrite;
 PassLightingMode lightingMode;
 String pixelShader;
+String pixelShaderDefines;
 /* (readonly) */
 int refs;
 String vertexShader;
+String vertexShaderDefines;
 /* (readonly) */
 int weakRefs;
 };
@@ -4516,6 +4518,7 @@ String metadata;
 uint numOutputs;
 Array<String> outputNames;
 String pass;
+String pixelShaderDefines;
 String pixelShaderName;
 Array<Variant> shaderParameters;
 RenderCommandSortMode sortMode;
@@ -4526,6 +4529,7 @@ bool useFogColor;
 bool useLitBase;
 bool useScissor;
 bool vertexLights;
+String vertexShaderDefines;
 String vertexShaderName;
 };
 
@@ -4577,6 +4581,12 @@ void SetDefaultRenderPath(XMLFile);
 ShortStringHash baseType;
 /* (readonly) */
 String category;
+/* (readonly) */
+Material defaultLightRamp;
+/* (readonly) */
+Material defaultLightSpot;
+/* (readonly) */
+Material defaultMaterial;
 RenderPath defaultRenderPath;
 /* (readonly) */
 Zone defaultZone;
@@ -8318,6 +8328,7 @@ float fogEnd;
 float fogHeight;
 float fogHeightScale;
 float fogStart;
+bool heightFog;
 /* (readonly) */
 uint id;
 /* (readonly) */

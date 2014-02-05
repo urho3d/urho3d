@@ -1354,10 +1354,6 @@ Methods:
 - TextureCube* GetFaceSelectCubeMap() const
 - TextureCube* GetIndirectionCubeMap() const
 - VertexBuffer* GetInstancingBuffer() const
-- ShaderVariation* GetVertexShader(const String name, bool checkExists = false) const
-- ShaderVariation* GetPixelShader(const String name, bool checkExists = false) const
-- ShaderVariation* GetStencilVS() const
-- ShaderVariation* GetStencilPS() const
 - const FrameInfo& GetFrameInfo()
 - void DrawDebugGeometry(bool depthTest)
 
@@ -1388,15 +1384,9 @@ Properties:
 - unsigned numPrimitives (readonly)
 - unsigned numBatches (readonly)
 - Zone* defaultZone (readonly)
-- Light* quadDirLight (readonly)
 - Material* defaultMaterial (readonly)
 - Texture2D* defaultLightRamp (readonly)
 - Texture2D* defaultLightSpot (readonly)
-- TextureCube* faceSelectCubeMap (readonly)
-- TextureCube* indirectionCubeMap (readonly)
-- VertexBuffer* instancingBuffer (readonly)
-- ShaderVariation* stencilVS (readonly)
-- ShaderVariation* stencilPS (readonly)
 
 ### RenderPath
 
@@ -1716,6 +1706,7 @@ Methods:
 - Texture2D()
 - ~Texture2D()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool Load(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
 
 Properties:
@@ -1762,7 +1753,10 @@ Methods:
 - void SetFogColor(const Color& color)
 - void SetFogStart(float start)
 - void SetFogEnd(float end)
+- void SetFogHeight(float height)
+- void SetFogHeightScale(float scale)
 - void SetPriority(int priority)
+- void SetHeightFog(bool enable)
 - void SetOverride(bool enable)
 - void SetAmbientGradient(bool enable)
 - const Matrix3x4& GetInverseWorldTransform() const
@@ -1772,7 +1766,10 @@ Methods:
 - const Color& GetFogColor() const
 - float GetFogStart() const
 - float GetFogEnd() const
+- float GetFogHeight() const
+- float GetFogHeightScale() const
 - int GetPriority() const
+- bool GetHeightFog() const
 - bool GetOverride() const
 - bool GetAmbientGradient() const
 - bool IsInside(const Vector3& point) const
@@ -1787,7 +1784,10 @@ Properties:
 - Color& fogColor
 - float fogStart
 - float fogEnd
+- float fogHeight
+- float fogHeightScale
 - int priority
+- bool heightFog
 - bool override
 - bool ambientGradient
 
