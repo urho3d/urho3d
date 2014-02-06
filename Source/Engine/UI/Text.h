@@ -175,12 +175,6 @@ protected:
     int fontSize_;
     /// UTF-8 encoded text.
     String text_;
-    /// Text as Unicode characters.
-    PODVector<unsigned> unicodeText_;
-    /// Text modified into printed form.
-    PODVector<unsigned> printText_;
-    /// Mapping of printed form back to original char indices.
-    PODVector<unsigned> printToText_;
     /// Row alignment.
     HorizontalAlignment textAlignment_;
     /// Row spacing.
@@ -205,6 +199,12 @@ protected:
     float effectDepthBias_;
     /// Row height.
     int rowHeight_;
+    /// Text as Unicode characters.
+    PODVector<unsigned> unicodeText_;
+    /// Text modified into printed form.
+    PODVector<unsigned> printText_;
+    /// Mapping of printed form back to original char indices.
+    PODVector<unsigned> printToText_;
     /// Row widths.
     PODVector<int> rowWidths_;
     /// Positions of each character.
