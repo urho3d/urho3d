@@ -764,7 +764,8 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
                 {
                     // Reloading a resource may modify the dependency tracking structure. Therefore collect the
                     // resources we need to reload first
-                    Vector<SharedPtr<Resource> > dependents(j->second_.Size());
+                    Vector<SharedPtr<Resource> > dependents;
+                    dependents.Reserve(j->second_.Size());
                     
                     for (HashSet<StringHash>::ConstIterator k = j->second_.Begin(); k != j->second_.End(); ++k)
                     {
