@@ -1071,6 +1071,7 @@ Methods:
 - void SetDepthBias(const BiasParameters& parameters)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
+- Material* Clone(const String cloneName = String::EMPTY) const
 - void SortTechniques()
 - void MarkForAuxView(unsigned frameNumber)
 - unsigned GetNumTechniques() const
@@ -3182,17 +3183,6 @@ Properties:
 - unsigned availableSize (readonly)
 - bool open (readonly)
 
-### SharedPtr
-
-Methods:
-
-- TOLUA_TEMPLATE_BIND(T, HttpRequest)
-- SharedPtr()
-- ~SharedPtr()
-- bool Null() const
-- bool NotNull() const
-- T* Get() const
-
 ### Network
 
 Methods:
@@ -3215,7 +3205,7 @@ Methods:
 - void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
 - void SetPackageCacheDir(const String path)
-- SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY)
+- HttpRequest* MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY)
 - int GetUpdateFps() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
@@ -5687,7 +5677,6 @@ Properties:
 - unsigned DD_SOURCE_AND_TARGET
 
 \section LuaScriptAPI_RenameTypes Rename types
-- SharedPtr<HttpRequest> becomes HttpRequestSPtr
 
 */
 
