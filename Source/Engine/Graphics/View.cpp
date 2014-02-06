@@ -1544,8 +1544,10 @@ void View::SetTextures(RenderPathCommand& command)
 
 void View::RenderQuad(RenderPathCommand& command)
 {
+    if (command.vertexShaderName_.Empty() || command.pixelShaderName_.Empty())
+        return;
+    
     // If shader can not be found, clear it from the command to prevent redundant attempts
-    /// \todo Do not re-query each frame, as it involves string manipulation
     ShaderVariation* vs = renderer_->GetShader(VS, command.vertexShaderName_, command.vertexShaderDefines_);
     if (!vs)
         command.vertexShaderName_ = String::EMPTY;
