@@ -126,6 +126,11 @@ bool ShaderVariation::Create()
         #endif
     }
     
+    #ifdef RASPI
+    if (type_ == VS)
+        shaderCode += "#define RASPI\n";
+    #endif
+
     shaderCode += originalShaderCode;
     
     const char* shaderCStr = shaderCode.CString();
