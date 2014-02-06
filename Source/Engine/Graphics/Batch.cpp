@@ -315,8 +315,11 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
-    Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
-    unsigned zoneHash = (unsigned)(size_t)zone_ + (unsigned)(size_t)fogColorZone;
+    // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
+    bool overrideFogColorToBlack = blend == BLEND_ADD || blend == BLEND_ADDALPHA;
+    unsigned zoneHash = (unsigned)(size_t)zone_;
+    if (overrideFogColorToBlack)
+        zoneHash += 0x80000000;
     if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<void*>(zoneHash)))
     {
         graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
@@ -331,9 +334,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         graphics->SetShaderParameter(VSP_ZONE, zoneTransform);
         
         graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
-        
-        // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
-        graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor());
+        graphics->SetShaderParameter(PSP_FOGCOLOR, overrideFogColorToBlack ? Color::BLACK : zone_->GetFogColor());
         
         float farClip = camera_->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);

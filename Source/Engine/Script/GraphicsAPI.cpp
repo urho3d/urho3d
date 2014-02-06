@@ -1271,6 +1271,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int QUALITY_LOW", (void*)&QUALITY_LOW);
     engine->RegisterGlobalProperty("const int QUALITY_MEDIUM", (void*)&QUALITY_MEDIUM);
     engine->RegisterGlobalProperty("const int QUALITY_HIGH", (void*)&QUALITY_HIGH);
+    engine->RegisterGlobalProperty("const int QUALITY_MAX", (void*)&QUALITY_MAX);
     
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_16BIT", (void*)&SHADOWQUALITY_LOW_16BIT);
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_24BIT", (void*)&SHADOWQUALITY_LOW_24BIT);

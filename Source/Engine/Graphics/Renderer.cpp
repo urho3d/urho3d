@@ -368,9 +368,14 @@ void Renderer::SetTextureQuality(int quality)
 
 void Renderer::SetMaterialQuality(int quality)
 {
-    materialQuality_ = Clamp(quality, QUALITY_LOW, QUALITY_MAX);
-    shadersDirty_ = true;
-    ResetViews();
+    quality = Clamp(quality, QUALITY_LOW, QUALITY_MAX);
+    
+    if (quality != materialQuality_)
+    {
+        materialQuality_ = quality;
+        shadersDirty_ = true;
+        ResetViews();
+    }
 }
 
 void Renderer::SetDrawShadows(bool enable)

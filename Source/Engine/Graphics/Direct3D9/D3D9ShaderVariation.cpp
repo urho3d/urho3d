@@ -58,11 +58,15 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if (!graphics_ || !owner_)
+    if (!graphics_)
         return false;
-
-    PODVector<unsigned> byteCode;
     
+    if (!owner_)
+    {
+        compilerOutput_ = "Owner shader has expired";
+        return false;
+    }
+
     // Check for up-to-date bytecode on disk
     bool useSM3 = graphics_->GetSM3Support();
     String path, name, extension;
@@ -71,7 +75,9 @@ bool ShaderVariation::Create()
         extension = type_ == VS ? ".vs3" : ".ps3";
     else
         extension = type_ == VS ? ".vs2" : ".ps2";
+    
     String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
+    PODVector<unsigned> byteCode;
     
     if (!LoadByteCode(byteCode, binaryShaderName))
     {
