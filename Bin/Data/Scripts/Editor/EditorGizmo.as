@@ -122,16 +122,25 @@ void PositionGizmo()
     if (gizmo is null)
         return;
 
-    if (editNodes.empty)
+    Vector3 center(0, 0, 0);
+    bool containsScene = false;
+
+    for (uint i = 0; i < editNodes.length; ++i)
+    {
+        // Scene's transform should not be edited, so hide gizmo if it is included
+        if (editNodes[i] is editorScene)
+        {
+            containsScene = true;
+            break;
+        }
+        center += editNodes[i].worldPosition;
+    }
+
+    if (editNodes.empty || containsScene)
     {
         HideGizmo();
         return;
     }
-
-    Vector3 center(0, 0, 0);
-
-    for (uint i = 0; i < editNodes.length; ++i)
-        center += editNodes[i].worldPosition;
 
     center /= editNodes.length;
     gizmoNode.position = center;
