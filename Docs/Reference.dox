@@ -973,6 +973,7 @@ Vertex shader:
 - SPEC: the per-pixel forward light has specular calculations
 - SHADOW: the per-pixel forward light has shadowing
 - SKINNED, INSTANCED, BILLBOARD: choosing the geometry type
+- HEIGHTFOG: object's zone has height fog mode
 
 Pixel shader:
 
@@ -982,6 +983,7 @@ Pixel shader:
 - SHADOW: the per-pixel forward light has shadowing
 - LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
 - HWSHADOW: use hardware shadow depth compare, Direct3D9 only
+- HEIGHTFOG: object's zone has height fog mode
 
 \section Shaders_Writing Writing shaders
 
