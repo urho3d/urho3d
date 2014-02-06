@@ -69,7 +69,8 @@ struct RenderTargetInfo
         sizeMode_(SIZE_ABSOLUTE),
         enabled_(true),
         filtered_(false),
-        sRGB_(false)
+        sRGB_(false),
+        persistent_(false)
     {
     }
     
@@ -92,6 +93,8 @@ struct RenderTargetInfo
     bool filtered_;
     /// sRGB sampling/writing mode flag.
     bool sRGB_;
+    /// Should be persistent and not shared/reused between other buffers of same size.
+    bool persistent_;
 };
 
 /// Rendering path command.

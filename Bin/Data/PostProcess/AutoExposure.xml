@@ -4,7 +4,7 @@
     <rendertarget name="lum16" tag="AutoExposure" size="16 16" format="rg16f" filter="true" />
     <rendertarget name="lum4" tag="AutoExposure" size="4 4" format="rg16f" filter="true" />
     <rendertarget name="lum1" tag="AutoExposure" size="1 1" format="rg16f" filter="false" />
-    <rendertarget name="adaptedLum" tag="AutoExposure" size="1 1" format="rg16f" filter="false" />
+    <rendertarget name="adaptedLum" tag="AutoExposure" size="1 1" format="rg16f" filter="false" persistent="true" />
     <rendertarget name="prevAdaptedLum" tag="AutoExposure" size="1 1" format="rg16f" filter="false" />
     <command type="quad" tag="AutoExposure" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="hdr128">
         <texture unit="diffuse" name="viewport" />

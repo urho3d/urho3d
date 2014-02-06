@@ -1035,7 +1035,7 @@ GLSL shaders in 1.3 and before used separate .vert and .frag files for the verte
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. For an example of rendertarget definitions, see the inbuilt bloom effect in Bin/Data/PostProcess/Bloom.xml.
+A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
 
 The available commands are:
 
@@ -1054,7 +1054,7 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" />
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" persistent="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
         <output index="0" name="RTName1" />

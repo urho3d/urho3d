@@ -1779,7 +1779,9 @@ void View::AllocateScreenBuffers()
             height = rtSize_.y_ / (height ? height : 1);
         }
         
-        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_);
+        // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
+        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_,
+            rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
     }
 }
 
