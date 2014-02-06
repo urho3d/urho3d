@@ -60,7 +60,7 @@ template<typename T> int ToluaNewObject(lua_State* tolua_S)
     tolua_pushusertype(tolua_S, (void*)object,T::GetTypeNameStatic().CString());
     return 1;
 }
-/// Create object with GC.
+/// Create object with garbage collection.
 template<typename T> int ToluaNewObjectGC(lua_State* tolua_S)
 {
     T* object = Mtolua_new(T(GetContext(tolua_S)));
@@ -77,14 +77,14 @@ template<typename T> int ToluaGetSubsystem(lua_State* tolua_S)
     return 1;
 }
 
-/// Check Lua table is Vector<T>.
+/// Check is Vector<T>.
 template<typename T> int ToluaIsVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
-/// Check Lua table is Vector<String>.
+/// Check is Vector<String>.
 template<> int ToluaIsVector<String>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
 
-/// Convert Lua table to Vector<T>.
+/// Convert to Vector<T>.
 template<typename T> void* ToluaToVector(lua_State* L, int narg, void* def);
-/// Convert Lua table to Vector<String>.
+/// Convert to Vector<String>.
 template<> void* ToluaToVector<String>(lua_State* L, int narg, void* def);
 
 /// Push Vector<T> to Lua as a table.
@@ -92,14 +92,14 @@ template<typename T> int ToluaPushVector(lua_State*L, void* data, const char* ty
 /// Push Vector<String> to Lua as a table.
 template<> int ToluaPushVector<String>(lua_State* L, void* data, const char* type);
 
-/// Check Lua table is Vector<T>.
+/// Check is PODVector<T>.
 template<typename T> int ToluaIsPODVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
-/// Check Lua table is Vector<unsigned>.
+/// Check is PODVector<unsigned>.
 template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
 
-/// Convert Lua table to PODVector<T>.
+/// Convert to PODVector<T>.
 template<typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def);
-/// Convert Lua table to PODVector<unsigned>.
+/// Convert PODVector<unsigned>.
 template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def);
 
 /// Push PODVector<T> to Lua as a table.
@@ -112,7 +112,6 @@ template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char
 template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<UIElement*> to Lua as a table.
 template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char* type);
-
 /// Push PODVector<Vector3> to Lua as a table.
 template<> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char* type);
 /// Push PODVector<IntVector2> to Lua as a table.
@@ -123,5 +122,3 @@ template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, c
 template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* type);
-
-

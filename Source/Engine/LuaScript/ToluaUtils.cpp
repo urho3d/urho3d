@@ -36,7 +36,7 @@ const char* tolua_tourho3dstring(lua_State* L, int narg, const String& str)
     return tolua_tourho3dstring(L, narg, str.CString());
 }
 
-// Lua state to context mapping.
+// Lua state to context mapping
 static HashMap<void*, Context*> contextMapping;
 
 void SetContext(lua_State* L, Context* context)
@@ -190,7 +190,7 @@ template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def)
     return &result;
 }
 
-template<> int ToluaPushPODVector<int>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<int>(lua_State* L, void* data, const char*)
 {
     const PODVector<int>& vector = *((const PODVector<int>*)data);
     lua_newtable(L);
@@ -203,7 +203,7 @@ template<> int ToluaPushPODVector<int>(lua_State* L, void* data, const char* /*t
     return 1;
 }
 
-template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char*)
 {
     const PODVector<unsigned>& vector = *((const PODVector<unsigned>*)data);
     lua_newtable(L);
@@ -216,7 +216,7 @@ template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char
     return 1;
 }
 
-template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char*)
 {
     const PODVector<SoundSource*>& vector = *((const PODVector<SoundSource*>*)data);
     lua_newtable(L);
@@ -228,7 +228,7 @@ template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const 
     return 1;
 }
 
-template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char*)
 {
     const PODVector<UIElement*>& vector = *((const PODVector<UIElement*>*)data);
     lua_newtable(L);
@@ -255,27 +255,27 @@ template<typename T> int tolua_pushurho3dpodvectorusertype(lua_State* L, const P
     return 1;
 }
 
-template<> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<Vector3>*)data), "Vector3");
 }
 
-template<> int ToluaPushPODVector<IntVector2>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<IntVector2>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<IntVector2>*)data), "IntVector2");
 }
 
-template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<OctreeQueryResult>*)data), "OctreeQueryResult");
 }
 
-template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<PhysicsRaycastResult>*)data), "PhysicsRaycastResult");
 }
 
-template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* /*type*/)
+template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<RayQueryResult>*)data), "RayQueryResult");
 }

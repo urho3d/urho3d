@@ -160,7 +160,7 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
     scriptObjectType_ = scriptObjectType;
     scriptObjectRef_ = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
-    // Find script object method refs.
+    // Find script object method refs
     FindScriptObjectMethodRefs();
 }
 
@@ -450,7 +450,7 @@ void LuaScriptInstance::ReleaseObject()
     if (IsEnabledEffective())
         UnsubscribeFromScriptMethodEvents();
 
-    // Unref script object.
+    // Unref script object
     luaL_unref(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
     scriptObjectRef_ = LUA_REFNIL;
 

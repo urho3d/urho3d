@@ -244,11 +244,11 @@ void LuaScript::ScriptUnsubscribeFromEvents(void* sender)
 
 void LuaScript::RegisterLoader()
 {
-    // Get package.loaders table.
+    // Get package.loaders table
     lua_getglobal(luaState_, "package");
     lua_getfield(luaState_, -1, "loaders");
 
-    // Add our loader to the end of the table
+    // Add LuaScript::Loader to the end of the table
     lua_pushinteger(luaState_, lua_objlen(luaState_, -1) + 1);
     lua_pushcfunction(luaState_, &LuaScript::Loader);
     lua_settable(luaState_, -3);
@@ -269,15 +269,15 @@ int LuaScript::Loader(lua_State* L)
     if (!cache)
         return 0;
 
-    // Get module name.
+    // Get module name
     const char* name = luaL_checkstring(L, 1);
 
-    // Get Luc file from module name.
+    // Get Luc file
     LuaFile* lucFile = cache->GetResource<LuaFile>(String(name) + ".luc");
     if (lucFile)
         return lucFile->LoadChunk(L) ? 1 : 0;
 
-    // Get Lua file from module name.
+    // Get Lua file
     LuaFile* luaFile = cache->GetResource<LuaFile>(String(name) + ".lua");
     if (luaFile)
         return luaFile->LoadChunk(L) ? 1 : 0;
@@ -306,21 +306,25 @@ int LuaScript::Print(lua_State *L)
     for (int i = 1; i <= n; i++)
     {
         const char *s;
-        lua_pushvalue(L, -1);  /* function to be called */
-        lua_pushvalue(L, i);   /* value to print */
+        // Function to be called
+        lua_pushvalue(L, -1);
+        // Value to print
+        lua_pushvalue(L, i);
         lua_call(L, 1, 1);
-        s = lua_tostring(L, -1);  /* get result */
+        // Get result
+        s = lua_tostring(L, -1);
         if (s == NULL)
             return luaL_error(L, LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
         if (i > 1)
-            string.Append("    "); // fputs("\t", stdout);
+            string.Append("    ");
 
-        string.Append(s); // fputs(s, stdout);
-        lua_pop(L, 1);  /* pop result */
+        string.Append(s);
+        // Pop result
+        lua_pop(L, 1);
     }
 
-    LOGRAW("Lua: " + string); // fputs("\n", stdout);
+    LOGRAW("Lua: " + string);
 
     return 0;
 }

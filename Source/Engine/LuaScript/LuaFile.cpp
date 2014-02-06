@@ -101,7 +101,7 @@ bool LuaFile::LoadChunk(lua_State* luaState)
 
     int top = lua_gettop(luaState);
 
-    // Get file name without extension.
+    // Get file base name
     String name = GetName();
     unsigned extPos = name.FindLast('.');
     if (extPos != String::NPOS)
