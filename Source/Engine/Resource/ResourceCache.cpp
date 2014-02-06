@@ -755,7 +755,8 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
                 LOGDEBUG("Reloading changed resource " + fileName);
                 ReloadResource(resource);
             }
-            else
+            // Always perform dependency resource check for resource loaded from XML file as it could be used in inheritance
+            if (!resource || GetExtension(resource->GetName()) == ".xml")
             {
                 // Check if this is a dependency resource, reload dependents
                 HashMap<StringHash, HashSet<StringHash> >::ConstIterator j = dependentResources_.Find(fileNameHash);
@@ -763,7 +764,7 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
                 {
                     // Reloading a resource may modify the dependency tracking structure. Therefore collect the
                     // resources we need to reload first
-                    Vector<SharedPtr<Resource> > dependents;
+                    Vector<SharedPtr<Resource> > dependents(j->second_.Size());
                     
                     for (HashSet<StringHash>::ConstIterator k = j->second_.Begin(); k != j->second_.End(); ++k)
                     {
