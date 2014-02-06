@@ -115,10 +115,18 @@ bool XMLFile::Load(Deserializer& source)
         // Patch this XMLFile and leave the original inherited XMLFile as it is
         pugi::xml_document* patchDocument = document_;
         document_ = new pugi::xml_document();
-        document_->reset(*inheritedXMLFile->document_);      // Unfortunately there is no way to adjust the data size correctly
+        document_->reset(*inheritedXMLFile->document_);
         Patch(rootElem);
         delete patchDocument;
+
+        // Store resource dependencies so we know when to reload/repatch when the inherited resource changes
+        cache->StoreResourceDependency(this, inherit);
+
+        // Approximate patched data size
+        dataSize += inheritedXMLFile->GetRoot().GetUInt("dataSize");
     }
+    else
+        rootElem.SetUInt("dataSize", dataSize);
 
     // Note: this probably does not reflect internal data structure size accurately
     SetMemoryUse(dataSize);

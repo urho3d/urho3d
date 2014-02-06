@@ -7632,6 +7632,7 @@ Properties:
 - float M_RADTODEG
 - int QUALITY_HIGH
 - int QUALITY_LOW
+- int QUALITY_MAX
 - int QUALITY_MEDIUM
 - int QUAL_ALT
 - int QUAL_ANY
