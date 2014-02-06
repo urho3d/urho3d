@@ -26,13 +26,22 @@ set (TARGET_NAME Urho3D)
 # Define generated source files
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
 if (GIT_EXIT_CODE EQUAL 0)
-    add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
-        COMMAND ${CMAKE_COMMAND} -E echo_append const char* revision=\\\" >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
-        COMMAND git describe --always --dirty |tr -d '\\\n' >>${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
-        COMMAND ${CMAKE_COMMAND} -E echo \\\""\;" >>${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
-        DEPENDS ${STATIC_LIBRARY_TARGETS}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
+    # On Windows determine whether we can execute sh to see which version of the command to use
+    # Visual Studio will not use sh
+    if (NOT MSVC AND CMAKE_HOST_WIN32)
+        execute_process (COMMAND sh --version RESULT_VARIABLE SH_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+    endif ()
+    if (MSVC OR (CMAKE_HOST_WIN32 AND NOT SH_EXIT_CODE EQUAL 0))
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
+            COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
+    else ()
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
+            COMMAND for v in `git describe --always --dirty`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
+    endif ()
 else ()
     # No GIT command line tool or not a GIT repository, generate a dummy version file
     file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h "const char* revision=\"Unversioned\";")
