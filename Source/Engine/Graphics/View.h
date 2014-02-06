@@ -154,7 +154,7 @@ private:
     /// Update geometries and sort batches.
     void UpdateGeometries();
     /// Get pixel lit batches for a certain light and drawable.
-    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue, bool useLitBase);
+    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue);
     /// Execute render commands.
     void ExecuteRenderPathCommands();
     /// Set rendertargets for current render command.
@@ -300,6 +300,8 @@ private:
     bool deferred_;
     /// Deferred ambient pass flag. This means that the destination rendertarget is being written to at the same time as albedo/normal/depth buffers, and needs to be RGBA on OpenGL.
     bool deferredAmbient_;
+    /// Forward light base pass optimization flag. If in use, combine the base pass and first light for all opaque objects.
+    bool useLitBase_;
     /// Renderpath.
     RenderPath* renderPath_;
     /// Per-thread octree query results.

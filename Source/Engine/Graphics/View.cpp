@@ -388,9 +388,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             lightPassName_ = command.pass_;
     }
     
-    // Go through commands to check for deferred rendering
+    // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
     deferredAmbient_ = false;
+    useLitBase_ = false;
     
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
@@ -404,13 +405,14 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             if (CheckViewportWrite(command))
                 deferredAmbient_ = true;
         }
-        
-        if (command.type_ == CMD_LIGHTVOLUMES)
+        else if (command.type_ == CMD_LIGHTVOLUMES)
         {
             lightVolumeVSName_ = command.vertexShaderName_;
             lightVolumePSName_ = command.pixelShaderName_;
             deferred_ = true;
         }
+        else if (command.type_ == CMD_FORWARDLIGHTS)
+            useLitBase_ = command.useLitBase_;
     }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
@@ -754,15 +756,6 @@ void View::GetBatches()
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
     
-    // Check whether to use the lit base pass optimization
-    bool useLitBase = true;
-    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
-    {
-        const RenderPathCommand& command = renderPath_->commands_[i];
-        if (command.type_ == CMD_FORWARDLIGHTS)
-            useLitBase = command.useLitBase_;
-    }
-    
     // Process lit geometries and shadow casters for each light
     {
         PROFILE(ProcessLights);
@@ -896,7 +889,7 @@ void View::GetBatches()
                     
                     // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                     if (!drawable->GetMaxLights())
-                        GetLitBatches(drawable, lightQueue, alphaQueue, useLitBase);
+                        GetLitBatches(drawable, lightQueue, alphaQueue);
                     else
                         maxLightsDrawables_.Insert(drawable);
                 }
@@ -950,7 +943,7 @@ void View::GetBatches()
                 // Find the correct light queue again
                 LightBatchQueue* queue = light->GetLightQueue();
                 if (queue)
-                    GetLitBatches(drawable, *queue, alphaQueue, useLitBase);
+                    GetLitBatches(drawable, *queue, alphaQueue);
             }
         }
     }
@@ -1142,7 +1135,7 @@ void View::UpdateGeometries()
     queue->Complete(M_MAX_UNSIGNED);
 }
 
-void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue, bool useLitBase)
+void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue)
 {
     Light* light = lightQueue.light_;
     Zone* zone = GetZone(drawable);
@@ -1151,7 +1144,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
-    bool allowLitBase = useLitBase && light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
+    bool allowLitBase = useLitBase_ && light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {
