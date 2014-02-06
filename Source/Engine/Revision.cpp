@@ -22,7 +22,7 @@
 
 #include "Precompiled.h"
 #include "Revision.h"
-#include "gitversion.h"
+#include "librevision.h"
 
 namespace Urho3D
 {

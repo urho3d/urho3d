@@ -26,25 +26,14 @@ set (TARGET_NAME Urho3D)
 # Define generated source files
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
 if (GIT_EXIT_CODE EQUAL 0)
-    # On Windows determine whether we can execute sh to see which version of the command to use
-    # Visual Studio will not use sh
-    if (NOT MSVC AND CMAKE_HOST_WIN32)
-        execute_process (COMMAND sh --version RESULT_VARIABLE SH_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    endif ()
-    if (MSVC OR (CMAKE_HOST_WIN32 AND NOT SH_EXIT_CODE EQUAL 0))
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
-            COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
-    else ()
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
-            COMMAND for v in `git describe --always --dirty`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
-    endif ()
+    add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
+        COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
+        DEPENDS ${STATIC_LIBRARY_TARGETS} ${PROJECT_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 else ()
-    # No GIT command line tool or not a GIT repository, generate a dummy version file
-    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h "const char* revision=\"Unversioned\";")
+    # No GIT command line tool or not a GIT repository, generate a dummy revision file
+    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/librevision.h "const char* revision=\"Unversioned\";")
 endif ()
 
 if (WIN32)
@@ -91,7 +80,7 @@ foreach (SOURCE ${SOURCES})
     list (APPEND ENGINE_SOURCE_FILES ${${SOURCE}_CPP_FILES} ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${SOURCE})
 endforeach ()
-define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h PCH)
+define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h PCH)
 install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
