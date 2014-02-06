@@ -161,8 +161,16 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         FontFace* face = font_->GetFace(fontSize_);
         if (!face)
             return;
+        
+        // If face has changed or char positions are not valid anymore, update before rendering
         if (charPositionsDirty_ || !fontFace_ || face != fontFace_)
             UpdateCharPositions();
+        // If face uses mutable glyphs mechanism, reacquire glyphs before rendering to make sure they are in the texture
+        else if (face->HasMutableGlyphs())
+        {
+            for (unsigned i = 0; i < printText_.Size(); ++i)
+                face->GetGlyph(printText_[i]);
+        }
         
         const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
         for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)

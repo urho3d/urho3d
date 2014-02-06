@@ -115,6 +115,8 @@ public:
     int GetRowHeight() const { return rowHeight_; }
     /// Return textures.
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
+    /// Return if font face uses mutable glyphs.
+    bool HasMutableGlyphs() const { return !mutableGlyphs_.Empty(); }
     
 private:
     /// Render all glyphs of the face into a single texture. Return true if could fit them. Called by Font.
