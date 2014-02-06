@@ -212,6 +212,7 @@ void CreateViewportUI()
     viewportUI.clipChildren = true;
     viewportUI.clipBorder = viewportUIClipBorder;
     viewportUI.RemoveAllChildren();
+    viewportUI.priority = -2000;
 
     Array<BorderImage@> borders;
 
@@ -411,7 +412,6 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 
 void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
 {
-
     UIElement@ dragBorder = eventData["Element"].GetUIElement();
     if (dragBorder is null)
         return;
@@ -419,7 +419,7 @@ void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
     uint hPos;
     uint vPos;
 
-    // moves border to new cursor position, restricts motion to 1 axis, and keeps borders within view area
+    // Moves border to new cursor position, restricts motion to 1 axis, and keeps borders within view area
     if (resizingBorder & VIEWPORT_BORDER_V_ANY > 0)
     {
         hPos = Clamp(ui.cursorPosition.x, 150, viewportArea.width-150);
@@ -433,7 +433,7 @@ void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
         dragBorder.position = IntVector2(hPos, vPos);
     }
 
-    // move all dependent borders
+    // Move all dependent borders
     Array<UIElement@> borders = viewportUI.GetChildren();
     for (uint i = 0; i < borders.length; ++i)
     {
@@ -472,7 +472,6 @@ void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
 void HandleViewportBorderDragEnd(StringHash eventType, VariantMap& eventData)
 {
     // Sets the new viewports by checking all the dependencies
-
     Array<UIElement@> children = viewportUI.GetChildren();
     Array<BorderImage@> borders;
 
