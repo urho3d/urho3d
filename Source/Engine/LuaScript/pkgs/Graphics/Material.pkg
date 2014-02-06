@@ -18,7 +18,10 @@ class Material : public Resource
     void SetDepthBias(const BiasParameters& parameters);
     void RemoveShaderParameter(const String name);
     void ReleaseShaders();
+    
     // SharedPtr<Material> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside Material* MaterialClone @ Clone(const String cloneName = String::EMPTY) const;
+    
     void SortTechniques();
     void MarkForAuxView(unsigned frameNumber);
     
@@ -56,5 +59,17 @@ static int tolua_GraphicsLuaAPI_Material_new00(lua_State* tolua_S)
 static int tolua_GraphicsLuaAPI_Material_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<Material>(tolua_S);
+}
+
+static Material* MaterialClone(const Material* material, const String& cloneName = String::EMPTY)
+{
+    if (!material)
+        return 0;
+        
+    SharedPtr<Material> clonedMaterialPtr = material->Clone(cloneName);
+    Material* clonedMaterial = clonedMaterialPtr.Get();
+    clonedMaterialPtr.Detach();
+    
+    return clonedMaterial;
 }
 $}

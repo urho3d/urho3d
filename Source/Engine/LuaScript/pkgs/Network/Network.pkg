@@ -29,7 +29,9 @@ class Network
     
     void UnregisterAllRemoteEvents();
     void SetPackageCacheDir(const String path);
-    SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
+    
+    // SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
+    tolua_outside HttpRequest* NetworkMakeHttpRequest @ MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
     
     int GetUpdateFps() const;
     Connection* GetServerConnection() const;
@@ -57,4 +59,16 @@ static int tolua_NetworkLuaAPI_GetNetwork00(lua_State* tolua_S)
 
 #define TOLUA_DISABLE_tolua_get_network_ptr
 #define tolua_get_network_ptr tolua_NetworkLuaAPI_GetNetwork00
+
+static HttpRequest* NetworkMakeHttpRequest(Network* network, const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY)
+{
+    if (!network)
+        return 0;
+
+    SharedPtr<HttpRequest> httpRequestPtr = network->MakeHttpRequest(url, verb, headers, postData);
+    HttpRequest* httpRequest = httpRequestPtr.Get();
+    httpRequestPtr.Detach();
+
+    return httpRequest;
+}
 $}

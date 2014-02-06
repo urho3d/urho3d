@@ -8,6 +8,8 @@ class Texture2D : public Texture
     ~Texture2D();
 
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+
+    // bool Load(SharedPtr<Image> image, bool useAlpha = false);
     tolua_outside bool Texture2DLoad @ Load(Image* image, bool useAlpha = false);
 
     RenderSurface* GetRenderSurface() const;
@@ -16,16 +18,6 @@ class Texture2D : public Texture
 };
 
 ${
-static bool Texture2DLoad(Texture2D* texture, Image* image, bool useAlpha)
-{
-    SharedPtr<Image> imagePtr(image);
-    bool ret = texture->Load(imagePtr, useAlpha);
-    // Need to safely detach the object from the shared pointer so that the Lua script can manually
-    // delete the object once done
-    imagePtr.Detach();
-    return ret;
-}
-
 #define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Texture2D_new00
 static int tolua_GraphicsLuaAPI_Texture2D_new00(lua_State* tolua_S)
 {
@@ -36,5 +28,15 @@ static int tolua_GraphicsLuaAPI_Texture2D_new00(lua_State* tolua_S)
 static int tolua_GraphicsLuaAPI_Texture2D_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<Texture2D>(tolua_S);
+}
+
+static bool Texture2DLoad(Texture2D* texture, Image* image, bool useAlpha)
+{
+    SharedPtr<Image> imagePtr(image);
+    bool ret = texture->Load(imagePtr, useAlpha);
+    // Need to safely detach the object from the shared pointer so that the Lua script can manually
+    // delete the object once done
+    imagePtr.Detach();
+    return ret;
 }
 $}

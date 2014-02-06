@@ -24,17 +24,3 @@ class HttpRequest : public Deserializer
     tolua_readonly tolua_property__get_set unsigned availableSize;
     tolua_readonly tolua_property__is_set bool open;
 };
-
-class SharedPtr
-{
-    TOLUA_TEMPLATE_BIND(T, HttpRequest)
-    
-    SharedPtr();
-    ~SharedPtr();
-    
-    bool Null() const;
-    bool NotNull() const;
-    T* Get() const;
-};
-
-$renaming SharedPtr<HttpRequest> @ HttpRequestSPtr

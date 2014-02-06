@@ -11,7 +11,9 @@ class ResourceCache
     void SetAutoReloadResources(bool enable);
     void SetSearchPackagesFirst(bool value);
 
+    // SharedPtr<File> GetFile(const String& name);
     tolua_outside File* ResourceCacheGetFile @ GetFile(const String name);
+
     Resource* GetResource(const String type, const String name);
     
     bool Exists(const String name) const;
@@ -47,17 +49,14 @@ static int tolua_ResourceLuaAPI_GetCache00(lua_State* tolua_S)
 
 static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
 {
-    SharedPtr<File> file = cache->GetFile(fileName);
-    if (!file)
+    SharedPtr<File> filePtr = cache->GetFile(fileName);
+    if (!filePtr)
         return 0;
-    else
-    {
-        // Need to safely detach the object from the shared pointer so that the Lua script can manually
-        // delete the object once done. The refcount needs to be zero or else the destructor will assert
-        File* fileRaw = file.Get();
-        file.Detach();
-        return fileRaw;
-    }
+
+    File* file = filePtr.Get();
+    filePtr.Detach();
+    
+    return file;
 }
 
 // Disable generated GetResource function.
