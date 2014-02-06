@@ -1003,6 +1003,20 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
         newBuffer->SetFilterMode(filtered ? FILTER_BILINEAR : FILTER_NEAREST);
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
+        #ifdef USE_OPENGL
+        // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
+        // Otherwise eg. the AutoExposure post process will not work correctly
+        if (persistentKey && Texture::GetDataType(format) == GL_FLOAT)
+        {
+            // Note: this loses current rendertarget assignment
+            graphics_->ResetRenderTargets();
+            graphics_->SetRenderTarget(0, newBuffer);
+            graphics_->SetDepthStencil((RenderSurface*)0);
+            graphics_->SetViewport(IntRect(0, 0, width, height));
+            graphics_->Clear(CLEAR_COLOR);
+        }
+        #endif
+        
         LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }

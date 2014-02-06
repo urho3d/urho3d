@@ -379,7 +379,7 @@ unsigned Texture::GetDataType(unsigned format)
     else if (format == GL_RG16 || format == GL_RGBA16)
         return GL_UNSIGNED_SHORT;
     else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_RGBA16F_ARB ||
-        format == GL_RGBA32F_ARB)
+        format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F)
         return GL_FLOAT;
     else
         return GL_UNSIGNED_BYTE;
