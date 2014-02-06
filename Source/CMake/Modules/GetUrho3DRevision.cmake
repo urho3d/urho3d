@@ -24,7 +24,11 @@
 
 execute_process (COMMAND git describe --always --dirty RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_VARIABLE LIB_REVISION ERROR_QUIET)
 if (GIT_EXIT_CODE EQUAL 0)
+    # Remove trailing end of line character
     string (STRIP ${LIB_REVISION} LIB_REVISION)
-    set (LIB_REVISION "const char* revision=\"${LIB_REVISION}\"\;\n")
-    file (WRITE ${FILENAME} ${LIB_REVISION})
+else ()
+    # This should not happen, but just in case
+    set (LIB_REVISION Unversioned)
 endif ()
+set (LIB_REVISION "const char* revision=\"${LIB_REVISION}\"\;\n")
+file (WRITE ${FILENAME} ${LIB_REVISION})
