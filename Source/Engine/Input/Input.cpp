@@ -137,17 +137,22 @@ void Input::Update()
         return;
 
     // Check for relative mode mouse move
-    if (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))
+    if (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS)))
     {
         IntVector2 mousePosition = GetMousePosition();
         mouseMove_ = mousePosition - lastMousePosition_;
 
-        // Recenter the mouse cursor manually
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        if (mousePosition != center)
+        if (graphics_->GetExternalWindow())
+            lastMousePosition_ = mousePosition;
+        else
         {
-            SetMousePosition(center);
-            lastMousePosition_ = center;
+            // Recenter the mouse cursor manually
+            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+            if (mousePosition != center)
+            {
+                SetMousePosition(center);
+                lastMousePosition_ = center;
+            }
         }
 
         // Send mouse move event if necessary
@@ -542,7 +547,7 @@ void Input::SetMouseButton(int button, bool newState)
 #endif
 
     // If we do not have focus yet, do not react to the mouse button down
-    if (newState && !inputFocus_)
+    if (!graphics_->GetExternalWindow() && newState && !inputFocus_)
         return;
 
     if (newState)
@@ -572,7 +577,7 @@ void Input::SetMouseButton(int button, bool newState)
 void Input::SetKey(int key, bool newState)
 {
     // If we do not have focus yet, do not react to the key down
-    if (newState && !inputFocus_)
+    if (!graphics_->GetExternalWindow() && newState && !inputFocus_)
         return;
 
     bool repeat = false;
@@ -610,7 +615,7 @@ void Input::SetKey(int key, bool newState)
 void Input::SetMouseWheel(int delta)
 {
     // If we do not have focus yet, do not react to the wheel
-    if (!inputFocus_)
+    if (!graphics_->GetExternalWindow() && !inputFocus_)
         return;
 
     if (delta)
