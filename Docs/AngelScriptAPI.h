@@ -4562,6 +4562,7 @@ bool enabled;
 bool filtered;
 uint format;
 String name;
+bool persistent;
 bool sRGB;
 IntVector2 size;
 RenderTargetSizeMode sizeMode;
