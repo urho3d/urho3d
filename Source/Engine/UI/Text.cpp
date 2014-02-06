@@ -53,6 +53,7 @@ Text::Text(Context* context) :
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
     wordWrap_(false),
+    charPositionsDirty_(true),
     selectionStart_(0),
     selectionLength_(0),
     selectionColor_(Color::TRANSPARENT),
@@ -160,119 +161,42 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         FontFace* face = font_->GetFace(fontSize_);
         if (!face)
             return;
-
-        const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
+        if (charPositionsDirty_ || !fontFace_ || face != fontFace_)
+            UpdateCharPositions();
         
-        if (textures.Size() > 1)
+        const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
+        for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)
         {
-            // Only traversing thru the printText once regardless of number of textures/pages in the font
-            pageGlyphLocations_.Resize(textures.Size());
-            
-            unsigned rowIndex = 0;
-            int x = GetRowStartPosition(rowIndex);
-            int y = 0;
-            const FontGlyph* p = 0;
-            unsigned last = 0;
+            // One batch per texture/page
+            UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
 
-            for (unsigned i = 0; i < printText_.Size(); ++i)
-            {
-                unsigned c = printText_[i];
-
-                if (c != '\n')
-                {
-                    // Optimize if same glyph requested several times in a row
-                    if (!p || c != last)
-                    {
-                        p = face->GetGlyph(c);
-                        last = c;
-                    }
-
-                    if (!p)
-                        continue;
-
-                    // Validate page because of possible glyph unallocations (should not happen, though)
-                    if (p->page_ < textures.Size())
-                        pageGlyphLocations_[p->page_].Push(GlyphLocation(x, y, p));
-
-                    x += p->advanceX_;
-                    if (i < printText_.Size() - 1)
-                        x += face->GetKerning(c, printText_[i + 1]);
-                }
-                else
-                {
-                    x = GetRowStartPosition(++rowIndex);
-                    y += rowHeight_;
-                }
-            }
-
-            for (unsigned n = 0; n < textures.Size(); ++n)
-            {
-                // One batch per texture/page
-                UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
-
-                const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
-
-                switch (textEffect_)
-                {
-                case TE_NONE:
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                    break;
-                    
-                case TE_SHADOW:
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                    break;
-                    
-                case TE_STROKE:
-                    ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                    break;
-                }
-
-                batches.Push(pageBatch);
-            }
-        }
-        else
-        {
-            // If only one texture page, construct the UI batch directly
-            int x = GetRowStartPosition(0);
-            int y = 0;
-
-            UIBatch batch(this, BLEND_ALPHA, currentScissor, textures[0], &vertexData);
+            const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
 
             switch (textEffect_)
             {
             case TE_NONE:
-                ConstructBatch(batch, face, x, y);
+                ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
                 break;
                 
             case TE_SHADOW:
-                ConstructBatch(batch, face, x, y, 1, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y);
+                ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
                 break;
                 
             case TE_STROKE:
-                ConstructBatch(batch, face, x, y, -1, -1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, 0, -1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, 1, -1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, -1, 0, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, 1, 0, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, -1, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, 0, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y, 1, 1, &effectColor_, effectDepthBias_);
-                
-                ConstructBatch(batch, face, x, y);
+                ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
                 break;
             }
 
-            UIBatch::AddOrMerge(batch, batches);
+            UIBatch::AddOrMerge(pageBatch, batches);
         }
     }
 
@@ -284,6 +208,13 @@ void Text::OnResize()
 {
     if (wordWrap_)
         UpdateText();
+    else
+        charPositionsDirty_ = true;
+}
+
+void Text::OnIndentSet()
+{
+    charPositionsDirty_ = true;
 }
 
 bool Text::SetFont(const String& fontName, int size)
@@ -328,7 +259,7 @@ void Text::SetTextAlignment(HorizontalAlignment align)
     if (align != textAlignment_)
     {
         textAlignment_ = align;
-        UpdateText();
+        charPositionsDirty_ = true;
     }
 }
 
@@ -388,6 +319,20 @@ void Text::SetEffectDepthBias(float bias)
     effectDepthBias_ = bias;
 }
 
+const PODVector<IntVector2>& Text::GetCharPositions()
+{
+    if (charPositionsDirty_)
+        UpdateCharPositions();
+    return charPositions_;
+}
+
+const PODVector<IntVector2>& Text::GetCharSizes()
+{
+    if (charPositionsDirty_)
+        UpdateCharPositions();
+    return charSizes_;
+}
+
 void Text::SetFontAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -419,14 +364,9 @@ bool Text::FilterImplicitAttributes(XMLElement& dest) const
 
 void Text::UpdateText()
 {
-    int width = 0;
-    int height = 0;
-
     rowWidths_.Clear();
     printText_.Clear();
-
-    PODVector<unsigned> printToText;
-
+    
     if (font_)
     {
         FontFace* face = font_->GetFace(fontSize_);
@@ -434,6 +374,9 @@ void Text::UpdateText()
             return;
 
         rowHeight_ = face->GetRowHeight();
+        
+        int width = 0;
+        int height = 0;
         int rowWidth = 0;
         int rowHeight = (int)(rowSpacing_ * rowHeight_);
 
@@ -441,15 +384,17 @@ void Text::UpdateText()
         if (!wordWrap_)
         {
             printText_ = unicodeText_;
-            printToText.Resize(printText_.Size());
+            printToText_.Resize(printText_.Size());
             for (unsigned i = 0; i < printText_.Size(); ++i)
-                printToText[i] = i;
+                printToText_[i] = i;
         }
         else
         {
             int maxWidth = GetWidth();
             unsigned nextBreak = 0;
             unsigned lineStart = 0;
+            printToText_.Clear();
+            
             for (unsigned i = 0; i < unicodeText_.Size(); ++i)
             {
                 unsigned j;
@@ -498,12 +443,18 @@ void Text::UpdateText()
                             while (i < j)
                             {
                                 printText_.Push(unicodeText_[i]);
-                                printToText.Push(i);
+                                printToText_.Push(i);
                                 ++i;
                             }
                         }
+                        // Eliminate spaces that have been copied before the forced break
+                        while (printText_.Size() && printText_.Back() == ' ')
+                        {
+                            printText_.Pop();
+                            printToText_.Pop();
+                        }
                         printText_.Push('\n');
-                        printToText.Push(Min((int)i, (int)unicodeText_.Size() - 1));
+                        printToText_.Push(Min((int)i, (int)unicodeText_.Size() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -522,14 +473,14 @@ void Text::UpdateText()
                         if (rowWidth <= maxWidth)
                         {
                             printText_.Push(c);
-                            printToText.Push(i);
+                            printToText_.Push(i);
                         }
                     }
                 }
                 else
                 {
                     printText_.Push('\n');
-                    printToText.Push(Min((int)i, (int)unicodeText_.Size() - 1));
+                    printToText_.Push(Min((int)i, (int)unicodeText_.Size() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }
@@ -568,27 +519,70 @@ void Text::UpdateText()
             rowWidths_.Push(rowWidth);
         }
 
-        // Set row height even if text is empty
+        // Set at least one row height even if text is empty
         if (!height)
             height = rowHeight;
 
-        // Store position & size of each character
+        // Set minimum and current size according to the text size, but respect fixed width if set
+        if (!IsFixedWidth())
+        {
+            SetMinWidth(wordWrap_ ? 0 : width);
+            SetWidth(width);
+        }
+        SetFixedHeight(height);
+        
+        charPositionsDirty_ = true;
+    }
+    else
+    {
+        // No font, nothing to render
+        pageGlyphLocations_.Clear();
+    }
+}
+
+void Text::UpdateCharPositions()
+{
+    if (font_)
+    {
+        // Remember the font face to see if it's still valid when it's time to render
+        FontFace* face = font_->GetFace(fontSize_);
+        if (!face)
+            return;
+        fontFace_ = face;
+        
+        int rowHeight = (int)(rowSpacing_ * rowHeight_);
+        
+        // Store position & size of each character, and locations per texture page
         charPositions_.Resize(unicodeText_.Size() + 1);
         charSizes_.Resize(unicodeText_.Size());
+        pageGlyphLocations_.Resize(face->GetTextures().Size());
+        for (unsigned i = 0; i < pageGlyphLocations_.Size(); ++i)
+            pageGlyphLocations_[i].Clear();
 
         unsigned rowIndex = 0;
+        unsigned lastFilled = 0;
         int x = GetRowStartPosition(rowIndex);
         int y = 0;
         for (unsigned i = 0; i < printText_.Size(); ++i)
         {
-            charPositions_[printToText[i]] = IntVector2(x, y);
+            IntVector2 pos(x, y);
+            
+            // Fill gaps in case characters were skipped from printing
+            for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
+                charPositions_[j] = pos;
+            
             unsigned c = printText_[i];
             if (c != '\n')
             {
                 const FontGlyph* glyph = face->GetGlyph(c);
-                charSizes_[printToText[i]] = IntVector2(glyph ? glyph->advanceX_ : 0, rowHeight_);
+                IntVector2 size(glyph ? glyph->advanceX_ : 0, rowHeight_);
+                for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
+                    charSizes_[j] = size;
                 if (glyph)
                 {
+                    // Store glyph's location for rendering. Verify that glyph page is valid
+                    if (glyph->page_ < pageGlyphLocations_.Size())
+                        pageGlyphLocations_[glyph->page_].Push(GlyphLocation(x, y, glyph));
                     x += glyph->advanceX_;
                     if (i < printText_.Size() - 1)
                         x += face->GetKerning(c, printText_[i + 1]);
@@ -596,22 +590,19 @@ void Text::UpdateText()
             }
             else
             {
-                charSizes_[printToText[i]] = IntVector2::ZERO;
+                for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
+                    charSizes_[j] = IntVector2::ZERO;
                 x = GetRowStartPosition(++rowIndex);
                 y += rowHeight;
             }
+            
+            lastFilled = printToText_[i] + 1;
         }
         // Store the ending position
         charPositions_[unicodeText_.Size()] = IntVector2(x, y);
+        
+        charPositionsDirty_ = false;
     }
-
-    // Set minimum and current size according to the text size, but respect fixed width if set
-    if (!IsFixedWidth())
-    {
-        SetMinWidth(wordWrap_ ? 0 : width);
-        SetWidth(width);
-    }
-    SetFixedHeight(height);
 }
 
 void Text::ValidateSelection()
@@ -679,47 +670,6 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
         unsigned dataSize = pageBatch.vertexData_->Size();
         for (unsigned i = startDataSize; i < dataSize; i += UI_VERTEX_SIZE)
             pageBatch.vertexData_->At(i + 2) += depthBias;
-    }
-}
-
-void Text::ConstructBatch(UIBatch& batch, FontFace* face, int x, int y, int dx, int dy, Color* color, float depthBias)
-{
-    unsigned rowIndex = 0;
-    unsigned startDataSize = batch.vertexData_->Size();
-    
-    if (!color)
-        batch.SetDefaultColor();
-    else
-        batch.SetColor(*color);
-
-    for (unsigned i = 0; i < printText_.Size(); ++i)
-    {
-        unsigned c = printText_[i];
-
-        if (c != '\n')
-        {
-            const FontGlyph* p = face->GetGlyph(c);
-            if (!p)
-                continue;
-
-            batch.AddQuad(dx + x + p->offsetX_, dy + y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
-
-            x += p->advanceX_;
-            if (i < printText_.Size() - 1)
-                x += face->GetKerning(c, printText_[i + 1]);
-        }
-        else
-        {
-            x = GetRowStartPosition(++rowIndex);
-            y += rowHeight_;
-        }
-    }
-    
-    if (depthBias != 0.0f)
-    {
-        unsigned dataSize = batch.vertexData_->Size();
-        for (unsigned i = startDataSize; i < dataSize; i += UI_VERTEX_SIZE)
-            batch.vertexData_->At(i + 2) += depthBias;
     }
 }
 

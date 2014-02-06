@@ -923,6 +923,7 @@ void UIElement::SetIndent(int indent)
     if (parent_)
         parent_->UpdateLayout();
     UpdateLayout();
+    OnIndentSet();
 }
 
 void UIElement::SetIndentSpacing(int indentSpacing)
@@ -931,6 +932,7 @@ void UIElement::SetIndentSpacing(int indentSpacing)
     if (parent_)
         parent_->UpdateLayout();
     UpdateLayout();
+    OnIndentSet();
 }
 
 void UIElement::UpdateLayout()

@@ -175,6 +175,8 @@ public:
     virtual void OnPositionSet() {}
     /// React to editable status change.
     virtual void OnSetEditable() {}
+    /// React to indent change.
+    virtual void OnIndentSet() {}
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);

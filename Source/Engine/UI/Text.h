@@ -81,6 +81,8 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to resize.
     virtual void OnResize();
+    /// React to indent change.
+    virtual void OnIndentSet();
 
     /// Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
@@ -138,9 +140,9 @@ public:
     /// Return width of each row.
     const PODVector<int>& GetRowWidths() const { return rowWidths_; }
     /// Return position of each character.
-    const PODVector<IntVector2>& GetCharPositions() const { return charPositions_; }
+    const PODVector<IntVector2>& GetCharPositions();
     /// Return size of each character.
-    const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
+    const PODVector<IntVector2>& GetCharSizes();
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -156,17 +158,19 @@ protected:
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update text when text, font or spacing changed.
     void UpdateText();
+    /// Update character positions.
+    void UpdateCharPositions();
     /// Validate text selection to be within the text.
     void ValidateSelection();
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
     void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
-    /// Contruct batch.
-    void ConstructBatch(UIBatch& batch, FontFace* face, int x, int y, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
 
     /// Font.
     SharedPtr<Font> font_;
+    /// Current face.
+    WeakPtr<FontFace> fontFace_;
     /// Font size.
     int fontSize_;
     /// UTF-8 encoded text.
@@ -175,12 +179,16 @@ protected:
     PODVector<unsigned> unicodeText_;
     /// Text modified into printed form.
     PODVector<unsigned> printText_;
+    /// Mapping of printed form back to original char indices.
+    PODVector<unsigned> printToText_;
     /// Row alignment.
     HorizontalAlignment textAlignment_;
     /// Row spacing.
     float rowSpacing_;
     /// Wordwrap mode.
     bool wordWrap_;
+    /// Char positions dirty flag.
+    bool charPositionsDirty_;
     /// Selection start.
     unsigned selectionStart_;
     /// Selection length.
