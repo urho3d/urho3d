@@ -8791,6 +8791,7 @@ float Random(float, float);
 int RandomInt();
 int RandomInt(int);
 int RandomInt(int, int);
+float RandomNormal(float, float);
 void Remove();
 String RemoveTrailingSlash(const String&);
 String ReplaceExtension(const String&, const String&);
