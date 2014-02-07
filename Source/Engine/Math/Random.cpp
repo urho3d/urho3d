@@ -46,13 +46,13 @@ int Rand()
 
 float RandStandardNormal()
 {
-	float val = 0.0f;
-	for(int i = 0; i < 12; i++) {
-		val += Rand() / 32768.0f;
-	}
-	val -= 6.0f;
-	// now val is approximatly standard normal distributed.
-	return val;
+    float val = 0.0f;
+    for (int i = 0; i < 12; i++)
+        val += Rand() / 32768.0f;
+    val -= 6.0f;
+    
+    // Now val is approximatly standard normal distributed
+    return val;
 }
 
 }
