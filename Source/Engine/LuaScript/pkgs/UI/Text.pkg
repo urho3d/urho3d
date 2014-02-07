@@ -41,9 +41,10 @@ class Text : public UIElement
     const Color& GetEffectColor() const;
     int GetRowHeight() const;
     unsigned GetNumRows() const;
-    const PODVector<int>& GetRowWidths() const;
-    const PODVector<IntVector2>& GetCharPositions();
-    const PODVector<IntVector2>& GetCharSizes();
+    unsigned GetNumChars() const;
+    int GetRowWidth(unsigned index) const;
+    IntVector2 GetCharPosition(unsigned index);
+    IntVector2 GetCharSize(unsigned index);
     
     void SetEffectDepthBias(float bias);
     float GetEffectDepthBias() const;

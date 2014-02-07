@@ -53,7 +53,7 @@ Text::Text(Context* context) :
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
     wordWrap_(false),
-    charPositionsDirty_(true),
+    charLocationsDirty_(true),
     selectionStart_(0),
     selectionLength_(0),
     selectionColor_(Color::TRANSPARENT),
@@ -108,6 +108,23 @@ void Text::ApplyAttributes()
 
 void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
+    FontFace* face = font_ ? font_->GetFace(fontSize_) : (FontFace*)0;
+    if (!face)
+    {
+        hovering_ = false;
+        return;
+    }
+    
+    // If face has changed or char locations are not valid anymore, update before rendering
+    if (charLocationsDirty_ || !fontFace_ || face != fontFace_)
+        UpdateCharLocations();
+    // If face uses mutable glyphs mechanism, reacquire glyphs before rendering to make sure they are in the texture
+    else if (face->HasMutableGlyphs())
+    {
+        for (unsigned i = 0; i < printText_.Size(); ++i)
+            face->GetGlyph(printText_[i]);
+    }
+    
     // Hovering and/or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
@@ -120,29 +137,29 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     }
 
     // Partial selection batch
-    if (!selected_ && selectionLength_ && charSizes_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
+    if (!selected_ && selectionLength_ && charLocations_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
         batch.SetColor(selectionColor_);
 
-        IntVector2 currentStart = charPositions_[selectionStart_];
+        IntVector2 currentStart = charLocations_[selectionStart_].position_;
         IntVector2 currentEnd = currentStart;
         for (unsigned i = selectionStart_; i < selectionStart_ + selectionLength_; ++i)
         {
             // Check if row changes, and start a new quad in that case
-            if (charSizes_[i].x_ && charSizes_[i].y_)
+            if (charLocations_[i].size_ != IntVector2::ZERO)
             {
-                if (charPositions_[i].y_ != currentStart.y_)
+                if (charLocations_[i].position_.y_ != currentStart.y_)
                 {
                     batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
                         0, 0);
-                    currentStart = charPositions_[i];
-                    currentEnd = currentStart + charSizes_[i];
+                    currentStart = charLocations_[i].position_;
+                    currentEnd = currentStart + charLocations_[i].size_;
                 }
                 else
                 {
-                    currentEnd.x_ += charSizes_[i].x_;
-                    currentEnd.y_ = Max(currentStart.y_ + charSizes_[i].y_, currentEnd.y_);
+                    currentEnd.x_ += charLocations_[i].size_.x_;
+                    currentEnd.y_ = Max(currentStart.y_ + charLocations_[i].size_.y_, currentEnd.y_);
                 }
             }
         }
@@ -156,56 +173,39 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     }
 
     // Text batch
-    if (font_)
+    const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
+    for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)
     {
-        FontFace* face = font_->GetFace(fontSize_);
-        if (!face)
-            return;
-        
-        // If face has changed or char positions are not valid anymore, update before rendering
-        if (charPositionsDirty_ || !fontFace_ || face != fontFace_)
-            UpdateCharPositions();
-        // If face uses mutable glyphs mechanism, reacquire glyphs before rendering to make sure they are in the texture
-        else if (face->HasMutableGlyphs())
+        // One batch per texture/page
+        UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
+
+        const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
+
+        switch (textEffect_)
         {
-            for (unsigned i = 0; i < printText_.Size(); ++i)
-                face->GetGlyph(printText_[i]);
+        case TE_NONE:
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+            break;
+            
+        case TE_SHADOW:
+            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+            break;
+            
+        case TE_STROKE:
+            ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+            break;
         }
-        
-        const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
-        for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)
-        {
-            // One batch per texture/page
-            UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
 
-            const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
-
-            switch (textEffect_)
-            {
-            case TE_NONE:
-                ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                break;
-                
-            case TE_SHADOW:
-                ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                break;
-                
-            case TE_STROKE:
-                ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                break;
-            }
-
-            UIBatch::AddOrMerge(pageBatch, batches);
-        }
+        UIBatch::AddOrMerge(pageBatch, batches);
     }
 
     // Reset hovering for next frame
@@ -217,12 +217,12 @@ void Text::OnResize()
     if (wordWrap_)
         UpdateText();
     else
-        charPositionsDirty_ = true;
+        charLocationsDirty_ = true;
 }
 
 void Text::OnIndentSet()
 {
-    charPositionsDirty_ = true;
+    charLocationsDirty_ = true;
 }
 
 bool Text::SetFont(const String& fontName, int size)
@@ -267,7 +267,7 @@ void Text::SetTextAlignment(HorizontalAlignment align)
     if (align != textAlignment_)
     {
         textAlignment_ = align;
-        charPositionsDirty_ = true;
+        charLocationsDirty_ = true;
     }
 }
 
@@ -327,18 +327,33 @@ void Text::SetEffectDepthBias(float bias)
     effectDepthBias_ = bias;
 }
 
-const PODVector<IntVector2>& Text::GetCharPositions()
+int Text::GetRowWidth(unsigned index) const
 {
-    if (charPositionsDirty_)
-        UpdateCharPositions();
-    return charPositions_;
+    return index < rowWidths_.Size() ? rowWidths_[index] : 0;
 }
 
-const PODVector<IntVector2>& Text::GetCharSizes()
+IntVector2 Text::GetCharPosition(unsigned index)
 {
-    if (charPositionsDirty_)
-        UpdateCharPositions();
-    return charSizes_;
+    if (charLocationsDirty_)
+        UpdateCharLocations();
+    if (charLocations_.Empty())
+        return IntVector2::ZERO;
+    // For convenience, return the position of the text ending if index exceeded
+    if (index > charLocations_.Size() - 1)
+        index = charLocations_.Size() - 1;
+    return charLocations_[index].position_;
+}
+
+IntVector2 Text::GetCharSize(unsigned index)
+{
+    if (charLocationsDirty_)
+        UpdateCharLocations();
+    if (charLocations_.Size() < 2)
+        return IntVector2::ZERO;
+    // For convenience, return the size of the last char if index exceeded (last size entry is zero)
+    if (index > charLocations_.Size() - 2)
+        index = charLocations_.Size() - 2;
+    return charLocations_[index].size_;
 }
 
 void Text::SetFontAttr(ResourceRef value)
@@ -539,7 +554,7 @@ void Text::UpdateText()
         }
         SetFixedHeight(height);
         
-        charPositionsDirty_ = true;
+        charLocationsDirty_ = true;
     }
     else
     {
@@ -548,69 +563,64 @@ void Text::UpdateText()
     }
 }
 
-void Text::UpdateCharPositions()
+void Text::UpdateCharLocations()
 {
-    if (font_)
-    {
-        // Remember the font face to see if it's still valid when it's time to render
-        FontFace* face = font_->GetFace(fontSize_);
-        if (!face)
-            return;
-        fontFace_ = face;
-        
-        int rowHeight = (int)(rowSpacing_ * rowHeight_);
-        
-        // Store position & size of each character, and locations per texture page
-        charPositions_.Resize(unicodeText_.Size() + 1);
-        charSizes_.Resize(unicodeText_.Size());
-        pageGlyphLocations_.Resize(face->GetTextures().Size());
-        for (unsigned i = 0; i < pageGlyphLocations_.Size(); ++i)
-            pageGlyphLocations_[i].Clear();
+    // Remember the font face to see if it's still valid when it's time to render
+    FontFace* face = font_ ? font_->GetFace(fontSize_) : (FontFace*)0;
+    if (!face)
+        return;
+    fontFace_ = face;
+    
+    int rowHeight = (int)(rowSpacing_ * rowHeight_);
+    
+    // Store position & size of each character, and locations per texture page
+    unsigned numChars = unicodeText_.Size();
+    charLocations_.Resize(numChars + 1);
+    pageGlyphLocations_.Resize(face->GetTextures().Size());
+    for (unsigned i = 0; i < pageGlyphLocations_.Size(); ++i)
+        pageGlyphLocations_[i].Clear();
 
-        unsigned rowIndex = 0;
-        unsigned lastFilled = 0;
-        int x = GetRowStartPosition(rowIndex);
-        int y = 0;
-        for (unsigned i = 0; i < printText_.Size(); ++i)
-        {
-            IntVector2 pos(x, y);
-            
-            // Fill gaps in case characters were skipped from printing
-            for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
-                charPositions_[j] = pos;
-            
-            unsigned c = printText_[i];
-            if (c != '\n')
-            {
-                const FontGlyph* glyph = face->GetGlyph(c);
-                IntVector2 size(glyph ? glyph->advanceX_ : 0, rowHeight_);
-                for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
-                    charSizes_[j] = size;
-                if (glyph)
-                {
-                    // Store glyph's location for rendering. Verify that glyph page is valid
-                    if (glyph->page_ < pageGlyphLocations_.Size())
-                        pageGlyphLocations_[glyph->page_].Push(GlyphLocation(x, y, glyph));
-                    x += glyph->advanceX_;
-                    if (i < printText_.Size() - 1)
-                        x += face->GetKerning(c, printText_[i + 1]);
-                }
-            }
-            else
-            {
-                for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
-                    charSizes_[j] = IntVector2::ZERO;
-                x = GetRowStartPosition(++rowIndex);
-                y += rowHeight;
-            }
-            
-            lastFilled = printToText_[i] + 1;
-        }
-        // Store the ending position
-        charPositions_[unicodeText_.Size()] = IntVector2(x, y);
+    unsigned rowIndex = 0;
+    unsigned lastFilled = 0;
+    int x = GetRowStartPosition(rowIndex);
+    int y = 0;
+    for (unsigned i = 0; i < printText_.Size(); ++i)
+    {
+        CharLocation loc;
+        loc.position_ = IntVector2(x, y);
         
-        charPositionsDirty_ = false;
+        unsigned c = printText_[i];
+        if (c != '\n')
+        {
+            const FontGlyph* glyph = face->GetGlyph(c);
+            loc.size_ = IntVector2(glyph ? glyph->advanceX_ : 0, rowHeight_);
+            if (glyph)
+            {
+                // Store glyph's location for rendering. Verify that glyph page is valid
+                if (glyph->page_ < pageGlyphLocations_.Size())
+                    pageGlyphLocations_[glyph->page_].Push(GlyphLocation(x, y, glyph));
+                x += glyph->advanceX_;
+                if (i < printText_.Size() - 1)
+                    x += face->GetKerning(c, printText_[i + 1]);
+            }
+        }
+        else
+        {
+            loc.size_ = IntVector2::ZERO;
+            x = GetRowStartPosition(++rowIndex);
+            y += rowHeight;
+        }
+        
+        // Fill gaps in case characters were skipped from printing
+        for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
+            charLocations_[j] = loc;
+        lastFilled = printToText_[i] + 1;
     }
+    // Store the ending position
+    charLocations_[numChars].position_ = IntVector2(x, y);
+    charLocations_[numChars].size_ = IntVector2::ZERO;
+    
+    charLocationsDirty_ = false;
 }
 
 void Text::ValidateSelection()

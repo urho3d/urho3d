@@ -41,6 +41,15 @@ enum TextEffect
     TE_STROKE
 };
 
+/// Cached character location and size within text. Used for queries related to text editing.
+struct CharLocation
+{
+    /// Position.
+    IntVector2 position_;
+    /// Size.
+    IntVector2 size_;
+};
+
 /// Glyph and its location within the text. Used when preparing text rendering.
 struct GlyphLocation
 {
@@ -137,12 +146,14 @@ public:
     int GetRowHeight() const { return rowHeight_; }
     /// Return number of rows.
     unsigned GetNumRows() const { return rowWidths_.Size(); }
-    /// Return width of each row.
-    const PODVector<int>& GetRowWidths() const { return rowWidths_; }
-    /// Return position of each character.
-    const PODVector<IntVector2>& GetCharPositions();
-    /// Return size of each character.
-    const PODVector<IntVector2>& GetCharSizes();
+    /// Return number of characters.
+    unsigned GetNumChars() const { return unicodeText_.Size(); }
+    /// Return width of row by index.
+    int GetRowWidth(unsigned index) const;
+    /// Return position of character by index relative to the text element origin.
+    IntVector2 GetCharPosition(unsigned index);
+    /// Return size of character by index.
+    IntVector2 GetCharSize(unsigned index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -158,8 +169,8 @@ protected:
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update text when text, font or spacing changed.
     void UpdateText();
-    /// Update character positions.
-    void UpdateCharPositions();
+    /// Update cached character locations after text update, or when text alignment or indent has changed.
+    void UpdateCharLocations();
     /// Validate text selection to be within the text.
     void ValidateSelection();
     /// Return row start X position.
@@ -182,7 +193,7 @@ protected:
     /// Wordwrap mode.
     bool wordWrap_;
     /// Char positions dirty flag.
-    bool charPositionsDirty_;
+    bool charLocationsDirty_;
     /// Selection start.
     unsigned selectionStart_;
     /// Selection length.
@@ -207,12 +218,10 @@ protected:
     PODVector<unsigned> printToText_;
     /// Row widths.
     PODVector<int> rowWidths_;
-    /// Positions of each character.
-    PODVector<IntVector2> charPositions_;
-    /// Sizes of each character.
-    PODVector<IntVector2> charSizes_;
     /// Glyph locations per each texture in the font.
     Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
+    /// Cached locations of each character in the text.
+    PODVector<CharLocation> charLocations_;
 };
 
 }

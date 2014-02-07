@@ -570,10 +570,7 @@ void LineEdit::UpdateText()
 
 void LineEdit::UpdateCursor()
 {
-    int x = 0;
-    const PODVector<IntVector2>& charPositions = text_->GetCharPositions();
-    if (charPositions.Size())
-        x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
+    int x = text_->GetCharPosition(cursorPosition_).x_;
 
     text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
@@ -599,14 +596,14 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
 {
     IntVector2 screenPosition = ElementToScreen(position);
     IntVector2 textPosition = text_->ScreenToElement(screenPosition);
-    const PODVector<IntVector2>& charPositions = text_->GetCharPositions();
 
     if (textPosition.x_ < 0)
         return 0;
 
-    for (unsigned i = charPositions.Size() - 1; i < charPositions.Size(); --i)
+    int numChars = text_->GetNumChars();
+    for (int i = numChars; i >= 0; --i)
     {
-        if (textPosition.x_ >= charPositions[i].x_)
+        if (textPosition.x_ >= text_->GetCharPosition(i).x_)
             return i;
     }
 
