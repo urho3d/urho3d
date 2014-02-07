@@ -282,7 +282,7 @@ int LuaScript::Loader(lua_State* L)
     if (luaFile)
         return luaFile->LoadChunk(L) ? 1 : 0;
 
-    return false;
+    return 0;
 }
 
 void LuaScript::ReplacePrint()
