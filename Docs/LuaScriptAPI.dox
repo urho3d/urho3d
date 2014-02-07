@@ -4621,9 +4621,10 @@ Methods:
 - const Color& GetEffectColor() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
-- const PODVector<int>& GetRowWidths() const
-- const PODVector<IntVector2>& GetCharPositions()
-- const PODVector<IntVector2>& GetCharSizes()
+- unsigned GetNumChars() const
+- int GetRowWidth(unsigned index) const
+- IntVector2 GetCharPosition(unsigned index)
+- IntVector2 GetCharSize(unsigned index)
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
 
@@ -4643,6 +4644,7 @@ Properties:
 - Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
+- unsigned numChars (readonly)
 
 ### Text3D : Drawable
 
@@ -4683,7 +4685,10 @@ Methods:
 - int GetWidth() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
-- const PODVector<int>& GetRowWidths() const
+- unsigned GetNumChars() const
+- int GetRowWidth(unsigned index) const
+- IntVector2 GetCharPosition(unsigned index)
+- IntVector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool GetFaceCamera() const
@@ -4705,6 +4710,7 @@ Properties:
 - int width
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
+- unsigned numChars (readonly)
 - float opacity
 - bool faceCamera
 

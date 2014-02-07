@@ -5663,6 +5663,8 @@ Properties:
 - bool bringToBack
 - bool bringToFront
 - String category (readonly)
+- IntVector2[] charPositions (readonly)
+- IntVector2[] charSizes (readonly)
 - IntVector2 childOffset (readonly)
 - UIElement@[] children (readonly)
 - IntRect clipBorder
@@ -5705,6 +5707,7 @@ Properties:
 - String name
 - uint numAllChildren (readonly)
 - uint numAttributes (readonly)
+- uint numChars (readonly)
 - uint numChildren (readonly)
 - uint numRows (readonly)
 - float opacity
@@ -5715,6 +5718,7 @@ Properties:
 - UIElement@ root (readonly)
 - int rowHeight (readonly)
 - float rowSpacing
+- int[] rowWidths (readonly)
 - IntVector2 screenPosition (readonly)
 - bool selected
 - Color selectionColor
@@ -5770,6 +5774,8 @@ Properties:
 - BoundingBox boundingBox (readonly)
 - bool castShadows
 - String category (readonly)
+- IntVector2[] charPositions (readonly)
+- IntVector2[] charSizes (readonly)
 - Color color (writeonly)
 - Color[] colors
 - float drawDistance
@@ -5789,6 +5795,7 @@ Properties:
 - uint maxLights
 - Node@ node (readonly)
 - uint numAttributes (readonly)
+- uint numChars (readonly)
 - uint numRows (readonly)
 - bool occludee
 - bool occluder
@@ -5796,6 +5803,7 @@ Properties:
 - int refs (readonly)
 - int rowHeight (readonly)
 - float rowSpacing
+- int[] rowWidths (readonly)
 - float shadowDistance
 - uint shadowMask
 - bool temporary

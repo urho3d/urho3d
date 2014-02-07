@@ -6733,6 +6733,10 @@ bool bringToFront;
 /* (readonly) */
 String category;
 /* (readonly) */
+Array<IntVector2> charPositions;
+/* (readonly) */
+Array<IntVector2> charSizes;
+/* (readonly) */
 IntVector2 childOffset;
 /* (readonly) */
 Array<UIElement> children;
@@ -6790,6 +6794,8 @@ uint numAllChildren;
 /* (readonly) */
 uint numAttributes;
 /* (readonly) */
+uint numChars;
+/* (readonly) */
 uint numChildren;
 /* (readonly) */
 uint numRows;
@@ -6804,6 +6810,8 @@ UIElement root;
 /* (readonly) */
 int rowHeight;
 float rowSpacing;
+/* (readonly) */
+Array<int> rowWidths;
 /* (readonly) */
 IntVector2 screenPosition;
 bool selected;
@@ -6869,6 +6877,10 @@ BoundingBox boundingBox;
 bool castShadows;
 /* (readonly) */
 String category;
+/* (readonly) */
+Array<IntVector2> charPositions;
+/* (readonly) */
+Array<IntVector2> charSizes;
 /* (writeonly) */
 Color color;
 Array<Color> colors;
@@ -6897,6 +6909,8 @@ Node node;
 /* (readonly) */
 uint numAttributes;
 /* (readonly) */
+uint numChars;
+/* (readonly) */
 uint numRows;
 bool occludee;
 bool occluder;
@@ -6906,6 +6920,8 @@ int refs;
 /* (readonly) */
 int rowHeight;
 float rowSpacing;
+/* (readonly) */
+Array<int> rowWidths;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
