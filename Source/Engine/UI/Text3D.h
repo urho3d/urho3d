@@ -121,8 +121,14 @@ public:
     int GetRowHeight() const;
     /// Return number of rows.
     unsigned GetNumRows() const;
-    /// Return width of each row.
-    const PODVector<int>& GetRowWidths() const;
+    /// Return number of characters.
+    unsigned GetNumChars() const;
+    /// Return width of row by index.
+    int GetRowWidth(unsigned index) const;
+    /// Return position of character by index relative to the text element origin.
+    IntVector2 GetCharPosition(unsigned index);
+    /// Return size of character by index.
+    IntVector2 GetCharSize(unsigned index);
     /// Return corner color.
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
