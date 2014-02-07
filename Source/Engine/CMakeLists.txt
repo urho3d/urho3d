@@ -23,22 +23,16 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
-# Define generated source files
-execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-if (GIT_EXIT_CODE EQUAL 0)
-    add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
-        COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
-        DEPENDS ${STATIC_LIBRARY_TARGETS} ${PROJECT_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
-else ()
-    # No GIT command line tool or not a GIT repository, generate a dummy revision file
-    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/librevision.h "const char* revision=\"Unversioned\";")
-endif ()
-
 if (WIN32)
     set (CMAKE_DEBUG_POSTFIX _d)
 endif ()
+
+# Define generated source files
+add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
+    COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
+    DEPENDS ${STATIC_LIBRARY_TARGETS} ${PROJECT_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
 # Define generated object files
 # This is a hack as it relies on internal working of CMake

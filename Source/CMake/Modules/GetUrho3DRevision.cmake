@@ -27,8 +27,7 @@ if (GIT_EXIT_CODE EQUAL 0)
     # Remove trailing end of line character
     string (STRIP ${LIB_REVISION} LIB_REVISION)
 else ()
-    # This should not happen, but just in case
+    # No GIT command line tool or not a GIT repository
     set (LIB_REVISION Unversioned)
 endif ()
-set (LIB_REVISION "const char* revision=\"${LIB_REVISION}\"\;\n")
-file (WRITE ${FILENAME} ${LIB_REVISION})
+file (WRITE ${FILENAME} "const char* revision=\"${LIB_REVISION}\";")
