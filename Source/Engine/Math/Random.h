@@ -24,8 +24,6 @@
 
 #include "Urho3D.h"
 
-#include <cmath>
-
 namespace Urho3D
 {
 
@@ -35,7 +33,7 @@ URHO3D_API void SetRandomSeed(unsigned seed);
 URHO3D_API unsigned GetRandomSeed();
 /// Return a random number between 0-32767. Should operate similarly to MSVC rand().
 URHO3D_API int Rand();
-/// Return a normal distributed number.
-URHO3D_API float RandNormal(float meanValue, float standardDeviation);
+/// Return a standard normal distributed number.
+URHO3D_API float RandStandardNormal();
 
 }

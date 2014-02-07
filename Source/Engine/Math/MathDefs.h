@@ -151,5 +151,7 @@ inline float Random(float min, float max) { return Rand() * (max - min) / 32767.
 inline int Random(int range) { return (Rand() * (range - 1) + 16384) / 32767; }
 /// Return a random integer between min and max - 1.
 inline int Random(int min, int max) { return (Rand() * (max - min - 1) + 16384) / 32767 + min; }
+/// Return a random normal distributed number with the given mean value and variance.
+inline float RandomNormal(float meanValue, float variance) { return RandStandardNormal() * sqrtf(variance) + meanValue; }
 
 }
