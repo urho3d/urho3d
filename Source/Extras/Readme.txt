@@ -1,7 +1,6 @@
 BlenderExporter
 
-- Contributed by reattiva. Read installation instructions from the Readme.txt
-  file within the subdirectory
+- Has moved to https://github.com/reattiva/Urho3D-Blender
 
 OgreBatchConverter
 
