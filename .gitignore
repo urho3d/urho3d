@@ -56,3 +56,4 @@ configure*
 .DS_Store
 *.log
 *.bak
+Thumbs.db
