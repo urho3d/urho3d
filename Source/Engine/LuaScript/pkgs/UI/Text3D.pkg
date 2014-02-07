@@ -66,6 +66,7 @@ class Text3D : public Drawable
     tolua_property__get_set Color& color; // Write only property.
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_readonly tolua_property__get_set unsigned numChars;
     tolua_property__get_set float opacity;
     tolua_property__get_set bool faceCamera;
 };

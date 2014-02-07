@@ -63,6 +63,7 @@ class Text : public UIElement
     tolua_property__get_set Color& effectColor;
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_readonly tolua_property__get_set unsigned numChars;
 };
 
 ${
