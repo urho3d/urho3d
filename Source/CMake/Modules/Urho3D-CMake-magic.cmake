@@ -101,8 +101,7 @@ endif ()
 
 # Add definitions for GLEW
 if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
-    add_definitions (-DGLEW_STATIC)
-    add_definitions (-DGLEW_NO_GLU)
+    add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
 endif ()
 
 # Enable AngelScript by default
@@ -121,6 +120,10 @@ if (ENABLE_LUAJIT)
     set (JIT JIT)
     # Implied ENABLE_LUA
     set (ENABLE_LUA 1)
+    # Adjust LuaJIT default search path as necessary (adapted from LuaJIT's original Makefile)
+    if (NOT CMAKE_INSTALL_PREFIX STREQUAL /usr/local)
+        add_definitions (-DLUA_XROOT="${CMAKE_INSTALL_PREFIX}/")
+    endif ()
 endif ()
 if (ENABLE_LUA)
     add_definitions (-DENABLE_LUA)

@@ -9,6 +9,7 @@ Bin/*
 !Bin/*.sh
 Bin/*.app/
 Bin/*.app.dSYM/
+Bin/Data/LuaScripts/jit/
 *-Bin/
 Lib/
 *-Lib/

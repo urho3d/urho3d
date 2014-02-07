@@ -209,15 +209,15 @@ set (TARGET_NAME LuaJIT)
 # Macro for generating source file
 macro (generate_source name mode)
     set (GEN_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/${name})
-    set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC}) 
+    set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC})
     add_custom_command (OUTPUT ${GEN_SRC}
-        COMMAND ${PROJECT_ROOT_DIR}/Bin/${BUILDVM_X} -m ${mode} -o ${GEN_SRC} ${ARGN} DEPENDS ${BUILDVM_DEP} ${ARGN}
+        COMMAND ${PROJECT_ROOT_DIR}/Bin/${BUILDVM_X} -m ${mode} -o ${GEN_SRC} ${ARGN}
+        DEPENDS ${BUILDVM_DEP} ${ARGN}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating buildvm output: ${name}")
 endmacro ()
 
 # Define generated source files
-file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 if (WIN32)
     set (LJVM_MODE peobj)
     set (LJVM_BOUT lj_vm.obj)
@@ -243,6 +243,7 @@ generate_source (${LJVM_BOUT} ${LJVM_MODE})
 foreach (MODE bcdef ffdef libdef recdef)
     generate_source (lj_${MODE}.h ${MODE} ${LJLIB_C})
 endforeach ()
+generate_source (vmdef.lua vmdef ${LJLIB_C})
 generate_source (lj_folddef.h folddef src/lj_opt_fold.c)
 
 # Define source files
@@ -285,4 +286,19 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
     # Setup target
     setup_executable ()
     adjust_target_name ()   # Adjust to intended target output name
+
+    # Define post build steps
+    set (LUAJIT_DEP_DIR ${PROJECT_ROOT_DIR}/Bin/Data/LuaScripts/jit)
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/jit ${LUAJIT_DEP_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/vmdef.lua ${LUAJIT_DEP_DIR}
+        COMMENT "Copying dependency files for luajit standalone executable")
+
+    # Install dependency files required by luajit
+    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR}/Data/LuaScripts USE_SOURCE_PERMISSIONS)
 endif ()
+
+# Add Data/LuaScripts directory into the LuaJIT module search path
+file (TO_NATIVE_PATH Data/LuaScripts/ LUA_RDIR)     # Relative directory
+file (TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${DEST_RUNTIME_DIR}/Data/LuaScripts/ LUA_IDIR)     # Installation directory
+add_definitions (-DLUA_RDIR="${LUA_RDIR}" -DLUA_IDIR="${LUA_IDIR}")
