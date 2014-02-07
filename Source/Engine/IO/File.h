@@ -84,7 +84,7 @@ public:
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
     /// Return whether is open.
-    bool IsOpen() const { return handle_ != 0; }
+    bool IsOpen() const;
     /// Return the file handle.
     void* GetHandle() const { return handle_; }
     /// Return whether the file originates from a package.

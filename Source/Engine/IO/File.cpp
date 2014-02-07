@@ -463,4 +463,13 @@ void File::SetName(const String& name)
     fileName_ = name;
 }
 
+bool File::IsOpen() const
+{
+    #ifdef ANDROID
+        return handle_ != 0 || assetHandle_ != 0;
+    #else
+        return handle_ != 0;
+    #endif
+}
+
 }
