@@ -118,6 +118,7 @@ bool LuaFile::LoadChunk(lua_State* luaState)
         return false;
     }
 
+    LOGINFO("Loaded Lua script " + GetName());
     hasLoaded_ = true;
 
     return true;
