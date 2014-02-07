@@ -34,5 +34,6 @@ bool Equals(float lhs, float rhs);
 float Random();
 float Random(float range);
 float Random(float min, float max);
+float RandomNormal(float meanValue, float variance);
 int Random @ RandomInt(int range);
 int Random @ RandomInt(int min, int max);
