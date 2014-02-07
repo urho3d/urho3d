@@ -40,6 +40,7 @@ Urho3D development, contributions and bugfixes by:
 - Magic.Lixin
 - Mike3D
 - amadeus_osa
+- mightyCelu
 - reattiva
 - skaiware
 
