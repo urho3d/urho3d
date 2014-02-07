@@ -4622,8 +4622,8 @@ Methods:
 - int GetRowHeight() const
 - unsigned GetNumRows() const
 - const PODVector<int>& GetRowWidths() const
-- const PODVector<IntVector2>& GetCharPositions() const
-- const PODVector<IntVector2>& GetCharSizes() const
+- const PODVector<IntVector2>& GetCharPositions()
+- const PODVector<IntVector2>& GetCharSizes()
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
 
