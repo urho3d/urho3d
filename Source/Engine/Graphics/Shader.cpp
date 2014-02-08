@@ -30,6 +30,7 @@
 #include "ResourceCache.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
+#include "Sort.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -66,6 +67,7 @@ Shader::Shader(Context* context) :
     Resource(context),
     timeStamp_(0)
 {
+    RefreshMemoryUse();
 }
 
 Shader::~Shader()
@@ -113,9 +115,7 @@ bool Shader::Load(Deserializer& source)
     for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Begin(); i != psVariations_.End(); ++i)
         i->second_->Release();
     
-    SetMemoryUse(sizeof(Shader) + vsSourceCode_.Length() + psSourceCode_.Length() + (vsVariations_.Size() + psVariations_.Size()) *
-        sizeof(ShaderVariation));
-    
+    RefreshMemoryUse();
     return true;
 }
 
@@ -131,14 +131,28 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
     if (type == VS)
     {
         HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Find(definesHash);
-        // Create the shader variation now if not created yet
         if (i == vsVariations_.End())
         {
-            i = vsVariations_.Insert(MakePair(definesHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
-            i->second_->SetName(GetFileName(GetName()) + " " + defines);
-            i->second_->SetDefines(defines);
+            // If shader not found, normalize the defines (to prevent duplicates) and check again. In that case make an alias
+            // so that further queries are faster
+            String normalizedDefines = NormalizeDefines(defines);
+            StringHash normalizedHash(normalizedDefines);
             
-            SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
+            i = vsVariations_.Find(normalizedHash);
+            if (i != vsVariations_.End())
+                vsVariations_.Insert(MakePair(definesHash, i->second_));
+            else
+            {
+                // No shader variation found. Create new
+                i = vsVariations_.Insert(MakePair(normalizedHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
+                if (definesHash != normalizedHash)
+                    vsVariations_.Insert(MakePair(definesHash, i->second_));
+                
+                i->second_->SetName(GetFileName(GetName()) + " " + normalizedDefines);
+                i->second_->SetDefines(normalizedDefines);
+                ++numVariations_;
+                RefreshMemoryUse();
+            }
         }
         
         return i->second_;
@@ -146,40 +160,29 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
     else
     {
         HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Find(definesHash);
-        // Create the shader variation now if not created yet
         if (i == psVariations_.End())
         {
-            i = psVariations_.Insert(MakePair(definesHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
-            i->second_->SetName(GetFileName(GetName()) + " " + defines);
-            i->second_->SetDefines(defines);
+            String normalizedDefines = NormalizeDefines(defines);
+            StringHash normalizedHash(normalizedDefines);
             
-            SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
+            i = psVariations_.Find(normalizedHash);
+            if (i != psVariations_.End())
+                psVariations_.Insert(MakePair(definesHash, i->second_));
+            else
+            {
+                i = psVariations_.Insert(MakePair(normalizedHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
+                if (definesHash != normalizedHash)
+                    psVariations_.Insert(MakePair(definesHash, i->second_));
+                
+                i->second_->SetName(GetFileName(GetName()) + " " + normalizedDefines);
+                i->second_->SetDefines(normalizedDefines);
+                ++numVariations_;
+                RefreshMemoryUse();
+            }
         }
         
         return i->second_;
     }
-}
-
-String Shader::SanitateDefines(const String& definesIn)
-{
-    String ret;
-    ret.Reserve(definesIn.Length());
-    
-    unsigned numSpaces = 0;
-    
-    for (unsigned i = 0; i < definesIn.Length(); ++i)
-    {
-        // Ensure only one space in a row
-        if (definesIn[i] == ' ')
-            ++numSpaces;
-        else
-            numSpaces = 0;
-        
-        if (numSpaces <= 1)
-            ret += definesIn[i];
-    }
-    
-    return ret.Trimmed();
 }
 
 bool Shader::ProcessSource(String& code, Deserializer& source)
@@ -233,6 +236,18 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     code += "\n";
     
     return true;
+}
+
+String Shader::NormalizeDefines(const String& defines)
+{
+    Vector<String> definesVec = defines.ToUpper().Split(' ');
+    Sort(definesVec.Begin(), definesVec.End());
+    return String::Joined(definesVec, " ");
+}
+
+void Shader::RefreshMemoryUse()
+{
+    SetMemoryUse(sizeof(Shader) + vsSourceCode_.Length() + psSourceCode_.Length() + numVariations_ * sizeof(ShaderVariation));
 }
 
 }

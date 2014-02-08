@@ -1549,8 +1549,8 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             unsigned g = k / MAX_LIGHT_VS_VARIATIONS;
             unsigned l = k % MAX_LIGHT_VS_VARIATIONS;
             
-            vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), Shader::SanitateDefines(pass->GetVertexShaderDefines() + " " +
-                lightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]));
+            vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                lightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
@@ -1558,12 +1558,12 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             unsigned h = j / MAX_LIGHT_PS_VARIATIONS;
             if (k & LPS_SHADOW)
             {
-                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), Shader::SanitateDefines(pass->GetPixelShaderDefines() +
-                    " " + lightPSVariations[k] + shadowVariations[shadows] + heightFogVariations[h]));
+                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                    lightPSVariations[k] + shadowVariations[shadows] + heightFogVariations[h]);
             }
             else
-                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), Shader::SanitateDefines(pass->GetPixelShaderDefines() +
-                    " " + lightPSVariations[k] + heightFogVariations[h]));
+                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                    lightPSVariations[k] + heightFogVariations[h]);
         }
     }
     else
@@ -1578,8 +1578,8 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
                 unsigned h = j / (MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
                 unsigned g = k / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = k % MAX_VERTEXLIGHT_VS_VARIATIONS;
-                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), Shader::SanitateDefines(pass->GetVertexShaderDefines() +
-                    " " + vertexLightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]));
+                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                    vertexLightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
             }
         }
         else
@@ -1589,16 +1589,16 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             {
                 unsigned k = j % MAX_GEOMETRYTYPES;
                 unsigned h = j / MAX_GEOMETRYTYPES;
-                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), Shader::SanitateDefines(pass->GetVertexShaderDefines() +
-                    " " + geometryVSVariations[k] + heightFogVariations[h]));
+                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                    geometryVSVariations[k] + heightFogVariations[h]);
             }
         }
         
         pixelShaders.Resize(2);
         for (unsigned j = 0; j < 2; ++j)
         {
-            pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), Shader::SanitateDefines(pass->GetPixelShaderDefines() + " " +
-                heightFogVariations[j]));
+            pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                heightFogVariations[j]);
         }
     }
     

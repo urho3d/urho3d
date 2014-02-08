@@ -105,7 +105,6 @@ void RenderPathCommand::Load(const XMLElement& element)
         if (element.HasAttribute("color"))
         {
             clearFlags_ |= CLEAR_COLOR;
-            // Mark fog color with negative values
             if (element.GetAttributeLower("color") == "fog")
                 useFogColor_ = true;
             else
