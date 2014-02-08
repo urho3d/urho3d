@@ -26,12 +26,12 @@
     </command>
     <command type="quad" tag="AutoExposure" vs="AutoExposure" ps="AutoExposure" vsdefines="ADAPTLUMINANCE" psdefines="ADAPTLUMINANCE" output="adaptedLum">
         <parameter name="AutoExposureAdaptRate" value="0.6" />
+        <parameter name="AutoExposureLumRange" value="0.01 1.0" />
         <texture unit="diffuse" name="prevAdaptedLum" />
         <texture unit="normal" name="lum1" />
     </command>
     <command type="quad" tag="AutoExposure" vs="AutoExposure" ps="AutoExposure" vsdefines="EXPOSE" psdefines="EXPOSE" output="viewport">
-        <parameter name="AutoExposureMiddleGrey" value="0.8" />
-        <parameter name="AutoExposureSensitivity" value="1.2" />
+        <parameter name="AutoExposureMiddleGrey" value="0.6" />
         <texture unit="diffuse" name="viewport" />
         <texture unit="normal" name="adaptedLum" />
     </command>

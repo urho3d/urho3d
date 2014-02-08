@@ -9,8 +9,8 @@ varying vec2 vScreenPos;
 
 #ifdef COMPILEPS
 uniform float cAutoExposureAdaptRate;
+uniform vec2 cAutoExposureLumRange;
 uniform float cAutoExposureMiddleGrey;
-uniform float cAutoExposureSensitivity;
 uniform vec2 cHDR128InvSize;
 uniform vec2 cLum64InvSize;
 uniform vec2 cLum16InvSize;
@@ -39,16 +39,16 @@ void VS()
 void PS()
 {
     #ifdef LUMINANCE64
-    float logLumSum = 1e-5;
-    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(-1.0, -1.0) * cHDR128InvSize).rgb, LumWeights));
-    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(-1.0, 1.0) * cHDR128InvSize).rgb, LumWeights));
-    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(1.0, 1.0) * cHDR128InvSize).rgb, LumWeights));
-    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(1.0, -1.0) * cHDR128InvSize).rgb, LumWeights));
+    float logLumSum = 0.0;
+    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(-1.0, -1.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
+    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(-1.0, 1.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
+    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(1.0, 1.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
+    logLumSum += log(dot(texture2D(sDiffMap, vTexCoord + vec2(1.0, -1.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
     gl_FragColor.r = logLumSum;
     #endif
 
     #ifdef LUMINANCE16
-    gl_FragColor.r = exp(GatherAvgLum(sDiffMap, vTexCoord, cLum64InvSize) / 16.0);
+    gl_FragColor.r = GatherAvgLum(sDiffMap, vTexCoord, cLum64InvSize);
     #endif
 
     #ifdef LUMINANCE4
@@ -56,18 +56,18 @@ void PS()
     #endif
 
     #ifdef LUMINANCE1
-    gl_FragColor.r = GatherAvgLum(sDiffMap, vTexCoord, cLum4InvSize);
+    gl_FragColor.r = exp(GatherAvgLum(sDiffMap, vTexCoord, cLum4InvSize) / 16.0);
     #endif
 
     #ifdef ADAPTLUMINANCE
     float adaptedLum = texture2D(sDiffMap, vTexCoord).r;
-    float lum = texture2D(sNormalMap, vTexCoord).r;
+    float lum = clamp(texture2D(sNormalMap, vTexCoord).r, cAutoExposureLumRange.x, cAutoExposureLumRange.y);
     gl_FragColor.r = adaptedLum + (lum - adaptedLum) * (1.0 - exp(-cDeltaTimePS * cAutoExposureAdaptRate));
     #endif
 
     #ifdef EXPOSE
     vec3 color = texture2D(sDiffMap, vScreenPos).rgb;
-    float adaptedLum = max(mix(cAutoExposureMiddleGrey, texture2D(sNormalMap, vTexCoord).r, cAutoExposureSensitivity), 1e-5);
+    float adaptedLum = texture2D(sNormalMap, vTexCoord).r;
     gl_FragColor = vec4(color * (cAutoExposureMiddleGrey / adaptedLum), 1.0);
     #endif
 }

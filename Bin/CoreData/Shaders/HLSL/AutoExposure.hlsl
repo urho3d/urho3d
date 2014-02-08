@@ -5,8 +5,8 @@
 #include "PostProcess.hlsl"
 
 uniform float cAutoExposureAdaptRate;
+uniform float2 cAutoExposureLumRange;
 uniform float cAutoExposureMiddleGrey;
-uniform float cAutoExposureSensitivity;
 uniform float2 cHDR128Offsets;
 uniform float2 cLum64Offsets;
 uniform float2 cLum16Offsets;
@@ -61,16 +61,16 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef LUMINANCE64
-    float logLumSum = 1e-5;
-    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(0.0, 0.0) * cHDR128InvSize).rgb, LumWeights));
-    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(0.0, 2.0) * cHDR128InvSize).rgb, LumWeights));
-    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(2.0, 2.0) * cHDR128InvSize).rgb, LumWeights));
-    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(2.0, 0.0) * cHDR128InvSize).rgb, LumWeights));
+    float logLumSum = 0.0;
+    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(0.0, 0.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
+    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(0.0, 2.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
+    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(2.0, 2.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
+    logLumSum += log(dot(tex2D(sDiffMap, iTexCoord + float2(2.0, 0.0) * cHDR128InvSize).rgb, LumWeights) + 1e-5);
     oColor = logLumSum;
     #endif
 
     #ifdef LUMINANCE16
-    oColor = exp(GatherAvgLum(sDiffMap, iTexCoord, cLum64InvSize) / 16.0);
+    oColor = GatherAvgLum(sDiffMap, iTexCoord, cLum64InvSize);
     #endif
 
     #ifdef LUMINANCE4
@@ -78,18 +78,18 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
 
     #ifdef LUMINANCE1
-    oColor = GatherAvgLum(sDiffMap, iTexCoord, cLum4InvSize);
+    oColor = exp(GatherAvgLum(sDiffMap, iTexCoord, cLum4InvSize) / 16.0);
     #endif
 
     #ifdef ADAPTLUMINANCE
     float adaptedLum = tex2D(sDiffMap, iTexCoord).r;
-    float lum = tex2D(sNormalMap, iTexCoord).r;
+    float lum = clamp(tex2D(sNormalMap, iTexCoord).r, cAutoExposureLumRange.x, cAutoExposureLumRange.y);
     oColor = adaptedLum + (lum - adaptedLum) * (1.0 - exp(-cDeltaTimePS * cAutoExposureAdaptRate));
     #endif
 
     #ifdef EXPOSE
     float3 color = tex2D(sDiffMap, iScreenPos).rgb;
-    float adaptedLum = max(lerp(cAutoExposureMiddleGrey, tex2D(sNormalMap, iTexCoord).r, cAutoExposureSensitivity), 1e-5);
+    float adaptedLum = tex2D(sNormalMap, iTexCoord).r;
     oColor = float4(color * (cAutoExposureMiddleGrey / adaptedLum), 1.0);
     #endif
 }
