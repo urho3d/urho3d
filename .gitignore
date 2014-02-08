@@ -23,6 +23,9 @@ Lib/
 # Compiled AngelScript
 *.asc
 
+# Compiled Lua script
+*.luc
+
 # Generated documentation
 Docs/html/
 Docs/Doxyfile
