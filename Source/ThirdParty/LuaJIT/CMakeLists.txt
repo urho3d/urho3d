@@ -218,6 +218,7 @@ macro (generate_source name mode)
 endmacro ()
 
 # Define generated source files
+file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 if (WIN32)
     set (LJVM_MODE peobj)
     set (LJVM_BOUT lj_vm.obj)
