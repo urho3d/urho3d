@@ -42,4 +42,16 @@ EVENT(E_RELOADFAILED, ReloadFailed)
 {
 }
 
+/// Resource not found.
+EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
+{
+    PARAM(P_RESOURCENAME, ResourceName);            // String
+}
+
+/// Unknown resource type.
+EVENT(E_UNKNOWNRESOURCETYPE, UnknownResourceType)
+{
+    PARAM(P_RESOURCETYPE, ResourceType);            // ShortStringHash
+}
+
 }

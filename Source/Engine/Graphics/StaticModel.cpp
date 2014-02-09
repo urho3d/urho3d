@@ -307,9 +307,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
         useFileName = ReplaceExtension(model_->GetName(), ".txt");
     
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (!cache->Exists(useFileName))
-        return;
-    SharedPtr<File> file = cache->GetFile(useFileName);
+    SharedPtr<File> file = cache->GetFile(useFileName, false);
     if (!file)
         return;
     

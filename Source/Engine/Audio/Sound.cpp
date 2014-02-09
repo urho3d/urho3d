@@ -376,10 +376,7 @@ void Sound::LoadParameters()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    if (!cache->Exists(xmlName))
-        return;
-    
-    XMLFile* file = cache->GetResource<XMLFile>(xmlName);
+    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
     if (!file)
         return;
     

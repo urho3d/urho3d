@@ -126,9 +126,8 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
     CursorShapeInfo& info = shapeInfos_[shape];
 
     // Prefer to get the texture with same name from cache to prevent creating several copies of the texture
-    if (cache->Exists(image->GetName()))
-        info.texture_ = cache->GetResource<Texture2D>(image->GetName());
-    else
+    info.texture_ = cache->GetResource<Texture2D>(image->GetName(), false);
+    if (!info.texture_)
     {
         Texture2D* texture = new Texture2D(context_);
         texture->Load(SharedPtr<Image>(image));

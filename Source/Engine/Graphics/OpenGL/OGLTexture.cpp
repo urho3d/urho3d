@@ -398,11 +398,9 @@ void Texture::LoadParameters()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    if (cache->Exists(xmlName))
-    {
-        XMLFile* file = cache->GetResource<XMLFile>(xmlName);
+    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
+    if (file)
         LoadParameters(file);
-    }
 }
 
 void Texture::LoadParameters(XMLFile* file)

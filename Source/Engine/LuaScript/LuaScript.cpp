@@ -259,16 +259,13 @@ int LuaScript::Loader(lua_State* L)
     // Get module name
     const char* name = luaL_checkstring(L, 1);
 
-    // Try get .luc file. Use Exists() check here to avoid log error in case only the .lua file exists
+    // Attempt to get .luc file first.
     String lucFileName = String(name) + ".luc";
-    if (cache->Exists(lucFileName))
-    {
-        LuaFile* lucFile = cache->GetResource<LuaFile>(lucFileName);
-        if (lucFile)
-            return lucFile->LoadChunk(L) ? 1 : 0;
-    }
+    LuaFile* lucFile = cache->GetResource<LuaFile>(lucFileName, false);
+    if (lucFile)
+        return lucFile->LoadChunk(L) ? 1 : 0;
 
-    // Try get .lua file. If this also fails, error is logged
+    // Then try to get .lua file. If this also fails, error is logged and resource not found event is sent
     String luaFileName = String(name) + ".lua";
     LuaFile* luaFile = cache->GetResource<LuaFile>(luaFileName);
     if (luaFile)

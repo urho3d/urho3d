@@ -383,7 +383,7 @@ void ResourceCache::SetAutoReloadResources(bool enable)
     }
 }
 
-SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
+SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool SendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
     File* file = 0;
@@ -403,17 +403,27 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
     
     if (file)
         return SharedPtr<File>(file);
-    
-    LOGERROR("Could not find resource " + name);
+
+    if (SendEventOnFailure)
+    {
+        LOGERROR("Could not find resource " + name);
+
+        using namespace ResourceNotFound;
+
+	    VariantMap& eventData = GetEventDataMap();
+	    eventData[P_RESOURCENAME] = name;
+	    SendEvent(E_RESOURCENOTFOUND, eventData);
+    }
+
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const char* name)
+Resource* ResourceCache::GetResource(ShortStringHash type, const String& name, bool SendEventOnFailure)
 {
-    return GetResource(type, String(name));
+    return GetResource(type, name.CString(), SendEventOnFailure);
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
+Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, bool SendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
     
@@ -432,11 +442,18 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
     if (!resource)
     {
         LOGERROR("Could not load unknown resource type " + String(type));
+
+        using namespace UnknownResourceType;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_RESOURCETYPE] = type;
+        SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
+
         return 0;
     }
     
     // Attempt to load the resource
-    SharedPtr<File> file = GetFile(name);
+    SharedPtr<File> file = GetFile(name, SendEventOnFailure);
     if (!file)
         return 0;
 
@@ -778,7 +795,6 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 
 File* ResourceCache::SearchResourceDirs(const String& nameIn)
 {
-    // Then the filesystem
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
@@ -801,7 +817,6 @@ File* ResourceCache::SearchResourceDirs(const String& nameIn)
 
 File* ResourceCache::SearchPackages(const String& nameIn)
 {
-    // Check first the packages
     for (unsigned i = 0; i < packages_.Size(); ++i)
     {
         if (packages_[i]->Exists(nameIn))

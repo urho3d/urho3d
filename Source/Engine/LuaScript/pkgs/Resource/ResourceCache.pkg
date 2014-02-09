@@ -14,7 +14,7 @@ class ResourceCache
     // SharedPtr<File> GetFile(const String& name);
     tolua_outside File* ResourceCacheGetFile @ GetFile(const String name);
 
-    Resource* GetResource(const String type, const String name);
+    Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true);
     
     bool Exists(const String name) const;
     unsigned GetMemoryBudget(ShortStringHash type) const;
@@ -70,7 +70,8 @@ static int tolua_ResourceLuaAPI_ResourceCache_GetResource00(lua_State* tolua_S)
  !tolua_isusertype(tolua_S,1,"ResourceCache",0,&tolua_err) ||
  !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
+ !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
  goto tolua_lerror;
  else
@@ -79,11 +80,12 @@ static int tolua_ResourceLuaAPI_ResourceCache_GetResource00(lua_State* tolua_S)
   ResourceCache* self = (ResourceCache*)  tolua_tousertype(tolua_S,1,0);
   const String type = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
   const String name = ((const String)  tolua_tourho3dstring(tolua_S,3,0));
+  bool SendEventOnFailure = ((bool)  tolua_toboolean(tolua_S,4,true));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetResource'", NULL);
 #endif
  {
-  Resource* tolua_ret = (Resource*)  self->GetResource(type,name);
+  Resource* tolua_ret = (Resource*)  self->GetResource(type,name,SendEventOnFailure);
   tolua_pushusertype(tolua_S,(void*)tolua_ret,type.CString());
  }
  }

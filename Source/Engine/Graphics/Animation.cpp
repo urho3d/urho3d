@@ -126,25 +126,22 @@ bool Animation::Load(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    if (cache->Exists(xmlName))
+    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
+    if (file)
     {
-        XMLFile* file = cache->GetResource<XMLFile>(xmlName);
-        if (file)
+        XMLElement rootElem = file->GetRoot();
+        XMLElement triggerElem = rootElem.GetChild("trigger");
+        while (triggerElem)
         {
-            XMLElement rootElem = file->GetRoot();
-            XMLElement triggerElem = rootElem.GetChild("trigger");
-            while (triggerElem)
-            {
-                if (triggerElem.HasAttribute("normalizedtime"))
-                    AddTrigger(triggerElem.GetFloat("normalizedtime"), true, triggerElem.GetVariant());
-                else if (triggerElem.HasAttribute("time"))
-                    AddTrigger(triggerElem.GetFloat("time"), false, triggerElem.GetVariant());
-                
-                triggerElem = triggerElem.GetNext("trigger");
-            }
+            if (triggerElem.HasAttribute("normalizedtime"))
+                AddTrigger(triggerElem.GetFloat("normalizedtime"), true, triggerElem.GetVariant());
+            else if (triggerElem.HasAttribute("time"))
+                AddTrigger(triggerElem.GetFloat("time"), false, triggerElem.GetVariant());
             
-            memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
+            triggerElem = triggerElem.GetNext("trigger");
         }
+
+        memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
     }
     
     SetMemoryUse(memoryUse);
