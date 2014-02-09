@@ -73,8 +73,7 @@ Shader::Shader(Context* context) :
 Shader::~Shader()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (cache)
-        cache->ResetDependencies(this);
+    cache->ResetDependencies(this);
 }
 
 void Shader::RegisterObject(Context* context)
@@ -188,21 +187,16 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
 bool Shader::ProcessSource(String& code, Deserializer& source)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (!cache)
-        return false;
     
     // If the source if a non-packaged file, store the timestamp
     File* file = dynamic_cast<File*>(&source);
     if (file && !file->IsPackaged())
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
-        if (fileSystem)
-        {
-            String fullName = cache->GetResourceFileName(file->GetName());
-            unsigned fileTimeStamp = fileSystem->GetLastModifiedTime(fullName);
-            if (fileTimeStamp > timeStamp_)
-                timeStamp_ = fileTimeStamp;
-        }
+        String fullName = cache->GetResourceFileName(file->GetName());
+        unsigned fileTimeStamp = fileSystem->GetLastModifiedTime(fullName);
+        if (fileTimeStamp > timeStamp_)
+            timeStamp_ = fileTimeStamp;
     }
     
     // Store resource dependencies for includes so that we know to reload if any of them changes

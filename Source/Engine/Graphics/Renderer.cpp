@@ -571,9 +571,6 @@ ShaderVariation* Renderer::GetShader(ShaderType type, const char* name, const ch
     if (lastShaderName_ != name || !lastShader_)
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        if (!cache)
-            return 0;
-        
         String fullShaderName = shaderPath_ + name + shaderExtension_;
         // Try to reduce repeated error log prints because of missing shaders
         if (lastShaderName_ == name && !cache->Exists(fullShaderName))

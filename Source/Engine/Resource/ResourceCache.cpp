@@ -476,19 +476,16 @@ bool ResourceCache::Exists(const String& nameIn) const
     }
     
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem)
+    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
-        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
-        {
-            if (fileSystem->FileExists(resourceDirs_[i] + name))
-                return true;
-        }
-        
-        // Fallback using absolute path
-        if (fileSystem->FileExists(name))
+        if (fileSystem->FileExists(resourceDirs_[i] + name))
             return true;
     }
     
+    // Fallback using absolute path
+    if (fileSystem->FileExists(name))
+        return true;
+
     return false;
 }
 
@@ -521,13 +518,10 @@ unsigned ResourceCache::GetTotalMemoryUse() const
 String ResourceCache::GetResourceFileName(const String& name) const
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem)
+    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
-        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
-        {
-            if (fileSystem->FileExists(resourceDirs_[i] + name))
-                return resourceDirs_[i] + name;
-        }
+        if (fileSystem->FileExists(resourceDirs_[i] + name))
+            return resourceDirs_[i] + name;
     }
     
     return String();
@@ -541,9 +535,6 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
     bool parentHasKnownDirs = false;
     
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    // If no filesystem, can not check directory existence, so just return the original path
-    if (!fileSystem)
-        return fixedPath;
     
     for (unsigned i = 0; checkDirs[i] != 0; ++i)
     {
@@ -581,7 +572,7 @@ String ResourceCache::SanitateResourceName(const String& nameIn) const
 
     // If the path refers to one of the resource directories, normalize the resource name
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && resourceDirs_.Size())
+    if (resourceDirs_.Size())
     {
         String namePath = GetPath(name);
         String exePath = fileSystem->GetProgramDir();
@@ -789,24 +780,21 @@ File* ResourceCache::SearchResourceDirs(const String& nameIn)
 {
     // Then the filesystem
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem)
+    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
-        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+        if (fileSystem->FileExists(resourceDirs_[i] + nameIn))
         {
-            if (fileSystem->FileExists(resourceDirs_[i] + nameIn))
-            {
-                // Construct the file first with full path, then rename it to not contain the resource path,
-                // so that the file's name can be used in further GetFile() calls (for example over the network)
-                File* file(new File(context_, resourceDirs_[i] + nameIn));
-                file->SetName(nameIn);
-                return file;
-            }
+            // Construct the file first with full path, then rename it to not contain the resource path,
+            // so that the file's name can be used in further GetFile() calls (for example over the network)
+            File* file(new File(context_, resourceDirs_[i] + nameIn));
+            file->SetName(nameIn);
+            return file;
         }
-
-        // Fallback using absolute path
-        if (fileSystem->FileExists(nameIn))
-            return new File(context_, nameIn);
     }
+
+    // Fallback using absolute path
+    if (fileSystem->FileExists(nameIn))
+        return new File(context_, nameIn);
 
     return 0;
 }

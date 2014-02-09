@@ -26,9 +26,9 @@ uint elementContainerIndex = M_MAX_UNSIGNED;
 
 void InitXMLResources()
 {
-    String[] resources = { "Attribute", "Variable", "Style" };
+    String[] resources = { "UI/EditorInspector_Attribute.xml", "UI/EditorInspector_Variable.xml", "UI/EditorInspector_Style.xml" };
     for (uint i = 0; i < resources.length; ++i)
-        xmlResources.Push(cache.GetResource("XMLFile", "UI/EditorInspector_" + resources[i] + ".xml"));
+        xmlResources.Push(cache.GetResource("XMLFile", resources[i]));
 }
 
 /// Delete all child containers in the inspector list.

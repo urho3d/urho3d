@@ -123,14 +123,8 @@ bool LuaScript::ExecuteFile(const String& fileName)
     PROFILE(ExecuteFile);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (!cache)
-        return false;
-
     LuaFile* luaFile = cache->GetResource<LuaFile>(fileName);
-    if (!luaFile)
-        return false;
-
-    return luaFile->LoadAndExecute(luaState_);
+    return luaFile && luaFile->LoadAndExecute(luaState_);
 }
 
 bool LuaScript::ExecuteString(const String& string)
@@ -153,12 +147,7 @@ bool LuaScript::ExecuteString(const String& string)
 bool LuaScript::ExecuteFunction(const String& functionName)
 {
     WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (function && function->BeginCall())
-    {
-        return function->EndCall();
-    }
-
-    return false;
+    return function && function->BeginCall() && function->EndCall();
 }
 
 void LuaScript::ScriptSendEvent(const String& eventName, VariantMap& eventData)
@@ -266,8 +255,6 @@ int LuaScript::AtPanic(lua_State* L)
 int LuaScript::Loader(lua_State* L)
 {
     ResourceCache* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
-    if (!cache)
-        return 0;
 
     // Get module name
     const char* name = luaL_checkstring(L, 1);

@@ -55,9 +55,6 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     }
 
     UI* ui = GetSubsystem<UI>();
-    if (!ui)
-        return;
-    
     window_ = ui->LoadLayout(layoutFile, styleFile);
     ui->GetRoot()->AddChild(window_);
 

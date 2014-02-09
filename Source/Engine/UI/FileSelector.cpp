@@ -111,8 +111,7 @@ FileSelector::FileSelector(Context* context) :
     defaultFilters.Push("*.*");
     SetFilters(defaultFilters, 0);
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem)
-        SetPath(fileSystem->GetCurrentDir());
+    SetPath(fileSystem->GetCurrentDir());
 
     // Focus the fileselector's filelist initially when created, and bring to front
     UI* ui = GetSubsystem<UI>();
@@ -195,9 +194,6 @@ void FileSelector::SetButtonTexts(const String& okText, const String& cancelText
 void FileSelector::SetPath(const String& path)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (!fileSystem)
-        return;
-
     if (fileSystem->DirExists(path))
     {
         path_ = AddTrailingSlash(path);
@@ -292,8 +288,6 @@ void FileSelector::SetLineEditText(LineEdit* edit, const String& text)
 void FileSelector::RefreshFiles()
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (!fileSystem)
-        return;
 
     ignoreEvents_ = true;
 

@@ -733,8 +733,7 @@ void ScriptFile::ReleaseModule()
         SetMemoryUse(0);
         
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        if (cache)
-            cache->ResetDependencies(this);
+        cache->ResetDependencies(this);
     }
 }
 
