@@ -162,12 +162,15 @@ bool CloseUILayout()
             if (element !is null && element.vars[MODIFIED_VAR].GetBool())
             {
                 MessageBox@ messageBox = MessageBox("UI layout has been modified.\nContinue to close?", "Warning");
-                Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
-                cancelButton.visible = true;
-                cancelButton.focus = true;
-                SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
-                messageBoxCallback = @CloseUILayout;
-                return false;
+                if (messageBox.window !is null)
+                {
+                    Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
+                    cancelButton.visible = true;
+                    cancelButton.focus = true;
+                    SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
+                    messageBoxCallback = @CloseUILayout;
+                    return false;
+                }
             }
         }
     }
@@ -205,12 +208,15 @@ bool CloseAllUILayouts()
             if (element !is null && element.vars[MODIFIED_VAR].GetBool())
             {
                 MessageBox@ messageBox = MessageBox("UI layout has been modified.\nContinue to close?", "Warning");
-                Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
-                cancelButton.visible = true;
-                cancelButton.focus = true;
-                SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
-                messageBoxCallback = @CloseAllUILayouts;
-                return false;
+                if (messageBox.window !is null)
+                {
+                    Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
+                    cancelButton.visible = true;
+                    cancelButton.focus = true;
+                    SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
+                    messageBoxCallback = @CloseAllUILayouts;
+                    return false;
+                }
             }
         }
     }

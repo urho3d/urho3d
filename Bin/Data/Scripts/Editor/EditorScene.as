@@ -65,12 +65,15 @@ bool ResetScene()
     if (messageBoxCallback is null && sceneModified)
     {
         MessageBox@ messageBox = MessageBox("Scene has been modified.\nContinue to reset?", "Warning");
-        Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
-        cancelButton.visible = true;
-        cancelButton.focus = true;
-        SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
-        messageBoxCallback = @ResetScene;
-        return false;
+        if (messageBox.window !is null)
+        {
+            Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
+            cancelButton.visible = true;
+            cancelButton.focus = true;
+            SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
+            messageBoxCallback = @ResetScene;
+            return false;
+        }
     }
     else
         messageBoxCallback = null;

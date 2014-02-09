@@ -47,11 +47,8 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         layoutFile = cache->GetResource<XMLFile>("UI/MessageBox.xml");
-        if (!layoutFile)
-        {
-            LOGERROR("Could not find default message box layout file");
-            return;
-        }
+        if (!layoutFile)    // Error is already logged
+            return;         // Note: windowless MessageBox should not be used!
     }
 
     UI* ui = GetSubsystem<UI>();
