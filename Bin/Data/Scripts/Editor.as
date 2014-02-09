@@ -38,16 +38,18 @@ void Start()
     }
 
     SubscribeToEvent("Update", "HandleUpdate");
+    SubscribeToEvent(cache, "ResourceNotFound", "HandleResourceError");
+    SubscribeToEvent(cache, "UnknownResourceType", "HandleResourceError");
+    SubscribeToEvent(input, "ExitRequested", "HandleExitRequested");
 
+    // Disable Editor auto exit, check first if it is OK to exit
+    engine.autoExit = false;
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
     cache.autoReloadResources = true;
     // Use OS mouse without grabbing it
     input.mouseVisible = true;
-    // Disable Editor auto exit, check first if it is OK to exit
-    engine.autoExit = false;
-    SubscribeToEvent(input, "ExitRequested", "HandleExitRequested");
 
     // Create root scene node
     CreateScene();

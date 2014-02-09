@@ -1392,3 +1392,9 @@ bool LoadMostRecentScene()
 
     return LoadScene(text.text);
 }
+
+void HandleResourceError(StringHash eventType, VariantMap& eventData)
+{
+    // Open console if it not yet open
+    console.visible = true;
+}
