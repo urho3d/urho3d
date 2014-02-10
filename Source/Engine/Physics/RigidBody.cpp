@@ -235,14 +235,9 @@ void RigidBody::SetPosition(Vector3 position)
         worldTrans.setOrigin(ToBtVector3(position + ToQuaternion(worldTrans.getRotation()) * centerOfMass_));
         
         // When forcing the physics position, set also interpolated position so that there is no jitter
-        // Do not reset for kinematic objects, so that they can estimate velocity properly
-        if (!kinematic_)
-        {
-            btTransform interpTrans = body_->getInterpolationWorldTransform();
-            interpTrans.setOrigin(worldTrans.getOrigin());
-            body_->setInterpolationWorldTransform(interpTrans);
-        }
-        
+        btTransform interpTrans = body_->getInterpolationWorldTransform();
+        interpTrans.setOrigin(worldTrans.getOrigin());
+        body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
 
         Activate();
@@ -254,22 +249,17 @@ void RigidBody::SetRotation(Quaternion rotation)
 {
     if (body_)
     {
-        // Due to center of mass offset, we may need to adjust position also
         Vector3 oldPosition = GetPosition();
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
         if (!centerOfMass_.Equals(Vector3::ZERO))
             worldTrans.setOrigin(ToBtVector3(oldPosition + rotation * centerOfMass_));
 
-        if (!kinematic_)
-        {
-            btTransform interpTrans = body_->getInterpolationWorldTransform();
-            interpTrans.setRotation(worldTrans.getRotation());
-            if (!centerOfMass_.Equals(Vector3::ZERO))
-                interpTrans.setOrigin(worldTrans.getOrigin());
-            body_->setInterpolationWorldTransform(interpTrans);
-        }
-        
+        btTransform interpTrans = body_->getInterpolationWorldTransform();
+        interpTrans.setRotation(worldTrans.getRotation());
+        if (!centerOfMass_.Equals(Vector3::ZERO))
+            interpTrans.setOrigin(worldTrans.getOrigin());
+        body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
 
         Activate();
@@ -285,14 +275,10 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         worldTrans.setRotation(ToBtQuaternion(rotation));
         worldTrans.setOrigin(ToBtVector3(position + rotation * centerOfMass_));
         
-        if (!kinematic_)
-        {
-            btTransform interpTrans = body_->getInterpolationWorldTransform();
-            interpTrans.setOrigin(worldTrans.getOrigin());
-            interpTrans.setRotation(worldTrans.getRotation());
-            body_->setInterpolationWorldTransform(interpTrans);
-        }
-        
+        btTransform interpTrans = body_->getInterpolationWorldTransform();
+        interpTrans.setOrigin(worldTrans.getOrigin());
+        interpTrans.setRotation(worldTrans.getRotation());
+        body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
 
         Activate();
@@ -874,7 +860,8 @@ void RigidBody::OnMarkedDirty(Node* node)
     // If node transform changes, apply it back to the physics transform. However, do not do this when a SmoothedTransform
     // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
     // states; rather follow the SmoothedTransform target transform directly
-    if ((!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !hasSmoothedTransform_)
+    // Also, for kinematic objects Bullet asks the position from us, so we do not need to apply ourselves
+    if (!kinematic_ && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !hasSmoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = GetScene();
