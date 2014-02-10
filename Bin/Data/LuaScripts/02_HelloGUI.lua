@@ -3,10 +3,19 @@
 --     - Creation of controls and building a UI hierarchy
 --     - Loading UI style from XML and applying it to controls
 --     - Handling of global and per-control events
+-- For more advanced users (beginners can skip this section):
+--     - Dragging UIElements
+--     - Displaying tooltips
+--     - Accessing available Events data (eventData)
 
 require "LuaScripts/Utilities/Sample"
 
 local window = nil
+
+local cache = GetCache()
+local engine = GetEngine()
+local input = GetInput()
+local ui = GetUI()
 
 function Start()
     -- Execute the common startup for samples
@@ -26,6 +35,9 @@ function Start()
 
     -- Create and add some controls to the Window
     InitControls()
+
+    -- Create a draggable Fish
+    CreateDraggableFish()
 
     SubscribeToEvents()
 end
@@ -126,4 +138,47 @@ function HandleControlClicked(eventType, eventData)
 
     -- Update the Window's title text
     windowTitle.text = "Hello " .. name .. "!"
+end
+
+
+-----------------------------------------------------  Dragging / Tooltips  ----------------------------------------------
+
+local dragBeginPosition = IntVector2(0, 0)
+
+function CreateDraggableFish()
+    -- Create a draggable Fish button
+    local draggableFish = ui.root:CreateChild("Button", "Fish")
+    draggableFish.texture = cache:GetResource("Texture2D", "Textures/UrhoDecal.dds") -- Set texture
+    draggableFish.blendMode = BLEND_ADD
+    draggableFish:SetSize(128, 128)
+    draggableFish:SetPosition((GetGraphics().width - draggableFish.width) / 2, 200)
+
+    -- Add a tooltip to Fish button
+    local toolTip = draggableFish:CreateChild("ToolTip")
+    toolTip.position = IntVector2(draggableFish.width + 5, draggableFish.width/2) -- Slightly offset from fish
+    local textHolder = toolTip:CreateChild("BorderImage")
+    textHolder:SetStyle("ToolTipBorderImage")
+    local toolTipText = textHolder:CreateChild("Text")
+    toolTipText:SetStyle("ToolTipText")
+    toolTipText.text = "Please drag me!"
+
+    -- Subscribe draggableFish to Drag Events (in order to make it draggable)
+    -- See "Event list" in documentation's Main Page for reference on available Events and their eventData
+    SubscribeToEvent(draggableFish, "DragBegin", "HandleDragBegin")
+    SubscribeToEvent(draggableFish, "DragMove", "HandleDragMove")
+    SubscribeToEvent(draggableFish, "DragEnd", "HandleDragEnd")
+end
+
+function HandleDragBegin(eventType, eventData)
+    -- Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+    dragBeginPosition = IntVector2(eventData:GetInt("ElementX"), eventData:GetInt("ElementY"))
+end
+
+function HandleDragMove(eventType, eventData)
+    local dragCurrentPosition = IntVector2(eventData:GetInt("X"), eventData:GetInt("Y"))
+    local draggedElement = eventData:GetPtr("UIElement", "Element")
+    draggedElement:SetPosition(dragCurrentPosition - dragBeginPosition)
+end
+
+function HandleDragEnd(eventType, eventData) -- For reference (not used here)
 end
