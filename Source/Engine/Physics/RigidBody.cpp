@@ -238,7 +238,6 @@ void RigidBody::SetPosition(Vector3 position)
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
-        body_->updateInertiaTensor();
 
         Activate();
         MarkNetworkUpdate();
