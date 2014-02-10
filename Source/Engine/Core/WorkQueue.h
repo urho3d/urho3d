@@ -38,7 +38,7 @@ EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
 class WorkerThread;
 
 /// Work queue item.
-struct WorkItem
+struct WorkItem : public RefCounted
 {
     // Construct
     WorkItem() :
@@ -80,7 +80,7 @@ public:
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
     /// Add a work item and resume worker threads.
-    void AddWorkItem(const WorkItem& item);
+    void AddWorkItem(SharedPtr<WorkItem> item);
     /// Pause worker threads.
     void Pause();
     /// Resume worker threads.
@@ -104,7 +104,7 @@ private:
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item collection. Accessed only by the main thread.
-    List<WorkItem> workItems_;
+    List<SharedPtr<WorkItem> > workItems_;
     /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems.)
     List<WorkItem*> queue_;
     /// Worker queue mutex.
