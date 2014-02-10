@@ -3556,7 +3556,7 @@ Methods:
 - void SetAutoReloadResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
 - File* GetFile(const String name)
-- Resource* GetResource(const String type, const String name)
+- Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
 - bool Exists(const String name) const
 - unsigned GetMemoryBudget(ShortStringHash type) const
 - unsigned GetMemoryUse(ShortStringHash type) const

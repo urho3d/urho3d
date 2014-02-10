@@ -3931,8 +3931,8 @@ Methods:
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&) const
-- Resource@ GetResource(ShortStringHash, const String&)
-- Resource@ GetResource(const String&, const String&)
+- Resource@ GetResource(ShortStringHash, const String&, bool = true)
+- Resource@ GetResource(const String&, const String&, bool = true)
 - String GetResourceFileName(const String&) const
 - void ReleaseAllResources(bool = false)
 - void ReleaseResource(const String&, const String&, bool = false)
@@ -7953,6 +7953,12 @@ Properties:
 ### ReloadFinished
 
 ### ReloadFailed
+
+### ResourceNotFound
+- %ResourceName : String
+
+### UnknownResourceType
+- %ResourceType : ShortStringHash
 
 ## %Scene events
 
