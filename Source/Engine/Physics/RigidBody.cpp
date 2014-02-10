@@ -235,9 +235,14 @@ void RigidBody::SetPosition(Vector3 position)
         worldTrans.setOrigin(ToBtVector3(position + ToQuaternion(worldTrans.getRotation()) * centerOfMass_));
         
         // When forcing the physics position, set also interpolated position so that there is no jitter
-        btTransform interpTrans = body_->getInterpolationWorldTransform();
-        interpTrans.setOrigin(worldTrans.getOrigin());
-        body_->setInterpolationWorldTransform(interpTrans);
+        // Do not reset for kinematic objects, so that they can estimate velocity properly
+        if (!kinematic_)
+        {
+            btTransform interpTrans = body_->getInterpolationWorldTransform();
+            interpTrans.setOrigin(worldTrans.getOrigin());
+            body_->setInterpolationWorldTransform(interpTrans);
+        }
+        
         body_->updateInertiaTensor();
 
         Activate();
@@ -256,11 +261,15 @@ void RigidBody::SetRotation(Quaternion rotation)
         if (!centerOfMass_.Equals(Vector3::ZERO))
             worldTrans.setOrigin(ToBtVector3(oldPosition + rotation * centerOfMass_));
 
-        btTransform interpTrans = body_->getInterpolationWorldTransform();
-        interpTrans.setRotation(worldTrans.getRotation());
-        if (!centerOfMass_.Equals(Vector3::ZERO))
-            interpTrans.setOrigin(worldTrans.getOrigin());
-        body_->setInterpolationWorldTransform(interpTrans);
+        if (!kinematic_)
+        {
+            btTransform interpTrans = body_->getInterpolationWorldTransform();
+            interpTrans.setRotation(worldTrans.getRotation());
+            if (!centerOfMass_.Equals(Vector3::ZERO))
+                interpTrans.setOrigin(worldTrans.getOrigin());
+            body_->setInterpolationWorldTransform(interpTrans);
+        }
+        
         body_->updateInertiaTensor();
 
         Activate();
@@ -276,10 +285,14 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         worldTrans.setRotation(ToBtQuaternion(rotation));
         worldTrans.setOrigin(ToBtVector3(position + rotation * centerOfMass_));
         
-        btTransform interpTrans = body_->getInterpolationWorldTransform();
-        interpTrans.setOrigin(worldTrans.getOrigin());
-        interpTrans.setRotation(worldTrans.getRotation());
-        body_->setInterpolationWorldTransform(interpTrans);
+        if (!kinematic_)
+        {
+            btTransform interpTrans = body_->getInterpolationWorldTransform();
+            interpTrans.setOrigin(worldTrans.getOrigin());
+            interpTrans.setRotation(worldTrans.getRotation());
+            body_->setInterpolationWorldTransform(interpTrans);
+        }
+        
         body_->updateInertiaTensor();
 
         Activate();
