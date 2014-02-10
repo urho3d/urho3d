@@ -406,20 +406,20 @@ void Octree::Update(const FrameInfo& frame)
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = drawableUpdates_.Size() / numWorkItems;
         
-        WorkItem item;
-        item.workFunction_ = UpdateDrawablesWork;
-        item.aux_ = const_cast<FrameInfo*>(&frame);
-
         PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
+            SharedPtr<WorkItem> item(new WorkItem());
+            item->workFunction_ = UpdateDrawablesWork;
+            item->aux_ = const_cast<FrameInfo*>(&frame);
+
             PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
-            item.start_ = &(*start);
-            item.end_ = &(*end);
+            item->start_ = &(*start);
+            item->end_ = &(*end);
             queue->AddWorkItem(item);
 
             start = end;
@@ -526,19 +526,19 @@ void Octree::Raycast(RayOctreeQuery& query) const
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
                 rayQueryResults_[i].Clear();
 
-            WorkItem item;
-            item.workFunction_ = RaycastDrawablesWork;
-            item.aux_ = const_cast<Octree*>(this);
-
             PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
             while (start != rayQueryDrawables_.End())
             {
+                SharedPtr<WorkItem> item(new WorkItem());
+                item->workFunction_ = RaycastDrawablesWork;
+                item->aux_ = const_cast<Octree*>(this);
+
                 PODVector<Drawable*>::Iterator end = rayQueryDrawables_.End();
                 if (end - start > RAYCASTS_PER_WORK_ITEM)
                     end = start + RAYCASTS_PER_WORK_ITEM;
 
-                item.start_ = &(*start);
-                item.end_ = &(*end);
+                item->start_ = &(*start);
+                item->end_ = &(*end);
                 queue->AddWorkItem(item);
 
                 start = end;

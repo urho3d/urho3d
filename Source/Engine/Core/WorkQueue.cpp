@@ -99,13 +99,16 @@ void WorkQueue::CreateThreads(unsigned numThreads)
     }
 }
 
-void WorkQueue::AddWorkItem(const WorkItem& item)
+void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
+    // Check for duplicate items.
+    if (workItems_.Contains(item))
+        return;
+
     // Push to the main thread list to keep item alive
     // Clear completed flag in case item is reused
     workItems_.Push(item);
-    WorkItem* itemPtr = &workItems_.Back();
-    itemPtr->completed_ = false;
+    item->completed_ = false;
     
     // Make sure worker threads' list is safe to modify
     if (threads_.Size() && !paused_)
@@ -113,14 +116,14 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
     
     // Find position for new item
     if (queue_.Empty())
-        queue_.Push(itemPtr);
+        queue_.Push(item);
     else
     {
         for (List<WorkItem*>::Iterator i = queue_.Begin(); i != queue_.End(); ++i)
         {
-            if ((*i)->priority_ <= itemPtr->priority_)
+            if ((*i)->priority_ <= item->priority_)
             {
-                queue_.Insert(i, itemPtr);
+                queue_.Insert(i, item);
                 break;
             }
         }
@@ -207,9 +210,9 @@ void WorkQueue::Complete(unsigned priority)
 
 bool WorkQueue::IsCompleted(unsigned priority) const
 {
-    for (List<WorkItem>::ConstIterator i = workItems_.Begin(); i != workItems_.End(); ++i)
+    for (List<SharedPtr<WorkItem> >::ConstIterator i = workItems_.Begin(); i != workItems_.End(); ++i)
     {
-        if (i->priority_ >= priority && !i->completed_)
+        if ((*i)->priority_ >= priority && !(*i)->completed_)
             return false;
     }
     
@@ -258,13 +261,13 @@ void WorkQueue::PurgeCompleted()
     VariantMap& eventData = GetEventDataMap();
     
     // Purge completed work items and send completion events.
-    for (List<WorkItem>::Iterator i = workItems_.Begin(); i != workItems_.End();)
+    for (List<SharedPtr<WorkItem> >::Iterator i = workItems_.Begin(); i != workItems_.End();)
     {
-        if (i->completed_)
+        if ((*i)->completed_)
         {
-            if (i->sendEvent_)
+            if ((*i)->sendEvent_)
             {
-                eventData[P_ITEM] = (void*)(&(*i));
+                eventData[P_ITEM] = static_cast<void*>(i->Get());
                 SendEvent(E_WORKITEMCOMPLETED, eventData);
             }
             

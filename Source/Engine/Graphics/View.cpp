@@ -687,20 +687,20 @@ void View::GetDrawables()
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = tempDrawables.Size() / numWorkItems;
         
-        WorkItem item;
-        item.workFunction_ = CheckVisibilityWork;
-        item.aux_ = this;
-        
         PODVector<Drawable*>::Iterator start = tempDrawables.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
+            SharedPtr<WorkItem> item(new WorkItem());
+            item->workFunction_ = CheckVisibilityWork;
+            item->aux_ = this;
+
             PODVector<Drawable*>::Iterator end = tempDrawables.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
             
-            item.start_ = &(*start);
-            item.end_ = &(*end);
+            item->start_ = &(*start);
+            item->end_ = &(*end);
             queue->AddWorkItem(item);
             
             start = end;
@@ -762,16 +762,16 @@ void View::GetBatches()
         
         lightQueryResults_.Resize(lights_.Size());
         
-        WorkItem item;
-        item.workFunction_ = ProcessLightWork;
-        item.aux_ = this;
-        
         for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
         {
+            SharedPtr<WorkItem> item(new WorkItem());
+            item->workFunction_ = ProcessLightWork;
+            item->aux_ = this;
+
             LightQueryResult& query = lightQueryResults_[i];
             query.light_ = lights_[i];
             
-            item.start_ = &query;
+            item->start_ = &query;
             queue->AddWorkItem(item);
         }
         
@@ -1048,8 +1048,7 @@ void View::UpdateGeometries()
     
     // Sort batches
     {
-        WorkItem item;
-        
+     
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
@@ -1060,22 +1059,26 @@ void View::UpdateGeometries()
             {
                 BatchQueue* passQueue = &batchQueues_[command.pass_];
                 
-                item.workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork :
-                    SortBatchQueueBackToFrontWork;
-                item.start_ = &batchQueues_[command.pass_];
+                SharedPtr<WorkItem> item(new WorkItem());
+                item->workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
+                item->start_ = &batchQueues_[command.pass_];
                 queue->AddWorkItem(item);
             }
         }
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
-            item.workFunction_ = SortLightQueueWork;
-            item.start_ = &(*i);
-            queue->AddWorkItem(item);
+            SharedPtr<WorkItem> lightItem(new WorkItem());
+            lightItem->workFunction_ = SortLightQueueWork;
+            lightItem->start_ = &(*i);
+            queue->AddWorkItem(lightItem);
+
             if (i->shadowSplits_.Size())
             {
-                item.workFunction_ = SortShadowQueueWork;
-                queue->AddWorkItem(item);
+                SharedPtr<WorkItem> shadowItem(new WorkItem());
+                shadowItem->workFunction_ = SortShadowQueueWork;
+                shadowItem->start_ = &(*i);
+                queue->AddWorkItem(shadowItem);
             }
         }
     }
@@ -1107,10 +1110,6 @@ void View::UpdateGeometries()
             int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
             int drawablesPerItem = threadedGeometries_.Size() / numWorkItems;
             
-            WorkItem item;
-            item.workFunction_ = UpdateDrawableGeometriesWork;
-            item.aux_ = const_cast<FrameInfo*>(&frame_);
-            
             PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
             for (int i = 0; i < numWorkItems; ++i)
             {
@@ -1118,8 +1117,11 @@ void View::UpdateGeometries()
                 if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                     end = start + drawablesPerItem;
                 
-                item.start_ = &(*start);
-                item.end_ = &(*end);
+                SharedPtr<WorkItem> item(new WorkItem());
+                item->workFunction_ = UpdateDrawableGeometriesWork;
+                item->aux_ = const_cast<FrameInfo*>(&frame_);
+                item->start_ = &(*start);
+                item->end_ = &(*end);
                 queue->AddWorkItem(item);
                 
                 start = end;
