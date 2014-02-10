@@ -38,9 +38,11 @@ void Start()
     }
 
     SubscribeToEvent("Update", "HandleUpdate");
-    SubscribeToEvent(cache, "ResourceNotFound", "HandleResourceError");
-    SubscribeToEvent(cache, "UnknownResourceType", "HandleResourceError");
     SubscribeToEvent(input, "ExitRequested", "HandleExitRequested");
+
+    String[] errorEvents = { "LoadFailed", "ResourceNotFound", "UnknownResourceType" };
+    for (uint i = 0; i < errorEvents.length; ++i)
+        SubscribeToEvent(cache, errorEvents[i], "HandleErrorEvent");
 
     // Disable Editor auto exit, check first if it is OK to exit
     engine.autoExit = false;

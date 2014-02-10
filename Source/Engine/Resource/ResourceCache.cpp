@@ -455,12 +455,22 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     // Attempt to load the resource
     SharedPtr<File> file = GetFile(name, SendEventOnFailure);
     if (!file)
-        return 0;
+        return 0;   // Error is already logged
 
     LOGDEBUG("Loading resource " + name);
     resource->SetName(file->GetName());
     if (!resource->Load(*(file.Get())))
+    {
+        // Error should already been logged by corresponding resource descendant class
+
+        using namespace LoadFailed;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_RESOURCENAME] = name;
+        SendEvent(E_LOADFAILED, eventData);
+
         return 0;
+    }
     
     // Store to cache
     resource->ResetUseTimer();

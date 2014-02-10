@@ -158,10 +158,10 @@ void ShaderVariation::SetDefines(const String& defines)
 bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
-    FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
-    if (!cache || !fileSystem || !cache->Exists(binaryShaderName))
+    if (!cache->Exists(binaryShaderName))
         return false;
     
+    FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
     unsigned sourceTimeStamp = owner_->GetTimeStamp();
     // If source code is loaded from a package, its timestamp will be zero. Else check that binary is not older
     // than source

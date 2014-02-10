@@ -175,7 +175,7 @@ void PerformQuickMenuSearch(const String&in query)
         Array<QuickMenuItem@> filtered;
         {
             QuickMenuItem@ qi;
-            for(uint x=0; x < quickMenuItems.length; x++)
+            for (uint x=0; x < quickMenuItems.length; x++)
             {
                 @qi = quickMenuItems[x];
                 int find = qi.action.Find(query, 0, false);
@@ -190,9 +190,9 @@ void PerformQuickMenuSearch(const String&in query)
         {
             QuickMenuItem@ a;
             QuickMenuItem@ b;
-            for(uint x=0; x < filtered.length; x++)
+            for (uint x=0; x < filtered.length; x++)
             {
-                for(uint y=0; y < filtered.length-1; y++)
+                for (uint y=0; y < filtered.length-1; y++)
                 {
                     @a = filtered[y];
                     @b = filtered[y+1];
@@ -208,7 +208,7 @@ void PerformQuickMenuSearch(const String&in query)
         {
             QuickMenuItem@ qi;
             limit = filtered.length > MAX_QUICK_MENU_ITEMS ? MAX_QUICK_MENU_ITEMS : filtered.length;
-            for(uint x=0; x < limit; x++)
+            for (uint x=0; x < limit; x++)
             {
                 @qi = filtered[x];
                 Menu@ item = CreateMenuItem(qi.action, qi.callback);
@@ -1393,8 +1393,9 @@ bool LoadMostRecentScene()
     return LoadScene(text.text);
 }
 
-void HandleResourceError(StringHash eventType, VariantMap& eventData)
+void HandleErrorEvent(StringHash eventType, VariantMap& eventData)
 {
     // Open console if it not yet open
-    console.visible = true;
+    if (!console.visible)
+        console.visible = true;
 }

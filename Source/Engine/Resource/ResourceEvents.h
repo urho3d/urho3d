@@ -42,6 +42,12 @@ EVENT(E_RELOADFAILED, ReloadFailed)
 {
 }
 
+/// Resource loading failed.
+EVENT(E_LOADFAILED, LoadFailed)
+{
+    PARAM(P_RESOURCENAME, ResourceName);            // String
+}
+
 /// Resource not found.
 EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
 {
