@@ -141,7 +141,7 @@ void HandleControlClicked(StringHash eventType, VariantMap& eventData)
 }
 
 
-//-----------------------------------------------------  Draging / Tooltips  ----------------------------------------------
+//-----------------------------------------------------  Dragging / Tooltips  ----------------------------------------------
 
 IntVector2 dragBeginPosition = IntVector2(0, 0);
 
