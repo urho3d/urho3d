@@ -444,6 +444,12 @@ void SaveMaterialAsDone(StringHash eventType, VariantMap& eventData)
     }
 
     String fullName = eventData["FileName"].GetString();
+
+    // Add default extension for saving if not specified
+    String filter = eventData["Filter"].GetString();
+    if (GetExtension(fullName).empty && filter != "*.*")
+        fullName = fullName + filter.Substring(1);
+
     File saveFile(fullName, FILE_WRITE);
     if (editMaterial.Save(saveFile))
     {
