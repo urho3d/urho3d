@@ -7954,6 +7954,9 @@ Properties:
 
 ### ReloadFailed
 
+### LoadFailed
+- %ResourceName : String
+
 ### ResourceNotFound
 - %ResourceName : String
 
