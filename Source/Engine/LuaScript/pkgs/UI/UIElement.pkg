@@ -71,7 +71,7 @@ class UIElement : public Serializable
     bool FilterAttributes(XMLElement& dest) const;
 
     void SetName(const String name);
-    
+
     void SetPosition(const IntVector2& position);
     void SetPosition(int x, int y);
     void SetSize(const IntVector2& size);
@@ -112,13 +112,13 @@ class UIElement : public Serializable
     void SetDragDropMode(unsigned mode);
 
     bool SetStyle(const String styleName, XMLFile* file = 0);
-    
+
     bool SetStyle(const XMLElement& element);
     bool SetStyleAuto(XMLFile* file = 0);
     void SetDefaultStyle(XMLFile* style);
-    
+
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
-    
+
     void SetLayoutMode(LayoutMode mode);
     void SetLayoutSpacing(int spacing);
     void SetLayoutBorder(const IntRect& border);
@@ -128,9 +128,9 @@ class UIElement : public Serializable
     void DisableLayoutUpdate();
     void EnableLayoutUpdate();
     void BringToFront();
-    
+
     UIElement* CreateChild(const String type, const String name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
-    
+
     void AddChild(UIElement* element);
     void InsertChild(unsigned index, UIElement* element);
     void RemoveChild(UIElement* element, unsigned index = 0);
@@ -187,10 +187,10 @@ class UIElement : public Serializable
     int GetLayoutSpacing() const;
     const IntRect& GetLayoutBorder() const;
     unsigned GetNumChildren(bool recursive = false) const;
-    
-    UIElement* GetChild(unsigned index) const;
+
     UIElement* GetChild(const String name, bool recursive = false) const;
-    
+    UIElement* GetChild(unsigned index) const;
+
     UIElement* GetParent() const;
     UIElement* GetRoot() const;
     const Color& GetDerivedColor() const;
@@ -213,7 +213,7 @@ class UIElement : public Serializable
     TraversalMode GetTraversalMode() const;
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
-    
+
     tolua_readonly tolua_property__get_set IntVector2& screenPosition;
     tolua_property__get_set String name;
     tolua_property__get_set IntVector2& position;

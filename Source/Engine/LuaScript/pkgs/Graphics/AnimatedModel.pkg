@@ -30,7 +30,7 @@ class AnimatedModel : public StaticModel
     float GetMorphWeight(StringHash nameHash) const;
     float GetMorphWeight(unsigned index) const;
     bool IsMaster() const;
-    
+
     tolua_property__get_set Model* model;
     tolua_readonly tolua_property__get_set Skeleton& skeleton;
     tolua_readonly tolua_property__get_set unsigned numAnimationStates;
