@@ -16,16 +16,28 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
-  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test' or abort 'Failed to configure/build/test Urho3D library'
-  scaffolding 'Build/generated/externallib'
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUA=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug' or abort 'Failed to configure Urho3D library build'
+  if ENV['ANDROID']
+    system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
+    system 'cd Build/ThirdParty/LuaJIT/generated/buildvm-android && make' or abort 'Failed to build buildvm-android tool'
+    system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
+    PLATFORM_PREFIX = 'android-'
+    TEST = ''
+    ENV['SKIP_NATIVE'] = '1'
+  else
+    PLATFORM_PREFIX = ''
+    TEST = '&& make test'
+  end
+  system "cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to build or test Urho3D library'
+  scaffolding "#{PLATFORM_PREFIX}Build/generated/externallib"
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{PLATFORM_PREFIX}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master rake travis_ci_site_update)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master SITE_UPDATE=1 rake travis_ci_site_update)
 desc 'Update site documentation to GitHub Pages'
 task :travis_ci_site_update do
   # Skip documentation update if one of the following conditions is met
-  if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master' or ENV['TEST_LIB_TYPE'] == 'SHARED'
+  if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master' or ENV['SITE_UPDATE'] != '1'
     next
   end
   # Pull or clone
