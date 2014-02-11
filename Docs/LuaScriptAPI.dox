@@ -553,9 +553,9 @@ Methods:
 - void RemoveAllAnimationStates()
 - void SetAnimationLodBias(float bias)
 - void SetUpdateInvisible(bool enable)
-- void SetMorphWeight(unsigned index, float weight)
 - void SetMorphWeight(const String name, float weight)
 - void SetMorphWeight(StringHash nameHash, float weight)
+- void SetMorphWeight(unsigned index, float weight)
 - void ResetMorphWeights()
 - Skeleton& GetSkeleton()
 - unsigned GetNumAnimationStates() const
@@ -566,9 +566,9 @@ Methods:
 - float GetAnimationLodBias() const
 - bool GetUpdateInvisible() const
 - unsigned GetNumMorphs() const
-- float GetMorphWeight(unsigned index) const
 - float GetMorphWeight(const String name) const
 - float GetMorphWeight(StringHash nameHash) const
+- float GetMorphWeight(unsigned index) const
 - bool IsMaster() const
 
 Properties:
