@@ -79,6 +79,8 @@ public:
     
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
+    /// Get next free WorkItem Ptr.
+    SharedPtr<WorkItem> GetFreeItem();
     /// Add a work item and resume worker threads.
     void AddWorkItem(SharedPtr<WorkItem> item);
     /// Pause worker threads.
@@ -98,11 +100,15 @@ private:
     void ProcessItems(unsigned threadIndex);
     /// Purge completed work items and send completion events as necessary.
     void PurgeCompleted();
+    /// Purge the pool to reduce allocation where its unneeded.
+    void PurgePool();
     /// Handle frame start event. Purge completed work from the main thread queue, and perform work if no threads at all.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
+    /// Work item pool for reuse to cut down on allocation. The bool is a flag for item pooling and whether it is available or not.
+    HashMap<SharedPtr<WorkItem>, bool> itemPool_;
     /// Work item collection. Accessed only by the main thread.
     List<SharedPtr<WorkItem> > workItems_;
     /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems.)

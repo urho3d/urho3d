@@ -691,7 +691,7 @@ void View::GetDrawables()
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
-            SharedPtr<WorkItem> item(new WorkItem());
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
             item->workFunction_ = CheckVisibilityWork;
             item->aux_ = this;
 
@@ -764,7 +764,7 @@ void View::GetBatches()
         
         for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
         {
-            SharedPtr<WorkItem> item(new WorkItem());
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
             item->workFunction_ = ProcessLightWork;
             item->aux_ = this;
 
@@ -1059,7 +1059,7 @@ void View::UpdateGeometries()
             {
                 BatchQueue* passQueue = &batchQueues_[command.pass_];
                 
-                SharedPtr<WorkItem> item(new WorkItem());
+                SharedPtr<WorkItem> item = queue->GetFreeItem();
                 item->workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
                 item->start_ = &batchQueues_[command.pass_];
                 queue->AddWorkItem(item);
@@ -1068,14 +1068,14 @@ void View::UpdateGeometries()
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
-            SharedPtr<WorkItem> lightItem(new WorkItem());
+            SharedPtr<WorkItem> lightItem = queue->GetFreeItem();
             lightItem->workFunction_ = SortLightQueueWork;
             lightItem->start_ = &(*i);
             queue->AddWorkItem(lightItem);
 
             if (i->shadowSplits_.Size())
             {
-                SharedPtr<WorkItem> shadowItem(new WorkItem());
+                SharedPtr<WorkItem> shadowItem = queue->GetFreeItem();
                 shadowItem->workFunction_ = SortShadowQueueWork;
                 shadowItem->start_ = &(*i);
                 queue->AddWorkItem(shadowItem);
@@ -1117,7 +1117,7 @@ void View::UpdateGeometries()
                 if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                     end = start + drawablesPerItem;
                 
-                SharedPtr<WorkItem> item(new WorkItem());
+                SharedPtr<WorkItem> item = queue->GetFreeItem();
                 item->workFunction_ = UpdateDrawableGeometriesWork;
                 item->aux_ = const_cast<FrameInfo*>(&frame_);
                 item->start_ = &(*start);
