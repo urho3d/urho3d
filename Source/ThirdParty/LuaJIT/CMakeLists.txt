@@ -285,7 +285,7 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
     set (LINK_LIBS_ONLY LuaJIT)
 
     # Setup target
-    setup_executable ()
+    setup_executable (NODEPS)
     adjust_target_name ()   # Adjust to intended target output name
 
     # Define post build steps

@@ -47,4 +47,4 @@ set (SOURCE_FILES ${C_FILES} ${GEN_ARCH_H})
 set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} @CMAKE_CURRENT_SOURCE_DIR@/src)
 
 # Setup target
-setup_executable ()
+setup_executable (NODEPS)

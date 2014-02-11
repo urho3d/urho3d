@@ -34,4 +34,4 @@ if (NOT MSVC)
 endif ()
 
 # Setup target
-setup_executable ()
+setup_executable (NODEPS)

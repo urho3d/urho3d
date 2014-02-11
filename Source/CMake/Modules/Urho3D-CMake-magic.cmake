@@ -433,9 +433,16 @@ macro (setup_library)
 endmacro ()
 
 # Macro for setting up an executable target
+#  NODEPS - setup executable target without defining Urho3D dependency libraries
+#  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable command
 macro (setup_executable)
-    add_executable (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
-    define_dependency_libs (Urho3D)
+    # Parse extra arguments
+    cmake_parse_arguments (ARG "NODEPS" "" "" ${ARGN})
+
+    add_executable (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
+    if (NOT ARG_NODEPS)
+        define_dependency_libs (Urho3D)
+    endif ()
     setup_target ()
     
     if (IOS)

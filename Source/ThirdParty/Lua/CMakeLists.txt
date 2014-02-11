@@ -48,7 +48,7 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
     endif ()
 
     # Setup target
-    setup_executable ()
+    setup_executable (NODEPS)
     adjust_target_name ()   # Adjust to intended target output name
 
     # Define target name for Lua compiler
@@ -61,5 +61,5 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
     # Same as above
 
     # Setup target
-    setup_executable ()
+    setup_executable (NODEPS)
 endif ()
