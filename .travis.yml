@@ -20,6 +20,6 @@ install:
     - rvm gemset use global && gem install rake
     - sh -c "[ ! $ENABLE_64BIT ] &&  sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true"
     - sh -c "[ $ANDROID ] &&  sudo apt-get install -q -y --no-install-recommends openjdk-7-jdk g++-multilib && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-19.0.1,android-19,system-image,extra-android-support || true"
-    - sh -c "[ $SITE_UPDATE ] && sudo apt-get install -q -y --no-install-recommends doxygen graphviz"
+    - sh -c "[ $SITE_UPDATE ] && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true"
 script: rake travis_ci
 after_success: rake travis_ci_site_update
