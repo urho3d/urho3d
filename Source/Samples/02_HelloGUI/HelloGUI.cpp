@@ -46,7 +46,7 @@ DEFINE_APPLICATION_MAIN(HelloGUI)
 HelloGUI::HelloGUI(Context* context) :
     Sample(context),
     uiRoot_(GetSubsystem<UI>()->GetRoot()),
-    window_()
+    dragBeginPosition_(IntVector2::ZERO)
 {
 }
 
@@ -67,14 +67,12 @@ void HelloGUI::Start()
 
     // Initialize Window
     InitWindow();
-
-    // Create a draggable Fish
-    CreateDraggableFish();
-
+    
     // Create and add some controls to the Window
     InitControls();
 
-    SubscribeToEvents();
+    // Create a draggable Fish
+    CreateDraggableFish();
 }
 
 void HelloGUI::InitControls()
@@ -143,44 +141,12 @@ void HelloGUI::InitWindow()
     windowTitle->SetStyleAuto();
     buttonClose->SetStyle("CloseButton");
 
-    // Lastly, subscribe to buttonClose release (following a 'press') events
+    // Subscribe to buttonClose release (following a 'press') events
     SubscribeToEvent(buttonClose, E_RELEASED, HANDLER(HelloGUI, HandleClosePressed));
-}
-
-void HelloGUI::SubscribeToEvents()
-{
-    // Subscribe handler; invoked whenever a mouse click event is dispatched
+    
+    // Subscribe also to all UI mouse clicks just to see where we have clicked
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
 }
-
-void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
-{
-    GetSubsystem<Engine>()->Exit();
-}
-
-void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
-{
-    // Get the Text control acting as the Window's title
-    SharedPtr<Text> windowTitle((Text*)window_->GetChild("WindowTitle", true));
-
-    // Get control that was clicked
-    UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
-
-    String name = "...?";
-    if (clicked)
-    {
-        // Get the name of the control that was clicked
-        name = clicked->GetName();
-    }
-
-    // Update the Window's title text
-    windowTitle->SetText("Hello " + name + "!");
-}
-
-
-//-----------------------------------------------------  Dragging / Tooltips  ----------------------------------------------
-
-IntVector2 dragBeginPosition = IntVector2(0, 0);
 
 void HelloGUI::CreateDraggableFish()
 {
@@ -218,16 +184,40 @@ void HelloGUI::CreateDraggableFish()
 void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
     // Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
-    dragBeginPosition = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
+    dragBeginPosition_ = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
 }
 
 void HelloGUI::HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
     IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
     UIElement* draggedElement = static_cast<UIElement*>(eventData["Element"].GetPtr());
-    draggedElement->SetPosition(dragCurrentPosition - dragBeginPosition);
+    draggedElement->SetPosition(dragCurrentPosition - dragBeginPosition_);
 }
 
 void HelloGUI::HandleDragEnd(StringHash eventType, VariantMap& eventData) // For reference (not used here)
 {
+}
+
+void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Engine>()->Exit();
+}
+
+void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
+{
+    // Get the Text control acting as the Window's title
+    SharedPtr<Text> windowTitle((Text*)window_->GetChild("WindowTitle", true));
+
+    // Get control that was clicked
+    UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+
+    String name = "...?";
+    if (clicked)
+    {
+        // Get the name of the control that was clicked
+        name = clicked->GetName();
+    }
+
+    // Update the Window's title text
+    windowTitle->SetText("Hello " + name + "!");
 }

@@ -17,6 +17,8 @@ local engine = GetEngine()
 local input = GetInput()
 local ui = GetUI()
 
+local dragBeginPosition = IntVector2(0, 0)
+
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -38,8 +40,6 @@ function Start()
 
     -- Create a draggable Fish
     CreateDraggableFish()
-
-    SubscribeToEvents()
 end
 
 function InitControls()
@@ -72,13 +72,13 @@ function InitWindow()
     -- Create the Window and add it to the UI's root node
     window = Window:new()
     ui.root:AddChild(window)
-    
+
     -- Set Window size and layout settings
     window:SetMinSize(384, 192)
     window:SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6))
     window:SetAlignment(HA_CENTER, VA_CENTER)
     window:SetName("Window")
-    
+
     -- Create Window 'titlebar' container
     local titleBar = UIElement:new()
     titleBar:SetMinSize(0, 24)
@@ -89,8 +89,8 @@ function InitWindow()
     local windowTitle = Text:new()
     windowTitle.name = "WindowTitle"
     windowTitle.text = "Hello GUI!"
-    
-    
+
+
     -- Create the Window's close button
     local buttonClose = Button:new()
     buttonClose:SetName("CloseButton")
@@ -101,49 +101,19 @@ function InitWindow()
 
     -- Add the title bar to the Window
     window:AddChild(titleBar)
-    
-    
+
+
     -- Apply styles
     window:SetStyleAuto()
     windowTitle:SetStyleAuto()
     buttonClose:SetStyle("CloseButton")
-    
-    -- Lastly, subscribe to buttonClose release (following a 'press') events
-    SubscribeToEvent(buttonClose, "Released", "HandleClosePressed")
-end
 
-function SubscribeToEvents()
-    -- Subscribe handler invoked whenever a mouse click event is dispatched
+    -- Subscribe to buttonClose release (following a 'press') events
+    SubscribeToEvent(buttonClose, "Released", "HandleClosePressed")
+    
+    -- Subscribe also to all UI mouse clicks just to see where we have clicked
     SubscribeToEvent("UIMouseClick", "HandleControlClicked")
 end
-
-function HandleClosePressed(eventType, eventData)
-    engine:Exit()
-end
-
-function HandleControlClicked(eventType, eventData)
-    -- Get the Text control acting as the Window's title
-    local element = window:GetChild("WindowTitle", true)
-    local windowTitle = tolua.cast(element, 'Text')
-    
-    -- Get control that was clicked
-    -- Note difference to C++: in C++ we would call GetPtr() and cast the function pointer to UIElement, here we must specify
-    -- what kind of object we are getting. Null will be returned on type mismatch
-    local clicked = eventData:GetPtr("UIElement", "Element")
-    local name = "...?"
-    if clicked ~= nil then
-        -- Get the name of the control that was clicked
-        name = clicked.name
-    end
-
-    -- Update the Window's title text
-    windowTitle.text = "Hello " .. name .. "!"
-end
-
-
------------------------------------------------------  Dragging / Tooltips  ----------------------------------------------
-
-local dragBeginPosition = IntVector2(0, 0)
 
 function CreateDraggableFish()
     -- Create a draggable Fish button
@@ -181,4 +151,27 @@ function HandleDragMove(eventType, eventData)
 end
 
 function HandleDragEnd(eventType, eventData) -- For reference (not used here)
+end
+
+function HandleClosePressed(eventType, eventData)
+    engine:Exit()
+end
+
+function HandleControlClicked(eventType, eventData)
+    -- Get the Text control acting as the Window's title
+    local element = window:GetChild("WindowTitle", true)
+    local windowTitle = tolua.cast(element, 'Text')
+
+    -- Get control that was clicked
+    -- Note difference to C++: in C++ we would call GetPtr() and cast the function pointer to UIElement, here we must specify
+    -- what kind of object we are getting. Null will be returned on type mismatch
+    local clicked = eventData:GetPtr("UIElement", "Element")
+    local name = "...?"
+    if clicked ~= nil then
+        -- Get the name of the control that was clicked
+        name = clicked.name
+    end
+
+    -- Update the Window's title text
+    windowTitle.text = "Hello " .. name .. "!"
 end

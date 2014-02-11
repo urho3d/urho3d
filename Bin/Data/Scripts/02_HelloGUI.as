@@ -11,6 +11,7 @@
 #include "Scripts/Utilities/Sample.as"
 
 Window@ window;
+IntVector2 dragBeginPosition = IntVector2(0, 0);
 
 void Start()
 {
@@ -29,13 +30,11 @@ void Start()
     // Initialize Window
     InitWindow();
 
-    // Create a draggable Fish
-    CreateDraggableFish();
-
     // Create and add some controls to the Window
     InitControls();
-
-    SubscribeToEvents();
+    
+    // Create a draggable Fish
+    CreateDraggableFish();
 }
 
 void InitControls()
@@ -104,46 +103,12 @@ void InitWindow()
     windowTitle.SetStyleAuto();
     buttonClose.style = "CloseButton";
 
-    // Lastly, subscribe to buttonClose release (following a 'press') events
+    // Subscribe to buttonClose release (following a 'press') events
     SubscribeToEvent(buttonClose, "Released", "HandleClosePressed");
-}
 
-void SubscribeToEvents()
-{
-    // Subscribe handler; invoked whenever a mouse click event is dispatched
+    // Subscribe also to all UI mouse clicks just to see where we have clicked
     SubscribeToEvent("UIMouseClick", "HandleControlClicked");
 }
-
-void HandleClosePressed(StringHash eventType, VariantMap& eventData)
-{
-    engine.Exit();
-}
-
-void HandleControlClicked(StringHash eventType, VariantMap& eventData)
-{
-    // Get the Text control acting as the Window's title
-    Text@ windowTitle = window.GetChild("WindowTitle", true);
-
-    // Get control that was clicked
-    // Note difference to C++: in C++ we would call GetPtr() and cast the void pointer to UIElement, here we must specify
-    // what kind of object we are getting. Null will be returned on type mismatch
-    UIElement@ clicked = eventData["Element"].GetUIElement();
-
-    String name = "...?";
-    if (clicked !is null)
-    {
-        // Get the name of the control that was clicked
-        name = clicked.name;
-    }
-
-    // Update the Window's title text
-    windowTitle.text = "Hello " + name + "!";
-}
-
-
-//-----------------------------------------------------  Draging / Tooltips  ----------------------------------------------
-
-IntVector2 dragBeginPosition = IntVector2(0, 0);
 
 void CreateDraggableFish()
 {
@@ -185,4 +150,30 @@ void HandleDragMove(StringHash eventType, VariantMap& eventData)
 
 void HandleDragEnd(StringHash eventType, VariantMap& eventData) // For reference (not used here)
 {
+}
+
+void HandleClosePressed(StringHash eventType, VariantMap& eventData)
+{
+    engine.Exit();
+}
+
+void HandleControlClicked(StringHash eventType, VariantMap& eventData)
+{
+    // Get the Text control acting as the Window's title
+    Text@ windowTitle = window.GetChild("WindowTitle", true);
+
+    // Get control that was clicked
+    // Note difference to C++: in C++ we would call GetPtr() and cast the void pointer to UIElement, here we must specify
+    // what kind of object we are getting. Null will be returned on type mismatch
+    UIElement@ clicked = eventData["Element"].GetUIElement();
+
+    String name = "...?";
+    if (clicked !is null)
+    {
+        // Get the name of the control that was clicked
+        name = clicked.name;
+    }
+
+    // Update the Window's title text
+    windowTitle.text = "Hello " + name + "!";
 }

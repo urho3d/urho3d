@@ -56,25 +56,25 @@ private:
     void InitWindow();
     /// Create and add various common controls for demonstration purposes.
     void InitControls();
-    /// Subscribe to UI events.
-    void SubscribeToEvents();
+    /// Create a draggable fish button.
+    void CreateDraggableFish();
+    /// Handle drag begin for the fish button.
+    void HandleDragBegin(StringHash eventType, VariantMap& eventData);
+    /// Handle drag move for the fish button.
+    void HandleDragMove(StringHash eventType, VariantMap& eventData);
+    /// Handle drag end for the fish button.
+    void HandleDragEnd(StringHash eventType, VariantMap& eventData);
     /// Handle any UI control being clicked.
     void HandleControlClicked(StringHash eventType, VariantMap& eventData);
     /// Handle close button pressed and released.
     void HandleClosePressed(StringHash eventType, VariantMap& eventData);
-    /// Create a draggable fish button
-    void CreateDraggableFish();
-    /// Handle drag begin
-    void HandleDragBegin(StringHash eventType, VariantMap& eventData);
-    /// Handle drag move
-    void HandleDragMove(StringHash eventType, VariantMap& eventData);
-    /// Handle drag end
-    void HandleDragEnd(StringHash eventType, VariantMap& eventData);
-
+    
     /// The Window.
     SharedPtr<Window> window_;
     /// The UI's root UIElement.
     SharedPtr<UIElement> uiRoot_;
+    /// Remembered drag begin position.
+    IntVector2 dragBeginPosition_;
 };
 
 
