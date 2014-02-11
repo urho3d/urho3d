@@ -16,8 +16,11 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
+  if ENV['ENABLE_64BIT'].to_i == 0
+    ENV['CMAKE_PREFIX_PATH'] = '/usr/lib/i386-linux-gnu'
+  end
   system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug' or abort 'Failed to configure Urho3D library build'
-  if ENV['ANDROID']
+  if ENV['ANDROID_NDK']
     system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
     system 'cd Build/ThirdParty/LuaJIT/generated/buildvm-android && make' or abort 'Failed to build buildvm-android tool'
     system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'

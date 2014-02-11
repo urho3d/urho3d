@@ -3,23 +3,24 @@ env:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
     - DISPLAY=:99.0
   matrix:
-    - URHO3D_LIB_TYPE=STATIC ENABLE_64BIT=0
-    - URHO3D_LIB_TYPE=SHARED ENABLE_64BIT=0
+# Disable for now as it fails to install 32-bit prerequisite
+#    - URHO3D_LIB_TYPE=STATIC ENABLE_64BIT=0
+#    - URHO3D_LIB_TYPE=SHARED ENABLE_64BIT=0
     - URHO3D_LIB_TYPE=STATIC ENABLE_64BIT=1
     - URHO3D_LIB_TYPE=SHARED ENABLE_64BIT=1 SITE_UPDATE=1
-    - URHO3D_LIB_TYPE=STATIC ENABLE_64BIT=0 ANDROID=1
-    - URHO3D_LIB_TYPE=SHARED ENABLE_64BIT=0 ANDROID=1
+    - URHO3D_LIB_TYPE=STATIC ENABLE_64BIT=0 ANDROID_NDK=/home/travis/build/urho3d/Urho3D/android-ndk
+    - URHO3D_LIB_TYPE=SHARED ENABLE_64BIT=0 ANDROID_NDK=/home/travis/build/urho3d/Urho3D/android-ndk
 language: cpp
 compiler: gcc
 before_install:
-    - sh -e /etc/init.d/xvfb start && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1024x768x24
-    - sh -c "[ $ANDROID ] && wget -q http://dl.google.com/android/android-sdk_r22.3-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && wget -q http://dl.google.com/android/ndk/android-ndk-r9c-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=`pwd`/android-ndk || true"
-    - sh -c "[ $SITE_UPDATE ] && sudo add-apt-repository ppa:george-edison55/precise-backports -y && sudo apt-get update -q -y || true"
+    - bash -e /etc/init.d/xvfb start && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1024x768x24
+    - bash -c "[ $ANDROID_NDK ] && wget -q http://dl.google.com/android/android-sdk_r22.3-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && wget -q http://dl.google.com/android/ndk/android-ndk-r9c-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk || true"
+    - bash -c "[ $SITE_UPDATE ] && sudo add-apt-repository ppa:george-edison55/precise-backports -y && sudo apt-get update -q -y || true"
 install:
     - sudo apt-get install -q -y --no-install-recommends libasound2-dev
     - rvm gemset use global && gem install rake
-    - sh -c "[ ! $ENABLE_64BIT ] &&  sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true"
-    - sh -c "[ $ANDROID ] &&  sudo apt-get install -q -y --no-install-recommends openjdk-7-jdk g++-multilib && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-19.0.1,android-19,system-image,extra-android-support || true"
-    - sh -c "[ $SITE_UPDATE ] && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true"
+    - bash -c "[ x$ENABLE_64BIT == 'x0' ] &&  sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 g++-multilib || true"
+    - bash -c "[ $ANDROID_NDK ] &&  sudo apt-get install -q -y --no-install-recommends openjdk-7-jdk g++-multilib && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-19.0.1,android-19,system-image,extra-android-support || true"
+    - bash -c "[ $SITE_UPDATE ] && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true"
 script: rake travis_ci
 after_success: rake travis_ci_site_update
