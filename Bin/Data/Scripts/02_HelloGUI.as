@@ -3,6 +3,10 @@
 //     - Creation of controls and building a UI hierarchy
 //     - Loading UI style from XML and applying it to controls
 //     - Handling of global and per-control events
+// For more advanced users (beginners can skip this section):
+//     - Dragging UIElements
+//     - Displaying tooltips
+//     - Accessing available Events data (eventData)
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -24,6 +28,9 @@ void Start()
 
     // Initialize Window
     InitWindow();
+
+    // Create a draggable Fish
+    CreateDraggableFish();
 
     // Create and add some controls to the Window
     InitControls();
@@ -131,4 +138,51 @@ void HandleControlClicked(StringHash eventType, VariantMap& eventData)
 
     // Update the Window's title text
     windowTitle.text = "Hello " + name + "!";
+}
+
+
+//-----------------------------------------------------  Draging / Tooltips  ----------------------------------------------
+
+IntVector2 dragBeginPosition = IntVector2(0, 0);
+
+void CreateDraggableFish()
+{
+    // Create a draggable Fish button
+    Button@ draggableFish = ui.root.CreateChild("Button", "Fish");
+    draggableFish.texture = cache.GetResource("Texture2D", "Textures/UrhoDecal.dds"); // Set texture
+    draggableFish.blendMode = BLEND_ADD;
+    draggableFish.SetSize(128, 128);
+    draggableFish.SetPosition((graphics.width - draggableFish.width) / 2, 200);
+
+    // Add a tooltip to Fish button
+    ToolTip@ toolTip = draggableFish.CreateChild("ToolTip");
+    toolTip.position = IntVector2(draggableFish.width + 5, draggableFish.width/2); // slightly offset from fish
+    BorderImage@ textHolder = toolTip.CreateChild("BorderImage");
+    textHolder.SetStyle("ToolTipBorderImage");
+    Text@ toolTipText = textHolder.CreateChild("Text");
+    toolTipText.SetStyle("ToolTipText");
+    toolTipText.text = "Please drag me!";
+
+    // Subscribe draggableFish to Drag Events (in order to make it draggable)
+    // See "Event list" in documentation's Main Page for reference on available Events and their eventData
+    SubscribeToEvent(draggableFish, "DragBegin", "HandleDragBegin");
+    SubscribeToEvent(draggableFish, "DragMove", "HandleDragMove");
+    SubscribeToEvent(draggableFish, "DragEnd", "HandleDragEnd");
+}
+
+void HandleDragBegin(StringHash eventType, VariantMap& eventData)
+{
+    // Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+    dragBeginPosition = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
+}
+
+void HandleDragMove(StringHash eventType, VariantMap& eventData)
+{
+    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
+    UIElement@ draggedElement = eventData["Element"].GetUIElement();
+    draggedElement.position = dragCurrentPosition - dragBeginPosition;
+}
+
+void HandleDragEnd(StringHash eventType, VariantMap& eventData) // For reference (not used here)
+{
 }

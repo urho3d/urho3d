@@ -36,6 +36,10 @@ class Window;
 ///     - Creation of controls and building a UI hierarchy
 ///     - Loading UI style from XML and applying it to controls
 ///     - Handling of global and per-control events
+/// For more advanced users (beginners can skip this section):
+///     - Dragging UIElements
+///     - Displaying tooltips
+///     - Accessing available Events data (eventData)
 class HelloGUI : public Sample
 {
     OBJECT(HelloGUI);
@@ -58,6 +62,14 @@ private:
     void HandleControlClicked(StringHash eventType, VariantMap& eventData);
     /// Handle close button pressed and released.
     void HandleClosePressed(StringHash eventType, VariantMap& eventData);
+    /// Create a draggable fish button
+    void CreateDraggableFish();
+    /// Handle drag begin
+    void HandleDragBegin(StringHash eventType, VariantMap& eventData);
+    /// Handle drag move
+    void HandleDragMove(StringHash eventType, VariantMap& eventData);
+    /// Handle drag end
+    void HandleDragEnd(StringHash eventType, VariantMap& eventData);
 
     /// The Window.
     SharedPtr<Window> window_;
