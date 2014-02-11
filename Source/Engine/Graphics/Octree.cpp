@@ -410,7 +410,7 @@ void Octree::Update(const FrameInfo& frame)
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
-            SharedPtr<WorkItem> item(new WorkItem());
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
             item->workFunction_ = UpdateDrawablesWork;
             item->aux_ = const_cast<FrameInfo*>(&frame);
 
@@ -529,7 +529,7 @@ void Octree::Raycast(RayOctreeQuery& query) const
             PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
             while (start != rayQueryDrawables_.End())
             {
-                SharedPtr<WorkItem> item(new WorkItem());
+                SharedPtr<WorkItem> item = queue->GetFreeItem();
                 item->workFunction_ = RaycastDrawablesWork;
                 item->aux_ = const_cast<Octree*>(this);
 
