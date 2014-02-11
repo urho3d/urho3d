@@ -99,6 +99,26 @@ void WorkQueue::CreateThreads(unsigned numThreads)
     }
 }
 
+SharedPtr<WorkItem> WorkQueue::GetFreeItem()
+{
+    // Check for the next usable item
+    HashMap<SharedPtr<WorkItem>, bool>::Iterator i = itemPool_.Begin();
+    for (; i != itemPool_.End(); i++)
+    {
+        // If available set it to in use and return it
+        if (i->second_)
+        {
+            i->second_ = false;
+            return i->first_;
+        }
+    }
+
+    // No usable items found, create a new one add it to queue as in use and return it
+    SharedPtr<WorkItem> item(new WorkItem());
+    itemPool_[item] = false;
+    return item;
+}
+
 void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
     // Check for duplicate items.
@@ -109,7 +129,7 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
     // Clear completed flag in case item is reused
     workItems_.Push(item);
     item->completed_ = false;
-    
+
     // Make sure worker threads' list is safe to modify
     if (threads_.Size() && !paused_)
         queueMutex_.Acquire();
@@ -270,12 +290,43 @@ void WorkQueue::PurgeCompleted()
                 eventData[P_ITEM] = static_cast<void*>(i->Get());
                 SendEvent(E_WORKITEMCOMPLETED, eventData);
             }
-            
+
+            // Check if this was a pooled item and set it to usable
+            if (itemPool_.Contains(*i))
+            {
+                // Reset the values to their defaults. This should 
+                // be safe to do here as the completed event has 
+                // already been handled and this is part of the 
+                // internal pool.
+                (*i)->start_ = NULL;
+                (*i)->end_ = NULL;
+                (*i)->aux_ = NULL;
+                (*i)->workFunction_ = NULL;
+                (*i)->priority_ = M_MAX_UNSIGNED;
+                (*i)->sendEvent_ = false;
+                (*i)->completed_ = false;
+
+                itemPool_[*i] = true;
+            }
+
             i = workItems_.Erase(i);
         }
         else
             ++i;
     }
+}
+
+void WorkQueue::PurgePool()
+{
+    static unsigned int lastSize = 0;
+    unsigned int currentSize = itemPool_.Size();
+    int difference = lastSize - currentSize;
+
+    // Difference tolerance, should be fairly significant to reduce the pool size.
+    for (unsigned i = 0; itemPool_.Size() > 0 && difference > 10 && i < difference; i++)
+        itemPool_.Erase(itemPool_.Begin());
+
+    lastSize = currentSize;
 }
 
 void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
@@ -297,6 +348,7 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     }
     
     PurgeCompleted();
+    PurgePool();
 }
 
 }
