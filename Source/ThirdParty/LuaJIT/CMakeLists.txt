@@ -300,6 +300,6 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
 endif ()
 
 # Add Data/LuaScripts directory into the LuaJIT module search path
-file (TO_NATIVE_PATH Data/LuaScripts/ LUA_RDIR)     # Relative directory
-file (TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${DEST_RUNTIME_DIR}/Data/LuaScripts/ LUA_IDIR)     # Installation directory
+set (LUA_RDIR Data/LuaScripts/)     # Relative directory
+set (LUA_IDIR ${CMAKE_INSTALL_PREFIX}/${DEST_RUNTIME_DIR}/Data/LuaScripts/)     # Installation directory
 add_definitions (-DLUA_RDIR="${LUA_RDIR}" -DLUA_IDIR="${LUA_IDIR}")
