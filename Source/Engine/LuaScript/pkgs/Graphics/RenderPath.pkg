@@ -12,9 +12,9 @@ class RenderPath
     void ToggleEnabled(const String tag);
     void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
     void AddRenderTarget(const RenderTargetInfo& info);
-    void RemoveRenderTarget(unsigned index);
 
     void RemoveRenderTarget(const String name);
+    void RemoveRenderTarget(unsigned index);
     void RemoveRenderTargets(const String tag);
     
     void SetCommand(unsigned index, const RenderPathCommand& command);
