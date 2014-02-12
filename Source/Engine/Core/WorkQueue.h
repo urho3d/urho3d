@@ -40,11 +40,15 @@ class WorkerThread;
 /// Work queue item.
 struct WorkItem : public RefCounted
 {
+    friend class WorkQueue;
+
+public:
     // Construct
     WorkItem() :
         priority_(M_MAX_UNSIGNED),
         sendEvent_(false),
-        completed_(false)
+        completed_(false),
+        pooled_(false)
     {
     }
     
@@ -62,6 +66,9 @@ struct WorkItem : public RefCounted
     bool sendEvent_;
     /// Completed flag.
     volatile bool completed_;
+
+private:
+    bool pooled_;
 };
 
 /// Work queue subsystem for multithreading.
@@ -89,11 +96,15 @@ public:
     void Resume();
     /// Finish all queued work which has at least the specified priority. Main thread will also execute priority work. Pause worker threads if no more work remains.
     void Complete(unsigned priority);
+    /// Set the pool telerance before it starts deleting pool items.
+    void SetTolerance(int tolerance) { tolerance_ = tolerance; }
     
     /// Return number of worker threads.
     unsigned GetNumThreads() const { return threads_.Size(); }
     /// Return whether all work with at least the specified priority is finished.
     bool IsCompleted(unsigned priority) const;
+    /// Return the pool tolerance.
+    int GetTolerance() const { return tolerance_; }
     
 private:
     /// Process work items until shut down. Called by the worker threads.
@@ -108,7 +119,7 @@ private:
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item pool for reuse to cut down on allocation. The bool is a flag for item pooling and whether it is available or not.
-    HashMap<SharedPtr<WorkItem>, bool> itemPool_;
+    List<SharedPtr<WorkItem> > poolItems_;
     /// Work item collection. Accessed only by the main thread.
     List<SharedPtr<WorkItem> > workItems_;
     /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems.)
@@ -121,6 +132,8 @@ private:
     volatile bool pausing_;
     /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
     bool paused_;
+    /// Tolerance for the shared pool before it begins to deallocate.
+    int tolerance_;
 };
 
 }

@@ -66,7 +66,8 @@ WorkQueue::WorkQueue(Context* context) :
     Object(context),
     shutDown_(false),
     pausing_(false),
-    paused_(false)
+    paused_(false),
+    tolerance_(10)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WorkQueue, HandleBeginFrame));
 }
@@ -101,29 +102,25 @@ void WorkQueue::CreateThreads(unsigned numThreads)
 
 SharedPtr<WorkItem> WorkQueue::GetFreeItem()
 {
-    // Check for the next usable item
-    HashMap<SharedPtr<WorkItem>, bool>::Iterator i = itemPool_.Begin();
-    for (; i != itemPool_.End(); i++)
+    if (poolItems_.Size() > 0)
     {
-        // If available set it to in use and return it
-        if (i->second_)
-        {
-            i->second_ = false;
-            return i->first_;
-        }
+        SharedPtr<WorkItem> item = poolItems_.Front();
+        poolItems_.PopFront();
+        return item;
     }
-
-    // No usable items found, create a new one add it to queue as in use and return it
-    SharedPtr<WorkItem> item(new WorkItem());
-    itemPool_[item] = false;
-    return item;
+    else
+    {
+        // No usable items found, create a new one set it as pooled and return it.
+        SharedPtr<WorkItem> item(new WorkItem());
+        item->pooled_ = true;
+        return item;
+    }
 }
 
 void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
     // Check for duplicate items.
-    if (workItems_.Contains(item))
-        return;
+    assert(!workItems_.Contains(item));
 
     // Push to the main thread list to keep item alive
     // Clear completed flag in case item is reused
@@ -292,7 +289,7 @@ void WorkQueue::PurgeCompleted()
             }
 
             // Check if this was a pooled item and set it to usable
-            if (itemPool_.Contains(*i))
+            if ((*i)->pooled_)
             {
                 // Reset the values to their defaults. This should 
                 // be safe to do here as the completed event has 
@@ -306,7 +303,7 @@ void WorkQueue::PurgeCompleted()
                 (*i)->sendEvent_ = false;
                 (*i)->completed_ = false;
 
-                itemPool_[*i] = true;
+                poolItems_.Push(*i);
             }
 
             i = workItems_.Erase(i);
@@ -319,12 +316,12 @@ void WorkQueue::PurgeCompleted()
 void WorkQueue::PurgePool()
 {
     static unsigned int lastSize = 0;
-    unsigned int currentSize = itemPool_.Size();
+    unsigned int currentSize = poolItems_.Size();
     int difference = lastSize - currentSize;
 
     // Difference tolerance, should be fairly significant to reduce the pool size.
-    for (unsigned i = 0; itemPool_.Size() > 0 && difference > 10 && i < difference; i++)
-        itemPool_.Erase(itemPool_.Begin());
+    for (unsigned i = 0; poolItems_.Size() > 0 && difference > tolerance_ && i < difference; i++)
+        poolItems_.PopFront();
 
     lastSize = currentSize;
 }
