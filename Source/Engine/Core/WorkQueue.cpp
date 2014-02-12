@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "CoreEvents.h"
+#include "Log.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Thread.h"
@@ -67,7 +68,8 @@ WorkQueue::WorkQueue(Context* context) :
     shutDown_(false),
     pausing_(false),
     paused_(false),
-    tolerance_(10)
+    tolerance_(10),
+    lastSize_(0)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WorkQueue, HandleBeginFrame));
 }
@@ -119,9 +121,15 @@ SharedPtr<WorkItem> WorkQueue::GetFreeItem()
 
 void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
+    if (!item)
+    {
+        LOGERROR("Null work item submitted to the work queue");
+        return;
+    }
+    
     // Check for duplicate items.
     assert(!workItems_.Contains(item));
-
+    
     // Push to the main thread list to keep item alive
     // Clear completed flag in case item is reused
     workItems_.Push(item);
@@ -222,7 +230,7 @@ void WorkQueue::Complete(unsigned priority)
         }
     }
     
-    PurgeCompleted();
+    PurgeCompleted(priority);
 }
 
 bool WorkQueue::IsCompleted(unsigned priority) const
@@ -271,12 +279,14 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
     }
 }
 
-void WorkQueue::PurgeCompleted()
+void WorkQueue::PurgeCompleted(unsigned priority)
 {
-    // Purge completed work items and send completion events.
+    // Purge completed work items and send completion events. Do not signal items lower than priority threshold,
+    // as those may be user submitted and lead to eg. scene manipulation that could happen in the middle of the
+    // render update, which is not allowed
     for (List<SharedPtr<WorkItem> >::Iterator i = workItems_.Begin(); i != workItems_.End();)
     {
-        if ((*i)->completed_)
+        if ((*i)->completed_ && (*i)->priority_ >= priority)
         {
             if ((*i)->sendEvent_)
             {
@@ -314,15 +324,14 @@ void WorkQueue::PurgeCompleted()
 
 void WorkQueue::PurgePool()
 {
-    static unsigned int lastSize = 0;
     unsigned int currentSize = poolItems_.Size();
-    int difference = lastSize - currentSize;
+    int difference = lastSize_ - currentSize;
 
     // Difference tolerance, should be fairly significant to reduce the pool size.
-    for (unsigned i = 0; poolItems_.Size() > 0 && difference > tolerance_ && i < difference; i++)
+    for (unsigned i = 0; poolItems_.Size() > 0 && difference > tolerance_ && i < (unsigned)difference; i++)
         poolItems_.PopFront();
 
-    lastSize = currentSize;
+    lastSize_ = currentSize;
 }
 
 void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
@@ -343,7 +352,8 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
         }
     }
     
-    PurgeCompleted();
+    // Complete and signal items down to the lowest priority
+    PurgeCompleted(0);
     PurgePool();
 }
 

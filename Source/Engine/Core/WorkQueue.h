@@ -45,7 +45,7 @@ struct WorkItem : public RefCounted
 public:
     // Construct
     WorkItem() :
-        priority_(M_MAX_UNSIGNED),
+        priority_(0),
         sendEvent_(false),
         completed_(false),
         pooled_(false)
@@ -86,7 +86,7 @@ public:
     
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
-    /// Get next free WorkItem Ptr.
+    /// Get pointer to an usable WorkItem from the item pool. Allocate one if no more free items.
     SharedPtr<WorkItem> GetFreeItem();
     /// Add a work item and resume worker threads.
     void AddWorkItem(SharedPtr<WorkItem> item);
@@ -109,8 +109,8 @@ public:
 private:
     /// Process work items until shut down. Called by the worker threads.
     void ProcessItems(unsigned threadIndex);
-    /// Purge completed work items and send completion events as necessary.
-    void PurgeCompleted();
+    /// Purge completed work items which have at least the specified priority, and send completion events as necessary.
+    void PurgeCompleted(unsigned priority);
     /// Purge the pool to reduce allocation where its unneeded.
     void PurgePool();
     /// Handle frame start event. Purge completed work from the main thread queue, and perform work if no threads at all.
@@ -134,6 +134,8 @@ private:
     bool paused_;
     /// Tolerance for the shared pool before it begins to deallocate.
     int tolerance_;
+    /// Last size of the shared pool.
+    unsigned lastSize_;
 };
 
 }

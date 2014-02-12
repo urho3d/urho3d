@@ -692,6 +692,7 @@ void View::GetDrawables()
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
             item->workFunction_ = CheckVisibilityWork;
             item->aux_ = this;
 
@@ -765,6 +766,7 @@ void View::GetBatches()
         for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
             item->workFunction_ = ProcessLightWork;
             item->aux_ = this;
 
@@ -1060,6 +1062,7 @@ void View::UpdateGeometries()
                 BatchQueue* passQueue = &batchQueues_[command.pass_];
                 
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
+                item->priority_ = M_MAX_UNSIGNED;
                 item->workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
                 item->start_ = &batchQueues_[command.pass_];
                 queue->AddWorkItem(item);
@@ -1069,6 +1072,7 @@ void View::UpdateGeometries()
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
             SharedPtr<WorkItem> lightItem = queue->GetFreeItem();
+            lightItem->priority_ = M_MAX_UNSIGNED;
             lightItem->workFunction_ = SortLightQueueWork;
             lightItem->start_ = &(*i);
             queue->AddWorkItem(lightItem);
@@ -1076,6 +1080,7 @@ void View::UpdateGeometries()
             if (i->shadowSplits_.Size())
             {
                 SharedPtr<WorkItem> shadowItem = queue->GetFreeItem();
+                shadowItem->priority_ = M_MAX_UNSIGNED;
                 shadowItem->workFunction_ = SortShadowQueueWork;
                 shadowItem->start_ = &(*i);
                 queue->AddWorkItem(shadowItem);
@@ -1118,6 +1123,7 @@ void View::UpdateGeometries()
                     end = start + drawablesPerItem;
                 
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
+                item->priority_ = M_MAX_UNSIGNED;
                 item->workFunction_ = UpdateDrawableGeometriesWork;
                 item->aux_ = const_cast<FrameInfo*>(&frame_);
                 item->start_ = &(*start);

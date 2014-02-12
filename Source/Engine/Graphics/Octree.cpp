@@ -411,6 +411,7 @@ void Octree::Update(const FrameInfo& frame)
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
             item->workFunction_ = UpdateDrawablesWork;
             item->aux_ = const_cast<FrameInfo*>(&frame);
 
@@ -530,6 +531,7 @@ void Octree::Raycast(RayOctreeQuery& query) const
             while (start != rayQueryDrawables_.End())
             {
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
+                item->priority_ = M_MAX_UNSIGNED;
                 item->workFunction_ = RaycastDrawablesWork;
                 item->aux_ = const_cast<Octree*>(this);
 
