@@ -10,16 +10,12 @@ task :scaffolding do
   puts "\nNew project created in #{abs_path}\n\n"
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'URHO3D_INSTALL_PREFIX' environment variable"
   puts "Please see http://urho3d.github.io/documentation/a00004.html for more detail. For example:\n\n"
-  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUA=1\n$ cd Build\n$ make\n\n"
+  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUAJIT=1\n$ cd Build\n$ make\n\n"
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
-  # Tell CMake where to find 32-bit libraries (specific to Ubuntu 12.04 LTS)
-  if ENV['ENABLE_64BIT'].to_i == 0
-    ENV['CMAKE_PREFIX_PATH'] = '/usr/lib/i386-linux-gnu'
-  end
   system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug' or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID_NDK']
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
@@ -29,15 +25,19 @@ task :travis_ci do
     ENV['SKIP_NATIVE'] = '1'
     system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
     PLATFORM_PREFIX = 'android-'
-    TEST = ''
   else
     PLATFORM_PREFIX = ''
+  end
+  # Only 64-bit environment has virtual framebuffer X server support
+  if ENV['ENABLE_64BIT'].to_i == 0
+    TEST = ''
+  else
     TEST = '&& make test'
   end
   system "cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{PLATFORM_PREFIX}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{PLATFORM_PREFIX}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{PLATFORM_PREFIX}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUAJIT=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master SITE_UPDATE=1 rake travis_ci_site_update)
