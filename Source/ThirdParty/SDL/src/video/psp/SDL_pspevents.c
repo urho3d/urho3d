@@ -97,7 +97,7 @@ void PSP_PumpEvents(_THIS)
                             &sym);
         */
                 SDL_SendKeyboardKey((keys & keymap_psp[i].id) ?
-                                    SDL_PRESSED : SDL_RELEASED, static_cast<Uint32>(keymap_psp[i].sym), SDL_GetScancodeFromKey(keymap_psp[i].sym));
+                                    SDL_PRESSED : SDL_RELEASED, (Uint32)(keymap_psp[i].sym), SDL_GetScancodeFromKey(keymap_psp[i].sym));
             }
         }
     }
@@ -121,7 +121,7 @@ void PSP_PumpEvents(_THIS)
                 /* not tested */
                 /* SDL_PrivateKeyboard(pressed?SDL_PRESSED:SDL_RELEASED, &sym); */
                 SDL_SendKeyboardKey((keys & keymap_psp[i].id) ?
-                                    SDL_PRESSED : SDL_RELEASED, static_cast<Uint32>(keymap[raw]), SDL_GetScancodeFromKey(keymap[raw]);
+                                    SDL_PRESSED : SDL_RELEASED, (Uint32)(keymap[raw]), SDL_GetScancodeFromKey(keymap[raw]);
 
                 }
             }
