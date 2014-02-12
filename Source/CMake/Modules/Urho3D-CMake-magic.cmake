@@ -440,7 +440,9 @@ macro (setup_executable)
     cmake_parse_arguments (ARG "NODEPS" "" "" ${ARGN})
 
     add_executable (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
-    if (NOT ARG_NODEPS)
+    if (ARG_NODEPS)
+        define_dependency_libs (Urho3D-nodeps)
+    else ()
         define_dependency_libs (Urho3D)
     endif ()
     setup_target ()
@@ -630,17 +632,17 @@ macro (define_dependency_libs TARGET)
                 list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
             endif ()
         endif ()
+    endif ()
 
-        # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
-        if (ENABLE_LUAJIT)
-            # 64-bit Mac OS X
-            if (ENABLE_64BIT AND APPLE AND NOT IOS)
-                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pagezero_size 10000 -image_base 100000000")
-            endif ()
-            # GCC-specific
-            if (NOT WIN32 AND NOT APPLE AND NOT ANDROID)
-                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
-            endif ()
+    # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
+    if (ENABLE_LUAJIT AND ${TARGET} MATCHES Urho3D)
+        # 64-bit Mac OS X
+        if (ENABLE_64BIT AND APPLE AND NOT IOS)
+            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pagezero_size 10000 -image_base 100000000")
+        endif ()
+        # GCC-specific
+        if (NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
         endif ()
     endif ()
 
