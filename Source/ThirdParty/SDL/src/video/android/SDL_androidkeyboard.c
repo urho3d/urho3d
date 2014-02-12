@@ -281,7 +281,7 @@ TranslateKeycode(int keycode)
 int
 Android_OnKeyDown(int keycode)
 {
-	return SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(keycode), TranslateKeycode(keycode));
+    return SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(keycode), TranslateKeycode(keycode));
 }
 
 int

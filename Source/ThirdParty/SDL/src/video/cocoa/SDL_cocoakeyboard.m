@@ -228,10 +228,10 @@ DoUnsidedModifiers(unsigned short scancode,
             }
             SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(i), mapping[i]);
         } else if (newMask && oldMask != newMask) { /* modifier down event */
-			SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(i), mapping[i]);
+            SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(i), mapping[i]);
             /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
             if (bit == NSAlphaShiftKeyMask) {
-				SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(i), mapping[i]);
+                SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(i), mapping[i]);
             }
         }
     }
@@ -256,9 +256,9 @@ HandleNonDeviceModifier(unsigned int device_independent_mask,
     newMask = newMods & device_independent_mask;
 
     if (oldMask && oldMask != newMask) {
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(scancode), scancode);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(scancode), scancode);
     } else if (newMask && oldMask != newMask) {
-		SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(scancode), scancode);
+        SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(scancode), scancode);
     }
 }
 
@@ -283,9 +283,9 @@ HandleModifierOneSide(unsigned int oldMods, unsigned int newMods,
      * find out which it is.
      */
     if (new_dep_mask && old_dep_mask != new_dep_mask) {
-		SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(scancode), scancode);
+        SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(scancode), scancode);
     } else {
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(scancode), scancode);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(scancode), scancode);
     }
 }
 
@@ -356,7 +356,7 @@ ReleaseModifierSide(unsigned int device_independent_mask,
         /* In this case, we can't detect the keyboard, so use the left side
          * to represent both, and release it.
          */
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(left_scancode), left_scancode);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(left_scancode), left_scancode);
         return;
     }
 
@@ -367,10 +367,10 @@ ReleaseModifierSide(unsigned int device_independent_mask,
      * so I hope this doesn't cause other problems.
      */
     if ( left_device_dependent_mask & oldMods ) {
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(left_scancode), left_scancode);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(left_scancode), left_scancode);
     }
     if ( right_device_dependent_mask & oldMods ) {
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(right_scancode), right_scancode);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(right_scancode), right_scancode);
     }
 }
 
@@ -387,8 +387,8 @@ HandleCapsLock(unsigned short scancode,
     newMask = newMods & NSAlphaShiftKeyMask;
 
     if (oldMask != newMask) {
-		SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
+        SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
     }
 }
 
@@ -651,7 +651,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
         }
         break;
     case NSKeyUp:
-		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(code), code);
+        SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(code), code);
         break;
     case NSFlagsChanged:
         /* FIXME CW 2007-08-14: check if this whole mess that takes up half of this file is really necessary */
