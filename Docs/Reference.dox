@@ -1704,7 +1704,14 @@ The thread index ranges from 0 to n, where 0 represents the main thread and n is
 
 Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
 
-Note that as the Profiler currently manages only a single hierarchy tree, profiling blocks may only appear in main thread code, not in the work functions.
+When making your own work functions, observe that the following things are (at least currently) unsafe and will result in undefined behavior and crashes, if done outside the main thread:
+
+- Sending events
+- Using profiler blocks
+- Modifying scene or UI content
+- Modifying GPU resources
+- Requesting resources from ResourceCache
+- Executing script functions
 
 \page Tools Tools
 
