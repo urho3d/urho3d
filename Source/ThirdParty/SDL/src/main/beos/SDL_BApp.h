@@ -271,7 +271,7 @@ private:
             return;
         }
         BE_SetKeyState(scancode, state);
-        SDL_SendKeyboardKey(state, BE_GetScancodeFromBeKey(scancode));
+        SDL_SendKeyboardKey(state, static_cast<Uint32>(scancode), BE_GetScancodeFromBeKey(scancode));
     }
 
     void _HandleMouseFocus(BMessage *msg) {

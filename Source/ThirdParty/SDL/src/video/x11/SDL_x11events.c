@@ -447,7 +447,7 @@ X11_DispatchEvent(_THIS)
 #ifdef DEBUG_XEVENTS
             printf("window %p: KeyPress (X11 keycode = 0x%X)\n", data, xevent.xkey.keycode);
 #endif
-			SDL_SendKeyboardKey(SDL_PRESSED, keycode, videodata->key_layout[keycode]);
+			SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(keycode), videodata->key_layout[keycode]);
 #if 0
             if (videodata->key_layout[keycode] == SDL_SCANCODE_UNKNOWN && keycode) {
                 int min_keycode, max_keycode;
@@ -490,7 +490,7 @@ X11_DispatchEvent(_THIS)
                 /* We're about to get a repeated key down, ignore the key up */
                 break;
             }
-            SDL_SendKeyboardKey(SDL_RELEASED, keycode, videodata->key_layout[keycode]);
+            SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(keycode), videodata->key_layout[keycode]);
         }
         break;
 
