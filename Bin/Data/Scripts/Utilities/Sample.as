@@ -66,7 +66,7 @@ void CreateLogo()
 
 void SetWindowTitleAndIcon()
 {
-    Image@ icon = cache.GetResource("Image", "Textures/LogoLarge.png");
+    Image@ icon = cache.GetResource("Image", "Textures/UrhoIcon.png");
     graphics.windowIcon = icon;
     graphics.windowTitle = "Urho3D Sample";
 }

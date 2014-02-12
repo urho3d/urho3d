@@ -64,7 +64,7 @@ function CreateLogo()
 end
 
 function SetWindowTitleAndIcon()
-    local icon = cache:GetResource("Image", "Textures/LogoLarge.png")
+    local icon = cache:GetResource("Image", "Textures/UrhoIcon.png")
     graphics:SetWindowIcon(icon)
     graphics.windowTitle = "Urho3D Sample"
 end
