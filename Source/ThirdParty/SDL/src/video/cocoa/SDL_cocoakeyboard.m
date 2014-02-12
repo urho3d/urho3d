@@ -256,7 +256,7 @@ HandleNonDeviceModifier(unsigned int device_independent_mask,
     newMask = newMods & device_independent_mask;
 
     if (oldMask && oldMask != newMask) {
-		SDL_SendKeyboardKey(SDL_RELEASED, , static_cast<Uint32>(scancode), scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, static_cast<Uint32>(scancode), scancode);
     } else if (newMask && oldMask != newMask) {
 		SDL_SendKeyboardKey(SDL_PRESSED, static_cast<Uint32>(scancode), scancode);
     }
