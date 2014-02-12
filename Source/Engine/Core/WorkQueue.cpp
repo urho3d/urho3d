@@ -273,10 +273,6 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
 
 void WorkQueue::PurgeCompleted()
 {
-    using namespace WorkItemCompleted;
-    
-    VariantMap& eventData = GetEventDataMap();
-    
     // Purge completed work items and send completion events.
     for (List<SharedPtr<WorkItem> >::Iterator i = workItems_.Begin(); i != workItems_.End();)
     {
@@ -284,6 +280,9 @@ void WorkQueue::PurgeCompleted()
         {
             if ((*i)->sendEvent_)
             {
+                using namespace WorkItemCompleted;
+                
+                VariantMap& eventData = GetEventDataMap();
                 eventData[P_ITEM] = static_cast<void*>(i->Get());
                 SendEvent(E_WORKITEMCOMPLETED, eventData);
             }
