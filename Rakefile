@@ -1,5 +1,11 @@
 require 'pathname'
 
+# Usage: rake sync
+desc 'Fetch and merge upstream urho3d/Urho3D to weitjong/Urho3D fork'
+task :sync do
+      system "cwb=`git symbolic-ref -q --short HEAD || git rev-parse --short HEAD`; export cwb && git fetch upstream && git checkout master && git pull && git merge -m 'Sync at #{Time.now.localtime}.' upstream/master && git push && git rebase master master.OSX-CI && git push -f && git checkout $cwb"
+end
+
 # Usage: rake scaffolding dir=/path/to/new/project/root
 desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
