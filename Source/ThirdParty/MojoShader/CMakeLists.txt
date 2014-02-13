@@ -9,6 +9,7 @@ set (SOURCE_FILES ${C_FILES} ${H_FILES})
 if (MSVC)
     add_definitions (-D_CRT_SECURE_NO_WARNINGS=1 -TP)
 endif (MSVC)
+set (AMALG_EXCLUDES .)
 
 # Setup target
 setup_library ()

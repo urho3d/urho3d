@@ -28,6 +28,7 @@ file (GLOB C_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.c)
 list (REMOVE_ITEM C_FILES src/lua.c src/luac.c)
 file (GLOB H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.h)
 set (SOURCE_FILES ${C_FILES} ${H_FILES})
+set (AMALG_EXCLUDES .)
 
 # Setup target
 setup_library ()

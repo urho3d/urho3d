@@ -20,6 +20,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 # Install dependency for Engine/Physics/PhysicsWorld.h and Engine/Physics/RigidBody.h
 install (DIRECTORY src/LinearMath DESTINATION ${DEST_INCLUDE_DIR}/Bullet USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} Bullet PARENT_SCOPE)
+set (AMALG_EXCLUDES "(btSoftBodyHelpers|Gimpact|Narrow)")
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY src)

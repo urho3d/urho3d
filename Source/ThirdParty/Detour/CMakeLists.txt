@@ -5,6 +5,7 @@ set (TARGET_NAME Detour)
 file (GLOB CPP_FILES source/*.cpp)
 file (GLOB H_FILES include/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (AMALG_EXCLUDES Alloc)
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY include)
