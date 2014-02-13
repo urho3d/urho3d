@@ -224,14 +224,14 @@ DoUnsidedModifiers(unsigned short scancode,
         if (oldMask && oldMask != newMask) {        /* modifier up event */
             /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
             if (bit == NSAlphaShiftKeyMask) {
-                SDL_SendKeyboardKey(SDL_PRESSED, mapping[i]);
+                SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(i), mapping[i]);
             }
-            SDL_SendKeyboardKey(SDL_RELEASED, mapping[i]);
+            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(i), mapping[i]);
         } else if (newMask && oldMask != newMask) { /* modifier down event */
-            SDL_SendKeyboardKey(SDL_PRESSED, mapping[i]);
+			SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(i), mapping[i]);
             /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
             if (bit == NSAlphaShiftKeyMask) {
-                SDL_SendKeyboardKey(SDL_RELEASED, mapping[i]);
+				SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(i), mapping[i]);
             }
         }
     }
@@ -256,9 +256,9 @@ HandleNonDeviceModifier(unsigned int device_independent_mask,
     newMask = newMods & device_independent_mask;
 
     if (oldMask && oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(scancode), scancode);
     } else if (newMask && oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+		SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(scancode), scancode);
     }
 }
 
@@ -283,9 +283,9 @@ HandleModifierOneSide(unsigned int oldMods, unsigned int newMods,
      * find out which it is.
      */
     if (new_dep_mask && old_dep_mask != new_dep_mask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+		SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(scancode), scancode);
     } else {
-        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(scancode), scancode);
     }
 }
 
@@ -356,7 +356,7 @@ ReleaseModifierSide(unsigned int device_independent_mask,
         /* In this case, we can't detect the keyboard, so use the left side
          * to represent both, and release it.
          */
-        SDL_SendKeyboardKey(SDL_RELEASED, left_scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(left_scancode), left_scancode);
         return;
     }
 
@@ -367,10 +367,10 @@ ReleaseModifierSide(unsigned int device_independent_mask,
      * so I hope this doesn't cause other problems.
      */
     if ( left_device_dependent_mask & oldMods ) {
-        SDL_SendKeyboardKey(SDL_RELEASED, left_scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(left_scancode), left_scancode);
     }
     if ( right_device_dependent_mask & oldMods ) {
-        SDL_SendKeyboardKey(SDL_RELEASED, right_scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(right_scancode), right_scancode);
     }
 }
 
@@ -387,8 +387,8 @@ HandleCapsLock(unsigned short scancode,
     newMask = newMods & NSAlphaShiftKeyMask;
 
     if (oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_CAPSLOCK);
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_CAPSLOCK);
+		SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
     }
 }
 
@@ -632,7 +632,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
             UpdateKeymap(data);
         }
 
-        SDL_SendKeyboardKey(SDL_PRESSED, code);
+        SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(code), code);
 #if 1
         if (code == SDL_SCANCODE_UNKNOWN) {
             fprintf(stderr, "The key you just pressed is not recognized by SDL. To help get this fixed, report this to the SDL mailing list <sdl@libsdl.org> or to Christian Walther <cwalther@gmx.ch>. Mac virtual key code is %d.\n", scancode);
@@ -651,7 +651,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
         }
         break;
     case NSKeyUp:
-        SDL_SendKeyboardKey(SDL_RELEASED, code);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(code), code);
         break;
     case NSFlagsChanged:
         /* FIXME CW 2007-08-14: check if this whole mess that takes up half of this file is really necessary */

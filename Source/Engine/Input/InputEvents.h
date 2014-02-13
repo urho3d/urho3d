@@ -73,6 +73,7 @@ EVENT(E_KEYDOWN, KeyDown)
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
     PARAM(P_REPEAT, Repeat);                // bool
+    PARAM(P_RAW, Raw);                      // uint
 }
 
 /// Key released.
@@ -81,6 +82,7 @@ EVENT(E_KEYUP, KeyUp)
     PARAM(P_KEY, Key);                      // int
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
+    PARAM(P_RAW, Raw);                      // uint
 }
 
 /// Character typed on the keyboard.
