@@ -574,7 +574,7 @@ void Input::SetMouseButton(int button, bool newState)
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
-void Input::SetKey(int key, bool newState, uint32_t raw)
+void Input::SetKey(int key, bool newState, unsigned raw)
 {
     // If we do not have focus yet, do not react to the key down
     if (!graphics_->GetExternalWindow() && newState && !inputFocus_)

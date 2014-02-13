@@ -39,6 +39,7 @@ Urho3D development, contributions and bugfixes by:
 - Firegorilla
 - Magic.Lixin
 - Mike3D
+- OvermindDL1
 - amadeus_osa
 - mightyCelu
 - reattiva
