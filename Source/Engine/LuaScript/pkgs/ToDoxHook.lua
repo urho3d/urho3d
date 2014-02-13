@@ -69,7 +69,7 @@ function classEnumerate:print(ident,close)
   end
 end
 
-function printFunction(self,ident,close)
+function printFunction(self,ident,close,isfunc)
   local func = {}
   func.mod  = self.mod
   func.type = self.type
@@ -79,6 +79,10 @@ function printFunction(self,ident,close)
   func.const = self.const
   func.cname = self.cname
   func.lname = self.lname
+
+  if isfunc then
+    func.name = func.lname
+  end
 
   currentFunction = func
   local i = 1
@@ -108,11 +112,11 @@ function printFunction(self,ident,close)
 end
 
 function classFunction:print(ident,close)
-  printFunction(self,ident,close)
+  printFunction(self,ident,close, true)
 end
 
 function classOperator:print(ident,close)
-  printFunction(self,ident,close)
+  printFunction(self,ident,close, false)
 end
 
 function classVariable:print(ident,close)
@@ -120,10 +124,10 @@ function classVariable:print(ident,close)
   property.mod  = self.mod
   property.type = self.type
   property.ptr  = self.ptr
-  property.name = self.name
+  property.name = self.lname
   property.def  = self.def
   property.ret  = self.ret
-
+  
   if currentClass == nil then
     if property.mod:find("tolua_property__") == nil then
       table.insert(globalConstants, property)
@@ -271,7 +275,6 @@ function writeGLobalProperties(file)
 end
 
 function writeProperty(file, property)
-  property.name = property.name:gsub("_", "")
   file:write("- " .. property.type .. property.ptr .. " " .. property.name)
   if property.mod:find("tolua_readonly") == nil then
     file:write("\n")
