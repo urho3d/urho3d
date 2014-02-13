@@ -78,17 +78,17 @@ Methods:
 
 Properties:
 
-- StringHash hash
-- float speed
-- float targetWeight
-- float fadeTime
-- float autoFadeTime
-- float setTimeTtl
-- float setWeightTtl
-- short setTime
-- char setWeight
-- char setTimeRev
-- char setWeightRev
+- StringHash hash_
+- float speed_
+- float targetWeight_
+- float fadeTime_
+- float autoFadeTime_
+- float setTimeTtl_
+- float setWeightTtl_
+- short setTime_
+- char setWeight_
+- char setTimeRev_
+- char setWeightRev_
 
 ### AnimationController : Component
 
@@ -928,7 +928,7 @@ Properties:
 
 Methods:
 
-- VectorBuffer DeserializerRead(unsigned size)
+- VectorBuffer Read(unsigned size)
 - unsigned Seek(unsigned position)
 - const String GetName() const
 - unsigned GetChecksum()
@@ -1073,7 +1073,7 @@ Methods:
 - void SetResizePopup(bool enable)
 - unsigned GetNumItems() const
 - UIElement* GetItem(unsigned index) const
-- const PODVector<UIElement*>& DropDownListGetItems() const
+- const PODVector<UIElement*>& GetItems() const
 - unsigned GetSelection() const
 - UIElement* GetSelectedItem() const
 - ListView* GetListView() const
@@ -1147,7 +1147,7 @@ Methods:
 - bool IsOpen() const
 - void* GetHandle() const
 - bool IsPackaged() const
-- VectorBuffer DeserializerRead(unsigned size)
+- VectorBuffer Read(unsigned size)
 - unsigned Seek(unsigned position)
 - const String GetName() const
 - unsigned GetChecksum()
@@ -1187,7 +1187,7 @@ Methods:
 - unsigned ReadVLE()
 - unsigned ReadNetID()
 - String ReadLine()
-- unsigned SerializerWrite(const VectorBuffer& buffer)
+- unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
@@ -1211,7 +1211,7 @@ Methods:
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
 - bool WriteShortStringHash(const ShortStringHash& value)
-- bool SerializerWriteBuffer(const VectorBuffer& buffer)
+- bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
 - bool WriteVariant(const Variant& value)
@@ -1310,7 +1310,7 @@ Methods:
 - unsigned GetLastModifiedTime(const String fileName) const
 - bool FileExists(const String fileName) const
 - bool DirExists(const String pathName) const
-- const Vector<String>& FileSystemScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const
+- const Vector<String>& ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
 
@@ -1472,7 +1472,7 @@ Methods:
 - void SetPixel(int x, int y, const Color& color)
 - void SetPixel(int x, int y, int z, const Color& color)
 - bool LoadColorLUT(Deserializer& source)
-- bool ImageLoadColorLUT(const String fileName)
+- bool LoadColorLUT(const String fileName)
 - void FlipVertical()
 - bool Resize(int width, int height)
 - void Clear(const Color& color)
@@ -1748,12 +1748,12 @@ Methods:
 - void ToggleExpand(unsigned index, bool recursive = false)
 - unsigned GetNumItems() const
 - UIElement* GetItem(unsigned index) const
-- const PODVector<UIElement*>& ListViewGetItems() const
+- const PODVector<UIElement*>& GetItems() const
 - unsigned FindItem(UIElement* item) const
 - unsigned GetSelection() const
 - const PODVector<unsigned>& GetSelections() const
 - UIElement* GetSelectedItem() const
-- const PODVector<UIElement*>& ListViewGetSelectedItems() const
+- const PODVector<UIElement*>& GetSelectedItems() const
 - bool IsSelected(unsigned index) const
 - bool IsExpanded(unsigned index) const
 - HighlightMode GetHighlightMode() const
@@ -1803,12 +1803,12 @@ Methods:
 - bool CreateObject(const String scriptFileName, const String scriptObjectType)
 - void SetScriptFileName(const String scriptFileName)
 - void SetScriptObjectType(const String scriptObjectType)
-- void ScriptSubscribeToEvent(const String eventName, const String functionName)
-- void ScriptUnsubscribeFromEvent(const String eventName)
-- void ScriptUnsubscribeFromAllEvents()
-- void ScriptSubscribeToEvent(void* sender, const String eventName, const String functionName)
-- void ScriptUnsubscribeFromEvent(void* sender, const String eventName)
-- void ScriptUnsubscribeFromEvents(void* sender)
+- void SubscribeToEvent(const String eventName, const String functionName)
+- void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromAllEvents()
+- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void UnsubscribeFromEvent(void* sender, const String eventName)
+- void UnsubscribeFromEvents(void* sender)
 - const String GetScriptFileName() const
 - const String GetScriptObjectType() const
 
@@ -1834,7 +1834,7 @@ Methods:
 - void SetDepthBias(const BiasParameters& parameters)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
-- Material* MaterialClone(const String cloneName = String::EMPTY) const
+- Material* Clone(const String cloneName = String::EMPTY) const
 - void SortTechniques()
 - void MarkForAuxView(unsigned frameNumber)
 - unsigned GetNumTechniques() const
@@ -2108,8 +2108,8 @@ Methods:
 - Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents)
 - Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end)
 - Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited = 3)
-- const PODVector<Vector3>& NavigationMeshFindPath(const Vector3& start, const Vector3& end)
-- const PODVector<Vector3>& NavigationMeshFindPath(const Vector3& start, const Vector3& end, const Vector3& extents)
+- const PODVector<Vector3>& FindPath(const Vector3& start, const Vector3& end)
+- const PODVector<Vector3>& FindPath(const Vector3& start, const Vector3& end, const Vector3& extents)
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3& center, float radius)
 - Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents)
@@ -2188,8 +2188,8 @@ Methods:
 - void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
 - void SetPackageCacheDir(const String path)
-- HttpRequest* NetworkMakeHttpRequest(const String url, const String verb = String::EMPTY)
-- HttpRequest* NetworkMakeHttpRequest(const String url, const String verb, const Vector<String>& headers, const String postData = String::EMPTY)
+- HttpRequest* MakeHttpRequest(const String url, const String verb = String::EMPTY)
+- HttpRequest* MakeHttpRequest(const String url, const String verb, const Vector<String>& headers, const String postData = String::EMPTY)
 - int GetUpdateFps() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
@@ -2230,47 +2230,47 @@ Methods:
 
 - * Node()
 -  ~Node()
-- bool NodeSaveXML(File* dest) const
+- bool SaveXML(File* dest) const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
-- void NodeSetPositionXYZ(float x, float y, float z)
+- void SetPositionXYZ(float x, float y, float z)
 - void SetRotation(const Quaternion& rotation)
-- void NodeSetRotationXYZ(float x, float y, float z)
+- void SetRotationXYZ(float x, float y, float z)
 - void SetDirection(const Vector3& direction)
-- void NodeSetDirectionXYZ(float x, float y, float z)
+- void SetDirectionXYZ(float x, float y, float z)
 - void SetScale(float scale)
 - void SetScale(const Vector3& scale)
-- void NodeSetScaleXYZ(float x, float y, float z)
+- void SetScaleXYZ(float x, float y, float z)
 - void SetTransform(const Vector3& position, const Quaternion& rotation)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 - void SetWorldPosition(const Vector3& position)
-- void NodeSetWorldPositionXYZ(float x, float y, float z)
+- void SetWorldPositionXYZ(float x, float y, float z)
 - void SetWorldRotation(const Quaternion& rotation)
-- void NodeSetWorldRotationXYZ(float x, float y, float z)
+- void SetWorldRotationXYZ(float x, float y, float z)
 - void SetWorldDirection(const Vector3& direction)
-- void NodeSetWorldDirectionXYZ(float x, float y, float z)
+- void SetWorldDirectionXYZ(float x, float y, float z)
 - void SetWorldScale(float scale)
 - void SetWorldScale(const Vector3& scale)
-- void NodeSetWorldScaleXYZ(float x, float y, float z)
+- void SetWorldScaleXYZ(float x, float y, float z)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 - void Translate(const Vector3& delta)
-- void NodeTranslateXYZ(float x, float y, float z)
+- void TranslateXYZ(float x, float y, float z)
 - void TranslateRelative(const Vector3& delta)
-- void NodeTranslateRelativeXYZ(float x, float y, float z)
+- void TranslateRelativeXYZ(float x, float y, float z)
 - void Rotate(const Quaternion& delta, bool fixedAxis = false)
-- void NodeRotateXYZ(float x, float y, float z, bool fixedAxis = false)
+- void RotateXYZ(float x, float y, float z, bool fixedAxis = false)
 - void Pitch(float angle, bool fixedAxis = false)
 - void Yaw(float angle, bool fixedAxis = false)
 - void Roll(float angle, bool fixedAxis = false)
 - void LookAt(const Vector3& target)
 - void LookAt(const Vector3& target, const Vector3& upAxis)
-- void NodeLookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f)
+- void LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f)
 - void Scale(float scale)
 - void Scale(const Vector3& scale)
-- void NodeScaleXYZ(float x, float y, float z)
+- void ScaleXYZ(float x, float y, float z)
 - void SetEnabled(bool enable)
 - void SetEnabled(bool enable, bool recursive)
 - void SetOwner(Connection* owner)
@@ -2304,32 +2304,32 @@ Methods:
 - bool IsEnabled() const
 - Connection* GetOwner() const
 - const Vector3& GetPosition() const
-- void NodeGetPositionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetPositionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - const Quaternion& GetRotation() const
-- void NodeGetRotationXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
-- void NodeGetRotationWXYZ(float w = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetRotationXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetRotationWXYZ(float w = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetDirection() const
-- void NodeGetDirectionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetDirectionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetUp() const
-- void NodeGetUpXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetUpXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetRight() const
-- void NodeGetRightXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetRightXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - const Vector3& GetScale() const
-- void NodeGetScaleXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetScaleXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Matrix3x4 GetTransform() const
 - Vector3 GetWorldPosition() const
-- void NodeGetWorldPositionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldPositionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Quaternion GetWorldRotation() const
-- void NodeGetWorldRotationXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
-- void NodeGetWorldRotationWXYZ(float w = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldRotationXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldRotationWXYZ(float w = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldDirection() const
-- void NodeGetWorldDirectionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldDirectionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldUp() const
-- void NodeGetWorldUpXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldUpXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldRight() const
-- void NodeGetWorldRightXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldRightXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldScale() const
-- void NodeGetWorldScaleXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
+- void GetWorldScaleXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - const Matrix3x4& GetWorldTransform() const
 - Vector3 LocalToWorld(const Vector3& position) const
 - Vector3 LocalToWorld(const Vector4& vector) const
@@ -2390,7 +2390,7 @@ Methods:
 - ShortStringHash GetBaseType() const
 - const String GetTypeName() const
 - const String GetCategory() const
-- void ObjectSendEvent(const String eventName, VariantMap* eventData = 0)
+- void SendEvent(const String eventName, VariantMap* eventData = 0)
 
 Properties:
 
@@ -2407,12 +2407,12 @@ Methods:
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
 - void RemoveManualDrawable(Drawable* drawable)
-- const PODVector<OctreeQueryResult>& OctreeGetDrawablesPoint(const Vector3& point, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- const PODVector<OctreeQueryResult>& OctreeGetDrawablesBoundingBox(const BoundingBox& box, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- const PODVector<OctreeQueryResult>& OctreeGetDrawablesFrustum(const Frustum& frustum, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- const PODVector<OctreeQueryResult>& OctreeGetDrawablesSphere(const Sphere& sphere, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- const PODVector<RayQueryResult>& OctreeRaycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
-- RayQueryResult OctreeRaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const Vector3& point, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const BoundingBox& box, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const Frustum& frustum, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const Sphere& sphere, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
+- RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
 - void DrawDebugGeometry(bool depthTest)
@@ -2621,9 +2621,9 @@ Methods:
 - void SetInternalEdge(bool enable)
 - void SetSplitImpulse(bool enable)
 - void SetMaxNetworkAngularVelocity(float velocity)
-- const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
-- PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
-- PhysicsRaycastResult PhysicsWorldSphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- const PODVector<PhysicsRaycastResult>& Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - void DrawDebugGeometry(bool depthTest)
 - void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const
@@ -2854,7 +2854,7 @@ Properties:
 
 Methods:
 
-- RenderPath* RenderPathClone()
+- RenderPath* Clone()
 - bool Load(XMLFile* file)
 - bool Append(XMLFile* file)
 - void SetEnabled(const String tag, bool active)
@@ -3016,8 +3016,8 @@ Methods:
 
 - bool Load(Deserializer& source)
 - bool Save(Serializer& dest) const
-- bool ResourceLoad(const String fileName)
-- bool ResourceSave(const String fileName) const
+- bool Load(const String fileName)
+- bool Save(const String fileName) const
 - const String GetName() const
 - StringHash GetNameHash() const
 - unsigned GetMemoryUse() const
@@ -3039,7 +3039,7 @@ Methods:
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
-- File* ResourceCacheGetFile(const String name)
+- File* GetFile(const String name)
 - Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
 - bool Exists(const String name) const
 - unsigned GetMemoryBudget(ShortStringHash type) const
@@ -3194,18 +3194,18 @@ Methods:
 
 - * Scene()
 -  ~Scene()
-- bool SceneLoad(File* source)
-- bool SceneSave(File* dest) const
-- bool SceneLoad(const String fileName)
-- bool SceneSave(const String fileName) const
-- bool SceneLoadXML(File* source)
-- bool SceneSaveXML(File* dest) const
-- bool SceneLoadXML(const String fileName)
-- bool SceneSaveXML(const String fileName) const
-- Node* SceneInstantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
-- Node* SceneInstantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
-- Node* SceneInstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
-- Node* SceneInstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- bool Load(File* source)
+- bool Save(File* dest) const
+- bool Load(const String fileName)
+- bool Save(const String fileName) const
+- bool LoadXML(File* source)
+- bool SaveXML(File* dest) const
+- bool LoadXML(const String fileName)
+- bool SaveXML(const String fileName) const
+- Node* Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - bool LoadAsync(File* file)
 - bool LoadAsyncXML(File* file)
 - void StopAsyncLoading()
@@ -3344,7 +3344,7 @@ Properties:
 
 Methods:
 
-- unsigned SerializerWrite(const VectorBuffer& buffer)
+- unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
@@ -3368,7 +3368,7 @@ Methods:
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
 - bool WriteShortStringHash(const ShortStringHash& value)
-- bool SerializerWriteBuffer(const VectorBuffer& buffer)
+- bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
 - bool WriteVariant(const Variant& value)
@@ -3452,9 +3452,9 @@ Methods:
 - bool LoadRaw(Deserializer& source)
 - bool LoadWav(Deserializer& source)
 - bool LoadOggVorbis(Deserializer& source)
-- bool SoundLoadRaw(const String fileName)
-- bool SoundLoadWav(const String fileName)
-- bool SoundLoadOggVorbis(const String fileName)
+- bool LoadRaw(const String fileName)
+- bool LoadWav(const String fileName)
+- bool LoadOggVorbis(const String fileName)
 - void SetSize(unsigned dataSize)
 - void SetData(const void* data, unsigned dataSize)
 - void SetFormat(unsigned frequency, bool sixteenBit, bool stereo)
@@ -4010,7 +4010,7 @@ Methods:
 - * Texture2D()
 -  ~Texture2D()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
-- bool Texture2DLoad(Image* image, bool useAlpha = false)
+- bool Load(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
 
 Properties:
@@ -4155,8 +4155,8 @@ Methods:
 - const IntVector2& GetScreenPosition() const
 - bool LoadXML(Deserializer& source)
 - bool SaveXML(Serializer& dest) const
-- bool UIElementLoadXML(const String fileName)
-- bool UIElementSaveXML(const String fileName) const
+- bool LoadXML(const String fileName)
+- bool SaveXML(const String fileName) const
 - bool FilterAttributes(XMLElement& dest) const
 - void SetName(const String name)
 - void SetPosition(const IntVector2& position)
@@ -4287,7 +4287,7 @@ Methods:
 - int GetIndentWidth() const
 - void SetChildOffset(const IntVector2& offset)
 - void SetHovering(bool enable)
-- const Color& GetColorAttr() const
+- const Color& GetColor() const
 - TraversalMode GetTraversalMode() const
 - bool IsElementEventSender() const
 - UIElement* GetElementEventSender() const
@@ -4313,7 +4313,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
-- Color& colorAttr
+- Color& color
 - int priority
 - float opacity
 - float derivedOpacity (readonly)
@@ -4395,23 +4395,23 @@ Methods:
 - bool operator==(const IntVector2& rhs) const
 - bool operator==(const StringHash& rhs) const
 - bool operator==(const ShortStringHash& rhs) const
-- void VariantSetInt(int value)
-- void VariantSetUint(unsigned value)
-- void VariantSetStringHash(const StringHash& value)
-- void VariantSetShortStringHash(const ShortStringHash& value)
-- void VariantSetBool(bool value)
-- void VariantSetFloat(float value)
-- void VariantSetVector2(const Vector2& value)
-- void VariantSetVector3(const Vector3& value)
-- void VariantSetVector4(const Vector4& value)
-- void VariantSetQuaternion(const Quaternion& value)
-- void VariantSetColor(const Color& value)
-- void VariantSetString(const String value)
-- void VariantSetBuffer(const VectorBuffer& value)
-- void VariantSetResourceRef(const ResourceRef& value)
-- void VariantSetResourceRefList(const ResourceRefList& value)
-- void VariantSetIntRect(const IntRect& value)
-- void VariantSetIntVector2(const IntVector2& value)
+- void SetInt(int value)
+- void SetUint(unsigned value)
+- void SetStringHash(const StringHash& value)
+- void SetShortStringHash(const ShortStringHash& value)
+- void SetBool(bool value)
+- void SetFloat(float value)
+- void SetVector2(const Vector2& value)
+- void SetVector3(const Vector3& value)
+- void SetVector4(const Vector4& value)
+- void SetQuaternion(const Quaternion& value)
+- void SetColor(const Color& value)
+- void SetString(const String value)
+- void SetBuffer(const VectorBuffer& value)
+- void SetResourceRef(const ResourceRef& value)
+- void SetResourceRefList(const ResourceRefList& value)
+- void SetIntRect(const IntRect& value)
+- void SetIntVector2(const IntVector2& value)
 - int GetInt() const
 - int GetUInt() const
 - StringHash GetStringHash()
@@ -4424,7 +4424,7 @@ Methods:
 - const Quaternion& GetQuaternion() const
 - const Color& GetColor() const
 - const String GetString() const
-- VectorBuffer VariantGetBuffer() const
+- VectorBuffer GetBuffer() const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
 - const IntRect& GetIntRect() const
@@ -4449,42 +4449,42 @@ Methods:
 
 - * VariantMap()
 -  ~VariantMap()
-- void VariantMapSetInt(const String key, int value)
-- void VariantMapSetUInt(const String key, unsigned value)
-- void VariantMapSetStringHash(const String key, const StringHash& value)
-- void VariantMapSetShortStringHash(const String key, const ShortStringHash& value)
-- void VariantMapSetBool(const String key, bool value)
-- void VariantMapSetFloat(const String key, float value)
-- void VariantMapSetVector2(const String key, const Vector2 value)
-- void VariantMapSetVector3(const String key, const Vector3 value)
-- void VariantMapSetVector4(const String key, const Vector4 value)
-- void VariantMapSetQuaternion(const String key, const Quaternion value)
-- void VariantMapSetColor(const String key, const Color value)
-- void VariantMapSetString(const String key, const String value)
-- void VariantMapSetBuffer(const String key, const VectorBuffer& value)
-- void VariantMapSetResourceRef(const String key, const ResourceRef value)
-- void VariantMapSetResourceRefList(const String key, const ResourceRefList value)
-- void VariantMapSetIntRect(const String key, const IntRect value)
-- void VariantMapSetIntVector2(const String key, const IntVector2 value)
-- void VariantMapSetPtr(const String key, void* value)
-- int VariantMapGetInt(const String key)
-- int VariantMapGetUInt(const String key)
-- StringHash VariantMapGetStringHash(const String key)
-- ShortStringHash VariantMapGetShortStringHash(const String key)
-- bool VariantMapGetBool(const String key)
-- float VariantMapGetFloat(const String key)
-- const Vector2& VariantMapGetVector2(const String key)
-- const Vector3& VariantMapGetVector3(const String key)
-- const Vector4& VariantMapGetVector4(const String key)
-- const Quaternion& VariantMapGetQuaternion(const String key)
-- const Color& VariantMapGetColor(const String key)
-- const String VariantMapGetString(const String key)
-- VectorBuffer VariantMapGetBuffer(const String key)
-- const ResourceRef& VariantMapGetResourceRef(const String key)
-- const ResourceRefList& VariantMapGetResourceRefList(const String key)
-- const IntRect& VariantMapGetIntRect(const String key)
-- const IntVector2& VariantMapGetIntVector2(const String key)
-- const void* VariantMapGetPtr(const String type, const String key)
+- void SetInt(const String key, int value)
+- void SetUInt(const String key, unsigned value)
+- void SetStringHash(const String key, const StringHash& value)
+- void SetShortStringHash(const String key, const ShortStringHash& value)
+- void SetBool(const String key, bool value)
+- void SetFloat(const String key, float value)
+- void SetVector2(const String key, const Vector2 value)
+- void SetVector3(const String key, const Vector3 value)
+- void SetVector4(const String key, const Vector4 value)
+- void SetQuaternion(const String key, const Quaternion value)
+- void SetColor(const String key, const Color value)
+- void SetString(const String key, const String value)
+- void SetBuffer(const String key, const VectorBuffer& value)
+- void SetResourceRef(const String key, const ResourceRef value)
+- void SetResourceRefList(const String key, const ResourceRefList value)
+- void SetIntRect(const String key, const IntRect value)
+- void SetIntVector2(const String key, const IntVector2 value)
+- void SetPtr(const String key, void* value)
+- int GetInt(const String key)
+- int GetUInt(const String key)
+- StringHash GetStringHash(const String key)
+- ShortStringHash GetShortStringHash(const String key)
+- bool GetBool(const String key)
+- float GetFloat(const String key)
+- const Vector2& GetVector2(const String key)
+- const Vector3& GetVector3(const String key)
+- const Vector4& GetVector4(const String key)
+- const Quaternion& GetQuaternion(const String key)
+- const Color& GetColor(const String key)
+- const String GetString(const String key)
+- VectorBuffer GetBuffer(const String key)
+- const ResourceRef& GetResourceRef(const String key)
+- const ResourceRefList& GetResourceRefList(const String key)
+- const IntRect& GetIntRect(const String key)
+- const IntVector2& GetIntVector2(const String key)
+- const void* GetPtr(const String type, const String key)
 
 ### Vector2
 
@@ -4620,7 +4620,7 @@ Methods:
 - void Resize(unsigned size)
 - const void* GetData() const
 - void* GetModifiableData()
-- VectorBuffer DeserializerRead(unsigned size)
+- VectorBuffer Read(unsigned size)
 - unsigned Seek(unsigned position)
 - const String GetName() const
 - unsigned GetChecksum()
@@ -4660,7 +4660,7 @@ Methods:
 - unsigned ReadVLE()
 - unsigned ReadNetID()
 - String ReadLine()
-- unsigned SerializerWrite(const VectorBuffer& buffer)
+- unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
@@ -4684,7 +4684,7 @@ Methods:
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
 - bool WriteShortStringHash(const ShortStringHash& value)
-- bool SerializerWriteBuffer(const VectorBuffer& buffer)
+- bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
 - bool WriteVariant(const Variant& value)
@@ -5438,10 +5438,10 @@ Properties:
 - int Rand()
 - float RandStandardNormal()
 - float Random(float range)
-- int Random(int range)
-- int Random(int min, int max)
-- float Random()
 - float Random(float min, float max)
+- float Random()
+- int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
