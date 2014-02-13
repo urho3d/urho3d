@@ -1,11 +1,10 @@
 local classes = {}
 local enumerates = {}
-local globalconstants = {}
-local globalfunctions = {}
-local globalproperties = {}
-
-local current_class = nil
-local current_function = nil
+local globalConstants = {}
+local globalFunctions = {}
+local globalProperties = {}
+local currentClass = nil
+local currentFunction = nil
 
 function classClass:print(ident,close)
   local class = {}
@@ -16,18 +15,18 @@ function classClass:print(ident,close)
   class.btype = self.btype
   class.ctype = self.ctype
 
-  current_class = class
-  local i=1
+  currentClass = class
+  local i = 1
   while self[i] do
     self[i]:print(ident.." ",",")
-    i = i+1
+    i = i + 1
   end
-  current_class = nil
+  currentClass = nil
 
   table.insert(classes, class)
 end
 
-function classCode:print (ident,close)
+function classCode:print(ident,close)
 end
 
 function classDeclaration:print(ident,close)
@@ -40,11 +39,12 @@ function classDeclaration:print(ident,close)
   declaration.def  = self.def
   declaration.ret  = self.ret
 
-  if current_function ~= nil then
-    if current_function.declarations == nil then
-      current_function.declarations = {}
+  if currentFunction ~= nil then
+    if currentFunction.declarations == nil then
+      currentFunction.declarations = { declaration }
+    else
+      table.insert(currentFunction.declarations, declaration)
     end
-    table.insert(current_function.declarations, declaration)
   end
 end
 
@@ -56,9 +56,10 @@ function classEnumerate:print(ident,close)
   while self[i] do
     if self[i] ~= "" then
       if enumerate.values == nil then
-        enumerate.values = {}
+        enumerate.values = { self[i] }
+      else
+        table.insert(enumerate.values, self[i])
       end
-      table.insert(enumerate.values, self[i])
     end
     i = i + 1
   end
@@ -79,31 +80,30 @@ function printFunction(self,ident,close)
   func.cname = self.cname
   func.lname = self.lname
 
-  current_function = func
-  local i=1
+  currentFunction = func
+  local i = 1
   while self.args[i] do
     self.args[i]:print(ident.."  ",",")
-    i = i+1
+    i = i + 1
   end
-  current_function = nil
+  currentFunction = nil
 
-  if current_class == nil then
-    table.insert(globalfunctions, func)
+  if currentClass == nil then
+    table.insert(globalFunctions, func)
   else
-    if current_class.functions == nil then
-      current_class.functions = {}
-    end
-
     if func.name == "new" then
       func.type = ""
-      func.name = current_class.name
+      func.name = currentClass.name
     end
 
     if func.name == "delete" then
-      func.name = "~" .. current_class.name
+      func.name = "~" .. currentClass.name
     end
-
-    table.insert(current_class.functions, func)
+    if currentClass.functions == nil then
+      currentClass.functions = { func }
+    else
+      table.insert(currentClass.functions, func)
+    end
   end
 end
 
@@ -124,29 +124,30 @@ function classVariable:print(ident,close)
   property.def  = self.def
   property.ret  = self.ret
 
-  if current_class == nil then
+  if currentClass == nil then
     if property.mod:find("tolua_property__") == nil then
-      table.insert(globalconstants, property)
+      table.insert(globalConstants, property)
     else
-      table.insert(globalproperties, property)
+      table.insert(globalProperties, property)
     end
   else
-    if current_class.properties == nil then
-      current_class.properties = {}
+    if currentClass.properties == nil then
+      currentClass.properties = { property }
+    else
+      table.insert(currentClass.properties, property)
     end
-    table.insert(current_class.properties, property)
   end
 end
 
 function classVerbatim:print(ident,close)  
 end
 
-function sort_by_name(t)
+function sortByName(t)
   table.sort(t, function(a, b) return a.name < b.name end)
 end
 
-function write_classes(file)
-  sort_by_name(classes)
+function writeClasses(file)
+  sortByName(classes)
 
   file:write("\n\\section LuaScriptAPI_Classes Classes\n\n")
   for i, class in ipairs(classes) do
@@ -159,14 +160,14 @@ function write_classes(file)
     if class.functions ~= nil then
       file:write("\nMethods:\n\n")
       for i, func in ipairs(class.functions) do
-          write_function(file, func)
+          writeFunction(file, func)
       end
     end
 
     if class.properties ~= nil then
       file:write("\nProperties:\n\n")
       for i, property in ipairs(class.properties) do
-        write_property(file, property)
+        writeProperty(file, property)
       end
     end
 
@@ -174,8 +175,8 @@ function write_classes(file)
   end
 end
 
-function write_enumerates(file)
-  sort_by_name(enumerates)
+function writeEnumerates(file)
+  sortByName(enumerates)
 
   file:write("\\section LuaScriptAPI_Enums Enumerations\n\n")
 
@@ -188,7 +189,7 @@ function write_enumerates(file)
   end
 end
 
-function write_function(file, func)
+function writeFunction(file, func)
   -- write function begin
   local func_str = "- "
 
@@ -237,11 +238,11 @@ function write_function(file, func)
   end
 end
 
-function write_globalconstans(file)
-  sort_by_name(globalconstants)
+function writeGlobalConstants(file)
+  sortByName(globalConstants)
 
   file:write("\n\\section LuaScriptAPI_GlobalConstants Global constants\n")
-  for i, constant in ipairs(globalconstants) do
+  for i, constant in ipairs(globalConstants) do
     local const_str = "- " .. constant.type:gsub("const ", "")
     if constant.ptr ~= "" then
       const_str = const_str .. constant.ptr
@@ -252,24 +253,24 @@ function write_globalconstans(file)
   file:write("\n")  
 end
 
-function write_globalfunctions(file)  
-  sort_by_name(globalfunctions)
+function writeGlobalFunctions(file)  
+  sortByName(globalFunctions)
 
   file:write("\n\\section LuaScriptAPI_GlobalFunctions Global functions\n")  
-  for i, func in ipairs(globalfunctions) do
-    write_function(file, func)
+  for i, func in ipairs(globalFunctions) do
+    writeFunction(file, func)
   end
   file:write("\n")
 end
 
-function write_globalproperties(file)
+function writeGLobalProperties(file)
   file:write("\n\\section LuaScriptAPI_GlobalProperties Global properties\n")
-  for i, property in ipairs(globalproperties) do
-    write_property(file, property)
+  for i, property in ipairs(globalProperties) do
+    writeProperty(file, property)
   end
 end
 
-function write_property(file, property)
+function writeProperty(file, property)
   property.name = property.name:gsub("_", "")
   file:write("- " .. property.type .. property.ptr .. " " .. property.name)
   if property.mod:find("tolua_readonly") == nil then
@@ -281,29 +282,30 @@ end
 
 function classPackage:print()
   if flags.o == nil then
+    print("Invalid output filename");
     return
   end
-  
+
   local filename = flags.o
   local file = io.open(filename, "wt")
-  
+
   file:write("namespace Urho3D\n")
   file:write("{\n")
   file:write("\n")
   file:write("/**\n")
-  file:write("\page LuaScriptAPI Lua Scripting API\n")
+  file:write("\\page LuaScriptAPI Lua Scripting API\n")
 
-  local i=1
+  local i = 1
   while self[i] do
     self[i]:print("","")
-    i = i+1
+    i = i + 1
   end
 
-  write_classes(file)
-  write_enumerates(file)
-  write_globalfunctions(file)
-  write_globalproperties(file)
-  write_globalconstans(file)
+  writeClasses(file)
+  writeEnumerates(file)
+  writeGlobalFunctions(file)
+  writeGLobalProperties(file)
+  writeGlobalConstants(file)
   
   file:write("*/\n")
   file:write("\n")
