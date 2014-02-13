@@ -67,7 +67,7 @@ On Windows, execute cmake_android.bat. If MKLINK support is available, provide b
 
 - android update project -p . -t 1 (only needed on the first time,
                                     replace '-t 1' with desired target-id)
-- make -j8 (replace '-j8' with the number of logical CPU cores of the 
+- make -j8 (replace '-j8' with the number of logical CPU cores of the
             host/build system)
 - ant debug
 
@@ -95,7 +95,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 For native build on Raspberry Pi itself, use the similar process for Linux Desktop build described above.
 
-For cross-compiling build on another build/host machine, firstly set the RASPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RASPI_ROOT environment variable to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. 
+For cross-compiling build on another build/host machine, firstly set the RASPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RASPI_ROOT environment variable to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build.
 
 When running cmake_gcc.sh with RASPI_TOOL environment variable set, it tells build script to generate additional raspi-Build directory for cross-compiling. Go to this raspi-Build directory and proceed to execute make. After the build is complete, the ARM executables can be found in Bin-CC output directory.
 
@@ -105,9 +105,19 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 As of v1.31 (to be released), the build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.
 
-To install the Urho3D library (or should we call it SDK), use the usual 'make install' command when using Makefile. There is an equivalent command in Visual Studio and Xcode IDE to build 'install' target instead of the default 'all' target. This could be useful when you want your application to always link against a 'stable' installed version of the Urho3D library, while keeping your Urho3D project root tree in sync with origin/master. That is, install the newly built library after you have tested the changes do not break your application during development.   
+To install the Urho3D library (or should we call it SDK), use the usual 'make install' command when using Makefile. There is an equivalent command in Visual Studio and Xcode IDE to build 'install' target instead of the default 'all' target. This could be useful when you want your application to always link against a 'stable' installed version of the Urho3D library, while keeping your Urho3D project root tree in sync with origin/master. That is, install the newly built library after you have tested the changes do not break your application during development.
 
 Refer to \ref UsingLibrary "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
+
+\section Building_MinGW MinGW cross-compile build process
+
+It is possible to cross-compile Urho3D for Windows using a Linux system. The process is largely the same as for the Linux Desktop build process described above.
+
+To cross-compile, the MinGW tool-chain (compiler, linker and w32api) needs to be installed on the system. You will also need the DirectX header files, those can be downloaded and installed from the following packet: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.
+
+For activating the MinGW tool-chain, and to allow it to find the correct compiler, the MINGW_PREFIX environment variable needs to be set when running cmake_gcc.sh. This variable should be set to the prefix of the compiler name. So, if for example your MinGW compiler is named i686-pc-mingw32-gcc, the MINGW_PREFIX should read i686-pc.
+
+Running cmake_gcc.sh with the MINGW_PREFIX environment variable set, produces an additional mingw-Build directory. Go to this directory and execute make to start the build process. When the build is complete, the Windows executables can be found in the Bin output directory.
 
 \section Building_64bit Desktop 64bit build
 
@@ -123,7 +133,7 @@ Note that you can also force an OpenGL mode build on Windows by using the CMake 
 
 If ENABLE_DOCS build option is set then a normal (ALL) build would not only build Urho3D software but also Urho3D documentation automatically. If it is not then the documentation can be generated by manually invoking 'make doc' command or its equivalent command in IDE.
 
-The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) will be built internally when all the tools are being built.  
+The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) will be built internally when all the tools are being built.
 
 \section Build_Options Build options
 
@@ -143,7 +153,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
 |-DUSE_MKLINK=1        |to use mklink command to create symbolic links (Windows Vista and above only)|
 |-DUSE_STATIC_RUNTIME=1|to use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
-|-DSCP_TO_TARGET=<v>   |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc| 
+|-DSCP_TO_TARGET=<v>   |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |-DCMAKE_BUILD_TYPE=<v>|to tell CMake which build configuration to be generated (Makefile generator only), possible values are Release (default), Debug, and RelWithDebInfo|
 |-DURHO3D_LIB_TYPE=<v> |to specify Urho3D library type, possible values are STATIC (default) and SHARED|
 |-DANDROID_ABI=<v>     |to specify ABI for native code (Android build only), possible values are armeabi-v7a (default) and armeabi|
@@ -201,7 +211,7 @@ By default Mac OS X recognizes file having extension .as as 'AppleSingle Archive
 
 The drawback of the above approach is, Xcode does not remember it. The steps need to be carried out each time Xcode is relaunched.
 
-To solve this permanently, we need to 'hack' the system a little bit to 'fool' Xcode to always treat .as file as one of the C++ source files. Execute the following commands in a terminal as normal user. These commands have been verified to work with Xcode 4.x on Lion and Xcode 5.x on Mountain Lion. 
+To solve this permanently, we need to 'hack' the system a little bit to 'fool' Xcode to always treat .as file as one of the C++ source files. Execute the following commands in a terminal as normal user. These commands have been verified to work with Xcode 4.x on Lion and Xcode 5.x on Mountain Lion.
 
 \code
 $ cd /System/Library/CoreServices/CoreTypes.bundle/Contents
@@ -357,7 +367,7 @@ On non-Windows platform:
 set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
-\subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake 
+\subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake
 
 If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
 
