@@ -7785,11 +7785,13 @@ Properties:
 - %Buttons : int
 - %Qualifiers : int
 - %Repeat : bool
+- %Raw : uint
 
 ### KeyUp
 - %Key : int
 - %Buttons : int
 - %Qualifiers : int
+- %Raw : uint
 
 ### Char
 - %Char : int
