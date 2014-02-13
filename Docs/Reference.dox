@@ -285,6 +285,15 @@ A Scene whose updates are enabled (default) will be automatically updated on eac
 
 Nodes and components can be excluded from the scene update by disabling them, see \ref Node::SetEnabled "SetEnabled()". Disabling for example a drawable component also makes it invisible, a sound source component becomes inaudible etc. If a node is disabled, all of its components are treated as disabled regardless of their own enable/disable state.
 
+\section SceneModel_Logic Creating logic functionality
+
+To implement your game logic you typically either create script objects (when using scripting) or new components (when using C++). %Script objects exist in a C++ placeholder component, but can be basically thought of as components themselves. For a simple example to get you started, check the 05_AnimatingScene sample, which creates a Rotator object to scene nodes to perform rotation on each frame update.
+
+Unless you have extremely serious reasons for doing so, you should not subclass the Node class in C++ for implementing your own logic. Doing so will theoretically work, but has the following drawbacks:
+
+- Loading and saving will not work properly without changes. It assumes that the root node is a %Scene, and all the child nodes are of the %Node class. It will not know how to instantiate your custom subclass.
+- The Editor does not know how to edit your subclass.
+
 \section SceneModel_LoadSave Loading and saving scenes
 
 Scenes can be loaded and saved in either binary or XML format; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()". See \ref Serialization
