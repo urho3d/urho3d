@@ -254,7 +254,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
         // so use a higher constant bias
         #ifdef GL_ES_VERSION_2_0
-        constantBias *= 1.5f;
+        constantBias *= 2.0f;
         #endif
         projection.m22_ += projection.m32_ * constantBias;
         projection.m23_ += projection.m33_ * constantBias;

@@ -60,12 +60,8 @@ float GetVertexLightVolumetric(int index, vec3 worldPos)
 
 #ifdef SHADOW
 
-#ifdef DIRLIGHT
-    #ifndef GL_ES
-        #define NUMCASCADES 4
-    #else
-        #define NUMCASCADES 2
-    #endif
+#if defined(DIRLIGHT) && !defined(GL_ES)
+    #define NUMCASCADES 4
 #else
     #define NUMCASCADES 1
 #endif
@@ -126,12 +122,8 @@ float GetIntensity(vec3 color)
 
 #ifdef SHADOW
 
-#ifdef DIRLIGHT
-    #ifndef GL_ES
-        #define NUMCASCADES 4
-    #else
-        #define NUMCASCADES 2
-    #endif
+#if defined(DIRLIGHT) && !defined(GL_ES)
+    #define NUMCASCADES 4
 #else
     #define NUMCASCADES 1
 #endif
@@ -240,14 +232,7 @@ float GetDirShadowDeferred(vec4 projWorldPos, float depth)
 #else
 float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
 {
-    vec4 shadowPos;
-
-    if (depth < cShadowSplits.x)
-        shadowPos = iShadowPos[0];
-    else
-        shadowPos = iShadowPos[1];
-
-    return GetDirShadowFade(GetShadow(shadowPos), depth);
+    return GetDirShadowFade(GetShadow(iShadowPos[0]), depth);
 }
 #endif
 #endif
