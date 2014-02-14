@@ -25,6 +25,8 @@ struct ColorFrame
     ColorFrame();
     ColorFrame(const Color& color);
     ColorFrame(const Color& color, float time);
+    ~ColorFrame();
+    
     Color Interpolate(const ColorFrame& next, float time);
     Color color_ @ color;
     float time_ @ time;
@@ -33,6 +35,8 @@ struct ColorFrame
 struct TextureFrame
 {
     TextureFrame();
+    ~TextureFrame();
+
     Rect uv_ @ uv;
     float time_ @ time;
 };

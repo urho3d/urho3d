@@ -74,7 +74,9 @@ Properties:
 
 Methods:
 
-- * AnimationControl()
+- AnimationControl() (GC)
+- AnimationControl* new()
+- void delete()
 
 Properties:
 
@@ -140,9 +142,11 @@ Properties:
 
 Methods:
 
-- * AnimationState(AnimatedModel* model, Animation* animation)
-- * AnimationState(Node* node, Animation* animation)
--  ~AnimationState()
+- AnimationState(AnimatedModel* model, Animation* animation) (GC)
+- AnimationState* new(AnimatedModel* model, Animation* animation)
+- AnimationState(Node* node, Animation* animation) (GC)
+- AnimationState* new(Node* node, Animation* animation)
+- void delete()
 - void SetStartBone(Bone* bone)
 - void SetLooped(bool looped)
 - void SetWeight(float weight)
@@ -217,8 +221,11 @@ Properties:
 
 Methods:
 
-- * BiasParameters()
-- * BiasParameters(float constantBias, float slopeScaledBias)
+- BiasParameters() (GC)
+- BiasParameters* new()
+- BiasParameters(float constantBias, float slopeScaledBias) (GC)
+- BiasParameters* new(float constantBias, float slopeScaledBias)
+- void delete()
 
 ### Billboard
 
@@ -269,7 +276,9 @@ Properties:
 
 Methods:
 
-- * Bone()
+- Bone() (GC)
+- Bone* new()
+- void delete()
 
 Properties:
 
@@ -290,8 +299,9 @@ Properties:
 
 Methods:
 
-- * BorderImage()
--  ~BorderImage()
+- BorderImage() (GC)
+- BorderImage* new()
+- void delete()
 - void SetTexture(Texture* texture)
 - void SetImageRect(const IntRect& rect)
 - void SetFullImageRect()
@@ -321,15 +331,23 @@ Properties:
 
 Methods:
 
-- * BoundingBox()
-- * BoundingBox(const BoundingBox& box)
-- * BoundingBox(const Rect& rect)
-- * BoundingBox(const Vector3& min, const Vector3& max)
-- * BoundingBox(float min, float max)
-- * BoundingBox(const Frustum& frustum)
-- * BoundingBox(const Polyhedron& poly)
-- * BoundingBox(const Sphere& sphere)
--  ~BoundingBox()
+- BoundingBox() (GC)
+- BoundingBox* new()
+- BoundingBox(const BoundingBox& box) (GC)
+- BoundingBox* new(const BoundingBox& box)
+- BoundingBox(const Rect& rect) (GC)
+- BoundingBox* new(const Rect& rect)
+- BoundingBox(const Vector3& min, const Vector3& max) (GC)
+- BoundingBox* new(const Vector3& min, const Vector3& max)
+- BoundingBox(float min, float max) (GC)
+- BoundingBox* new(float min, float max)
+- BoundingBox(const Frustum& frustum) (GC)
+- BoundingBox* new(const Frustum& frustum)
+- BoundingBox(const Polyhedron& poly) (GC)
+- BoundingBox* new(const Polyhedron& poly)
+- BoundingBox(const Sphere& sphere) (GC)
+- BoundingBox* new(const Sphere& sphere)
+- void delete()
 - bool operator==(const BoundingBox& rhs) const
 - void Define(const BoundingBox& box)
 - void Define(const Rect& rect)
@@ -374,8 +392,9 @@ Properties:
 
 Methods:
 
-- * Button()
--  ~Button()
+- Button() (GC)
+- Button* new()
+- void delete()
 - void SetPressedOffset(const IntVector2& offset)
 - void SetPressedOffset(int x, int y)
 - void SetPressedChildOffset(const IntVector2& offset)
@@ -485,15 +504,19 @@ Properties:
 
 Methods:
 
-- * CascadeParameters()
-- * CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
+- CascadeParameters() (GC)
+- CascadeParameters* new()
+- CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) (GC)
+- CascadeParameters* new(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
+- void delete()
 
 ### CheckBox : BorderImage
 
 Methods:
 
-- * CheckBox()
--  ~CheckBox()
+- CheckBox() (GC)
+- CheckBox* new()
+- void delete()
 - void SetChecked(bool enable)
 - void SetCheckedOffset(const IntVector2& rect)
 - void SetCheckedOffset(int x, int y)
@@ -572,12 +595,17 @@ Properties:
 
 Methods:
 
-- * Color()
-- * Color(const Color& color)
-- * Color(const Color& color, float a)
-- * Color(float r, float g, float b)
-- * Color(float r, float g, float b, float a)
--  ~Color()
+- Color() (GC)
+- Color* new()
+- Color(const Color& color) (GC)
+- Color* new(const Color& color)
+- Color(const Color& color, float a) (GC)
+- Color* new(const Color& color, float a)
+- Color(float r, float g, float b) (GC)
+- Color* new(float r, float g, float b)
+- Color(float r, float g, float b, float a) (GC)
+- Color* new(float r, float g, float b, float a)
+- void delete()
 - bool operator==(const Color& rhs) const
 - Color operator*(float rhs) const
 - Color operator+(const Color& rhs)
@@ -627,9 +655,13 @@ Properties:
 
 Methods:
 
-- * ColorFrame()
-- * ColorFrame(const Color& color)
-- * ColorFrame(const Color& color, float time)
+- ColorFrame() (GC)
+- ColorFrame* new()
+- ColorFrame(const Color& color) (GC)
+- ColorFrame* new(const Color& color)
+- ColorFrame(const Color& color, float time) (GC)
+- ColorFrame* new(const Color& color, float time)
+- void delete()
 - Color Interpolate(const ColorFrame& next, float time)
 
 Properties:
@@ -805,7 +837,9 @@ Methods:
 
 Methods:
 
-- * Controls()
+- Controls() (GC)
+- Controls* new()
+- void delete()
 - void Reset()
 - void Set(unsigned buttons, bool down = true)
 - bool IsDown(unsigned button) const
@@ -822,8 +856,9 @@ Properties:
 
 Methods:
 
-- * Cursor()
--  ~Cursor()
+- Cursor() (GC)
+- Cursor* new()
+- void delete()
 - void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
 - void SetShape(CursorShape shape)
 - void SetUseSystemShapes(bool enable)
@@ -1061,8 +1096,9 @@ Properties:
 
 Methods:
 
-- * DropDownList()
--  ~DropDownList()
+- DropDownList() (GC)
+- DropDownList* new()
+- void delete()
 - void AddItem(UIElement* item)
 - void InsertItem(unsigned index, UIElement* item)
 - void RemoveItem(UIElement* item)
@@ -1134,10 +1170,13 @@ Properties:
 
 Methods:
 
-- * File()
-- * File(const String fileName, FileMode mode = FILE_READ)
-- * File(PackageFile* package, const String fileName)
--  ~File()
+- File() (GC)
+- File* new()
+- File(const String fileName, FileMode mode = FILE_READ) (GC)
+- File* new(const String fileName, FileMode mode = FILE_READ)
+- File(PackageFile* package, const String fileName) (GC)
+- File* new(PackageFile* package, const String fileName)
+- void delete()
 - bool Open(const String fileName, FileMode mode = FILE_READ)
 - bool Open(PackageFile* package, const String fileName)
 - void Close()
@@ -1237,8 +1276,9 @@ Properties:
 
 Methods:
 
-- * FileSelector()
--  ~FileSelector()
+- FileSelector() (GC)
+- FileSelector* new()
+- void delete()
 - void SetDefaultStyle(XMLFile* style)
 - void SetTitle(const String text)
 - void SetButtonTexts(const String okText, const String cancelText)
@@ -1328,8 +1368,11 @@ Methods:
 
 Methods:
 
-- * FocusParameters()
-- * FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
+- FocusParameters() (GC)
+- FocusParameters* new()
+- FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) (GC)
+- FocusParameters* new(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
+- void delete()
 
 ### Font : Resource
 
@@ -1338,9 +1381,11 @@ Methods:
 
 Methods:
 
-- * Frustum()
-- * Frustum(const Frustum& frustum)
--  ~Frustum()
+- Frustum() (GC)
+- Frustum* new()
+- Frustum(const Frustum& frustum) (GC)
+- Frustum* new(const Frustum& frustum)
+- void delete()
 - void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ)
 - void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
 - void Define(const Vector3& near, const Vector3& far)
@@ -1465,8 +1510,9 @@ Properties:
 
 Methods:
 
-- * Image()
--  ~Image()
+- Image() (GC)
+- Image* new()
+- void delete()
 - bool SetSize(int width, int height, unsigned components)
 - bool SetSize(int width, int height, int depth, unsigned components)
 - void SetPixel(int x, int y, const Color& color)
@@ -1559,9 +1605,11 @@ Properties:
 
 Methods:
 
-- * IntRect()
-- * IntRect(int left, int top, int right, int bottom)
--  ~IntRect()
+- IntRect() (GC)
+- IntRect* new()
+- IntRect(int left, int top, int right, int bottom) (GC)
+- IntRect* new(int left, int top, int right, int bottom)
+- void delete()
 - bool operator==(const IntRect& rhs) const
 - IntVector2 Size() const
 - int Width() const
@@ -1584,10 +1632,13 @@ Properties:
 
 Methods:
 
-- * IntVector2()
-- * IntVector2(int x, int y)
-- * IntVector2(const IntVector2& rhs)
--  ~IntVector2()
+- IntVector2() (GC)
+- IntVector2* new()
+- IntVector2(int x, int y) (GC)
+- IntVector2* new(int x, int y)
+- IntVector2(const IntVector2& rhs) (GC)
+- IntVector2* new(const IntVector2& rhs)
+- void delete()
 - bool operator==(const IntVector2& rhs) const
 - IntVector2 operator+(const IntVector2& rhs) const
 - IntVector2 operator-() const
@@ -1687,8 +1738,9 @@ Properties:
 
 Methods:
 
-- * LineEdit()
--  ~LineEdit()
+- LineEdit() (GC)
+- LineEdit* new()
+- void delete()
 - void SetText(const String text)
 - void SetCursorPosition(unsigned position)
 - void SetCursorBlinkRate(float rate)
@@ -1725,8 +1777,9 @@ Properties:
 
 Methods:
 
-- * ListView()
--  ~ListView()
+- ListView() (GC)
+- ListView* new()
+- void delete()
 - void AddItem(UIElement* item)
 - void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0)
 - void RemoveItem(UIElement* item, unsigned index = 0)
@@ -1821,8 +1874,9 @@ Properties:
 
 Methods:
 
-- * Material()
--  ~Material()
+- Material() (GC)
+- Material* new()
+- void delete()
 - void SetNumTechniques(unsigned num)
 - void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f)
 - void SetShaderParameter(const String name, const Variant& value)
@@ -1862,10 +1916,13 @@ Properties:
 
 Methods:
 
-- * Matrix3()
-- * Matrix3(const Matrix3& matrix)
-- * Matrix3(float v00, float v01, float v02, float v10, float v11, float v12, float v20, float v21, float v22)
--  ~Matrix3()
+- Matrix3() (GC)
+- Matrix3* new()
+- Matrix3(const Matrix3& matrix) (GC)
+- Matrix3* new(const Matrix3& matrix)
+- Matrix3(float v00, float v01, float v02, float v10, float v11, float v12, float v20, float v21, float v22) (GC)
+- Matrix3* new(float v00, float v01, float v02, float v10, float v11, float v12, float v20, float v21, float v22)
+- void delete()
 - bool operator==(const Matrix3& rhs) const
 - Vector3 operator*(const Vector3& rhs) const
 - Matrix3 operator+(const Matrix3& rhs) const
@@ -1899,13 +1956,21 @@ Properties:
 
 Methods:
 
-- * Matrix3x4()
-- * Matrix3x4(const Matrix3x4& matrix)
-- * Matrix3x4(const Matrix3& matrix)
-- * Matrix3x4(const Matrix4& matrix)
-- * Matrix3x4(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23)
-- * Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
-- * Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+- Matrix3x4() (GC)
+- Matrix3x4* new()
+- Matrix3x4(const Matrix3x4& matrix) (GC)
+- Matrix3x4* new(const Matrix3x4& matrix)
+- Matrix3x4(const Matrix3& matrix) (GC)
+- Matrix3x4* new(const Matrix3& matrix)
+- Matrix3x4(const Matrix4& matrix) (GC)
+- Matrix3x4* new(const Matrix4& matrix)
+- Matrix3x4(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23) (GC)
+- Matrix3x4* new(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23)
+- Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale) (GC)
+- Matrix3x4* new(const Vector3& translation, const Quaternion& rotation, float scale)
+- Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale) (GC)
+- Matrix3x4* new(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+- void delete()
 - bool operator==(const Matrix3x4& rhs) const
 - Vector3 operator*(const Vector3& rhs) const
 - Vector3 operator*(const Vector4& rhs) const
@@ -1950,11 +2015,15 @@ Properties:
 
 Methods:
 
-- * Matrix4()
-- * Matrix4(const Matrix4& matrix)
-- * Matrix4(const Matrix3& matrix)
-- * Matrix4(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33)
--  ~Matrix4()
+- Matrix4() (GC)
+- Matrix4* new()
+- Matrix4(const Matrix4& matrix) (GC)
+- Matrix4* new(const Matrix4& matrix)
+- Matrix4(const Matrix3& matrix) (GC)
+- Matrix4* new(const Matrix3& matrix)
+- Matrix4(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33) (GC)
+- Matrix4* new(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33)
+- void delete()
 - bool operator==(const Matrix4& rhs) const
 - Vector3 operator*(const Vector3& rhs) const
 - Vector4 operator*(const Vector4& rhs) const
@@ -2001,8 +2070,9 @@ Properties:
 
 Methods:
 
-- * Menu()
--  ~Menu()
+- Menu() (GC)
+- Menu* new()
+- void delete()
 - void SetPopup(UIElement* element)
 - void SetPopupOffset(const IntVector2& offset)
 - void SetPopupOffset(int x, int y)
@@ -2026,8 +2096,9 @@ Properties:
 
 Methods:
 
-- * MessageBox(const String messageString = String::EMPTY, const String titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
--  ~MessageBox()
+- MessageBox(const String messageString = String::EMPTY, const String titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0) (GC)
+- MessageBox* new(const String messageString = String::EMPTY, const String titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- void delete()
 - void SetTitle(const String text)
 - void SetMessage(const String text)
 - const String GetTitle() const
@@ -2228,8 +2299,9 @@ Properties:
 
 Methods:
 
-- * Node()
--  ~Node()
+- Node() (GC)
+- Node* new()
+- void delete()
 - bool SaveXML(File* dest) const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
@@ -2426,7 +2498,9 @@ Properties:
 
 Methods:
 
-- * OctreeQueryResult()
+- OctreeQueryResult() (GC)
+- OctreeQueryResult* new()
+- void delete()
 
 Properties:
 
@@ -2463,9 +2537,11 @@ Properties:
 
 Methods:
 
-- * PackageFile()
-- * PackageFile(const String fileName, unsigned startOffset = 0)
--  ~PackageFile()
+- PackageFile() (GC)
+- PackageFile* new()
+- PackageFile(const String fileName, unsigned startOffset = 0) (GC)
+- PackageFile* new(const String fileName, unsigned startOffset = 0)
+- void delete()
 - bool Open(const String fileName, unsigned startOffset = 0)
 - bool Exists(const String fileName) const
 - const PackageEntry* GetEntry(const String fileName) const
@@ -2599,7 +2675,9 @@ Properties:
 
 Methods:
 
-- * PhysicsRaycastResult()
+- PhysicsRaycastResult() (GC)
+- PhysicsRaycastResult* new()
+- void delete()
 
 Properties:
 
@@ -2650,12 +2728,17 @@ Properties:
 
 Methods:
 
-- * Plane()
-- * Plane(const Plane& plane)
-- * Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
-- * Plane(const Vector3& normal, const Vector3& point)
-- * Plane(const Vector4& plane)
--  ~Plane()
+- Plane() (GC)
+- Plane* new()
+- Plane(const Plane& plane) (GC)
+- Plane* new(const Plane& plane)
+- Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2) (GC)
+- Plane* new(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+- Plane(const Vector3& normal, const Vector3& point) (GC)
+- Plane* new(const Vector3& normal, const Vector3& point)
+- Plane(const Vector4& plane) (GC)
+- Plane* new(const Vector4& plane)
+- void delete()
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
 - void Define(const Vector4& plane)
@@ -2682,11 +2765,15 @@ Properties:
 
 Methods:
 
-- * Polyhedron()
-- * Polyhedron(const Polyhedron& polyhedron)
-- * Polyhedron(const BoundingBox& box)
-- * Polyhedron(const Frustum& frustum)
--  ~Polyhedron()
+- Polyhedron() (GC)
+- Polyhedron* new()
+- Polyhedron(const Polyhedron& polyhedron) (GC)
+- Polyhedron* new(const Polyhedron& polyhedron)
+- Polyhedron(const BoundingBox& box) (GC)
+- Polyhedron* new(const BoundingBox& box)
+- Polyhedron(const Frustum& frustum) (GC)
+- Polyhedron* new(const Frustum& frustum)
+- void delete()
 - void Define(const BoundingBox& box)
 - void Define(const Frustum& frustum)
 - void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2)
@@ -2710,15 +2797,23 @@ Properties:
 
 Methods:
 
-- * Quaternion()
-- * Quaternion(const Quaternion& quat)
-- * Quaternion(float w, float x, float y, float z)
-- * Quaternion(float angle, const Vector3& axis)
-- * Quaternion(float x, float y, float z)
-- * Quaternion(const Vector3& start, const Vector3& end)
-- * Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
-- * Quaternion(const Matrix3& matrix)
--  ~Quaternion()
+- Quaternion() (GC)
+- Quaternion* new()
+- Quaternion(const Quaternion& quat) (GC)
+- Quaternion* new(const Quaternion& quat)
+- Quaternion(float w, float x, float y, float z) (GC)
+- Quaternion* new(float w, float x, float y, float z)
+- Quaternion(float angle, const Vector3& axis) (GC)
+- Quaternion* new(float angle, const Vector3& axis)
+- Quaternion(float x, float y, float z) (GC)
+- Quaternion* new(float x, float y, float z)
+- Quaternion(const Vector3& start, const Vector3& end) (GC)
+- Quaternion* new(const Vector3& start, const Vector3& end)
+- Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis) (GC)
+- Quaternion* new(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+- Quaternion(const Matrix3& matrix) (GC)
+- Quaternion* new(const Matrix3& matrix)
+- void delete()
 - bool operator==(const Quaternion& rhs) const
 - Quaternion operator*(float rhs) const
 - Quaternion operator-() const
@@ -2764,10 +2859,13 @@ Properties:
 
 Methods:
 
-- * Ray()
-- * Ray(const Vector3& origin, const Vector3& direction)
-- * Ray(const Ray& ray)
--  ~Ray()
+- Ray() (GC)
+- Ray* new()
+- Ray(const Vector3& origin, const Vector3& direction) (GC)
+- Ray* new(const Vector3& origin, const Vector3& direction)
+- Ray(const Ray& ray) (GC)
+- Ray* new(const Ray& ray)
+- void delete()
 - bool operator==(const Ray& rhs) const
 - void Define(const Vector3& origin, const Vector3& direction)
 - Vector3 Project(const Vector3& point) const
@@ -2790,7 +2888,9 @@ Properties:
 
 Methods:
 
-- * RayQueryResult()
+- RayQueryResult() (GC)
+- RayQueryResult* new()
+- void delete()
 
 Properties:
 
@@ -2806,12 +2906,17 @@ Properties:
 
 Methods:
 
-- * Rect()
-- * Rect(const Rect& rect)
-- * Rect(const Vector2& min, const Vector2& max)
-- * Rect(float left, float top, float right, float bottom)
-- * Rect(const Vector4& vector)
--  ~Rect()
+- Rect() (GC)
+- Rect* new()
+- Rect(const Rect& rect) (GC)
+- Rect* new(const Rect& rect)
+- Rect(const Vector2& min, const Vector2& max) (GC)
+- Rect* new(const Vector2& min, const Vector2& max)
+- Rect(float left, float top, float right, float bottom) (GC)
+- Rect* new(float left, float top, float right, float bottom)
+- Rect(const Vector4& vector) (GC)
+- Rect* new(const Vector4& vector)
+- void delete()
 - bool operator==(const Rect& rhs) const
 - void Define(const Rect& rect)
 - void Define(const Vector2& min, const Vector2& max)
@@ -2879,8 +2984,9 @@ Methods:
 
 Methods:
 
-- * RenderSurface(Texture* parentTexture)
--  ~RenderSurface()
+- RenderSurface(Texture* parentTexture) (GC)
+- RenderSurface* new(Texture* parentTexture)
+- void delete()
 - void SetNumViewports(unsigned num)
 - void SetViewport(unsigned index, Viewport* viewport)
 - void SetUpdateMode(RenderSurfaceUpdateMode mode)
@@ -3063,10 +3169,15 @@ Properties:
 
 Methods:
 
-- * ResourceRef()
-- * ResourceRef(ShortStringHash type)
-- * ResourceRef(ShortStringHash type, String name)
-- * ResourceRef(const ResourceRef& rhs)
+- ResourceRef() (GC)
+- ResourceRef* new()
+- ResourceRef(ShortStringHash type) (GC)
+- ResourceRef* new(ShortStringHash type)
+- ResourceRef(ShortStringHash type, String name) (GC)
+- ResourceRef* new(ShortStringHash type, String name)
+- ResourceRef(const ResourceRef& rhs) (GC)
+- ResourceRef* new(const ResourceRef& rhs)
+- void delete()
 - bool operator==(const ResourceRef& rhs) const
 
 Properties:
@@ -3079,8 +3190,11 @@ Properties:
 
 Methods:
 
-- * ResourceRefList()
-- * ResourceRefList(ShortStringHash type)
+- ResourceRefList() (GC)
+- ResourceRefList* new()
+- ResourceRefList(ShortStringHash type) (GC)
+- ResourceRefList* new(ShortStringHash type)
+- void delete()
 - bool operator==(const ResourceRefList& rhs) const
 
 Properties:
@@ -3192,8 +3306,9 @@ Properties:
 
 Methods:
 
-- * Scene()
--  ~Scene()
+- Scene() (GC)
+- Scene* new()
+- void delete()
 - bool Load(File* source)
 - bool Save(File* dest) const
 - bool Load(const String fileName)
@@ -3263,8 +3378,9 @@ Properties:
 
 Methods:
 
-- * ScrollBar()
--  ~ScrollBar()
+- ScrollBar() (GC)
+- ScrollBar* new()
+- void delete()
 - void SetOrientation(Orientation orientation)
 - void SetRange(float range)
 - void SetValue(float value)
@@ -3299,8 +3415,9 @@ Properties:
 
 Methods:
 
-- * ScrollView()
--  ~ScrollView()
+- ScrollView() (GC)
+- ScrollView* new()
+- void delete()
 - void SetContentElement(UIElement* element)
 - void SetViewPosition(const IntVector2& position)
 - void SetViewPosition(int x, int y)
@@ -3384,12 +3501,17 @@ Methods:
 
 Methods:
 
-- * ShortStringHash()
-- * ShortStringHash(const ShortStringHash& rhs)
-- * ShortStringHash(const StringHash& rhs)
-- * ShortStringHash(short value)
-- * ShortStringHash(const String str)
--  ~ShortStringHash()
+- ShortStringHash() (GC)
+- ShortStringHash* new()
+- ShortStringHash(const ShortStringHash& rhs) (GC)
+- ShortStringHash* new(const ShortStringHash& rhs)
+- ShortStringHash(const StringHash& rhs) (GC)
+- ShortStringHash* new(const StringHash& rhs)
+- ShortStringHash(short value) (GC)
+- ShortStringHash* new(short value)
+- ShortStringHash(const String str) (GC)
+- ShortStringHash* new(const String str)
+- void delete()
 - ShortStringHash operator+(const ShortStringHash& rhs) const
 - bool operator==(const ShortStringHash& rhs) const
 - bool operator<(const ShortStringHash& rhs) const
@@ -3422,8 +3544,9 @@ Properties:
 
 Methods:
 
-- * Slider()
--  ~Slider()
+- Slider() (GC)
+- Slider* new()
+- void delete()
 - void SetOrientation(Orientation orientation)
 - void SetRange(float range)
 - void SetValue(float value)
@@ -3447,8 +3570,9 @@ Properties:
 
 Methods:
 
-- * Sound()
--  ~Sound()
+- Sound() (GC)
+- Sound* new()
+- void delete()
 - bool LoadRaw(Deserializer& source)
 - bool LoadWav(Deserializer& source)
 - bool LoadOggVorbis(Deserializer& source)
@@ -3555,13 +3679,19 @@ Properties:
 
 Methods:
 
-- * Sphere()
-- * Sphere(const Sphere& sphere)
-- * Sphere(const Vector3& center, float radius)
-- * Sphere(const BoundingBox& box)
-- * Sphere(const Frustum& frustum)
-- * Sphere(const Polyhedron& poly)
--  ~Sphere()
+- Sphere() (GC)
+- Sphere* new()
+- Sphere(const Sphere& sphere) (GC)
+- Sphere* new(const Sphere& sphere)
+- Sphere(const Vector3& center, float radius) (GC)
+- Sphere* new(const Vector3& center, float radius)
+- Sphere(const BoundingBox& box) (GC)
+- Sphere* new(const BoundingBox& box)
+- Sphere(const Frustum& frustum) (GC)
+- Sphere* new(const Frustum& frustum)
+- Sphere(const Polyhedron& poly) (GC)
+- Sphere* new(const Polyhedron& poly)
+- void delete()
 - bool operator==(const Sphere& rhs) const
 - void Define(const Sphere& sphere)
 - void Define(const Vector3& center, float radius)
@@ -3613,8 +3743,9 @@ Properties:
 
 Methods:
 
-- * Sprite()
--  ~Sprite()
+- Sprite() (GC)
+- Sprite* new()
+- void delete()
 - void SetPosition(const Vector2& position)
 - void SetPosition(float x, float y)
 - void SetHotSpot(const IntVector2& hotSpot)
@@ -3698,11 +3829,15 @@ Properties:
 
 Methods:
 
-- * StringHash()
-- * StringHash(const StringHash& rhs)
-- * StringHash(unsigned value)
-- * StringHash(const String str)
--  ~StringHash()
+- StringHash() (GC)
+- StringHash* new()
+- StringHash(const StringHash& rhs) (GC)
+- StringHash* new(const StringHash& rhs)
+- StringHash(unsigned value) (GC)
+- StringHash* new(unsigned value)
+- StringHash(const String str) (GC)
+- StringHash* new(const String str)
+- void delete()
 - StringHash operator+(const StringHash& rhs) const
 - bool operator==(const StringHash& rhs) const
 - bool operator<(const StringHash& rhs) const
@@ -3840,8 +3975,9 @@ Properties:
 
 Methods:
 
-- * Text()
--  ~Text()
+- Text() (GC)
+- Text* new()
+- void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
 - void SetText(const String text)
@@ -3897,8 +4033,9 @@ Properties:
 
 Methods:
 
-- * Text3D()
--  ~Text3D()
+- Text3D() (GC)
+- Text3D* new()
+- void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
 - void SetMaterial(Material* material)
@@ -4007,8 +4144,9 @@ Properties:
 
 Methods:
 
-- * Texture2D()
--  ~Texture2D()
+- Texture2D() (GC)
+- Texture2D* new()
+- void delete()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
 - bool Load(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
@@ -4028,7 +4166,9 @@ Methods:
 
 Methods:
 
-- * TextureFrame()
+- TextureFrame() (GC)
+- TextureFrame* new()
+- void delete()
 
 Properties:
 
@@ -4058,8 +4198,9 @@ Properties:
 
 Methods:
 
-- * ToolTip()
--  ~ToolTip()
+- ToolTip() (GC)
+- ToolTip* new()
+- void delete()
 - void SetDelay(float delay)
 - float GetDelay() const
 
@@ -4150,8 +4291,9 @@ Properties:
 
 Methods:
 
-- * UIElement()
--  ~UIElement()
+- UIElement() (GC)
+- UIElement* new()
+- void delete()
 - const IntVector2& GetScreenPosition() const
 - bool LoadXML(Deserializer& source)
 - bool SaveXML(Serializer& dest) const
@@ -4354,29 +4496,51 @@ Properties:
 
 Methods:
 
-- * Variant()
-- * Variant(int value)
-- * Variant(unsigned value)
-- * Variant(const StringHash& value)
-- * Variant(const ShortStringHash& value)
-- * Variant(bool value)
-- * Variant(float value)
-- * Variant(const Vector2& value)
-- * Variant(const Vector3& value)
-- * Variant(const Vector4& value)
-- * Variant(const Quaternion& value)
-- * Variant(const Color& value)
-- * Variant(const String value)
-- * Variant(const char* value)
-- * Variant(const ResourceRef& value)
-- * Variant(const ResourceRefList& value)
-- * Variant(const IntRect& value)
-- * Variant(const IntVector2& value)
-- * Variant(const String type, const String value)
-- * Variant(VariantType type, const String value)
-- * Variant(VariantType type, const char* value)
-- * Variant(const Variant& value)
--  ~Variant()
+- Variant() (GC)
+- Variant* new()
+- Variant(int value) (GC)
+- Variant* new(int value)
+- Variant(unsigned value) (GC)
+- Variant* new(unsigned value)
+- Variant(const StringHash& value) (GC)
+- Variant* new(const StringHash& value)
+- Variant(const ShortStringHash& value) (GC)
+- Variant* new(const ShortStringHash& value)
+- Variant(bool value) (GC)
+- Variant* new(bool value)
+- Variant(float value) (GC)
+- Variant* new(float value)
+- Variant(const Vector2& value) (GC)
+- Variant* new(const Vector2& value)
+- Variant(const Vector3& value) (GC)
+- Variant* new(const Vector3& value)
+- Variant(const Vector4& value) (GC)
+- Variant* new(const Vector4& value)
+- Variant(const Quaternion& value) (GC)
+- Variant* new(const Quaternion& value)
+- Variant(const Color& value) (GC)
+- Variant* new(const Color& value)
+- Variant(const String value) (GC)
+- Variant* new(const String value)
+- Variant(const char* value) (GC)
+- Variant* new(const char* value)
+- Variant(const ResourceRef& value) (GC)
+- Variant* new(const ResourceRef& value)
+- Variant(const ResourceRefList& value) (GC)
+- Variant* new(const ResourceRefList& value)
+- Variant(const IntRect& value) (GC)
+- Variant* new(const IntRect& value)
+- Variant(const IntVector2& value) (GC)
+- Variant* new(const IntVector2& value)
+- Variant(const String type, const String value) (GC)
+- Variant* new(const String type, const String value)
+- Variant(VariantType type, const String value) (GC)
+- Variant* new(VariantType type, const String value)
+- Variant(VariantType type, const char* value) (GC)
+- Variant* new(VariantType type, const char* value)
+- Variant(const Variant& value) (GC)
+- Variant* new(const Variant& value)
+- void delete()
 - void Clear()
 - bool operator==(const Variant& rhs) const
 - bool operator==(int rhs) const
@@ -4447,8 +4611,9 @@ Properties:
 
 Methods:
 
-- * VariantMap()
--  ~VariantMap()
+- VariantMap() (GC)
+- VariantMap* new()
+- void delete()
 - void SetInt(const String key, int value)
 - void SetUInt(const String key, unsigned value)
 - void SetStringHash(const String key, const StringHash& value)
@@ -4491,10 +4656,13 @@ Methods:
 
 Methods:
 
-- * Vector2()
-- * Vector2(const Vector2& vector)
-- * Vector2(float x, float y)
--  ~Vector2()
+- Vector2() (GC)
+- Vector2* new()
+- Vector2(const Vector2& vector) (GC)
+- Vector2* new(const Vector2& vector)
+- Vector2(float x, float y) (GC)
+- Vector2* new(float x, float y)
+- void delete()
 - bool operator==(const Vector2& rhs) const
 - Vector2 operator+(const Vector2& rhs) const
 - Vector2 operator-() const
@@ -4531,11 +4699,15 @@ Properties:
 
 Methods:
 
-- * Vector3()
-- * Vector3(const Vector3& vector)
-- * Vector3(const Vector2& vector, float z)
-- * Vector3(float x, float y, float z)
--  ~Vector3()
+- Vector3() (GC)
+- Vector3* new()
+- Vector3(const Vector3& vector) (GC)
+- Vector3* new(const Vector3& vector)
+- Vector3(const Vector2& vector, float z) (GC)
+- Vector3* new(const Vector2& vector, float z)
+- Vector3(float x, float y, float z) (GC)
+- Vector3* new(float x, float y, float z)
+- void delete()
 - bool operator==(const Vector3& rhs) const
 - Vector3 operator+(const Vector3& rhs) const
 - Vector3 operator-() const
@@ -4577,11 +4749,15 @@ Properties:
 
 Methods:
 
-- * Vector4()
-- * Vector4(const Vector4& vector)
-- * Vector4(const Vector3& vector, float w)
-- * Vector4(float x, float y, float z, float w)
--  ~Vector4()
+- Vector4() (GC)
+- Vector4* new()
+- Vector4(const Vector4& vector) (GC)
+- Vector4* new(const Vector4& vector)
+- Vector4(const Vector3& vector, float w) (GC)
+- Vector4* new(const Vector3& vector, float w)
+- Vector4(float x, float y, float z, float w) (GC)
+- Vector4* new(float x, float y, float z, float w)
+- void delete()
 - bool operator==(const Vector4& rhs) const
 - Vector4 operator+(const Vector4& rhs) const
 - Vector4 operator-() const
@@ -4612,9 +4788,11 @@ Properties:
 
 Methods:
 
-- * VectorBuffer()
-- * VectorBuffer(Deserializer& source, unsigned size)
--  ~VectorBuffer()
+- VectorBuffer() (GC)
+- VectorBuffer* new()
+- VectorBuffer(Deserializer& source, unsigned size) (GC)
+- VectorBuffer* new(Deserializer& source, unsigned size)
+- void delete()
 - void SetData(Deserializer& source, unsigned size)
 - void Clear()
 - void Resize(unsigned size)
@@ -4707,8 +4885,9 @@ Properties:
 
 Methods:
 
-- * View3D()
--  ~View3D()
+- View3D() (GC)
+- View3D* new()
+- void delete()
 - void SetView(Scene* scene, Camera* camera)
 - void SetFormat(unsigned format)
 - void SetAutoUpdate(bool enable)
@@ -4731,10 +4910,13 @@ Properties:
 
 Methods:
 
-- * Viewport()
-- * Viewport(Scene* scene, Camera* camera, RenderPath* renderPath = 0)
-- * Viewport(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0)
--  ~Viewport()
+- Viewport() (GC)
+- Viewport* new()
+- Viewport(Scene* scene, Camera* camera, RenderPath* renderPath = 0) (GC)
+- Viewport* new(Scene* scene, Camera* camera, RenderPath* renderPath = 0)
+- Viewport(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0) (GC)
+- Viewport* new(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0)
+- void delete()
 - void SetScene(Scene* scene)
 - void SetCamera(Camera* camera)
 - void SetRect(const IntRect& rect)
@@ -4756,8 +4938,9 @@ Properties:
 
 Methods:
 
-- * Window()
--  ~Window()
+- Window() (GC)
+- Window* new()
+- void delete()
 - void SetMovable(bool enable)
 - void SetResizable(bool enable)
 - void SetFixedWidthResizing(bool enable)
@@ -4866,8 +5049,9 @@ Properties:
 
 Methods:
 
-- * XMLFile()
--  ~XMLFile()
+- XMLFile() (GC)
+- XMLFile* new()
+- void delete()
 - XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
 - void Patch(XMLFile* patchFile)
@@ -5475,17 +5659,17 @@ Properties:
 
 \section LuaScriptAPI_GlobalProperties Global properties
 - Audio* audio (readonly)
-- Time* time (readonly)
+- ResourceCache* cache (readonly)
 - Console* console (readonly)
 - DebugHud* debugHud (readonly)
 - Engine* engine (readonly)
-- Graphics* graphics (readonly)
-- Renderer* renderer (readonly)
-- Input* input (readonly)
 - FileSystem* fileSystem (readonly)
+- Graphics* graphics (readonly)
+- Input* input (readonly)
 - Log* log (readonly)
 - Network* network (readonly)
-- ResourceCache* cache (readonly)
+- Renderer* renderer (readonly)
+- Time* time (readonly)
 - UI* ui (readonly)
 
 \section LuaScriptAPI_GlobalConstants Global constants

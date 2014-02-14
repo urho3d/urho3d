@@ -3,6 +3,7 @@ $#include "OctreeQuery.h"
 struct OctreeQueryResult
 {
     OctreeQueryResult();
+    ~OctreeQueryResult();
     
     Drawable* drawable_ @ drawable;
     Node* node_ @ node;
@@ -18,6 +19,8 @@ enum RayQueryLevel
 struct RayQueryResult
 {
     RayQueryResult();
+    ~RayQueryResult();
+    
     Vector3 position_ @ position;
     Vector3 normal_ @ normal;
     float distance_ @ distance;
