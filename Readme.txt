@@ -339,20 +339,22 @@ It is possible to cross-compile Urho3D for Windows using a Linux system. The
 process is largely the same as for the Linux Desktop build process described
 above.
 
-To cross-compile, the MinGW tool-chain (compiler, linker and w32api) needs to be 
+To cross-compile, the MinGW tool-chain (compiler, linker and w32api) needs to be
 installed on the system. You will also need the DirectX header files, those can
 be downloaded and installed from the following packet:
 http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.
 
-For activating the MinGW tool-chain, and to allow it to find the correct compiler, 
-the MINGW_PREFIX environment variable needs to be set when running cmake_gcc.sh.
-This variable should be set to the prefix of the compiler name. So, if for example
-your MinGW compiler is named i686-pc-mingw32-gcc, the MINGW_PREFIX should read i686-pc.
+For activating the MinGW tool-chain, and to allow it to find the correct
+compiler, the MINGW_PREFIX environment variable needs to be set when running
+cmake_gcc.sh. This variable should be set to the prefix of the compiler name.
+So, if for example your MinGW compiler is named i686-pc-mingw32-gcc, the
+MINGW_PREFIX should read i686-pc. Most likely you also need to set MINGW_ROOT
+environment variable to point to your mingw32 system root.
 
 Running cmake_gcc.sh with the MINGW_PREFIX environment variable set, produces
 an additional mingw-Build directory. Go to this directory and execute make to
 start the build process. When the build is complete, the Windows executables can
-be found in the Bin output directory.
+be found in the mingw-Bin output directory.
 
 
 Desktop 64bit build
@@ -388,18 +390,6 @@ Refer to "Using Urho3D as external library" on how to setup your own project to
 use Urho3D as external library.
 
 
-Compiling Direct3D shaders
---------------------------
-
-When building with the Windows 8 SDK, copy d3dcompiler_46.dll from
-C:/Program Files (x86)/Windows Kits/8.0/bin/x86 to Urho3D Bin directory so that
-Urho3D executables will run correctly.
-
-Note that you can also force an OpenGL mode build on Windows by using the CMake
-option in the table below; OpenGL does not depend on a separate shader compiler
-DLL.
-
-
 Documentation build
 -------------------
 
@@ -412,6 +402,18 @@ The prerequisites are Doxygen and Graphviz. Tools to dump the AngelScript API
 for the default scripting subsystem and the LuaScript API (when the LuaScript
 subsystem is also enabled) will be built internally when all the tools are being
 built.
+
+
+Compiling Direct3D shaders
+--------------------------
+
+When building with the Windows 8 SDK, copy d3dcompiler_46.dll from
+C:/Program Files (x86)/Windows Kits/8.0/bin/x86 to Urho3D Bin directory so that
+Urho3D executables will run correctly.
+
+Note that you can also force an OpenGL mode build on Windows by using the CMake
+option in the table below; OpenGL does not depend on a separate shader compiler
+DLL.
 
 
 Build options
@@ -444,7 +446,7 @@ cmake_xxxx batch files or shell scripts.
 |-DUSE_STATIC_RUNTIME=1|to use static C/C++ runtime libraries and eliminate the|
 |                      |  need for runtime DLLs installation (VS only)         |
 |-DSCP_TO_TARGET=<v>   |to automatically scp executables to target system      |
-|                      | (Raspberry Pi cross-compiling build only), SSH digital|
+|                      | (non-Android cross-compiling build only), SSH digital |
 |                      | key must be setup first for this to work, typical     |
 |                      | value has a pattern of usr@tgt:remote-loc             |
 |-DCMAKE_BUILD_TYPE=<v>|to tell CMake which build configuration to be          |

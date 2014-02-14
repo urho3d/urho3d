@@ -20,21 +20,33 @@
 # THE SOFTWARE.
 #
 
-# Target operating system and architecture
-set(CMAKE_SYSTEM_NAME Windows)
-set(CMAKE_SYSTEM_PROCESSOR x86)
+cmake_minimum_required (VERSION 2.6.3)
 
-set(MINGW_PREFIX "$ENV{MINGW_PREFIX}")
+if (CMAKE_TOOLCHAIN_FILE)
+    # Reference toolchain variable to suppress "unused variable" warning
+endif ()
+
+# Target operating system and architecture
+set (CMAKE_SYSTEM_NAME Windows)
+set (CMAKE_SYSTEM_PROCESSOR x86)
+
+# Sanitate the path
+file (TO_CMAKE_PATH "$ENV{MINGW_PREFIX}" MINGW_PREFIX)
 
 # C/C++ compilers
-set(CMAKE_C_COMPILER ${MINGW_PREFIX}-mingw32-gcc)
-set(CMAKE_CXX_COMPILER ${MINGW_PREFIX}-mingw32-g++)
-set(CMAKE_RC_COMPILER ${MINGW_PREFIX}-mingw32-windres)
+set (CMAKE_C_COMPILER ${MINGW_PREFIX}-mingw32-gcc      CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${MINGW_PREFIX}-mingw32-g++    CACHE PATH "C++ compiler")
+set (CMAKE_RC_COMPILER ${MINGW_PREFIX}-mingw32-windres CACHE PATH "RC compiler")
 
 # specify the system root
-set(CMAKE_FIND_ROOT_PATH /usr/${MINGW_PREFIX}-mingw32)
+file (TO_CMAKE_PATH "$ENV{MINGW_ROOT}" MINGW_ROOT)
+if (NOT MINGW_ROOT)
+    set (MINGW_ROOT /usr/${MINGW_PREFIX}-mingw32)
+endif ()
+set (MINGW_SYSROOT ${MINGW_ROOT} CACHE PATH "Path to MinGW SYSROOT")
+set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
 
-# only search programs, libraries, and headers in the target directories
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+# only search libraries and headers in the target directories
+set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

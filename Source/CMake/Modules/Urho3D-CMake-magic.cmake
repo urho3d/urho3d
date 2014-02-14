@@ -279,6 +279,8 @@ elseif (CMAKE_CROSSCOMPILING)
         set (PLATFORM_PREFIX raspi-)
     elseif (ANDROID)
         set (PLATFORM_PREFIX android-)      # Note: this is for Android tools (ARM arch) runtime binaries, Android libs output directory is not affected by this
+    elseif (MINGW)
+        set (PLATFORM_PREFIX mingw-)
     endif ()
 endif ()
 set_output_directories (${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Bin RUNTIME PDB)
