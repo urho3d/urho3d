@@ -3,6 +3,7 @@ $#include "AnimationController.h"
 struct AnimationControl
 {
     AnimationControl();
+    ~AnimationControl();
     StringHash hash_;
     float speed_;
     float targetWeight_;

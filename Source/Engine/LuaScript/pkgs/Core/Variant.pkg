@@ -29,6 +29,7 @@ struct ResourceRef
     ResourceRef(ShortStringHash type);
     ResourceRef(ShortStringHash type, String name);
     ResourceRef(const ResourceRef& rhs);
+    ~ResourceRef();
     
     ShortStringHash type_ @ type;
     String name_ @ name;
@@ -40,6 +41,7 @@ struct ResourceRefList
 {
     ResourceRefList();
     ResourceRefList(ShortStringHash type);
+    ~ResourceRefList();
     
     ShortStringHash type_ @ type;
 

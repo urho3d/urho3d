@@ -11,18 +11,21 @@ struct BiasParameters
 {
     BiasParameters();
     BiasParameters(float constantBias, float slopeScaledBias);
+    ~BiasParameters();
 };
 
 struct CascadeParameters
 {
     CascadeParameters();
     CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f);
+    ~CascadeParameters();
 };
 
 struct FocusParameters
 {
     FocusParameters();
     FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView);
+    ~FocusParameters();
 };
 
 class Light : public Drawable

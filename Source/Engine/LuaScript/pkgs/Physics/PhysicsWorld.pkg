@@ -3,6 +3,8 @@ $#include "PhysicsWorld.h"
 struct PhysicsRaycastResult
 {
     PhysicsRaycastResult();
+    ~PhysicsRaycastResult();
+    
     Vector3 position_ @ position;
     Vector3 normal_ @ normal;
     float distance_ @ distance;

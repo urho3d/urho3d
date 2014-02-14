@@ -69,6 +69,24 @@ function classEnumerate:print(ident,close)
   end
 end
 
+function deepCopy(t)
+  if type(t) ~= "table" then
+    return t
+  end
+
+  local mt = getmetatable(t)
+  local ret = {}
+  for k, v in pairs(t) do
+    if type(v) == "table" then
+      v = deepCopy(v)
+    end
+    ret[k] = v
+  end
+  setmetatable(ret, mt)
+
+  return ret
+end
+
 function printFunction(self,ident,close,isfunc)
   local func = {}
   func.mod  = self.mod
@@ -96,13 +114,27 @@ function printFunction(self,ident,close,isfunc)
     table.insert(globalFunctions, func)
   else
     if func.name == "new" then
-      func.type = ""
-      func.name = currentClass.name
+      -- add construct function
+      local ctor = deepCopy(func)
+      ctor.type = ""
+      ctor.ptr = ""
+      ctor.name = currentClass.name
+      ctor.lname = currentClass.name
+      ctor.const = "(GC)"
+      ctor.cname = currentClass.name
+      ctor.lname = currentClass.name
+
+      if currentClass.functions == nil then
+        currentClass.functions = { ctor }
+      else
+        table.insert(currentClass.functions, ctor)
+      end
     end
 
     if func.name == "delete" then
-      func.name = "~" .. currentClass.name
+      func.type = "void"
     end
+
     if currentClass.functions == nil then
       currentClass.functions = { func }
     else
@@ -150,38 +182,42 @@ function sortByName(t)
   table.sort(t, function(a, b) return a.name < b.name end)
 end
 
+function writeClass(file, class)
+  if class.base == "" then
+    file:write("### " .. class.name .. "\n\n")
+  else
+    file:write("### " .. class.name .. " : " .. class.base .. "\n")
+  end
+
+  if class.functions ~= nil then
+    file:write("\nMethods:\n\n")
+    for i, func in ipairs(class.functions) do
+        writeFunction(file, func)
+    end
+  end
+
+  if class.properties ~= nil then
+    file:write("\nProperties:\n\n")
+    for i, property in ipairs(class.properties) do
+      writeProperty(file, property)
+    end
+  end
+
+  file:write("\n")
+end
+
 function writeClasses(file)
   sortByName(classes)
-
   file:write("\n\\section LuaScriptAPI_Classes Classes\n\n")
+
   for i, class in ipairs(classes) do
-    if class.base == "" then
-      file:write("### " .. class.name .. "\n\n")
-    else
-      file:write("### " .. class.name .. " : " .. class.base .. "\n")
-    end
-
-    if class.functions ~= nil then
-      file:write("\nMethods:\n\n")
-      for i, func in ipairs(class.functions) do
-          writeFunction(file, func)
-      end
-    end
-
-    if class.properties ~= nil then
-      file:write("\nProperties:\n\n")
-      for i, property in ipairs(class.properties) do
-        writeProperty(file, property)
-      end
-    end
-
-    file:write("\n")
+    writeClass(file, class)    
   end
+
 end
 
 function writeEnumerates(file)
   sortByName(enumerates)
-
   file:write("\\section LuaScriptAPI_Enums Enumerations\n\n")
 
   for i, enumerate in ipairs(enumerates) do
@@ -193,20 +229,14 @@ function writeEnumerates(file)
   end
 end
 
-function writeFunction(file, func)
-  -- write function begin
-  local func_str = "- "
-
-  if func.type ~= "" then
-    func_str = func_str .. func.type
+function writeFunction(file, func)  
+  local line = "- "
+  -- construct function
+  if func.type == "" and func.ptr == "" then
+    line = line .. func.name .. "("
+  else
+    line = line .. func.type .. func.ptr .. " " .. func.name .. "("
   end
-
-  if func.ptr ~= "" then
-    func_str = func_str .. func.ptr
-  end
-
-  func_str = func_str .. " " .. func.name .. "("
-  file:write(func_str)
 
   -- write parameters
   if func.declarations ~= nil then
@@ -214,64 +244,59 @@ function writeFunction(file, func)
     for i = 1, count do
       local declaration = func.declarations[i]
       if declaration.type ~= "void" then
-        -- add paramter type
-        local param_str = declaration.type
-        -- add pointer or reference
-        if declaration.ptr ~= "" then
-          param_str = param_str .. declaration.ptr
-        end
-        -- add paramter name
-        param_str = param_str .. " " .. declaration.name
+        line = line .. declaration.type .. declaration.ptr .. " " .. declaration.name
         -- add paramter default value
         if declaration.def ~= "" then
-          param_str = param_str .. " = " .. declaration.def
+          line = line .. " = " .. declaration.def
         end
-        file:write(param_str)
       end
+
       if i ~= count then
-        file:write(", ")
-      end
+        line = line .. ", "
+      end      
     end
   end
 
-  -- write function end
-  if func.const == "" then
-    file:write(")\n")
-  else
-    file:write(") " .. func.const .. "\n")
+  line = line .. ")"
+  -- add const
+  if func.const ~= "" then
+    line = line .. " " .. func.const
   end
+
+  file:write(line .. "\n")
 end
 
 function writeGlobalConstants(file)
   sortByName(globalConstants)
-
   file:write("\n\\section LuaScriptAPI_GlobalConstants Global constants\n")
+
   for i, constant in ipairs(globalConstants) do
-    local const_str = "- " .. constant.type:gsub("const ", "")
-    if constant.ptr ~= "" then
-      const_str = const_str .. constant.ptr
-    end
-    const_str = const_str .. " " .. constant.name;
-    file:write(const_str .. "\n")
+    local line = "- " .. constant.type:gsub("const ", "") .. constant.ptr .. " " .. constant.name
+    file:write(line .. "\n")
   end
+
   file:write("\n")  
 end
 
 function writeGlobalFunctions(file)  
   sortByName(globalFunctions)
-
   file:write("\n\\section LuaScriptAPI_GlobalFunctions Global functions\n")  
+
   for i, func in ipairs(globalFunctions) do
     writeFunction(file, func)
   end
+
   file:write("\n")
 end
 
 function writeGLobalProperties(file)
+  sortByName(globalProperties)
   file:write("\n\\section LuaScriptAPI_GlobalProperties Global properties\n")
+
   for i, property in ipairs(globalProperties) do
     writeProperty(file, property)
   end
+
 end
 
 function writeProperty(file, property)

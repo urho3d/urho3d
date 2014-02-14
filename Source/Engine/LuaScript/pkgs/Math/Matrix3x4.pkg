@@ -11,6 +11,7 @@ class Matrix3x4
             float v20, float v21, float v22, float v23);
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale);
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
+    ~Matrix3x4();
     
     bool operator == (const Matrix3x4& rhs) const;
     
