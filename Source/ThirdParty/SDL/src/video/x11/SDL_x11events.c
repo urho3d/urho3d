@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_X11
@@ -447,8 +450,8 @@ X11_DispatchEvent(_THIS)
 #ifdef DEBUG_XEVENTS
             printf("window %p: KeyPress (X11 keycode = 0x%X)\n", data, xevent.xkey.keycode);
 #endif
-            SDL_SendKeyboardKey(SDL_PRESSED, videodata->key_layout[keycode]);
-#if 1
+            SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(keycode), videodata->key_layout[keycode]);
+#if 0
             if (videodata->key_layout[keycode] == SDL_SCANCODE_UNKNOWN && keycode) {
                 int min_keycode, max_keycode;
                 X11_XDisplayKeycodes(display, &min_keycode, &max_keycode);
@@ -490,7 +493,7 @@ X11_DispatchEvent(_THIS)
                 /* We're about to get a repeated key down, ignore the key up */
                 break;
             }
-            SDL_SendKeyboardKey(SDL_RELEASED, videodata->key_layout[keycode]);
+            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(keycode), videodata->key_layout[keycode]);
         }
         break;
 

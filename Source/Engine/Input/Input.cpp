@@ -574,7 +574,7 @@ void Input::SetMouseButton(int button, bool newState)
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
-void Input::SetKey(int key, bool newState)
+void Input::SetKey(int key, bool newState, unsigned raw)
 {
     // If we do not have focus yet, do not react to the key down
     if (!graphics_->GetExternalWindow() && newState && !inputFocus_)
@@ -604,6 +604,7 @@ void Input::SetKey(int key, bool newState)
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
+    eventData[P_RAW] = raw;
     if (newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
@@ -648,11 +649,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
     {
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), true);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), true, evt.key.keysym.raw);
         break;
 
     case SDL_KEYUP:
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), false);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), false, evt.key.keysym.raw);
         break;
 
     case SDL_TEXTINPUT:

@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "SDL_config.h"
 
 #ifdef SDL_INPUT_LINUXEV
@@ -610,9 +613,9 @@ SDL_EVDEV_Poll(void)
                     scan_code = SDL_EVDEV_translate_keycode(events[i].code);
                     if (scan_code != SDL_SCANCODE_UNKNOWN) {
                         if (events[i].value == 0) {
-                            SDL_SendKeyboardKey(SDL_RELEASED, scan_code);
+                            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(events[i].code), scan_code);
                         } else if (events[i].value == 1 || events[i].value == 2 /* Key repeated */ ) {
-                            SDL_SendKeyboardKey(SDL_PRESSED, scan_code);
+                            SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(events[i].code), scan_code);
 #ifdef SDL_INPUT_LINUXKD
                             if (_this->console_fd >= 0) {
                                 kbe.kb_index = events[i].code;

@@ -671,8 +671,15 @@ void Scene::NodeAdded(Node* node)
     
     node->SetScene(this);
 
-    // If we already have an existing node with the same ID, must remove the scene reference from it
+    // If the new node has an ID of zero (default), assign a replicated ID now
     unsigned id = node->GetID();
+    if (!id)
+    {
+        id = GetFreeNodeID(REPLICATED);
+        node->SetID(id);
+    }
+    
+    // If node with same ID exists, remove the scene reference from it and overwrite with the new node
     if (id < FIRST_LOCAL_ID)
     {
         HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);

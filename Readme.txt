@@ -39,6 +39,7 @@ Urho3D development, contributions and bugfixes by:
 - Firegorilla
 - Magic.Lixin
 - Mike3D
+- OvermindDL1
 - amadeus_osa
 - mightyCelu
 - reattiva
@@ -329,6 +330,29 @@ automatically deploy the ARM executables to target Raspberry Pi as part of every
 project build or configure Eclipse to perform a "download to target path" in the
 Run/Debug configuration for C/C++ Remote Application. Either way, you have to
 configure the Run/Debug configuration how to reach your target Raspberry Pi.
+
+
+MinGW cross-compile build process
+---------------------------------
+
+It is possible to cross-compile Urho3D for Windows using a Linux system. The
+process is largely the same as for the Linux Desktop build process described
+above.
+
+To cross-compile, the MinGW tool-chain (compiler, linker and w32api) needs to be 
+installed on the system. You will also need the DirectX header files, those can
+be downloaded and installed from the following packet:
+http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.
+
+For activating the MinGW tool-chain, and to allow it to find the correct compiler, 
+the MINGW_PREFIX environment variable needs to be set when running cmake_gcc.sh.
+This variable should be set to the prefix of the compiler name. So, if for example
+your MinGW compiler is named i686-pc-mingw32-gcc, the MINGW_PREFIX should read i686-pc.
+
+Running cmake_gcc.sh with the MINGW_PREFIX environment variable set, produces
+an additional mingw-Build directory. Go to this directory and execute make to
+start the build process. When the build is complete, the Windows executables can
+be found in the Bin output directory.
 
 
 Desktop 64bit build

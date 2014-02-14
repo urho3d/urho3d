@@ -44,6 +44,7 @@ GENERATOR="Unix Makefiles"
 OPT=-Wno-dev    # \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
 [ $ANDROID_NDK ] && msg "Android build" && cmake -E make_directory android-Build && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
 [ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E make_directory raspi-Build && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
+[ $MINGW_PREFIX ] && msg "MingW build" && cmake -E make_directory mingw-Build && cmake -E chdir mingw-Build cmake $OPT -G $GENERATOR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake $@ $SOURCE && post_cmake mingw-Build
 [ ! $SKIP_NATIVE ] && msg "Native build" && cmake -E make_directory Build && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
 unset IFS
 

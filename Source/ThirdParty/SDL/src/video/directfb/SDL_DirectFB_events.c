@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_DIRECTFB
@@ -42,12 +45,12 @@
 #if USE_MULTI_API
 #define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, id, relative, x, y, p)
 #define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, id, state, button)
-#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(id, state, scancode)
+#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(id, state, 0, scancode)
 #define SDL_SendKeyboardText_ex(id, text) SDL_SendKeyboardText(id, text)
 #else
 #define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, id, relative, x, y)
 #define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, id, state, button)
-#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(state, scancode)
+#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(state, 0, scancode)
 #define SDL_SendKeyboardText_ex(id, text) SDL_SendKeyboardText(text)
 #endif
 
