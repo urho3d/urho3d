@@ -44,7 +44,7 @@ if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make ]; the
 fi
 
 # Temporary fix: known CMake bug (still exists in 2.8.12)
-if [ "$1" == "-DIOS=1" ]; then
+if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/install_postBuildPhase.makeDebug ]; then
     # Due to a bug in the CMake/Xcode generator that prevents iOS targets (library and bundle) to be installed correctly
     # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
     # below temporary fix is required to work around the bug
