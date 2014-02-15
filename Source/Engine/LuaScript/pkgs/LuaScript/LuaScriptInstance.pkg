@@ -33,15 +33,46 @@ function LuaScriptObject:GetNode()
 end
 
 function LuaScriptObject:SubscribeToEvent(param1, param2, param3)
-    local instance = self.instance
+    local instance = self.instance    
     if instance == nil then
         return
     end
+
     if param3 == nil then
         instance:SubscribeToEvent(param1, param2)
     else
         instance:SubscribeToEvent(param1, param2, param3)
     end
+end
+
+function LuaScriptObject:UnsubscribeFromEvent(param1, param2)
+    local instance = self.instance
+    if instance == nil then
+        return
+    end
+
+    if param2 == nil then
+        instance:UnsubscribeFromEvent(param1)
+    else
+        instance:UnsubscribeFromEvent(param1, param2)
+    end
+end
+
+function LuaScriptObject:UnsubscribeFromAllEvents()
+    local instance = self.instance
+    if instance == nil then
+        return
+    end 
+    instance:UnsubscribeFromAllEvents()
+end
+
+function LuaScriptObject:UnsubscribeFromEvents(sender)
+    local instance = self.instance
+    if instance == nil then
+        return
+    end
+
+    instance:UnsubscribeFromEvents(sender)
 end
 
 function ScriptObject()
@@ -60,7 +91,7 @@ function CreateScriptObjectInstance(object, instance)
     o.instance = instance
     o.node = instance:GetNode()
     
-    -- Call object's start function.
+    -- Call start function
     o:Start()
     
     return o
@@ -72,7 +103,7 @@ function DestroyScriptObjectInstance(instance)
         return
     end
     
-    -- Call stop function.
+    -- Call stop function
     object:Stop()
     
     object.node = nil
