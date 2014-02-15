@@ -32,7 +32,7 @@
 
 #ifdef WIN32
 #ifndef _MSC_VER
-#define _WIN32_IE 0x400
+#define _WIN32_IE 0x501
 #endif
 #include <windows.h>
 #include <shellapi.h>

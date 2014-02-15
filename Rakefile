@@ -16,28 +16,41 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
-  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug' or abort 'Failed to configure Urho3D library build'
-  if ENV['ANDROID_NDK']
+  if ENV['WINDOWS']
+    # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its cross-compiler version is too old. Fallback to use Lua library instead.
+    jit = ''
+    amalg = ''
+    # Lua on MinGW build requires tolua++ tool to be built natively first
+    system 'MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA=1 -DENABLE_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
+    system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
+  else
+    jit = 'JIT'
+    amalg = '-DENABLE_LUAJIT_AMALG=1'
+  end
+  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 #{amalg} -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug' or abort 'Failed to configure Urho3D library build'
+  if ENV['ANDROID']
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
     system 'cd Build/ThirdParty/LuaJIT/generated/buildvm-android && make' or abort 'Failed to build buildvm-android tool'
     # Reconfigure Android build one more time now that we have the tools built
     ENV['SKIP_NATIVE'] = '1'
     system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
-    PLATFORM_PREFIX = 'android-'
+    platform_prefix = 'android-'
+  elsif ENV['WINDOWS']
+    platform_prefix = 'mingw-'
   else
-    PLATFORM_PREFIX = ''
+    platform_prefix = ''
   end
-  # Only 64-bit environment has virtual framebuffer X server support
-  if ENV['ENABLE_64BIT'].to_i == 0
-    TEST = ''
+  # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build are capable to run tests
+  if ENV['ENABLE_64BIT'].to_i == 1 or ENV['WINDOWS'].to_i != 1
+    test = '&& make test'
   else
-    TEST = '&& make test'
+    test = ''
   end
-  system "cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to build or test Urho3D library'
+  system "cd #{platform_prefix}Build && make #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
-  scaffolding "#{PLATFORM_PREFIX}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{PLATFORM_PREFIX}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUAJIT=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd #{PLATFORM_PREFIX}Build && make #{TEST}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  scaffolding "#{platform_prefix}Build/generated/externallib"
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd #{platform_prefix}Build && make #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master SITE_UPDATE=1 rake travis_ci_site_update)
