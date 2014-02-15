@@ -158,7 +158,7 @@ void InitScene()
         // Adjust the directional light shadow range slightly further, as only the first
         // cascade is supported
         Node@ dirLightNode = gameScene.GetChild("GlobalLight", true);
-        if (dirLightNode != null)
+        if (dirLightNode !is null)
         {
             Light@ dirLight = dirLightNode.GetComponent("Light");
             dirLight.shadowCascade = CascadeParameters(15.0f, 0.0f, 0.0f, 0.0f, 0.9f);
