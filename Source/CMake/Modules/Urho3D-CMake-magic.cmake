@@ -451,7 +451,7 @@ macro (setup_executable)
     
     if (IOS)
         set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
-    elseif (RASPI AND SCP_TO_TARGET)
+    elseif (CMAKE_CROSSCOMPILING AND NOT ANDROID AND SCP_TO_TARGET)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
     endif ()
     if (DEST_RUNTIME_DIR)
