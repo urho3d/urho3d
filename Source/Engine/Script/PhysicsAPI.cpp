@@ -101,7 +101,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "uint get_lodLevel() const", asMETHOD(CollisionShape, GetLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "BoundingBox get_worldBoundingBox() const", asMETHOD(CollisionShape, GetWorldBoundingBox), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for CollisionShape
+    // Register Variant GetPtr() for CollisionShape. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
 }
 
@@ -186,7 +186,7 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "CollisionEventMode get_collisionEventMode() const", asMETHOD(RigidBody, GetCollisionEventMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "Array<RigidBody@>@ get_collidingBodies() const", asFUNCTION(RigidBodyGetCollidingBodies), asCALL_CDECL_OBJLAST);
 
-    // Register Variant GetPtr() for RigidBody
+    // Register Variant GetPtr() for RigidBody. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody() const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
 }
 
@@ -307,7 +307,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
     
-    // Register Variant GetPtr() for PhysicsWorld
+    // Register Variant GetPtr() for PhysicsWorld. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld() const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
 }
 

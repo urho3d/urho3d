@@ -570,7 +570,7 @@ void PhysicsWorld::PreStep(float timeStep)
     using namespace PhysicsPreStep;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = (void*)this;
+    eventData[P_WORLD] = this;
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
 
@@ -596,7 +596,7 @@ void PhysicsWorld::PostStep(float timeStep)
     using namespace PhysicsPreStep;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = (void*)this;
+    eventData[P_WORLD] = this;
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPOSTSTEP, eventData);
 }
@@ -613,7 +613,7 @@ void PhysicsWorld::SendCollisionEvents()
 
     if (numManifolds)
     {
-        physicsCollisionData_[PhysicsCollision::P_WORLD] = (void*)this;
+        physicsCollisionData_[PhysicsCollision::P_WORLD] = this;
 
         for (int i = 0; i < numManifolds; ++i)
         {
@@ -674,10 +674,10 @@ void PhysicsWorld::SendCollisionEvents()
             bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
             bool newCollision = !previousCollisions_.Contains(i->first_);
 
-            physicsCollisionData_[PhysicsCollision::P_NODEA] = (void*)nodeA;
-            physicsCollisionData_[PhysicsCollision::P_NODEB] = (void*)nodeB;
-            physicsCollisionData_[PhysicsCollision::P_BODYA] = (void*)bodyA;
-            physicsCollisionData_[PhysicsCollision::P_BODYB] = (void*)bodyB;
+            physicsCollisionData_[PhysicsCollision::P_NODEA] = nodeA;
+            physicsCollisionData_[PhysicsCollision::P_NODEB] = nodeB;
+            physicsCollisionData_[PhysicsCollision::P_BODYA] = bodyA;
+            physicsCollisionData_[PhysicsCollision::P_BODYB] = bodyB;
             physicsCollisionData_[PhysicsCollision::P_PHANTOM] = phantom;
 
             contacts_.Clear();
@@ -707,9 +707,9 @@ void PhysicsWorld::SendCollisionEvents()
             if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
 
-            nodeCollisionData_[NodeCollision::P_BODY] = (void*)bodyA;
-            nodeCollisionData_[NodeCollision::P_OTHERNODE] = (void*)nodeB;
-            nodeCollisionData_[NodeCollision::P_OTHERBODY] = (void*)bodyB;
+            nodeCollisionData_[NodeCollision::P_BODY] = bodyA;
+            nodeCollisionData_[NodeCollision::P_OTHERNODE] = nodeB;
+            nodeCollisionData_[NodeCollision::P_OTHERBODY] = bodyB;
             nodeCollisionData_[NodeCollision::P_PHANTOM] = phantom;
             nodeCollisionData_[NodeCollision::P_CONTACTS] = contacts_.GetBuffer();
 
@@ -734,9 +734,9 @@ void PhysicsWorld::SendCollisionEvents()
                 contacts_.WriteFloat(point.m_appliedImpulse);
             }
 
-            nodeCollisionData_[NodeCollision::P_BODY] = (void*)bodyB;
-            nodeCollisionData_[NodeCollision::P_OTHERNODE] = (void*)nodeA;
-            nodeCollisionData_[NodeCollision::P_OTHERBODY] = (void*)bodyA;
+            nodeCollisionData_[NodeCollision::P_BODY] = bodyB;
+            nodeCollisionData_[NodeCollision::P_OTHERNODE] = nodeA;
+            nodeCollisionData_[NodeCollision::P_OTHERBODY] = bodyA;
             nodeCollisionData_[NodeCollision::P_CONTACTS] = contacts_.GetBuffer();
 
             if (newCollision)
@@ -752,7 +752,7 @@ void PhysicsWorld::SendCollisionEvents()
 
     // Send collision end events as applicable
     {
-        physicsCollisionData_[PhysicsCollisionEnd::P_WORLD] = (void*)this;
+        physicsCollisionData_[PhysicsCollisionEnd::P_WORLD] = this;
 
         for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
         {
@@ -779,10 +779,10 @@ void PhysicsWorld::SendCollisionEvents()
                 WeakPtr<Node> nodeWeakA(nodeA);
                 WeakPtr<Node> nodeWeakB(nodeB);
 
-                physicsCollisionData_[PhysicsCollisionEnd::P_BODYA] = (void*)bodyA;
-                physicsCollisionData_[PhysicsCollisionEnd::P_BODYB] = (void*)bodyB;
-                physicsCollisionData_[PhysicsCollisionEnd::P_NODEA] = (void*)nodeA;
-                physicsCollisionData_[PhysicsCollisionEnd::P_NODEB] = (void*)nodeB;
+                physicsCollisionData_[PhysicsCollisionEnd::P_BODYA] = bodyA;
+                physicsCollisionData_[PhysicsCollisionEnd::P_BODYB] = bodyB;
+                physicsCollisionData_[PhysicsCollisionEnd::P_NODEA] = nodeA;
+                physicsCollisionData_[PhysicsCollisionEnd::P_NODEB] = nodeB;
                 physicsCollisionData_[PhysicsCollisionEnd::P_PHANTOM] = phantom;
 
                 SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData_);
@@ -790,18 +790,18 @@ void PhysicsWorld::SendCollisionEvents()
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
 
-                nodeCollisionData_[NodeCollisionEnd::P_BODY] = (void*)bodyA;
-                nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeB;
-                nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyB;
+                nodeCollisionData_[NodeCollisionEnd::P_BODY] = bodyA;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = nodeB;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = bodyB;
                 nodeCollisionData_[NodeCollisionEnd::P_PHANTOM] = phantom;
 
                 nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData_);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
 
-                nodeCollisionData_[NodeCollisionEnd::P_BODY] = (void*)bodyB;
-                nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeA;
-                nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyA;
+                nodeCollisionData_[NodeCollisionEnd::P_BODY] = bodyB;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = nodeA;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = bodyA;
 
                 nodeB->SendEvent(E_NODECOLLISIONEND, nodeCollisionData_);
             }

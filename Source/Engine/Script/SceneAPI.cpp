@@ -74,7 +74,7 @@ static void RegisterNode(asIScriptEngine* engine)
     // Now GetNode can be registered
     engine->RegisterObjectMethod("Component", "Node@+ get_node() const", asMETHOD(Component, GetNode), asCALL_THISCALL);
 
-    // Register Variant GetPtr() for Serializable, Node & Component
+    // Register Variant GetPtr() for Serializable, Node & Component. These are deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "Serializable@+ GetSerializable() const", asFUNCTION(GetVariantPtr<Serializable>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Node@+ GetNode() const", asFUNCTION(GetVariantPtr<Node>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Component@+ GetComponent() const", asFUNCTION(GetVariantPtr<Component>), asCALL_CDECL_OBJLAST);
@@ -218,7 +218,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "Scene@+ get_scene() const", asMETHOD(Node, GetScene), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScriptContextScene), asCALL_CDECL);
 
-    // Register Variant GetPtr() for Scene
+    // Register Variant GetPtr() for Scene. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "Scene@+ GetScene() const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
 
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);

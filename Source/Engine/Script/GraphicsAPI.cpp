@@ -119,7 +119,7 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Matrix3x4 get_effectiveWorldTransform() const", asMETHOD(Camera, GetEffectiveWorldTransform), asCALL_THISCALL);
 
-    // Register Variant GetPtr() for Camera
+    // Register Variant GetPtr() for Camera. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "Camera@+ GetCamera() const", asFUNCTION(GetVariantPtr<Camera>), asCALL_CDECL_OBJLAST);
 }
 
@@ -445,7 +445,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthStencil), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHOD(RenderSurface, GetLinkedDepthStencil), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for RenderSurface
+    // Register Variant GetPtr() for RenderSurface. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "RenderSurface@+ GetRenderSurface() const", asFUNCTION(GetVariantPtr<RenderSurface>), asCALL_CDECL_OBJLAST);
     
     RegisterTexture<Texture2D>(engine, "Texture2D");
@@ -463,7 +463,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurfaces(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for Texture
+    // Register Variant GetPtr() for Texture. This is deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "Texture@+ GetTexture() const", asFUNCTION(GetVariantPtr<Texture>), asCALL_CDECL_OBJLAST);
     
     engine->RegisterGlobalFunction("uint GetAlphaFormat()", asFUNCTION(Graphics::GetAlphaFormat), asCALL_CDECL);

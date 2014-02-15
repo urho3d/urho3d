@@ -183,7 +183,7 @@ void Slider::SetValue(float value)
         using namespace SliderChanged;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_ELEMENT] = this;
         eventData[P_VALUE] = value_;
         SendEvent(E_SLIDERCHANGED, eventData);
     }
@@ -257,7 +257,7 @@ void Slider::Page(const IntVector2& position, bool pressed)
     using namespace SliderPaged;
     
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_ELEMENT] = this;
     eventData[P_OFFSET] = offset;
 
     // Start transmitting repeated pages after the initial press

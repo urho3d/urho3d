@@ -390,7 +390,7 @@ void HandleConnectionStatus(StringHash eventType, VariantMap& eventData)
 void HandleClientConnected(StringHash eventType, VariantMap& eventData)
 {
     // When a client connects, assign to scene to begin scene replication
-    Connection@ newConnection = eventData["Connection"].GetConnection();
+    Connection@ newConnection = eventData["Connection"].GetPtr();
     newConnection.scene = scene_;
     
     // Then create a controllable object for that client
@@ -409,7 +409,7 @@ void HandleClientConnected(StringHash eventType, VariantMap& eventData)
 void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 {
     // When a client disconnects, remove the controlled object
-    Connection@ connection = eventData["Connection"].GetConnection();
+    Connection@ connection = eventData["Connection"].GetPtr();
     for (uint i = 0; i < clients.length; ++i)
     {
         if (clients[i].connection is connection)

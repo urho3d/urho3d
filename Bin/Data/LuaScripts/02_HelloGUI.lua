@@ -146,6 +146,9 @@ end
 
 function HandleDragMove(eventType, eventData)
     local dragCurrentPosition = IntVector2(eventData:GetInt("X"), eventData:GetInt("Y"))
+    -- Get the dragged fish element
+    -- Note difference to C++: in C++ we would call GetPtr() and cast the pointer to UIElement, here we must specify
+    -- what kind of object we are getting. Null will be returned on type mismatch
     local draggedElement = eventData:GetPtr("UIElement", "Element")
     draggedElement:SetPosition(dragCurrentPosition - dragBeginPosition)
 end
@@ -163,8 +166,6 @@ function HandleControlClicked(eventType, eventData)
     local windowTitle = tolua.cast(element, 'Text')
 
     -- Get control that was clicked
-    -- Note difference to C++: in C++ we would call GetPtr() and cast the function pointer to UIElement, here we must specify
-    -- what kind of object we are getting. Null will be returned on type mismatch
     local clicked = eventData:GetPtr("UIElement", "Element")
     local name = "...?"
     if clicked ~= nil then

@@ -56,13 +56,18 @@ template <class T, class U> U* RefCast(T* t)
 /// Template function for returning a Variant pointer type cast to specific class.
 template <class T> T* GetVariantPtr(Variant* ptr)
 {
-    // An attempt at type safety. Probably can not guarantee that this could not be made to invoke UDB
-    T* ptrA = static_cast<T*>(ptr->GetPtr());
-    RefCounted* ptrB = static_cast<RefCounted*>(ptrA);
-    if (dynamic_cast<T*>(ptrB) == ptrA)
-        return ptrA;
-    else
-        return 0;
+    if (ptr->GetType() == VAR_PTR)
+        return dynamic_cast<T*>(ptr->GetPtr());
+    else if (ptr->GetType() == VAR_VOIDPTR)
+    {
+        // An attempt at type safety. Probably can not guarantee that this could not be made to invoke UDB
+        T* ptrA = static_cast<T*>(ptr->GetVoidPtr());
+        RefCounted* ptrB = static_cast<RefCounted*>(ptrA);
+        if (dynamic_cast<T*>(ptrB) == ptrA)
+            return ptrA;
+    }
+    
+    return 0;
 }
 
 /// Template function for Vector to array conversion.

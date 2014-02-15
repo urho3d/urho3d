@@ -383,7 +383,7 @@ void ResourceCache::SetAutoReloadResources(bool enable)
     }
 }
 
-SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool SendEventOnFailure)
+SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
     File* file = 0;
@@ -404,26 +404,26 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool SendEventOnFai
     if (file)
         return SharedPtr<File>(file);
 
-    if (SendEventOnFailure)
+    if (sendEventOnFailure)
     {
         LOGERROR("Could not find resource " + name);
 
         using namespace ResourceNotFound;
 
-	    VariantMap& eventData = GetEventDataMap();
-	    eventData[P_RESOURCENAME] = name;
-	    SendEvent(E_RESOURCENOTFOUND, eventData);
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_RESOURCENAME] = name;
+        SendEvent(E_RESOURCENOTFOUND, eventData);
     }
 
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const String& name, bool SendEventOnFailure)
+Resource* ResourceCache::GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure)
 {
-    return GetResource(type, name.CString(), SendEventOnFailure);
+    return GetResource(type, name.CString(), sendEventOnFailure);
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, bool SendEventOnFailure)
+Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
     
@@ -453,7 +453,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     }
     
     // Attempt to load the resource
-    SharedPtr<File> file = GetFile(name, SendEventOnFailure);
+    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
     if (!file)
         return 0;   // Error is already logged
 

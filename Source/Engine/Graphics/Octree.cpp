@@ -437,7 +437,7 @@ void Octree::Update(const FrameInfo& frame)
         using namespace SceneDrawableUpdateFinished;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SCENE] = (void*)scene;
+        eventData[P_SCENE] = scene;
         eventData[P_TIMESTEP] = frame.timeStep_;
         scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
     }

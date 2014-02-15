@@ -141,7 +141,7 @@ void DropDownList::OnHidePopup()
     using namespace ItemSelected;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_ELEMENT] = this;
     eventData[P_SELECTION] = GetSelection();
     SendEvent(E_ITEMSELECTED, eventData);
 }

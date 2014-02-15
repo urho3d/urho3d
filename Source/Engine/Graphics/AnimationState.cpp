@@ -288,7 +288,7 @@ void AnimationState::AddTime(float delta)
                 Node* senderNode = model_ ? model_->GetNode() : node_;
                 
                 VariantMap& eventData = senderNode->GetEventDataMap();
-                eventData[P_NODE] = (void*)senderNode;
+                eventData[P_NODE] = senderNode;
                 eventData[P_NAME] = animation_->GetAnimationName();
                 eventData[P_TIME] = i->time_;
                 eventData[P_DATA] = i->data_;

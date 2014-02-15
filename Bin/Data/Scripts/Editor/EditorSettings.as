@@ -147,7 +147,7 @@ void HideEditorSettingsDialog()
 
 void EditCameraNearClip(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     viewNearClip = edit.text.ToFloat();
     UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
@@ -156,7 +156,7 @@ void EditCameraNearClip(StringHash eventType, VariantMap& eventData)
 
 void EditCameraFarClip(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     viewFarClip = edit.text.ToFloat();
     UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
@@ -165,7 +165,7 @@ void EditCameraFarClip(StringHash eventType, VariantMap& eventData)
 
 void EditCameraFOV(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     viewFov = edit.text.ToFloat();
     UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
@@ -174,7 +174,7 @@ void EditCameraFOV(StringHash eventType, VariantMap& eventData)
 
 void EditCameraSpeed(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     cameraBaseSpeed = Max(edit.text.ToFloat(), 1.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(cameraBaseSpeed);
@@ -182,13 +182,13 @@ void EditCameraSpeed(StringHash eventType, VariantMap& eventData)
 
 void EditLimitRotation(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     limitRotation = edit.checked;
 }
 
 void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     newNodeDistance = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(newNodeDistance);
@@ -196,7 +196,7 @@ void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)
 
 void EditMoveStep(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     moveStep = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(moveStep);
@@ -204,7 +204,7 @@ void EditMoveStep(StringHash eventType, VariantMap& eventData)
 
 void EditRotateStep(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     rotateStep = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(rotateStep);
@@ -212,7 +212,7 @@ void EditRotateStep(StringHash eventType, VariantMap& eventData)
 
 void EditScaleStep(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     scaleStep = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(scaleStep);
@@ -220,76 +220,76 @@ void EditScaleStep(StringHash eventType, VariantMap& eventData)
 
 void EditMoveSnap(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     moveSnap = edit.checked;
     toolBarDirty = true;
 }
 
 void EditRotateSnap(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     rotateSnap = edit.checked;
     toolBarDirty = true;
 }
 
 void EditScaleSnap(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     scaleSnap = edit.checked;
     toolBarDirty = true;
 }
 
 void EditRememberResourcePath(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     rememberResourcePath = edit.checked;
 }
 
 void EditApplyMaterialList(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     applyMaterialList = edit.checked;
 }
 
 void EditImportOptions(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     importOptions = edit.text.Trimmed();
 }
 
 void EditPickMode(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     pickMode = edit.selection;
 }
 
 void EditTextureQuality(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     renderer.textureQuality = edit.selection;
 }
 
 void EditMaterialQuality(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     renderer.materialQuality = edit.selection;
 }
 
 void EditShadowResolution(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     SetShadowResolution(edit.selection);
 }
 
 void EditShadowQuality(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     renderer.shadowQuality = edit.selection;
 }
 
 void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     renderer.maxOccluderTriangles = edit.text.ToInt();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(renderer.maxOccluderTriangles);
@@ -297,18 +297,18 @@ void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
 
 void EditSpecularLighting(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     renderer.specularLighting = edit.checked;
 }
 
 void EditDynamicInstancing(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     renderer.dynamicInstancing = edit.checked;
 }
 
 void EditFrameLimiter(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     engine.maxFps = edit.checked ? 200 : 0;
 }

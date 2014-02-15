@@ -662,10 +662,10 @@ void Renderer::Update(float timeStep)
         using namespace BeginViewUpdate;
         
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SURFACE] = (void*)renderTarget.Get();
-        eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
-        eventData[P_SCENE] = (void*)scene;
-        eventData[P_CAMERA] = (void*)viewport->GetCamera();
+        eventData[P_SURFACE] = renderTarget.Get();
+        eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+        eventData[P_SCENE] = scene;
+        eventData[P_CAMERA] = viewport->GetCamera();
         SendEvent(E_BEGINVIEWUPDATE, eventData);
         
         ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
@@ -724,10 +724,10 @@ void Renderer::Render()
             RenderSurface* renderTarget = views_[i]->GetRenderTarget();
             
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_SURFACE] = (void*)renderTarget;
-            eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
-            eventData[P_SCENE] = (void*)views_[i]->GetScene();
-            eventData[P_CAMERA] = (void*)views_[i]->GetCamera();
+            eventData[P_SURFACE] = renderTarget;
+            eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+            eventData[P_SCENE] = views_[i]->GetScene();
+            eventData[P_CAMERA] = views_[i]->GetCamera();
             SendEvent(E_BEGINVIEWRENDER, eventData);
             
             // Screen buffers can be reused between views, as each is rendered completely

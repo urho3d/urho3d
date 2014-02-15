@@ -529,7 +529,7 @@ void Scene::Update(float timeStep)
     using namespace SceneUpdate;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_SCENE] = (void*)this;
+    eventData[P_SCENE] = this;
     eventData[P_TIMESTEP] = timeStep;
 
     // Update variable timestep logic
@@ -917,7 +917,7 @@ void Scene::UpdateAsyncLoading()
     using namespace AsyncLoadProgress;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_SCENE] = (void*)this;
+    eventData[P_SCENE] = this;
     eventData[P_PROGRESS] = (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
     eventData[P_LOADEDNODES]  = asyncProgress_.loadedNodes_;
     eventData[P_TOTALNODES]  = asyncProgress_.totalNodes_;
@@ -934,7 +934,7 @@ void Scene::FinishAsyncLoading()
     using namespace AsyncLoadFinished;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_SCENE] = (void*)this;
+    eventData[P_SCENE] = this;
     SendEvent(E_ASYNCLOADFINISHED, eventData);
 }
 

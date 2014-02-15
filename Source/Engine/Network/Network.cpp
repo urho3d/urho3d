@@ -84,7 +84,7 @@ void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t p
         using namespace NetworkMessage;
         
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_CONNECTION] = (void*)connection;
+        eventData[P_CONNECTION] = connection;
         eventData[P_MESSAGEID] = (int)msgId;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
@@ -127,7 +127,7 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     using namespace ClientConnected;
     
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_CONNECTION] = (void*)newConnection;
+    eventData[P_CONNECTION] = newConnection;
     newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
 }
 
@@ -145,7 +145,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
         using namespace ClientDisconnected;
         
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_CONNECTION] = (void*)connection;
+        eventData[P_CONNECTION] = connection;
         connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
         
         clientConnections_.Erase(i);

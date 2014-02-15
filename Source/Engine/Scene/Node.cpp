@@ -244,8 +244,8 @@ void Node::SetName(const String& name)
             using namespace NodeNameChanged;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_SCENE] = (void*)scene_;
-            eventData[P_NODE] = (void*)this;
+            eventData[P_SCENE] = scene_;
+            eventData[P_NODE] = this;
 
             scene_->SendEvent(E_NODENAMECHANGED, eventData);
         }
@@ -458,8 +458,8 @@ void Node::SetEnabled(bool enable, bool recursive)
             using namespace NodeEnabledChanged;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_SCENE] = (void*)scene_;
-            eventData[P_NODE] = (void*)this;
+            eventData[P_SCENE] = scene_;
+            eventData[P_NODE] = this;
 
             scene_->SendEvent(E_NODEENABLEDCHANGED, eventData);
         }
@@ -474,9 +474,9 @@ void Node::SetEnabled(bool enable, bool recursive)
                 using namespace ComponentEnabledChanged;
 
                 VariantMap& eventData = GetEventDataMap();
-                eventData[P_SCENE] = (void*)scene_;
-                eventData[P_NODE] = (void*)this;
-                eventData[P_COMPONENT] = (void*)(*i);
+                eventData[P_SCENE] = scene_;
+                eventData[P_NODE] = this;
+                eventData[P_COMPONENT] = (*i);
 
                 scene_->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
             }
@@ -558,9 +558,9 @@ void Node::AddChild(Node* node)
         using namespace NodeAdded;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_NODE] = (void*)node;
+        eventData[P_SCENE] = scene_;
+        eventData[P_PARENT] = this;
+        eventData[P_NODE] = node;
 
         scene_->SendEvent(E_NODEADDED, eventData);
     }
@@ -1398,9 +1398,9 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
         using namespace NodeRemoved;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_NODE] = (void*)(*i).Get();
+        eventData[P_SCENE] = scene_;
+        eventData[P_PARENT] = this;
+        eventData[P_NODE] = (*i).Get();
 
         scene_->SendEvent(E_NODEREMOVED, eventData);
     }
@@ -1503,9 +1503,9 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
         using namespace ComponentRemoved;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_NODE] = (void*)this;
-        eventData[P_COMPONENT] = (void*)(*i).Get();
+        eventData[P_SCENE] = scene_;
+        eventData[P_NODE] = this;
+        eventData[P_COMPONENT] = (*i).Get();
 
         scene_->SendEvent(E_COMPONENTREMOVED, eventData);
     }

@@ -287,7 +287,7 @@ void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     // Send the event forward
     VariantMap& newEventData = GetEventDataMap();
-    newEventData[ScrollBarChanged::P_ELEMENT] = (void*)this;
+    newEventData[ScrollBarChanged::P_ELEMENT] = this;
     newEventData[ScrollBarChanged::P_VALUE] = slider_->GetValue();
     SendEvent(E_SCROLLBARCHANGED, newEventData);
 }

@@ -260,7 +260,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         Renderer* renderer = GetSubsystem<Renderer>();
 
         if (HasParameter(parameters, "ExternalWindow"))
-            graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetPtr());
+            graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
         graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
         graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));

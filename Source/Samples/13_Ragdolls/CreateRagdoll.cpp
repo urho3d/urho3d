@@ -47,7 +47,7 @@ void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventD
     using namespace NodeCollision;
 
     // Get the other colliding body, make sure it is moving (has nonzero mass)
-    RigidBody* otherBody = (RigidBody*)eventData[P_OTHERBODY].GetPtr();
+    RigidBody* otherBody = static_cast<RigidBody*>(eventData[P_OTHERBODY].GetPtr());
 
     if (otherBody->GetMass() > 0.0f)
     {

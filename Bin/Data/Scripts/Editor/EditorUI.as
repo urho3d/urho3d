@@ -150,7 +150,7 @@ MENU_CALLBACK@ messageBoxCallback;
 
 void HandleQuickSearchChange(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ search = eventData["Element"].GetUIElement();
+    LineEdit@ search = eventData["Element"].GetPtr();
     if (search is null)
         return;
 
@@ -687,7 +687,7 @@ String GetActionName(const String&in name)
 
 void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 {
-    Menu@ menu = eventData["Element"].GetUIElement();
+    Menu@ menu = eventData["Element"].GetPtr();
     if (menu is null)
         return;
 
@@ -972,7 +972,7 @@ void HandlePopup(Menu@ menu)
         if (menuParent is null)
             break;
 
-        Menu@ nextMenu = menuParent.vars["Origin"].GetUIElement();
+        Menu@ nextMenu = menuParent.vars["Origin"].GetPtr();
         if (nextMenu is null)
             break;
         else

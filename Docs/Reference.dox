@@ -610,7 +610,7 @@ function HandleUpdate(eventType, eventData)
 end
 \endcode
 
-When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function:
+When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function. Note that in Lua retrieving an object pointer from a VariantMap requires the object type as the first parameter:
 
 \code
 CollisionDetector = ScriptObject()
@@ -1436,8 +1436,8 @@ An example of reading collision event and contact point data in script, from Nin
 \code
 void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
 {
-    Node@ otherNode = eventData["OtherNode"].GetNode();
-    RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
+    Node@ otherNode = eventData["OtherNode"].GetPtr();
+    RigidBody@ otherBody = eventData["OtherBody"].GetPtr();
     VectorBuffer contacts = eventData["Contacts"].GetBuffer();
 
     while (!contacts.eof)
@@ -1571,7 +1571,7 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -1690,7 +1690,7 @@ Connection* remoteSender = static_cast<Connection*>(eventData[P_CONNECTION].GetP
 
 %Script:
 \code
-Connection@ remoteSender = eventData["Connection"].GetConnection();
+Connection@ remoteSender = eventData["Connection"].GetPtr();
 \endcode
 
 \section Network_HttpRequests HTTP requests

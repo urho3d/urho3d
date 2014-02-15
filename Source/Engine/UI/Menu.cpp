@@ -295,7 +295,7 @@ void Menu::ShowPopup(bool enable)
     {
         OnShowPopup();
 
-        popup_->SetVar(VAR_ORIGIN, (void*)this);
+        popup_->SetVar(VAR_ORIGIN, this);
         static_cast<Window*>(popup_.Get())->SetModal(true);
 
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
@@ -376,7 +376,7 @@ void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)
         using namespace MenuSelected;
 
         VariantMap& newEventData = GetEventDataMap();
-        newEventData[P_ELEMENT] = (void*)this;
+        newEventData[P_ELEMENT] = this;
         SendEvent(E_MENUSELECTED, newEventData);
     }
 }
