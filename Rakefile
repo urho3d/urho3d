@@ -42,7 +42,7 @@ task :travis_ci do
     platform_prefix = ''
   end
   # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build are capable to run tests
-  if ENV['ENABLE_64BIT'].to_i == 1 or ENV['WINDOWS'].to_i != 1
+  if ENV['ENABLE_64BIT'].to_i == 1 and ENV['WINDOWS'].to_i != 1
     test = '&& make test'
   else
     test = ''
