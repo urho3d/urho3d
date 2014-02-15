@@ -5520,13 +5520,14 @@ Properties:
 - int VAR_COLOR
 - int VAR_STRING
 - int VAR_BUFFER
-- int VAR_PTR
+- int VAR_VOIDPTR
 - int VAR_RESOURCEREF
 - int VAR_RESOURCEREFLIST
 - int VAR_VARIANTVECTOR
 - int VAR_VARIANTMAP
 - int VAR_INTRECT
 - int VAR_INTVECTOR2
+- int VAR_PTR
 - int MAX_VAR_TYPES
 
 ### VertexElement

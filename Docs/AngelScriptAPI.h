@@ -7597,6 +7597,7 @@ float GetFloat() const;
 int GetInt() const;
 Node GetNode() const;
 PhysicsWorld GetPhysicsWorld() const;
+RefCounted GetPtr() const;
 RenderSurface GetRenderSurface() const;
 RigidBody GetRigidBody() const;
 Scene GetScene() const;
@@ -8701,13 +8702,14 @@ VAR_QUATERNION,
 VAR_COLOR,
 VAR_STRING,
 VAR_BUFFER,
-VAR_PTR,
+VAR_VOIDPTR,
 VAR_RESOURCEREF,
 VAR_RESOURCEREFLIST,
 VAR_VARIANTVECTOR,
 VAR_VARIANTMAP,
 VAR_INTRECT,
 VAR_INTVECTOR2,
+VAR_PTR,
 };
 
 enum VerticalAlignment
