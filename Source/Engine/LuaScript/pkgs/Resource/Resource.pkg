@@ -27,7 +27,7 @@ static bool ResourceLoad(Resource* resource, const String& fileName)
     if (!file.Open(fileName, FILE_READ))
         return false;
 
-    return resource->Save(file);
+    return resource->Load(file);
 }
 
 static bool ResourceSave(const Resource* resource, const String& fileName)
