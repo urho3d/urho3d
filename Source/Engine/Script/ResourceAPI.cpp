@@ -177,11 +177,11 @@ static void DestructXMLElement(XMLElement* ptr)
     ptr->~XMLElement();
 }
 
-static void XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
+static bool XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
 {
     VariantVector src;
     ArrayToVariantVector(value, src);
-    ptr->SetVariantVector(src);
+    return ptr->SetVariantVector(src);
 }
 
 static CScriptArray* XMLElementGetAttributeNames(XMLElement* ptr)

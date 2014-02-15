@@ -198,7 +198,7 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_D
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 if (NOT ANDROID AND NOT IOS)
-    set (SYSROOT ${RASPI_SYSROOT})  # SYSROOT is empty for native build
+    set (SYSROOT ${RASPI_SYSROOT} ${MINGW_SYSROOT})  # SYSROOT is empty for native build
     string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
     get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
     list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
@@ -233,8 +233,8 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
         COMMENT "Stripping shared library")
 endif ()
-if (RASPI AND SCP_TO_TARGET)
+if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND SCP_TO_TARGET)
     # Ensure SCP is the last command
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0
-        COMMENT "Scp-ing library to Raspberry Pi device")
+        COMMENT "Scp-ing library to target system")
 endif ()

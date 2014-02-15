@@ -149,9 +149,13 @@ void InitScene()
 
     gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
 
-    // On mobile devices render the shadowmap first
-    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+    // On mobile devices render the shadowmap first. Also adjust the shadow quality for performance
+    String platform = GetPlatform();
+    if (platform == "Android" || platform == "iOS" || platform == "Raspberry Pi")
+    {
         renderer.reuseShadowMaps = false;
+        renderer.shadowQuality = SHADOWQUALITY_LOW_16BIT;
+    }
 }
 
 void InitNetworking()
