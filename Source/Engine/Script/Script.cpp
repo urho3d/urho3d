@@ -332,15 +332,21 @@ void Script::DumpAPI(DumpMode mode)
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
                         ///\todo Is there a better way to mark deprecated API bindings for AngelScript?
-                        unsigned pos = declaration.FindLast("const String&in = \"deprecated:");
-                        if (pos != String::NPOS)
+                        unsigned posBegin = declaration.FindLast("const String&in = \"deprecated:");
+                        if (posBegin != String::NPOS)
                         {
                             // Assume this 'mark' is added as the last parameter
-                            unsigned posEnd = declaration.Find(')', pos);
-                            if (pos != String::NPOS)
+                            unsigned posEnd = declaration.Find(')', posBegin);
+                            if (posBegin != String::NPOS)
                             {
-                                declaration.Replace(pos, posEnd - pos, "");
-                                declaration += " /* deprecated */";
+                                declaration.Replace(posBegin, posEnd - posBegin, "");
+                                posBegin = declaration.Find(", ", posBegin - 2);
+                                if (posBegin != String::NPOS)
+                                    declaration.Replace(posBegin, 2, "");
+                                if (mode == DOXYGEN)
+                                    declaration += " // deprecated";
+                                else if (mode == C_HEADER)
+                                    declaration = "/* deprecated */\n" + declaration;
                             }
                         }
                         methodDeclarations.Push(declaration);
@@ -397,7 +403,7 @@ void Script::DumpAPI(DumpMode mode)
                     {
                         if (mode == DOXYGEN)
                         {
-                            remark = " /* " + remark + " */";
+                            remark = " // " + remark;
                         }
                         else if (mode == C_HEADER)
                         {
