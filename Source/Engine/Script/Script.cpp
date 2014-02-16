@@ -340,7 +340,7 @@ void Script::DumpAPI(DumpMode mode)
                             if (pos != String::NPOS)
                             {
                                 declaration.Replace(pos, posEnd - pos, "");
-                                declaration += "    // deprecated";
+                                declaration += " /* deprecated */";
                             }
                         }
                         methodDeclarations.Push(declaration);
@@ -390,13 +390,20 @@ void Script::DumpAPI(DumpMode mode)
                     String remark;
                     String cppdoc;
                     if (!propertyInfos[j].write_)
-                        remark = "    // readonly";
+                        remark = "readonly";
                     else if (!propertyInfos[j].read_)
-                        remark = "    // writeonly";
-                    if (mode == C_HEADER && !remark.Empty())
+                        remark = "writeonly";
+                    if (!remark.Empty())
                     {
-                        cppdoc = "/*" + remark + " */\n";
-                        remark.Clear();
+                        if (mode == DOXYGEN)
+                        {
+                            remark = " /* " + remark + " */";
+                        }
+                        else if (mode == C_HEADER)
+                        {
+                            cppdoc = "/* " + remark + " */\n";
+                            remark.Clear();
+                        }
                     }
 
                     OutputAPIRow(mode, cppdoc + propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
