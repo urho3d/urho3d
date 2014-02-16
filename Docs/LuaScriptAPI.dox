@@ -1424,6 +1424,10 @@ Methods:
 - void Minimize()
 - void Close()
 - bool TakeScreenShot(Image& destImage)
+- void BeginDumpShaders(const String fileName)
+- void EndDumpShaders()
+- void PrecacheShaders(Deserializer& source)
+- void PrecacheShaders(const String fileName)
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String GetWindowTitle() const

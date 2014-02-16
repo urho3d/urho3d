@@ -2421,9 +2421,12 @@ Array<Vector3> vertices;
 class Graphics
 {
 // Methods:
+void BeginDumpShaders(const String&);
 void Close();
+void EndDumpShaders();
 void Maximize();
 void Minimize();
+void PrecacheShaders(File);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetMode(int, int);
 bool SetMode(int, int, bool, bool, bool, bool, bool, int);
