@@ -30,7 +30,7 @@ varying vec2 vTexCoord;
         varying vec3 vCubeMaskVec;
     #endif
 #else
-    varying vec4 vglslexLight;
+    varying vec4 vVertexLight;
     varying vec3 vNormal;
     #ifdef NORMALMAP
         varying vec3 vTangent;
@@ -109,12 +109,12 @@ void VS()
             #endif
         #endif
     #else
-        // Ambient & per-glslex lighting
-        vglslexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
-
-        #ifdef NUMglslEXLIGHTS
-            for (int i = 0; i < NUMglslEXLIGHTS; ++i)
-                vglslexLight.rgb += GetglslexLight(i, worldPos, vNormal) * cglslexLights[i * 3].rgb;
+        // Ambient & per-vertex lighting
+        vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
+        
+        #ifdef NUMVERTEXLIGHTS
+            for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
+                vVertexLight.rgb += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
         #endif
         
         vScreenPos = GetScreenPos(gl_Position);
