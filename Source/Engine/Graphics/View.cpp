@@ -1549,10 +1549,10 @@ void View::RenderQuad(RenderPathCommand& command)
         return;
     
     // If shader can not be found, clear it from the command to prevent redundant attempts
-    ShaderVariation* vs = renderer_->GetShader(VS, command.vertexShaderName_, command.vertexShaderDefines_);
+    ShaderVariation* vs = graphics_->GetShader(VS, command.vertexShaderName_, command.vertexShaderDefines_);
     if (!vs)
         command.vertexShaderName_ = String::EMPTY;
-    ShaderVariation* ps = renderer_->GetShader(PS, command.pixelShaderName_, command.pixelShaderDefines_);
+    ShaderVariation* ps = graphics_->GetShader(PS, command.pixelShaderName_, command.pixelShaderDefines_);
     if (!ps)
         command.pixelShaderName_ = String::EMPTY;
     
@@ -1807,7 +1807,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetViewport(viewRect_);
     
     String shaderName = "CopyFramebuffer";
-    graphics_->SetShaders(renderer_->GetShader(VS, shaderName), renderer_->GetShader(PS, shaderName));
+    graphics_->SetShaders(graphics_->GetShader(VS, shaderName), graphics_->GetShader(PS, shaderName));
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;

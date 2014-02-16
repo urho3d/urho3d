@@ -165,6 +165,10 @@ void InitScene()
             dirLight.shadowIntensity = 0.333f;
         }
     }
+    
+    // Precache shaders if possible
+    if (cache.Exists("NinjaSnowWarShaders.txt"))
+        graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.txt"));
 }
 
 void InitNetworking()

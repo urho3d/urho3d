@@ -31,7 +31,6 @@
 #include "Light.h"
 #include "Polyhedron.h"
 #include "Profiler.h"
-#include "Renderer.h"
 #include "ResourceCache.h"
 #include "ShaderVariation.h"
 #include "VertexBuffer.h"
@@ -310,15 +309,14 @@ void DebugRenderer::Render()
         return;
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    Renderer* renderer = GetSubsystem<Renderer>();
 
     if (!graphics || graphics->IsDeviceLost())
         return;
 
     PROFILE(RenderDebugGeometry);
 
-    ShaderVariation* vs = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* ps = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* vs = graphics->GetShader(VS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* ps = graphics->GetShader(PS, "Basic", "VERTEXCOLOR");
     
     unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
     // Resize the vertex buffer if too small or much too large

@@ -38,7 +38,6 @@
 #include "Matrix3x4.h"
 #include "MessageBox.h"
 #include "Profiler.h"
-#include "Renderer.h"
 #include "ResourceCache.h"
 #include "ScrollBar.h"
 #include "Shader.h"
@@ -654,8 +653,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
 
-    Renderer* renderer = GetSubsystem<Renderer>();
-    if (!renderer || batches.Empty())
+    if (batches.Empty())
         return;
 
     Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
@@ -679,12 +677,12 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);
 
-    ShaderVariation* noTextureVS = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* diffTextureVS = renderer->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
-    ShaderVariation* noTexturePS = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* diffTexturePS = renderer->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
-    ShaderVariation* diffMaskTexturePS = renderer->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
-    ShaderVariation* alphaTexturePS = renderer->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
+    ShaderVariation* noTextureVS = graphics_->GetShader(VS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* diffTextureVS = graphics_->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
+    ShaderVariation* noTexturePS = graphics_->GetShader(PS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* diffTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
+    ShaderVariation* diffMaskTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
+    ShaderVariation* alphaTexturePS = graphics_->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
 
     unsigned alphaFormat = Graphics::GetAlphaFormat();
 

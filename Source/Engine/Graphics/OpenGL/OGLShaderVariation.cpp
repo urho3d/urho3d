@@ -36,8 +36,7 @@ namespace Urho3D
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    type_(type),
-    compiled_(false)
+    type_(type)
 {
 }
 
@@ -49,8 +48,7 @@ ShaderVariation::~ShaderVariation()
 void ShaderVariation::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
-    
-    compiled_ = false;
+
     compilerOutput_.Clear();
     
     if (graphics_)
@@ -81,7 +79,6 @@ void ShaderVariation::Release()
         }
         
         object_ = 0;
-        compiled_ = false;
         compilerOutput_.Clear();
         
         graphics_->CleanupShaderPrograms();
@@ -91,7 +88,7 @@ void ShaderVariation::Release()
 bool ShaderVariation::Create()
 {
     Release();
-    
+
     if (!owner_)
     {
         compilerOutput_ = "Owner shader has expired";
@@ -139,18 +136,19 @@ bool ShaderVariation::Create()
     
     int compiled, length;
     glGetShaderiv(object_, GL_COMPILE_STATUS, &compiled);
-    compiled_ = compiled != 0;
-    if (!compiled_)
+    if (!compiled)
     {
         glGetShaderiv(object_, GL_INFO_LOG_LENGTH, &length);
         compilerOutput_.Resize(length);
         int outLength;
         glGetShaderInfoLog(object_, length, &outLength, &compilerOutput_[0]);
+        glDeleteShader(object_);
+        object_ = 0;
     }
     else
         compilerOutput_.Clear();
     
-    return compiled_;
+    return object_ != 0;
 }
 
 void ShaderVariation::SetName(const String& name)

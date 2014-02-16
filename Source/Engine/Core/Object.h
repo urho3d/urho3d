@@ -23,7 +23,6 @@
 #pragma once
 
 #include "LinkedList.h"
-#include "Ptr.h"
 #include "Variant.h"
 
 namespace Urho3D

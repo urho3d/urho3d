@@ -115,6 +115,10 @@ private:
     unsigned checksum_;
     /// Compression flag.
     bool compressed_;
+    /// Synchronization needed before read -flag.
+    bool readSyncNeeded_;
+    /// Synchronization needed before write -flag.
+    bool writeSyncNeeded_;
 };
 
 }

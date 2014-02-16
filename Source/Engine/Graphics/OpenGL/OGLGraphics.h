@@ -25,7 +25,7 @@
 #include "ArrayPtr.h"
 #include "Color.h"
 #include "GraphicsDefs.h"
-#include "HashMap.h"
+#include "HashSet.h"
 #include "Image.h"
 #include "Object.h"
 #include "Plane.h"
@@ -34,11 +34,13 @@
 namespace Urho3D
 {
 
+class File;
 class Image;
 class IndexBuffer;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
+class Shader;
 class ShaderProgram;
 class ShaderVariation;
 class Texture;
@@ -217,6 +219,12 @@ public:
     void ResetStreamFrequencies();
     /// Set force Shader Model 2 flag. No-op on OpenGL.
     void SetForceSM2(bool enable);
+    /// Begin dumping shader variation names to a file for precaching.
+    void BeginDumpShaders(const String& fileName);
+    /// End dumping shader variations names.
+    void EndDumpShaders();
+    /// Precache shader variations from a file containing rows of shader names, generated with BeginDumpShaders().
+    void PrecacheShaders(Deserializer& source);
 
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -286,7 +294,11 @@ public:
     IntVector2 GetDesktopResolution() const;
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
-    /// Return vertex buffer by index.
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const char* name, const char* defines) const;
+    /// Return current vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
@@ -571,6 +583,18 @@ private:
     bool useClipPlane_;
     /// Releasing GPU objects flag.
     bool releasingGPUObjects_;
+    /// Base directory for shaders.
+    String shaderPath_;
+    /// File extension for shaders.
+    String shaderExtension_;
+    /// Last used shader in shader variation query.
+    mutable WeakPtr<Shader> lastShader_;
+    /// Last used shader name in shader variation query.
+    mutable String lastShaderName_;
+    /// File shader variations are dumped into. Null if dumping not active.
+    SharedPtr<File> shaderDumpFile_;
+    /// Hash set for detecting already dumped variations.
+    HashSet<String> usedShaders_;
 };
 
 /// Register Graphics library objects.

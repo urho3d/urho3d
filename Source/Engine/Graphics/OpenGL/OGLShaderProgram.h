@@ -69,8 +69,6 @@ public:
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
     /// Return the info for a shader parameter, or null if does not exist.
     const ShaderParameter* GetParameter(StringHash param) const;
-    /// Return whether successfully linked.
-    bool IsLinked() const { return linked_; }
     /// Return linker output.
     const String& GetLinkerOutput() const { return linkerOutput_; }
     
@@ -85,8 +83,6 @@ private:
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
     /// Shader link error string.
     String linkerOutput_;
-    /// Linked flag.
-    bool linked_;
 };
 
 }

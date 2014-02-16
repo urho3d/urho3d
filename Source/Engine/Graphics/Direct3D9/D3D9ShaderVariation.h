@@ -88,8 +88,6 @@ public:
     const String& GetName() const { return name_; }
     /// Return defines.
     const String& GetDefines() const { return defines_; }
-    /// Return whether successfully compiled.
-    bool IsCompiled() const { return compiled_; }
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
     /// Return whether uses a parameter.
@@ -121,8 +119,6 @@ private:
     String defines_;
     /// Shader compile error string.
     String compilerOutput_;
-    /// Compiled flag.
-    bool compiled_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.

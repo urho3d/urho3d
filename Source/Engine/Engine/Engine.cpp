@@ -275,6 +275,8 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "MultiSample", 1).GetInt()
         ))
             return false;
+        if (HasParameter(parameters, "DumpShaders"))
+            graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
 
         if (HasParameter(parameters, "RenderPath"))
             renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
@@ -700,6 +702,11 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument == "p" && !value.Empty())
             {
                 ret["ResourcePaths"] = value;
+                ++i;
+            }
+            else if (argument == "ds" && !value.Empty())
+            {
+                ret["DumpShaders"] = value;
                 ++i;
             }
             #ifdef ENABLE_TESTING

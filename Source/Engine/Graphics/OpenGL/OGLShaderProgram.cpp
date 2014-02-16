@@ -34,8 +34,7 @@ namespace Urho3D
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
-    pixelShader_(pixelShader),
-    linked_(false)
+    pixelShader_(pixelShader)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
@@ -53,7 +52,7 @@ void ShaderProgram::OnDeviceLost()
     if (graphics_ && graphics_->GetShaderProgram() == this)
         graphics_->SetShaders(0, 0);
     
-    linked_ = false;
+
     linkerOutput_.Clear();
 }
 
@@ -73,7 +72,6 @@ void ShaderProgram::Release()
         }
         
         object_ = 0;
-        linked_ = false;
         linkerOutput_.Clear();
         shaderParameters_.Clear();
         
@@ -121,18 +119,19 @@ bool ShaderProgram::Link()
     
     int linked, length;
     glGetProgramiv(object_, GL_LINK_STATUS, &linked);
-    linked_ = linked != 0;
-    if (!linked_)
+    if (!linked)
     {
         glGetProgramiv(object_, GL_INFO_LOG_LENGTH, &length);
         linkerOutput_.Resize(length);
         int outLength;
         glGetProgramInfoLog(object_, length, &outLength, &linkerOutput_[0]);
+        glDeleteProgram(object_);
+        object_ = 0;
     }
     else
         linkerOutput_.Clear();
     
-    if (!linked_)
+    if (!object_)
         return false;
     
     const int MAX_PARAMETER_NAME_LENGTH = 256;

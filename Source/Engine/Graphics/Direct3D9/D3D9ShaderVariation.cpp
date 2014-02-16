@@ -42,8 +42,7 @@ namespace Urho3D
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    type_(type),
-    compiled_(false)
+    type_(type)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
@@ -97,8 +96,6 @@ bool ShaderVariation::Create()
             (const DWORD*)&byteCode[0],
             (IDirect3DVertexShader9**)&object_)))
             compilerOutput_ = "Could not create vertex shader";
-        else
-            compiled_ = true;
     }
     else
     {
@@ -106,11 +103,9 @@ bool ShaderVariation::Create()
             (const DWORD*)&byteCode[0],
             (IDirect3DPixelShader9**)&object_)))
             compilerOutput_ = "Could not create pixel shader";
-        else
-            compiled_ = true;
     }
     
-    return compiled_;
+    return object_ != 0;
 }
 
 void ShaderVariation::Release()
@@ -136,7 +131,6 @@ void ShaderVariation::Release()
         }
         
         object_ = 0;
-        compiled_ = false;
         compilerOutput_.Clear();
         
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -395,8 +389,6 @@ void ShaderVariation::SaveByteCode(const PODVector<unsigned>& byteCode, const St
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
-    if (!cache || !fileSystem)
-        return;
     
     String path = GetPath(cache->GetResourceFileName(owner_->GetName())) + "Cache/";
     String fullName = path + GetFileNameAndExtension(binaryShaderName);
