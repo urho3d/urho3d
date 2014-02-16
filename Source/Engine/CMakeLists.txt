@@ -215,7 +215,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
     add_compiler_export_flags ()
     # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
-    if (NOT MSVC AND CMAKE_VERSION VERSION_LESS 2.8.9)  # \todo Remove this when CMake minimum version is 2.8.9
+    if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # \todo Remove this when CMake minimum version is 2.8.9
         set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
     endif ()
 endif ()

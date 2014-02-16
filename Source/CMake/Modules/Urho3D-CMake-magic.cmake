@@ -647,10 +647,6 @@ macro (define_dependency_libs TARGET)
             set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
         endif ()
     endif ()
-
-    if (LINK_LIBS_ONLY)
-        remove_duplicate (LINK_LIBS_ONLY)
-    endif ()
 endmacro ()
 
 # Macro for sorting and removing duplicate values

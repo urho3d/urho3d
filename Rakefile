@@ -23,6 +23,7 @@ task :travis_ci do
     # Lua on MinGW build requires tolua++ tool to be built natively first
     system 'MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA=1 -DENABLE_TOOLS=0' or abort 'Failed to configure native build for tolua++ target'
     system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
+    ENV['SKIP_NATIVE'] = '1'
   else
     jit = 'JIT'
     amalg = '-DENABLE_LUAJIT_AMALG=1'
