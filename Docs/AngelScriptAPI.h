@@ -7589,23 +7589,11 @@ void FromString(VariantType, const String&);
 void FromString(const String&, const String&);
 bool GetBool() const;
 VectorBuffer GetBuffer() const;
-Camera GetCamera() const /* deprecated */;
-CollisionShape GetCollisionShape() const /* deprecated */;
-Component GetComponent() const /* deprecated */;
-Connection GetConnection() const /* deprecated */;
 float GetFloat() const;
 int GetInt() const;
-Node GetNode() const /* deprecated */;
-PhysicsWorld GetPhysicsWorld() const /* deprecated */;
 RefCounted GetPtr() const;
-RenderSurface GetRenderSurface() const /* deprecated */;
-RigidBody GetRigidBody() const /* deprecated */;
-Scene GetScene() const /* deprecated */;
-Serializable GetSerializable() const /* deprecated */;
 ShortStringHash GetShortStringHash() const;
 StringHash GetStringHash() const;
-Texture GetTexture() const /* deprecated */;
-UIElement GetUIElement() const /* deprecated */;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
 const IntRect& GetIntRect() const;
@@ -7619,6 +7607,30 @@ const VariantMap& GetVariantMap() const;
 const Vector2& GetVector2() const;
 const Vector3& GetVector3() const;
 const Vector4& GetVector4() const;
+/* deprecated */
+Camera GetCamera() const;
+/* deprecated */
+CollisionShape GetCollisionShape() const;
+/* deprecated */
+Component GetComponent() const;
+/* deprecated */
+Connection GetConnection() const;
+/* deprecated */
+Node GetNode() const;
+/* deprecated */
+PhysicsWorld GetPhysicsWorld() const;
+/* deprecated */
+RenderSurface GetRenderSurface() const;
+/* deprecated */
+RigidBody GetRigidBody() const;
+/* deprecated */
+Scene GetScene() const;
+/* deprecated */
+Serializable GetSerializable() const;
+/* deprecated */
+Texture GetTexture() const;
+/* deprecated */
+UIElement GetUIElement() const;
 
 // Properties:
 /* readonly */

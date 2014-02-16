@@ -40,46 +40,46 @@ Methods:
 Properties:
 
 - float animationLodBias
-- AnimationState@[] animationStates /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- AnimationState@[] animationStates // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material /* writeonly */
+- Material@ material // writeonly
 - Material@[] materials
 - uint maxLights
 - Model@ model
-- String[] morphNames /* readonly */
+- String[] morphNames // readonly
 - float[] morphWeights
-- Node@ node /* readonly */
-- uint numAnimationStates /* readonly */
-- uint numAttributes /* readonly */
-- uint numGeometries /* readonly */
-- uint numMorphs /* readonly */
+- Node@ node // readonly
+- uint numAnimationStates // readonly
+- uint numAttributes // readonly
+- uint numGeometries // readonly
+- uint numMorphs // readonly
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
-- Skeleton@ skeleton /* readonly */
+- Skeleton@ skeleton // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool updateInvisible
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -96,20 +96,20 @@ Methods:
 
 Properties:
 
-- String animationName /* readonly */
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- float length /* readonly */
-- uint memoryUse /* readonly */
+- String animationName // readonly
+- ShortStringHash baseType // readonly
+- String category // readonly
+- float length // readonly
+- uint memoryUse // readonly
 - String name
-- uint numTracks /* readonly */
+- uint numTracks // readonly
 - uint numTriggers
-- int refs /* readonly */
-- AnimationTriggerPoint@[] triggers /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- AnimationTriggerPoint@[] triggers // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### AnimationController
@@ -161,21 +161,21 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### AnimationState
@@ -195,18 +195,18 @@ Methods:
 
 Properties:
 
-- Animation@ animation /* readonly */
+- Animation@ animation // readonly
 - float[] boneWeights
-- bool enabled /* readonly */
+- bool enabled // readonly
 - uint8 layer
-- float length /* readonly */
+- float length // readonly
 - bool looped
-- AnimatedModel@ model /* readonly */
-- Node@ node /* readonly */
-- int refs /* readonly */
+- AnimatedModel@ model // readonly
+- Node@ node // readonly
+- int refs // readonly
 - Bone@ startBone
 - float time
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - float weight
 
 
@@ -238,7 +238,7 @@ Methods:
 
 Properties:
 
-- bool empty /* readonly */
+- bool empty // readonly
 - uint length
 
 
@@ -247,7 +247,7 @@ Properties:
 Properties:
 
 - Variant defaultValue
-- String[]@ enumNames /* readonly */
+- String[]@ enumNames // readonly
 - uint mode
 - String name
 - VariantType type
@@ -264,20 +264,20 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- bool initialized /* readonly */
-- bool interpolation /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool initialized // readonly
+- bool interpolation // readonly
 - SoundListener@ listener
 - float[] masterGain
-- int mixRate /* readonly */
-- bool playing /* readonly */
-- int refs /* readonly */
-- uint sampleSize /* readonly */
-- bool stereo /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- int mixRate // readonly
+- bool playing // readonly
+- int refs // readonly
+- uint sampleSize // readonly
+- bool stereo // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### BiasParameters
@@ -323,42 +323,42 @@ Methods:
 Properties:
 
 - float animationLodBias
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- Billboard@[] billboards /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- Billboard@[] billboards // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - bool faceCamera
-- uint id /* readonly */
-- bool inView /* readonly */
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
 - Material@ material
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - uint numBillboards
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - bool relative
 - bool scaled
 - float shadowDistance
 - uint shadowMask
 - bool sorted
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -437,42 +437,42 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -484,16 +484,16 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
@@ -502,13 +502,13 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -542,12 +542,12 @@ Methods:
 
 Properties:
 
-- Vector3 center /* readonly */
+- Vector3 center // readonly
 - bool defined
-- Vector3 halfSize /* readonly */
+- Vector3 halfSize // readonly
 - Vector3 max
 - Vector3 min
-- Vector3 size /* readonly */
+- Vector3 size // readonly
 
 
 ### Button
@@ -614,42 +614,42 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -661,21 +661,21 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
-- bool pressed /* readonly */
+- bool pressed // readonly
 - IntVector2 pressedChildOffset
 - IntVector2 pressedOffset
 - int priority
-- int refs /* readonly */
+- int refs // readonly
 - float repeatDelay
 - float repeatRate
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
@@ -684,13 +684,13 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -723,42 +723,42 @@ Methods:
 Properties:
 
 - float aspectRatio
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoAspectRatio
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - Plane clipPlane
-- Matrix3x4 effectiveWorldTransform /* readonly */
+- Matrix3x4 effectiveWorldTransform // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - float farClip
 - FillMode fillMode
 - float fov
-- Frustum frustum /* readonly */
-- float halfViewSize /* readonly */
-- uint id /* readonly */
+- Frustum frustum // readonly
+- float halfViewSize // readonly
+- uint id // readonly
 - float lodBias
 - float nearClip
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - float orthoSize
 - bool orthographic
-- Matrix4 projection /* readonly */
+- Matrix4 projection // readonly
 - Vector2 projectionOffset
 - Plane reflectionPlane
-- int refs /* readonly */
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useClipping
 - bool useReflection
-- Matrix3x4 view /* readonly */
+- Matrix3x4 view // readonly
 - uint viewMask
 - uint viewOverrideFlags
-- Frustum viewSpaceFrustum /* readonly */
-- int weakRefs /* readonly */
+- Frustum viewSpaceFrustum // readonly
+- int weakRefs // readonly
 - float zoom
 
 
@@ -836,44 +836,44 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
+- String category // readonly
 - bool checked
 - IntVector2 checkedOffset
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -885,16 +885,16 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
@@ -903,13 +903,13 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -945,29 +945,29 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
 - uint lodLevel
 - float margin
 - Model@ model
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - Vector3 position
-- int refs /* readonly */
+- int refs // readonly
 - Quaternion rotation
 - ShapeType shapeType
 - Vector3 size
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 
 
 ### Color
@@ -1000,11 +1000,11 @@ Properties:
 
 - float a
 - float b
-- float[] data /* readonly */
+- float[] data // readonly
 - float g
 - float r
-- Vector3 rgb /* readonly */
-- Vector4 rgba /* readonly */
+- Vector3 rgb // readonly
+- Vector4 rgba // readonly
 
 
 ### ColorFrame
@@ -1036,21 +1036,21 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Connection
@@ -1066,26 +1066,26 @@ Methods:
 
 Properties:
 
-- String address /* readonly */
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- bool client /* readonly */
-- bool connectPending /* readonly */
-- bool connected /* readonly */
+- String address // readonly
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool client // readonly
+- bool connectPending // readonly
+- bool connected // readonly
 - Controls controls
-- String downloadName /* readonly */
-- float downloadProgress /* readonly */
+- String downloadName // readonly
+- float downloadProgress // readonly
 - VariantMap identity
 - bool logStatistics
-- uint numDownloads /* readonly */
-- uint16 port /* readonly */
+- uint numDownloads // readonly
+- uint16 port // readonly
 - Vector3 position
-- int refs /* readonly */
+- int refs // readonly
 - Scene@ scene
-- bool sceneLoaded /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- bool sceneLoaded // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Console
@@ -1098,20 +1098,20 @@ Methods:
 
 Properties:
 
-- BorderImage@ background /* readonly */
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- BorderImage@ background // readonly
+- ShortStringHash baseType // readonly
+- String category // readonly
 - XMLFile@ defaultStyle
-- uint historyPosition /* readonly */
-- String[] historyRow /* readonly */
-- LineEdit@ lineEdit /* readonly */
+- uint historyPosition // readonly
+- String[] historyRow // readonly
+- LineEdit@ lineEdit // readonly
 - uint numHistoryRows
 - uint numRows
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### Constraint
@@ -1135,35 +1135,35 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- Vector3 axis /* writeonly */
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- Vector3 axis // writeonly
+- ShortStringHash baseType // readonly
+- String category // readonly
 - float cfm
 - ConstraintType constraintType
 - bool disableCollision
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - float erp
 - Vector2 highLimit
-- uint id /* readonly */
+- uint id // readonly
 - Vector2 lowLimit
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- Vector3 otherAxis /* writeonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- Vector3 otherAxis // writeonly
 - RigidBody@ otherBody
 - Vector3 otherPosition
 - Quaternion otherRotation
-- RigidBody@ ownBody /* readonly */
+- RigidBody@ ownBody // readonly
 - Vector3 position
-- int refs /* readonly */
+- int refs // readonly
 - Quaternion rotation
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 - Vector3 worldPosition
 
 
@@ -1246,42 +1246,42 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -1293,16 +1293,16 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - CursorShape shape
 - IntVector2 size
@@ -1312,14 +1312,14 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
 - bool useSystemShapes
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -1352,38 +1352,38 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material /* writeonly */
+- Material@ material // writeonly
 - Material@[] materials
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - uint numGeometries
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -1401,20 +1401,20 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - XMLFile@ defaultStyle
 - uint mode
-- Text@ modeText /* readonly */
+- Text@ modeText // readonly
 - float profilerInterval
 - uint profilerMaxDepth
-- Text@ profilerText /* readonly */
-- int refs /* readonly */
-- Text@ statsText /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- Text@ profilerText // readonly
+- int refs // readonly
+- Text@ statsText // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useRendererStats
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### DebugRenderer
@@ -1445,21 +1445,21 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### DecalSet
@@ -1486,41 +1486,41 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
 - Material@ material
 - uint maxIndices
 - uint maxLights
 - uint maxVertices
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- uint numDecals /* readonly */
-- uint numIndices /* readonly */
-- uint numVertices /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numDecals // readonly
+- uint numIndices // readonly
+- uint numVertices // readonly
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -1560,11 +1560,11 @@ Methods:
 
 Properties:
 
-- uint checksum /* readonly */
-- bool eof /* readonly */
-- String name /* readonly */
-- uint position /* readonly */
-- uint size /* readonly */
+- uint checksum // readonly
+- bool eof // readonly
+- String name // readonly
+- uint position // readonly
+- uint size // readonly
 
 
 ### Dictionary
@@ -1583,9 +1583,9 @@ Methods:
 
 Properties:
 
-- bool empty /* readonly */
-- String[]@ keys /* readonly */
-- uint length /* readonly */
+- bool empty // readonly
+- String[]@ keys // readonly
+- uint length // readonly
 
 
 ### Drawable
@@ -1609,34 +1609,34 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
 
@@ -1712,50 +1712,50 @@ Methods:
 
 Properties:
 
-- int acceleratorKey /* readonly */
-- int acceleratorQualifiers /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- int acceleratorKey // readonly
+- int acceleratorQualifiers // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
-- UIElement@[] items /* readonly */
+- UIElement@[] items // readonly
 - IntRect layoutBorder
 - LayoutMode layoutMode
 - int layoutSpacing
-- ListView@ listView /* readonly */
+- ListView@ listView // readonly
 - int maxHeight
 - IntVector2 maxSize
 - int maxWidth
@@ -1763,27 +1763,27 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
-- uint numItems /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
+- uint numItems // readonly
 - float opacity
 - UIElement@ parent
-- UIElement@ placeholder /* readonly */
+- UIElement@ placeholder // readonly
 - String placeholderText
 - IntVector2 position
-- bool pressed /* readonly */
+- bool pressed // readonly
 - IntVector2 pressedChildOffset
 - IntVector2 pressedOffset
 - int priority
-- int refs /* readonly */
+- int refs // readonly
 - float repeatDelay
 - float repeatRate
 - bool resizePopup
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
-- UIElement@ selectedItem /* readonly */
+- UIElement@ selectedItem // readonly
 - uint selection
 - bool showPopup
 - IntVector2 size
@@ -1793,13 +1793,13 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -1819,20 +1819,20 @@ Methods:
 Properties:
 
 - bool autoExit
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- bool exiting /* readonly */
-- bool headless /* readonly */
-- bool initialized /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool exiting // readonly
+- bool headless // readonly
+- bool initialized // readonly
 - int maxFps
 - int maxInactiveFps
 - int minFps
 - bool pauseMinimized
-- int refs /* readonly */
+- int refs // readonly
 - int timeStepSmoothing
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### File
@@ -1902,20 +1902,20 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint checksum /* readonly */
-- bool eof /* readonly */
-- FileMode mode /* readonly */
-- String name /* readonly */
-- bool open /* readonly */
-- bool packaged /* readonly */
-- uint position /* readonly */
-- int refs /* readonly */
-- uint size /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint checksum // readonly
+- bool eof // readonly
+- FileMode mode // readonly
+- String name // readonly
+- bool open // readonly
+- bool packaged // readonly
+- uint position // readonly
+- int refs // readonly
+- uint size // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### FileSelector
@@ -1929,27 +1929,27 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- Button@ cancelButton /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- Button@ cancelButton // readonly
+- String category // readonly
 - XMLFile@ defaultStyle
 - bool directoryMode
-- ListView@ fileList /* readonly */
+- ListView@ fileList // readonly
 - String fileName
-- LineEdit@ fileNameEdit /* readonly */
-- String filter /* readonly */
-- uint filterIndex /* readonly */
-- DropDownList@ filterList /* readonly */
-- Button@ okButton /* readonly */
+- LineEdit@ fileNameEdit // readonly
+- String filter // readonly
+- uint filterIndex // readonly
+- DropDownList@ filterList // readonly
+- Button@ okButton // readonly
 - String path
-- LineEdit@ pathEdit /* readonly */
-- int refs /* readonly */
+- LineEdit@ pathEdit // readonly
+- int refs // readonly
 - String title
-- Text@ titleText /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
-- Window@ window /* readonly */
+- Text@ titleText // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- Window@ window // readonly
 
 
 ### FileSystem
@@ -1971,15 +1971,15 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - String currentDir
-- String programDir /* readonly */
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- String userDocumentsDir /* readonly */
-- int weakRefs /* readonly */
+- String programDir // readonly
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- String userDocumentsDir // readonly
+- int weakRefs // readonly
 
 
 ### FocusParameters
@@ -2005,15 +2005,15 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
 - String name
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### Frustum
@@ -2035,7 +2035,7 @@ Methods:
 
 Properties:
 
-- Vector3[] vertices /* readonly */
+- Vector3[] vertices // readonly
 
 
 ### Graphics
@@ -2054,38 +2054,38 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- bool borderless /* readonly */
-- String category /* readonly */
-- bool deferredSupport /* readonly */
-- IntVector2 desktopResolution /* readonly */
-- bool deviceLost /* readonly */
+- ShortStringHash baseType // readonly
+- bool borderless // readonly
+- String category // readonly
+- bool deferredSupport // readonly
+- IntVector2 desktopResolution // readonly
+- bool deviceLost // readonly
 - bool flushGPU
 - bool forceSM2
-- bool fullscreen /* readonly */
-- bool hardwareShadowSupport /* readonly */
-- int height /* readonly */
-- bool initialized /* readonly */
-- bool instancingSupport /* readonly */
-- bool lightPrepassSupport /* readonly */
-- int multiSample /* readonly */
-- int[]@ multiSampleLevels /* readonly */
-- uint numBatches /* readonly */
-- uint numPrimitives /* readonly */
-- int refs /* readonly */
-- bool resizable /* readonly */
-- IntVector2[]@ resolutions /* readonly */
+- bool fullscreen // readonly
+- bool hardwareShadowSupport // readonly
+- int height // readonly
+- bool initialized // readonly
+- bool instancingSupport // readonly
+- bool lightPrepassSupport // readonly
+- int multiSample // readonly
+- int[]@ multiSampleLevels // readonly
+- uint numBatches // readonly
+- uint numPrimitives // readonly
+- int refs // readonly
+- bool resizable // readonly
+- IntVector2[]@ resolutions // readonly
 - bool sRGB
-- bool sRGBSupport /* readonly */
-- bool sRGBWriteSupport /* readonly */
-- bool sm3Support /* readonly */
-- bool tripleBuffer /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- bool vsync /* readonly */
-- int weakRefs /* readonly */
-- int width /* readonly */
-- Image@ windowIcon /* writeonly */
+- bool sRGBSupport // readonly
+- bool sRGBWriteSupport // readonly
+- bool sm3Support // readonly
+- bool tripleBuffer // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- bool vsync // readonly
+- int weakRefs // readonly
+- int width // readonly
+- Image@ windowIcon // writeonly
 - IntVector2 windowPosition
 - String windowTitle
 
@@ -2126,19 +2126,19 @@ Methods:
 
 Properties:
 
-- uint availableSize /* readonly */
-- uint checksum /* readonly */
-- bool eof /* readonly */
-- String error /* readonly */
-- String name /* readonly */
-- bool open /* readonly */
-- uint position /* readonly */
-- int refs /* readonly */
-- uint size /* readonly */
-- HttpRequestState state /* readonly */
-- String url /* readonly */
-- String verb /* readonly */
-- int weakRefs /* readonly */
+- uint availableSize // readonly
+- uint checksum // readonly
+- bool eof // readonly
+- String error // readonly
+- String name // readonly
+- bool open // readonly
+- uint position // readonly
+- int refs // readonly
+- uint size // readonly
+- HttpRequestState state // readonly
+- String url // readonly
+- String verb // readonly
+- int weakRefs // readonly
 
 
 ### Image
@@ -2167,20 +2167,20 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint components /* readonly */
-- bool compressed /* readonly */
-- int depth /* readonly */
-- int height /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint components // readonly
+- bool compressed // readonly
+- int depth // readonly
+- int height // readonly
+- uint memoryUse // readonly
 - String name
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
-- int width /* readonly */
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
 
 
 ### Input
@@ -2194,35 +2194,35 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- bool focus /* readonly */
-- String[] joystickNames /* readonly */
-- JoystickState@[] joysticks /* readonly */
-- bool[] keyDown /* readonly */
-- bool[] keyPress /* readonly */
-- bool minimized /* readonly */
-- bool[] mouseButtonDown /* readonly */
-- bool[] mouseButtonPress /* readonly */
-- IntVector2 mouseMove /* readonly */
-- int mouseMoveWheel /* readonly */
-- int mouseMoveX /* readonly */
-- int mouseMoveY /* readonly */
-- IntVector2 mousePosition /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool focus // readonly
+- String[] joystickNames // readonly
+- JoystickState@[] joysticks // readonly
+- bool[] keyDown // readonly
+- bool[] keyPress // readonly
+- bool minimized // readonly
+- bool[] mouseButtonDown // readonly
+- bool[] mouseButtonPress // readonly
+- IntVector2 mouseMove // readonly
+- int mouseMoveWheel // readonly
+- int mouseMoveX // readonly
+- int mouseMoveY // readonly
+- IntVector2 mousePosition // readonly
 - bool mouseVisible
-- uint numJoysticks /* readonly */
-- uint numTouches /* readonly */
-- bool[] qualifierDown /* readonly */
-- bool[] qualifierPress /* readonly */
-- int qualifiers /* readonly */
-- int refs /* readonly */
-- bool screenKeyboardSupport /* readonly */
+- uint numJoysticks // readonly
+- uint numTouches // readonly
+- bool[] qualifierDown // readonly
+- bool[] qualifierPress // readonly
+- int qualifiers // readonly
+- int refs // readonly
+- bool screenKeyboardSupport // readonly
 - bool screenKeyboardVisible
 - bool toggleFullscreen
-- TouchState@[] touches /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- TouchState@[] touches // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### IntRect
@@ -2234,13 +2234,13 @@ Methods:
 Properties:
 
 - int bottom
-- int[] data /* readonly */
-- int height /* readonly */
+- int[] data // readonly
+- int height // readonly
 - int left
 - int right
-- IntVector2 size /* readonly */
+- IntVector2 size // readonly
 - int top
-- int width /* readonly */
+- int width // readonly
 
 
 ### IntVector2
@@ -2251,7 +2251,7 @@ Methods:
 
 Properties:
 
-- int[] data /* readonly */
+- int[] data // readonly
 - int x
 - int y
 
@@ -2260,14 +2260,14 @@ Properties:
 
 Properties:
 
-- float[] axisPosition /* readonly */
-- bool[] buttonDown /* readonly */
-- bool[] buttonPress /* readonly */
-- int[] hatPosition /* readonly */
+- float[] axisPosition // readonly
+- bool[] buttonDown // readonly
+- bool[] buttonPress // readonly
+- int[] hatPosition // readonly
 - String name
-- uint numAxes /* readonly */
-- uint numButtons /* readonly */
-- uint numHats /* readonly */
+- uint numAxes // readonly
+- uint numButtons // readonly
+- uint numHats // readonly
 
 
 ### Light
@@ -2292,34 +2292,34 @@ Methods:
 Properties:
 
 - float aspectRatio
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - Color color
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - float fadeDistance
 - float fov
-- Frustum frustum /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- Frustum frustum // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - LightType lightType
 - float lodBias
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - bool occludee
 - bool occluder
 - bool perVertex
 - Texture@ rampTexture
 - float range
-- int refs /* readonly */
+- int refs // readonly
 - BiasParameters shadowBias
 - CascadeParameters shadowCascade
 - float shadowDistance
@@ -2332,11 +2332,11 @@ Properties:
 - Texture@ shapeTexture
 - float specularIntensity
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
 
@@ -2401,47 +2401,47 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
-- BorderImage@ cursor /* readonly */
+- IntRect combinedScreenRect // readonly
+- BorderImage@ cursor // readonly
 - float cursorBlinkRate
 - bool cursorMovable
 - uint cursorPosition
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - uint echoCharacter
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -2454,16 +2454,16 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
@@ -2471,18 +2471,18 @@ Properties:
 - bool temporary
 - String text
 - bool textCopyable
-- Text@ textElement /* readonly */
+- Text@ textElement // readonly
 - bool textSelectable
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -2564,46 +2564,46 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - int baseIndent
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - bool clearSelectionOnDefocus
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
-- UIElement@ contentElement /* readonly */
+- IntRect combinedScreenRect // readonly
+- UIElement@ contentElement // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - bool hierarchyMode
 - HighlightMode highlightMode
 - HorizontalAlignment horizontalAlignment
-- ScrollBar@ horizontalScrollBar /* readonly */
-- bool hovering /* readonly */
+- ScrollBar@ horizontalScrollBar // readonly
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
-- UIElement@[] items /* readonly */
+- UIElement@[] items // readonly
 - IntRect layoutBorder
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -2615,40 +2615,40 @@ Properties:
 - int minWidth
 - bool multiselect
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
-- uint numItems /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
+- uint numItems // readonly
 - float opacity
 - float pageStep
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool scrollBarsAutoVisible
-- BorderImage@ scrollPanel /* readonly */
+- BorderImage@ scrollPanel // readonly
 - float scrollStep
 - bool selected
-- UIElement@ selectedItem /* readonly */
-- UIElement@[]@ selectedItems /* readonly */
+- UIElement@ selectedItem // readonly
+- UIElement@[]@ selectedItems // readonly
 - uint selection
-- uint[]@ selections /* readonly */
+- uint[]@ selections // readonly
 - IntVector2 size
 - bool sortChildren
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
-- ScrollBar@ verticalScrollBar /* readonly */
+- ScrollBar@ verticalScrollBar // readonly
 - IntVector2 viewPosition
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -2667,16 +2667,16 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- String lastMessage /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- String lastMessage // readonly
 - int level
 - bool quiet
-- int refs /* readonly */
+- int refs // readonly
 - bool timeStamp
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Material
@@ -2697,25 +2697,25 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - CullMode cullMode
 - BiasParameters depthBias
-- uint memoryUse /* readonly */
+- uint memoryUse // readonly
 - String name
 - uint numTechniques
-- bool occlusion /* readonly */
-- int refs /* readonly */
-- String[]@ shaderParameterNames /* readonly */
+- bool occlusion // readonly
+- int refs // readonly
+- String[]@ shaderParameterNames // readonly
 - Variant[] shaderParameters
 - CullMode shadowCullMode
-- TechniqueEntry[] techniqueEntries /* readonly */
-- Technique@[] techniques /* readonly */
+- TechniqueEntry[] techniqueEntries // readonly
+- Technique@[] techniques // readonly
 - Texture@[] textures
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### Matrix3
@@ -2881,44 +2881,44 @@ Methods:
 
 Properties:
 
-- int acceleratorKey /* readonly */
-- int acceleratorQualifiers /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- int acceleratorKey // readonly
+- int acceleratorQualifiers // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -2930,23 +2930,23 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - UIElement@ popup
 - IntVector2 popupOffset
 - IntVector2 position
-- bool pressed /* readonly */
+- bool pressed // readonly
 - IntVector2 pressedChildOffset
 - IntVector2 pressedOffset
 - int priority
-- int refs /* readonly */
+- int refs // readonly
 - float repeatDelay
 - float repeatRate
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - bool showPopup
 - IntVector2 size
@@ -2956,13 +2956,13 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -2974,15 +2974,15 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - String message
-- int refs /* readonly */
+- int refs // readonly
 - String title
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
-- UIElement@ window /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- UIElement@ window // readonly
 
 
 ### Model
@@ -2995,20 +2995,20 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
-- String category /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
+- String category // readonly
+- uint memoryUse // readonly
 - String name
-- uint numGeometries /* readonly */
-- uint[] numGeometryLodLevels /* readonly */
-- uint numMorphs /* readonly */
-- int refs /* readonly */
-- Skeleton@ skeleton /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- uint numGeometries // readonly
+- uint[] numGeometryLodLevels // readonly
+- uint numMorphs // readonly
+- int refs // readonly
+- Skeleton@ skeleton // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### Navigable
@@ -3032,22 +3032,22 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
 - bool recursive
-- int refs /* readonly */
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### NavigationMesh
@@ -3085,12 +3085,12 @@ Properties:
 - float agentMaxClimb
 - float agentMaxSlope
 - float agentRadius
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
+- String category // readonly
 - float cellHeight
 - float cellSize
 - float detailSampleDistance
@@ -3098,22 +3098,22 @@ Properties:
 - float edgeMaxError
 - float edgeMaxLength
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool initialized /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- IntVector2 numTiles /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool initialized // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- IntVector2 numTiles // readonly
 - Vector3 padding
-- int refs /* readonly */
+- int refs // readonly
 - float regionMergeSize
 - float regionMinSize
 - bool temporary
 - int tileSize
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 
 
 ### Network
@@ -3137,17 +3137,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- Connection@[]@ clientConnections /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- Connection@[]@ clientConnections // readonly
 - String packageCacheDir
-- int refs /* readonly */
-- Connection@ serverConnection /* readonly */
-- bool serverRunning /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- int refs // readonly
+- Connection@ serverConnection // readonly
+- bool serverRunning // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
 - int updateFps
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### NetworkPriority
@@ -3172,24 +3172,24 @@ Methods:
 Properties:
 
 - bool alwaysUpdateOwner
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - float basePriority
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - float distanceFactor
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
 - float minPriority
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Node
@@ -3258,44 +3258,44 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- Node@[] children /* readonly */
-- Component@[] components /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- Node@[] children // readonly
+- Component@[] components // readonly
 - Vector3 direction
 - bool enabled
-- uint id /* readonly */
+- uint id // readonly
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
-- uint numComponents /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
+- uint numComponents // readonly
 - Connection@ owner
 - Node@ parent
 - Vector3 position
-- int refs /* readonly */
-- Vector3 right /* readonly */
+- int refs // readonly
+- Vector3 right // readonly
 - Quaternion rotation
 - Vector3 scale
-- Scene@ scene /* readonly */
-- ScriptObject@ scriptObject /* readonly */
+- Scene@ scene // readonly
+- ScriptObject@ scriptObject // readonly
 - bool temporary
-- Matrix3x4 transform /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- Vector3 up /* readonly */
-- VariantMap vars /* readonly */
-- int weakRefs /* readonly */
+- Matrix3x4 transform // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- Vector3 up // readonly
+- VariantMap vars // readonly
+- int weakRefs // readonly
 - Vector3 worldDirection
 - Vector3 worldPosition
-- Vector3 worldRight /* readonly */
+- Vector3 worldRight // readonly
 - Quaternion worldRotation
 - Vector3 worldScale
-- Matrix3x4 worldTransform /* readonly */
-- Vector3 worldUp /* readonly */
+- Matrix3x4 worldTransform // readonly
+- Vector3 worldUp // readonly
 
 
 ### Object
@@ -3306,12 +3306,12 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Octree
@@ -3345,23 +3345,23 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- uint numLevels /* readonly */
-- int refs /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numLevels // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 
 
 ### OffMeshConnection
@@ -3385,24 +3385,24 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bidirectional
-- String category /* readonly */
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - Node@ endPoint
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
 - float radius
-- int refs /* readonly */
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### PackageFile
@@ -3416,16 +3416,16 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint checksum /* readonly */
-- String name /* readonly */
-- uint numFiles /* readonly */
-- int refs /* readonly */
-- uint totalSize /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint checksum // readonly
+- String name // readonly
+- uint numFiles // readonly
+- int refs // readonly
+- uint totalSize // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### ParticleEmitter
@@ -3455,25 +3455,25 @@ Properties:
 
 - float activeTime
 - float animationLodBias
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
-- ColorFrame@[] colors /* readonly */
+- String category // readonly
+- ColorFrame@[] colors // readonly
 - Vector3 constantForce
 - float dampingForce
 - float drawDistance
-- float emissionRate /* writeonly */
+- float emissionRate // writeonly
 - Vector3 emitterSize
 - EmitterType emitterType
 - bool emitting
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - float inactiveTime
 - uint lightMask
 - float lodBias
@@ -3493,18 +3493,18 @@ Properties:
 - float minRotationSpeed
 - float minTimeToLive
 - float minVelocity
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - uint numColors
 - uint numParticles
 - uint numTextureFrames
 - bool occludee
 - bool occluder
-- Vector2 particleSize /* writeonly */
-- int refs /* readonly */
+- Vector2 particleSize // writeonly
+- int refs // readonly
 - bool relative
-- float rotation /* writeonly */
-- float rotationSpeed /* writeonly */
+- float rotation // writeonly
+- float rotationSpeed // writeonly
 - bool scaled
 - float shadowDistance
 - uint shadowMask
@@ -3512,16 +3512,16 @@ Properties:
 - float sizeMul
 - bool sorted
 - bool temporary
-- TextureFrame@[] textureFrames /* readonly */
-- float timeToLive /* writeonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- TextureFrame@[] textureFrames // readonly
+- float timeToLive // writeonly
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool updateInvisible
-- float velocity /* writeonly */
+- float velocity // writeonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -3536,17 +3536,17 @@ Properties:
 - PassLightingMode lightingMode
 - String pixelShader
 - String pixelShaderDefines
-- int refs /* readonly */
+- int refs // readonly
 - String vertexShader
 - String vertexShaderDefines
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### PhysicsRaycastResult
 
 Properties:
 
-- RigidBody@ body /* readonly */
+- RigidBody@ body // readonly
 - float distance
 - Vector3 normal
 - Vector3 position
@@ -3583,27 +3583,27 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - int fps
 - Vector3 gravity
-- uint id /* readonly */
+- uint id // readonly
 - bool internalEdge
 - bool interpolation
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - int numIterations
-- int refs /* readonly */
+- int refs // readonly
 - bool splitImpulse
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Plane
@@ -3628,7 +3628,7 @@ Properties:
 - Vector3 absNormal
 - float d
 - Vector3 normal
-- Matrix3x4 reflectionMatrix /* readonly */
+- Matrix3x4 reflectionMatrix // readonly
 
 
 ### Polyhedron
@@ -3650,8 +3650,8 @@ Methods:
 
 Properties:
 
-- Vector3[]@[] face /* readonly */
-- uint numFaces /* readonly */
+- Vector3[]@[] face // readonly
+- uint numFaces // readonly
 
 
 ### Quaternion
@@ -3674,13 +3674,13 @@ Methods:
 
 Properties:
 
-- Vector3 eulerAngles /* readonly */
-- float pitch /* readonly */
-- float roll /* readonly */
+- Vector3 eulerAngles // readonly
+- float pitch // readonly
+- float roll // readonly
 - float w
 - float x
 - float y
-- float yaw /* readonly */
+- float yaw // readonly
 - float z
 
 
@@ -3709,8 +3709,8 @@ Properties:
 Properties:
 
 - float distance
-- Drawable@ drawable /* readonly */
-- Node@ node /* readonly */
+- Drawable@ drawable // readonly
+- Node@ node // readonly
 - Vector3 normal
 - Vector3 position
 - uint subObject
@@ -3733,14 +3733,14 @@ Methods:
 Properties:
 
 - float bottom
-- Vector2 center /* readonly */
+- Vector2 center // readonly
 - bool defined
-- Vector2 halfSize /* readonly */
+- Vector2 halfSize // readonly
 - float left
 - Vector2 max
 - Vector2 min
 - float right
-- Vector2 size /* readonly */
+- Vector2 size // readonly
 - float top
 
 
@@ -3748,8 +3748,8 @@ Properties:
 
 Properties:
 
-- int refs /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- int weakRefs // readonly
 
 
 ### RenderPath
@@ -3773,12 +3773,12 @@ Methods:
 Properties:
 
 - RenderPathCommand[] commands
-- uint numCommands /* readonly */
-- uint numRenderTargets /* readonly */
-- int refs /* readonly */
+- uint numCommands // readonly
+- uint numRenderTargets // readonly
+- int refs // readonly
 - RenderTargetInfo[] renderTargets
 - Variant[] shaderParameters
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### RenderPathCommand
@@ -3822,15 +3822,15 @@ Methods:
 
 Properties:
 
-- int height /* readonly */
+- int height // readonly
 - RenderSurface@ linkedDepthStencil
 - RenderSurface@ linkedRenderTarget
 - uint numViewports
-- Texture@ parentTexture /* readonly */
+- Texture@ parentTexture // readonly
 - RenderSurfaceUpdateMode updateMode
-- TextureUsage usage /* readonly */
+- TextureUsage usage // readonly
 - Viewport@[] viewports
-- int width /* readonly */
+- int width // readonly
 
 
 ### RenderTargetInfo
@@ -3859,13 +3859,13 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- Material@ defaultLightRamp /* readonly */
-- Material@ defaultLightSpot /* readonly */
-- Material@ defaultMaterial /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- Material@ defaultLightRamp // readonly
+- Material@ defaultLightSpot // readonly
+- Material@ defaultMaterial // readonly
 - RenderPath@ defaultRenderPath
-- Zone@ defaultZone /* readonly */
+- Zone@ defaultZone // readonly
 - bool drawShadows
 - bool dynamicInstancing
 - bool hdrRendering
@@ -3876,17 +3876,17 @@ Properties:
 - int maxShadowMaps
 - int maxSortedInstances
 - int minInstances
-- uint numBatches /* readonly */
-- uint[] numGeometries /* readonly */
-- uint[] numLights /* readonly */
-- uint[] numOccluders /* readonly */
-- uint numPrimitives /* readonly */
-- uint[] numShadowMaps /* readonly */
+- uint numBatches // readonly
+- uint[] numGeometries // readonly
+- uint[] numLights // readonly
+- uint[] numOccluders // readonly
+- uint numPrimitives // readonly
+- uint[] numShadowMaps // readonly
 - uint numViewports
-- uint numViews /* readonly */
+- uint numViews // readonly
 - float occluderSizeThreshold
 - int occlusionBufferSize
-- int refs /* readonly */
+- int refs // readonly
 - bool reuseShadowMaps
 - int shadowMapSize
 - int shadowQuality
@@ -3894,10 +3894,10 @@ Properties:
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
 - int textureQuality
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - Viewport@[] viewports
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### Resource
@@ -3910,15 +3910,15 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
 - String name
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### ResourceCache
@@ -3950,19 +3950,19 @@ Methods:
 Properties:
 
 - bool autoReloadResources
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - uint[] memoryBudget
-- uint[] memoryUse /* readonly */
-- PackageFile@[]@ packageFiles /* readonly */
-- int refs /* readonly */
-- String[]@ resourceDirs /* readonly */
-- bool seachPackagesFirst /* readonly */
-- bool searchPackagesFirst /* writeonly */
-- uint totalMemoryUse /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- uint[] memoryUse // readonly
+- PackageFile@[]@ packageFiles // readonly
+- int refs // readonly
+- String[]@ resourceDirs // readonly
+- bool seachPackagesFirst // readonly
+- bool searchPackagesFirst // writeonly
+- uint totalMemoryUse // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### ResourceRef
@@ -3981,8 +3981,8 @@ Methods:
 
 Properties:
 
-- bool empty /* readonly */
-- uint length /* readonly */
+- bool empty // readonly
+- uint length // readonly
 - String[] names
 - ShortStringHash type
 
@@ -4020,49 +4020,49 @@ Methods:
 
 Properties:
 
-- bool active /* readonly */
+- bool active // readonly
 - float angularDamping
 - Vector3 angularFactor
 - float angularRestThreshold
 - Vector3 angularVelocity
 - Vector3 anisotropicFriction
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - float ccdMotionThreshold
 - float ccdRadius
-- Vector3 centerOfMass /* readonly */
-- RigidBody@[]@ collidingBodies /* readonly */
+- Vector3 centerOfMass // readonly
+- RigidBody@[]@ collidingBodies // readonly
 - CollisionEventMode collisionEventMode
 - uint collisionLayer
 - uint collisionMask
 - float contactProcessingThreshold
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - float friction
 - Vector3 gravityOverride
-- uint id /* readonly */
+- uint id // readonly
 - bool kinematic
 - float linearDamping
 - Vector3 linearFactor
 - float linearRestThreshold
 - Vector3 linearVelocity
 - float mass
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - bool phantom
 - Vector3 position
-- int refs /* readonly */
+- int refs // readonly
 - float restitution
 - float rollingFriction
 - Quaternion rotation
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useGravity
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### Scene
@@ -4147,54 +4147,54 @@ Methods:
 
 Properties:
 
-- bool asyncLoading /* readonly */
-- float asyncProgress /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- bool asyncLoading // readonly
+- float asyncProgress // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint checksum /* readonly */
-- Node@[] children /* readonly */
-- Component@[] components /* readonly */
-- DebugRenderer@ debugRenderer /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint checksum // readonly
+- Node@[] children // readonly
+- Component@[] components // readonly
+- DebugRenderer@ debugRenderer // readonly
 - Vector3 direction
 - float elapsedTime
-- String fileName /* readonly */
-- uint id /* readonly */
+- String fileName // readonly
+- uint id // readonly
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
-- uint numComponents /* readonly */
-- Octree@ octree /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
+- uint numComponents // readonly
+- Octree@ octree // readonly
 - Node@ parent
-- PhysicsWorld@ physicsWorld /* readonly */
+- PhysicsWorld@ physicsWorld // readonly
 - Vector3 position
-- int refs /* readonly */
-- PackageFile@[]@ requiredPackageFiles /* readonly */
-- Vector3 right /* readonly */
+- int refs // readonly
+- PackageFile@[]@ requiredPackageFiles // readonly
+- Vector3 right // readonly
 - Quaternion rotation
 - Vector3 scale
-- ScriptObject@ scriptObject /* readonly */
+- ScriptObject@ scriptObject // readonly
 - float smoothingConstant
 - float snapThreshold
 - bool temporary
 - float timeScale
-- Matrix3x4 transform /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- Vector3 up /* readonly */
+- Matrix3x4 transform // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- Vector3 up // readonly
 - bool updateEnabled
-- VariantMap vars /* readonly */
-- int weakRefs /* readonly */
+- VariantMap vars // readonly
+- int weakRefs // readonly
 - Vector3 worldDirection
 - Vector3 worldPosition
-- Vector3 worldRight /* readonly */
+- Vector3 worldRight // readonly
 - Quaternion worldRotation
 - Vector3 worldScale
-- Matrix3x4 worldTransform /* readonly */
-- Vector3 worldUp /* readonly */
+- Matrix3x4 worldTransform // readonly
+- Vector3 worldUp // readonly
 
 
 ### Script
@@ -4207,14 +4207,14 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - Scene@ defaultScene
 - ScriptFile@ defaultScriptFile
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### ScriptFile
@@ -4231,16 +4231,16 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- bool compiled /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool compiled // readonly
+- uint memoryUse // readonly
 - String name
-- int refs /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### ScriptInstance
@@ -4270,25 +4270,25 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - String className
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - int fixedUpdateFps
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- ScriptObject@ object /* readonly */
-- int refs /* readonly */
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ScriptObject@ object // readonly
+- int refs // readonly
 - ScriptFile@ scriptFile
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### ScriptObject
@@ -4356,41 +4356,41 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- Button@ backButton /* readonly */
-- ShortStringHash baseType /* readonly */
+- Button@ backButton // readonly
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
-- float effectiveScrollStep /* readonly */
+- float effectiveScrollStep // readonly
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
-- Button@ forwardButton /* readonly */
+- Button@ forwardButton // readonly
 - int height
 - HorizontalAlignment horizontalAlignment
-- bool hovering /* readonly */
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -4402,35 +4402,35 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - Orientation orientation
 - UIElement@ parent
 - IntVector2 position
 - int priority
 - float range
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - float scrollStep
 - bool selected
 - IntVector2 size
-- Slider@ slider /* readonly */
+- Slider@ slider // readonly
 - bool sortChildren
 - float stepFactor
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
 - float value
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -4495,40 +4495,40 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - UIElement@ contentElement
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
-- ScrollBar@ horizontalScrollBar /* readonly */
-- bool hovering /* readonly */
+- ScrollBar@ horizontalScrollBar // readonly
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -4540,19 +4540,19 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - float pageStep
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool scrollBarsAutoVisible
-- BorderImage@ scrollPanel /* readonly */
+- BorderImage@ scrollPanel // readonly
 - float scrollStep
 - bool selected
 - IntVector2 size
@@ -4560,15 +4560,15 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
-- ScrollBar@ verticalScrollBar /* readonly */
+- ScrollBar@ verticalScrollBar // readonly
 - IntVector2 viewPosition
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -4590,17 +4590,17 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Serializer
@@ -4645,7 +4645,7 @@ Methods:
 
 Properties:
 
-- uint16 value /* readonly */
+- uint16 value // readonly
 
 
 ### Skeleton
@@ -4657,9 +4657,9 @@ Methods:
 
 Properties:
 
-- Bone@[] bones /* readonly */
-- uint numBones /* readonly */
-- Bone@ rootBone /* readonly */
+- Bone@[] bones // readonly
+- uint numBones // readonly
+- Bone@ rootBone // readonly
 
 
 ### Skybox
@@ -4684,39 +4684,39 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material /* writeonly */
+- Material@ material // writeonly
 - Material@[] materials
 - uint maxLights
 - Model@ model
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- uint numGeometries /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numGeometries // readonly
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -4782,44 +4782,44 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
-- bool hovering /* readonly */
+- bool hovering // readonly
 - IntRect imageRect
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
-- BorderImage@ knob /* readonly */
+- BorderImage@ knob // readonly
 - IntRect layoutBorder
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4830,19 +4830,19 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - Orientation orientation
 - UIElement@ parent
 - IntVector2 position
 - int priority
 - float range
-- int refs /* readonly */
+- int refs // readonly
 - float repeatRate
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
@@ -4851,14 +4851,14 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
 - float value
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -4884,26 +4884,26 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inProgress /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inProgress // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - Vector3 targetPosition
 - Quaternion targetRotation
 - Vector3 targetWorldPosition
 - Quaternion targetWorldRotation
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Sound
@@ -4916,22 +4916,22 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- bool compressed /* readonly */
-- float frequency /* readonly */
-- float length /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool compressed // readonly
+- float frequency // readonly
+- float length // readonly
 - bool looped
-- uint memoryUse /* readonly */
+- uint memoryUse // readonly
 - String name
-- int refs /* readonly */
-- uint sampleSize /* readonly */
-- bool sixteenBit /* readonly */
-- bool stereo /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- uint sampleSize // readonly
+- bool sixteenBit // readonly
+- bool stereo // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### SoundListener
@@ -4955,21 +4955,21 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- int refs /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### SoundSource
@@ -4998,30 +4998,30 @@ Methods:
 
 Properties:
 
-- float attenuation /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- float attenuation // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - float frequency
 - float gain
-- uint id /* readonly */
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
 - float panning
-- bool playing /* readonly */
-- int refs /* readonly */
-- Sound@ sound /* readonly */
+- bool playing // readonly
+- int refs // readonly
+- Sound@ sound // readonly
 - SoundType soundType
 - bool temporary
-- float timePosition /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- float timePosition // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### SoundSource3D
@@ -5052,35 +5052,35 @@ Methods:
 
 Properties:
 
-- float attenuation /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- float attenuation // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - float farDistance
 - float frequency
 - float gain
-- uint id /* readonly */
+- uint id // readonly
 - float innerAngle
 - float nearDistance
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - float outerAngle
 - float panning
-- bool playing /* readonly */
-- int refs /* readonly */
+- bool playing // readonly
+- int refs // readonly
 - float rolloffFactor
-- Sound@ sound /* readonly */
+- Sound@ sound // readonly
 - SoundType soundType
 - bool temporary
-- float timePosition /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- float timePosition // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Sphere
@@ -5134,26 +5134,26 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - Vector3[]@ controlPoints
 - bool enabled
-- bool enabledEffective /* readonly */
-- bool finished /* readonly */
-- uint id /* readonly */
+- bool enabledEffective // readonly
+- bool finished // readonly
+- uint id // readonly
 - InterpolationMode interpolationMode
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - Vector3 position
-- int refs /* readonly */
+- int refs // readonly
 - float speed
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Sprite
@@ -5211,35 +5211,35 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BlendMode blendMode
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- UIElement@[] children /* readonly */
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- String category // readonly
+- UIElement@[] children // readonly
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - bool elementEventSender
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hotSpot
 - IntRect imageRect
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - Vector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
 - float rotation
 - Vector2 scale
 - IntVector2 size
@@ -5247,13 +5247,13 @@ Properties:
 - String style
 - bool temporary
 - Texture@ texture
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -5281,39 +5281,39 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material /* writeonly */
+- Material@ material // writeonly
 - Material@[] materials
 - uint maxLights
 - Model@ model
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- uint numGeometries /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numGeometries // readonly
 - bool occludee
 - bool occluder
 - uint occlusionLodLevel
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
 
@@ -5342,42 +5342,42 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
-- Node@[] instanceNodes /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
+- Node@[] instanceNodes // readonly
 - uint lightMask
 - float lodBias
-- Material@ material /* writeonly */
+- Material@ material // writeonly
 - Material@[] materials
 - uint maxLights
 - Model@ model
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- uint numGeometries /* readonly */
-- uint numInstanceNodes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numGeometries // readonly
+- uint numInstanceNodes // readonly
 - bool occludee
 - bool occluder
 - uint occlusionLodLevel
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
-- Zone@ zone /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
 - uint zoneMask
 
 
@@ -5430,9 +5430,9 @@ Methods:
 
 Properties:
 
-- bool empty /* readonly */
-- uint length /* readonly */
-- uint utf8Length /* readonly */
+- bool empty // readonly
+- uint length // readonly
+- uint utf8Length // readonly
 
 
 ### StringHash
@@ -5443,7 +5443,7 @@ Methods:
 
 Properties:
 
-- uint value /* readonly */
+- uint value // readonly
 
 
 ### Technique
@@ -5459,17 +5459,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
 - String name
-- Pass@[] passes /* readonly */
-- int refs /* readonly */
+- Pass@[] passes // readonly
+- int refs // readonly
 - bool sm3
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### TechniqueEntry
@@ -5505,39 +5505,39 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - Image@ heightMap
-- uint id /* readonly */
+- uint id // readonly
 - uint lightMask
 - float lodBias
 - Material@ material
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- IntVector2 numPatches /* readonly */
-- IntVector2 numVertices /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- IntVector2 numPatches // readonly
+- IntVector2 numVertices // readonly
 - bool occludee
 - bool occluder
 - int patchSize
-- TerrainPatch@[] patches /* readonly */
-- int refs /* readonly */
+- TerrainPatch@[] patches // readonly
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool smoothing
 - Vector3 spacing
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - uint zoneMask
 
 
@@ -5562,34 +5562,34 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
-- uint id /* readonly */
-- bool inView /* readonly */
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - bool occludee
 - bool occluder
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
 
@@ -5656,44 +5656,44 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2[] charPositions /* readonly */
-- IntVector2[] charSizes /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2[] charPositions // readonly
+- IntVector2[] charSizes // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - Color effectColor
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
-- Font@ font /* readonly */
-- int fontSize /* readonly */
+- Font@ font // readonly
+- int fontSize // readonly
 - int height
 - HorizontalAlignment horizontalAlignment
 - Color hoverColor
-- bool hovering /* readonly */
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -5705,25 +5705,25 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChars /* readonly */
-- uint numChildren /* readonly */
-- uint numRows /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChars // readonly
+- uint numChildren // readonly
+- uint numRows // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- int rowHeight /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- int rowHeight // readonly
 - float rowSpacing
-- int[] rowWidths /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int[] rowWidths // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - Color selectionColor
-- uint selectionLength /* readonly */
-- uint selectionStart /* readonly */
+- uint selectionLength // readonly
+- uint selectionStart // readonly
 - IntVector2 size
 - bool sortChildren
 - String style
@@ -5732,13 +5732,13 @@ Properties:
 - HorizontalAlignment textAlignment
 - TextEffect textEffect
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 - bool wordwrap
 
@@ -5767,57 +5767,57 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
-- BoundingBox boundingBox /* readonly */
+- ShortStringHash baseType // readonly
+- BoundingBox boundingBox // readonly
 - bool castShadows
-- String category /* readonly */
-- IntVector2[] charPositions /* readonly */
-- IntVector2[] charSizes /* readonly */
-- Color color /* writeonly */
+- String category // readonly
+- IntVector2[] charPositions // readonly
+- IntVector2[] charSizes // readonly
+- Color color // writeonly
 - Color[] colors
 - float drawDistance
 - Color effectColor
 - float effectDepthBias
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - bool faceCamera
-- Font@ font /* readonly */
-- int fontSize /* readonly */
+- Font@ font // readonly
+- int fontSize // readonly
 - HorizontalAlignment horizontalAlignment
-- uint id /* readonly */
-- bool inView /* readonly */
+- uint id // readonly
+- bool inView // readonly
 - uint lightMask
 - float lodBias
 - Material@ material
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
-- uint numChars /* readonly */
-- uint numRows /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numChars // readonly
+- uint numRows // readonly
 - bool occludee
 - bool occluder
 - float opacity
-- int refs /* readonly */
-- int rowHeight /* readonly */
+- int refs // readonly
+- int rowHeight // readonly
 - float rowSpacing
-- int[] rowWidths /* readonly */
+- int[] rowWidths // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
 - String text
 - HorizontalAlignment textAlignment
 - TextEffect textEffect
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - VerticalAlignment verticalAlignment
 - uint viewMask
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 - bool wordwrap
-- BoundingBox worldBoundingBox /* readonly */
+- BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
 
@@ -5835,28 +5835,28 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - Color borderColor
-- String category /* readonly */
-- bool compressed /* readonly */
-- bool dataLost /* readonly */
+- String category // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
 - TextureFilterMode filterMode
-- uint format /* readonly */
-- int height /* readonly */
-- int[] levelHeight /* readonly */
-- int[] levelWidth /* readonly */
-- uint levels /* readonly */
-- uint memoryUse /* readonly */
+- uint format // readonly
+- int height // readonly
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
 - int[] mipsToSkip
 - String name
-- int refs /* readonly */
+- int refs // readonly
 - bool sRGB
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- TextureUsage usage /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
-- int width /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
 
 
 ### Texture2D
@@ -5875,29 +5875,29 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - Color borderColor
-- String category /* readonly */
-- bool compressed /* readonly */
-- bool dataLost /* readonly */
+- String category // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
 - TextureFilterMode filterMode
-- uint format /* readonly */
-- int height /* readonly */
-- int[] levelHeight /* readonly */
-- int[] levelWidth /* readonly */
-- uint levels /* readonly */
-- uint memoryUse /* readonly */
+- uint format // readonly
+- int height // readonly
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
 - int[] mipsToSkip
 - String name
-- int refs /* readonly */
-- RenderSurface@ renderSurface /* readonly */
+- int refs // readonly
+- RenderSurface@ renderSurface // readonly
 - bool sRGB
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- TextureUsage usage /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
-- int width /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
 
 
 ### Texture3D
@@ -5916,29 +5916,29 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - Color borderColor
-- String category /* readonly */
-- bool compressed /* readonly */
-- bool dataLost /* readonly */
+- String category // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
 - TextureFilterMode filterMode
-- uint format /* readonly */
-- int height /* readonly */
-- int[] levelHeight /* readonly */
-- int[] levelWidth /* readonly */
-- uint levels /* readonly */
-- uint memoryUse /* readonly */
+- uint format // readonly
+- int height // readonly
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
 - int[] mipsToSkip
 - String name
-- int refs /* readonly */
-- RenderSurface@ renderSurface /* readonly */
+- int refs // readonly
+- RenderSurface@ renderSurface // readonly
 - bool sRGB
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- TextureUsage usage /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
-- int width /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
 
 
 ### TextureCube
@@ -5957,29 +5957,29 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - Color borderColor
-- String category /* readonly */
-- bool compressed /* readonly */
-- bool dataLost /* readonly */
+- String category // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
 - TextureFilterMode filterMode
-- uint format /* readonly */
-- int height /* readonly */
-- int[] levelHeight /* readonly */
-- int[] levelWidth /* readonly */
-- uint levels /* readonly */
-- uint memoryUse /* readonly */
+- uint format // readonly
+- int height // readonly
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
 - int[] mipsToSkip
 - String name
-- int refs /* readonly */
-- RenderSurface@[] renderSurfaces /* readonly */
+- int refs // readonly
+- RenderSurface@[] renderSurfaces // readonly
 - bool sRGB
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- TextureUsage usage /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
-- int width /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
 
 
 ### TextureFrame
@@ -5998,17 +5998,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- float elapsedTime /* readonly */
-- uint frameNumber /* readonly */
-- int refs /* readonly */
-- uint systemTime /* readonly */
-- String timeStamp /* readonly */
-- float timeStep /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- float elapsedTime // readonly
+- uint frameNumber // readonly
+- int refs // readonly
+- uint systemTime // readonly
+- String timeStamp // readonly
+- float timeStep // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### Timer
@@ -6078,39 +6078,39 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float delay
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
-- bool hovering /* readonly */
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -6122,29 +6122,29 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -6178,30 +6178,30 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
 - String clipBoardText
 - Cursor@ cursor
-- IntVector2 cursorPosition /* readonly */
+- IntVector2 cursorPosition // readonly
 - float defaultToolTipDelay
 - float doubleClickInterval
 - int dragBeginDistance
 - float dragBeginInterval
-- UIElement@ dragElement /* readonly */
+- UIElement@ dragElement // readonly
 - UIElement@ focusElement
 - bool forceAutoHint
-- UIElement@ frontElement /* readonly */
+- UIElement@ frontElement // readonly
 - int maxFontTextureSize
-- UIElement@ modalRoot /* readonly */
+- UIElement@ modalRoot // readonly
 - bool nonFocusedMouseWheel
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useMutableGlyphs
 - bool useScreenKeyboard
 - bool useSystemClipBoard
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 
 
 ### UIElement
@@ -6263,38 +6263,38 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
-- bool hovering /* readonly */
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -6306,29 +6306,29 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -6342,23 +6342,23 @@ Methods:
 - void FromString(const String&, const String&)
 - bool GetBool() const
 - VectorBuffer GetBuffer() const
-- Camera@ GetCamera() const /* deprecated */
-- CollisionShape@ GetCollisionShape() const /* deprecated */
-- Component@ GetComponent() const /* deprecated */
-- Connection@ GetConnection() const /* deprecated */
+- Camera@ GetCamera() const // deprecated
+- CollisionShape@ GetCollisionShape() const // deprecated
+- Component@ GetComponent() const // deprecated
+- Connection@ GetConnection() const // deprecated
 - float GetFloat() const
 - int GetInt() const
-- Node@ GetNode() const /* deprecated */
-- PhysicsWorld@ GetPhysicsWorld() const /* deprecated */
+- Node@ GetNode() const // deprecated
+- PhysicsWorld@ GetPhysicsWorld() const // deprecated
 - RefCounted@ GetPtr() const
-- RenderSurface@ GetRenderSurface() const /* deprecated */
-- RigidBody@ GetRigidBody() const /* deprecated */
-- Scene@ GetScene() const /* deprecated */
-- Serializable@ GetSerializable() const /* deprecated */
+- RenderSurface@ GetRenderSurface() const // deprecated
+- RigidBody@ GetRigidBody() const // deprecated
+- Scene@ GetScene() const // deprecated
+- Serializable@ GetSerializable() const // deprecated
 - ShortStringHash GetShortStringHash() const
 - StringHash GetStringHash() const
-- Texture@ GetTexture() const /* deprecated */
-- UIElement@ GetUIElement() const /* deprecated */
+- Texture@ GetTexture() const // deprecated
+- UIElement@ GetUIElement() const // deprecated
 - uint GetUInt() const
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
@@ -6375,10 +6375,10 @@ Methods:
 
 Properties:
 
-- bool empty /* readonly */
-- VariantType type /* readonly */
-- String typeName /* readonly */
-- bool zero /* readonly */
+- bool empty // readonly
+- VariantType type // readonly
+- String typeName // readonly
+- bool zero // readonly
 
 
 ### VariantMap
@@ -6393,8 +6393,8 @@ Methods:
 
 Properties:
 
-- ShortStringHash[]@ keys /* readonly */
-- uint length /* readonly */
+- ShortStringHash[]@ keys // readonly
+- uint length // readonly
 
 
 ### Vector2
@@ -6411,9 +6411,9 @@ Methods:
 
 Properties:
 
-- float[] data /* readonly */
-- float length /* readonly */
-- float lengthSquared /* readonly */
+- float[] data // readonly
+- float length // readonly
+- float lengthSquared // readonly
 - float x
 - float y
 
@@ -6434,9 +6434,9 @@ Methods:
 
 Properties:
 
-- float[] data /* readonly */
-- float length /* readonly */
-- float lengthSquared /* readonly */
+- float[] data // readonly
+- float length // readonly
+- float lengthSquared // readonly
 - float x
 - float y
 - float z
@@ -6454,7 +6454,7 @@ Methods:
 
 Properties:
 
-- float[] data /* readonly */
+- float[] data // readonly
 - float w
 - float x
 - float y
@@ -6528,11 +6528,11 @@ Methods:
 
 Properties:
 
-- uint checksum /* readonly */
-- bool eof /* readonly */
-- String name /* readonly */
-- uint position /* readonly */
-- uint size /* readonly */
+- uint checksum // readonly
+- bool eof // readonly
+- String name // readonly
+- uint position // readonly
+- uint size // readonly
 
 
 ### View3D
@@ -6596,44 +6596,44 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoUpdate
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- Node@ cameraNode /* readonly */
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- Node@ cameraNode // readonly
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- Texture2D@ depthTexture /* readonly */
-- float derivedOpacity /* readonly */
+- Texture2D@ depthTexture // readonly
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
+- bool fixedHeight // readonly
 - bool fixedHeightResizing
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool fixedWidthResizing
 - bool focus
 - FocusMode focusMode
 - uint format
 - int height
 - HorizontalAlignment horizontalAlignment
-- bool hovering /* readonly */
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -6650,34 +6650,34 @@ Properties:
 - Color modalShadeColor
 - bool movable
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
-- Texture2D@ renderTexture /* readonly */
+- int refs // readonly
+- Texture2D@ renderTexture // readonly
 - bool resizable
 - IntRect resizeBorder
-- UIElement@ root /* readonly */
-- Scene@ scene /* readonly */
-- IntVector2 screenPosition /* readonly */
+- UIElement@ root // readonly
+- Scene@ scene // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
-- Viewport@ viewport /* readonly */
+- Viewport@ viewport // readonly
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -6690,16 +6690,16 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - Camera@ camera
-- String category /* readonly */
+- String category // readonly
 - IntRect rect
-- int refs /* readonly */
+- int refs // readonly
 - RenderPath@ renderPath
 - Scene@ scene
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- int weakRefs /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 
 ### WeakHandle
@@ -6710,9 +6710,9 @@ Methods:
 
 Properties:
 
-- bool expired /* readonly */
-- int refs /* readonly */
-- int weakRefs /* readonly */
+- bool expired // readonly
+- int refs // readonly
+- int weakRefs // readonly
 
 
 ### Window
@@ -6774,40 +6774,40 @@ Methods:
 
 Properties:
 
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
-- String category /* readonly */
-- IntVector2 childOffset /* readonly */
-- UIElement@[] children /* readonly */
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
 - IntRect clipBorder
 - bool clipChildren
-- Color color /* writeonly */
-- bool colorGradient /* readonly */
+- Color color // writeonly
+- bool colorGradient // readonly
 - Color[] colors
-- IntRect combinedScreenRect /* readonly */
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
-- float derivedOpacity /* readonly */
+- float derivedOpacity // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
 - bool enabled
-- bool fixedHeight /* readonly */
+- bool fixedHeight // readonly
 - bool fixedHeightResizing
-- bool fixedSize /* readonly */
-- bool fixedWidth /* readonly */
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
 - bool fixedWidthResizing
 - bool focus
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
-- bool hovering /* readonly */
+- bool hovering // readonly
 - int indent
 - int indentSpacing
-- int indentWidth /* readonly */
+- int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
 - LayoutMode layoutMode
@@ -6824,31 +6824,31 @@ Properties:
 - Color modalShadeColor
 - bool movable
 - String name
-- uint numAllChildren /* readonly */
-- uint numAttributes /* readonly */
-- uint numChildren /* readonly */
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
 - float opacity
 - UIElement@ parent
 - IntVector2 position
 - int priority
-- int refs /* readonly */
+- int refs // readonly
 - bool resizable
 - IntRect resizeBorder
-- UIElement@ root /* readonly */
-- IntVector2 screenPosition /* readonly */
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
 - bool selected
 - IntVector2 size
 - bool sortChildren
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - bool useDerivedOpacity
-- VariantMap vars /* readonly */
+- VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
-- int weakRefs /* readonly */
+- int weakRefs // readonly
 - int width
 
 
@@ -6912,13 +6912,13 @@ Methods:
 
 Properties:
 
-- XMLFile@ file /* readonly */
-- bool isNull /* readonly */
-- String name /* readonly */
-- XMLElement nextResult /* readonly */
-- bool notNull /* readonly */
-- uint numAttributes /* readonly */
-- XMLElement parent /* readonly */
+- XMLFile@ file // readonly
+- bool isNull // readonly
+- String name // readonly
+- XMLElement nextResult // readonly
+- bool notNull // readonly
+- uint numAttributes // readonly
+- XMLElement parent // readonly
 - String value
 
 
@@ -6936,16 +6936,16 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType /* readonly */
-- String category /* readonly */
-- uint memoryUse /* readonly */
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
 - String name
-- int refs /* readonly */
-- XMLElement root /* readonly */
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
-- uint useTimer /* readonly */
-- int weakRefs /* readonly */
+- int refs // readonly
+- XMLElement root // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### XPathQuery
@@ -6973,9 +6973,9 @@ Properties:
 
 Properties:
 
-- bool empty /* readonly */
-- XMLElement firstResult /* readonly */
-- uint size /* readonly */
+- bool empty // readonly
+- XMLElement firstResult // readonly
+- uint size // readonly
 
 
 ### Zone
@@ -7000,46 +7000,46 @@ Methods:
 Properties:
 
 - Color ambientColor
-- Color ambientEndColor /* readonly */
+- Color ambientEndColor // readonly
 - bool ambientGradient
-- Color ambientStartColor /* readonly */
-- Variant[] attributeDefaults /* readonly */
-- AttributeInfo[] attributeInfos /* readonly */
+- Color ambientStartColor // readonly
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType /* readonly */
+- ShortStringHash baseType // readonly
 - BoundingBox boundingBox
 - bool castShadows
-- String category /* readonly */
+- String category // readonly
 - float drawDistance
 - bool enabled
-- bool enabledEffective /* readonly */
+- bool enabledEffective // readonly
 - Color fogColor
 - float fogEnd
 - float fogHeight
 - float fogHeightScale
 - float fogStart
 - bool heightFog
-- uint id /* readonly */
-- bool inView /* readonly */
-- Matrix3x4 inverseWorldTransform /* readonly */
+- uint id // readonly
+- bool inView // readonly
+- Matrix3x4 inverseWorldTransform // readonly
 - uint lightMask
 - float lodBias
 - uint maxLights
-- Node@ node /* readonly */
-- uint numAttributes /* readonly */
+- Node@ node // readonly
+- uint numAttributes // readonly
 - bool occludee
 - bool occluder
 - bool override
 - int priority
-- int refs /* readonly */
+- int refs // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type /* readonly */
-- String typeName /* readonly */
+- ShortStringHash type // readonly
+- String typeName // readonly
 - uint viewMask
-- int weakRefs /* readonly */
-- BoundingBox worldBoundingBox /* readonly */
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
 \section ScriptAPI_Enums Enumerations
