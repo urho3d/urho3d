@@ -102,7 +102,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "BoundingBox get_worldBoundingBox() const", asMETHOD(CollisionShape, GetWorldBoundingBox), asCALL_THISCALL);
     
     // Register Variant GetPtr() for CollisionShape. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape(const String&in binding = \"deprecated:GetCollisionShape\") const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
 }
 
 static CScriptArray* RigidBodyGetCollidingBodies(RigidBody* ptr)
@@ -187,7 +187,7 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "Array<RigidBody@>@ get_collidingBodies() const", asFUNCTION(RigidBodyGetCollidingBodies), asCALL_CDECL_OBJLAST);
 
     // Register Variant GetPtr() for RigidBody. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody() const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody(const String&in binding = \"deprecated:GetRigidBody\") const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterConstraint(asIScriptEngine* engine)
@@ -308,7 +308,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
     
     // Register Variant GetPtr() for PhysicsWorld. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld() const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld(const String&in binding = \"deprecated:GetPhysicWorld\") const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
 }
 
 void RegisterPhysicsAPI(asIScriptEngine* engine)

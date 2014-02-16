@@ -331,6 +331,18 @@ void Script::DumpAPI(DumpMode mode)
                     {
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
+                        ///\todo Is there a better way to mark deprecated API bindings for AngelScript?
+                        unsigned pos = declaration.FindLast("const String&in = \"deprecated:");
+                        if (pos != String::NPOS)
+                        {
+                            // Assume this 'mark' is added as the last parameter
+                            unsigned posEnd = declaration.Find(')', pos);
+                            if (pos != String::NPOS)
+                            {
+                                declaration.Replace(pos, posEnd - pos, "");
+                                declaration += "    // deprecated";
+                            }
+                        }
                         methodDeclarations.Push(declaration);
                     }
                 }
@@ -378,9 +390,9 @@ void Script::DumpAPI(DumpMode mode)
                     String remark;
                     String cppdoc;
                     if (!propertyInfos[j].write_)
-                        remark = " (readonly)";
+                        remark = "    // readonly";
                     else if (!propertyInfos[j].read_)
-                        remark = " (writeonly)";
+                        remark = "    // writeonly";
                     if (mode == C_HEADER && !remark.Empty())
                     {
                         cppdoc = "/*" + remark + " */\n";

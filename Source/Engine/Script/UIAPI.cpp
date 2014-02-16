@@ -106,7 +106,7 @@ static void RegisterUIElement(asIScriptEngine* engine)
     RegisterUIElement<UIElement>(engine, "UIElement");
 
     // Register Variant GetPtr() for UIElement. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "UIElement@+ GetUIElement() const", asFUNCTION(GetVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "UIElement@+ GetUIElement(const String&in binding = \"deprecated:GetUIElement\") const", asFUNCTION(GetVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterBorderImage(asIScriptEngine* engine)

@@ -28,6 +28,7 @@
 #include "Drawable.h"
 #include "File.h"
 #include "HashSet.h"
+#include "Log.h"
 #include "Node.h"
 #include "Renderer.h"
 #include "Resource.h"
@@ -54,8 +55,10 @@ template <class T, class U> U* RefCast(T* t)
 }
 
 /// Template function for returning a Variant pointer type cast to specific class.
-template <class T> T* GetVariantPtr(Variant* ptr)
+template <class T> T* GetVariantPtr(const String& binding, Variant* ptr)
 {
+    LOGWARNINGF("The %s API binding is deprecated, GetPtr() should be used instead.", binding.Substring(11).CString());
+
     if (ptr->GetType() == VAR_PTR)
         return dynamic_cast<T*>(ptr->GetPtr());
     else if (ptr->GetType() == VAR_VOIDPTR)
