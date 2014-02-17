@@ -1317,9 +1317,9 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
         using namespace ComponentAdded;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_NODE] = (void*)this;
-        eventData[P_COMPONENT] = (void*)component;
+        eventData[P_SCENE] = scene_;
+        eventData[P_NODE] = this;
+        eventData[P_COMPONENT] = component;
 
         scene_->SendEvent(E_COMPONENTADDED, eventData);
     }
