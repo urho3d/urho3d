@@ -45,6 +45,7 @@
 #include "RenderSurface.h"
 #include "ResourceCache.h"
 #include "Shader.h"
+#include "ShaderPrecache.h"
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
@@ -1111,16 +1112,9 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
     
 
-    // If used shaders are being dumped, check now for unique combination and write if necessary
-    if (shaderDumpFile_ && vertexShader_ && pixelShader_)
-    {
-        String shaderNames = vertexShader_->GetName() + " " + pixelShader_->GetName();
-        if (!usedShaders_.Contains(shaderNames))
-        {
-            shaderDumpFile_->WriteLine(shaderNames);
-            usedShaders_.Insert(shaderNames);
-        }
-    }
+    // Store shader combination if shader dumping in progress
+    if (shaderPrecache_)
+        shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
@@ -1886,55 +1880,19 @@ void Graphics::SetForceSM2(bool enable)
 
 void Graphics::BeginDumpShaders(const String& fileName)
 {
-    shaderDumpFile_ = new File(context_, fileName, FILE_READWRITE);
-    if (!shaderDumpFile_->IsOpen())
-    {
-        shaderDumpFile_.Reset();
-        return;
-    }
-    
-    LOGDEBUG("Begin dumping shaders to file " + fileName);
-    
-    // Read existing combinations from the file (if any) to avoid duplicates
-    usedShaders_.Clear();
-    while (!shaderDumpFile_->IsEof())
-        usedShaders_.Insert(shaderDumpFile_->ReadLine());
+    shaderPrecache_ = new ShaderPrecache(context_, fileName);
 }
 
 void Graphics::EndDumpShaders()
 {
-    if (shaderDumpFile_)
-    {
-        LOGDEBUG("End dumping shaders");
-        shaderDumpFile_.Reset();
-    }
+    shaderPrecache_.Reset();
 }
 
 void Graphics::PrecacheShaders(Deserializer& source)
 {
     PROFILE(PrecacheShaders);
     
-    LOGDEBUG("Begin precaching shaders");
-    
-    while (!source.IsEof())
-    {
-        Vector<String> shaders = source.ReadLine().Split(' ');
-        if (shaders.Size() == 2)
-        {
-            // Shader names are stored as Name_DEFINE1_DEFINE2 etc.
-            unsigned vsNameEnd = shaders[0].Find('_');
-            unsigned psNameEnd = shaders[1].Find('_');
-            ShaderVariation* vs = GetShader(VS, shaders[0].Substring(0, vsNameEnd), vsNameEnd != String::NPOS ?
-                shaders[0].Substring(vsNameEnd + 1).Replaced('_', ' ') : String::EMPTY);
-            ShaderVariation* ps = GetShader(PS, shaders[1].Substring(0, psNameEnd), psNameEnd != String::NPOS ?
-                shaders[1].Substring(psNameEnd + 1).Replaced('_', ' ') : String::EMPTY);
-            // Set the shaders in use to fully compile them
-            if (vs && ps)
-                SetShaders(vs, ps);
-        }
-    }
-    
-    LOGDEBUG("End precaching shaders");
+    ShaderPrecache::LoadShaders(this, source);
 }
 
 bool Graphics::IsInitialized() const

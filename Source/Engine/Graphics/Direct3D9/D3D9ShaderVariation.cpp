@@ -149,6 +149,11 @@ void ShaderVariation::SetDefines(const String& defines)
     defines_ = defines;
 }
 
+Shader* ShaderVariation::GetOwner() const
+{
+    return owner_;
+}
+
 bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();

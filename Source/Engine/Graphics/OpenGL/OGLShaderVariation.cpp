@@ -161,4 +161,9 @@ void ShaderVariation::SetDefines(const String& defines)
     defines_ = defines;
 }
 
+Shader* ShaderVariation::GetOwner() const
+{
+    return owner_;
+}
+
 }

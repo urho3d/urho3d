@@ -41,6 +41,7 @@ class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
 class Shader;
+class ShaderPrecache;
 class ShaderVariation;
 class Texture;
 class Texture2D;
@@ -580,10 +581,8 @@ private:
     mutable WeakPtr<Shader> lastShader_;
     /// Last used shader name in shader variation query.
     mutable String lastShaderName_;
-    /// File shader variations are dumped into. Null if dumping not active.
-    SharedPtr<File> shaderDumpFile_;
-    /// Hash set for detecting already dumped variations.
-    HashSet<String> usedShaders_;
+    /// Shader precache utility.
+    SharedPtr<ShaderPrecache> shaderPrecache_;
 };
 
 /// Register Graphics library objects.

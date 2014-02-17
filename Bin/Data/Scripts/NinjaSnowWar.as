@@ -167,8 +167,8 @@ void InitScene()
     }
     
     // Precache shaders if possible
-    if (cache.Exists("NinjaSnowWarShaders.txt"))
-        graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.txt"));
+    if (cache.Exists("NinjaSnowWarShaders.xml"))
+        graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.xml"));
 }
 
 void InitNetworking()

@@ -108,7 +108,7 @@ bool XMLFile::Load(Deserializer& source)
         XMLFile* inheritedXMLFile = cache->GetResource<XMLFile>(inherit);
         if (!inheritedXMLFile)
         {
-            LOGERRORF("Could not find inherit RenderPath XML file: %s", inherit.CString());
+            LOGERRORF("Could not find inherited XML file: %s", inherit.CString());
             return false;
         }
 
@@ -123,10 +123,8 @@ bool XMLFile::Load(Deserializer& source)
         cache->StoreResourceDependency(this, inherit);
 
         // Approximate patched data size
-        dataSize += inheritedXMLFile->GetRoot().GetUInt("dataSize");
+        dataSize += inheritedXMLFile->GetMemoryUse();
     }
-    else
-        rootElem.SetUInt("dataSize", dataSize);
 
     // Note: this probably does not reflect internal data structure size accurately
     SetMemoryUse(dataSize);

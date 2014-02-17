@@ -54,6 +54,8 @@ public:
     /// Set defines.
     void SetDefines(const String& defines);
     
+    /// Return the owner resource.
+    Shader* GetOwner() const;
     /// Return shader type.
     ShaderType GetShaderType() const { return type_; }
     /// Return full shader name.
