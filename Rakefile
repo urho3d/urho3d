@@ -176,10 +176,10 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD')
   xcproj.recreate_user_schemes
   xcproj.save or true   # There is a bug in this gem, it does not appear to exit with proper exit status (assume always success for now)
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
-  # Use xctool as its output is nicer when building
+  # Use xctool when building as its output is nicer
   system "xctool -project #{project} -scheme #{scheme} #{sdk}" or return 1
   if ios.to_i != 1 and scheme == 'ALL_BUILD'     # Disable testing for IOS as we don't have unit tests for IOS platform yet
-    # Use xcodebuild as its output is instantaneous testing (ensure Travis-CI does not kill the process during testing)
+    # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
     system "xcodebuild -project #{project} -scheme RUN_TESTS #{sdk}" or return 1
   end
   return 0
