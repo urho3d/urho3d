@@ -157,7 +157,7 @@ def xcode_travis_ci()
     xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
   else
     jit = 'JIT'
-    amalg = '-DENABLE_AMALG=1'
+    amalg = '-DENABLE_LUAJIT_AMALG=1'
     platform_prefix = ''
   end
   system "./cmake_macosx.sh -DIOS=$IOS -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 #{amalg} -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1" or abort 'Failed to configure Urho3D library build'
