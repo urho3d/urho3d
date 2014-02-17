@@ -710,9 +710,10 @@ In the default render paths, the rendering operations proceed in the following o
 - Opaque geometry ambient pass, or G-buffer pass in deferred rendering modes.
 - Opaque geometry per-pixel lighting passes. For shadow casting lights, the shadow map is rendered first.
 - (%Light pre-pass only) Opaque geometry material pass, which renders the objects with accumulated per-pixel lighting.
-- Pre-alpha rendering pass for custom render ordering such as the skybox.
-- Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
-- Post-alpha rendering pass.
+- Post-opaque pass for custom render ordering such as the skybox.
+- Refractive geometry pass.
+- Transparent geometry pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
+- Post-alpha pass, can be used for 3D overlays that should appear on top of everything else.
 
 \section Rendering_Drawable Rendering components
 
@@ -784,7 +785,7 @@ Materials can also define an optimization pass, called "litbase", for forward re
 
 After the G-buffer is complete, light volumes (spot and point lights) or fullscreen quads (directional lights) will be rendered to a light accumulation buffer to calculate the diffuse and specular light at each opaque pixel. Specular light is stored as intensity only. Stencil compare (AND operation) with the 8 low bits of the light's lightmask will be used for light culling. Similarly to forward rendering, shadow maps will be updated before each light as necessary.
 
-Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the pre-alpha pass, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
+Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the post-opaque and refract passes, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
 
 \section RenderingModes_Deferred Deferred rendering
 
@@ -796,7 +797,7 @@ Deferred rendering needs to render each opaque object only once to the G-buffer,
 - RT3: Linear depth (D3DFMT_R32F)
 - DS: Hardware depth and lightmask (D3DFMT_D24S8)
 
-After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to pre-alpha, transparent, and post-alpha passes, as in other rendering modes.
+After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to post-opaque, refract, transparent, and post-alpha passes, as in other rendering modes.
 
 \section RenderingModes_Comparision Advantages and disadvantages
 
@@ -1092,7 +1093,7 @@ The render path XML definition looks like this:
 </renderpath>
 \endcode
 
-Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The file Samplers.frag in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
+Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
