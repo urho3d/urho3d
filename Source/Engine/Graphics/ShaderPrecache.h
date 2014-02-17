@@ -46,7 +46,7 @@ public:
     /// Collect a shader combination. Called by Graphics when shaders have been set.
     void StoreShaders(ShaderVariation* vs, ShaderVariation* ps);
     
-    /// Load shaders from a XML file.
+    /// Load shaders from an XML file.
     static void LoadShaders(Graphics* graphics, Deserializer& source);
 
 private:

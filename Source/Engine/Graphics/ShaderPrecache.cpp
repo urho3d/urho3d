@@ -54,15 +54,17 @@ ShaderPrecache::ShaderPrecache(Context* context, const String& fileName) :
             shader = shader.GetNext("shader");
         }
     }
-    else
+    
+    // If no file yet or loading failed, create the root element now
+    if (!xmlFile_.GetRoot())
         xmlFile_.CreateRoot("shaders");
     
-    LOGDEBUG("Begin dumping shaders to " + fileName_);
+    LOGINFO("Begin dumping shaders to " + fileName_);
 }
 
 ShaderPrecache::~ShaderPrecache()
 {
-    LOGDEBUG("End dumping shaders");
+    LOGINFO("End dumping shaders");
     
     if (usedCombinations_.Empty())
         return;

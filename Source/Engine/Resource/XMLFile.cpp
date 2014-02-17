@@ -96,6 +96,7 @@ bool XMLFile::Load(Deserializer& source)
     if (!document_->load_buffer(buffer.Get(), dataSize))
     {
         LOGERROR("Could not parse XML data from " + source.GetName());
+        document_->reset();
         return false;
     }
 
