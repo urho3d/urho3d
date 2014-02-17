@@ -215,11 +215,11 @@ public:
     void ResetStreamFrequencies();
     /// Set force Shader Model 2 flag. Only effective before setting the initial screen mode.
     void SetForceSM2(bool enable);
-    /// Begin dumping shader variation names to a file for precaching.
+    /// Begin dumping shader variation names to an XML file for precaching.
     void BeginDumpShaders(const String& fileName);
     /// End dumping shader variations names.
     void EndDumpShaders();
-    /// Precache shader variations from a file containing rows of shader names, generated with BeginDumpShaders().
+    /// Precache shader variations from an XML file generated with BeginDumpShaders().
     void PrecacheShaders(Deserializer& source);
     
     /// Return whether rendering initialized.

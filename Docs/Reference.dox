@@ -753,7 +753,7 @@ On Direct3D9 and Android OpenGL ES 2.0 it is possible to lose the rendering cont
 
 Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
 
-See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D and TextureCube classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
+See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D, TextureCube and Texture3D classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
 
 \section Rendering_Further Further details
 
@@ -993,7 +993,7 @@ Pixel shader:
 - SPEC: the per-pixel forward light has specular calculations
 - SHADOW: the per-pixel forward light has shadowing
 - LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
-- HWSHADOW: use hardware shadow depth compare, Direct3D9 only
+- SHADOWCMP: use manual shadow depth compare, Direct3D9 only for DF16 & DF24 shadow map formats
 - HEIGHTFOG: object's zone has height fog mode
 
 \section Shaders_Writing Writing shaders
