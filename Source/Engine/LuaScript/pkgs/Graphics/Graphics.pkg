@@ -1,3 +1,4 @@
+$#include "File.h"
 $#include "Graphics.h"
 
 class Graphics : public Object
@@ -17,7 +18,11 @@ class Graphics : public Object
     void Minimize();
     void Close();
     bool TakeScreenShot(Image& destImage);
-    
+    void BeginDumpShaders(const String fileName);
+    void EndDumpShaders();
+    void PrecacheShaders(Deserializer& source);
+    tolua_outside void GraphicsPrecacheShaders @ PrecacheShaders(const String fileName);
+
     bool IsInitialized() const;
     void* GetExternalWindow() const;
     const String GetWindowTitle() const;
@@ -84,6 +89,16 @@ Graphics* GetGraphics();
 tolua_readonly tolua_property__get_set Graphics* graphics;
 
 ${
+static void GraphicsPrecacheShaders(Graphics* graphics, const String& fileName)
+{
+    if (!graphics)
+        return;
+
+    File file(graphics->GetContext());
+    if (file.Open(fileName, FILE_READ))
+        graphics->PrecacheShaders(file);
+}
+
 #define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetGraphics00
 static int tolua_GraphicsLuaAPI_GetGraphics00(lua_State* tolua_S)
 {

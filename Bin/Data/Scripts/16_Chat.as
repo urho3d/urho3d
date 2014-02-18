@@ -200,7 +200,7 @@ void HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
         // If we are a client, just display the message
         if (network.serverRunning)
         {
-            Connection@ sender = eventData["Connection"].GetConnection();
+            Connection@ sender = eventData["Connection"].GetPtr();
             
             text = sender.ToString() + " " + text;
             

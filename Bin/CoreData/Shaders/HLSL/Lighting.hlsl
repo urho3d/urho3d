@@ -151,7 +151,7 @@ float GetShadow(float4 shadowPos)
             tex2Dproj(sShadowMap, float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
             tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
         );
-        #ifdef HWSHADOW
+        #ifndef SHADOWCMP
             return cShadowIntensity.y + dot(inLight, cShadowIntensity.x);
         #else
             #ifndef POINTLIGHT
@@ -163,7 +163,7 @@ float GetShadow(float4 shadowPos)
     #else
         // Take one sample
         float inLight = tex2Dproj(sShadowMap, shadowPos).r;
-        #ifdef HWSHADOW
+        #ifndef SHADOWCMP
             return cShadowIntensity.y + cShadowIntensity.x * inLight;
         #else
             #ifndef POINTLIGHT

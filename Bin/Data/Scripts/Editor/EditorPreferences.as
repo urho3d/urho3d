@@ -216,7 +216,7 @@ void HideEditorPreferencesDialog()
 
 void EditUIMinOpacity(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     uiMinOpacity = edit.text.ToFloat();
     edit.text = String(uiMinOpacity);
     FadeUI();
@@ -225,7 +225,7 @@ void EditUIMinOpacity(StringHash eventType, VariantMap& eventData)
 
 void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     uiMaxOpacity = edit.text.ToFloat();
     edit.text = String(uiMaxOpacity);
     FadeUI();
@@ -234,20 +234,20 @@ void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
 
 void ToggleShowInternalUIElement(StringHash eventType, VariantMap& eventData)
 {
-    showInternalUIElement = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    showInternalUIElement = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
     UpdateHierarchyItem(editorUIElement, true);
 }
 
 void ToggleShowTemporaryObject(StringHash eventType, VariantMap& eventData)
 {
-    showTemporaryObject = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    showTemporaryObject = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
     UpdateHierarchyItem(editorScene, true);
     UpdateHierarchyItem(editorUIElement, true);
 }
 
 void EditNodeTextColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     nodeTextColor = Color(nodeItemTextColorEditR.text.ToFloat(), nodeItemTextColorEditG.text.ToFloat(), nodeItemTextColorEditB.text.ToFloat());
     if (edit.name == "NodeItemTextColor.r")
         edit.text = String(normalTextColor.r);
@@ -260,7 +260,7 @@ void EditNodeTextColor(StringHash eventType, VariantMap& eventData)
 
 void EditComponentTextColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     componentTextColor = Color(componentItemTextColorEditR.text.ToFloat(), componentItemTextColorEditG.text.ToFloat(), componentItemTextColorEditB.text.ToFloat());
     if (edit.name == "ComponentItemTextColor.r")
         edit.text = String(normalTextColor.r);
@@ -273,13 +273,13 @@ void EditComponentTextColor(StringHash eventType, VariantMap& eventData)
 
 void ToggleShowNonEditableAttribute(StringHash eventType, VariantMap& eventData)
 {
-    showNonEditableAttribute = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    showNonEditableAttribute = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
     UpdateAttributeInspector(true);
 }
 
 void EditOriginalAttributeTextColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     normalTextColor = Color(originalAttributeTextColorEditR.text.ToFloat(), originalAttributeTextColorEditG.text.ToFloat(), originalAttributeTextColorEditB.text.ToFloat());
     if (edit.name == "OriginalAttributeTextColor.r")
         edit.text = String(normalTextColor.r);
@@ -292,7 +292,7 @@ void EditOriginalAttributeTextColor(StringHash eventType, VariantMap& eventData)
 
 void EditModifiedAttributeTextColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     modifiedTextColor = Color(modifiedAttributeTextColorEditR.text.ToFloat(), modifiedAttributeTextColorEditG.text.ToFloat(), modifiedAttributeTextColorEditB.text.ToFloat());
     if (edit.name == "ModifiedAttributeTextColor.r")
         edit.text = String(modifiedTextColor.r);
@@ -305,7 +305,7 @@ void EditModifiedAttributeTextColor(StringHash eventType, VariantMap& eventData)
 
 void EditNonEditableAttributeTextColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     nonEditableTextColor = Color(nonEditableAttributeTextColorEditR.text.ToFloat(), nonEditableAttributeTextColorEditG.text.ToFloat(), nonEditableAttributeTextColorEditB.text.ToFloat());
     if (edit.name == "NonEditableAttributeTextColor.r")
         edit.text = String(nonEditableTextColor.r);
@@ -318,7 +318,7 @@ void EditNonEditableAttributeTextColor(StringHash eventType, VariantMap& eventDa
 
 void EditDefaultZoneAmbientColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     renderer.defaultZone.ambientColor = Color(defaultZoneAmbientColorEditR.text.ToFloat(), defaultZoneAmbientColorEditG.text.ToFloat(), defaultZoneAmbientColorEditB.text.ToFloat());
     if (edit.name == "DefaultZoneAmbientColor.r")
         edit.text = String(renderer.defaultZone.ambientColor.r);
@@ -330,7 +330,7 @@ void EditDefaultZoneAmbientColor(StringHash eventType, VariantMap& eventData)
 
 void EditDefaultZoneFogColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     renderer.defaultZone.fogColor = Color(defaultZoneFogColorEditR.text.ToFloat(), defaultZoneFogColorEditG.text.ToFloat(), defaultZoneFogColorEditB.text.ToFloat());
     if (edit.name == "DefaultZoneFogColor.r")
         edit.text = String(renderer.defaultZone.fogColor.r);
@@ -342,33 +342,33 @@ void EditDefaultZoneFogColor(StringHash eventType, VariantMap& eventData)
 
 void EditDefaultZoneFogStart(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     renderer.defaultZone.fogStart = edit.text.ToFloat();
     edit.text = String(renderer.defaultZone.fogStart);
 }
 
 void EditDefaultZoneFogEnd(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     renderer.defaultZone.fogEnd = edit.text.ToFloat();
     edit.text = String(renderer.defaultZone.fogEnd);
 }
 
 void ToggleShowGrid(StringHash eventType, VariantMap& eventData)
 {
-    showGrid = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    showGrid = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
     UpdateGrid(false);
 }
 
 void ToggleGrid2DMode(StringHash eventType, VariantMap& eventData)
 {
-    grid2DMode = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    grid2DMode = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
     UpdateGrid();
 }
 
 void EditGridSize(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     gridSize = edit.text.ToInt();
     edit.text = String(gridSize);
     UpdateGrid();
@@ -376,7 +376,7 @@ void EditGridSize(StringHash eventType, VariantMap& eventData)
 
 void EditGridSubdivisions(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     gridSubdivisions = edit.text.ToInt();
     edit.text = String(gridSubdivisions);
     UpdateGrid();
@@ -384,7 +384,7 @@ void EditGridSubdivisions(StringHash eventType, VariantMap& eventData)
 
 void EditGridScale(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     gridScale = edit.text.ToFloat();
     edit.text = String(gridScale);
     UpdateGrid(false);
@@ -392,7 +392,7 @@ void EditGridScale(StringHash eventType, VariantMap& eventData)
 
 void EditGridColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     gridColor = Color(gridColorEditR.text.ToFloat(), gridColorEditG.text.ToFloat(), gridColorEditB.text.ToFloat());
     if (edit.name == "GridColor.r")
         edit.text = String(gridColor.r);
@@ -405,7 +405,7 @@ void EditGridColor(StringHash eventType, VariantMap& eventData)
 
 void EditGridSubdivisionColor(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     gridSubdivisionColor = Color(gridSubdivisionColorEditR.text.ToFloat(), gridSubdivisionColorEditG.text.ToFloat(), gridSubdivisionColorEditB.text.ToFloat());
     if (edit.name == "GridSubdivisionColor.r")
         edit.text = String(gridSubdivisionColor.r);

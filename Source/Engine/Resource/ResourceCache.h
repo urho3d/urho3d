@@ -96,11 +96,11 @@ public:
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
-    SharedPtr<File> GetFile(const String& name, bool SendEventOnFailure = true);
+    SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
-    Resource* GetResource(ShortStringHash type, const String& name, bool SendEventOnFailure = true);
+    Resource* GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
-    Resource* GetResource(ShortStringHash type, const char* name, bool SendEventOnFailure = true);
+    Resource* GetResource(ShortStringHash type, const char* name, bool sendEventOnFailure = true);
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
     /// Return all loaded resources.
@@ -110,9 +110,9 @@ public:
     /// Return added package files.
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name.
-    template <class T> T* GetResource(const String& name, bool SendEventOnFailure = true);
+    template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
     /// Template version of returning a resource by name.
-    template <class T> T* GetResource(const char* name, bool SendEventOnFailure = true);
+    template <class T> T* GetResource(const char* name, bool sendEventOnFailure = true);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists by name.
@@ -173,16 +173,16 @@ private:
     bool searchPackagesFirst_;
 };
 
-template <class T> T* ResourceCache::GetResource(const String& name, bool SendEventOnFailure)
+template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
 {
     ShortStringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, name, SendEventOnFailure));
+    return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
-template <class T> T* ResourceCache::GetResource(const char* name, bool SendEventOnFailure)
+template <class T> T* ResourceCache::GetResource(const char* name, bool sendEventOnFailure)
 {
     ShortStringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, name, SendEventOnFailure));
+    return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const

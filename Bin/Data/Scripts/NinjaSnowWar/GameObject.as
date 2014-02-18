@@ -81,8 +81,8 @@ class GameObject : ScriptObject
 
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
     {
-        Node@ otherNode = eventData["OtherNode"].GetNode();
-        RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
+        Node@ otherNode = eventData["OtherNode"].GetPtr();
+        RigidBody@ otherBody = eventData["OtherBody"].GetPtr();
 
         // If the other collision shape belongs to static geometry, perform world collision
         if (otherBody.collisionLayer == 2)

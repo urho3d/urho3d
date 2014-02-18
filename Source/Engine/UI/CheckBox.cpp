@@ -92,7 +92,7 @@ void CheckBox::SetChecked(bool enable)
         using namespace Toggled;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_ELEMENT] = this;
         eventData[P_STATE] = checked_;
         SendEvent(E_TOGGLED, eventData);
     }

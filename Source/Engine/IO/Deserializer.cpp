@@ -305,6 +305,8 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_BUFFER:
         return Variant(ReadBuffer());
         
+        // Deserializing pointers is not supported. Return null
+    case VAR_VOIDPTR:
     case VAR_PTR:
         ReadUInt();
         return Variant((void*)0);

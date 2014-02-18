@@ -38,7 +38,6 @@
 #include "Matrix3x4.h"
 #include "MessageBox.h"
 #include "Profiler.h"
-#include "Renderer.h"
 #include "ResourceCache.h"
 #include "ScrollBar.h"
 #include "Shader.h"
@@ -204,8 +203,8 @@ void UI::SetFocusElement(UIElement* element, bool byKey)
     }
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_CLICKEDELEMENT] = (void*)originalElement;
-    eventData[P_ELEMENT] = (void*)element;
+    eventData[P_CLICKEDELEMENT] = originalElement;
+    eventData[P_ELEMENT] = element;
     SendEvent(E_FOCUSCHANGED, eventData);
 }
 
@@ -257,7 +256,8 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
             return false;
 
         // Revert back to original parent
-        modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+        modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
+            modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
         VariantMap& vars = const_cast<VariantMap&>(modalElement->GetVars());
         vars.Erase(VAR_ORIGINAL_PARENT);
         vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
@@ -270,7 +270,8 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
             if (element)
             {
                 const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
-                element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+                element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
+                    element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
                 vars = const_cast<VariantMap&>(element->GetVars());
                 vars.Erase(VAR_ORIGINAL_PARENT);
                 vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
@@ -652,8 +653,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
 
-    Renderer* renderer = GetSubsystem<Renderer>();
-    if (!renderer || batches.Empty())
+    if (batches.Empty())
         return;
 
     Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
@@ -677,12 +677,12 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);
 
-    ShaderVariation* noTextureVS = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* diffTextureVS = renderer->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
-    ShaderVariation* noTexturePS = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* diffTexturePS = renderer->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
-    ShaderVariation* diffMaskTexturePS = renderer->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
-    ShaderVariation* alphaTexturePS = renderer->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
+    ShaderVariation* noTextureVS = graphics_->GetShader(VS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* diffTextureVS = graphics_->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
+    ShaderVariation* noTexturePS = graphics_->GetShader(PS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* diffTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
+    ShaderVariation* diffMaskTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
+    ShaderVariation* alphaTexturePS = graphics_->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
 
     unsigned alphaFormat = Graphics::GetAlphaFormat();
 
@@ -922,8 +922,8 @@ void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, 
             using namespace DragDropTest;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_SOURCE] = (void*)dragElement_.Get();
-            eventData[P_TARGET] = (void*)element.Get();
+            eventData[P_SOURCE] = dragElement_.Get();
+            eventData[P_TARGET] = element.Get();
             eventData[P_ACCEPT] = accept;
             SendEvent(E_DRAGDROPTEST, eventData);
             accept = eventData[P_ACCEPT].GetBool();
@@ -1028,8 +1028,8 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
                             using namespace DragDropFinish;
 
                             VariantMap& eventData = GetEventDataMap();
-                            eventData[P_SOURCE] = (void*)dragElement_.Get();
-                            eventData[P_TARGET] = (void*)element.Get();
+                            eventData[P_SOURCE] = dragElement_.Get();
+                            eventData[P_TARGET] = element.Get();
                             eventData[P_ACCEPT] = accept;
                             SendEvent(E_DRAGDROPFINISH, eventData);
                         }
@@ -1088,7 +1088,7 @@ void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector
     using namespace DragBegin;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_ELEMENT] = (void*)element;
+    eventData[P_ELEMENT] = element;
     eventData[P_X] = screenPos.x_;
     eventData[P_Y] = screenPos.y_;
     eventData[P_ELEMENTX] = relativePos.x_;
@@ -1100,7 +1100,7 @@ void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector
 void UI::SendClickEvent(StringHash eventType, UIElement* element, const IntVector2& pos, int button, int buttons, int qualifiers)
 {
     VariantMap& eventData = GetEventDataMap();
-    eventData[UIMouseClick::P_ELEMENT] = (void*)element;
+    eventData[UIMouseClick::P_ELEMENT] = element;
     eventData[UIMouseClick::P_X] = pos.x_;
     eventData[UIMouseClick::P_Y] = pos.y_;
     eventData[UIMouseClick::P_BUTTON] = button;
@@ -1389,7 +1389,7 @@ void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
         uiEventData[P_FILENAME] = eventData[P_FILENAME];
         uiEventData[P_X] = screenPos.x_;
         uiEventData[P_Y] = screenPos.y_;
-        uiEventData[P_ELEMENT] = (void*)element;
+        uiEventData[P_ELEMENT] = element;
         
         if (element)
         {

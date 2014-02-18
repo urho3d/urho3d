@@ -90,9 +90,9 @@ void Component::SetEnabled(bool enable)
             using namespace ComponentEnabledChanged;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_SCENE] = (void*)scene;
-            eventData[P_NODE] = (void*)node_;
-            eventData[P_COMPONENT] = (void*)this;
+            eventData[P_SCENE] = scene;
+            eventData[P_NODE] = node_;
+            eventData[P_COMPONENT] = this;
 
             scene->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
         }

@@ -29,6 +29,7 @@
 #include "CustomGeometry.h"
 #include "DebugRenderer.h"
 #include "DecalSet.h"
+#include "File.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
@@ -39,7 +40,9 @@
 #include "ParticleEmitter.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "Shader.h"
+#include "ShaderPrecache.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
 #include "StaticModelGroup.h"
@@ -205,7 +208,9 @@ Graphics::Graphics(Context* context) :
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
-    defaultTextureFilterMode_(FILTER_BILINEAR)
+    defaultTextureFilterMode_(FILTER_BILINEAR),
+    shaderPath_("Shaders/HLSL/"),
+    shaderExtension_(".hlsl")
 {
     SetTextureUnitMappings();
     
@@ -1026,7 +1031,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
         
         // Create the shader now if not yet created. If already attempted, do not retry
-        if (vs && !vs->IsCompiled())
+        if (vs && !vs->GetGPUObject())
         {
             if (vs->GetCompilerOutput().Empty())
             {
@@ -1069,7 +1074,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 i->second_.register_ = M_MAX_UNSIGNED;
         }
         
-        if (ps && !ps->IsCompiled())
+        if (ps && !ps->GetGPUObject())
         {
             if (ps->GetCompilerOutput().Empty())
             {
@@ -1102,6 +1107,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         
         pixelShader_ = ps;
     }
+    
+    // Store shader combination if shader dumping in progress
+    if (shaderPrecache_)
+        shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
@@ -1879,6 +1888,23 @@ void Graphics::SetForceSM2(bool enable)
         LOGERROR("Force Shader Model 2 can not be changed after setting the initial screen mode");
 }
 
+void Graphics::BeginDumpShaders(const String& fileName)
+{
+    shaderPrecache_ = new ShaderPrecache(context_, fileName);
+}
+
+void Graphics::EndDumpShaders()
+{
+    shaderPrecache_.Reset();
+}
+
+void Graphics::PrecacheShaders(Deserializer& source)
+{
+    PROFILE(PrecacheShaders);
+    
+    ShaderPrecache::LoadShaders(this, source);
+}
+
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0 && impl_->GetDevice() != 0;
@@ -1969,6 +1995,29 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     }
     
     return 0;
+}
+
+ShaderVariation* Graphics::GetShader(ShaderType type, const String& name, const String& defines) const
+{
+    return GetShader(type, name.CString(), defines.CString());
+}
+
+ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const char* defines) const
+{
+    if (lastShaderName_ != name || !lastShader_)
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        
+        String fullShaderName = shaderPath_ + name + shaderExtension_;
+        // Try to reduce repeated error log prints because of missing shaders
+        if (lastShaderName_ == name && !cache->Exists(fullShaderName))
+            return 0;
+        
+        lastShader_ = cache->GetResource<Shader>(fullShaderName);
+        lastShaderName_ = name;
+    }
+    
+    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)0;
 }
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const

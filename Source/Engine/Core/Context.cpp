@@ -122,8 +122,8 @@ void Context::RemoveSubsystem(ShortStringHash objectType)
 
 void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr)
 {
-    // None or Pointer types can not be supported
-    if (attr.type_ == VAR_NONE || attr.type_ == VAR_PTR)
+    // None or pointer types can not be supported
+    if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
         return;
 
     attributes_[objectType].Push(attr);

@@ -24,10 +24,7 @@ static bool ResourceLoad(Resource* resource, const String& fileName)
         return false;
 
     File file(resource->GetContext());
-    if (!file.Open(fileName, FILE_READ))
-        return false;
-
-    return resource->Save(file);
+    return file.Open(fileName, FILE_READ) && resource->Load(file);
 }
 
 static bool ResourceSave(const Resource* resource, const String& fileName)
@@ -36,9 +33,6 @@ static bool ResourceSave(const Resource* resource, const String& fileName)
         return false;
 
     File file(resource->GetContext());
-    if (!file.Open(fileName, FILE_WRITE))
-        return false;
-
-    return resource->Save(file);
+    return file.Open(fileName, FILE_WRITE) && resource->Save(file);
 }
 $}

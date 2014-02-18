@@ -408,7 +408,7 @@ void ScrollView::UpdateView(const IntVector2& position)
         using namespace ViewChanged;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_ELEMENT] = this;
         eventData[P_X] = viewPosition_.x_;
         eventData[P_Y] = viewPosition_.y_;
         SendEvent(E_VIEWCHANGED, eventData);

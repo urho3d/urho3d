@@ -143,6 +143,7 @@ The full list of supported parameters, their datatypes and default values:
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
+- DumpShaders (string) Filename to dump used shader variations to for precaching.
 - %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
 - LowQualityShadows (bool) Low-quality (1 sample) shadow mode. Default false.
@@ -610,7 +611,7 @@ function HandleUpdate(eventType, eventData)
 end
 \endcode
 
-When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function:
+When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function. Note that in Lua retrieving an object pointer from a VariantMap requires the object type as the first parameter:
 
 \code
 CollisionDetector = ScriptObject()
@@ -671,6 +672,7 @@ Graphics implements the low-level functionality:
 - Setting the screen mode
 - Keeping track of GPU resources
 - Keeping track of rendering context state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
+- Loading shaders
 - Performing primitive rendering operations
 - Handling lost device
 
@@ -708,9 +710,10 @@ In the default render paths, the rendering operations proceed in the following o
 - Opaque geometry ambient pass, or G-buffer pass in deferred rendering modes.
 - Opaque geometry per-pixel lighting passes. For shadow casting lights, the shadow map is rendered first.
 - (%Light pre-pass only) Opaque geometry material pass, which renders the objects with accumulated per-pixel lighting.
-- Pre-alpha rendering pass for custom render ordering such as the skybox.
-- Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
-- Post-alpha rendering pass.
+- Post-opaque pass for custom render ordering such as the skybox.
+- Refractive geometry pass.
+- Transparent geometry pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
+- Post-alpha pass, can be used for 3D overlays that should appear on top of everything else.
 
 \section Rendering_Drawable Rendering components
 
@@ -751,7 +754,7 @@ On Direct3D9 and Android OpenGL ES 2.0 it is possible to lose the rendering cont
 
 Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
 
-See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D and TextureCube classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
+See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D, TextureCube and Texture3D classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
 
 \section Rendering_Further Further details
 
@@ -782,7 +785,7 @@ Materials can also define an optimization pass, called "litbase", for forward re
 
 After the G-buffer is complete, light volumes (spot and point lights) or fullscreen quads (directional lights) will be rendered to a light accumulation buffer to calculate the diffuse and specular light at each opaque pixel. Specular light is stored as intensity only. Stencil compare (AND operation) with the 8 low bits of the light's lightmask will be used for light culling. Similarly to forward rendering, shadow maps will be updated before each light as necessary.
 
-Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the pre-alpha pass, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
+Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the post-opaque and refract passes, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
 
 \section RenderingModes_Deferred Deferred rendering
 
@@ -794,7 +797,7 @@ Deferred rendering needs to render each opaque object only once to the G-buffer,
 - RT3: Linear depth (D3DFMT_R32F)
 - DS: Hardware depth and lightmask (D3DFMT_D24S8)
 
-After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to pre-alpha, transparent, and post-alpha passes, as in other rendering modes.
+After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to post-opaque, refract, transparent, and post-alpha passes, as in other rendering modes.
 
 \section RenderingModes_Comparision Advantages and disadvantages
 
@@ -991,7 +994,7 @@ Pixel shader:
 - SPEC: the per-pixel forward light has specular calculations
 - SHADOW: the per-pixel forward light has shadowing
 - LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
-- HWSHADOW: use hardware shadow depth compare, Direct3D9 only
+- SHADOWCMP: use manual shadow depth compare, Direct3D9 only for DF16 & DF24 shadow map formats
 - HEIGHTFOG: object's zone has height fog mode
 
 \section Shaders_Writing Writing shaders
@@ -1040,6 +1043,12 @@ current system, look up the defines from the description files and add them dire
 
 GLSL shaders in 1.3 and before used separate .vert and .frag files for the vertex and pixel shader source code. Now these are combined into .glsl files that include both shaders. Include files are likewise merged into .glsl files instead of separate vertex and pixel shader includes. To merge your shader code, append the pixel shader source into the vertex shader source file without the varyings definition (which should already be in the vertex shader code). Merge and fix include statements: change the file extension to .glsl. Note that some include files depend on each other so it is safest to always include Uniforms.glsl and Samplers.glsl first. Finally change the file extension of the vertex shader source file from .vert to .glsl and delete the .frag file. If you have pieces of pixel shader code (for example additional functions or variables) that produce errors when included in the vertex shader compile, wrap these with #ifdef COMPILEPS, and vice versa for vertex shader code.
 
+\section Shaders_Precaching Shader precaching
+
+The shader variations that are potentially used by a material technique in different lighting conditions and rendering passes are enumerated at material load time, but because of their large amount, they are not actually compiled or loaded from bytecode before being used in rendering. Especially on OpenGL the compiling of shaders just before rendering can cause hitches in the framerate. To avoid this, used shader combinations can be dumped out to an XML file, then preloaded. See \ref Graphics::BeginDumpShaders "BeginDumpShaders()", \ref Graphics::EndDumpShaders "EndDumpShaders()" and \ref Graphics::PrecacheShaders "PrecacheShaders()" in the Graphics subsystem. The command line parameters -ds <file> can be used to instruct the Engine to begin dumping shaders automatically on startup.
+
+Note that the used shader variations will vary with graphics settings, for example shadow quality high/low or instancing on/off.
+
 \page RenderPaths Render path
 
 %Scene rendering and any post-processing on a Viewport is defined by its RenderPath object, which can either be read from an XML file or be created programmatically.
@@ -1084,7 +1093,7 @@ The render path XML definition looks like this:
 </renderpath>
 \endcode
 
-Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The file Samplers.frag in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
+Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
@@ -1436,8 +1445,8 @@ An example of reading collision event and contact point data in script, from Nin
 \code
 void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
 {
-    Node@ otherNode = eventData["OtherNode"].GetNode();
-    RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
+    Node@ otherNode = eventData["OtherNode"].GetPtr();
+    RigidBody@ otherBody = eventData["OtherBody"].GetPtr();
     VectorBuffer contacts = eventData["Contacts"].GetBuffer();
 
     while (!contacts.eof)
@@ -1571,7 +1580,7 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -1690,7 +1699,7 @@ Connection* remoteSender = static_cast<Connection*>(eventData[P_CONNECTION].GetP
 
 %Script:
 \code
-Connection@ remoteSender = eventData["Connection"].GetConnection();
+Connection@ remoteSender = eventData["Connection"].GetPtr();
 \endcode
 
 \section Network_HttpRequests HTTP requests

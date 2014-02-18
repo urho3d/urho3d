@@ -42,68 +42,68 @@ void SetMorphWeight(uint, float);
 
 // Properties:
 float animationLodBias;
-/* (readonly) */
+/* readonly */
 Array<AnimationState> animationStates;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
-/* (writeonly) */
+/* writeonly */
 Material material;
 Array<Material> materials;
 uint maxLights;
 Model model;
-/* (readonly) */
+/* readonly */
 Array<String> morphNames;
 Array<float> morphWeights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAnimationStates;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numGeometries;
-/* (readonly) */
+/* readonly */
 uint numMorphs;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
-/* (readonly) */
+/* readonly */
 Skeleton skeleton;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool updateInvisible;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -119,31 +119,31 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 String animationName;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 float length;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 uint numTracks;
 uint numTriggers;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Array<AnimationTriggerPoint> triggers;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -194,32 +194,32 @@ void StopLayer(uint8, float = 0.0f);
 const String& GetStartBone(const String&) const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -238,24 +238,24 @@ void SetBoneWeight(const String&, float, bool = false);
 void SetBoneWeight(uint, float, bool = false);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Animation animation;
 Array<float> boneWeights;
-/* (readonly) */
+/* readonly */
 bool enabled;
 uint8 layer;
-/* (readonly) */
+/* readonly */
 float length;
 bool looped;
-/* (readonly) */
+/* readonly */
 AnimatedModel model;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 int refs;
 Bone startBone;
 float time;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 float weight;
 };
@@ -286,7 +286,7 @@ void SortReverse();
 void SortReverse(uint, uint);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool empty;
 uint length;
 };
@@ -296,7 +296,7 @@ class AttributeInfo
 
 // Properties:
 Variant defaultValue;
-/* (readonly) */
+/* readonly */
 Array<String> enumNames;
 uint mode;
 String name;
@@ -312,31 +312,31 @@ void SetMode(int, int, bool, bool = true);
 void Stop();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool initialized;
-/* (readonly) */
+/* readonly */
 bool interpolation;
 SoundListener listener;
 Array<float> masterGain;
-/* (readonly) */
+/* readonly */
 int mixRate;
-/* (readonly) */
+/* readonly */
 bool playing;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 uint sampleSize;
-/* (readonly) */
+/* readonly */
 bool stereo;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -381,41 +381,41 @@ bool SetAttribute(const String&, const Variant&);
 
 // Properties:
 float animationLodBias;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 Array<Billboard> billboards;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 bool faceCamera;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 uint numBillboards;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 bool relative;
 bool scaled;
@@ -423,16 +423,16 @@ float shadowDistance;
 uint shadowMask;
 bool sorted;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -510,56 +510,56 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -572,21 +572,21 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -596,16 +596,16 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -638,14 +638,14 @@ BoundingBox Transformed(const Matrix3&) const;
 BoundingBox Transformed(const Matrix3x4&) const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Vector3 center;
 bool defined;
-/* (readonly) */
+/* readonly */
 Vector3 halfSize;
 Vector3 max;
 Vector3 min;
-/* (readonly) */
+/* readonly */
 Vector3 size;
 };
 
@@ -711,56 +711,56 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -773,27 +773,27 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
-/* (readonly) */
+/* readonly */
 bool pressed;
 IntVector2 pressedChildOffset;
 IntVector2 pressedOffset;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
 float repeatDelay;
 float repeatRate;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -803,16 +803,16 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -844,59 +844,59 @@ Vector2 WorldToScreenPoint(const Vector3&) const;
 
 // Properties:
 float aspectRatio;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoAspectRatio;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 Plane clipPlane;
-/* (readonly) */
+/* readonly */
 Matrix3x4 effectiveWorldTransform;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 float farClip;
 FillMode fillMode;
 float fov;
-/* (readonly) */
+/* readonly */
 Frustum frustum;
-/* (readonly) */
+/* readonly */
 float halfViewSize;
-/* (readonly) */
+/* readonly */
 uint id;
 float lodBias;
 float nearClip;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 float orthoSize;
 bool orthographic;
-/* (readonly) */
+/* readonly */
 Matrix4 projection;
 Vector2 projectionOffset;
 Plane reflectionPlane;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useClipping;
 bool useReflection;
-/* (readonly) */
+/* readonly */
 Matrix3x4 view;
 uint viewMask;
 uint viewOverrideFlags;
-/* (readonly) */
+/* readonly */
 Frustum viewSpaceFrustum;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 float zoom;
 };
@@ -973,58 +973,58 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
 bool checked;
 IntVector2 checkedOffset;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -1037,21 +1037,21 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -1061,16 +1061,16 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -1105,41 +1105,41 @@ void SetTransform(const Vector3&, const Quaternion&);
 void SetTriangleMesh(Model, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
 uint lodLevel;
 float margin;
 Model model;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
 Quaternion rotation;
 ShapeType shapeType;
 Vector3 size;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 };
 
@@ -1171,13 +1171,13 @@ float Value() const;
 // Properties:
 float a;
 float b;
-/* (readonly) */
+/* readonly */
 Array<float> data;
 float g;
 float r;
-/* (readonly) */
+/* readonly */
 Vector3 rgb;
-/* (readonly) */
+/* readonly */
 Vector4 rgba;
 };
 
@@ -1208,32 +1208,32 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -1248,40 +1248,40 @@ void SendRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( ));
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 String address;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool client;
-/* (readonly) */
+/* readonly */
 bool connectPending;
-/* (readonly) */
+/* readonly */
 bool connected;
 Controls controls;
-/* (readonly) */
+/* readonly */
 String downloadName;
-/* (readonly) */
+/* readonly */
 float downloadProgress;
 VariantMap identity;
 bool logStatistics;
-/* (readonly) */
+/* readonly */
 uint numDownloads;
-/* (readonly) */
+/* readonly */
 uint16 port;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
 Scene scene;
-/* (readonly) */
+/* readonly */
 bool sceneLoaded;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -1293,29 +1293,29 @@ void Toggle();
 void UpdateElements();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 BorderImage background;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 uint historyPosition;
-/* (readonly) */
+/* readonly */
 Array<String> historyRow;
-/* (readonly) */
+/* readonly */
 LineEdit lineEdit;
 uint numHistoryRows;
 uint numRows;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -1338,49 +1338,49 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (writeonly) */
+/* writeonly */
 Vector3 axis;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 float cfm;
 ConstraintType constraintType;
 bool disableCollision;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 float erp;
 Vector2 highLimit;
-/* (readonly) */
+/* readonly */
 uint id;
 Vector2 lowLimit;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (writeonly) */
+/* writeonly */
 Vector3 otherAxis;
 RigidBody otherBody;
 Vector3 otherPosition;
 Quaternion otherRotation;
-/* (readonly) */
+/* readonly */
 RigidBody ownBody;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
 Quaternion rotation;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 Vector3 worldPosition;
 };
@@ -1460,56 +1460,56 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -1522,21 +1522,21 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 CursorShape shape;
@@ -1547,17 +1547,17 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
 bool useSystemShapes;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -1589,54 +1589,54 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
-/* (writeonly) */
+/* writeonly */
 Material material;
 Array<Material> materials;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 uint numGeometries;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -1653,28 +1653,28 @@ void Toggle(uint);
 void ToggleAll();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 XMLFile defaultStyle;
 uint mode;
-/* (readonly) */
+/* readonly */
 Text modeText;
 float profilerInterval;
 uint profilerMaxDepth;
-/* (readonly) */
+/* readonly */
 Text profilerText;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Text statsText;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useRendererStats;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -1704,32 +1704,32 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -1755,25 +1755,25 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
@@ -1781,33 +1781,33 @@ Material material;
 uint maxIndices;
 uint maxLights;
 uint maxVertices;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numDecals;
-/* (readonly) */
+/* readonly */
 uint numIndices;
-/* (readonly) */
+/* readonly */
 uint numVertices;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -1846,15 +1846,15 @@ Vector4 ReadVector4();
 uint Seek(uint);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 uint checksum;
-/* (readonly) */
+/* readonly */
 bool eof;
-/* (readonly) */
+/* readonly */
 String name;
-/* (readonly) */
+/* readonly */
 uint position;
-/* (readonly) */
+/* readonly */
 uint size;
 };
 
@@ -1872,11 +1872,11 @@ void Set(const String&, double&);
 void Set(const String&, int64&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool empty;
-/* (readonly) */
+/* readonly */
 Array<String> keys;
-/* (readonly) */
+/* readonly */
 uint length;
 };
 
@@ -1899,48 +1899,48 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
 };
@@ -2015,68 +2015,68 @@ const Variant& GetVar(const ShortStringHash&);
 UIElement getPopup() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 int acceleratorKey;
-/* (readonly) */
+/* readonly */
 int acceleratorQualifiers;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
-/* (readonly) */
+/* readonly */
 Array<UIElement> items;
 IntRect layoutBorder;
 LayoutMode layoutMode;
 int layoutSpacing;
-/* (readonly) */
+/* readonly */
 ListView listView;
 int maxHeight;
 IntVector2 maxSize;
@@ -2085,36 +2085,36 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
-/* (readonly) */
+/* readonly */
 uint numItems;
 float opacity;
 UIElement parent;
-/* (readonly) */
+/* readonly */
 UIElement placeholder;
 String placeholderText;
 IntVector2 position;
-/* (readonly) */
+/* readonly */
 bool pressed;
 IntVector2 pressedChildOffset;
 IntVector2 pressedOffset;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
 float repeatDelay;
 float repeatRate;
 bool resizePopup;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
-/* (readonly) */
+/* readonly */
 UIElement selectedItem;
 uint selection;
 bool showPopup;
@@ -2125,16 +2125,16 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -2153,28 +2153,28 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 bool autoExit;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool exiting;
-/* (readonly) */
+/* readonly */
 bool headless;
-/* (readonly) */
+/* readonly */
 bool initialized;
 int maxFps;
 int maxInactiveFps;
 int minFps;
 bool pauseMinimized;
-/* (readonly) */
+/* readonly */
 int refs;
 int timeStepSmoothing;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -2243,33 +2243,33 @@ bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint checksum;
-/* (readonly) */
+/* readonly */
 bool eof;
-/* (readonly) */
+/* readonly */
 FileMode mode;
-/* (readonly) */
+/* readonly */
 String name;
-/* (readonly) */
+/* readonly */
 bool open;
-/* (readonly) */
+/* readonly */
 bool packaged;
-/* (readonly) */
+/* readonly */
 uint position;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 uint size;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -2282,42 +2282,42 @@ void SetFilters(Array<String>, uint);
 void UpdateElements();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 Button cancelButton;
-/* (readonly) */
+/* readonly */
 String category;
 XMLFile defaultStyle;
 bool directoryMode;
-/* (readonly) */
+/* readonly */
 ListView fileList;
 String fileName;
-/* (readonly) */
+/* readonly */
 LineEdit fileNameEdit;
-/* (readonly) */
+/* readonly */
 String filter;
-/* (readonly) */
+/* readonly */
 uint filterIndex;
-/* (readonly) */
+/* readonly */
 DropDownList filterList;
-/* (readonly) */
+/* readonly */
 Button okButton;
 String path;
-/* (readonly) */
+/* readonly */
 LineEdit pathEdit;
-/* (readonly) */
+/* readonly */
 int refs;
 String title;
-/* (readonly) */
+/* readonly */
 Text titleText;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 Window window;
 };
 
@@ -2338,22 +2338,22 @@ bool SystemOpen(const String&, const String&);
 int SystemRun(const String&, Array<String>);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 String currentDir;
-/* (readonly) */
+/* readonly */
 String programDir;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 String userDocumentsDir;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -2378,22 +2378,22 @@ bool SaveXML(const String&, int, bool = false);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -2414,16 +2414,19 @@ Frustum Transformed(const Matrix3&) const;
 Frustum Transformed(const Matrix3x4&) const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Vector3> vertices;
 };
 
 class Graphics
 {
 // Methods:
+void BeginDumpShaders(const String&);
 void Close();
+void EndDumpShaders();
 void Maximize();
 void Minimize();
+void PrecacheShaders(File);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetMode(int, int);
 bool SetMode(int, int, bool, bool, bool, bool, bool, int);
@@ -2432,66 +2435,66 @@ bool TakeScreenShot(Image);
 bool ToggleFullscreen();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 bool borderless;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool deferredSupport;
-/* (readonly) */
+/* readonly */
 IntVector2 desktopResolution;
-/* (readonly) */
+/* readonly */
 bool deviceLost;
 bool flushGPU;
 bool forceSM2;
-/* (readonly) */
+/* readonly */
 bool fullscreen;
-/* (readonly) */
+/* readonly */
 bool hardwareShadowSupport;
-/* (readonly) */
+/* readonly */
 int height;
-/* (readonly) */
+/* readonly */
 bool initialized;
-/* (readonly) */
+/* readonly */
 bool instancingSupport;
-/* (readonly) */
+/* readonly */
 bool lightPrepassSupport;
-/* (readonly) */
+/* readonly */
 int multiSample;
-/* (readonly) */
+/* readonly */
 Array<int> multiSampleLevels;
-/* (readonly) */
+/* readonly */
 uint numBatches;
-/* (readonly) */
+/* readonly */
 uint numPrimitives;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 bool resizable;
-/* (readonly) */
+/* readonly */
 Array<IntVector2> resolutions;
 bool sRGB;
-/* (readonly) */
+/* readonly */
 bool sRGBSupport;
-/* (readonly) */
+/* readonly */
 bool sRGBWriteSupport;
-/* (readonly) */
+/* readonly */
 bool sm3Support;
-/* (readonly) */
+/* readonly */
 bool tripleBuffer;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 bool vsync;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 int width;
-/* (writeonly) */
+/* writeonly */
 Image windowIcon;
 IntVector2 windowPosition;
 String windowTitle;
@@ -2531,31 +2534,31 @@ Vector4 ReadVector4();
 uint Seek(uint);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 uint availableSize;
-/* (readonly) */
+/* readonly */
 uint checksum;
-/* (readonly) */
+/* readonly */
 bool eof;
-/* (readonly) */
+/* readonly */
 String error;
-/* (readonly) */
+/* readonly */
 String name;
-/* (readonly) */
+/* readonly */
 bool open;
-/* (readonly) */
+/* readonly */
 uint position;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 uint size;
-/* (readonly) */
+/* readonly */
 HttpRequestState state;
-/* (readonly) */
+/* readonly */
 String url;
-/* (readonly) */
+/* readonly */
 String verb;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -2583,32 +2586,32 @@ bool SetSize(int, int, int, uint);
 bool SetSize(int, int, uint);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint components;
-/* (readonly) */
+/* readonly */
 bool compressed;
-/* (readonly) */
+/* readonly */
 int depth;
-/* (readonly) */
+/* readonly */
 int height;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -2621,60 +2624,60 @@ bool OpenJoystick(uint);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool focus;
-/* (readonly) */
+/* readonly */
 Array<String> joystickNames;
-/* (readonly) */
+/* readonly */
 Array<JoystickState> joysticks;
-/* (readonly) */
+/* readonly */
 Array<bool> keyDown;
-/* (readonly) */
+/* readonly */
 Array<bool> keyPress;
-/* (readonly) */
+/* readonly */
 bool minimized;
-/* (readonly) */
+/* readonly */
 Array<bool> mouseButtonDown;
-/* (readonly) */
+/* readonly */
 Array<bool> mouseButtonPress;
-/* (readonly) */
+/* readonly */
 IntVector2 mouseMove;
-/* (readonly) */
+/* readonly */
 int mouseMoveWheel;
-/* (readonly) */
+/* readonly */
 int mouseMoveX;
-/* (readonly) */
+/* readonly */
 int mouseMoveY;
-/* (readonly) */
+/* readonly */
 IntVector2 mousePosition;
 bool mouseVisible;
-/* (readonly) */
+/* readonly */
 uint numJoysticks;
-/* (readonly) */
+/* readonly */
 uint numTouches;
-/* (readonly) */
+/* readonly */
 Array<bool> qualifierDown;
-/* (readonly) */
+/* readonly */
 Array<bool> qualifierPress;
-/* (readonly) */
+/* readonly */
 int qualifiers;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 bool screenKeyboardSupport;
 bool screenKeyboardVisible;
 bool toggleFullscreen;
-/* (readonly) */
+/* readonly */
 Array<TouchState> touches;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -2685,16 +2688,16 @@ Intersection IsInside(const IntVector2&) const;
 
 // Properties:
 int bottom;
-/* (readonly) */
+/* readonly */
 Array<int> data;
-/* (readonly) */
+/* readonly */
 int height;
 int left;
 int right;
-/* (readonly) */
+/* readonly */
 IntVector2 size;
 int top;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -2704,7 +2707,7 @@ class IntVector2
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<int> data;
 int x;
 int y;
@@ -2714,20 +2717,20 @@ class JoystickState
 {
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<float> axisPosition;
-/* (readonly) */
+/* readonly */
 Array<bool> buttonDown;
-/* (readonly) */
+/* readonly */
 Array<bool> buttonPress;
-/* (readonly) */
+/* readonly */
 Array<int> hatPosition;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAxes;
-/* (readonly) */
+/* readonly */
 uint numButtons;
-/* (readonly) */
+/* readonly */
 uint numHats;
 };
 
@@ -2751,45 +2754,45 @@ bool SetAttribute(const String&, const Variant&);
 
 // Properties:
 float aspectRatio;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 Color color;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 float fadeDistance;
 float fov;
-/* (readonly) */
+/* readonly */
 Frustum frustum;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 LightType lightType;
 float lodBias;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 bool occludee;
 bool occluder;
 bool perVertex;
 Texture rampTexture;
 float range;
-/* (readonly) */
+/* readonly */
 int refs;
 BiasParameters shadowBias;
 CascadeParameters shadowCascade;
@@ -2803,14 +2806,14 @@ float shadowResolution;
 Texture shapeTexture;
 float specularIntensity;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
 };
@@ -2874,62 +2877,62 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
-/* (readonly) */
+/* readonly */
 BorderImage cursor;
 float cursorBlinkRate;
 bool cursorMovable;
 uint cursorPosition;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 uint echoCharacter;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -2943,21 +2946,21 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -2966,22 +2969,22 @@ String style;
 bool temporary;
 String text;
 bool textCopyable;
-/* (readonly) */
+/* readonly */
 Text textElement;
 bool textSelectable;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -3062,46 +3065,46 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 int baseIndent;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 bool clearSelectionOnDefocus;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
-/* (readonly) */
+/* readonly */
 UIElement contentElement;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
@@ -3109,16 +3112,16 @@ int height;
 bool hierarchyMode;
 HighlightMode highlightMode;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 ScrollBar horizontalScrollBar;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
-/* (readonly) */
+/* readonly */
 Array<UIElement> items;
 IntRect layoutBorder;
 LayoutMode layoutMode;
@@ -3131,55 +3134,55 @@ IntVector2 minSize;
 int minWidth;
 bool multiselect;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
-/* (readonly) */
+/* readonly */
 uint numItems;
 float opacity;
 float pageStep;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool scrollBarsAutoVisible;
-/* (readonly) */
+/* readonly */
 BorderImage scrollPanel;
 float scrollStep;
 bool selected;
-/* (readonly) */
+/* readonly */
 UIElement selectedItem;
-/* (readonly) */
+/* readonly */
 Array<UIElement> selectedItems;
 uint selection;
-/* (readonly) */
+/* readonly */
 Array<uint> selections;
 IntVector2 size;
 bool sortChildren;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
-/* (readonly) */
+/* readonly */
 ScrollBar verticalScrollBar;
 IntVector2 viewPosition;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -3197,22 +3200,22 @@ void Warning(const String&);
 void Write(const String&, bool = false);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 String lastMessage;
 int level;
 bool quiet;
-/* (readonly) */
+/* readonly */
 int refs;
 bool timeStamp;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3232,36 +3235,36 @@ void SetUVTransform(const Vector2&, float, float);
 void SortTechniques();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 CullMode cullMode;
 BiasParameters depthBias;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
 uint numTechniques;
-/* (readonly) */
+/* readonly */
 bool occlusion;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Array<String> shaderParameterNames;
 Array<Variant> shaderParameters;
 CullMode shadowCullMode;
-/* (readonly) */
+/* readonly */
 Array<TechniqueEntry> techniqueEntries;
-/* (readonly) */
+/* readonly */
 Array<Technique> techniques;
 Array<Texture> textures;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3420,60 +3423,60 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 int acceleratorKey;
-/* (readonly) */
+/* readonly */
 int acceleratorQualifiers;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -3486,29 +3489,29 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 UIElement popup;
 IntVector2 popupOffset;
 IntVector2 position;
-/* (readonly) */
+/* readonly */
 bool pressed;
 IntVector2 pressedChildOffset;
 IntVector2 pressedOffset;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
 float repeatDelay;
 float repeatRate;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 bool showPopup;
@@ -3519,16 +3522,16 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -3539,21 +3542,21 @@ class MessageBox
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 String message;
-/* (readonly) */
+/* readonly */
 int refs;
 String title;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 UIElement window;
 };
 
@@ -3565,32 +3568,32 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 uint numGeometries;
-/* (readonly) */
+/* readonly */
 Array<uint> numGeometryLodLevels;
-/* (readonly) */
+/* readonly */
 uint numMorphs;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Skeleton skeleton;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3613,33 +3616,33 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 bool recursive;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3676,16 +3679,16 @@ float agentHeight;
 float agentMaxClimb;
 float agentMaxSlope;
 float agentRadius;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
-/* (readonly) */
+/* readonly */
 String category;
 float cellHeight;
 float cellSize;
@@ -3694,32 +3697,32 @@ float detailSampleMaxError;
 float edgeMaxError;
 float edgeMaxLength;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool initialized;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 IntVector2 numTiles;
 Vector3 padding;
-/* (readonly) */
+/* readonly */
 int refs;
 float regionMergeSize;
 float regionMinSize;
 bool temporary;
 int tileSize;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 };
 
@@ -3742,25 +3745,25 @@ void UnregisterAllRemoteEvents();
 void UnregisterRemoteEvent(const String&) const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Array<Connection> clientConnections;
 String packageCacheDir;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Connection serverConnection;
-/* (readonly) */
+/* readonly */
 bool serverRunning;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 int updateFps;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3784,35 +3787,35 @@ bool SetAttribute(const String&, const Variant&);
 
 // Properties:
 bool alwaysUpdateOwner;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 float basePriority;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 float distanceFactor;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
 float minPriority;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3880,67 +3883,67 @@ Vector3 WorldToLocal(const Vector4&) const;
 void Yaw(float, bool = false);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Array<Node> children;
-/* (readonly) */
+/* readonly */
 Array<Component> components;
 Vector3 direction;
 bool enabled;
-/* (readonly) */
+/* readonly */
 uint id;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
-/* (readonly) */
+/* readonly */
 uint numComponents;
 Connection owner;
 Node parent;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Vector3 right;
 Quaternion rotation;
 Vector3 scale;
-/* (readonly) */
+/* readonly */
 Scene scene;
-/* (readonly) */
+/* readonly */
 ScriptObject scriptObject;
 bool temporary;
-/* (readonly) */
+/* readonly */
 Matrix3x4 transform;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 Vector3 up;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 Vector3 worldDirection;
 Vector3 worldPosition;
-/* (readonly) */
+/* readonly */
 Vector3 worldRight;
 Quaternion worldRotation;
 Vector3 worldScale;
-/* (readonly) */
+/* readonly */
 Matrix3x4 worldTransform;
-/* (readonly) */
+/* readonly */
 Vector3 worldUp;
 };
 
@@ -3950,17 +3953,17 @@ class Object
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -3993,36 +3996,36 @@ bool SetAttribute(const String&, const Variant&);
 void SetSize(const BoundingBox&, uint);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numLevels;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 };
 
@@ -4045,35 +4048,35 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bidirectional;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 Node endPoint;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 float radius;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4086,25 +4089,25 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool compressed() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint checksum;
-/* (readonly) */
+/* readonly */
 String name;
-/* (readonly) */
+/* readonly */
 uint numFiles;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 uint totalSize;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4133,34 +4136,34 @@ void SetEmitting(bool, bool);
 // Properties:
 float activeTime;
 float animationLodBias;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Array<ColorFrame> colors;
 Vector3 constantForce;
 float dampingForce;
 float drawDistance;
-/* (writeonly) */
+/* writeonly */
 float emissionRate;
 Vector3 emitterSize;
 EmitterType emitterType;
 bool emitting;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 float inactiveTime;
 uint lightMask;
@@ -4181,23 +4184,23 @@ float minRotation;
 float minRotationSpeed;
 float minTimeToLive;
 float minVelocity;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 uint numColors;
 uint numParticles;
 uint numTextureFrames;
 bool occludee;
 bool occluder;
-/* (writeonly) */
+/* writeonly */
 Vector2 particleSize;
-/* (readonly) */
+/* readonly */
 int refs;
 bool relative;
-/* (writeonly) */
+/* writeonly */
 float rotation;
-/* (writeonly) */
+/* writeonly */
 float rotationSpeed;
 bool scaled;
 float shadowDistance;
@@ -4206,23 +4209,23 @@ float sizeAdd;
 float sizeMul;
 bool sorted;
 bool temporary;
-/* (readonly) */
+/* readonly */
 Array<TextureFrame> textureFrames;
-/* (writeonly) */
+/* writeonly */
 float timeToLive;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool updateInvisible;
-/* (writeonly) */
+/* writeonly */
 float velocity;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -4238,11 +4241,11 @@ bool depthWrite;
 PassLightingMode lightingMode;
 String pixelShader;
 String pixelShaderDefines;
-/* (readonly) */
+/* readonly */
 int refs;
 String vertexShader;
 String vertexShaderDefines;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4250,7 +4253,7 @@ class PhysicsRaycastResult
 {
 
 // Properties:
-/* (readonly) */
+/* readonly */
 RigidBody body;
 float distance;
 Vector3 normal;
@@ -4286,38 +4289,38 @@ void Update(float);
 void UpdateCollisions();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 int fps;
 Vector3 gravity;
-/* (readonly) */
+/* readonly */
 uint id;
 bool internalEdge;
 bool interpolation;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 int numIterations;
-/* (readonly) */
+/* readonly */
 int refs;
 bool splitImpulse;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4341,7 +4344,7 @@ Plane Transformed(const Matrix4&) const;
 Vector3 absNormal;
 float d;
 Vector3 normal;
-/* (readonly) */
+/* readonly */
 Matrix3x4 reflectionMatrix;
 };
 
@@ -4362,9 +4365,9 @@ Polyhedron Transformed(const Matrix3&) const;
 Polyhedron Transformed(const Matrix3x4&) const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Array<Vector3>> face;
-/* (readonly) */
+/* readonly */
 uint numFaces;
 };
 
@@ -4386,16 +4389,16 @@ Quaternion Slerp(Quaternion, float) const;
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Vector3 eulerAngles;
-/* (readonly) */
+/* readonly */
 float pitch;
-/* (readonly) */
+/* readonly */
 float roll;
 float w;
 float x;
 float y;
-/* (readonly) */
+/* readonly */
 float yaw;
 float z;
 };
@@ -4423,9 +4426,9 @@ class RayQueryResult
 
 // Properties:
 float distance;
-/* (readonly) */
+/* readonly */
 Drawable drawable;
-/* (readonly) */
+/* readonly */
 Node node;
 Vector3 normal;
 Vector3 position;
@@ -4447,16 +4450,16 @@ Vector4 ToVector4() const;
 
 // Properties:
 float bottom;
-/* (readonly) */
+/* readonly */
 Vector2 center;
 bool defined;
-/* (readonly) */
+/* readonly */
 Vector2 halfSize;
 float left;
 Vector2 max;
 Vector2 min;
 float right;
-/* (readonly) */
+/* readonly */
 Vector2 size;
 float top;
 };
@@ -4465,9 +4468,9 @@ class RefCounted
 {
 
 // Properties:
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4490,15 +4493,15 @@ void ToggleEnabled(const String&);
 
 // Properties:
 Array<RenderPathCommand> commands;
-/* (readonly) */
+/* readonly */
 uint numCommands;
-/* (readonly) */
+/* readonly */
 uint numRenderTargets;
-/* (readonly) */
+/* readonly */
 int refs;
 Array<RenderTargetInfo> renderTargets;
 Array<Variant> shaderParameters;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4539,18 +4542,18 @@ class RenderSurface
 void QueueUpdate();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 int height;
 RenderSurface linkedDepthStencil;
 RenderSurface linkedRenderTarget;
 uint numViewports;
-/* (readonly) */
+/* readonly */
 Texture parentTexture;
 RenderSurfaceUpdateMode updateMode;
-/* (readonly) */
+/* readonly */
 TextureUsage usage;
 Array<Viewport> viewports;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -4578,18 +4581,18 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetDefaultRenderPath(XMLFile);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Material defaultLightRamp;
-/* (readonly) */
+/* readonly */
 Material defaultLightSpot;
-/* (readonly) */
+/* readonly */
 Material defaultMaterial;
 RenderPath defaultRenderPath;
-/* (readonly) */
+/* readonly */
 Zone defaultZone;
 bool drawShadows;
 bool dynamicInstancing;
@@ -4601,24 +4604,24 @@ int maxShadowCascades;
 int maxShadowMaps;
 int maxSortedInstances;
 int minInstances;
-/* (readonly) */
+/* readonly */
 uint numBatches;
-/* (readonly) */
+/* readonly */
 Array<uint> numGeometries;
-/* (readonly) */
+/* readonly */
 Array<uint> numLights;
-/* (readonly) */
+/* readonly */
 Array<uint> numOccluders;
-/* (readonly) */
+/* readonly */
 uint numPrimitives;
-/* (readonly) */
+/* readonly */
 Array<uint> numShadowMaps;
 uint numViewports;
-/* (readonly) */
+/* readonly */
 uint numViews;
 float occluderSizeThreshold;
 int occlusionBufferSize;
-/* (readonly) */
+/* readonly */
 int refs;
 bool reuseShadowMaps;
 int shadowMapSize;
@@ -4627,12 +4630,12 @@ bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
 int textureQuality;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 Array<Viewport> viewports;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4644,22 +4647,22 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4690,30 +4693,30 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 bool autoReloadResources;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 Array<uint> memoryBudget;
-/* (readonly) */
+/* readonly */
 Array<uint> memoryUse;
-/* (readonly) */
+/* readonly */
 Array<PackageFile> packageFiles;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Array<String> resourceDirs;
-/* (readonly) */
+/* readonly */
 bool seachPackagesFirst;
-/* (writeonly) */
+/* writeonly */
 bool searchPackagesFirst;
-/* (readonly) */
+/* readonly */
 uint totalMemoryUse;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4731,9 +4734,9 @@ class ResourceRefList
 void Resize(uint);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool empty;
-/* (readonly) */
+/* readonly */
 uint length;
 Array<String> names;
 ShortStringHash type;
@@ -4770,38 +4773,38 @@ void SetCollisionLayerAndMask(uint, uint);
 void SetTransform(const Vector3&, const Quaternion&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool active;
 float angularDamping;
 Vector3 angularFactor;
 float angularRestThreshold;
 Vector3 angularVelocity;
 Vector3 anisotropicFriction;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 float ccdMotionThreshold;
 float ccdRadius;
-/* (readonly) */
+/* readonly */
 Vector3 centerOfMass;
-/* (readonly) */
+/* readonly */
 Array<RigidBody> collidingBodies;
 CollisionEventMode collisionEventMode;
 uint collisionLayer;
 uint collisionMask;
 float contactProcessingThreshold;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 float friction;
 Vector3 gravityOverride;
-/* (readonly) */
+/* readonly */
 uint id;
 bool kinematic;
 float linearDamping;
@@ -4809,24 +4812,24 @@ Vector3 linearFactor;
 float linearRestThreshold;
 Vector3 linearVelocity;
 float mass;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 bool phantom;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
 float restitution;
 float rollingFriction;
 Quaternion rotation;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useGravity;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -4910,84 +4913,84 @@ Vector3 WorldToLocal(const Vector4&) const;
 void Yaw(float, bool = false);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool asyncLoading;
-/* (readonly) */
+/* readonly */
 float asyncProgress;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint checksum;
-/* (readonly) */
+/* readonly */
 Array<Node> children;
-/* (readonly) */
+/* readonly */
 Array<Component> components;
-/* (readonly) */
+/* readonly */
 DebugRenderer debugRenderer;
 Vector3 direction;
 float elapsedTime;
-/* (readonly) */
+/* readonly */
 String fileName;
-/* (readonly) */
+/* readonly */
 uint id;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
-/* (readonly) */
+/* readonly */
 uint numComponents;
-/* (readonly) */
+/* readonly */
 Octree octree;
 Node parent;
-/* (readonly) */
+/* readonly */
 PhysicsWorld physicsWorld;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Array<PackageFile> requiredPackageFiles;
-/* (readonly) */
+/* readonly */
 Vector3 right;
 Quaternion rotation;
 Vector3 scale;
-/* (readonly) */
+/* readonly */
 ScriptObject scriptObject;
 float smoothingConstant;
 float snapThreshold;
 bool temporary;
 float timeScale;
-/* (readonly) */
+/* readonly */
 Matrix3x4 transform;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 Vector3 up;
 bool updateEnabled;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 Vector3 worldDirection;
 Vector3 worldPosition;
-/* (readonly) */
+/* readonly */
 Vector3 worldRight;
 Quaternion worldRotation;
 Vector3 worldScale;
-/* (readonly) */
+/* readonly */
 Matrix3x4 worldTransform;
-/* (readonly) */
+/* readonly */
 Vector3 worldUp;
 };
 
@@ -4999,19 +5002,19 @@ bool Execute(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 Scene defaultScene;
 ScriptFile defaultScriptFile;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5027,24 +5030,24 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool compiled;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5073,37 +5076,37 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 String className;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 int fixedUpdateFps;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 ScriptObject object;
-/* (readonly) */
+/* readonly */
 int refs;
 ScriptFile scriptFile;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5171,58 +5174,58 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 Button backButton;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
-/* (readonly) */
+/* readonly */
 float effectiveScrollStep;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
-/* (readonly) */
+/* readonly */
 Button forwardButton;
 int height;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -5235,11 +5238,11 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 Orientation orientation;
@@ -5247,33 +5250,33 @@ UIElement parent;
 IntVector2 position;
 int priority;
 float range;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 float scrollStep;
 bool selected;
 IntVector2 size;
-/* (readonly) */
+/* readonly */
 Slider slider;
 bool sortChildren;
 float stepFactor;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
 float value;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -5337,55 +5340,55 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 UIElement contentElement;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 ScrollBar horizontalScrollBar;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -5398,25 +5401,25 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 float pageStep;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool scrollBarsAutoVisible;
-/* (readonly) */
+/* readonly */
 BorderImage scrollPanel;
 float scrollStep;
 bool selected;
@@ -5425,19 +5428,19 @@ bool sortChildren;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
-/* (readonly) */
+/* readonly */
 ScrollBar verticalScrollBar;
 IntVector2 viewPosition;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -5458,25 +5461,25 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5519,7 +5522,7 @@ class ShortStringHash
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 uint16 value;
 };
 
@@ -5530,11 +5533,11 @@ Bone GetBone(const String&) const;
 void Reset();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Bone> bones;
-/* (readonly) */
+/* readonly */
 uint numBones;
-/* (readonly) */
+/* readonly */
 Bone rootBone;
 };
 
@@ -5558,56 +5561,56 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
-/* (writeonly) */
+/* writeonly */
 Material material;
 Array<Material> materials;
 uint maxLights;
 Model model;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numGeometries;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -5672,59 +5675,59 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
-/* (readonly) */
+/* readonly */
 bool hovering;
 IntRect imageRect;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
-/* (readonly) */
+/* readonly */
 BorderImage knob;
 IntRect layoutBorder;
 LayoutMode layoutMode;
@@ -5736,11 +5739,11 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 Orientation orientation;
@@ -5748,12 +5751,12 @@ UIElement parent;
 IntVector2 position;
 int priority;
 float range;
-/* (readonly) */
+/* readonly */
 int refs;
 float repeatRate;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -5763,17 +5766,17 @@ bool temporary;
 Texture texture;
 bool tiled;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
 float value;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -5798,38 +5801,38 @@ bool SetAttribute(const String&, const Variant&);
 void Update(float, float);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inProgress;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 Vector3 targetPosition;
 Quaternion targetRotation;
 Vector3 targetWorldPosition;
 Quaternion targetWorldRotation;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5841,35 +5844,35 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool compressed;
-/* (readonly) */
+/* readonly */
 float frequency;
-/* (readonly) */
+/* readonly */
 float length;
 bool looped;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 uint sampleSize;
-/* (readonly) */
+/* readonly */
 bool sixteenBit;
-/* (readonly) */
+/* readonly */
 bool stereo;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5892,32 +5895,32 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -5945,45 +5948,45 @@ bool SetAttribute(const String&, const Variant&);
 void Stop();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 float attenuation;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoRemove;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 float frequency;
 float gain;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 float panning;
-/* (readonly) */
+/* readonly */
 bool playing;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Sound sound;
 SoundType soundType;
 bool temporary;
-/* (readonly) */
+/* readonly */
 float timePosition;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -6013,50 +6016,50 @@ void SetDistanceAttenuation(float, float, float);
 void Stop();
 
 // Properties:
-/* (readonly) */
+/* readonly */
 float attenuation;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoRemove;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 float farDistance;
 float frequency;
 float gain;
-/* (readonly) */
+/* readonly */
 uint id;
 float innerAngle;
 float nearDistance;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 float outerAngle;
 float panning;
-/* (readonly) */
+/* readonly */
 bool playing;
-/* (readonly) */
+/* readonly */
 int refs;
 float rolloffFactor;
-/* (readonly) */
+/* readonly */
 Sound sound;
 SoundType soundType;
 bool temporary;
-/* (readonly) */
+/* readonly */
 float timePosition;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -6107,38 +6110,38 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 Array<Vector3> controlPoints;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 bool finished;
-/* (readonly) */
+/* readonly */
 uint id;
 InterpolationMode interpolationMode;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 Vector3 position;
-/* (readonly) */
+/* readonly */
 int refs;
 float speed;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -6195,27 +6198,27 @@ bool SetStyleAuto(XMLFile = null);
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BlendMode blendMode;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 bool elementEventSender;
 int height;
@@ -6223,19 +6226,19 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hotSpot;
 IntRect imageRect;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 Vector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
 float rotation;
 Vector2 scale;
@@ -6244,16 +6247,16 @@ bool sortChildren;
 String style;
 bool temporary;
 Texture texture;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -6280,55 +6283,55 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
-/* (writeonly) */
+/* writeonly */
 Material material;
 Array<Material> materials;
 uint maxLights;
 Model model;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numGeometries;
 bool occludee;
 bool occluder;
 uint occlusionLodLevel;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
 };
@@ -6356,61 +6359,61 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
-/* (readonly) */
+/* readonly */
 Array<Node> instanceNodes;
 uint lightMask;
 float lodBias;
-/* (writeonly) */
+/* writeonly */
 Material material;
 Array<Material> materials;
 uint maxLights;
 Model model;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numGeometries;
-/* (readonly) */
+/* readonly */
 uint numInstanceNodes;
 bool occludee;
 bool occluder;
 uint occlusionLodLevel;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
-/* (readonly) */
+/* readonly */
 Zone zone;
 uint zoneMask;
 };
@@ -6462,11 +6465,11 @@ Variant ToVectorVariant() const;
 String Trimmed() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool empty;
-/* (readonly) */
+/* readonly */
 uint length;
-/* (readonly) */
+/* readonly */
 uint utf8Length;
 };
 
@@ -6476,7 +6479,7 @@ class StringHash
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 uint value;
 };
 
@@ -6491,25 +6494,25 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 Array<Pass> passes;
-/* (readonly) */
+/* readonly */
 int refs;
 bool sm3;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -6544,53 +6547,53 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 Image heightMap;
-/* (readonly) */
+/* readonly */
 uint id;
 uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 IntVector2 numPatches;
-/* (readonly) */
+/* readonly */
 IntVector2 numVertices;
 bool occludee;
 bool occluder;
 int patchSize;
-/* (readonly) */
+/* readonly */
 Array<TerrainPatch> patches;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool smoothing;
 Vector3 spacing;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 uint zoneMask;
 };
@@ -6614,48 +6617,48 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 bool occludee;
 bool occluder;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
 };
@@ -6721,62 +6724,62 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Array<IntVector2> charPositions;
-/* (readonly) */
+/* readonly */
 Array<IntVector2> charSizes;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 Color effectColor;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
-/* (readonly) */
+/* readonly */
 Font font;
-/* (readonly) */
+/* readonly */
 int fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
 Color hoverColor;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -6789,36 +6792,36 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChars;
-/* (readonly) */
+/* readonly */
 uint numChildren;
-/* (readonly) */
+/* readonly */
 uint numRows;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 int rowHeight;
 float rowSpacing;
-/* (readonly) */
+/* readonly */
 Array<int> rowWidths;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 Color selectionColor;
-/* (readonly) */
+/* readonly */
 uint selectionLength;
-/* (readonly) */
+/* readonly */
 uint selectionStart;
 IntVector2 size;
 bool sortChildren;
@@ -6828,16 +6831,16 @@ String text;
 HorizontalAlignment textAlignment;
 TextEffect textEffect;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 bool wordwrap;
@@ -6865,62 +6868,62 @@ bool SetFont(Font, int);
 bool SetFont(const String&, int);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 Array<IntVector2> charPositions;
-/* (readonly) */
+/* readonly */
 Array<IntVector2> charSizes;
-/* (writeonly) */
+/* writeonly */
 Color color;
 Array<Color> colors;
 float drawDistance;
 Color effectColor;
 float effectDepthBias;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 bool faceCamera;
-/* (readonly) */
+/* readonly */
 Font font;
-/* (readonly) */
+/* readonly */
 int fontSize;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
 uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChars;
-/* (readonly) */
+/* readonly */
 uint numRows;
 bool occludee;
 bool occluder;
 float opacity;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 int rowHeight;
 float rowSpacing;
-/* (readonly) */
+/* readonly */
 Array<int> rowWidths;
 float shadowDistance;
 uint shadowMask;
@@ -6928,17 +6931,17 @@ bool temporary;
 String text;
 HorizontalAlignment textAlignment;
 TextEffect textEffect;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 VerticalAlignment verticalAlignment;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 bool wordwrap;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
 };
@@ -6955,44 +6958,44 @@ void SetNumLevels(uint);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 Color borderColor;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool compressed;
-/* (readonly) */
+/* readonly */
 bool dataLost;
 TextureFilterMode filterMode;
-/* (readonly) */
+/* readonly */
 uint format;
-/* (readonly) */
+/* readonly */
 int height;
-/* (readonly) */
+/* readonly */
 Array<int> levelHeight;
-/* (readonly) */
+/* readonly */
 Array<int> levelWidth;
-/* (readonly) */
+/* readonly */
 uint levels;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
 bool sRGB;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 TextureUsage usage;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -7010,46 +7013,46 @@ bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 Color borderColor;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool compressed;
-/* (readonly) */
+/* readonly */
 bool dataLost;
 TextureFilterMode filterMode;
-/* (readonly) */
+/* readonly */
 uint format;
-/* (readonly) */
+/* readonly */
 int height;
-/* (readonly) */
+/* readonly */
 Array<int> levelHeight;
-/* (readonly) */
+/* readonly */
 Array<int> levelWidth;
-/* (readonly) */
+/* readonly */
 uint levels;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 RenderSurface renderSurface;
 bool sRGB;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 TextureUsage usage;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -7067,46 +7070,46 @@ bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 Color borderColor;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool compressed;
-/* (readonly) */
+/* readonly */
 bool dataLost;
 TextureFilterMode filterMode;
-/* (readonly) */
+/* readonly */
 uint format;
-/* (readonly) */
+/* readonly */
 int height;
-/* (readonly) */
+/* readonly */
 Array<int> levelHeight;
-/* (readonly) */
+/* readonly */
 Array<int> levelWidth;
-/* (readonly) */
+/* readonly */
 uint levels;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 RenderSurface renderSurface;
 bool sRGB;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 TextureUsage usage;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -7124,46 +7127,46 @@ bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 Color borderColor;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 bool compressed;
-/* (readonly) */
+/* readonly */
 bool dataLost;
 TextureFilterMode filterMode;
-/* (readonly) */
+/* readonly */
 uint format;
-/* (readonly) */
+/* readonly */
 int height;
-/* (readonly) */
+/* readonly */
 Array<int> levelHeight;
-/* (readonly) */
+/* readonly */
 Array<int> levelWidth;
-/* (readonly) */
+/* readonly */
 uint levels;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Array<RenderSurface> renderSurfaces;
 bool sRGB;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 TextureUsage usage;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 int width;
 };
 
@@ -7181,27 +7184,27 @@ class Time
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 float elapsedTime;
-/* (readonly) */
+/* readonly */
 uint frameNumber;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 uint systemTime;
-/* (readonly) */
+/* readonly */
 String timeStamp;
-/* (readonly) */
+/* readonly */
 float timeStep;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -7269,53 +7272,53 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
 float delay;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -7328,21 +7331,21 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -7350,16 +7353,16 @@ bool sortChildren;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -7392,40 +7395,40 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetFocusElement(UIElement, bool = false);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
 String clipBoardText;
 Cursor cursor;
-/* (readonly) */
+/* readonly */
 IntVector2 cursorPosition;
 float defaultToolTipDelay;
 float doubleClickInterval;
 int dragBeginDistance;
 float dragBeginInterval;
-/* (readonly) */
+/* readonly */
 UIElement dragElement;
 UIElement focusElement;
 bool forceAutoHint;
-/* (readonly) */
+/* readonly */
 UIElement frontElement;
 int maxFontTextureSize;
-/* (readonly) */
+/* readonly */
 UIElement modalRoot;
 bool nonFocusedMouseWheel;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useMutableGlyphs;
 bool useScreenKeyboard;
 bool useSystemClipBoard;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -7486,52 +7489,52 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -7544,21 +7547,21 @@ int minHeight;
 IntVector2 minSize;
 int minWidth;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -7566,16 +7569,16 @@ bool sortChildren;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -7589,22 +7592,11 @@ void FromString(VariantType, const String&);
 void FromString(const String&, const String&);
 bool GetBool() const;
 VectorBuffer GetBuffer() const;
-Camera GetCamera() const;
-CollisionShape GetCollisionShape() const;
-Component GetComponent() const;
-Connection GetConnection() const;
 float GetFloat() const;
 int GetInt() const;
-Node GetNode() const;
-PhysicsWorld GetPhysicsWorld() const;
-RenderSurface GetRenderSurface() const;
-RigidBody GetRigidBody() const;
-Scene GetScene() const;
-Serializable GetSerializable() const;
+RefCounted GetPtr() const;
 ShortStringHash GetShortStringHash() const;
 StringHash GetStringHash() const;
-Texture GetTexture() const;
-UIElement GetUIElement() const;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
 const IntRect& GetIntRect() const;
@@ -7618,15 +7610,39 @@ const VariantMap& GetVariantMap() const;
 const Vector2& GetVector2() const;
 const Vector3& GetVector3() const;
 const Vector4& GetVector4() const;
+/* deprecated */
+Camera GetCamera() const;
+/* deprecated */
+CollisionShape GetCollisionShape() const;
+/* deprecated */
+Component GetComponent() const;
+/* deprecated */
+Connection GetConnection() const;
+/* deprecated */
+Node GetNode() const;
+/* deprecated */
+PhysicsWorld GetPhysicsWorld() const;
+/* deprecated */
+RenderSurface GetRenderSurface() const;
+/* deprecated */
+RigidBody GetRigidBody() const;
+/* deprecated */
+Scene GetScene() const;
+/* deprecated */
+Serializable GetSerializable() const;
+/* deprecated */
+Texture GetTexture() const;
+/* deprecated */
+UIElement GetUIElement() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool empty;
-/* (readonly) */
+/* readonly */
 VariantType type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 bool zero;
 };
 
@@ -7640,9 +7656,9 @@ bool Erase(ShortStringHash);
 bool Erase(const String&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<ShortStringHash> keys;
-/* (readonly) */
+/* readonly */
 uint length;
 };
 
@@ -7658,11 +7674,11 @@ Vector2 Normalized() const;
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<float> data;
-/* (readonly) */
+/* readonly */
 float length;
-/* (readonly) */
+/* readonly */
 float lengthSquared;
 float x;
 float y;
@@ -7682,11 +7698,11 @@ Vector3 Normalized() const;
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<float> data;
-/* (readonly) */
+/* readonly */
 float length;
-/* (readonly) */
+/* readonly */
 float lengthSquared;
 float x;
 float y;
@@ -7703,7 +7719,7 @@ Vector4 Lerp(const Vector4&, float) const;
 String ToString() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<float> data;
 float w;
 float x;
@@ -7776,15 +7792,15 @@ bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 uint checksum;
-/* (readonly) */
+/* readonly */
 bool eof;
-/* (readonly) */
+/* readonly */
 String name;
-/* (readonly) */
+/* readonly */
 uint position;
-/* (readonly) */
+/* readonly */
 uint size;
 };
 
@@ -7847,48 +7863,48 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoUpdate;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 Node cameraNode;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 Texture2D depthTexture;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
 bool fixedHeightResizing;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool fixedWidthResizing;
 bool focus;
@@ -7896,11 +7912,11 @@ FocusMode focusMode;
 uint format;
 int height;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -7918,27 +7934,27 @@ IntVector2 modalFrameSize;
 Color modalShadeColor;
 bool movable;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 Texture2D renderTexture;
 bool resizable;
 IntRect resizeBorder;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 Scene scene;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -7946,18 +7962,18 @@ bool sortChildren;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
-/* (readonly) */
+/* readonly */
 Viewport viewport;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -7969,21 +7985,21 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetRenderPath(XMLFile);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 Camera camera;
-/* (readonly) */
+/* readonly */
 String category;
 IntRect rect;
-/* (readonly) */
+/* readonly */
 int refs;
 RenderPath renderPath;
 Scene scene;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -7993,11 +8009,11 @@ class WeakHandle
 RefCounted Get() const;
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool expired;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -8058,54 +8074,54 @@ void UpdateLayout();
 const Variant& GetVar(const ShortStringHash&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 bool bringToBack;
 bool bringToFront;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 IntVector2 childOffset;
-/* (readonly) */
+/* readonly */
 Array<UIElement> children;
 IntRect clipBorder;
 bool clipChildren;
-/* (writeonly) */
+/* writeonly */
 Color color;
-/* (readonly) */
+/* readonly */
 bool colorGradient;
 Array<Color> colors;
-/* (readonly) */
+/* readonly */
 IntRect combinedScreenRect;
 XMLFile defaultStyle;
-/* (readonly) */
+/* readonly */
 float derivedOpacity;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool fixedHeight;
 bool fixedHeightResizing;
-/* (readonly) */
+/* readonly */
 bool fixedSize;
-/* (readonly) */
+/* readonly */
 bool fixedWidth;
 bool fixedWidthResizing;
 bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
-/* (readonly) */
+/* readonly */
 bool hovering;
 int indent;
 int indentSpacing;
-/* (readonly) */
+/* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
@@ -8123,23 +8139,23 @@ IntVector2 modalFrameSize;
 Color modalShadeColor;
 bool movable;
 String name;
-/* (readonly) */
+/* readonly */
 uint numAllChildren;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 uint numChildren;
 float opacity;
 UIElement parent;
 IntVector2 position;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
 bool resizable;
 IntRect resizeBorder;
-/* (readonly) */
+/* readonly */
 UIElement root;
-/* (readonly) */
+/* readonly */
 IntVector2 screenPosition;
 bool selected;
 IntVector2 size;
@@ -8147,16 +8163,16 @@ bool sortChildren;
 String style;
 bool temporary;
 TraversalMode traversalMode;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 bool useDerivedOpacity;
-/* (readonly) */
+/* readonly */
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -8219,19 +8235,19 @@ bool SetVector4(const String&, const Vector4&);
 bool SetVectorVariant(const String&, const Variant&);
 
 // Properties:
-/* (readonly) */
+/* readonly */
 XMLFile file;
-/* (readonly) */
+/* readonly */
 bool isNull;
-/* (readonly) */
+/* readonly */
 String name;
-/* (readonly) */
+/* readonly */
 XMLElement nextResult;
-/* (readonly) */
+/* readonly */
 bool notNull;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
-/* (readonly) */
+/* readonly */
 XMLElement parent;
 String value;
 };
@@ -8248,24 +8264,24 @@ bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
-/* (readonly) */
+/* readonly */
 String category;
-/* (readonly) */
+/* readonly */
 uint memoryUse;
 String name;
-/* (readonly) */
+/* readonly */
 int refs;
-/* (readonly) */
+/* readonly */
 XMLElement root;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
-/* (readonly) */
+/* readonly */
 uint useTimer;
-/* (readonly) */
+/* readonly */
 int weakRefs;
 };
 
@@ -8292,11 +8308,11 @@ class XPathResultSet
 {
 
 // Properties:
-/* (readonly) */
+/* readonly */
 bool empty;
-/* (readonly) */
+/* readonly */
 XMLElement firstResult;
-/* (readonly) */
+/* readonly */
 uint size;
 };
 
@@ -8320,25 +8336,25 @@ bool SetAttribute(const String&, const Variant&);
 
 // Properties:
 Color ambientColor;
-/* (readonly) */
+/* readonly */
 Color ambientEndColor;
 bool ambientGradient;
-/* (readonly) */
+/* readonly */
 Color ambientStartColor;
-/* (readonly) */
+/* readonly */
 Array<Variant> attributeDefaults;
-/* (readonly) */
+/* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* (readonly) */
+/* readonly */
 ShortStringHash baseType;
 BoundingBox boundingBox;
 bool castShadows;
-/* (readonly) */
+/* readonly */
 String category;
 float drawDistance;
 bool enabled;
-/* (readonly) */
+/* readonly */
 bool enabledEffective;
 Color fogColor;
 float fogEnd;
@@ -8346,36 +8362,36 @@ float fogHeight;
 float fogHeightScale;
 float fogStart;
 bool heightFog;
-/* (readonly) */
+/* readonly */
 uint id;
-/* (readonly) */
+/* readonly */
 bool inView;
-/* (readonly) */
+/* readonly */
 Matrix3x4 inverseWorldTransform;
 uint lightMask;
 float lodBias;
 uint maxLights;
-/* (readonly) */
+/* readonly */
 Node node;
-/* (readonly) */
+/* readonly */
 uint numAttributes;
 bool occludee;
 bool occluder;
 bool override;
 int priority;
-/* (readonly) */
+/* readonly */
 int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-/* (readonly) */
+/* readonly */
 ShortStringHash type;
-/* (readonly) */
+/* readonly */
 String typeName;
 uint viewMask;
-/* (readonly) */
+/* readonly */
 int weakRefs;
-/* (readonly) */
+/* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
 };
@@ -8701,13 +8717,14 @@ VAR_QUATERNION,
 VAR_COLOR,
 VAR_STRING,
 VAR_BUFFER,
-VAR_PTR,
+VAR_VOIDPTR,
 VAR_RESOURCEREF,
 VAR_RESOURCEREFLIST,
 VAR_VARIANTVECTOR,
 VAR_VARIANTMAP,
 VAR_INTRECT,
 VAR_INTVECTOR2,
+VAR_PTR,
 };
 
 enum VerticalAlignment

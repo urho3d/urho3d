@@ -412,7 +412,7 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 
 void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ dragBorder = eventData["Element"].GetUIElement();
+    UIElement@ dragBorder = eventData["Element"].GetPtr();
     if (dragBorder is null)
         return;
 

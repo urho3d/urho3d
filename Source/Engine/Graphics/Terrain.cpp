@@ -717,7 +717,7 @@ void Terrain::CreateGeometry()
         using namespace TerrainCreated;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_NODE] = (void*)node_;
+        eventData[P_NODE] = node_;
         node_->SendEvent(E_TERRAINCREATED, eventData);
     }
 }

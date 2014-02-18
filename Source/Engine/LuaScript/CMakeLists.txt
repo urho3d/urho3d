@@ -48,9 +48,9 @@ foreach (API_PKG_FILE ${API_PKG_FILES})
     set (GEN_CPP_FILE generated/${API}LuaAPI.cpp)
     set (GEN_CPP_FILES ${GEN_CPP_FILES} ${GEN_CPP_FILE})
     file (GLOB PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/${API}/*.pkg)
-    add_custom_command (OUTPUT ${GEN_CPP_FILE}
-        COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L basic.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
-        DEPENDS ${TOLUADEP} ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/basic.lua
+    add_custom_command (OUTPUT ${GEN_CPP_FILE} 
+        COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
+        DEPENDS ${TOLUADEP} ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/ToCppHook.lua
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pkgs
         COMMENT "Generating tolua++ API binding on the fly for ${API}")
 endforeach ()

@@ -339,7 +339,7 @@ void RotateMaterialPreview(StringHash eventType, VariantMap& eventData)
 
 void EditMaterialName(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ nameEdit = eventData["Element"].GetUIElement();
+    LineEdit@ nameEdit = eventData["Element"].GetPtr();
     String newMaterialName = nameEdit.text.Trimmed();
     if (!newMaterialName.empty)
     {
@@ -467,7 +467,7 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
 
     String name = attrEdit.vars["Name"].GetString();
@@ -501,7 +501,7 @@ void CreateShaderParameter(StringHash eventType, VariantMap& eventData)
     if (newName.empty)
         return;
 
-    DropDownList@ dropDown = eventData["Element"].GetUIElement();
+    DropDownList@ dropDown = eventData["Element"].GetPtr();
     Variant newValue;
 
     switch (dropDown.selection)
@@ -549,7 +549,7 @@ void PickMaterialTexture(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     resourcePickIndex = button.vars["Index"].GetUInt();
 
     @resourcePicker = GetResourcePicker(ShortStringHash("Texture2D"));
@@ -594,7 +594,7 @@ void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     String textureName = attrEdit.text.Trimmed();
     uint index = attrEdit.vars["Index"].GetUInt();
     
@@ -640,7 +640,7 @@ void PickMaterialTechnique(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     resourcePickIndex = button.vars["Index"].GetUInt();
 
     @resourcePicker = GetResourcePicker(ShortStringHash("Technique"));
@@ -686,7 +686,7 @@ void EditMaterialTechnique(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     String techniqueName = attrEdit.text.Trimmed();
     uint index = attrEdit.vars["Index"].GetUInt();
 
@@ -707,7 +707,7 @@ void EditTechniqueQuality(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     uint newQualityLevel = attrEdit.text.ToUInt();
     uint index = attrEdit.vars["Index"].GetUInt();
 
@@ -722,7 +722,7 @@ void EditTechniqueLodDistance(StringHash eventType, VariantMap& eventData)
     if (editMaterial is null)
         return;
 
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     float newLodDistance = attrEdit.text.ToFloat();
     uint index = attrEdit.vars["Index"].GetUInt();
 
@@ -751,7 +751,7 @@ void EditConstantBias(StringHash eventType, VariantMap& eventData)
         
     BeginMaterialEdit();
  
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     BiasParameters bias = editMaterial.depthBias;
     bias.constantBias = attrEdit.text.ToFloat();
     editMaterial.depthBias = bias;
@@ -766,7 +766,7 @@ void EditSlopeBias(StringHash eventType, VariantMap& eventData)
         
     BeginMaterialEdit();
  
-    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
     BiasParameters bias = editMaterial.depthBias;
     bias.slopeScaledBias = attrEdit.text.ToFloat();
     editMaterial.depthBias = bias;
@@ -781,7 +781,7 @@ void EditCullMode(StringHash eventType, VariantMap& eventData)
         
     BeginMaterialEdit();
     
-    DropDownList@ attrEdit = eventData["Element"].GetUIElement();
+    DropDownList@ attrEdit = eventData["Element"].GetPtr();
     editMaterial.cullMode = CullMode(attrEdit.selection);
 
     EndMaterialEdit();
@@ -794,7 +794,7 @@ void EditShadowCullMode(StringHash eventType, VariantMap& eventData)
         
     BeginMaterialEdit();
     
-    DropDownList@ attrEdit = eventData["Element"].GetUIElement();
+    DropDownList@ attrEdit = eventData["Element"].GetPtr();
     editMaterial.shadowCullMode = CullMode(attrEdit.selection);
 
     EndMaterialEdit();

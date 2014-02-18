@@ -43,7 +43,6 @@ class Graphics;
 class RenderPath;
 class RenderSurface;
 class ResourceCache;
-class Shader;
 class Skeleton;
 class OcclusionBuffer;
 class Texture2D;
@@ -287,10 +286,6 @@ public:
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
-    /// Return a shader variation by name and defines.
-    ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
-    /// Return a shader variation by name and defines.
-    ShaderVariation* GetShader(ShaderType type, const char* name, const char* defines) const;
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() const { return frame_; }
     
@@ -430,16 +425,8 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
-    /// Base directory for shaders.
-    String shaderPath_;
-    /// File extension for shaders.
-    String shaderExtension_;
     /// Current variation names for deferred light volume shaders.
     Vector<String> deferredLightPSVariations_;
-    /// Last used shader in shader variation query.
-    mutable WeakPtr<Shader> lastShader_;
-    /// Last used shader name in shader variation query.
-    mutable String lastShaderName_;
     /// Frame info for rendering.
     FrameInfo frame_;
     /// Texture anisotropy level.

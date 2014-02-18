@@ -38,7 +38,6 @@
 #include "RenderPath.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "Shader.h"
 #include "ShaderVariation.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -181,10 +180,10 @@ static const char* shadowVariations[] =
     ""
     #else
     // On Direct3D the quality is always "low" if not using hardware shadow compare
-    "",
-    "LQSHADOW HWSHADOW ",
-    "",
-    "HWSHADOW "
+    "SHADOWCMP",
+    "LQSHADOW",
+    "SHADOWCMP",
+    ""
     #endif
 };
 
@@ -288,14 +287,6 @@ Renderer::Renderer(Context* context) :
     shadersDirty_(true),
     initialized_(false)
 {
-    #ifndef USE_OPENGL
-    shaderPath_ = "Shaders/HLSL/";
-    shaderExtension_ = ".hlsl";
-    #else
-    shaderPath_ = "Shaders/GLSL/";
-    shaderExtension_ = ".glsl";
-    #endif
-
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
     
@@ -560,29 +551,6 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
     return numOccluders;
 }
 
-
-ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, const String& defines) const
-{
-    return GetShader(type, name.CString(), defines.CString());
-}
-
-ShaderVariation* Renderer::GetShader(ShaderType type, const char* name, const char* defines) const
-{
-    if (lastShaderName_ != name || !lastShader_)
-    {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        String fullShaderName = shaderPath_ + name + shaderExtension_;
-        // Try to reduce repeated error log prints because of missing shaders
-        if (lastShaderName_ == name && !cache->Exists(fullShaderName))
-            return 0;
-        
-        lastShader_ = cache->GetResource<Shader>(fullShaderName);
-        lastShaderName_ = name;
-    }
-    
-    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)0;
-}
-
 void Renderer::Update(float timeStep)
 {
     PROFILE(UpdateViews);
@@ -662,10 +630,10 @@ void Renderer::Update(float timeStep)
         using namespace BeginViewUpdate;
         
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_SURFACE] = (void*)renderTarget.Get();
-        eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
-        eventData[P_SCENE] = (void*)scene;
-        eventData[P_CAMERA] = (void*)viewport->GetCamera();
+        eventData[P_SURFACE] = renderTarget.Get();
+        eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+        eventData[P_SCENE] = scene;
+        eventData[P_CAMERA] = viewport->GetCamera();
         SendEvent(E_BEGINVIEWUPDATE, eventData);
         
         ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
@@ -724,10 +692,10 @@ void Renderer::Render()
             RenderSurface* renderTarget = views_[i]->GetRenderTarget();
             
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_SURFACE] = (void*)renderTarget;
-            eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
-            eventData[P_SCENE] = (void*)views_[i]->GetScene();
-            eventData[P_CAMERA] = (void*)views_[i]->GetCamera();
+            eventData[P_SURFACE] = renderTarget;
+            eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+            eventData[P_SCENE] = views_[i]->GetScene();
+            eventData[P_CAMERA] = views_[i]->GetCamera();
             SendEvent(E_BEGINVIEWRENDER, eventData);
             
             // Screen buffers can be reused between views, as each is rendered completely
@@ -1237,8 +1205,8 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, co
         psi += DLPS_ORTHO;
     }
     
-    batch.vertexShader_ = GetShader(VS, vsName, deferredLightVSVariations[vsi]);
-    batch.pixelShader_ = GetShader(PS, psName, deferredLightPSVariations_[psi]);
+    batch.vertexShader_ = graphics_->GetShader(VS, vsName, deferredLightVSVariations[vsi]);
+    batch.pixelShader_ = graphics_->GetShader(PS, psName, deferredLightPSVariations_[psi]);
 }
 
 void Renderer::SetCullMode(CullMode mode, Camera* camera)
@@ -1352,7 +1320,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
         graphics_->SetColorWrite(false);
         graphics_->SetDepthWrite(false);
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
-        graphics_->SetShaders(GetShader(VS, "Stencil"), GetShader(PS, "Stencil"));
+        graphics_->SetShaders(graphics_->GetShader(VS, "Stencil"), graphics_->GetShader(PS, "Stencil"));
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
         graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(camera));
         
@@ -1546,7 +1514,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             unsigned g = k / MAX_LIGHT_VS_VARIATIONS;
             unsigned l = k % MAX_LIGHT_VS_VARIATIONS;
             
-            vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+            vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
                 lightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
@@ -1555,11 +1523,11 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             unsigned h = j / MAX_LIGHT_PS_VARIATIONS;
             if (k & LPS_SHADOW)
             {
-                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
                     lightPSVariations[k] + shadowVariations[shadows] + heightFogVariations[h]);
             }
             else
-                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
                     lightPSVariations[k] + heightFogVariations[h]);
         }
     }
@@ -1575,7 +1543,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
                 unsigned h = j / (MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
                 unsigned g = k / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = k % MAX_VERTEXLIGHT_VS_VARIATIONS;
-                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
                     vertexLightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
             }
         }
@@ -1586,7 +1554,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             {
                 unsigned k = j % MAX_GEOMETRYTYPES;
                 unsigned h = j / MAX_GEOMETRYTYPES;
-                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
                     geometryVSVariations[k] + heightFogVariations[h]);
             }
         }
@@ -1594,7 +1562,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         pixelShaders.Resize(2);
         for (unsigned j = 0; j < 2; ++j)
         {
-            pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+            pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
                 heightFogVariations[j]);
         }
     }

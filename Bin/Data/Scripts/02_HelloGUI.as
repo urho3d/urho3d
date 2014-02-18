@@ -144,7 +144,8 @@ void HandleDragBegin(StringHash eventType, VariantMap& eventData)
 void HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
     IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
-    UIElement@ draggedElement = eventData["Element"].GetUIElement();
+    // Get the element (fish) that is being dragged. GetPtr() returns a RefCounted handle which can be cast implicitly
+    UIElement@ draggedElement = eventData["Element"].GetPtr();
     draggedElement.position = dragCurrentPosition - dragBeginPosition;
 }
 
@@ -163,9 +164,7 @@ void HandleControlClicked(StringHash eventType, VariantMap& eventData)
     Text@ windowTitle = window.GetChild("WindowTitle", true);
 
     // Get control that was clicked
-    // Note difference to C++: in C++ we would call GetPtr() and cast the void pointer to UIElement, here we must specify
-    // what kind of object we are getting. Null will be returned on type mismatch
-    UIElement@ clicked = eventData["Element"].GetUIElement();
+    UIElement@ clicked = eventData["Element"].GetPtr();
 
     String name = "...?";
     if (clicked !is null)

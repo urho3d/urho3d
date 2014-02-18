@@ -331,6 +331,24 @@ void Script::DumpAPI(DumpMode mode)
                     {
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
+                        ///\todo Is there a better way to mark deprecated API bindings for AngelScript?
+                        unsigned posBegin = declaration.FindLast("const String&in = \"deprecated:");
+                        if (posBegin != String::NPOS)
+                        {
+                            // Assume this 'mark' is added as the last parameter
+                            unsigned posEnd = declaration.Find(')', posBegin);
+                            if (posBegin != String::NPOS)
+                            {
+                                declaration.Replace(posBegin, posEnd - posBegin, "");
+                                posBegin = declaration.Find(", ", posBegin - 2);
+                                if (posBegin != String::NPOS)
+                                    declaration.Replace(posBegin, 2, "");
+                                if (mode == DOXYGEN)
+                                    declaration += " // deprecated";
+                                else if (mode == C_HEADER)
+                                    declaration = "/* deprecated */\n" + declaration;
+                            }
+                        }
                         methodDeclarations.Push(declaration);
                     }
                 }
@@ -378,13 +396,20 @@ void Script::DumpAPI(DumpMode mode)
                     String remark;
                     String cppdoc;
                     if (!propertyInfos[j].write_)
-                        remark = " (readonly)";
+                        remark = "readonly";
                     else if (!propertyInfos[j].read_)
-                        remark = " (writeonly)";
-                    if (mode == C_HEADER && !remark.Empty())
+                        remark = "writeonly";
+                    if (!remark.Empty())
                     {
-                        cppdoc = "/*" + remark + " */\n";
-                        remark.Clear();
+                        if (mode == DOXYGEN)
+                        {
+                            remark = " // " + remark;
+                        }
+                        else if (mode == C_HEADER)
+                        {
+                            cppdoc = "/* " + remark + " */\n";
+                            remark.Clear();
+                        }
                     }
 
                     OutputAPIRow(mode, cppdoc + propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);

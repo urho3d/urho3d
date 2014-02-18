@@ -9,8 +9,6 @@ void UnsubscribeFromEvent(void* sender, const String eventName);
 void UnsubscribeFromEvents(void* sender);
 
 ${
-
-
 #define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_SendEvent00
 static int tolua_LuaScriptLuaAPI_SendEvent00(lua_State* tolua_S)
 {

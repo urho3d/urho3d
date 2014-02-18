@@ -33,8 +33,8 @@ endif ()
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Include Urho3D cmake module
-include (Urho3D-CMake-magic)
+# Include Urho3D cmake common module
+include (Urho3D-CMake-common)
 
 # Check existence of stdint.h for LibCpuId
 include (CheckIncludeFiles)

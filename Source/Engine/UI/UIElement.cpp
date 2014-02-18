@@ -531,7 +531,7 @@ void UIElement::SetName(const String& name)
     using namespace NameChanged;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_ELEMENT] = this;
 
     SendEvent(E_NAMECHANGED, eventData);
 }
@@ -547,7 +547,7 @@ void UIElement::SetPosition(const IntVector2& position)
         using namespace Positioned;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_ELEMENT] = this;
         eventData[P_X] = position_.x_;
         eventData[P_Y] = position_.y_;
         SendEvent(E_POSITIONED, eventData);
@@ -584,7 +584,7 @@ void UIElement::SetSize(const IntVector2& size)
             using namespace Resized;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_ELEMENT] = (void*)this;
+            eventData[P_ELEMENT] = this;
             eventData[P_WIDTH] = size_.x_;
             eventData[P_HEIGHT] = size_.y_;
             SendEvent(E_RESIZED, eventData);
@@ -834,7 +834,7 @@ void UIElement::SetVisible(bool enable)
         using namespace VisibleChanged;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_ELEMENT] = this;
         eventData[P_VISIBLE] = visible_;
         SendEvent(E_VISIBLECHANGED, eventData);
     }
@@ -1035,7 +1035,7 @@ void UIElement::UpdateLayout()
     using namespace LayoutUpdated;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_ELEMENT] = this;
     SendEvent(E_LAYOUTUPDATED, eventData);
 
     EnableLayoutUpdate();
@@ -1172,9 +1172,9 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
         using namespace ElementAdded;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ROOT] = (void*)root;
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_ELEMENT] = (void*)element;
+        eventData[P_ROOT] = root;
+        eventData[P_PARENT] = this;
+        eventData[P_ELEMENT] = element;
 
         sender->SendEvent(E_ELEMENTADDED, eventData);
     }
@@ -1193,9 +1193,9 @@ void UIElement::RemoveChild(UIElement* element, unsigned index)
                 using namespace ElementRemoved;
 
                 VariantMap& eventData = GetEventDataMap();
-                eventData[P_ROOT] = (void*)GetRoot();
-                eventData[P_PARENT] = (void*)this;
-                eventData[P_ELEMENT] = (void*)element;
+                eventData[P_ROOT] = GetRoot();
+                eventData[P_PARENT] = this;
+                eventData[P_ELEMENT] = element;
 
                 sender->SendEvent(E_ELEMENTREMOVED, eventData);
             }
@@ -1220,9 +1220,9 @@ void UIElement::RemoveChildAtIndex(unsigned index)
         using namespace ElementRemoved;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_ROOT] = (void*)GetRoot();
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_ELEMENT] = (void*)children_[index];
+        eventData[P_ROOT] = GetRoot();
+        eventData[P_PARENT] = this;
+        eventData[P_ELEMENT] = children_[index];
 
         sender->SendEvent(E_ELEMENTREMOVED, eventData);
     }
@@ -1245,9 +1245,9 @@ void UIElement::RemoveAllChildren()
             using namespace ElementRemoved;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_ROOT] = (void*)root;
-            eventData[P_PARENT] = (void*)this;
-            eventData[P_ELEMENT] = (void*)(*i).Get();
+            eventData[P_ROOT] = root;
+            eventData[P_PARENT] = this;
+            eventData[P_ELEMENT] = (*i).Get();
 
             sender->SendEvent(E_ELEMENTREMOVED, eventData);
         }

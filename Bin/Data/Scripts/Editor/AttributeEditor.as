@@ -788,7 +788,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     if (inLoadAttributeEditor)
         return;
 
-    UIElement@ attrEdit = eventData["Element"].GetUIElement();
+    UIElement@ attrEdit = eventData["Element"].GetPtr();
     UIElement@ parent = attrEdit.parent;
     Array<Serializable@>@ serializables = GetAttributeEditorTargets(attrEdit);
     if (serializables.empty)
@@ -901,7 +901,7 @@ ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
 
 void PickResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     Array<Serializable@>@ targets = GetAttributeEditorTargets(attrEdit);
@@ -1043,7 +1043,7 @@ String GetResourceNameFromFullName(const String&in resourceName)
 
 void OpenResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     String fileName = attrEdit.text.Trimmed();
@@ -1064,7 +1064,7 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
 
 void EditResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     String fileName = attrEdit.text.Trimmed();
@@ -1084,7 +1084,7 @@ void EditResource(StringHash eventType, VariantMap& eventData)
 
 void TestResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());

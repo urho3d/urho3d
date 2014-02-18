@@ -41,6 +41,7 @@ static const wchar_t* openMode[] =
 {
     L"rb",
     L"wb",
+    L"r+b",
     L"w+b"
 };
 #else
@@ -48,6 +49,7 @@ static const char* openMode[] =
 {
     "rb",
     "wb",
+    "r+b",
     "w+b"
 };
 #endif
@@ -66,7 +68,9 @@ File::File(Context* context) :
     readBufferSize_(0),
     offset_(0),
     checksum_(0),
-    compressed_(false)
+    compressed_(false),
+    readSyncNeeded_(false),
+    writeSyncNeeded_(false)
 {
 }
 
@@ -81,7 +85,9 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     readBufferSize_(0),
     offset_(0),
     checksum_(0),
-    compressed_(false)
+    compressed_(false),
+    readSyncNeeded_(false),
+    writeSyncNeeded_(false)
 {
     Open(fileName, mode);
 }
@@ -97,7 +103,9 @@ File::File(Context* context, PackageFile* package, const String& fileName) :
     readBufferSize_(0),
     offset_(0),
     checksum_(0),
-    compressed_(false)
+    compressed_(false),
+    readSyncNeeded_(false),
+    writeSyncNeeded_(false)
 {
     Open(package, fileName);
 }
@@ -161,6 +169,16 @@ bool File::Open(const String& fileName, FileMode mode)
     handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
     #endif
 
+    // If file did not exist in readwrite mode, retry with write-update mode
+    if (mode == FILE_READWRITE && !handle_)
+    {
+        #ifdef WIN32
+        handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
+        #else
+        handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
+        #endif
+    }
+    
     if (!handle_)
     {
         LOGERROR("Could not open file " + fileName);
@@ -173,6 +191,8 @@ bool File::Open(const String& fileName, FileMode mode)
     offset_ = 0;
     checksum_ = 0;
     compressed_ = false;
+    readSyncNeeded_ = false;
+    writeSyncNeeded_ = false;
 
     fseek((FILE*)handle_, 0, SEEK_END);
     size_ = ftell((FILE*)handle_);
@@ -209,7 +229,9 @@ bool File::Open(PackageFile* package, const String& fileName)
     position_ = 0;
     size_ = entry->size_;
     compressed_ = package->IsCompressed();
-
+    readSyncNeeded_ = false;
+    writeSyncNeeded_ = false;
+    
     fseek((FILE*)handle_, offset_, SEEK_SET);
     return true;
 }
@@ -304,6 +326,13 @@ unsigned File::Read(void* dest, unsigned size)
         return size;
     }
 
+    // Need to reassign the position due to internal buffering when transitioning from writing to reading
+    if (readSyncNeeded_)
+    {
+        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        readSyncNeeded_ = false;
+    }
+    
     size_t ret = fread(dest, size, 1, (FILE*)handle_);
     if (ret != 1)
     {
@@ -313,6 +342,7 @@ unsigned File::Read(void* dest, unsigned size)
         return 0;
     }
 
+    writeSyncNeeded_ = true;
     position_ += size;
     return size;
 }
@@ -368,6 +398,8 @@ unsigned File::Seek(unsigned position)
 
     fseek((FILE*)handle_, position + offset_, SEEK_SET);
     position_ = position;
+    readSyncNeeded_ = false;
+    writeSyncNeeded_ = false;
     return position_;
 }
 
@@ -388,6 +420,13 @@ unsigned File::Write(const void* data, unsigned size)
     if (!size)
         return 0;
 
+    // Need to reassign the position due to internal buffering when transitioning from reading to writing
+    if (writeSyncNeeded_)
+    {
+        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        writeSyncNeeded_ = false;
+    }
+    
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began
@@ -396,6 +435,7 @@ unsigned File::Write(const void* data, unsigned size)
         return 0;
     }
 
+    readSyncNeeded_ = true;
     position_ += size;
     if (position_ > size_)
         size_ = position_;

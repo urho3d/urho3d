@@ -119,8 +119,8 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Matrix3x4 get_effectiveWorldTransform() const", asMETHOD(Camera, GetEffectiveWorldTransform), asCALL_THISCALL);
 
-    // Register Variant GetPtr() for Camera
-    engine->RegisterObjectMethod("Variant", "Camera@+ GetCamera() const", asFUNCTION(GetVariantPtr<Camera>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for Camera. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "Camera@+ GetCamera(const String&in binding = \"deprecated:GetCamera\") const", asFUNCTION(GetVariantPtr<Camera>), asCALL_CDECL_OBJLAST);
 }
 
 static Node* BoneGetNode(Bone* ptr)
@@ -445,8 +445,8 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthStencil), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHOD(RenderSurface, GetLinkedDepthStencil), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for RenderSurface
-    engine->RegisterObjectMethod("Variant", "RenderSurface@+ GetRenderSurface() const", asFUNCTION(GetVariantPtr<RenderSurface>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for RenderSurface. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "RenderSurface@+ GetRenderSurface(const String&in binding = \"deprecated:GetRenderSurface\") const", asFUNCTION(GetVariantPtr<RenderSurface>), asCALL_CDECL_OBJLAST);
     
     RegisterTexture<Texture2D>(engine, "Texture2D");
     engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
@@ -463,8 +463,8 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurfaces(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for Texture
-    engine->RegisterObjectMethod("Variant", "Texture@+ GetTexture() const", asFUNCTION(GetVariantPtr<Texture>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for Texture. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "Texture@+ GetTexture(const String&in binding = \"deprecated:GetTexture\") const", asFUNCTION(GetVariantPtr<Texture>), asCALL_CDECL_OBJLAST);
     
     engine->RegisterGlobalFunction("uint GetAlphaFormat()", asFUNCTION(Graphics::GetAlphaFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetLuminanceFormat()", asFUNCTION(Graphics::GetLuminanceFormat), asCALL_CDECL);
@@ -1210,6 +1210,12 @@ static CScriptArray* GraphicsGetMultiSampleLevels(Graphics* ptr)
     return VectorToArray<int>(ptr->GetMultiSampleLevels(), "Array<int>");
 }
 
+static void GraphicsPrecacheShaders(File* file, Graphics* ptr)
+{
+    if (file)
+        ptr->PrecacheShaders(*file);
+}
+
 static Graphics* GetGraphics()
 {
     return GetScriptContext()->GetSubsystem<Graphics>();
@@ -1226,6 +1232,9 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "void Minimize()", asMETHOD(Graphics, Minimize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void Close()", asMETHOD(Graphics, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool TakeScreenShot(Image@+)", asMETHOD(Graphics, TakeScreenShot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void BeginDumpShaders(const String&in)", asMETHOD(Graphics, BeginDumpShaders), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void EndDumpShaders()", asMETHOD(Graphics, EndDumpShaders), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void PrecacheShaders(File@+)", asFUNCTION(GraphicsPrecacheShaders), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "void set_windowTitle(const String&in)", asMETHOD(Graphics, SetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "const String& get_windowTitle() const", asMETHOD(Graphics, GetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_windowIcon(Image@+)", asMETHOD(Graphics, SetWindowIcon), asCALL_THISCALL);
