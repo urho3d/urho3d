@@ -187,7 +187,7 @@ def xcode_travis_ci()
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 -DENABLE_TESTING=1" or abort 'Failed to configure temporary project using Urho3D as external library'
-  xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abourt 'Failed to configure/build/test temporary project using Urho3D as external library'
+  xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 
 def xcode_build(ios, project, scheme = 'ALL_BUILD')
