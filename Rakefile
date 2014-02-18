@@ -107,8 +107,8 @@ set (CMAKE_MODULE_PATH
     \\${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
-# Include Urho3D cmake module
-include (Urho3D-CMake-magic)
+# Include Urho3D Cmake common module
+include (Urho3D-CMake-common)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)

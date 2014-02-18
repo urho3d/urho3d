@@ -319,8 +319,8 @@ endif ()
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH $ENV{URHO3D_HOME}/Source/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 
-# Include Urho3D cmake module
-include (Urho3D-CMake-magic)
+# Include Urho3D Cmake common module
+include (Urho3D-CMake-common)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
@@ -336,9 +336,9 @@ define_source_files ()
 setup_main_executable ()
 \endcode
 
-The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-magic.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project.
+The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project.
 
-When both Urho3D static and shared library are built and available in the Urho3D project's library output directory, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-magic.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC.
+When both Urho3D static and shared library are built and available in the Urho3D project's library output directory, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC.
 
 The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_file() macro is a shorthand to glob all the source files in the current source directory. It is equivalent to these commands:
 
