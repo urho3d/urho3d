@@ -97,6 +97,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData["TimeStep"].GetFloat();
 
     UpdateView(timeStep);
+    UpdateViewports(timeStep);
     UpdateStats(timeStep);
     UpdateScene(timeStep);
     UpdateTestAnimation(timeStep);
