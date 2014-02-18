@@ -1224,7 +1224,7 @@ void ViewRaycast(bool mouseClick)
         float(pos.y - view.top) / view.height);
     Component@ selectedComponent;
 
-    if (pickMode != PICK_RIGIDBODIES)
+    if (pickMode < PICK_RIGIDBODIES)
     {
         if (editorScene.octree is null)
             return;
@@ -1380,7 +1380,7 @@ Vector3 SelectedNodesCenterPoint()
 }
 
 Vector3 GetScreenCollision(IntVector2 pos)
-{  
+{
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
     Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
 
@@ -1391,19 +1391,19 @@ Vector3 GetScreenCollision(IntVector2 pos)
             editorScene.physicsWorld.UpdateCollisions();
 
         PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-        
+
         if (result.body !is null)
         {
             physicsFound = true;
             result.position;
         }
-    } 
+    }
 
     if (editorScene.octree is null)
         return res;
 
     RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-        pickModeDrawableFlags[pickMode], 0x7fffffff);
+        DRAWABLE_GEOMETRY, 0x7fffffff);
 
     if (result.drawable !is null)
     {

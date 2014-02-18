@@ -499,6 +499,7 @@ E               - Ascend
 Q               - Descend
 Shift+E,Q       - Ascend or descend faster
 
+Numpad5         - Toggle orthographic / perspective camera
 Numpad1         - Front view
 Numpad3         - Right hand view
 Numpad7         - Top view
