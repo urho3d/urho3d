@@ -54,6 +54,8 @@ private:
     String fileName_;
     /// XML file.
     XMLFile xmlFile_;
+    /// Already encountered shader combinations, pointer version for fast queries.
+    HashSet<Pair<ShaderVariation*, ShaderVariation*> > usedPtrCombinations_;
     /// Already encountered shader combinations.
     HashSet<String> usedCombinations_;
 };

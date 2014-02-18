@@ -78,22 +78,28 @@ void ShaderPrecache::StoreShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (!vs || !ps)
         return;
     
+    // Check for duplicate using pointers first (fast)
+    Pair<ShaderVariation*, ShaderVariation*> shaderPair = MakePair(vs, ps);
+    if (usedPtrCombinations_.Contains(shaderPair))
+        return;
+    usedPtrCombinations_.Insert(shaderPair);
+    
     String vsName = vs->GetName().Substring(0, vs->GetName().Find('_'));
     String psName = ps->GetName().Substring(0, ps->GetName().Find('_'));
     const String& vsDefines = vs->GetDefines();
     const String& psDefines = ps->GetDefines();
     
-    // Check for duplicate
+    // Check for duplicate using strings (needed for combinations loaded from existing file)
     String newCombination = vsName + " " + vsDefines + " " + psName + " " + psDefines;
     if (usedCombinations_.Contains(newCombination))
         return;
+    usedCombinations_.Insert(newCombination);
     
     XMLElement shaderElem = xmlFile_.GetRoot().CreateChild("shader");
     shaderElem.SetAttribute("vs", vsName);
     shaderElem.SetAttribute("vsdefines", vsDefines);
     shaderElem.SetAttribute("ps", psName);
     shaderElem.SetAttribute("psdefines", psDefines);
-    usedCombinations_.Insert(newCombination);
 }
 
 void ShaderPrecache::LoadShaders(Graphics* graphics, Deserializer& source)
