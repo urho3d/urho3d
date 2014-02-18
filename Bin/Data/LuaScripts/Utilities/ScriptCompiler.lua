@@ -12,9 +12,9 @@ if table.maxn(files) == 0 then log:Write(LOG_WARNING, "No lua file found in " ..
 
 -- Compile each lua file found in rootFolder and subfolders to luc
 for i=1, table.maxn(files) do
-    local filename = rootFolder .. "/" .. files[i] -- Get file with its path
+    local filename = rootFolder .. files[i] -- Get file with its path
     if not fileSystem:FileExists(filename) then log:Write(LOG_WARNING, "Cannot find " .. filename) return end
-    print(filename)
+    print(filename .. "\n")
     local args = {"-b", filename, ReplaceExtension(filename, ".luc")} -- Set arguments to pass to the luajit command line app
     fileSystem:SystemRun(fileSystem:GetProgramDir() .. "luajit", args) -- Compile lua file to luc
 end
