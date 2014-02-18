@@ -55,8 +55,15 @@ if (DOXYGEN_FOUND)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ScriptAPI.dox COMMAND echo dummy >${CMAKE_CURRENT_BINARY_DIR}/ScriptAPI.dox)
     endif ()
     if (TARGET tolua++ AND NOT CMAKE_CROSSCOMPILING)
+        file (GLOB PKGS RELATIVE ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs/*.pkg)
+        list (SORT PKGS)
+        set (PKGLIST "// This is a generated file. DO NOT EDIT!\n\n")
+        foreach (PKG ${PKGS})
+            set (PKGLIST "${PKGLIST}$pfile \"${PKG}\"\n")
+        endforeach ()
+        file (WRITE ${PROJECT_ROOT_DIR}/Bin/LuaPkgToDox.txt ${PKGLIST})
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/LuaScriptAPI.dox
-            COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L ToDoxHook.lua -P -o ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs/Urho3D.tolua
+            COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L ToDoxHook.lua -P -o ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${PROJECT_ROOT_DIR}/Bin/LuaPkgToDox.txt
             DEPENDS Urho3D tolua++
             WORKING_DIRECTORY ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs
             COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
