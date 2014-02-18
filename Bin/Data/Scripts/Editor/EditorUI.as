@@ -1182,6 +1182,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         ReacquireCameraYawPitch();
     }
 
+    else if (key == KEY_NUMPAD5 && ui.focusElement is null)
+    {
+        activeViewport.ToggleOrthographic();
+    }
+
     else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
         if (key == '1')
