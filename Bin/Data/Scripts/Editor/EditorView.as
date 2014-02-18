@@ -77,6 +77,9 @@ class ViewportContext
     bool enabled = false;
     uint index = 0;
     uint viewportId = 0;
+    UIElement@ viewportContextUI;
+    UIElement@ statusBar;
+    Text@ cameraPosText;
 
     ViewportContext(IntRect viewRect, uint index_, uint viewportId_)
     {
@@ -103,6 +106,78 @@ class ViewportContext
         cameraYaw = cameraNode.rotation.yaw;
         cameraPitch = cameraNode.rotation.pitch;
     }
+
+    void CreateViewportContextUI()
+    {
+        Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+
+        viewportContextUI = UIElement();
+        viewportUI.AddChild(viewportContextUI);
+        viewportContextUI.SetPosition(viewport.rect.left, viewport.rect.top);
+        viewportContextUI.SetFixedSize(viewport.rect.width, viewport.rect.height);
+        viewportContextUI.clipChildren = true;
+
+        statusBar = BorderImage("ToolBar");
+        statusBar.style = "EditorToolBar";
+        viewportContextUI.AddChild(statusBar);
+
+        statusBar.SetLayout(LM_HORIZONTAL);
+        statusBar.SetAlignment(HA_LEFT, VA_BOTTOM);
+        statusBar.layoutSpacing = 4;
+        statusBar.opacity = uiMaxOpacity;
+
+        cameraPosText = Text();
+        statusBar.AddChild(cameraPosText);
+        
+        cameraPosText.SetFont(font, 11);
+        cameraPosText.color = Color(1, 1, 0);
+        cameraPosText.textEffect = TE_SHADOW;
+        cameraPosText.priority = -100;
+
+        HandleResize();
+    }
+
+    void HandleResize()
+    {
+        viewportContextUI.SetPosition(viewport.rect.left, viewport.rect.top);
+        viewportContextUI.SetFixedSize(viewport.rect.width, viewport.rect.height);
+        if (viewport.rect.left < 34)
+            statusBar.layoutBorder = IntRect(34 - viewport.rect.left, 4, 4, 8);
+        else
+            statusBar.layoutBorder = IntRect(8, 4, 4, 8);
+
+        statusBar.SetFixedSize(viewport.rect.width, 22);
+    }
+
+    void ToggleOrthographic()
+    {
+        SetOrthographic(!camera.orthographic);
+    }
+    
+    void SetOrthographic(bool orthographic)
+    {
+        if (orthographic)
+            camera.orthoSize = (cameraNode.position - GetScreenCollision(IntVector2(viewport.rect.width, viewport.rect.height))).length;
+
+        camera.orthographic = orthographic;
+    }
+
+    void Update(float timeStep)
+    {
+        Vector3 cameraPos = cameraNode.position;
+        String xText(cameraPos.x);
+        String yText(cameraPos.y);
+        String zText(cameraPos.z);
+        xText.Resize(8);
+        yText.Resize(8);
+        zText.Resize(8);
+
+        cameraPosText.text = String(
+            "Pos: " + xText + " " + yText + " " + zText +
+            " Zoom: " + camera.zoom);
+
+        cameraPosText.size = cameraPosText.minSize;
+    }
 }
 
 Array<ViewportContext@> viewports;
@@ -110,7 +185,6 @@ ViewportContext@ activeViewport;
 
 Text@ editorModeText;
 Text@ renderStatsText;
-Text@ cameraPosText;
 
 EditMode editMode = EDIT_MOVE;
 AxisMode axisMode = AXIS_WORLD;
@@ -228,6 +302,8 @@ void CreateViewportUI()
     for (uint i = 0; i < viewports.length; ++i)
     {
         ViewportContext@ vc = viewports[i];
+        vc.CreateViewportContextUI();
+
         if (vc.viewportId & VIEWPORT_TOP > 0)
             top = vc.viewport.rect;
         else if (vc.viewportId & VIEWPORT_BOTTOM > 0)
@@ -619,6 +695,7 @@ void HandleViewportBorderDragEnd(StringHash eventType, VariantMap& eventData)
             vc.viewport.rect = bottomLeft;
         else if (vc.viewportId & VIEWPORT_BOTTOM_RIGHT > 0)
             vc.viewport.rect = bottomRight;
+        vc.HandleResize();
     }
 
     // End drag state
@@ -769,8 +846,6 @@ void CreateStatsBar()
     ui.root.AddChild(editorModeText);
     renderStatsText = Text();
     ui.root.AddChild(renderStatsText);
-    cameraPosText = Text();
-    ui.root.AddChild(cameraPosText);
 
     if (ui.root.width >= 1200)
     {
@@ -782,8 +857,6 @@ void CreateStatsBar()
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
     }
-
-    SetupStatsBarText(cameraPosText, font, 35, -2, HA_LEFT, VA_BOTTOM);
 }
 
 void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -813,20 +886,17 @@ void UpdateStats(float timeStep)
         "  Shadowmaps: " + renderer.numShadowMaps[true] +
         "  Occluders: " + renderer.numOccluders[true]);
 
-    Vector3 cameraPos = cameraNode.position;
-    String xText(cameraPos.x);
-    String yText(cameraPos.y);
-    String zText(cameraPos.z);
-    xText.Resize(8);
-    yText.Resize(8);
-    zText.Resize(8);
-
-    cameraPosText.text = String(
-        "Pos: " + xText + " " + yText + " " + zText);
-
     editorModeText.size = editorModeText.minSize;
     renderStatsText.size = renderStatsText.minSize;
-    cameraPosText.size = cameraPosText.minSize;
+}
+
+void UpdateViewports(float timeStep)
+{
+    for(uint i = 0; i < viewports.length; i++)
+    {
+        ViewportContext@ viewportContext = viewports[i];
+        viewportContext.Update(timeStep);
+    }
 }
 
 void UpdateView(float timeStep)
@@ -879,7 +949,10 @@ void UpdateView(float timeStep)
             FadeUI();
         }
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
-            cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+        {
+            float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+            camera.zoom = Clamp(zoom, .1, 30);
+        }
     }
 
     // Rotate/orbit camera
@@ -1151,7 +1224,7 @@ void ViewRaycast(bool mouseClick)
         float(pos.y - view.top) / view.height);
     Component@ selectedComponent;
 
-    if (pickMode != PICK_RIGIDBODIES)
+    if (pickMode < PICK_RIGIDBODIES)
     {
         if (editorScene.octree is null)
             return;
@@ -1304,4 +1377,42 @@ Vector3 SelectedNodesCenterPoint()
         return centerPoint / count;
     else
         return centerPoint;
+}
+
+Vector3 GetScreenCollision(IntVector2 pos)
+{
+    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
+    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
+
+    bool physicsFound = false;
+    if (editorScene.physicsWorld !is null)
+    {
+        if (!runUpdate)
+            editorScene.physicsWorld.UpdateCollisions();
+
+        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
+
+        if (result.body !is null)
+        {
+            physicsFound = true;
+            result.position;
+        }
+    }
+
+    if (editorScene.octree is null)
+        return res;
+
+    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
+        DRAWABLE_GEOMETRY, 0x7fffffff);
+
+    if (result.drawable !is null)
+    {
+        // take the closer of the results
+        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
+            return res;
+        else
+            return result.position;
+    }
+
+    return res;
 }
