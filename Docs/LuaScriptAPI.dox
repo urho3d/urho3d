@@ -1059,8 +1059,6 @@ Methods:
 - float GetDistance() const
 - float GetLodDistance() const
 - float GetSortValue() const
-- bool IsInView(unsigned frameNumber) const
-- bool IsInView(const FrameInfo& frame, bool mainView = true) const
 - bool HasBasePass(unsigned batchIndex) const
 - Light* GetFirstLight() const
 - float GetMinZ() const
@@ -1068,6 +1066,7 @@ Methods:
 
 Properties:
 
+- bool inView (readonly)
 - BoundingBox& worldBoundingBox (readonly)
 - char drawableFlags (readonly)
 - float drawDistance
