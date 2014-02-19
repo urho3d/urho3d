@@ -91,7 +91,7 @@ public:
     /// Return defines.
     const String& GetDefines() const { return defines_; }
     /// Return full shader name.
-    const String& GetFullName() const { return fullName_; }
+    String GetFullName() const { return name_ + "(" + defines_ + ")"; }
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
     /// Return whether uses a parameter.
@@ -121,8 +121,6 @@ private:
     String name_;
     /// Defines to use in compiling.
     String defines_;
-    /// Full shader name.
-    String fullName_;
     /// Shader compile error string.
     String compilerOutput_;
     /// Shader parameters.

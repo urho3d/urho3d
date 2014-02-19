@@ -154,15 +154,11 @@ bool ShaderVariation::Create()
 void ShaderVariation::SetName(const String& name)
 {
     name_ = name;
-    // Set full name
-    fullName_ = name_ + "(" + defines_ + ")";
 }
 
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
-    // Set full name
-    fullName_ = name_ + "(" + defines_ + ")";
 }
 
 Shader* ShaderVariation::GetOwner() const
