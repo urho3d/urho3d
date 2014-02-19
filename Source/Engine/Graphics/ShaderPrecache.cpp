@@ -84,8 +84,8 @@ void ShaderPrecache::StoreShaders(ShaderVariation* vs, ShaderVariation* ps)
         return;
     usedPtrCombinations_.Insert(shaderPair);
     
-    String vsName = vs->GetName().Substring(0, vs->GetName().Find('_'));
-    String psName = ps->GetName().Substring(0, ps->GetName().Find('_'));
+    String vsName = vs->GetName();
+    String psName = ps->GetName();
     const String& vsDefines = vs->GetDefines();
     const String& psDefines = ps->GetDefines();
     

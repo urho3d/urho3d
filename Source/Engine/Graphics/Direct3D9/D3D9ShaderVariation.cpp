@@ -141,12 +141,16 @@ void ShaderVariation::Release()
 
 void ShaderVariation::SetName(const String& name)
 {
-    name_ = name.Trimmed().Replaced(' ', '_');
+	name_ = name;
+    // Set full name
+	fullName_ = name_ + "(" + defines_ + ")";
 }
 
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
+    // Set full name
+	fullName_ = name_ + "(" + defines_ + ")";
 }
 
 Shader* ShaderVariation::GetOwner() const
@@ -284,7 +288,7 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         // In debug mode, check that all defines are referenced by the shader code
         #ifdef _DEBUG
         if (sourceCode.Find(defines[i]) == String::NPOS)
-            LOGWARNING("Shader " + GetName() + " does not use the define " + defines[i]);
+            LOGWARNING("Shader " + GetFullName() + " does not use the define " + defines[i]);
         #endif
     }
     

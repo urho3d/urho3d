@@ -1040,7 +1040,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 bool success = vs->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile vertex shader " + vs->GetName() + ":\n" + vs->GetCompilerOutput());
+                    LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -1083,7 +1083,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 bool success = ps->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile pixel shader " + ps->GetName() + ":\n" + ps->GetCompilerOutput());
+                    LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }

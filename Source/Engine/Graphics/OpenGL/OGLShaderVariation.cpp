@@ -119,7 +119,7 @@ bool ShaderVariation::Create()
         #ifdef _DEBUG
         String defineCheck = defineString.Substring(8, defineString.Find(' ', 8) - 8);
         if (originalShaderCode.Find(defineCheck) == String::NPOS)
-            LOGWARNING("Shader " + GetName() + " does not use the define " + defineCheck);
+            LOGWARNING("Shader " + GetFullName() + " does not use the define " + defineCheck);
         #endif
     }
     
@@ -153,12 +153,16 @@ bool ShaderVariation::Create()
 
 void ShaderVariation::SetName(const String& name)
 {
-    name_ = name.Trimmed().Replaced(' ', '_');
+    name_ = name;
+	// Set full name
+	fullName_ = name_ + "(" + defines_ + ")";
 }
 
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
+	// Set full name
+	fullName_ = name_ + "(" + defines_ + ")";
 }
 
 Shader* ShaderVariation::GetOwner() const
