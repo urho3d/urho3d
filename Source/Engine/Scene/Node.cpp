@@ -1475,11 +1475,14 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         resolver.AddComponent(component->GetID(), cloneComponent);
 
         const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
-        for (unsigned j = 0; j < compAttributes->Size(); ++j)
+        if (compAttributes)
         {
-            const AttributeInfo& attr = compAttributes->At(j);
-            if (attr.mode_ & AM_FILE)
-                cloneComponent->SetAttribute(j, component->GetAttribute(j));
+            for (unsigned j = 0; j < compAttributes->Size(); ++j)
+            {
+                const AttributeInfo& attr = compAttributes->At(j);
+                if (attr.mode_ & AM_FILE)
+                    cloneComponent->SetAttribute(j, component->GetAttribute(j));
+            }
         }
     }
 
