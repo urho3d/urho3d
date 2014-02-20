@@ -293,7 +293,7 @@ void WorkQueue::PurgeCompleted(unsigned priority)
                 using namespace WorkItemCompleted;
                 
                 VariantMap& eventData = GetEventDataMap();
-                eventData[P_ITEM] = static_cast<void*>(i->Get());
+                eventData[P_ITEM] = i->Get();
                 SendEvent(E_WORKITEMCOMPLETED, eventData);
             }
 

@@ -1059,8 +1059,6 @@ Methods:
 - float GetDistance() const
 - float GetLodDistance() const
 - float GetSortValue() const
-- bool IsInView(unsigned frameNumber) const
-- bool IsInView(const FrameInfo& frame, bool mainView = true) const
 - bool HasBasePass(unsigned batchIndex) const
 - Light* GetFirstLight() const
 - float GetMinZ() const
@@ -1068,6 +1066,7 @@ Methods:
 
 Properties:
 
+- bool inView (readonly)
 - BoundingBox& worldBoundingBox (readonly)
 - char drawableFlags (readonly)
 - float drawDistance
@@ -5626,11 +5625,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float range)
-- float Random(float min, float max)
 - float Random()
-- int RandomInt(int min, int max)
+- float Random(float min, float max)
+- float Random(float range)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -5638,8 +5637,8 @@ Properties:
 - void SetRandomSeed(unsigned seed)
 - float Sign(float value)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(const String eventName, const String functionName)
 - void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void SubscribeToEvent(const String eventName, const String functionName)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)

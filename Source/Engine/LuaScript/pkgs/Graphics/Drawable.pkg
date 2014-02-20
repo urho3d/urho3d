@@ -65,13 +65,12 @@ class Drawable : public Component
     float GetDistance() const;
     float GetLodDistance() const;
     float GetSortValue() const;
-    bool IsInView(unsigned frameNumber) const;
-    bool IsInView(const FrameInfo& frame, bool mainView = true) const;
     bool HasBasePass(unsigned batchIndex) const;
     Light* GetFirstLight() const;
     float GetMinZ() const;
     float GetMaxZ() const;
     
+    tolua_readonly tolua_property__is_set bool inView;
     tolua_readonly tolua_property__get_set BoundingBox& worldBoundingBox;
     tolua_readonly tolua_property__get_set unsigned char drawableFlags;
     tolua_property__get_set float drawDistance;
@@ -96,3 +95,25 @@ class Drawable : public Component
     tolua_readonly tolua_property__get_set float minZ;
     tolua_readonly tolua_property__get_set float maxZ;
 };
+
+${
+static bool DrawableIsInView(Drawable* drawable)
+{
+    // Get the last frame number processed by the Renderer to be able to check
+    Renderer* renderer = drawable->GetContext()->GetSubsystem<Renderer>();
+    if (!renderer)
+        return false;
+    const FrameInfo& frame = renderer->GetFrameInfo();
+    return drawable->IsInView(frame.frameNumber_);
+}
+#define TOLUA_DISABLE_tolua_get_Drawable_inView
+static int tolua_get_Drawable_inView(lua_State* tolua_S)
+{
+  Drawable* self = (Drawable*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'inView'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)DrawableIsInView(self));
+ return 1;
+}
+$}

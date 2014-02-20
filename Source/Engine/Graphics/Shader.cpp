@@ -147,7 +147,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
                 if (definesHash != normalizedHash)
                     vsVariations_.Insert(MakePair(definesHash, i->second_));
                 
-                i->second_->SetName(GetFileName(GetName()) + " " + normalizedDefines);
+                i->second_->SetName(GetFileName(GetName()));
                 i->second_->SetDefines(normalizedDefines);
                 ++numVariations_;
                 RefreshMemoryUse();
@@ -173,7 +173,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
                 if (definesHash != normalizedHash)
                     psVariations_.Insert(MakePair(definesHash, i->second_));
                 
-                i->second_->SetName(GetFileName(GetName()) + " " + normalizedDefines);
+                i->second_->SetName(GetFileName(GetName()));
                 i->second_->SetDefines(normalizedDefines);
                 ++numVariations_;
                 RefreshMemoryUse();

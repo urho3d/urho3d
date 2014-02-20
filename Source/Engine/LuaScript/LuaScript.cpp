@@ -214,7 +214,7 @@ void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName
     if (i != objectToEventTypeToFunctionMap_[object].End())
     {
         UnsubscribeFromEvent(object, eventType);
-		
+        
         objectToEventTypeToFunctionMap_[object].Erase(i);
     }
 }

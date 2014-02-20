@@ -1,14 +1,14 @@
 @echo off
-SETLOCAL ENABLEDELAYEDEXPANSION
 pushd %~dp0\..\Docs
 echo Dumping AngelScript API...
-..\Bin\ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h
+%~dp0\ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h
 if errorlevel 1 exit /B 1
-pushd %~dp0\..\Source\Engine\LuaScript\pkgs\
 echo Dumping LuaScript API...
-..\..\..\..\Bin\tolua++ -L ToDoxHook.lua -P -o ..\..\..\..\Docs\LuaScriptAPI.dox Urho3D.tolua
+set "out=%CD%\LuaScriptAPI.dox"
+pushd ..\Source\Engine\LuaScript\pkgs
+%~dp0\tolua++ -L ToDoxHook.lua -P -o %out% %~dp0\LuaPkgToDox.txt
 if errorlevel 1 exit /B 1
-pushd %~dp0\..\Docs
+popd
 echo Converting Doxygen files to HTML...
 doxygen Doxyfile 1>nul
 echo Finish.

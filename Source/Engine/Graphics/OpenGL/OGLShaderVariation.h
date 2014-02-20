@@ -58,10 +58,12 @@ public:
     Shader* GetOwner() const;
     /// Return shader type.
     ShaderType GetShaderType() const { return type_; }
-    /// Return full shader name.
+    /// Return name.
     const String& GetName() const { return name_; }
     /// Return defines.
     const String& GetDefines() const { return defines_; }
+    /// Return full shader name.
+    String GetFullName() const { return name_ + "(" + defines_ + ")"; }
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
     
@@ -70,7 +72,7 @@ private:
     WeakPtr<Shader> owner_;
     /// Shader type.
     ShaderType type_;
-    /// Full shader name.
+    /// Shader name.
     String name_;
     /// Defines to use in compiling.
     String defines_;
