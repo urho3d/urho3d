@@ -112,7 +112,7 @@ int asAtomicDec(int &value)
 	return InterlockedDecrement((LONG*)&value);
 }
 
-#elif defined(AS_LINUX) || defined(AS_BSD) || defined(AS_ILLUMOS)
+#elif defined(AS_LINUX) || defined(AS_BSD) || defined(AS_ILLUMOS) || defined(AS_ANDROID)
 
 //
 // atomic_inc_and_test() and atomic_dec_and_test() from asm/atomic.h is not meant 

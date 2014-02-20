@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ CheckBox::CheckBox(Context* context) :
     checked_(false)
 {
     enabled_ = true;
+    focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 }
 
 CheckBox::~CheckBox()
@@ -51,6 +52,7 @@ void CheckBox::RegisterObject(Context* context)
 
     COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(CheckBox, "Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(CheckBox, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     ACCESSOR_ATTRIBUTE(CheckBox, VAR_BOOL,"Is Checked", IsChecked, SetChecked, bool, false, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(CheckBox, VAR_INTVECTOR2,"Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
@@ -58,7 +60,7 @@ void CheckBox::RegisterObject(Context* context)
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (hovering_ || selected_)
+    if (hovering_ || selected_ || HasFocus())
         offset += hoverOffset_;
     if (checked_)
         offset += checkedOffset_;
@@ -68,8 +70,17 @@ void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexD
 
 void CheckBox::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (button == MOUSEB_LEFT)
+    if (button == MOUSEB_LEFT && editable_)
         SetChecked(!checked_);
+}
+
+void CheckBox::OnKey(int key, int buttons, int qualifiers)
+{
+    if (HasFocus() && key == KEY_SPACE)
+    {
+        // Simulate LMB click
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
+    }
 }
 
 void CheckBox::SetChecked(bool enable)
@@ -80,8 +91,8 @@ void CheckBox::SetChecked(bool enable)
 
         using namespace Toggled;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_STATE] = checked_;
         SendEvent(E_TOGGLED, eventData);
     }

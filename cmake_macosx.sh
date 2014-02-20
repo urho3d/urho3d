@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,30 +22,33 @@
 
 # Ensure we are in project root directory
 cd $( dirname $0 )
-SOURCE=`pwd`/Source
 
 # Create out-of-source build directory
-cmake -E make_directory Build
-
-# Remove existing CMake cache and rules
-rm -rf Build/CMakeCache.txt Build/CMakeFiles
-# Do cleanup one more time for old build directory created by previous version of cmake_macosx.sh, just in case
-rm -rf {../build,.,build}/CMakeCache.txt {../build,.,build}/CMakeFiles
+SOURCE=`pwd`/Source
+BUILD=Build
+if [ "$1" == "-DIOS=1" ]; then
+    BUILD=ios-Build
+fi
+cmake -E make_directory $BUILD
 
 # Create project with the Xcode generator
-cmake -E chdir Build cmake -G "Xcode" $@ $SOURCE
+OPT=-Wno-dev    # \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
+cmake -E chdir $BUILD cmake $OPT -G "Xcode" $@ $SOURCE
 
-# Below temporary fix may no longer be required by newer version of CMake
-sed -i.bak 's/lastKnownFileType = sourcecode; name = "as_callfunc_arm_xcode.S"/lastKnownFileType = sourcecode.asm; name = "as_callfunc_arm_xcode.S"/g' Build/*.xcodeproj/project.pbxproj
-
-# Apple always uses OpenGL
-sed 's/OpenGL/Direct3D9/g' Docs/Doxyfile.in >Doxyfile
-
-if [ $1 == "-DIOS=1" ]; then
-    # Due to a bug in the CMake/Xcode generator where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
+# Temporary fix: can be removed when CMake minimum required has reached 2.8.12
+if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make ]; then
+    # Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
     # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
-    sed -i.bak 's/\/Contents\/MacOS//g' Build/CMakeScripts/XCODE_DEPEND_HELPER.make
-    echo -e "\tsed -i.bak 's/\/Contents\/MacOS//g' CMakeScripts/XCODE_DEPEND_HELPER.make" >> Build/CMakeScripts/ReRunCMake.make
+    # Since version 2.8.12 CMake does not generate XCODE_DEPEND_HELPER.make script anymore, so we skip this fix when the script does not exist
+    sed -i '' 's/\/Contents\/MacOS//g' $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make
+fi
+
+# Temporary fix: known CMake bug (still exists in 2.8.12)
+if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/install_postBuildPhase.makeDebug ]; then
+    # Due to a bug in the CMake/Xcode generator that prevents iOS targets (library and bundle) to be installed correctly
+    # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
+    # below temporary fix is required to work around the bug
+    sed -i '' 's/$(EFFECTIVE_PLATFORM_NAME)//g' $BUILD/CMakeScripts/install_postBuildPhase.make*
 fi
 
 # vi: set ts=4 sw=4 expandtab:

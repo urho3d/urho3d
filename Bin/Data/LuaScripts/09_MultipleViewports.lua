@@ -12,14 +12,6 @@ local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false
 
-local context = GetContext()
-
-local cache = GetCache()
-local input = GetInput()
-local graphics = GetGraphics()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -38,7 +30,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Also create a DebugRenderer component so that we can draw debug geometry
@@ -67,7 +59,7 @@ function CreateScene()
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
     light.castShadows = true
-    light.shadowBias = BiasParameters(0.0001, 0.5)
+    light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
 
@@ -142,7 +134,7 @@ function SetupViewports()
     renderer.numViewports = 2
 
     -- Set up the front camera viewport
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
     
     -- Clone the default render path so that we do not interfere with the other viewport, then add
@@ -160,7 +152,7 @@ function SetupViewports()
 
     -- Set up the rear camera viewport on top of the front view ("rear view mirror")
     -- The viewport index must be greater in that case, otherwise the view would be left behind
-    local rearViewport = Viewport:new(context, scene_, rearCameraNode:GetComponent("Camera"),
+    local rearViewport = Viewport:new(scene_, rearCameraNode:GetComponent("Camera"),
         IntRect(graphics.width * 2 / 3, 32, graphics.width - 32, graphics.height / 3))
     renderer:SetViewport(1, rearViewport)
 end

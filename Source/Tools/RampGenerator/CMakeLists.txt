@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,10 @@
 set (TARGET_NAME RampGenerator)
 
 # Define source files
-set (SOURCE_FILES RampGenerator.cpp)
+define_source_files ()
 
 # Define dependency libs
-set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/IO ../../Engine/Math ../../Engine/Resource ../../ThirdParty/STB)
+set (LIBS ../../ThirdParty/STB)
 
 # Setup target
 setup_executable ()

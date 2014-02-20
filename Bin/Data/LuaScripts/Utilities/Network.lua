@@ -6,27 +6,27 @@ userName = ''
 nobgm = false
 
 function ParseNetworkArguments()
-    local index = 0
     local arguments = GetArguments()
+    local skipNext = false
     for i, argument in ipairs(arguments) do
-        if string.sub(argument, 1, 1) ~= '-'  then
+        if skipNext == false and string.sub(argument, 1, 1) == '-'  then
+            argument = string.lower(string.sub(argument, 1))
             if argument == "server" then
                 runServer = true
                 runClient = false
-                return
-            elseif index == 1 then -- First parameter is script name, so skip that
+            elseif argument == "address" then
                 runClient = true
-                serverAddress = argument
-            elseif index == 2 and runClient then
-                userName = argument
-            end
-            index = index + 1
-        else
-            argument = string.lower(string.sub(argument, 2))
-            if argument == "nobgm" then
+                runServer = false
+                serverAddress = arguments[i + 1]
+                skipNext = true
+            elseif argument == "username" then
+                userName = arguments[i + 1]
+                skipNext = true
+            elseif argument == "nobgm" then
                 nobgm = true
             end
         end
+        skipNext = false
     end
 end
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ void BorderImage::RegisterObject(Context* context)
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ ? hoverOffset_ : IntVector2::ZERO);
+    GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ || HasFocus() ? hoverOffset_ : IntVector2::ZERO);
 }
 
 void BorderImage::SetTexture(Texture* texture)
@@ -189,7 +189,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 void BorderImage::SetTextureAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetTexture(cache->GetResource<Texture2D>(value.id_));
+    SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 
 ResourceRef BorderImage::GetTextureAttr() const

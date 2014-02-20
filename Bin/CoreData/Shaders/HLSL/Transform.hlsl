@@ -1,3 +1,4 @@
+#ifdef COMPILEVS
 #ifdef SKINNED
 float4x3 GetSkinMatrix(float4 blendWeights, int4 blendIndices)
 {
@@ -30,12 +31,12 @@ float GetDepth(float4 clipPos)
 
 float3 GetBillboardPos(float4 iPos, float2 iSize, float4x3 modelMatrix)
 {
-    return mul(float4(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector, 1.0), modelMatrix);
+    return mul(iPos, modelMatrix) + mul(float3(iSize.x, iSize.y, 0.0), cBillboardRot);
 }
 
 float3 GetBillboardNormal()
 {
-    return float3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
+    return float3(-cBillboardRot[2][0], -cBillboardRot[2][1], -cBillboardRot[2][2]);
 }
 
 #if defined(SKINNED)
@@ -59,3 +60,4 @@ float3 GetBillboardNormal()
 #endif
 
 #define GetWorldTangent(modelMatrix) normalize(mul(iTangent.xyz, (float3x3)modelMatrix))
+#endif

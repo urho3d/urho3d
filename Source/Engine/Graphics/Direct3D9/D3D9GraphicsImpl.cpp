@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ GraphicsImpl::GraphicsImpl() :
     device_(0),
     defaultColorSurface_(0),
     defaultDepthStencilSurface_(0),
+    frameQuery_(0),
     adapter_(D3DADAPTER_DEFAULT),
     deviceType_(D3DDEVTYPE_HAL)
 {

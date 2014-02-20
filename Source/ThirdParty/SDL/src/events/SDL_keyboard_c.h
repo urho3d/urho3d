@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "SDL_config.h"
 
 #ifndef _SDL_keyboard_c_h
@@ -48,7 +51,7 @@ extern void SDL_SetScancodeName(SDL_Scancode scancode, const char *name);
 extern void SDL_SetKeyboardFocus(SDL_Window * window);
 
 /* Send a keyboard key event */
-extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
+extern int SDL_SendKeyboardKey(Uint8 state, Uint32 keycode, SDL_Scancode scancode);
 
 /* Send keyboard text input */
 extern int SDL_SendKeyboardText(const char *text);
@@ -58,6 +61,9 @@ extern int SDL_SendEditingText(const char *text, int start, int end);
 
 /* Shutdown the keyboard subsystem */
 extern void SDL_KeyboardQuit(void);
+
+/* Convert to UTF-8 */
+extern char *SDL_UCS4ToUTF8(Uint32 ch, char *dst);
 
 #endif /* _SDL_keyboard_c_h */
 

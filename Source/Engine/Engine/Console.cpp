@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,8 @@ static const int DEFAULT_HISTORY_SIZE = 16;
 Console::Console(Context* context) :
     Object(context),
     historyRows_(DEFAULT_HISTORY_SIZE),
-    historyPosition_(0)
+    historyPosition_(0),
+    printing_(false)
 {
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -170,7 +171,6 @@ void Console::UpdateElements()
     background_->SetFixedWidth(width);
     background_->SetHeight(background_->GetMinHeight());
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
-    lineEdit_->SetFixedHeight(lineEdit_->GetTextElement()->GetRowHeight());
 }
 
 XMLFile* Console::GetDefaultStyle() const
@@ -203,7 +203,7 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_COMMAND] = line;
         SendEvent(E_CONSOLECOMMAND, eventData);
 
@@ -264,6 +264,10 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
+    // If printing a log message causes more messages to be logged (error accessing font), disregard them
+    if (printing_)
+        return;
+    
     using namespace LogMessage;
 
     int level = eventData[P_LEVEL].GetInt();
@@ -279,6 +283,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     if (!rowContainer_->GetNumChildren())
         return;
     
+    printing_ = true;
     rowContainer_->DisableLayoutUpdate();
     
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
@@ -294,6 +299,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
+    printing_ = false;
 }
 
 }

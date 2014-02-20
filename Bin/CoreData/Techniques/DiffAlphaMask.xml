@@ -1,10 +1,10 @@
-<technique>
-    <pass name="base" vs="LitSolid" ps="LitSolid_DiffAlphaMask" alphamask="true" />
-    <pass name="litbase" vs="LitSolid" ps="LitSolid_DiffAlphaMaskAmbient" alphamask="true" />
-    <pass name="light" vs="LitSolid" ps="LitSolid_DiffAlphaMask"  depthtest="equal" depthwrite="false" blend="add" alphamask="true" />
-    <pass name="prepass" vs="LitSolid" ps="LitSolid_DiffAlphaMaskPrepass" alphamask="true" />
-    <pass name="material" vs="LitSolid" ps="LitSolid_DiffAlphaMaskMaterial" depthtest="equal" depthwrite="false" alphamask="true" />
-    <pass name="deferred" vs="LitSolid" ps="LitSolid_DiffAlphaMaskDeferred" alphamask="true" />
-    <pass name="depth" vs="Depth" ps="Depth_AlphaMask" alphamask="true" />
-    <pass name="shadow" vs="Shadow" ps="Shadow_AlphaMask" alphamask="true" />
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP ALPHAMASK" alphamask="true" >
+    <pass name="base" />
+    <pass name="litbase" psdefines="AMBIENT" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" psdefines="DEFERRED" />
+    <pass name="depth" vs="Depth" ps="Depth" psdefines="ALPHAMASK" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" psdefines="ALPHAMASK" />
 </technique>

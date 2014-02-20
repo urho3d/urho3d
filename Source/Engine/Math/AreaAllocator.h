@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@ namespace Urho3D
 class URHO3D_API AreaAllocator
 {
 public:
+    /// Default construct with empty size.
+    AreaAllocator();
     /// Construct with given width and height.
     AreaAllocator(int width, int height);
     /// Construct with given width and height, and set the maximum it allows to grow.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,23 +25,22 @@
 #include "ArrayPtr.h"
 #include "Color.h"
 #include "GraphicsDefs.h"
-#include "HashMap.h"
 #include "Image.h"
-#include "Matrix3x4.h"
 #include "Object.h"
+#include "Plane.h"
 #include "Rect.h"
 
 namespace Urho3D
 {
 
+class File;
 class Image;
 class IndexBuffer;
-class Matrix3;
-class Matrix4;
-class Matrix3x4;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
+class Shader;
+class ShaderPrecache;
 class ShaderProgram;
 class ShaderVariation;
 class Texture;
@@ -83,17 +82,25 @@ public:
     Graphics(Context* context_);
     /// Destruct. Release the OpenGL context and close the window.
     virtual ~Graphics();
-    
+
     /// Set external window handle. Only effective before setting the initial screen mode. On Windows it is necessary to set up OpenGL pixel format manually for the window.
     void SetExternalWindow(void* window);
+    /// Set window icon.
+    void SetWindowIcon(Image* windowIcon);
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
+    /// Set window position.
+    void SetWindowPosition(const IntVector2& position);
+    /// Set window position.
+    void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
-    bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
+    /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
+    void SetFlushGPU(bool enable) {}
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
@@ -182,8 +189,6 @@ public:
     void SetDepthStencil(RenderSurface* depthStencil);
     /// Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// Set view texture (deferred rendering final output rendertarget) to prevent it from being sampled.
-    void SetViewTexture(Texture* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
     /// Set blending mode.
@@ -206,12 +211,20 @@ public:
     void SetScissorTest(bool enable, const IntRect& rect);
     /// Set stencil test.
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
+    void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY, const Matrix4& projection = Matrix4::IDENTITY);
     /// Set vertex buffer stream frequency. No-op on OpenGL.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL.
     void ResetStreamFrequencies();
     /// Set force Shader Model 2 flag. No-op on OpenGL.
     void SetForceSM2(bool enable);
+    /// Begin dumping shader variation names to an XML file for precaching.
+    void BeginDumpShaders(const String& fileName);
+    /// End dumping shader variations names.
+    void EndDumpShaders();
+    /// Precache shader variations from an XML file generated with BeginDumpShaders().
+    void PrecacheShaders(Deserializer& source);
 
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -221,6 +234,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return window position.
+    IntVector2 GetWindowPosition() const;
     /// Return window width.
     int GetWidth() const { return width_; }
     /// Return window height.
@@ -229,6 +244,8 @@ public:
     int GetMultiSample() const { return multiSample_; }
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
+    /// Return whether window is borderless.
+    bool GetBorderless() const { return borderless_; }
     /// Return whether window is resizable.
     bool GetResizable() const { return resizable_; }
     /// Return whether vertical sync is on.
@@ -237,6 +254,8 @@ public:
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
+    /// Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
+    bool GetFlushGPU() const { return false; }
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
     /// Return number of primitives drawn this frame.
@@ -249,8 +268,8 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether Shader Model 3 is supported. Always false on OpenGL.
-    bool GetSM3Support() const { return false; }
+    /// Return whether Shader Model 3 is supported. Has no meaning on OpenGL, so is assumed to be true.
+    bool GetSM3Support() const { return true; }
     /// Return whether hardware instancing is supported.
     bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.
@@ -271,9 +290,15 @@ public:
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
+    /// Return the desktop resolution.
+    IntVector2 GetDesktopResolution() const;
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
-    /// Return vertex buffer by index.
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const char* name, const char* defines) const;
+    /// Return current vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
@@ -337,6 +362,8 @@ public:
     unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
     /// Return stencil write bitmask.
     unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
+    /// Return whether a custom clipping plane is in use.
+    bool GetUseClipPlane() const { return useClipPlane_; }
     /// Return stream frequency by vertex buffer index. Always returns 0 on OpenGL.
     unsigned GetStreamFrequency(unsigned index) const { return 0; }
     /// Return rendertarget width and height.
@@ -360,6 +387,10 @@ public:
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
     void Restore();
+    /// Maximize the Window.
+    void Maximize();
+    /// Minimize the Window.
+    void Minimize();
     /// Clean up a render surface from all FBOs.
     void CleanupRenderSurface(RenderSurface* surface);
     /// Mark the FBO needing an update.
@@ -399,6 +430,8 @@ public:
     static unsigned GetFormat(const String& formatName);
     
 private:
+    /// Create the application window icon.
+    void CreateWindowIcon();
     /// Check supported rendering features.
     void CheckFeatureSupport(String& extensions);
     /// Select FBO and commit changes.
@@ -406,7 +439,7 @@ private:
     /// Check FBO completeness.
     bool CheckFramebuffer();
     /// Cleanup unused and unbound FBO's.
-    void CleanupFramebuffers(bool contextLost);
+    void CleanupFramebuffers(bool force = false);
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.
@@ -416,6 +449,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
+    /// Window Icon File Name
+    Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width.
@@ -426,6 +461,8 @@ private:
     int multiSample_;
     /// Fullscreen flag.
     bool fullscreen_;
+    /// Borderless flag.
+    bool borderless_;
     /// Resizable flag.
     bool resizable_;
     /// Vertical sync flag.
@@ -490,8 +527,6 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
-    /// View texture.
-    Texture* viewTexture_;
     /// Viewport coordinates.
     IntRect viewport_;
     /// Texture anisotropy level.
@@ -544,11 +579,23 @@ private:
     Matrix3 tempMatrices3_[NUM_TEMP_MATRICES];
     /// Temp matrices for transposing shader parameters.
     Matrix4 tempMatrices4_[NUM_TEMP_MATRICES];
+    /// Custom clip plane enable flag.
+    bool useClipPlane_;
     /// Releasing GPU objects flag.
     bool releasingGPUObjects_;
+    /// Base directory for shaders.
+    String shaderPath_;
+    /// File extension for shaders.
+    String shaderExtension_;
+    /// Last used shader in shader variation query.
+    mutable WeakPtr<Shader> lastShader_;
+    /// Last used shader name in shader variation query.
+    mutable String lastShaderName_;
+    /// Shader precache utility.
+    SharedPtr<ShaderPrecache> shaderPrecache_;
 };
 
 /// Register Graphics library objects.
-void RegisterGraphicsLibrary(Context* context_);
+void URHO3D_API RegisterGraphicsLibrary(Context* context_);
 
 }

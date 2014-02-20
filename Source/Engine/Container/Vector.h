@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -439,15 +439,18 @@ private:
     /// Copy elements from one buffer to another.
     static void CopyElements(T* dest, const T* src, unsigned count)
     {
-        for (unsigned i = 0; i < count; ++i)
-            dest[i] = src[i];
+        while (count--)
+            *dest++ = *src++;
     }
     
     // Call the elements' destructors.
     static void DestructElements(T* dest, unsigned count)
     {
-        for (unsigned i = 0; i < count; ++i)
-            (dest + i)->~T();
+        while (count--)
+        {
+            dest->~T();
+            ++dest;
+        }
     }
 };
 

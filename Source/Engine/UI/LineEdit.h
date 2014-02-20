@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,6 @@ public:
     virtual void ApplyAttributes();
     /// Perform UI element update.
     virtual void Update(float timeStep);
-
     /// React to mouse click begin.
     virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse doubleclick.
@@ -147,6 +146,8 @@ private:
     void HandleFocused(StringHash eventType, VariantMap& eventData);
     /// Handle being defocused.
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
+    /// Handle the element layout having been updated.
+    void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData);
 };
 
 }

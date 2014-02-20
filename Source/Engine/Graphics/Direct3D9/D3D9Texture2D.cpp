@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -242,13 +242,10 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
-    unsigned rowOffset = GetRowDataSize(x);
+    
     // GetRowDataSize() returns CPU-side (source) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
-    {
         rowSize = rowSize / 3 * 4;
-        rowOffset = rowOffset / 3 * 4;
-    }
     
     // Perform conversion from RGB / RGBA as necessary
     switch (format_)
@@ -256,7 +253,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     default:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             memcpy(dest, src, rowSize);
             src += rowSize;
         }
@@ -265,8 +262,8 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     case D3DFMT_X8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
-            for (int j = 0; j < levelWidth; ++j)
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
+            for (int j = 0; j < width; ++j)
             {
                 *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = 255;
                 src += 3;
@@ -277,8 +274,8 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     case D3DFMT_A8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
-            for (int j = 0; j < levelWidth; ++j)
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
+            for (int j = 0; j < width; ++j)
             {
                 *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = src[3];
                 src += 4;
@@ -342,6 +339,9 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
             break;
         }
         
+        // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+        if (IsCompressed() && requestedLevels_ > 1)
+            requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
         
         for (unsigned i = 0; i < levels_; ++i)

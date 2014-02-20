@@ -1,0 +1,58 @@
+$#include "Audio.h"
+
+enum SoundType
+{
+    SOUND_EFFECT,
+    SOUND_AMBIENT,
+    SOUND_VOICE,
+    SOUND_MUSIC,
+    SOUND_MASTER,
+    MAX_SOUND_TYPES
+};
+
+class Audio : public Object
+{
+    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
+    bool Play();
+    void Stop();
+    void SetMasterGain(SoundType type, float gain);
+    void SetListener(SoundListener* listener);
+    void StopSound(Sound* sound);
+
+    unsigned GetSampleSize() const;
+    int GetMixRate() const;
+    bool GetInterpolation() const;
+    bool IsStereo() const;
+    bool IsPlaying() const;
+    bool IsInitialized() const;
+    float GetMasterGain(SoundType type) const;
+    SoundListener* GetListener() const;
+    const PODVector<SoundSource*>& GetSoundSources() const;
+
+    void AddSoundSource(SoundSource* soundSource);
+    void RemoveSoundSource(SoundSource* soundSource);
+    float GetSoundSourceMasterGain(SoundType type) const;
+    void MixOutput(void *dest, unsigned samples);
+
+    tolua_readonly tolua_property__get_set unsigned sampleSize;
+    tolua_readonly tolua_property__get_set int mixRate;
+    tolua_readonly tolua_property__get_set bool interpolation;
+    tolua_readonly tolua_property__is_set bool stereo;
+    tolua_readonly tolua_property__is_set bool playing;
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_property__get_set SoundListener* listener;
+};
+
+Audio* GetAudio();
+tolua_readonly tolua_property__get_set Audio* audio;
+
+${
+#define TOLUA_DISABLE_tolua_AudioLuaAPI_GetAudio00
+static int tolua_AudioLuaAPI_GetAudio00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Audio>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_audio_ptr
+#define tolua_get_audio_ptr tolua_AudioLuaAPI_GetAudio00
+$}

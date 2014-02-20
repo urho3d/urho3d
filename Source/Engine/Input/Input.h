@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0)
+        joystick_(0), controller_(0)
     {
     }
     
@@ -101,6 +101,8 @@ struct JoystickState
     
     /// SDL joystick.
     SDL_Joystick* joystick_;
+    /// SDL game controller
+    SDL_GameController* controller_;
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -136,6 +138,8 @@ public:
     void CloseJoystick(unsigned index);
     /// Redetect joysticks. Return true if successful.
     bool DetectJoysticks();
+    /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
+    void SetScreenKeyboardVisible(bool enable);
     
     /// Check if a key is held down.
     bool GetKeyDown(int key) const;
@@ -173,6 +177,10 @@ public:
     JoystickState* GetJoystick(unsigned index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
+    /// Return whether on-screen keyboard is supported.
+    bool GetScreenKeyboardSupport() const;
+    /// Return whether on-screen keyboard is being shown.
+    bool IsScreenKeyboardVisible() const;
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether application window has input focus.
@@ -196,7 +204,7 @@ private:
     /// Handle a mouse button change.
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
-    void SetKey(int key, bool newState);
+    void SetKey(int key, bool newState, unsigned raw);
     /// Handle mousewheel change.
     void SetMouseWheel(int delta);
     /// Internal function to set the mouse cursor position.
@@ -216,6 +224,8 @@ private:
     HashSet<int> keyPress_;
     /// Active finger touches.
     HashMap<int, TouchState> touches_;
+    /// String for text input.
+    String textInput_;
     /// Opened joysticks.
     Vector<JoystickState> joysticks_;
     /// Mouse buttons' down state.

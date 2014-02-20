@@ -2,10 +2,13 @@
 // This sample demonstrates:
 //     - Controlling a humanoid character through physics
 //     - Driving animations using the AnimationController component
+//     - Manual control of a bone scene node
 //     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera clipping into scenery
 //     - Saving and loading the variables of a script object
+//     - Using touch inputs/gyroscope for iOS/Android (implemented through an external file)
 
 #include "Scripts/Utilities/Sample.as"
+#include "Scripts/Utilities/Touch.as"
 
 const int CTRL_FORWARD = 1;
 const int CTRL_BACK = 2;
@@ -20,13 +23,8 @@ const float JUMP_FORCE = 7.0f;
 const float YAW_SENSITIVITY = 0.1f;
 const float INAIR_THRESHOLD_TIME = 0.1f;
 
-const float CAMERA_MIN_DIST = 1.0f;
-const float CAMERA_MAX_DIST = 5.0f;
-
 Scene@ scene_;
-Node@ cameraNode;
 Node@ characterNode;
-bool firstPerson = false;
 
 void Start()
 {
@@ -41,6 +39,13 @@ void Start()
 
     // Create the UI content
     CreateInstructions();
+
+    // Activate mobile stuff when appropriate
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+    {
+        SetLogoVisible(false);
+        InitTouchInput();
+    }
 
     // Subscribe to necessary events
     SubscribeToEvents();
@@ -75,7 +80,7 @@ void CreateScene()
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
     light.castShadows = true;
-    light.shadowBias = BiasParameters(0.0001f, 0.5f);
+    light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
 
@@ -149,6 +154,9 @@ void CreateCharacter()
     object.castShadows = true;
     characterNode.CreateComponent("AnimationController");
 
+    // Set the head bone for manual control
+    object.skeleton.GetBone("Bip01_Head").animated = false;
+
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody@ body = characterNode.CreateComponent("RigidBody");
     body.collisionLayer = 1;
@@ -194,6 +202,10 @@ void SubscribeToEvents()
 
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate");
+
+    // Subscribe to mobile touch events
+    if (touchEnabled)
+        SubscribeToTouchEvents();
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -205,44 +217,53 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (character is null)
         return;
 
-    // Get movement controls and assign them to the character logic component. If UI has a focused element, clear controls
-    if (ui.focusElement is null)
+    // Clear previous controls
+    character.controls.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
+
+    if (touchEnabled)
     {
-        character.controls.Set(CTRL_FORWARD, input.keyDown['W']);
-        character.controls.Set(CTRL_BACK, input.keyDown['S']);
-        character.controls.Set(CTRL_LEFT, input.keyDown['A']);
-        character.controls.Set(CTRL_RIGHT, input.keyDown['D']);
-        character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
-
-        // Add character yaw & pitch from the mouse motion
-        character.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
-        character.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
-        // Limit pitch
-        character.controls.pitch = Clamp(character.controls.pitch, -80.0f, 80.0f);
-
-        // Switch between 1st and 3rd person
-        if (input.keyPress['F'])
-            firstPerson = !firstPerson;
-
-        // Check for loading / saving the scene
-        if (input.keyPress[KEY_F5])
-        {
-            File saveFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
-            scene_.SaveXML(saveFile);
-        }
-        if (input.keyPress[KEY_F7])
-        {
-            File loadFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_READ);
-            scene_.LoadXML(loadFile);
-            // After loading we have to reacquire the character scene node, as it has been recreated
-            // Simply find by name as there's only one of them
-            characterNode = scene_.GetChild("Jack", true);
-            if (characterNode is null)
-                return;
-        }
+        // Update controls using touch (mobile)
+        UpdateTouches(character.controls);
     }
     else
-        character.controls.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
+    {
+        // Update controls using keys (desktop)
+        if (ui.focusElement is null)
+        {
+            character.controls.Set(CTRL_FORWARD, input.keyDown['W']);
+            character.controls.Set(CTRL_BACK, input.keyDown['S']);
+            character.controls.Set(CTRL_LEFT, input.keyDown['A']);
+            character.controls.Set(CTRL_RIGHT, input.keyDown['D']);
+            character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
+
+            // Add character yaw & pitch from the mouse motion
+            character.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
+            character.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
+            // Limit pitch
+            character.controls.pitch = Clamp(character.controls.pitch, -80.0f, 80.0f);
+
+            // Switch between 1st and 3rd person
+            if (input.keyPress['F'])
+                firstPerson = newFirstPerson = !firstPerson;
+
+            // Check for loading / saving the scene
+            if (input.keyPress[KEY_F5])
+            {
+                File saveFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
+                scene_.SaveXML(saveFile);
+            }
+            if (input.keyPress[KEY_F7])
+            {
+                File loadFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_READ);
+                scene_.LoadXML(loadFile);
+                // After loading we have to reacquire the character scene node, as it has been recreated
+                // Simply find by name as there's only one of them
+                characterNode = scene_.GetChild("Jack", true);
+                if (characterNode is null)
+                    return;
+            }
+        }
+    }
 
     // Set rotation already here so that it's updated every rendering frame instead of every physics frame
     characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
@@ -261,28 +282,34 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     Quaternion rot = characterNode.rotation;
     Quaternion dir = rot * Quaternion(character.controls.pitch, Vector3(1.0f, 0.0f, 0.0f));
 
+    // Turn head to camera pitch, but limit to avoid unnatural animation
+    Node@ headNode = characterNode.GetChild("Bip01_Head", true);
+    float limitPitch = Clamp(character.controls.pitch, -45.0f, 45.0f);
+    Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
+    // This could be expanded to look at an arbitrary target, now just look at a point in front
+    Vector3 headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    headNode.LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
+    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
+    headNode.Rotate(Quaternion(0.0f, 90.0f, 90.0f));
+
     if (firstPerson)
     {
         // First person camera: position to the head bone + offset slightly forward & up
-        Node@ headNode = characterNode.GetChild("Bip01_Head", true);
-        if (headNode !is null)
-        {
-            cameraNode.position = headNode.worldPosition + rot * Vector3(0.0f, 0.15f, 0.2f);
-            cameraNode.rotation = dir;
-        }
+        cameraNode.position = headNode.worldPosition + rot * Vector3(0.0f, 0.15f, 0.2f);
+        cameraNode.rotation = dir;
     }
     else
     {
         // Third person camera: position behind the character
-        Vector3 aimPoint = characterNode.position + rot * Vector3(0.0f, 1.7f, 0.0f);
+        Vector3 aimPoint = characterNode.position + rot * Vector3(0.0f, 1.7f, 0.0f); // You can modify x Vector3 value to translate the fixed character position (indicative range[-2;2])
 
         // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
-        Vector3 rayDir = dir * Vector3(0.0f, 0.0f, -1.0f);
-        float rayDistance = CAMERA_MAX_DIST;
+        Vector3 rayDir = dir * Vector3(0.0f, 0.0f, -1.0f); // For indoor scenes you can use dir * Vector3(0.0, 0.0, -0.5) to prevent camera from crossing the walls
+        float rayDistance = cameraDistance;
         PhysicsRaycastResult result = scene_.physicsWorld.RaycastSingle(Ray(aimPoint, rayDir), rayDistance, 2);
         if (result.body !is null)
             rayDistance = Min(rayDistance, result.distance);
-        rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
+        rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, cameraDistance);
 
         cameraNode.position = aimPoint + rayDir * rayDistance;
         cameraNode.rotation = dir;

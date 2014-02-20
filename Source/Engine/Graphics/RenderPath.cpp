@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,6 +68,9 @@ void RenderTargetInfo::Load(const XMLElement& element)
     if (element.HasAttribute("srgb"))
         sRGB_ = element.GetBool("srgb");
     
+    if (element.HasAttribute("persistent"))
+        persistent_ = element.GetBool("persistent");
+    
     if (element.HasAttribute("size"))
         size_ = element.GetIntVector2("size");
     if (element.HasAttribute("sizedivisor"))
@@ -102,7 +105,6 @@ void RenderPathCommand::Load(const XMLElement& element)
         if (element.HasAttribute("color"))
         {
             clearFlags_ |= CLEAR_COLOR;
-            // Mark fog color with negative values
             if (element.GetAttributeLower("color") == "fog")
                 useFogColor_ = true;
             else
@@ -141,6 +143,9 @@ void RenderPathCommand::Load(const XMLElement& element)
     case CMD_QUAD:
         vertexShaderName_ = element.GetAttribute("vs");
         pixelShaderName_ = element.GetAttribute("ps");
+        vertexShaderDefines_ = element.GetAttribute("vsdefines");
+        pixelShaderDefines_ = element.GetAttribute("psdefines");
+        
         if (type_ == CMD_QUAD)
         {
             XMLElement parameterElem = element.GetChild("parameter");

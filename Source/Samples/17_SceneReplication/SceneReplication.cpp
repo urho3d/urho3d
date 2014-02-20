@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -463,7 +463,7 @@ void SceneReplication::HandleClientConnected(StringHash eventType, VariantMap& e
     using namespace ClientConnected;
     
     // When a client connects, assign to scene to begin scene replication
-    Connection* newConnection = (Connection*)eventData[P_CONNECTION].GetPtr();
+    Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
     
     // Then create a controllable object for that client
@@ -481,7 +481,7 @@ void SceneReplication::HandleClientDisconnected(StringHash eventType, VariantMap
     using namespace ClientConnected;
     
     // When a client disconnects, remove the controlled object
-    Connection* connection = (Connection*)eventData[P_CONNECTION].GetPtr();
+    Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     Node* object = serverObjects_[connection];
     if (object)
         object->Remove();

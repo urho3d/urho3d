@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,7 @@ enum LayoutMode
     LM_VERTICAL
 };
 
-/// Traversal mode.
+/// Traversal mode for rendering.
 enum TraversalMode
 {
     /// Traverse thru children having same priority first and recurse into their children before traversing children having higher priority.
@@ -114,7 +114,8 @@ class ResourceCache;
 class URHO3D_API UIElement : public Serializable
 {
     OBJECT(UIElement);
-
+    BASEOBJECT(UIElement);
+    
 public:
     /// Construct.
     UIElement(Context* context);
@@ -147,31 +148,35 @@ public:
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
-    virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse click end.
-    virtual void OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement);
+    virtual void OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement) {}
     /// React to double mouse click.
-    virtual void OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse drag begin.
-    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse drag motion.
-    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse drag end.
-    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
+    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor) {}
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
-    virtual bool OnDragDropTest(UIElement* source);
+    virtual bool OnDragDropTest(UIElement* source) { return true; }
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
-    virtual bool OnDragDropFinish(UIElement* source);
+    virtual bool OnDragDropFinish(UIElement* source) { return true; }
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers);
+    virtual void OnWheel(int delta, int buttons, int qualifiers) {}
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) {}
     /// React to a key press translated to a character.
-    virtual void OnChar(unsigned c, int buttons, int qualifiers);
+    virtual void OnChar(unsigned c, int buttons, int qualifiers) {}
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize() {}
     /// React to position change.
-    virtual void OnPositionSet();
+    virtual void OnPositionSet() {}
+    /// React to editable status change.
+    virtual void OnSetEditable() {}
+    /// React to indent change.
+    virtual void OnIndentSet() {}
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -244,8 +249,10 @@ public:
     void SetSortChildren(bool enable);
     /// Set whether parent elements' opacity affects opacity. Default true.
     void SetUseDerivedOpacity(bool enable);
-    /// Set whether reacts to input.
+    /// Set whether reacts to input. Default false, but is enabled by subclasses if applicable.
     void SetEnabled(bool enable);
+    /// Set whether value is editable through input. Not applicable to all elements. Default true.
+    void SetEditable(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
     void SetFocus(bool enable);
     /// Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
@@ -306,7 +313,7 @@ public:
     void SetVar(ShortStringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
     void SetInternal(bool enable);
-    /// Set traversal mode. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
+    /// Set traversal mode for rendering. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
     void SetTraversalMode(TraversalMode traversalMode);
     /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
     void SetElementEventSender(bool flag);
@@ -372,6 +379,8 @@ public:
     bool HasFocus() const;
     /// Return whether reacts to input.
     bool IsEnabled() const { return enabled_; }
+    /// Return whether value is editable through input.
+    bool IsEditable() const { return editable_; }
     /// Return whether is selected. Actual meaning is element dependent.
     bool IsSelected() const { return selected_; }
     /// Return whether is visible.
@@ -449,13 +458,13 @@ public:
     /// Get UI rendering batches with a specified offset. Also recurses to child elements.
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect
         currentScissor);
-    /// Get color attribute. Uses just the top-left color.
+    /// Return color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }
-    /// Get traversal mode.
+    /// Return traversal mode for rendering.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
-    /// Get element event sender flag.
+    /// Return whether element should send child added / removed events by itself. If false, defers to parent element.
     bool IsElementEventSender() const { return elementEventSender_; }
-    /// Get element event sender.
+    /// Get element which should send child added / removed events.
     UIElement* GetElementEventSender() const;
 
 protected:
@@ -496,6 +505,8 @@ protected:
     bool useDerivedOpacity_;
     /// Input enabled flag.
     bool enabled_;
+    /// Value editable flag.
+    bool editable_;
     /// Selected flag.
     bool selected_;
     /// Visible flag.
@@ -544,6 +555,8 @@ private:
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.
     void Detach();
+    /// Verify that child elements have proper alignment for layout mode.
+    void VerifyChildAlignment();
 
     /// Size.
     IntVector2 size_;
@@ -573,7 +586,7 @@ private:
     bool colorGradient_;
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
-    /// Traversal mode.
+    /// Traversal mode for rendering.
     TraversalMode traversalMode_;
     /// Flag whether node should send child added / removed events by itself.
     bool elementEventSender_;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -141,13 +141,12 @@ Bone* Skeleton::GetBone(unsigned index)
 
 Bone* Skeleton::GetBone(const String& name)
 {
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
-    {
-        if (i->name_ == name)
-            return &(*i);
-    }
-    
-    return 0;
+    return GetBone(StringHash(name));
+}
+
+Bone* Skeleton::GetBone(const char* name)
+{
+    return GetBone(StringHash(name));
 }
 
 Bone* Skeleton::GetBone(StringHash nameHash)

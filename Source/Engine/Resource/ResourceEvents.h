@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,24 @@ EVENT(E_RELOADFINISHED, ReloadFinished)
 /// Resource reloading failed.
 EVENT(E_RELOADFAILED, ReloadFailed)
 {
+}
+
+/// Resource loading failed.
+EVENT(E_LOADFAILED, LoadFailed)
+{
+    PARAM(P_RESOURCENAME, ResourceName);            // String
+}
+
+/// Resource not found.
+EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
+{
+    PARAM(P_RESOURCENAME, ResourceName);            // String
+}
+
+/// Unknown resource type.
+EVENT(E_UNKNOWNRESOURCETYPE, UnknownResourceType)
+{
+    PARAM(P_RESOURCETYPE, ResourceType);            // ShortStringHash
 }
 
 }

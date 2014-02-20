@@ -149,9 +149,26 @@ void InitScene()
 
     gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
 
-    // On mobile devices render the shadowmap first
-    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+    // On mobile devices render the shadowmap first. Also adjust the shadow quality for performance
+    String platform = GetPlatform();
+    if (platform == "Android" || platform == "iOS" || platform == "Raspberry Pi")
+    {
         renderer.reuseShadowMaps = false;
+        renderer.shadowQuality = SHADOWQUALITY_LOW_16BIT;
+        // Adjust the directional light shadow range slightly further, as only the first
+        // cascade is supported
+        Node@ dirLightNode = gameScene.GetChild("GlobalLight", true);
+        if (dirLightNode !is null)
+        {
+            Light@ dirLight = dirLightNode.GetComponent("Light");
+            dirLight.shadowCascade = CascadeParameters(15.0f, 0.0f, 0.0f, 0.0f, 0.9f);
+            dirLight.shadowIntensity = 0.333f;
+        }
+    }
+    
+    // Precache shaders if possible
+    if (cache.Exists("NinjaSnowWarShaders.xml"))
+        graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.xml"));
 }
 
 void InitNetworking()
@@ -1003,7 +1020,7 @@ void UpdateControls()
 
         playerControls.yaw += mouseSensitivity * input.mouseMoveX;
         playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-        playerControls.pitch = Clamp(playerControls.pitch, -60, 60);
+        playerControls.pitch = Clamp(playerControls.pitch, -60.0, 60.0);
 
         // In singleplayer, set controls directly on the player's ninja. In multiplayer, transmit to server
         if (singlePlayer)
@@ -1110,7 +1127,7 @@ void UpdateFreelookCamera()
 
     playerControls.yaw += mouseSensitivity * input.mouseMoveX;
     playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-    playerControls.pitch = Clamp(playerControls.pitch, -90, 90);
+    playerControls.pitch = Clamp(playerControls.pitch, -90.0, 90.0);
     gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
 }
 

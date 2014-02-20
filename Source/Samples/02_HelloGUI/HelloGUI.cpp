@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,19 @@
 //
 
 #include "Button.h"
+#include "BorderImage.h"
 #include "CheckBox.h"
 #include "CoreEvents.h"
 #include "Engine.h"
+#include "Graphics.h"
 #include "Input.h"
 #include "LineEdit.h"
+#include "ResourceCache.h"
 #include "Text.h"
+#include "Texture2D.h"
+#include "ToolTip.h"
 #include "UI.h"
+#include "UIElement.h"
 #include "UIEvents.h"
 #include "Window.h"
 
@@ -40,7 +46,7 @@ DEFINE_APPLICATION_MAIN(HelloGUI)
 HelloGUI::HelloGUI(Context* context) :
     Sample(context),
     uiRoot_(GetSubsystem<UI>()->GetRoot()),
-    window_()
+    dragBeginPosition_(IntVector2::ZERO)
 {
 }
 
@@ -61,11 +67,12 @@ void HelloGUI::Start()
 
     // Initialize Window
     InitWindow();
-
+    
     // Create and add some controls to the Window
     InitControls();
 
-    SubscribeToEvents();
+    // Create a draggable Fish
+    CreateDraggableFish();
 }
 
 void HelloGUI::InitControls()
@@ -134,14 +141,61 @@ void HelloGUI::InitWindow()
     windowTitle->SetStyleAuto();
     buttonClose->SetStyle("CloseButton");
 
-    // Lastly, subscribe to buttonClose release (following a 'press') events
+    // Subscribe to buttonClose release (following a 'press') events
     SubscribeToEvent(buttonClose, E_RELEASED, HANDLER(HelloGUI, HandleClosePressed));
+    
+    // Subscribe also to all UI mouse clicks just to see where we have clicked
+    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
 }
 
-void HelloGUI::SubscribeToEvents()
+void HelloGUI::CreateDraggableFish()
 {
-    // Subscribe handler; invoked whenever a mouse click event is dispatched
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Graphics* graphics = GetSubsystem<Graphics>();
+
+    // Create a draggable Fish button
+    Button* draggableFish = new Button(context_);
+    draggableFish->SetTexture(cache->GetResource<Texture2D>("Textures/UrhoDecal.dds")); // Set texture
+    draggableFish->SetBlendMode(BLEND_ADD);
+    draggableFish->SetSize(128, 128);
+    draggableFish->SetPosition((graphics->GetWidth() - draggableFish->GetWidth()) / 2, 200);
+    draggableFish->SetName("Fish");
+    uiRoot_->AddChild(draggableFish);
+
+    // Add a tooltip to Fish button
+    ToolTip* toolTip = new ToolTip(context_);
+    draggableFish->AddChild(toolTip);
+    toolTip->SetPosition(IntVector2(draggableFish->GetWidth() + 5, draggableFish->GetWidth() / 2)); // slightly offset from close button
+    BorderImage* textHolder = new BorderImage(context_);
+    toolTip->AddChild(textHolder);
+    textHolder->SetStyle("ToolTipBorderImage");
+    Text* toolTipText = new Text(context_);
+    textHolder->AddChild(toolTipText);
+    toolTipText->SetStyle("ToolTipText");
+    toolTipText->SetText("Please drag me!");
+
+    // Subscribe draggableFish to Drag Events (in order to make it draggable)
+    // See "Event list" in documentation's Main Page for reference on available Events and their eventData
+    SubscribeToEvent(draggableFish, E_DRAGBEGIN, HANDLER(HelloGUI, HandleDragBegin));
+    SubscribeToEvent(draggableFish, E_DRAGMOVE, HANDLER(HelloGUI, HandleDragMove));
+    SubscribeToEvent(draggableFish, E_DRAGEND, HANDLER(HelloGUI, HandleDragEnd));
+}
+
+void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)
+{
+    // Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+    dragBeginPosition_ = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
+}
+
+void HelloGUI::HandleDragMove(StringHash eventType, VariantMap& eventData)
+{
+    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
+    UIElement* draggedElement = static_cast<UIElement*>(eventData["Element"].GetPtr());
+    draggedElement->SetPosition(dragCurrentPosition - dragBeginPosition_);
+}
+
+void HelloGUI::HandleDragEnd(StringHash eventType, VariantMap& eventData) // For reference (not used here)
+{
 }
 
 void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)

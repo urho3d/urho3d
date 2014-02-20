@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -109,6 +109,8 @@ static void RegisterEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "int get_minFps() const", asMETHOD(Engine, GetMinFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void set_maxFps(int)", asMETHOD(Engine, SetMaxFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int get_maxFps() const", asMETHOD(Engine, GetMaxFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void set_timeStepSmoothing(int)", asMETHOD(Engine, SetTimeStepSmoothing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "int get_timeStepSmoothing() const", asMETHOD(Engine, GetTimeStepSmoothing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void set_maxInactiveFps(int)", asMETHOD(Engine, SetMaxInactiveFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int get_maxInactiveFps() const", asMETHOD(Engine, GetMaxInactiveFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void set_pauseMinimized(bool)", asMETHOD(Engine, SetPauseMinimized), asCALL_THISCALL);

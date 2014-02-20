@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ public:
         FromEulerAngles(x, y, z);
     }
     
-    /// Construct from the rotation difference between two vectors.
+    /// Construct from the rotation difference between two direction vectors.
     Quaternion(const Vector3& start, const Vector3& end)
     {
         FromRotationTo(start, end);
@@ -165,13 +165,15 @@ public:
     void FromAngleAxis(float angle, const Vector3& axis);
     /// Define from Euler angles (in degrees.)
     void FromEulerAngles(float x, float y, float z);
-    /// Define from the rotation difference between two vectors.
+    /// Define from the rotation difference between two direction vectors.
     void FromRotationTo(const Vector3& start, const Vector3& end);
     /// Define from orthonormal axes.
     void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
-    
+    /// Define from a direction to look in and an up direction
+    void FromLookRotation(const Vector3& direction, const Vector3&up = Vector3::UP);
+
     /// Normalize to unit length.
     void Normalize()
     {
@@ -232,6 +234,8 @@ public:
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.
     Quaternion Slerp(Quaternion rhs, float t) const;
+    /// Normalized linear interpolation with another quaternion.
+    Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath = false) const;
     /// Return float data.
     const float* Data() const { return &w_; }
     /// Return as string.

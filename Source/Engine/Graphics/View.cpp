@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "DebugRenderer.h"
+#include "FileSystem.h"
 #include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
@@ -39,6 +40,7 @@
 #include "Skybox.h"
 #include "Technique.h"
 #include "Texture2D.h"
+#include "Texture3D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
 #include "View.h"
@@ -179,13 +181,22 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable* drawable = *start++;
+        bool batchesUpdated = false;
         
-        // If draw distance non-zero, check it
+        // If draw distance non-zero, update and check it
         float maxDistance = drawable->GetDrawDistance();
-        if ((maxDistance <= 0.0f || drawable->GetDistance() <= maxDistance) && (!buffer || !drawable->IsOccludee() ||
-            buffer->IsVisible(drawable->GetWorldBoundingBox())))
+        if (maxDistance > 0.0f)
         {
             drawable->UpdateBatches(view->frame_);
+            batchesUpdated = true;
+            if (drawable->GetDistance() > maxDistance)
+                continue;
+        }
+        
+        if (!buffer || !drawable->IsOccludee() || buffer->IsVisible(drawable->GetWorldBoundingBox()))
+        {
+            if (!batchesUpdated)
+                drawable->UpdateBatches(view->frame_);
             drawable->MarkInView(view->frame_);
             
             // For geometries, find zone, clear lights and calculate view space Z range
@@ -283,7 +294,8 @@ View::View(Context* context) :
     camera_(0),
     cameraZone_(0),
     farClipZone_(0),
-    renderTarget_(0)
+    renderTarget_(0),
+    substituteRenderTarget_(0)
 {
     // Create octree query and scene results vector for each thread
     unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
@@ -348,17 +360,16 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.vertexLights_ = command.vertexLights_;
             
             // Check scenepass metadata for defining custom passes which interact with lighting
-            String metadata = command.metadata_.Trimmed().ToLower();
-            if (!metadata.Empty())
+            if (!command.metadata_.Empty())
             {
-                if (metadata == "gbuffer")
+                if (command.metadata_ == "gbuffer")
                     gBufferPassName_ = command.pass_;
-                else if (metadata == "base")
+                else if (command.metadata_ == "base" && command.pass_ != "base")
                 {
                     basePassName_ = command.pass_;
                     litBasePassName_ = "lit" + command.pass_;
                 }
-                else if (metadata == "alpha")
+                else if (command.metadata_ == "alpha" && command.pass_ != "alpha")
                 {
                     alphaPassName_ = command.pass_;
                     litAlphaPassName_ = "lit" + command.pass_;
@@ -372,16 +383,16 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             
             scenePasses_.Push(info);
         }
-        else if (command.type_ == CMD_FORWARDLIGHTS)
-        {
-            if (!command.pass_.Trimmed().Empty())
-                lightPassName_ = command.pass_;
-        }
+        // Allow a custom forward light pass
+        else if (command.type_ == CMD_FORWARDLIGHTS && !command.pass_.Empty())
+            lightPassName_ = command.pass_;
     }
     
-    // Get light volume shaders according to the renderpath, if it needs them
+    // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
     deferredAmbient_ = false;
+    useLitBase_ = false;
+    
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
@@ -391,26 +402,17 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         // Check if ambient pass and G-buffer rendering happens at the same time
         if (command.type_ == CMD_SCENEPASS && command.outputNames_.Size() > 1)
         {
-            for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
-            {
-                if (!command.outputNames_[j].Compare("viewport", false))
-                {
-                    deferredAmbient_ = true;
-                    break;
-                }
-            }
+            if (CheckViewportWrite(command))
+                deferredAmbient_ = true;
         }
-        
-        if (command.type_ == CMD_LIGHTVOLUMES)
+        else if (command.type_ == CMD_LIGHTVOLUMES)
         {
-            renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.pixelShaderName_);
+            lightVolumeVSName_ = command.vertexShaderName_;
+            lightVolumePSName_ = command.pixelShaderName_;
             deferred_ = true;
         }
-    }
-    if (!deferred_)
-    {
-        lightVS_.Clear();
-        lightPS_.Clear();
+        else if (command.type_ == CMD_FORWARDLIGHTS)
+            useLitBase_ = command.useLitBase_;
     }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
@@ -473,8 +475,7 @@ void View::Update(const FrameInfo& frame)
     
     int maxSortedInstances = renderer_->GetMaxSortedInstances();
     
-    // Clear screen buffers, geometry, light, occluder & batch lists
-    screenBuffers_.Clear();
+    // Clear buffers, geometry, light, occluder & batch list
     renderTargets_.Clear();
     geometries_.Clear();
     shadowGeometries_.Clear();
@@ -504,10 +505,6 @@ void View::Render()
     // Allocate screen buffers as necessary
     AllocateScreenBuffers();
     
-    // Initialize screenbuffer indices to use for read and write (pingponging)
-    writeBuffer_ = 0;
-    readBuffer_ = 0;
-    
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
     
@@ -528,11 +525,8 @@ void View::Render()
         graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     }
     
-    // Set "view texture" to prevent destination texture sampling during all renderpasses
     if (renderTarget_)
     {
-        graphics_->SetViewTexture(renderTarget_->GetParentTexture());
-        
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
         // as a render texture produced on Direct3D9
         #ifdef USE_OPENGL
@@ -550,11 +544,10 @@ void View::Render()
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetViewTexture(0);
     graphics_->ResetStreamFrequencies();
     
     // Run framebuffer blitting if necessary
-    if (screenBuffers_.Size() && currentRenderTarget_ != renderTarget_)
+    if (currentRenderTarget_ != renderTarget_)
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
@@ -694,20 +687,21 @@ void View::GetDrawables()
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = tempDrawables.Size() / numWorkItems;
         
-        WorkItem item;
-        item.workFunction_ = CheckVisibilityWork;
-        item.aux_ = this;
-        
         PODVector<Drawable*>::Iterator start = tempDrawables.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = CheckVisibilityWork;
+            item->aux_ = this;
+
             PODVector<Drawable*>::Iterator end = tempDrawables.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
             
-            item.start_ = &(*start);
-            item.end_ = &(*end);
+            item->start_ = &(*start);
+            item->end_ = &(*end);
             queue->AddWorkItem(item);
             
             start = end;
@@ -763,31 +757,23 @@ void View::GetBatches()
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
     
-    // Check whether to use the lit base pass optimization
-    bool useLitBase = true;
-    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
-    {
-        const RenderPathCommand& command = renderPath_->commands_[i];
-        if (command.type_ == CMD_FORWARDLIGHTS)
-            useLitBase = command.useLitBase_;
-    }
-    
     // Process lit geometries and shadow casters for each light
     {
         PROFILE(ProcessLights);
         
         lightQueryResults_.Resize(lights_.Size());
         
-        WorkItem item;
-        item.workFunction_ = ProcessLightWork;
-        item.aux_ = this;
-        
         for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
         {
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = ProcessLightWork;
+            item->aux_ = this;
+
             LightQueryResult& query = lightQueryResults_[i];
             query.light_ = lights_[i];
             
-            item.start_ = &query;
+            item->start_ = &query;
             queue->AddWorkItem(item);
         }
         
@@ -905,7 +891,7 @@ void View::GetBatches()
                     
                     // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                     if (!drawable->GetMaxLights())
-                        GetLitBatches(drawable, lightQueue, alphaQueue, useLitBase);
+                        GetLitBatches(drawable, lightQueue, alphaQueue);
                     else
                         maxLightsDrawables_.Insert(drawable);
                 }
@@ -925,7 +911,7 @@ void View::GetBatches()
                     volumeBatch.material_ = 0;
                     volumeBatch.pass_ = 0;
                     volumeBatch.zone_ = 0;
-                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVS_, lightPS_);
+                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVolumeVSName_, lightVolumePSName_);
                     lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }
@@ -959,7 +945,7 @@ void View::GetBatches()
                 // Find the correct light queue again
                 LightBatchQueue* queue = light->GetLightQueue();
                 if (queue)
-                    GetLitBatches(drawable, *queue, alphaQueue, useLitBase);
+                    GetLitBatches(drawable, *queue, alphaQueue);
             }
         }
     }
@@ -1064,32 +1050,40 @@ void View::UpdateGeometries()
     
     // Sort batches
     {
-        WorkItem item;
-        
+     
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.enabled_)
+            if (!IsNecessary(command))
                 continue;
             
             if (command.type_ == CMD_SCENEPASS)
             {
-                item.workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork :
-                    SortBatchQueueBackToFrontWork;
-                item.start_ = &batchQueues_[command.pass_];
+                BatchQueue* passQueue = &batchQueues_[command.pass_];
+                
+                SharedPtr<WorkItem> item = queue->GetFreeItem();
+                item->priority_ = M_MAX_UNSIGNED;
+                item->workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
+                item->start_ = &batchQueues_[command.pass_];
                 queue->AddWorkItem(item);
             }
         }
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
-            item.workFunction_ = SortLightQueueWork;
-            item.start_ = &(*i);
-            queue->AddWorkItem(item);
+            SharedPtr<WorkItem> lightItem = queue->GetFreeItem();
+            lightItem->priority_ = M_MAX_UNSIGNED;
+            lightItem->workFunction_ = SortLightQueueWork;
+            lightItem->start_ = &(*i);
+            queue->AddWorkItem(lightItem);
+
             if (i->shadowSplits_.Size())
             {
-                item.workFunction_ = SortShadowQueueWork;
-                queue->AddWorkItem(item);
+                SharedPtr<WorkItem> shadowItem = queue->GetFreeItem();
+                shadowItem->priority_ = M_MAX_UNSIGNED;
+                shadowItem->workFunction_ = SortShadowQueueWork;
+                shadowItem->start_ = &(*i);
+                queue->AddWorkItem(shadowItem);
             }
         }
     }
@@ -1121,10 +1115,6 @@ void View::UpdateGeometries()
             int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
             int drawablesPerItem = threadedGeometries_.Size() / numWorkItems;
             
-            WorkItem item;
-            item.workFunction_ = UpdateDrawableGeometriesWork;
-            item.aux_ = const_cast<FrameInfo*>(&frame_);
-            
             PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
             for (int i = 0; i < numWorkItems; ++i)
             {
@@ -1132,8 +1122,12 @@ void View::UpdateGeometries()
                 if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                     end = start + drawablesPerItem;
                 
-                item.start_ = &(*start);
-                item.end_ = &(*end);
+                SharedPtr<WorkItem> item = queue->GetFreeItem();
+                item->priority_ = M_MAX_UNSIGNED;
+                item->workFunction_ = UpdateDrawableGeometriesWork;
+                item->aux_ = const_cast<FrameInfo*>(&frame_);
+                item->start_ = &(*start);
+                item->end_ = &(*end);
                 queue->AddWorkItem(item);
                 
                 start = end;
@@ -1149,7 +1143,7 @@ void View::UpdateGeometries()
     queue->Complete(M_MAX_UNSIGNED);
 }
 
-void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue, bool useLitBase)
+void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue)
 {
     Light* light = lightQueue.light_;
     Zone* zone = GetZone(drawable);
@@ -1158,7 +1152,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
-    bool allowLitBase = useLitBase && light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
+    bool allowLitBase = useLitBase_ && light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {
@@ -1230,62 +1224,95 @@ void View::ExecuteRenderPathCommands()
         }
     }
     
-    // Check if forward rendering needs to resolve the multisampled backbuffer to a texture
-    bool needResolve = !deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1 && screenBuffers_.Size();
-    
     {
         PROFILE(ExecuteRenderPath);
+        
+        // Set for safety in case of empty renderpath
+        currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
+        currentViewportTexture_ = 0;
+
+        bool viewportModified = false;
+        bool isPingponging = false;
         
         unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            if (!renderPath_->commands_[i].enabled_)
-                continue;
-            lastCommandIndex = i;
+            RenderPathCommand& command = renderPath_->commands_[i];
+            if (IsNecessary(command))
+                lastCommandIndex = i;
         }
-        
+
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.enabled_)
+            if (!IsNecessary(command))
                 continue;
+
+            bool viewportRead = CheckViewportRead(command);
+            bool viewportWrite = CheckViewportWrite(command);
+            bool beginPingpong = CheckPingpong(i);
             
-            // If command writes and reads the target at same time, pingpong automatically
-            if (CheckViewportRead(command))
+            // Has the viewport been modified and will be read as a texture by the current command?
+            if (viewportRead && viewportModified)
             {
-                readBuffer_ = writeBuffer_;
-                if (!command.outputNames_[0].Compare("viewport", false))
-                {
-                    ++writeBuffer_;
-                    if (writeBuffer_ >= screenBuffers_.Size())
-                        writeBuffer_ = 0;
-                    
-                    // If this is a scene render pass, must copy the previous viewport contents now
-                    if (command.type_ == CMD_SCENEPASS && !needResolve)
-                        BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(), false);
-                }
+                // Start pingponging without a blit if already rendering to the substitute render target
+                if (currentRenderTarget_ && currentRenderTarget_ == substituteRenderTarget_ && beginPingpong)
+                    isPingponging = true;
                 
-                // Resolve multisampled framebuffer now if necessary
-                /// \todo Does not copy the depth buffer
-                if (needResolve)
+                // If not using pingponging, simply resolve/copy to the first viewport texture
+                if (!isPingponging)
                 {
-                    graphics_->ResolveToTexture(screenBuffers_[readBuffer_], viewRect_);
-                    needResolve = false;
+                    if (!currentRenderTarget_)
+                    {
+                        graphics_->ResolveToTexture(viewportTextures_[0], viewRect_);
+                        currentViewportTexture_ = viewportTextures_[0];
+                        viewportModified = false;
+                    }
+                    else
+                    {
+                        if (viewportWrite)
+                        {
+                            BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()),
+                                viewportTextures_[0]->GetRenderSurface(), false);
+                            currentViewportTexture_ = viewportTextures_[0];
+                            viewportModified = false;
+                        }
+                        else
+                        {
+                            // If the current render target is already a texture, and we are not writing to it, can read that
+                            // texture directly instead of blitting. However keep the viewport dirty flag in case a later command
+                            // will do both read and write, and then we need to blit / resolve
+                            currentViewportTexture_ = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
+                        }
+                    }
+                }
+                else
+                {
+                    // Swap the pingpong double buffer sides. Texture 0 will be read next
+                    viewportTextures_[1] = viewportTextures_[0];
+                    viewportTextures_[0] = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
+                    currentViewportTexture_ = viewportTextures_[0];
+                    viewportModified = false;
                 }
             }
             
-            // Check which rendertarget will be used on this pass
-            if (screenBuffers_.Size() && !needResolve)
-                currentRenderTarget_ = screenBuffers_[writeBuffer_]->GetRenderSurface();
-            else
-                currentRenderTarget_ = renderTarget_;
-            
-            // Optimization: if the last command is a quad with output to the viewport, do not use the screenbuffers,
-            // but the viewport directly. This saves the extra copy
-            if (screenBuffers_.Size() && i == lastCommandIndex && command.type_ == CMD_QUAD && command.outputNames_.Size() == 1 &&
-                !command.outputNames_[0].Compare("viewport", false))
-                currentRenderTarget_ = renderTarget_;
-            
+            if (beginPingpong)
+                isPingponging = true;
+
+            // Determine viewport write target
+            if (viewportWrite)
+            {
+                if (isPingponging)
+                {
+                    currentRenderTarget_ = viewportTextures_[1]->GetRenderSurface();
+                    // If the render path ends into a quad, it can be redirected to the final render target
+                    if (i == lastCommandIndex && command.type_ == CMD_QUAD)
+                        currentRenderTarget_ = renderTarget_;
+                }
+                else
+                    currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
+            }
+
             switch (command.type_)
             {
             case CMD_CLEAR:
@@ -1309,6 +1336,7 @@ void View::ExecuteRenderPathCommands()
                     SetRenderTargets(command);
                     SetTextures(command);
                     graphics_->SetFillMode(camera_->GetFillMode());
+                    graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                     batchQueues_[command.pass_].Draw(this, command.useScissor_, command.markToStencil_);
                 }
                 break;
@@ -1342,6 +1370,7 @@ void View::ExecuteRenderPathCommands()
                         
                         SetTextures(command);
                         graphics_->SetFillMode(camera_->GetFillMode());
+                        graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                         i->litBatches_.Draw(i->light_, this);
                     }
                     
@@ -1357,7 +1386,6 @@ void View::ExecuteRenderPathCommands()
                     PROFILE(RenderLightVolumes);
                     
                     SetRenderTargets(command);
-                    
                     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
                     {
                         // If reusing shadowmaps, render each of them before the lit batches
@@ -1384,6 +1412,10 @@ void View::ExecuteRenderPathCommands()
             default:
                 break;
             }
+
+            // If current command output to the viewport, mark it modified
+            if (viewportWrite)
+                viewportModified = true;
         }
     }
     
@@ -1394,6 +1426,7 @@ void View::ExecuteRenderPathCommands()
     graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
     graphics_->SetViewport(viewRect_);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
 }
 
 void View::SetRenderTargets(RenderPathCommand& command)
@@ -1473,7 +1506,7 @@ void View::SetTextures(RenderPathCommand& command)
         // Bind the rendered output
         if (!command.textureNames_[i].Compare("viewport", false))
         {
-            graphics_->SetTexture(i, screenBuffers_[readBuffer_]);
+            graphics_->SetTexture(i, currentViewportTexture_);
             continue;
         }
         
@@ -1486,7 +1519,20 @@ void View::SetTextures(RenderPathCommand& command)
         }
         
         // Bind a texture from the resource system
-        Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+        Texture* texture;
+
+        // Detect cube/3D textures by file extension: they are defined by an XML file
+        if (GetExtension(command.textureNames_[i]) == ".xml")
+        {
+            // Assume 3D textures are only bound to the volume map unit, otherwise it's a cube texture
+            if (i == TU_VOLUMEMAP)
+                texture = cache->GetResource<Texture3D>(command.textureNames_[i]);
+            else
+                texture = cache->GetResource<TextureCube>(command.textureNames_[i]);
+        }
+        else
+            texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+
         if (texture)
             graphics_->SetTexture(i, texture);
         else
@@ -1499,11 +1545,14 @@ void View::SetTextures(RenderPathCommand& command)
 
 void View::RenderQuad(RenderPathCommand& command)
 {
+    if (command.vertexShaderName_.Empty() || command.pixelShaderName_.Empty())
+        return;
+    
     // If shader can not be found, clear it from the command to prevent redundant attempts
-    ShaderVariation* vs = renderer_->GetVertexShader(command.vertexShaderName_);
+    ShaderVariation* vs = graphics_->GetShader(VS, command.vertexShaderName_, command.vertexShaderDefines_);
     if (!vs)
         command.vertexShaderName_ = String::EMPTY;
-    ShaderVariation* ps = renderer_->GetPixelShader(command.pixelShaderName_);
+    ShaderVariation* ps = graphics_->GetShader(PS, command.pixelShaderName_, command.pixelShaderDefines_);
     if (!ps)
         command.pixelShaderName_ = String::EMPTY;
     
@@ -1513,6 +1562,16 @@ void View::RenderQuad(RenderPathCommand& command)
     const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
     for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
         graphics_->SetShaderParameter(k->first_, k->second_);
+
+    graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
+    graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
+
+    float nearClip = camera_->GetNearClip();
+    float farClip = camera_->GetFarClip();
+    graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
+    graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(PSP_FARCLIP, farClip);
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
@@ -1558,10 +1617,17 @@ void View::RenderQuad(RenderPathCommand& command)
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
     DrawFullscreenQuad(false);
+}
+
+bool View::IsNecessary(const RenderPathCommand& command)
+{
+    return command.enabled_ && command.outputNames_.Size() && (command.type_ != CMD_SCENEPASS ||
+        !batchQueues_[command.pass_].IsEmpty());
 }
 
 bool View::CheckViewportRead(const RenderPathCommand& command)
@@ -1575,55 +1641,123 @@ bool View::CheckViewportRead(const RenderPathCommand& command)
     return false;
 }
 
+bool View::CheckViewportWrite(const RenderPathCommand& command)
+{
+    for (unsigned i = 0; i < command.outputNames_.Size(); ++i)
+    {
+        if (!command.outputNames_[i].Compare("viewport", false))
+            return true;
+    }
+    
+    return false;
+}
+
+
+bool View::CheckPingpong(unsigned index)
+{
+    // Current command must be a viewport-reading & writing quad to begin the pingpong chain
+    RenderPathCommand& current = renderPath_->commands_[index];
+    if (current.type_ != CMD_QUAD || !CheckViewportRead(current) || !CheckViewportWrite(current))
+        return false;
+
+    // If there are commands other than quads that target the viewport, we must keep rendering to the final target and resolving
+    // to a viewport texture when necessary instead of pingponging, as a scene pass is not guaranteed to fill the entire viewport
+    for (unsigned i = index + 1; i < renderPath_->commands_.Size(); ++i)
+    {
+        RenderPathCommand& command = renderPath_->commands_[i];
+        if (!IsNecessary(command))
+            continue;
+        if (CheckViewportWrite(command))
+        {
+            if (command.type_ != CMD_QUAD)
+                return false;
+        }
+    }
+
+    return true;
+}
+
 void View::AllocateScreenBuffers()
 {
-    unsigned neededBuffers = 0;
+    bool needSubstitute = false;
+    unsigned numViewportTextures = 0;
+
     #ifdef USE_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers.
     if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
         Graphics::GetRGBAFormat()))
-        neededBuffers = 1;
+        needSubstitute = true;
     #endif
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
-        neededBuffers = 1;
+        needSubstitute = true;
     
     // Follow final rendertarget format, or use RGB to match the backbuffer format
     unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
     
+    // If HDR rendering is enabled use RGBA16f and reserve a buffer
+    bool hdrRendering = renderer_->GetHDRRendering();
+
+    if (renderer_->GetHDRRendering())
+    {
+        format = Graphics::GetRGBAFloat16Format();
+        needSubstitute = true;
+    }
+
     #ifdef USE_OPENGL
-    if (deferred_)
+    if (deferred_ && !hdrRendering)
         format = Graphics::GetRGBAFormat();
     #endif
     
-    // Check for commands which read the rendered scene and allocate a buffer for each, up to 2 maximum for pingpong
-    /// \todo If the last copy is optimized away, this allocates an extra buffer unnecessarily
+    // Check for commands which read the viewport, or pingpong between viewport textures
     bool hasViewportRead = false;
-    bool hasViewportReadWrite = false;
+    bool hasPingpong = false;
     
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!command.enabled_)
+        if (!IsNecessary(command))
             continue;
         if (CheckViewportRead(command))
-        {
             hasViewportRead = true;
-            if (!command.outputNames_[0].Compare("viewport", false))
-                hasViewportReadWrite = true;
-        }
+        if (!hasPingpong && CheckPingpong(i))
+            hasPingpong = true;
     }
-    if (hasViewportRead && !neededBuffers)
-        neededBuffers = 1;
-    if (hasViewportReadWrite)
-        neededBuffers = 2;
-    
+
+    if (hasViewportRead)
+    {
+        ++numViewportTextures;
+
+        // If OpenGL ES, use substitute target to avoid resolve from the backbuffer, which may be slow. However if multisampling
+        // is specified, there is no choice
+        #ifdef GL_ES_VERSION_2_0
+        if (!renderTarget_ && graphics_->GetMultiSample() < 2)
+            needSubstitute = true;
+        #endif
+
+        // If we have viewport read and target is a cube map, must allocate a substitute target instead as BlitFramebuffer()
+        // does not support reading a cube map
+        if (renderTarget_ && renderTarget_->GetParentTexture()->GetType() == TextureCube::GetTypeStatic())
+            needSubstitute = true;
+
+        if (hasPingpong && !needSubstitute)
+            ++numViewportTextures;
+    }
+
     // Allocate screen buffers with filtering active in case the quad commands need that
-    // Follow the sRGB mode of the destination rendertarget
+    // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    for (unsigned i = 0; i < neededBuffers; ++i)
-        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB));
+    substituteRenderTarget_ = needSubstitute ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, 
+        sRGB)->GetRenderSurface() : (RenderSurface*)0;
+    for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
+    {
+        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB) :
+            (Texture2D*)0;
+    }
+    // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
+    if (numViewportTextures == 1 && substituteRenderTarget_)
+        viewportTextures_[1] = static_cast<Texture2D*>(substituteRenderTarget_->GetParentTexture());
     
     // Allocate extra render targets defined by the rendering path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
@@ -1646,18 +1780,24 @@ void View::AllocateScreenBuffers()
             height = rtSize_.y_ / (height ? height : 1);
         }
         
-        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_);
+        // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
+        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_,
+            rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
     }
 }
 
 void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite)
 {
+    if (!source)
+        return;
+
     PROFILE(BlitFramebuffer);
     
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(true);
+    graphics_->SetDepthWrite(depthWrite);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, destination);
@@ -1667,7 +1807,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetViewport(viewRect_);
     
     String shaderName = "CopyFramebuffer";
-    graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
+    graphics_->SetShaders(graphics_->GetShader(VS, shaderName), graphics_->GetShader(PS, shaderName));
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
@@ -1930,19 +2070,29 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
        // For point light, check that this drawable is inside the split shadow camera frustum
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
             continue;
+        
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
         float drawDistance = drawable->GetDrawDistance();
+        bool batchesUpdated = drawable->IsInView(frame_, false);
         if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
             maxShadowDistance = drawDistance;
-        if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
-            continue;
+        if (maxShadowDistance > 0.0f)
+        {
+            if (!batchesUpdated)
+            {
+                drawable->UpdateBatches(frame_);
+                batchesUpdated = true;
+            }
+            if (drawable->GetDistance() > maxShadowDistance)
+                continue;
+        }
         
         // Note: as lights are processed threaded, it is possible a drawable's UpdateBatches() function is called several
         // times. However, this should not cause problems as no scene modification happens at this point.
-        if (!drawable->IsInView(frame_, false))
+        if (!batchesUpdated)
             drawable->UpdateBatches(frame_);
-        
+
         // Project shadow caster bounding box to light view space for visibility check
         lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);
         
@@ -2338,6 +2488,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
         {
             const TechniqueEntry& entry = techniques[i];
             Technique* tech = entry.technique_;
+
             if (!tech || (tech->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
                 continue;
             if (lodDistance >= entry.lodDistance_)
@@ -2477,6 +2628,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     
     if (type != LIGHT_DIRECTIONAL)
     {
@@ -2519,6 +2671,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     graphics_->SetColorWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
     graphics_->SetDepthStencil(shadowMap);

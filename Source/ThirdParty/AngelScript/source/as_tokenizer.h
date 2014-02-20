@@ -70,8 +70,7 @@ protected:
 
 	const asCScriptEngine *engine;
 
-	asCMap<asCStringPointer, eTokenType> alphaKeywordMap;
-	asCMap<asCStringPointer, eTokenType> nonAlphaKeywordMap;
+	const sTokenWord **keywordTable[256];
 };
 
 END_AS_NAMESPACE

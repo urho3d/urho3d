@@ -56,18 +56,26 @@ void VS(float4 iPos : POSITION,
         #endif
         out float4 oScreenPos : TEXCOORD5,
     #endif
+    #ifdef HEIGHTFOG
+        out float3 oWorldPos : TEXCOORD8,
+    #endif
     out float4 oPos : POSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
+    float height = worldPos.y - cModel._m31;
 
-    float windStrength = max(iPos.y - cWindHeightPivot, 0.0) * cWindHeightFactor;
+    float windStrength = max(height - cWindHeightPivot, 0.0) * cWindHeightFactor;
     float windPeriod = cElapsedTime * cWindPeriod + dot(worldPos.xz, cWindWorldSpacing);
     worldPos.x += windStrength * sin(windPeriod);
     worldPos.z -= windStrength * cos(windPeriod);
 
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
+
+    #ifdef HEIGHTFOG
+        oWorldPos = worldPos;
+    #endif
 
     #if defined(PERPIXEL) && defined(NORMALMAP)
         float3 oNormal;

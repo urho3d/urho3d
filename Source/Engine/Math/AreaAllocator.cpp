@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,14 @@
 
 namespace Urho3D
 {
+
+AreaAllocator::AreaAllocator() :
+    size_(IntVector2::ZERO),
+    maxSize_(IntVector2::ZERO),
+    doubleWidth_(true)
+{
+    Reset(0, 0);
+}
 
 AreaAllocator::AreaAllocator(int width, int height) :
     size_(width, height),

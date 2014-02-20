@@ -4,6 +4,8 @@ XMLFile@ uiStyle;
 XMLFile@ iconStyle;
 UIElement@ uiMenuBar;
 UIElement@ quickMenu;
+Menu@ recentSceneMenu;
+Window@ mruScenesPopup;
 Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
 
@@ -21,20 +23,26 @@ const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 const int SHOW_POPUP_INDICATOR = -1;
 const uint MAX_QUICK_MENU_ITEMS = 10;
 
+const uint maxRecentSceneCount = 5;
+
 Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
 Array<String> uiElementFilters = {"*.xml"};
 Array<String> uiAllFilters = {"*.*"};
 Array<String> uiScriptFilters = {"*.as", "*.*"};
+Array<String> uiParticleFilters = {"*.xml"};
 uint uiSceneFilter = 0;
 uint uiElementFilter = 0;
 uint uiNodeFilter = 0;
 uint uiImportFilter = 0;
 uint uiScriptFilter = 0;
+uint uiParticleFilter = 0;
 String uiScenePath = fileSystem.programDir + "Data/Scenes";
 String uiElementPath = fileSystem.programDir + "Data/UI";
 String uiNodePath = fileSystem.programDir + "Data/Objects";
 String uiImportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
+String uiParticlePath = fileSystem.programDir + "Data/Particles";
+Array<String> uiRecentScenes;
 
 bool uiFaded = false;
 float uiMinOpacity = 0.3;
@@ -53,6 +61,8 @@ void CreateUI()
 
     CreateCursor();
     CreateMenuBar();
+    CreateToolBar();
+    CreateSecondaryToolBar();
     CreateQuickMenu();
     CreateHierarchyWindow();
     CreateAttributeInspectorWindow();
@@ -62,6 +72,7 @@ void CreateUI()
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
+    CreateCamera();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
@@ -75,17 +86,23 @@ void ResizeUI()
     // Resize menu bar
     uiMenuBar.SetFixedWidth(graphics.width);
 
+    // Resize tool bar
+    toolBar.SetFixedWidth(graphics.width);
+
+    // Resize secondary tool bar
+    secondaryToolBar.SetFixedHeight(graphics.height);
+
     // Relayout stats bar
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
     if (graphics.width >= 1200)
     {
-        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 24, HA_RIGHT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 36, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
     }
 
     // Relayout windows
@@ -98,6 +115,10 @@ void ResizeUI()
 
     // Relayout root UI element
     editorUIElement.SetSize(graphics.width, graphics.height);
+    
+    // Set new viewport area and reset the viewport layout
+    viewportArea = IntRect(0, 0, graphics.width, graphics.height);
+    SetViewportMode(viewportMode);
 }
 
 void AdjustPosition(Window@ window)
@@ -106,9 +127,9 @@ void AdjustPosition(Window@ window)
     IntVector2 size = window.size;
     IntVector2 extend = position + size;
     if (extend.x > graphics.width)
-        position.x = Max(20, graphics.width - size.x - 20);
+        position.x = Max(10, graphics.width - size.x - 10);
     if (extend.y > graphics.height)
-        position.y = Max(40, graphics.height - size.y - 20);
+        position.y = Max(100, graphics.height - size.y - 10);
     window.position = position;
 }
 
@@ -125,10 +146,11 @@ void CreateCursor()
 // AngelScript does not support closures (yet), but funcdef should do just fine as a workaround for a few cases here for now
 funcdef bool MENU_CALLBACK();
 Array<MENU_CALLBACK@> menuCallbacks;
+MENU_CALLBACK@ messageBoxCallback;
 
 void HandleQuickSearchChange(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ search = eventData["Element"].GetUIElement();
+    LineEdit@ search = eventData["Element"].GetPtr();
     if (search is null)
         return;
 
@@ -153,7 +175,7 @@ void PerformQuickMenuSearch(const String&in query)
         Array<QuickMenuItem@> filtered;
         {
             QuickMenuItem@ qi;
-            for(uint x=0; x < quickMenuItems.length; x++)
+            for (uint x=0; x < quickMenuItems.length; x++)
             {
                 @qi = quickMenuItems[x];
                 int find = qi.action.Find(query, 0, false);
@@ -168,9 +190,9 @@ void PerformQuickMenuSearch(const String&in query)
         {
             QuickMenuItem@ a;
             QuickMenuItem@ b;
-            for(uint x=0; x < filtered.length; x++)
+            for (uint x=0; x < filtered.length; x++)
             {
-                for(uint y=0; y < filtered.length-1; y++)
+                for (uint y=0; y < filtered.length-1; y++)
                 {
                     @a = filtered[y];
                     @b = filtered[y+1];
@@ -186,7 +208,7 @@ void PerformQuickMenuSearch(const String&in query)
         {
             QuickMenuItem@ qi;
             limit = filtered.length > MAX_QUICK_MENU_ITEMS ? MAX_QUICK_MENU_ITEMS : filtered.length;
-            for(uint x=0; x < limit; x++)
+            for (uint x=0; x < limit; x++)
             {
                 @qi = filtered[x];
                 Menu@ item = CreateMenuItem(qi.action, qi.callback);
@@ -198,6 +220,7 @@ void PerformQuickMenuSearch(const String&in query)
 
     menu.visible = limit > 0;
     menu.SetFixedHeight(limit * 16);
+    quickMenu.BringToFront();
     quickMenu.SetFixedHeight(limit*16 + 62 + (menu.visible ? 6 : 0));
 }
 
@@ -265,6 +288,10 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
+        recentSceneMenu = CreateMenuItem("Open recent scene", null, SHOW_POPUP_INDICATOR);
+        popup.AddChild(recentSceneMenu);
+        mruScenesPopup = CreatePopup(recentSceneMenu);
+        PopulateMruScenes();
         CreateChildDivider(popup);
 
         Menu@ childMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
@@ -306,10 +333,12 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         CreateChildDivider(popup);
-        popup.AddChild(CreateMenuItem("Toggle update", @ToggleUpdate, 'P', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
+        popup.AddChild(CreateMenuItem("Load particle data", @PickFile));
+        popup.AddChild(CreateMenuItem("Save particle data", @PickFile));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -402,14 +431,57 @@ void CreateMenuBar()
 
     BorderImage@ logo = BorderImage("Logo");
     logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
-    logo.SetFixedWidth(50);
+    logo.SetFixedWidth(64);
     uiMenuBar.AddChild(logo);
 }
 
 bool Exit()
 {
+    ui.cursor.shape = CS_BUSY;
+
+    if (messageBoxCallback is null)
+    {
+        String message;
+        if (sceneModified)
+            message = "Scene has been modified.\n";
+
+        bool uiLayoutModified = false;
+        for (uint i = 0; i < editorUIElement.numChildren; ++i)
+        {
+            UIElement@ element = editorUIElement.children[i];
+            if (element !is null && element.vars[MODIFIED_VAR].GetBool())
+            {
+                uiLayoutModified = true;
+                message += "UI layout has been modified.\n";
+                break;
+            }
+        }
+
+        if (sceneModified || uiLayoutModified)
+        {
+            MessageBox@ messageBox = MessageBox(message + "Continue to exit?", "Warning");
+            if (messageBox.window !is null)
+            {
+                Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
+                cancelButton.visible = true;
+                cancelButton.focus = true;
+                SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
+                messageBoxCallback = @Exit;
+                return false;
+            }
+        }
+    }
+    else
+        messageBoxCallback = null;
+
     engine.Exit();
     return true;
+}
+
+void HandleExitRequested()
+{
+    if (!ui.HasModalElement())
+        Exit();
 }
 
 bool PickFile()
@@ -475,6 +547,31 @@ bool PickFile()
         CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
         uiFileSelector.directoryMode = true;
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
+    }
+    else if (action == "Load particle data")
+    {
+        bool hasParticleEmitter = false;
+        for (uint i = 0; i < editComponents.length; ++i)
+        {
+            if (editComponents[i].typeName == "ParticleEmitter")
+            {
+                hasParticleEmitter = true;
+                break;
+            }
+        }
+        if (hasParticleEmitter)
+        {
+            CreateFileSelector("Load particle data", "Load", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadParticleData");
+        }
+    }
+    else if (action == "Save particle data")
+    {
+        if (editComponents.length == 1 && editComponents[0].typeName == "ParticleEmitter")
+        {
+            CreateFileSelector("Save particle data", "Save", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveParticleData");
+        }
     }
     // UI-element
     else if (action == "Open UI-layout...")
@@ -590,7 +687,7 @@ String GetActionName(const String&in name)
 
 void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 {
-    Menu@ menu = eventData["Element"].GetUIElement();
+    Menu@ menu = eventData["Element"].GetPtr();
     if (menu is null)
         return;
 
@@ -629,10 +726,11 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 
     if (accelKey != 0)
     {
-        int minWidth = menuText.minWidth;
-        menuText.layoutMode = LM_HORIZONTAL;
-        menuText.AddChild(CreateAccelKeyText(accelKey, accelQual));
-        menuText.minWidth = minWidth;
+        UIElement@ spacer = UIElement();
+        spacer.minWidth = menuText.indentSpacing;
+        spacer.height = menuText.height;
+        menu.AddChild(spacer);
+        menu.AddChild(CreateAccelKeyText(accelKey, accelQual));
     }
 
     return menu;
@@ -722,8 +820,7 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
     Text@ accelKeyText = Text();
     accelKeyText.defaultStyle = uiStyle;
     accelKeyText.style = "EditorMenuText";
-    accelKeyText.horizontalAlignment = HA_RIGHT;
-    accelKeyText.indent = 1;
+    accelKeyText.textAlignment = HA_RIGHT;
 
     String text;
     if (accelKey == KEY_DELETE)
@@ -816,7 +913,6 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
     uiFileSelector.SetFilters(filters, initialFilter);
-    uiFileSelector.window.priority = 1000;    // Ensure when it is visible then it has the highest priority (in front of all others UI)
     CenterDialog(uiFileSelector.window);
 }
 
@@ -876,7 +972,7 @@ void HandlePopup(Menu@ menu)
         if (menuParent is null)
             break;
 
-        Menu@ nextMenu = menuParent.vars["Origin"].GetUIElement();
+        Menu@ nextMenu = menuParent.vars["Origin"].GetPtr();
         if (nextMenu is null)
             break;
         else
@@ -887,14 +983,19 @@ void HandlePopup(Menu@ menu)
         menu.showPopup = false;
 }
 
-String ExtractFileName(VariantMap& eventData)
+String ExtractFileName(VariantMap& eventData, bool forSave = false)
 {
     String fileName;
 
     // Check for OK
     if (eventData["OK"].GetBool())
+    {
+        String filter = eventData["Filter"].GetString();
         fileName = eventData["FileName"].GetString();
-
+        // Add default extension for saving if not specified
+        if (GetExtension(fileName).empty && forSave && filter != "*.*")
+            fileName = fileName + filter.Substring(1);
+    }
     return fileName;
 }
 
@@ -907,7 +1008,7 @@ void HandleOpenSceneFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiSceneFilter, uiScenePath);
-    SaveScene(ExtractFileName(eventData));
+    SaveScene(ExtractFileName(eventData, true));
 }
 
 void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
@@ -919,7 +1020,7 @@ void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveNodeFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiNodeFilter, uiNodePath);
-    SaveNode(ExtractFileName(eventData));
+    SaveNode(ExtractFileName(eventData, true));
 }
 
 void HandleImportModel(StringHash eventType, VariantMap& eventData)
@@ -932,6 +1033,18 @@ void HandleImportScene(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiImportFilter, uiImportPath);
     ImportScene(ExtractFileName(eventData));
+}
+
+void HandleLoadParticleData(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiParticleFilter, uiParticlePath);
+    LoadParticleData(ExtractFileName(eventData));
+}
+
+void HandleSaveParticleData(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiParticleFilter, uiParticlePath);
+    SaveParticleData(ExtractFileName(eventData, true));
 }
 
 void ExecuteScript(const String&in fileName)
@@ -960,8 +1073,10 @@ void HandleRunScript(StringHash eventType, VariantMap& eventData)
 
 void HandleResourcePath(StringHash eventType, VariantMap& eventData)
 {
+    String pathName = uiFileSelector.path;
     CloseFileSelector();
-    SetResourcePath(ExtractFileName(eventData), false);
+    if (eventData["OK"].GetBool())
+        SetResourcePath(pathName, false);
 }
 
 void HandleOpenUILayoutFile(StringHash eventType, VariantMap& eventData)
@@ -973,7 +1088,7 @@ void HandleOpenUILayoutFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveUILayoutFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiElementFilter, uiElementPath);
-    SaveUILayout(ExtractFileName(eventData));
+    SaveUILayout(ExtractFileName(eventData, true));
 }
 
 void HandleLoadChildUIElementFile(StringHash eventType, VariantMap& eventData)
@@ -985,7 +1100,7 @@ void HandleLoadChildUIElementFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveChildUIElementFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiElementFilter, uiElementPath);
-    SaveChildUIElement(ExtractFileName(eventData));
+    SaveChildUIElement(ExtractFileName(eventData, true));
 }
 
 void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
@@ -997,6 +1112,7 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
+    int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
 
     if (key == KEY_ESC)
     {
@@ -1004,6 +1120,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             UnhideUI();
         else if (console.visible)
             console.visible = false;
+        else if (quickMenu.visible)
+        {
+            quickMenu.visible = false;
+            quickMenu.enabled = false;
+        }
         else
         {
             UIElement@ front = ui.frontElement;
@@ -1027,6 +1148,44 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
+
+    else if (key == KEY_NUMPAD1 && ui.focusElement is null) // Front view
+    {
+        Vector3 pos = cameraNode.position;
+        pos.z = -pos.length * viewDirection;
+        pos.x = 0;
+        pos.y = 0;
+        cameraNode.position = pos;
+        cameraNode.direction = Vector3(0, 0, viewDirection);
+        ReacquireCameraYawPitch();
+    }
+
+    else if (key == KEY_NUMPAD3 && ui.focusElement is null) // Side view
+    {
+        Vector3 pos = cameraNode.position;
+        pos.x = pos.length * viewDirection;
+        pos.y = 0;
+        pos.z = 0;
+        cameraNode.position = pos;
+        cameraNode.direction = Vector3(-viewDirection, 0, 0);
+        ReacquireCameraYawPitch();
+    }
+
+    else if (key == KEY_NUMPAD7 && ui.focusElement is null) // Top view
+    {
+        Vector3 pos = cameraNode.position;
+        pos.y = pos.length * viewDirection;
+        pos.x = 0;
+        pos.z = 0;
+        cameraNode.position = pos;
+        cameraNode.direction = Vector3(0, -viewDirection, 0);
+        ReacquireCameraYawPitch();
+    }
+
+    else if (key == KEY_NUMPAD5 && ui.focusElement is null)
+    {
+        activeViewport.ToggleOrthographic();
+    }
 
     else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
@@ -1059,7 +1218,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 fillMode = FILL_SOLID;
 
             // Update camera fill mode
-            camera.fillMode = fillMode;
+            SetFillMode(fillMode);
         }
         else if (key == KEY_SPACE)
         {
@@ -1068,6 +1227,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         else
             SteppedObjectManipulation(key);
+        toolBarDirty = true;
     }
 }
 
@@ -1189,6 +1349,8 @@ void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
 
 void UpdateDirtyUI()
 {
+    UpdateDirtyToolBar();
+
     // Perform hierarchy selection latently after the new selections are finalized (used in undo/redo action)
     if (!hierarchyUpdateSelections.empty)
     {
@@ -1199,4 +1361,46 @@ void UpdateDirtyUI()
     // Perform some event-triggered updates latently in case a large hierarchy was changed
     if (attributesFullDirty || attributesDirty)
         UpdateAttributeInspector(attributesFullDirty);
+}
+
+void HandleMessageAcknowledgement(StringHash eventType, VariantMap& eventData)
+{
+    if (eventData["Ok"].GetBool())
+        messageBoxCallback();
+    else
+        messageBoxCallback = null;
+}
+
+void PopulateMruScenes()
+{
+    mruScenesPopup.RemoveAllChildren();
+    if (uiRecentScenes.length > 0)
+    {
+        recentSceneMenu.enabled = true;
+        for (uint i=0; i < uiRecentScenes.length; ++i)
+            mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false));
+    }
+    else
+        recentSceneMenu.enabled = false;
+
+}
+
+bool LoadMostRecentScene()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    Text@ text = menu.GetChildren()[0];
+    if (text is null)
+        return false;
+
+    return LoadScene(text.text);
+}
+
+void HandleErrorEvent(StringHash eventType, VariantMap& eventData)
+{
+    // Open console if it not yet open
+    if (!console.visible)
+        console.visible = true;
 }

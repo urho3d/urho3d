@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,18 @@
 #include "Font.h"
 #include "LineEdit.h"
 #include "ListView.h"
+#include "MessageBox.h"
 #include "ScrollBar.h"
 #include "Slider.h"
 #include "Sprite.h"
 #include "Text.h"
 #include "Text3D.h"
+#include "ToolTip.h"
 #include "UI.h"
-#include "Window.h"
 #include "View3D.h"
+#include "Window.h"
+
+#include "DebugNew.h"
 
 namespace Urho3D
 {
@@ -101,8 +105,8 @@ static void RegisterUIElement(asIScriptEngine* engine)
 
     RegisterUIElement<UIElement>(engine, "UIElement");
 
-    // Register Variant GetPtr() for UIElement
-    engine->RegisterObjectMethod("Variant", "UIElement@+ GetUIElement() const", asFUNCTION(GetVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for UIElement. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "UIElement@+ GetUIElement(const String&in binding = \"deprecated:GetUIElement\") const", asFUNCTION(GetVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterBorderImage(asIScriptEngine* engine)
@@ -346,6 +350,10 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "void set_effectColor(const Color&in)", asMETHOD(Text, SetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "const Color& get_effectColor() const", asMETHOD(Text, GetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_numRows() const", asMETHOD(Text, GetNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "uint get_numChars() const", asMETHOD(Text, GetNumChars), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "int get_rowWidths(uint) const", asMETHOD(Text, GetRowWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "IntVector2 get_charPositions(uint)", asMETHOD(Text, GetCharPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "IntVector2 get_charSizes(uint)", asMETHOD(Text, GetCharSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "int get_rowHeight() const", asMETHOD(Text, GetRowHeight), asCALL_THISCALL);
 }
 
@@ -387,6 +395,10 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "void set_faceCamera(bool)", asMETHOD(Text3D, SetFaceCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "bool get_faceCamera() const", asMETHOD(Text3D, GetFaceCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHOD(Text3D, GetNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_numChars() const", asMETHOD(Text3D, GetNumChars), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_rowWidths(uint) const", asMETHOD(Text3D, GetRowWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "IntVector2 get_charPositions(uint)", asMETHOD(Text3D, GetCharPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "IntVector2 get_charSizes(uint)", asMETHOD(Text3D, GetCharSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_rowHeight() const", asMETHOD(Text3D, GetRowHeight), asCALL_THISCALL);
 }
 
@@ -426,6 +438,25 @@ static void RegisterMenu(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "bool get_showPopup() const", asMETHOD(Menu, GetShowPopup), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "int get_acceleratorKey() const", asMETHOD(Menu, GetAcceleratorKey), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "int get_acceleratorQualifiers() const", asMETHOD(Menu, GetAcceleratorQualifiers), asCALL_THISCALL);
+}
+
+static MessageBox* ConstructMessageBox(const String& messageString, const String& titleString, XMLFile* layoutFile, XMLFile* styleFile)
+{
+    SharedPtr<MessageBox> messageBox(new MessageBox(GetScriptContext(), messageString, titleString, layoutFile, styleFile));
+    if (messageBox)
+        messageBox->AddRef();
+    return messageBox.Get();
+}
+
+static void RegisterMessageBox(asIScriptEngine* engine)
+{
+    RegisterObject<MessageBox>(engine, "MessageBox");
+    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_FACTORY, "MessageBox@+ f(const String&in messageString = String(), const String&in titleString = String(), XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asFUNCTION(ConstructMessageBox), asCALL_CDECL);
+    engine->RegisterObjectMethod("MessageBox", "void set_title(const String&in)", asMETHOD(MessageBox, SetTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_title() const", asMETHOD(MessageBox, GetTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "void set_message(const String&in)", asMETHOD(MessageBox, SetMessage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_message() const", asMETHOD(MessageBox, GetMessage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "UIElement@+ get_window() const", asMETHOD(MessageBox, GetWindow), asCALL_THISCALL);
 }
 
 static CScriptArray* DropDownListGetItems(DropDownList* ptr)
@@ -477,6 +508,7 @@ static void RegisterView3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View3D", "void set_autoUpdate(bool)", asMETHOD(View3D, SetAutoUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "bool get_autoUpdate() const", asMETHOD(View3D, GetAutoUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Texture2D@+ get_renderTexture() const", asMETHOD(View3D, GetRenderTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "Texture2D@+ get_depthTexture() const", asMETHOD(View3D, GetDepthTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Viewport@+ get_viewport() const", asMETHOD(View3D, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Scene@+ get_scene() const", asMETHOD(View3D, GetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Node@+ get_cameraNode() const", asMETHOD(View3D, GetCameraNode), asCALL_THISCALL);
@@ -523,6 +555,13 @@ static void RegisterFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "DropDownList@+ get_filterList() const", asMETHOD(FileSelector, GetFilterList), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "Button@+ get_okButton() const", asMETHOD(FileSelector, GetOKButton), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "Button@+ get_cancelButton() const", asMETHOD(FileSelector, GetCancelButton), asCALL_THISCALL);
+}
+
+static void RegisterToolTip(asIScriptEngine* engine)
+{
+    RegisterUIElement<ToolTip>(engine, "ToolTip");
+    engine->RegisterObjectMethod("ToolTip", "void set_delay(float)", asMETHOD(ToolTip, SetDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ToolTip", "float get_delay() const", asMETHOD(ToolTip, GetDelay), asCALL_THISCALL);
 }
 
 static UI* GetUI()
@@ -577,6 +616,11 @@ static bool UISaveLayout(File* file, UIElement* element, UI* ptr)
     return file && ptr->SaveLayout(*file, element);
 }
 
+static void UISetFocusElement(UIElement* element, UI* ptr)
+{
+    ptr->SetFocusElement(element);
+}
+
 static void RegisterUI(asIScriptEngine* engine)
 {
     RegisterObject<UI>(engine, "UI");
@@ -587,23 +631,41 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+, XMLFile@+)", asFUNCTION(UILoadLayoutWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "bool SaveLayout(File@+, UIElement@+)", asFUNCTION(UISaveLayout), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "void SetFocusElement(UIElement@+, bool byKey = false)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool HasModalElement() const", asMETHOD(UI, HasModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_cursor(Cursor@+)", asMETHOD(UI, SetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHOD(UI, GetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition() const", asMETHOD(UI, GetCursorPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asFUNCTION(UISetFocusElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHOD(UI, GetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_dragElement() const", asMETHOD(UI, GetDragElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHOD(UI, GetRootModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_clipBoardText(const String&in)", asMETHOD(UI, SetClipBoardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipBoardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHOD(UI, SetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHOD(UI, GetDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_dragBeginInterval(float)", asMETHOD(UI, SetDragBeginInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_dragBeginInterval() const", asMETHOD(UI, GetDragBeginInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_dragBeginDistance(int)", asMETHOD(UI, SetDragBeginDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_dragBeginDistance() const", asMETHOD(UI, GetDragBeginDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_defaultToolTipDelay(float)", asMETHOD(UI, SetDefaultToolTipDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_defaultToolTipDelay() const", asMETHOD(UI, GetDefaultToolTipDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_maxFontTextureSize(int)", asMETHOD(UI, SetMaxFontTextureSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHOD(UI, GetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useSystemClipBoard(bool)", asMETHOD(UI, SetUseSystemClipBoard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useSystemClipBoard() const", asMETHOD(UI, GetUseSystemClipBoard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useScreenKeyboard(bool)", asMETHOD(UI, SetUseScreenKeyboard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useScreenKeyboard() const", asMETHOD(UI, GetUseScreenKeyboard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useMutableGlyphs(bool)", asMETHOD(UI, SetUseMutableGlyphs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHOD(UI, GetUseMutableGlyphs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_forceAutoHint(bool)", asMETHOD(UI, SetForceAutoHint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHOD(UI, GetForceAutoHint), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 
@@ -624,10 +686,12 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterText3D(engine);
     RegisterLineEdit(engine);
     RegisterMenu(engine);
+    RegisterMessageBox(engine);
     RegisterDropDownList(engine);
     RegisterWindow(engine);
     RegisterView3D(engine);
     RegisterFileSelector(engine);
+    RegisterToolTip(engine);
     RegisterUI(engine);
 }
 

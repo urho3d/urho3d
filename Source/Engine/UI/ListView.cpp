@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@
 #include "ListView.h"
 #include "Log.h"
 #include "Sort.h"
-#include "StringUtils.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -81,8 +80,9 @@ class HierarchyContainer : public UIElement
 
 public:
     /// Construct.
-    HierarchyContainer(Context* context, UIElement* overlayContainer) :
+    HierarchyContainer(Context* context, ListView* listView, UIElement* overlayContainer) :
         UIElement(context),
+        listView_(listView),
         overlayContainer_(overlayContainer)
     {
         SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(HierarchyContainer, HandleLayoutUpdated));
@@ -133,7 +133,7 @@ public:
             const Vector<SharedPtr<UIElement> >& children = overlayContainer_->GetChildren();
             Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
             if (i != children.End())
-                static_cast<ListView*>(overlayContainer_->GetParent())->ToggleExpand(i - children.Begin());
+                listView_->ToggleExpand(i - children.Begin());
         }
     }
 
@@ -142,8 +142,8 @@ public:
     {
         // Insert the overlay at the same index position to the overlay container
         CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->CreateChild(CheckBox::GetTypeStatic(), String::EMPTY, index));
-        overlay->SetStyle("ListViewHierarchyOverlay");
-        int baseIndent = static_cast<ListView*>(overlayContainer_->GetParent())->GetBaseIndent();
+        overlay->SetStyle("HierarchyListViewOverlay");
+        int baseIndent = listView_->GetBaseIndent();
         int indent = element->GetIndent() - baseIndent - 1;
         overlay->SetIndent(indent);
         overlay->SetFixedWidth((indent + 1) * element->GetIndentSpacing());
@@ -153,6 +153,9 @@ public:
     }
 
 private:
+    // Parent list view.
+    ListView* listView_;
+    // Container for overlay checkboxes.
     UIElement* overlayContainer_;
 };
 
@@ -171,7 +174,9 @@ ListView::ListView(Context* context) :
 
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
     SubscribeToEvent(E_UIMOUSEDOUBLECLICK, HANDLER(ListView, HandleUIMouseDoubleClick));
-    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
+    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleItemFocusChanged));
+    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleFocusChanged));
+    SubscribeToEvent(this, E_FOCUSED, HANDLER(ListView, HandleFocusChanged));
 }
 
 ListView::~ListView()
@@ -199,16 +204,16 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     // If either shift or ctrl held down, add to selection if multiselect enabled
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
-    int delta = 0;
+    int delta = M_MAX_INT;
     int pageDirection = 1;
 
-    if (selection != M_MAX_UNSIGNED && numItems)
+    if (numItems)
     {
         switch (key)
         {
         case KEY_LEFT:
         case KEY_RIGHT:
-            if (hierarchyMode_)
+            if (selection != M_MAX_UNSIGNED && hierarchyMode_)
             {
                 Expand(selection, key == KEY_RIGHT);
                 return;
@@ -218,7 +223,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_RETURN:
         case KEY_RETURN2:
         case KEY_KP_ENTER:
-            if (hierarchyMode_)
+            if (selection != M_MAX_UNSIGNED && hierarchyMode_)
             {
                 ToggleExpand(selection);
                 return;
@@ -240,7 +245,9 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
-                int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - GetSelectedItem()->GetHeight();
+                if (selection == M_MAX_UNSIGNED)
+                    selection = 0;      // Assume as if first item is selected
+                int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - contentElement_->GetChild(selection)->GetHeight();
                 unsigned newSelection = selection;
                 unsigned okSelection = selection;
                 unsigned invisible = 0;
@@ -274,7 +281,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         }
     }
 
-    if (delta)
+    if (delta != M_MAX_INT)
     {
         ChangeSelection(delta, additive);
         return;
@@ -282,8 +289,8 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     using namespace UnhandledKey;
 
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = this;
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = buttons;
     eventData[P_QUALIFIERS] = qualifiers;
@@ -483,8 +490,8 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
 
             using namespace ItemSelected;
 
-            VariantMap eventData;
-            eventData[P_ELEMENT] = (void*)this;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_ELEMENT] = this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMDESELECTED, eventData);
 
@@ -515,8 +522,8 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
 
                 using namespace ItemSelected;
 
-                VariantMap eventData;
-                eventData[P_ELEMENT] = (void*)this;
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_ELEMENT] = this;
                 eventData[P_SELECTION] = *i;
                 SendEvent(E_ITEMSELECTED, eventData);
 
@@ -555,8 +562,8 @@ void ListView::AddSelection(unsigned index)
 
             using namespace ItemSelected;
 
-            VariantMap eventData;
-            eventData[P_ELEMENT] = (void*)this;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_ELEMENT] = this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMSELECTED, eventData);
 
@@ -581,8 +588,8 @@ void ListView::RemoveSelection(unsigned index)
     {
         using namespace ItemSelected;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_SELECTION] = index;
         SendEvent(E_ITEMDESELECTED, eventData);
     }
@@ -606,15 +613,21 @@ void ListView::ToggleSelection(unsigned index)
 
 void ListView::ChangeSelection(int delta, bool additive)
 {
+    unsigned numItems = GetNumItems();
     if (selections_.Empty())
-        return;
+    {
+        // Select first item if there is no selection yet
+        if (numItems > 0)
+            SetSelection(0);
+        if (abs(delta) == 1)
+            return;
+    }
     if (!multiselect_)
         additive = false;
 
     // If going downwards, use the last selection as a base. Otherwise use first
     unsigned selection = delta > 0 ? selections_.Back() : selections_.Front();
     int direction = delta > 0 ? 1 : -1;
-    unsigned numItems = GetNumItems();
     unsigned newSelection = selection;
     unsigned okSelection = selection;
     PODVector<unsigned> indices = selections_;
@@ -664,12 +677,14 @@ void ListView::SetHierarchyMode(bool enable)
     UIElement* container;
     if (enable)
     {
-        overlayContainer_ = CreateChild<UIElement>("LV_OverlayContainer");
+        overlayContainer_ = new UIElement(context_);
+        overlayContainer_->SetName("LV_OverlayContainer");
         overlayContainer_->SetInternal(true);
+        AddChild(overlayContainer_);
         overlayContainer_->SetSortChildren(false);
         overlayContainer_->SetClipChildren(true);
 
-        container = new HierarchyContainer(context_, overlayContainer_);
+        container = new HierarchyContainer(context_, this, overlayContainer_);
     }
     else
     {
@@ -682,11 +697,10 @@ void ListView::SetHierarchyMode(bool enable)
         container = new UIElement(context_);
     }
 
-    SetContentElement(container);
-    container->SetInternal(true);
     container->SetName("LV_ItemContainer");
+    container->SetInternal(true);
+    SetContentElement(container);
     container->SetEnabled(true);
-    container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);
 }
 
@@ -701,16 +715,8 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
     if (enable != clearSelectionOnDefocus_)
     {
         clearSelectionOnDefocus_ = enable;
-
-        if (clearSelectionOnDefocus_)
-        {
-            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleDefocused));
-
-            if (!HasFocus())
-                ClearSelection();
-        }
-        else
-            UnsubscribeFromEvent(this, E_DEFOCUSED);
+        if (clearSelectionOnDefocus_ && !HasFocus())
+            ClearSelection();
     }
 }
 
@@ -788,12 +794,41 @@ PODVector<UIElement*> ListView::GetItems() const
 
 unsigned ListView::FindItem(UIElement* item) const
 {
-    const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
-    Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(item));
-    if (i != children.End())
-        return i - children.Begin();
-    else
+    if (!item)
         return M_MAX_UNSIGNED;
+
+    // Early-out by checking if the item belongs to the listview hierarchy at all
+    if (item->GetParent() != contentElement_)
+        return M_MAX_UNSIGNED;
+
+    const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
+
+    // Binary search for list item based on screen coordinate Y
+    if (contentElement_->GetLayoutMode() == LM_VERTICAL && item->GetHeight())
+    {
+        int itemY = item->GetScreenPosition().y_;
+        int left = 0;
+        int right = children.Size() - 1;
+        while (right >= left)
+        {
+            int mid = (left + right) / 2;
+            if (children[mid] == item)
+                return mid;
+            if (itemY < children[mid]->GetScreenPosition().y_)
+                right = mid - 1;
+            else
+                left = mid + 1;
+        }
+    }
+
+    // Fallback to linear search in case the coordinates/sizes were not yet initialized
+    for (unsigned i = 0; i < children.Size(); ++i)
+    {
+        if (children[i] == item)
+            return i;
+    }
+
+    return M_MAX_UNSIGNED;
 }
 
 unsigned ListView::GetSelection() const
@@ -917,95 +952,113 @@ void ListView::EnsureItemVisibility(UIElement* item)
 
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
-        return;
+    int button = eventData[UIMouseClick::P_BUTTON].GetInt();
+    int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
 
     UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
-    unsigned numItems = GetNumItems();
-    for (unsigned i = 0; i < numItems; ++i)
+    // Check if the clicked element belongs to the list
+    unsigned i = FindItem(element);
+    if (i >= GetNumItems())
+        return;
+
+    // If not editable, repeat the previous selection. This will send an event and allow eg. a dropdownlist to close
+    if (!editable_)
     {
-        if (element == GetItem(i))
+        SetSelections(selections_);
+        return;
+    }
+
+    if (button == MOUSEB_LEFT)
+    {
+        // Single selection
+        if (!multiselect_ || !qualifiers)
+            SetSelection(i);
+
+        // Check multiselect with shift & ctrl
+        if (multiselect_)
         {
-            // Single selection
-            if (!multiselect_ || !qualifiers)
-                SetSelection(i);
-
-            // Check multiselect with shift & ctrl
-            if (multiselect_)
+            if (qualifiers & QUAL_SHIFT)
             {
-                if (qualifiers & QUAL_SHIFT)
+                if (selections_.Empty())
+                    SetSelection(i);
+                else
                 {
-                    if (selections_.Empty())
-                        SetSelection(i);
-                    else
+                    unsigned first = selections_.Front();
+                    unsigned last = selections_.Back();
+                    PODVector<unsigned> newSelections = selections_;
+                    if (i == first || i == last)
                     {
-                        unsigned first = selections_.Front();
-                        unsigned last = selections_.Back();
-                        PODVector<unsigned> newSelections = selections_;
-                        if (i == first || i == last)
-                        {
-                            for (unsigned j = first; j <= last; ++j)
-                                newSelections.Push(j);
-                        }
-                        else if (i < first)
-                        {
-                            for (unsigned j = i; j <= first; ++j)
-                                newSelections.Push(j);
-                        }
-                        else if (i < last)
-                        {
-                            if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
-                            {
-                                for (unsigned j = first; j <= i; ++j)
-                                    newSelections.Push(j);
-                            }
-                            else
-                            {
-                                for (unsigned j = i; j <= last; ++j)
-                                    newSelections.Push(j);
-                            }
-                        }
-                        else if (i > last)
-                        {
-                            for (unsigned j = last; j <= i; ++j)
-                                newSelections.Push(j);
-                        }
-                        SetSelections(newSelections);
+                        for (unsigned j = first; j <= last; ++j)
+                            newSelections.Push(j);
                     }
+                    else if (i < first)
+                    {
+                        for (unsigned j = i; j <= first; ++j)
+                            newSelections.Push(j);
+                    }
+                    else if (i < last)
+                    {
+                        if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
+                        {
+                            for (unsigned j = first; j <= i; ++j)
+                                newSelections.Push(j);
+                        }
+                        else
+                        {
+                            for (unsigned j = i; j <= last; ++j)
+                                newSelections.Push(j);
+                        }
+                    }
+                    else if (i > last)
+                    {
+                        for (unsigned j = last; j <= i; ++j)
+                            newSelections.Push(j);
+                    }
+                    SetSelections(newSelections);
                 }
-                else if (qualifiers & QUAL_CTRL)
-                    ToggleSelection(i);
             }
-
-            return;
+            else if (qualifiers & QUAL_CTRL)
+                ToggleSelection(i);
         }
     }
+    
+    // Propagate the click as an event. Also include right-clicks
+    VariantMap& clickEventData = GetEventDataMap();
+    clickEventData[ItemClicked::P_ELEMENT] = this;
+    clickEventData[ItemClicked::P_ITEM] = element;
+    clickEventData[ItemClicked::P_SELECTION] = i;
+    clickEventData[ItemClicked::P_BUTTON] = button;
+    clickEventData[ItemClicked::P_BUTTONS] = buttons;
+    clickEventData[ItemClicked::P_QUALIFIERS] = qualifiers;
+    SendEvent(E_ITEMCLICKED, clickEventData);
 }
 
 void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
-        return;
-    UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+    int button = eventData[UIMouseClick::P_BUTTON].GetInt();
+    int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
+    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
 
-    unsigned numItems = GetNumItems();
-    for (unsigned i = 0; i < numItems; ++i)
-    {
-        if (element == GetItem(i))
-        {
-            VariantMap eventData;
-            eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
-            eventData[ItemDoubleClicked::P_SELECTION] = i;
-            SendEvent(E_ITEMDOUBLECLICKED, eventData);
-            return;
-        }
-    }
+    UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+    // Check if the clicked element belongs to the list
+    unsigned i = FindItem(element);
+    if (i >= GetNumItems())
+        return;
+
+    VariantMap& clickEventData = GetEventDataMap();
+    clickEventData[ItemDoubleClicked::P_ELEMENT] = this;
+    clickEventData[ItemDoubleClicked::P_ITEM] = element;
+    clickEventData[ItemDoubleClicked::P_SELECTION] = i;
+    clickEventData[ItemDoubleClicked::P_BUTTON] = button;
+    clickEventData[ItemDoubleClicked::P_BUTTONS] = buttons;
+    clickEventData[ItemDoubleClicked::P_QUALIFIERS] = qualifiers;
+    SendEvent(E_ITEMDOUBLECLICKED, clickEventData);
 }
 
 
-void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
+void ListView::HandleItemFocusChanged(StringHash eventType, VariantMap& eventData)
 {
     using namespace FocusChanged;
 
@@ -1023,9 +1076,13 @@ void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void ListView::HandleDefocused(StringHash eventType, VariantMap& eventData)
+void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 {
-    ClearSelection();
+    scrollPanel_->SetSelected(eventType == E_FOCUSED);
+    if (clearSelectionOnDefocus_ && eventType == E_DEFOCUSED)
+        ClearSelection();
+    else if (highlightMode_ == HM_FOCUS)
+        UpdateSelectionEffect();
 }
 
 }

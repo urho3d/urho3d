@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -123,7 +123,7 @@ void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPos
 
 void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (!dragSlider_ || GetSize() == knob_->GetSize())
+    if (!editable_ || !dragSlider_ || GetSize() == knob_->GetSize())
         return;
 
     float newValue = value_;
@@ -182,8 +182,8 @@ void Slider::SetValue(float value)
 
         using namespace SliderChanged;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_VALUE] = value_;
         SendEvent(E_SLIDERCHANGED, eventData);
     }
@@ -247,14 +247,17 @@ void Slider::UpdateSlider()
 
 void Slider::Page(const IntVector2& position, bool pressed)
 {
+    if (!editable_)
+        return;
+    
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
     float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
 
     using namespace SliderPaged;
     
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = this;
     eventData[P_OFFSET] = offset;
 
     // Start transmitting repeated pages after the initial press

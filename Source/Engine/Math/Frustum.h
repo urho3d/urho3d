@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -120,7 +120,7 @@ public:
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
             const Plane& plane = planes_[i];
-            float dist = plane.normal_.DotProduct(center) - plane.intercept_;
+            float dist = plane.normal_.DotProduct(center) + plane.d_;
             float absDist = plane.absNormal_.DotProduct(edge);
             
             if (dist < -absDist)
@@ -141,7 +141,7 @@ public:
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
             const Plane& plane = planes_[i];
-            float dist = plane.normal_.DotProduct(center) - plane.intercept_;
+            float dist = plane.normal_.DotProduct(center) + plane.d_;
             float absDist = plane.absNormal_.DotProduct(edge);
             
             if (dist < -absDist)

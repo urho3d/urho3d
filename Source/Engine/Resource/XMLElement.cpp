@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Log.h"
-#include "ResourceCache.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <pugixml.hpp>
@@ -223,6 +221,20 @@ XPathResultSet XMLElement::SelectPrepared(const XPathQuery& query) const
     return XPathResultSet(file_, &result);
 }
 
+bool XMLElement::SetValue(const String& value)
+{
+    return SetValue(value.CString());
+}
+
+bool XMLElement::SetValue(const char* value)
+{
+    if (!file_ || (!node_ && !xpathNode_))
+        return false;
+
+    const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    return const_cast<pugi::xml_node&>(node).append_child(pugi::node_pcdata).set_value(value);
+}
+
 bool XMLElement::SetAttribute(const String& name, const String& value)
 {
     return SetAttribute(name.CString(), value.CString());
@@ -361,11 +373,10 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
     if (!file_ || (!node_ && !xpathNode_))
         return false;
 
-    // Need the context & resource cache to query for reverse hash mappings
+    // Need the context to query for the type
     Context* context = file_->GetContext();
-    ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
 
-    return SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
+    return SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + value.name_);
 }
 
 bool XMLElement::SetResourceRefList(const ResourceRefList& value)
@@ -373,15 +384,14 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
     if (!file_ || (!node_ && !xpathNode_))
         return false;
 
-    // Need the context & resource cache to query for reverse hash mappings
+    // Need the context to query for the type
     Context* context = file_->GetContext();
-    ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
 
     String str(context->GetTypeName(value.type_));
-    for (unsigned i = 0; i < value.ids_.Size(); ++i)
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
     {
         str += ";";
-        str += cache->GetResourceName(value.ids_[i]);
+        str += value.names_[i];
     }
 
     return SetAttribute("value", str.CString());
@@ -566,6 +576,15 @@ bool XMLElement::HasAttribute(const char* name) const
     return !node.attribute(name).empty();
 }
 
+String XMLElement::GetValue() const
+{
+    if (!file_ || (!node_ && !xpathNode_))
+        return String::EMPTY;
+
+    const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    return String(node.child_value());
+}
+
 String XMLElement::GetAttribute(const String& name) const
 {
     return String(GetAttributeCString(name.CString()));
@@ -734,12 +753,7 @@ ResourceRef XMLElement::GetResourceRef() const
     if (values.Size() == 2)
     {
         ret.type_ = values[0];
-        ret.id_ = values[1];
-
-        // Whenever we encounter a resource name read from a ResourceRef XML element, store the reverse mapping to
-        // ResourceCache if possible. We will probably use the hash to request a resource shortly afterward
-        if (file_)
-            file_->GetSubsystem<ResourceCache>()->StoreNameHash(values[1]);
+        ret.name_ = values[1];
     }
 
     return ret;
@@ -752,18 +766,10 @@ ResourceRefList XMLElement::GetResourceRefList() const
     Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() >= 1)
     {
-        // Whenever we encounter resource names read from a ResourceRefList XML element, store the reverse mapping to
-        // ResourceCache if possible. We will probably use the hashes to request resources shortly afterward
-        ResourceCache* cache = file_ ? file_->GetSubsystem<ResourceCache>() : 0;
-
         ret.type_ = values[0];
-        ret.ids_.Resize(values.Size() - 1);
+        ret.names_.Resize(values.Size() - 1);
         for (unsigned i = 1; i < values.Size(); ++i)
-        {
-            ret.ids_[i - 1] = StringHash(values[i]);
-            if (cache)
-                cache->StoreNameHash(values[i]);
-        }
+            ret.names_[i - 1] = values[i];
     }
 
     return ret;
@@ -872,7 +878,7 @@ XPathResultSet& XPathResultSet::operator = (const XPathResultSet& rhs)
 XMLElement XPathResultSet::operator[](unsigned index) const
 {
     if (!resultSet_)
-        LOGERROR(ToString("Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.", index));
+        LOGERRORF("Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.", index);
 
     return resultSet_ && index < Size() ? XMLElement(file_, this, &resultSet_->operator [](index), index) : XMLElement();
 }

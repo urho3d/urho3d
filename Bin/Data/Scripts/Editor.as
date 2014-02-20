@@ -9,6 +9,8 @@
 #include "Scripts/Editor/EditorMaterial.as"
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorPreferences.as"
+#include "Scripts/Editor/EditorToolBar.as"
+#include "Scripts/Editor/EditorSecondaryToolbar.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
 
@@ -36,7 +38,14 @@ void Start()
     }
 
     SubscribeToEvent("Update", "HandleUpdate");
+    SubscribeToEvent(input, "ExitRequested", "HandleExitRequested");
 
+    String[] errorEvents = { "LoadFailed", "ResourceNotFound", "UnknownResourceType" };
+    for (uint i = 0; i < errorEvents.length; ++i)
+        SubscribeToEvent(cache, errorEvents[i], "HandleErrorEvent");
+
+    // Disable Editor auto exit, check first if it is OK to exit
+    engine.autoExit = false;
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
@@ -66,13 +75,16 @@ void ParseArguments()
     Array<String> arguments = GetArguments();
     bool loaded = false;
 
-    // The first argument should be the editor script name. Scan for a scene to load
+    // Scan for a scene to load
     for (uint i = 1; i < arguments.length; ++i)
     {
-        if (arguments[i][0] != '-')
+        if (arguments[i].ToLower() == "-scene")
         {
-            loaded = LoadScene(arguments[i]);
-            break;
+            if (++i < arguments.length)
+            {
+                loaded = LoadScene(arguments[i]);
+                break;
+            }
         }
     }
 
@@ -85,6 +97,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData["TimeStep"].GetFloat();
 
     UpdateView(timeStep);
+    UpdateViewports(timeStep);
     UpdateStats(timeStep);
     UpdateScene(timeStep);
     UpdateTestAnimation(timeStep);
@@ -110,14 +123,18 @@ void LoadConfig()
     XMLElement uiElem = configElem.GetChild("ui");
     XMLElement hierarchyElem = configElem.GetChild("hierarchy");
     XMLElement inspectorElem = configElem.GetChild("attributeinspector");
+    XMLElement viewElem = configElem.GetChild("view");
     XMLElement resourcesElem = configElem.GetChild("resources");
 
     if (!cameraElem.isNull)
     {
-        if (cameraElem.HasAttribute("nearclip")) camera.nearClip = cameraElem.GetFloat("nearclip");
-        if (cameraElem.HasAttribute("farclip")) camera.farClip = cameraElem.GetFloat("farclip");
-        if (cameraElem.HasAttribute("fov")) camera.fov = cameraElem.GetFloat("fov");
+        if (cameraElem.HasAttribute("nearclip")) viewNearClip = cameraElem.GetFloat("nearclip");
+        if (cameraElem.HasAttribute("farclip")) viewFarClip = cameraElem.GetFloat("farclip");
+        if (cameraElem.HasAttribute("fov")) viewFov = cameraElem.GetFloat("fov");
         if (cameraElem.HasAttribute("speed")) cameraBaseSpeed = cameraElem.GetFloat("speed");
+        if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
+        if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
+        UpdateViewParameters();
     }
 
     if (!objectElem.isNull)
@@ -129,7 +146,6 @@ void LoadConfig()
         if (objectElem.HasAttribute("movesnap")) moveSnap = objectElem.GetBool("movesnap");
         if (objectElem.HasAttribute("rotatesnap")) rotateSnap = objectElem.GetBool("rotatesnap");
         if (objectElem.HasAttribute("scalesnap")) scaleSnap = objectElem.GetBool("scalesnap");
-        if (objectElem.HasAttribute("uselocalids")) useLocalIDs = objectElem.GetBool("uselocalids");
         if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
         if (objectElem.HasAttribute("importoptions")) importOptions = objectElem.GetAttribute("importoptions");
         if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
@@ -149,6 +165,10 @@ void LoadConfig()
             String newImportPath = resourcesElem.GetAttribute("importpath");
             if (fileSystem.DirExists(newImportPath))
                 uiImportPath = newImportPath;
+        }
+        if (resourcesElem.HasAttribute("recentscenes"))
+        {
+            uiRecentScenes = resourcesElem.GetAttribute("recentscenes").Split(';');
         }
     }
 
@@ -185,6 +205,21 @@ void LoadConfig()
         if (inspectorElem.HasAttribute("noneditablecolor")) nonEditableTextColor = inspectorElem.GetColor("noneditablecolor");
         if (inspectorElem.HasAttribute("shownoneditable")) showNonEditableAttribute = inspectorElem.GetBool("shownoneditable");
     }
+
+    if (!viewElem.isNull)
+    {
+        if (viewElem.HasAttribute("defaultzoneambientcolor")) renderer.defaultZone.ambientColor = viewElem.GetColor("defaultzoneambientcolor");
+        if (viewElem.HasAttribute("defaultzonefogcolor")) renderer.defaultZone.fogColor = viewElem.GetColor("defaultzonefogcolor");
+        if (viewElem.HasAttribute("defaultzonefogstart")) renderer.defaultZone.fogStart = viewElem.GetInt("defaultzonefogstart");
+        if (viewElem.HasAttribute("defaultzonefogend")) renderer.defaultZone.fogEnd = viewElem.GetInt("defaultzonefogend");
+        if (viewElem.HasAttribute("showgrid")) showGrid = viewElem.GetBool("showgrid");
+        if (viewElem.HasAttribute("grid2dmode")) grid2DMode = viewElem.GetBool("grid2dmode");
+        if (viewElem.HasAttribute("gridsize")) gridSize = viewElem.GetInt("gridsize");
+        if (viewElem.HasAttribute("gridsubdivisions")) gridSubdivisions = viewElem.GetInt("gridsubdivisions");
+        if (viewElem.HasAttribute("gridscale")) gridScale = viewElem.GetFloat("gridscale");
+        if (viewElem.HasAttribute("gridcolor")) gridColor = viewElem.GetColor("gridcolor");
+        if (viewElem.HasAttribute("gridsubdivisioncolor")) gridSubdivisionColor = viewElem.GetColor("gridsubdivisioncolor");
+    }
 }
 
 void SaveConfig()
@@ -199,16 +234,15 @@ void SaveConfig()
     XMLElement uiElem = configElem.CreateChild("ui");
     XMLElement hierarchyElem = configElem.CreateChild("hierarchy");
     XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
+    XMLElement viewElem = configElem.CreateChild("view");
     XMLElement resourcesElem = configElem.CreateChild("resources");
 
-    // The save config may be called on error exit so some of the objects below could still be null
-    if (camera !is null)
-    {
-        cameraElem.SetFloat("nearclip", camera.nearClip);
-        cameraElem.SetFloat("farclip", camera.farClip);
-        cameraElem.SetFloat("fov", camera.fov);
-        cameraElem.SetFloat("speed", cameraBaseSpeed);
-    }
+    cameraElem.SetFloat("nearclip", viewNearClip);
+    cameraElem.SetFloat("farclip", viewFarClip);
+    cameraElem.SetFloat("fov", viewFov);
+    cameraElem.SetFloat("speed", cameraBaseSpeed);
+    cameraElem.SetBool("limitrotation", limitRotation);
+    cameraElem.SetUInt("viewportmode", viewportMode);
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
@@ -217,7 +251,6 @@ void SaveConfig()
     objectElem.SetBool("movesnap", moveSnap);
     objectElem.SetBool("rotatesnap", rotateSnap);
     objectElem.SetBool("scalesnap", scaleSnap);
-    objectElem.SetBool("uselocalids", useLocalIDs);
     objectElem.SetBool("applymateriallist", applyMaterialList);
     objectElem.SetAttribute("importoptions", importOptions);
     objectElem.SetInt("pickmode", pickMode);
@@ -225,6 +258,7 @@ void SaveConfig()
     resourcesElem.SetBool("rememberresourcepath", rememberResourcePath);
     resourcesElem.SetAttribute("resourcepath", sceneResourcePath);
     resourcesElem.SetAttribute("importpath", uiImportPath);
+    resourcesElem.SetAttribute("recentscenes", Join(uiRecentScenes, ";"));
 
     if (renderer !is null)
     {
@@ -253,6 +287,18 @@ void SaveConfig()
     inspectorElem.SetColor("modifiedcolor", modifiedTextColor);
     inspectorElem.SetColor("noneditablecolor", nonEditableTextColor);
     inspectorElem.SetBool("shownoneditable", showNonEditableAttribute);
+
+    viewElem.SetBool("showgrid", showGrid);
+    viewElem.SetBool("grid2dmode", grid2DMode);
+    viewElem.SetColor("defaultzoneambientcolor", renderer.defaultZone.ambientColor);
+    viewElem.SetColor("defaultzonefogcolor", renderer.defaultZone.fogColor);
+    viewElem.SetFloat("defaultzonefogstart", renderer.defaultZone.fogStart);
+    viewElem.SetFloat("defaultzonefogend", renderer.defaultZone.fogEnd);
+    viewElem.SetInt("gridsize", gridSize);
+    viewElem.SetInt("gridsubdivisions", gridSubdivisions);
+    viewElem.SetFloat("gridscale", gridScale);
+    viewElem.SetColor("gridcolor", gridColor);
+    viewElem.SetColor("gridsubdivisioncolor", gridSubdivisionColor);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

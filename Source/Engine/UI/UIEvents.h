@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -117,6 +117,7 @@ EVENT(E_VISIBLECHANGED, VisibleChanged)
 EVENT(E_FOCUSED, Focused)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_BYKEY, ByKey);                  // bool
 }
 
 /// UI element defocused.
@@ -227,11 +228,26 @@ EVENT(E_SELECTIONCHANGED, SelectionChanged)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
+/// Listview item clicked. If this is a left-click, also ItemSelected event will be sent. If this is a right-click, only this event is sent.
+EVENT(E_ITEMCLICKED, ItemClicked)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_ITEM, Item);                    // UIElement pointer
+    PARAM(P_SELECTION, Selection);          // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
 /// Listview item double clicked.
 EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_ITEM, Item);                    // UIElement pointer
     PARAM(P_SELECTION, Selection);          // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// LineEdit or ListView unhandled key pressed.
@@ -247,6 +263,13 @@ EVENT(E_UNHANDLEDKEY, UnhandledKey)
 EVENT(E_FILESELECTED, FileSelected)
 {
     PARAM(P_FILENAME, FileName);            // String
+    PARAM(P_FILTER, Filter);                // String
+    PARAM(P_OK, Ok);                        // bool
+}
+
+/// MessageBox acknowlegement.
+EVENT(E_MESSAGEACK, MessageACK)
+{
     PARAM(P_OK, Ok);                        // bool
 }
 
@@ -294,6 +317,17 @@ EVENT(E_DRAGEND, DragEnd)
     PARAM(P_Y, Y);                          // int
     PARAM(P_ELEMENTX, ElementX);            // int
     PARAM(P_ELEMENTY, ElementY);            // int
+}
+
+/// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable
+EVENT(E_UIDROPFILE, UIDropFile)
+{
+    PARAM(P_FILENAME, FileName);            // String
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
+    PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
 }
 
 }

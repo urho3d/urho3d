@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,11 @@ void Mover::SetParameters(float moveSpeed, float rotationSpeed, const BoundingBo
 
 void Mover::OnNodeSet(Node* node)
 {
-    // If the node pointer is nonzero, this component has been created into a scene node. Subscribe to the variable timestep
-    // scene update event now. If the node pointer is zero, the component is being removed from a scene node at destruction
-    // time. In that case we do nothing
+    // If the node pointer is non-null, this component has been created into a scene node. Subscribe to the variable timestep
+    // scene update event now
     if (node)
     {
         Scene* scene = node->GetScene();
-        // The scene pointer will be nonzero if the scene node belongs to a scene (it is also legal to create free-standing
-        // scene nodes)
         if (scene)
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(Mover, HandleSceneUpdate));
     }

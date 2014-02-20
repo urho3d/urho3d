@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sort.h"
-#include "StringUtils.h"
 #include "WorkQueue.h"
 
 #include "DebugNew.h"
@@ -407,20 +406,21 @@ void Octree::Update(const FrameInfo& frame)
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = drawableUpdates_.Size() / numWorkItems;
         
-        WorkItem item;
-        item.workFunction_ = UpdateDrawablesWork;
-        item.aux_ = const_cast<FrameInfo*>(&frame);
-
         PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = UpdateDrawablesWork;
+            item->aux_ = const_cast<FrameInfo*>(&frame);
+
             PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
-            item.start_ = &(*start);
-            item.end_ = &(*end);
+            item->start_ = &(*start);
+            item->end_ = &(*end);
             queue->AddWorkItem(item);
 
             start = end;
@@ -436,8 +436,8 @@ void Octree::Update(const FrameInfo& frame)
     {
         using namespace SceneDrawableUpdateFinished;
 
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene;
         eventData[P_TIMESTEP] = frame.timeStep_;
         scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
     }
@@ -522,24 +522,25 @@ void Octree::Raycast(RayOctreeQuery& query) const
         GetDrawablesOnlyInternal(query, rayQueryDrawables_);
 
         // Check that amount of drawables is large enough to justify threading
-        if (rayQueryDrawables_.Size() > RAYCASTS_PER_WORK_ITEM)
+        if (rayQueryDrawables_.Size() >= RAYCASTS_PER_WORK_ITEM * 2)
         {
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
                 rayQueryResults_[i].Clear();
 
-            WorkItem item;
-            item.workFunction_ = RaycastDrawablesWork;
-            item.aux_ = const_cast<Octree*>(this);
-
             PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
             while (start != rayQueryDrawables_.End())
             {
+                SharedPtr<WorkItem> item = queue->GetFreeItem();
+                item->priority_ = M_MAX_UNSIGNED;
+                item->workFunction_ = RaycastDrawablesWork;
+                item->aux_ = const_cast<Octree*>(this);
+
                 PODVector<Drawable*>::Iterator end = rayQueryDrawables_.End();
                 if (end - start > RAYCASTS_PER_WORK_ITEM)
                     end = start + RAYCASTS_PER_WORK_ITEM;
 
-                item.start_ = &(*start);
-                item.end_ = &(*end);
+                item->start_ = &(*start);
+                item->end_ = &(*end);
                 queue->AddWorkItem(item);
 
                 start = end;

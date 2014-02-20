@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@
 #include "Material.h"
 #include "MemoryBuffer.h"
 #include "Node.h"
+#include "OctreeQuery.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Sort.h"
@@ -57,6 +58,7 @@ BillboardSet::BillboardSet(Context* context) :
     relative_(true),
     scaled_(true),
     sorted_(false),
+    faceCamera_(true),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
@@ -72,6 +74,7 @@ BillboardSet::BillboardSet(Context* context) :
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
     batches_[0].geometryType_ = GEOM_BILLBOARD;
+    batches_[0].worldTransform_ = &transforms_[0];
 }
 
 BillboardSet::~BillboardSet()
@@ -87,6 +90,7 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
@@ -95,6 +99,49 @@ void BillboardSet::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(BillboardSet, Drawable);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+}
+
+void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+{
+    // If no billboard-level testing, use the Drawable test
+    if (query.level_ < RAY_TRIANGLE)
+    {
+        Drawable::ProcessRayQuery(query, results);
+        return;
+    }
+
+    // Check ray hit distance to AABB before proceeding with billboard-level tests
+    if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)
+        return;
+    
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
+    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
+    
+    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    {
+        if (!billboards_[i].enabled_)
+            continue;
+        
+        // Approximate the billboards as spheres for raycasting
+        float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
+        Vector3 center = billboardTransform * billboards_[i].position_;
+        Sphere billboardSphere(center, size);
+        
+        float distance = query.ray_.HitDistance(billboardSphere);
+        if (distance < query.maxDistance_)
+        {
+            // If the code reaches here then we have a hit
+            RayQueryResult result;
+            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+            result.normal_ = -query.ray_.direction_;
+            result.distance_ = distance;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.subObject_ = i;
+            results.Push(result);
+        }
+    }
 }
 
 void BillboardSet::UpdateBatches(const FrameInfo& frame)
@@ -128,7 +175,10 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = 0.0f;
     
     batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = relative_ ? &node_->GetWorldTransform() : &Matrix3x4::IDENTITY;
+    batches_[0].numWorldTransforms_ = faceCamera_ ? 1 : 2;
+    transforms_[0] = relative_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+    if (!faceCamera_)
+        transforms_[1] = node_->GetWorldTransform();
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -199,6 +249,12 @@ void BillboardSet::SetSorted(bool enable)
     Commit();
 }
 
+void BillboardSet::SetFaceCamera(bool enable)
+{
+    faceCamera_ = enable;
+    MarkNetworkUpdate();
+}
+
 void BillboardSet::SetAnimationLodBias(float bias)
 {
     animationLodBias_ = Max(bias, 0.0f);
@@ -224,7 +280,7 @@ Billboard* BillboardSet::GetBillboard(unsigned index)
 void BillboardSet::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void BillboardSet::SetBillboardsAttr(VariantVector value)
@@ -329,9 +385,8 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
         ++enabledBillboards;
     }
     
-    // If no billboards enabled, the bounding box is just the node's world position
-    if (!enabledBillboards)
-        worldBox.Merge(node_->GetWorldPosition());
+    // Always merge the node's own position to ensure particle emitter updates continue when the relative mode is switched
+    worldBox.Merge(node_->GetWorldPosition());
 
     worldBoundingBox_ = worldBox;
 }
@@ -360,9 +415,10 @@ void BillboardSet::UpdateBufferSize()
     unsigned vertexIndex = 0;
     while (numBillboards--)
     {
-        *dest++ = vertexIndex; *dest++ = vertexIndex + 1; *dest++ = vertexIndex + 2;
-        *dest++ = vertexIndex + 2; *dest++ = vertexIndex + 3; *dest++ = vertexIndex;
+        dest[0] = vertexIndex; dest[1] = vertexIndex + 1; dest[2] = vertexIndex + 2;
+        dest[3] = vertexIndex + 2; dest[4] = vertexIndex + 3; dest[5] = vertexIndex;
         
+        dest += 6;
         vertexIndex += 4;
     }
     
@@ -441,29 +497,31 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         rotationMatrix[1][0] = -rotationMatrix[0][1];
         rotationMatrix[1][1] = rotationMatrix[0][0];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.max_.y_;
-        *dest++ = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
-        *dest++ = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
+        dest[0] = billboard.position_.x_; dest[1] = billboard.position_.y_; dest[2] = billboard.position_.z_;
+        ((unsigned&)dest[3]) = color;
+        dest[4] = billboard.uv_.min_.x_; dest[5] = billboard.uv_.min_.y_;
+        dest[6] = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
+        dest[7] = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.max_.y_;
-        *dest++ = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
-        *dest++ = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
+        dest[8] = billboard.position_.x_; dest[9] = billboard.position_.y_; dest[10] = billboard.position_.z_;
+        ((unsigned&)dest[11]) = color;
+        dest[12] = billboard.uv_.max_.x_; dest[13] = billboard.uv_.min_.y_;
+        dest[14] = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
+        dest[15] = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.min_.y_;
-        *dest++ = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
-        *dest++ = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
+        dest[16] = billboard.position_.x_; dest[17] = billboard.position_.y_; dest[18] = billboard.position_.z_;
+        ((unsigned&)dest[19]) = color;
+        dest[20] = billboard.uv_.max_.x_; dest[21] = billboard.uv_.max_.y_;
+        dest[22] = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
+        dest[23] = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.min_.y_;
-        *dest++ = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
-        *dest++ = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
+        dest[24] = billboard.position_.x_; dest[25] = billboard.position_.y_; dest[26] = billboard.position_.z_;
+        ((unsigned&)dest[27]) = color;
+        dest[28] = billboard.uv_.min_.x_; dest[29] = billboard.uv_.max_.y_;
+        dest[30] = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
+        dest[31] = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
+
+        dest += 32;
     }
     
     vertexBuffer_->Unlock();

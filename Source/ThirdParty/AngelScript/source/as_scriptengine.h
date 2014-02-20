@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -47,7 +47,6 @@
 #include "as_datatype.h"
 #include "as_objecttype.h"
 #include "as_module.h"
-#include "as_restore.h"
 #include "as_callfunc.h"
 #include "as_configgroup.h"
 #include "as_memory.h"
@@ -61,13 +60,6 @@ class asCContext;
 
 // TODO: import: Remove this when import is removed
 struct sBindInfo;
-
-// TODO: DiscardModule should take an optional pointer to asIScriptModule instead of module name. If null, nothing is done.
-
-// TODO: Should have a CreateModule/GetModule instead of just GetModule with parameters.
-
-// TODO: Should allow enumerating modules, in case they have not been named.
-
 
 class asCScriptEngine : public asIScriptEngine
 {
@@ -88,9 +80,9 @@ public:
 	virtual int ClearMessageCallback();
 	virtual int WriteMessage(const char *section, int row, int col, asEMsgType type, const char *message);
 
-    // JIT Compiler
-    virtual int SetJITCompiler(asIJITCompiler *compiler);
-    virtual asIJITCompiler *GetJITCompiler() const;
+	// JIT Compiler
+	virtual int SetJITCompiler(asIJITCompiler *compiler);
+	virtual asIJITCompiler *GetJITCompiler() const;
 
 	// Global functions
 	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
@@ -154,10 +146,12 @@ public:
 	// Script modules
 	virtual asIScriptModule *GetModule(const char *module, asEGMFlags flag);
 	virtual int              DiscardModule(const char *module);
+	virtual asUINT           GetModuleCount() const;
+	virtual asIScriptModule *GetModuleByIndex(asUINT index) const;
 
 	// Script functions
 	virtual asIScriptFunction *GetFunctionById(int funcId) const;
-    virtual asIScriptFunction *GetFuncDefFromTypeId(int typeId) const;
+	virtual asIScriptFunction *GetFuncDefFromTypeId(int typeId) const;
 
 	// Type identification
 	virtual asIObjectType *GetObjectTypeById(int typeId) const;
@@ -269,7 +263,11 @@ public:
 
 	int CreateContext(asIScriptContext **context, bool isInternal);
 
-	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns);
+	asCObjectType *GetRegisteredObjectType(const asCString &name, asSNameSpace *ns) const;
+
+	asCObjectType *GetListPatternType(int listPatternFuncId);
+	void DestroyList(asBYTE *buffer, const asCObjectType *listPatternType);
+	void DestroySubList(asBYTE *&buffer, asSListPatternNode *&patternNode);
 
 	int AddBehaviourFunction(asCScriptFunction &func, asSSystemFunctionInterface &internal);
 
@@ -330,21 +328,29 @@ public:
 	asCObjectType    globalPropertyBehaviours;
 
 	// Registered interface
-	asCArray<asCObjectType *>          registeredObjTypes;
-	asCArray<asCObjectType *>          registeredTypeDefs;
-	asCArray<asCObjectType *>          registeredEnums;
-	asCSymbolTable<asCGlobalProperty>  registeredGlobalProps;
-	asCArray<asCScriptFunction *>      registeredGlobalFuncs;
-	asCArray<asCScriptFunction *>      registeredFuncDefs;
-	asCScriptFunction                 *stringFactory;
+	asCArray<asCObjectType *>         registeredObjTypes;
+	asCArray<asCObjectType *>         registeredTypeDefs;
+	asCArray<asCObjectType *>         registeredEnums;
+	asCSymbolTable<asCGlobalProperty> registeredGlobalProps; // TODO: memory savings: Since there can be only one property with the same name a simpler symbol table should be used
+	asCSymbolTable<asCScriptFunction> registeredGlobalFuncs;
+	asCArray<asCScriptFunction *>     registeredFuncDefs;
+	asCArray<asCObjectType *>         registeredTemplateTypes;
+	asCScriptFunction                *stringFactory;
 	bool configFailed;
 
-	// Stores all known object types, both application registered, and script declared
-	asCArray<asCObjectType *>      objectTypes;
+	// Stores all registered types except funcdefs
+	asCMap<asSNameSpaceNamePair, asCObjectType*> allRegisteredTypes;  
+
+	// Dummy types used to name the subtypes in the template objects 
 	asCArray<asCObjectType *>      templateSubTypes;
 
 	// Store information about template types
-	asCArray<asCObjectType *>      templateTypes;
+	// This list will contain all instances of templates, both registered specialized 
+	// types and those automacially instanciated from scripts
+	asCArray<asCObjectType *>      templateInstanceTypes;
+
+	// Store information about list patterns
+	asCArray<asCObjectType *>      listPatternTypes;
 
 	// Stores all global properties, both those registered by application, and those declared by scripts.
 	// The id of a global property is the index in this array.
@@ -377,8 +383,8 @@ public:
 
 	// Stores script declared object types
 	asCArray<asCObjectType *> classTypes;
-	// This array stores the template instances types, that have been generated from template types
-	asCArray<asCObjectType *> templateInstanceTypes;
+	// This array stores the template instances types that have been automatically generated from template types
+	asCArray<asCObjectType *> generatedTemplateTypes;
 	// Stores the funcdefs
 	asCArray<asCScriptFunction *> funcDefs;
 
@@ -404,7 +410,7 @@ public:
 	asSSystemFunctionInterface  msgCallbackFunc;
 	void                       *msgCallbackObj;
 
-    asIJITCompiler              *jitCompiler;
+	asIJITCompiler             *jitCompiler;
 
 	// Namespaces
 	// These are shared between all entities and are 
@@ -421,7 +427,7 @@ public:
 	asCArray<asPWORD>       userData;
 
 	struct SEngineClean { asPWORD type; asCLEANENGINEFUNC_t cleanFunc; };
-	asCArray<SEngineClean> cleanEngineFuncs;
+	asCArray<SEngineClean>  cleanEngineFuncs;
 	asCLEANMODULEFUNC_t     cleanModuleFunc;
 	asCLEANCONTEXTFUNC_t    cleanContextFunc;
 	asCLEANFUNCTIONFUNC_t   cleanFunctionFunc;

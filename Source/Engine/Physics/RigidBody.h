@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -98,6 +98,8 @@ public:
     void SetAngularDamping(float factor);
     /// Set friction coefficient.
     void SetFriction(float friction);
+    /// Set anisotropic friction.
+    void SetAnisotropicFriction(Vector3 friction);
     /// Set rolling friction coefficient.
     void SetRollingFriction(float friction);
     /// Set restitution coefficient.
@@ -175,6 +177,8 @@ public:
     float GetAngularDamping() const;
     /// Return friction coefficient.
     float GetFriction() const;
+    /// Return anisotropic friction.
+    Vector3 GetAnisotropicFriction() const;
     /// Return rolling friction coefficient.
     float GetRollingFriction() const;
     /// Return restitution coefficient.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,42 @@
 # Find Broadcom VideoCore firmware installation
 #
 #  BCM_VC_FOUND
-#  BCM_VC_INCLUDE_DIR
+#  BCM_VC_INCLUDE_DIRS
 #  BCM_VC_LIBRARIES
 #
 
-if (RASPI)
-    set (BCM_VC_FOUND 0)
-    
-    # Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
-    set (BCM_VC_INC_SEARCH_PATH /opt/vc/include)
-    set (BCM_VC_LIB_SEARCH_PATH /opt/vc/lib)
-
-    # Assume all the other headers are installed at same relative path as bcm_host.h
-    find_path (BCM_VC_INCLUDE_DIR bcm_host.h ${BCM_VC_INC_SEARCH_PATH})
-    
-    # Assume all the other libs are installed at the same relative path as libbcm_host.so
-    find_library (BCM_VC_LIB_BCM_HOST bcm_host ${BCM_VC_LIB_SEARCH_PATH})
-    find_library (BCM_VC_LIB_GLES2 GLESv2 ${BCM_VC_LIB_SEARCH_PATH})
-
-    if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIB_BCM_HOST AND BCM_VC_LIB_GLES2)
-        set (BCM_VC_INCLUDE_DIR ${BCM_VC_INCLUDE_DIR} ${BCM_VC_INCLUDE_DIR}/interface/vcos/pthreads)
-        set (BCM_VC_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_GLES2})
-        set (BCM_VC_FOUND 1)
-    endif ()
-
-    if (BCM_VC_FOUND)
-        include (FindPackageMessage)
-        FIND_PACKAGE_MESSAGE (BCM_VC "Found Broadcom VideoCore firmware: ${BCM_VC_LIBRARIES} ${BCM_VC_INCLUDE_DIR}" "[${BCM_VC_LIBRARIES}][${BCM_VC_INCLUDE_DIR}]")
-    else ()
-        if (BCM_VC_FIND_REQUIRED)
-            message (FATAL_ERROR "Could not find Broadcom VideoCore firmware")
-        endif ()
-    endif ()
- 
-    mark_as_advanced (BCM_VC_INCLUDE_DIR BCM_VC_LIBRARIES)
+if (NOT RASPI)
+    return ()
 endif ()
+if (BCM_VC_FOUND)
+    return ()
+endif ()
+    
+# Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
+set (BCM_VC_INC_SEARCH_PATH /opt/vc/include)
+set (BCM_VC_LIB_SEARCH_PATH /opt/vc/lib)
+
+# Assume all the other headers are installed at same relative path as bcm_host.h
+find_path (BCM_VC_INCLUDE_DIRS bcm_host.h PATHS ${BCM_VC_INC_SEARCH_PATH} PATH_SUFFIXES vc)
+
+# Assume all the other libs are installed at the same relative path as libbcm_host.so
+find_library (BCM_VC_LIB_BCM_HOST bcm_host PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc)
+find_library (BCM_VC_LIB_EGL EGL PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc)
+find_library (BCM_VC_LIB_GLES2 GLESv2 PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc)
+
+if (BCM_VC_INCLUDE_DIRS AND BCM_VC_LIB_BCM_HOST AND BCM_VC_LIB_EGL AND BCM_VC_LIB_GLES2)
+    list (APPEND BCM_VC_INCLUDE_DIRS ${BCM_VC_INCLUDE_DIRS}/interface/vcos/pthreads)  # Note: variable change to list context after this
+    set (BCM_VC_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_EGL} ${BCM_VC_LIB_GLES2})
+    set (BCM_VC_FOUND 1)
+endif ()
+
+if (BCM_VC_FOUND)
+    include (FindPackageMessage)
+    FIND_PACKAGE_MESSAGE (BCM_VC "Found Broadcom VideoCore firmware: ${BCM_VC_LIBRARIES} ${BCM_VC_INCLUDE_DIRS}" "[${BCM_VC_LIBRARIES}][${BCM_VC_INCLUDE_DIRS}]")
+else ()
+    if (BCM_VC_FIND_REQUIRED)
+        message (FATAL_ERROR "Could not find Broadcom VideoCore firmware")
+    endif ()
+endif ()
+
+mark_as_advanced (BCM_VC_INCLUDE_DIRS BCM_VC_LIBRARIES)

@@ -5,7 +5,7 @@
 /*    FreeType API for color filtering of subpixel bitmap glyphs           */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 2006, 2007, 2008 by                                          */
+/*  Copyright 2006-2008, 2010, 2013 by                                     */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -45,20 +45,58 @@ FT_BEGIN_HEADER
    *
    * @description:
    *   The @FT_Library_SetLcdFilter API can be used to specify a low-pass
-   *   filter which is then applied to LCD-optimized bitmaps generated
+   *   filter, which is then applied to LCD-optimized bitmaps generated
    *   through @FT_Render_Glyph.  This is useful to reduce color fringes
-   *   which would occur with unfiltered rendering.
+   *   that would occur with unfiltered rendering.
    *
    *   Note that no filter is active by default, and that this function is
    *   *not* implemented in default builds of the library.  You need to
    *   #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING in your `ftoption.h' file
    *   in order to activate it.
+   *
+   *   FreeType generates alpha coverage maps, which are linear by nature.
+   *   For instance, the value 0x80 in bitmap representation means that
+   *   (within numerical precision) 0x80/0xff fraction of that pixel is
+   *   covered by the glyph's outline.  The blending function for placing
+   *   text over a background is
+   *
+   *   {
+   *     dst = alpha * src + (1 - alpha) * dst    ,
+   *   }
+   *
+   *   which is known as OVER.  However, when calculating the output of the
+   *   OVER operator, the source colors should first be transformed to a
+   *   linear color space, then alpha blended in that space, and transformed
+   *   back to the output color space.
+   *
+   *   When linear light blending is used, the default FIR5 filtering
+   *   weights (as given by FT_LCD_FILTER_DEFAULT) are no longer optimal, as
+   *   they have been designed for black on white rendering while lacking
+   *   gamma correction.  To preserve color neutrality, weights for a FIR5
+   *   filter should be chosen according to two free parameters `a' and `c',
+   *   and the FIR weights should be
+   *
+   *   {
+   *     [a - c, a + c, 2 * a, a + c, a - c]    .
+   *   }
+   *
+   *   This formula generates equal weights for all the color primaries
+   *   across the filter kernel, which makes it colorless.  One suggested
+   *   set of weights is
+   *
+   *   {
+   *     [0x10, 0x50, 0x60, 0x50, 0x10]    ,
+   *   }
+   *
+   *   where `a' has value 0x30 and `b' value 0x20.  The weights in filter
+   *   may have a sum larger than 0x100, which increases coloration slightly
+   *   but also improves contrast.
    */
 
 
   /****************************************************************************
    *
-   * @func:
+   * @enum:
    *   FT_LcdFilter
    *
    * @description:
@@ -160,6 +198,47 @@ FT_BEGIN_HEADER
   FT_EXPORT( FT_Error )
   FT_Library_SetLcdFilter( FT_Library    library,
                            FT_LcdFilter  filter );
+
+
+  /**************************************************************************
+   *
+   * @func:
+   *   FT_Library_SetLcdFilterWeights
+   *
+   * @description:
+   *   Use this function to override the filter weights selected by
+   *   @FT_Library_SetLcdFilter.  By default, FreeType uses the quintuple
+   *   (0x00, 0x55, 0x56, 0x55, 0x00) for FT_LCD_FILTER_LIGHT, and (0x10,
+   *   0x40, 0x70, 0x40, 0x10) for FT_LCD_FILTER_DEFAULT and
+   *   FT_LCD_FILTER_LEGACY.
+   *
+   * @input:
+   *   library ::
+   *     A handle to the target library instance.
+   *
+   *   weights ::
+   *     A pointer to an array; the function copies the first five bytes and
+   *     uses them to specify the filter weights.
+   *
+   * @return:
+   *   FreeType error code.  0~means success.
+   *
+   * @note:
+   *   Due to *PATENTS* covering subpixel rendering, this function doesn't
+   *   do anything except returning `FT_Err_Unimplemented_Feature' if the
+   *   configuration macro FT_CONFIG_OPTION_SUBPIXEL_RENDERING is not
+   *   defined in your build of the library, which should correspond to all
+   *   default builds of FreeType.
+   *
+   *   This function must be called after @FT_Library_SetLcdFilter to have
+   *   any effect.
+   *
+   * @since:
+   *   2.4.0
+   */
+  FT_EXPORT( FT_Error )
+  FT_Library_SetLcdFilterWeights( FT_Library      library,
+                                  unsigned char  *weights );
 
   /* */
 

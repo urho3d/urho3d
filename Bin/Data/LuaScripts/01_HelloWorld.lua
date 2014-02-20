@@ -19,14 +19,12 @@ end
 
 function CreateText()
     -- Construct new Text object
-    local context = GetContext()
-    local helloText = Text:new(context)
+    local helloText = Text:new()
 
     -- Set String to display
     helloText.text = "Hello World from Urho3D!"
 
     -- Set font and text color
-    local cache = GetCache()
     helloText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30)
     helloText.color = Color(0.0, 1.0, 0.0)
     
@@ -35,7 +33,6 @@ function CreateText()
     helloText.verticalAlignment = VA_CENTER;
     
     -- Add Text instance to the UI root element
-    local ui = GetUI()
     ui.root:AddChild(helloText)
 end
 

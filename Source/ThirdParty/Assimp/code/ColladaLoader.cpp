@@ -73,7 +73,7 @@ static const aiImporterDesc desc = {
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 ColladaLoader::ColladaLoader()
-: noSkeletonMesh()
+: noSkeletonMesh(), ignoreUpDirection(false)
 {}
 
 // ------------------------------------------------------------------------------------------------
@@ -108,6 +108,7 @@ bool ColladaLoader::CanRead( const std::string& pFile, IOSystem* pIOHandler, boo
 void ColladaLoader::SetupProperties(const Importer* pImp)
 {
 	noSkeletonMesh = pImp->GetPropertyInteger(AI_CONFIG_IMPORT_NO_SKELETON_MESHES,0) != 0;
+	ignoreUpDirection = pImp->GetPropertyInteger(AI_CONFIG_IMPORT_COLLADA_IGNORE_UP_DIRECTION,0) != 0;
 }
 
 
@@ -155,20 +156,26 @@ void ColladaLoader::InternReadFile( const std::string& pFile, aiScene* pScene, I
 	// ... then fill the materials with the now adjusted settings
 	FillMaterials(parser, pScene);
 
-	// Convert to Y_UP, if different orientation
-	if( parser.mUpDirection == ColladaParser::UP_X)
-		pScene->mRootNode->mTransformation *= aiMatrix4x4( 
-			 0, -1,  0,  0, 
-			 1,  0,  0,  0,
-			 0,  0,  1,  0,
-			 0,  0,  0,  1);
-	else if( parser.mUpDirection == ColladaParser::UP_Z)
-		pScene->mRootNode->mTransformation *= aiMatrix4x4( 
-			 1,  0,  0,  0, 
-			 0,  0,  1,  0,
-			 0, -1,  0,  0,
-			 0,  0,  0,  1);
-
+        // Apply unitsize scale calculation
+        pScene->mRootNode->mTransformation *= aiMatrix4x4(parser.mUnitSize, 0,  0,  0, 
+                                                          0,  parser.mUnitSize,  0,  0,
+                                                          0,  0,  parser.mUnitSize,  0,
+                                                          0,  0,  0,  1);
+        if( !ignoreUpDirection ) {
+        // Convert to Y_UP, if different orientation
+		if( parser.mUpDirection == ColladaParser::UP_X)
+			pScene->mRootNode->mTransformation *= aiMatrix4x4( 
+				 0, -1,  0,  0, 
+				 1,  0,  0,  0,
+				 0,  0,  1,  0,
+				 0,  0,  0,  1);
+		else if( parser.mUpDirection == ColladaParser::UP_Z)
+			pScene->mRootNode->mTransformation *= aiMatrix4x4( 
+				 1,  0,  0,  0, 
+				 0,  0,  1,  0,
+				 0, -1,  0,  0,
+				 0,  0,  0,  1);
+        }
 	// store all meshes
 	StoreSceneMeshes( pScene);
 
@@ -466,7 +473,7 @@ void ColladaLoader::BuildMeshesForNode( const ColladaParser& pParser, const Coll
 			}
 			else 
 			{
-				DefaultLogger::get()->warn( boost::str( boost::format( "Collada: No material specified for subgroup \"%s\" in geometry \"%s\".") % submesh.mMaterial % mid.mMeshOrController));
+				DefaultLogger::get()->warn( boost::str( boost::format( "Collada: No material specified for subgroup <%s> in geometry <%s>.") % submesh.mMaterial % mid.mMeshOrController));
 				if( !mid.mMaterials.empty() )
 					meshMaterial = mid.mMaterials.begin()->second.mMatName;
 			}
@@ -514,7 +521,10 @@ void ColladaLoader::BuildMeshesForNode( const ColladaParser& pParser, const Coll
 
 				// assign the material index
 				dstMesh->mMaterialIndex = matIdx;
-        dstMesh->mName = mid.mMeshOrController;			
+                if(dstMesh->mName.length == 0)
+                {
+                    dstMesh->mName = mid.mMeshOrController;
+                }
       }
 		}
 	}
@@ -534,6 +544,8 @@ aiMesh* ColladaLoader::CreateMesh( const ColladaParser& pParser, const Collada::
 	const Collada::Controller* pSrcController, size_t pStartVertex, size_t pStartFace)
 {
 	aiMesh* dstMesh = new aiMesh;
+    
+    dstMesh->mName = pSrcMesh->mName;
 
 	// count the vertices addressed by its faces
 	const size_t numVertices = std::accumulate( pSrcMesh->mFaceSize.begin() + pStartFace,
@@ -636,7 +648,7 @@ aiMesh* ColladaLoader::CreateMesh( const ColladaParser& pParser, const Collada::
 			throw DeadlyImportError( "Data type mismatch while resolving mesh joints");
 		// sanity check: we rely on the vertex weights always coming as pairs of BoneIndex-WeightIndex
 		if( pSrcController->mWeightInputJoints.mOffset != 0 || pSrcController->mWeightInputWeights.mOffset != 1)
-			throw DeadlyImportError( "Unsupported vertex_weight adressing scheme. ");
+			throw DeadlyImportError( "Unsupported vertex_weight addressing scheme. ");
 
 		// create containers to collect the weights for each bone
 		size_t numBones = jointNames.mStrings.size();
@@ -967,7 +979,7 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
 				else if( subElement == "Z")
 					entry.mSubElement = 2;
 				else 
-					DefaultLogger::get()->warn( boost::str( boost::format( "Unknown anim subelement \"%s\". Ignoring") % subElement));
+					DefaultLogger::get()->warn( boost::str( boost::format( "Unknown anim subelement <%s>. Ignoring") % subElement));
 			} else
 			{
 				// no subelement following, transformId is remaining string

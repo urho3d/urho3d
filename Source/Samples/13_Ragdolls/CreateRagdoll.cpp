@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ CreateRagdoll::CreateRagdoll(Context* context) :
 
 void CreateRagdoll::OnNodeSet(Node* node)
 {
-    // If the node pointer is nonzero, this component has been created into a scene node. Subscribe to physics collisions that
+    // If the node pointer is non-null, this component has been created into a scene node. Subscribe to physics collisions that
     // concern this scene node
     if (node)
         SubscribeToEvent(node, E_NODECOLLISION, HANDLER(CreateRagdoll, HandleNodeCollision));
@@ -47,7 +47,7 @@ void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventD
     using namespace NodeCollision;
 
     // Get the other colliding body, make sure it is moving (has nonzero mass)
-    RigidBody* otherBody = (RigidBody*)eventData[P_OTHERBODY].GetPtr();
+    RigidBody* otherBody = static_cast<RigidBody*>(eventData[P_OTHERBODY].GetPtr());
 
     if (otherBody->GetMass() > 0.0f)
     {

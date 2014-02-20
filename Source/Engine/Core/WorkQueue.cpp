@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "CoreEvents.h"
+#include "Log.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Thread.h"
@@ -66,7 +67,9 @@ WorkQueue::WorkQueue(Context* context) :
     Object(context),
     shutDown_(false),
     pausing_(false),
-    paused_(false)
+    paused_(false),
+    tolerance_(10),
+    lastSize_(0)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WorkQueue, HandleBeginFrame));
 }
@@ -99,28 +102,53 @@ void WorkQueue::CreateThreads(unsigned numThreads)
     }
 }
 
-void WorkQueue::AddWorkItem(const WorkItem& item)
+SharedPtr<WorkItem> WorkQueue::GetFreeItem()
 {
+    if (poolItems_.Size() > 0)
+    {
+        SharedPtr<WorkItem> item = poolItems_.Front();
+        poolItems_.PopFront();
+        return item;
+    }
+    else
+    {
+        // No usable items found, create a new one set it as pooled and return it.
+        SharedPtr<WorkItem> item(new WorkItem());
+        item->pooled_ = true;
+        return item;
+    }
+}
+
+void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
+{
+    if (!item)
+    {
+        LOGERROR("Null work item submitted to the work queue");
+        return;
+    }
+    
+    // Check for duplicate items.
+    assert(!workItems_.Contains(item));
+    
     // Push to the main thread list to keep item alive
     // Clear completed flag in case item is reused
     workItems_.Push(item);
-    WorkItem* itemPtr = &workItems_.Back();
-    itemPtr->completed_ = false;
-    
+    item->completed_ = false;
+
     // Make sure worker threads' list is safe to modify
     if (threads_.Size() && !paused_)
         queueMutex_.Acquire();
     
     // Find position for new item
     if (queue_.Empty())
-        queue_.Push(itemPtr);
+        queue_.Push(item);
     else
     {
         for (List<WorkItem*>::Iterator i = queue_.Begin(); i != queue_.End(); ++i)
         {
-            if ((*i)->priority_ <= itemPtr->priority_)
+            if ((*i)->priority_ <= item->priority_)
             {
-                queue_.Insert(i, itemPtr);
+                queue_.Insert(i, item);
                 break;
             }
         }
@@ -202,14 +230,14 @@ void WorkQueue::Complete(unsigned priority)
         }
     }
     
-    PurgeCompleted();
+    PurgeCompleted(priority);
 }
 
 bool WorkQueue::IsCompleted(unsigned priority) const
 {
-    for (List<WorkItem>::ConstIterator i = workItems_.Begin(); i != workItems_.End(); ++i)
+    for (List<SharedPtr<WorkItem> >::ConstIterator i = workItems_.Begin(); i != workItems_.End(); ++i)
     {
-        if (i->priority_ >= priority && !i->completed_)
+        if ((*i)->priority_ >= priority && !(*i)->completed_)
             return false;
     }
     
@@ -251,28 +279,59 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
     }
 }
 
-void WorkQueue::PurgeCompleted()
+void WorkQueue::PurgeCompleted(unsigned priority)
 {
-    using namespace WorkItemCompleted;
-    
-    VariantMap eventData;
-    
-    // Purge completed work items and send completion events.
-    for (List<WorkItem>::Iterator i = workItems_.Begin(); i != workItems_.End();)
+    // Purge completed work items and send completion events. Do not signal items lower than priority threshold,
+    // as those may be user submitted and lead to eg. scene manipulation that could happen in the middle of the
+    // render update, which is not allowed
+    for (List<SharedPtr<WorkItem> >::Iterator i = workItems_.Begin(); i != workItems_.End();)
     {
-        if (i->completed_)
+        if ((*i)->completed_ && (*i)->priority_ >= priority)
         {
-            if (i->sendEvent_)
+            if ((*i)->sendEvent_)
             {
-                eventData[P_ITEM] = (void*)(&(*i));
+                using namespace WorkItemCompleted;
+                
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_ITEM] = i->Get();
                 SendEvent(E_WORKITEMCOMPLETED, eventData);
             }
-            
+
+            // Check if this was a pooled item and set it to usable
+            if ((*i)->pooled_)
+            {
+                // Reset the values to their defaults. This should 
+                // be safe to do here as the completed event has 
+                // already been handled and this is part of the 
+                // internal pool.
+                (*i)->start_ = NULL;
+                (*i)->end_ = NULL;
+                (*i)->aux_ = NULL;
+                (*i)->workFunction_ = NULL;
+                (*i)->priority_ = M_MAX_UNSIGNED;
+                (*i)->sendEvent_ = false;
+                (*i)->completed_ = false;
+
+                poolItems_.Push(*i);
+            }
+
             i = workItems_.Erase(i);
         }
         else
             ++i;
     }
+}
+
+void WorkQueue::PurgePool()
+{
+    unsigned int currentSize = poolItems_.Size();
+    int difference = lastSize_ - currentSize;
+
+    // Difference tolerance, should be fairly significant to reduce the pool size.
+    for (unsigned i = 0; poolItems_.Size() > 0 && difference > tolerance_ && i < (unsigned)difference; i++)
+        poolItems_.PopFront();
+
+    lastSize_ = currentSize;
 }
 
 void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
@@ -293,7 +352,9 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
         }
     }
     
-    PurgeCompleted();
+    // Complete and signal items down to the lowest priority
+    PurgeCompleted(0);
+    PurgePool();
 }
 
 }

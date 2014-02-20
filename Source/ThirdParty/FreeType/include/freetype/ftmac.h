@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Additional Mac-specific API.                                         */
 /*                                                                         */
-/*  Copyright 1996-2001, 2004, 2006, 2007 by                               */
+/*  Copyright 1996-2001, 2004, 2006, 2007, 2013 by                         */
 /*  Just van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.     */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -168,7 +168,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Return a pathname of the disk file and face index for given font   */
-  /*    name which is handled by ATS framework.                            */
+  /*    name that is handled by ATS framework.                             */
   /*                                                                       */
   /* <Input>                                                               */
   /*    fontName    :: Mac OS name of the font in ATS framework.           */

@@ -57,6 +57,10 @@ void ExportScenePly(const char* pFile,IOSystem* pIOSystem, const aiScene* pScene
 
 	// we're still here - export successfully completed. Write the file.
 	boost::scoped_ptr<IOStream> outfile (pIOSystem->Open(pFile,"wt"));
+	if(outfile == NULL) {
+		throw DeadlyExportError("could not open output .ply file: " + std::string(pFile));
+	}
+
 	outfile->Write( exporter.mOutput.str().c_str(), static_cast<size_t>(exporter.mOutput.tellp()),1);
 }
 
@@ -99,7 +103,7 @@ PlyExporter :: PlyExporter(const char* _filename, const aiScene* pScene)
 
 	mOutput << "ply" << endl;
 	mOutput << "format ascii 1.0" << endl;
-	mOutput << "Created by Open Asset Import Library - http://assimp.sf.net (v"
+	mOutput << "comment Created by Open Asset Import Library - http://assimp.sf.net (v"
 		<< aiGetVersionMajor() << '.' << aiGetVersionMinor() << '.' 
 		<< aiGetVersionRevision() << ")" << endl;
 
@@ -155,7 +159,7 @@ PlyExporter :: PlyExporter(const char* _filename, const aiScene* pScene)
 	}
 
 	mOutput << "element face " << faces << endl;
-	mOutput << "property list uint uint vertex_indices" << endl;
+	mOutput << "property list uint uint vertex_index" << endl;
 	mOutput << "end_header" << endl;
 
 	for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {

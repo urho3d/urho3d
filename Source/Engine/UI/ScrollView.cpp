@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -407,8 +407,8 @@ void ScrollView::UpdateView(const IntVector2& position)
     {
         using namespace ViewChanged;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_X] = viewPosition_.x_;
         eventData[P_Y] = viewPosition_.y_;
         SendEvent(E_VIEWCHANGED, eventData);

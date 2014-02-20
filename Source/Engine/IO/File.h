@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,12 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "Deserializer.h"
 #include "Serializer.h"
 #include "Object.h"
 
 #ifdef ANDROID
-#include "ArrayPtr.h"
-
 #include <SDL_rwops.h>
 #endif
 
@@ -85,7 +84,7 @@ public:
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
     /// Return whether is open.
-    bool IsOpen() const { return handle_ != 0; }
+    bool IsOpen() const;
     /// Return the file handle.
     void* GetHandle() const { return handle_; }
     /// Return whether the file originates from a package.
@@ -101,17 +100,25 @@ private:
     #ifdef ANDROID
     /// SDL RWops context for Android asset loading.
     SDL_RWops* assetHandle_;
-    /// Read buffer for Android asset loading.
+    #endif
+    /// Read buffer for Android asset or compressed file loading.
     SharedArrayPtr<unsigned char> readBuffer_;
+    /// Decompression input buffer for compressed file loading.
+    SharedArrayPtr<unsigned char> inputBuffer_;
     /// Read buffer position.
     unsigned readBufferOffset_;
     /// Bytes in the current read buffer.
     unsigned readBufferSize_;
-    #endif
     /// Start position within a package file, 0 for regular files.
     unsigned offset_;
     /// Content checksum.
     unsigned checksum_;
+    /// Compression flag.
+    bool compressed_;
+    /// Synchronization needed before read -flag.
+    bool readSyncNeeded_;
+    /// Synchronization needed before write -flag.
+    bool writeSyncNeeded_;
 };
 
 }

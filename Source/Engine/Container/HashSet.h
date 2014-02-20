@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -136,8 +136,8 @@ public:
     /// Construct from another hash set.
     HashSet(const HashSet<T>& set)
     {
-        // Reserve the tail node
-        allocator_ = AllocatorInitialize(sizeof(Node));
+        // Reserve the tail node + initial capacity according to the set's size
+        allocator_ = AllocatorInitialize(sizeof(Node), set.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = set;
     }
@@ -517,8 +517,6 @@ private:
     /// Reserve a node with specified key.
     Node* ReserveNode(const T& key)
     {
-        if (!allocator_)
-            allocator_ = AllocatorInitialize(sizeof(Node));
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key);
         return newNode;

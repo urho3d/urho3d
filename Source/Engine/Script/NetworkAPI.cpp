@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -111,8 +111,8 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Connection", "Controls controls", offsetof(Connection, controls_));
     engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
     
-    // Register Variant GetPtr() for Connection
-    engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection() const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for Connection. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection(const String&in binding = \"deprecated:GetConnection\") const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
     
     // Register SetOwner/GetOwner now
     engine->RegisterObjectMethod("Node", "void set_owner(Connection@+)", asMETHOD(Node, SetOwner), asCALL_THISCALL);
@@ -121,10 +121,19 @@ static void RegisterConnection(asIScriptEngine* engine)
 
 static void RegisterHttpRequest(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("HttpRequestState");
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_INITIALIZING", HTTP_INITIALIZING);
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_ERROR", HTTP_ERROR);
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_OPEN", HTTP_OPEN);
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_CLOSED", HTTP_CLOSED);
+    
     RegisterRefCounted<HttpRequest>(engine, "HttpRequest");
     RegisterDeserializer<HttpRequest>(engine, "HttpRequest");
     engine->RegisterObjectMethod("HttpRequest", "const String& get_url() const", asMETHOD(HttpRequest, GetURL), asCALL_THISCALL);
     engine->RegisterObjectMethod("HttpRequest", "const String& get_verb() const", asMETHOD(HttpRequest, GetVerb), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "String get_error() const", asMETHOD(HttpRequest, GetError), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "HttpRequestState get_state() const", asMETHOD(HttpRequest, GetState), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "uint get_availableSize() const", asMETHOD(HttpRequest, GetAvailableSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("HttpRequest", "bool get_open() const", asMETHOD(HttpRequest, IsOpen), asCALL_THISCALL);
 }
 

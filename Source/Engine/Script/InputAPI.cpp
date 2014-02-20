@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,6 +113,27 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int HAT_RIGHT", (void*)&HAT_RIGHT);
     engine->RegisterGlobalProperty("const int HAT_DOWN", (void*)&HAT_DOWN);
     engine->RegisterGlobalProperty("const int HAT_LEFT", (void*)&HAT_LEFT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_A", (void*)&CONTROLLER_BUTTON_A);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_B", (void*)&CONTROLLER_BUTTON_B);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_X", (void*)&CONTROLLER_BUTTON_X);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_Y", (void*)&CONTROLLER_BUTTON_Y);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_BACK", (void*)&CONTROLLER_BUTTON_BACK);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_GUIDE", (void*)&CONTROLLER_BUTTON_GUIDE);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_START", (void*)&CONTROLLER_BUTTON_START);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_LEFTSTICK", (void*)&CONTROLLER_BUTTON_LEFTSTICK);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_RIGHTSTICK", (void*)&CONTROLLER_BUTTON_RIGHTSTICK);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_LEFTSHOULDER", (void*)&CONTROLLER_BUTTON_LEFTSHOULDER);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_RIGHTSHOULDER", (void*)&CONTROLLER_BUTTON_RIGHTSHOULDER);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_UP", (void*)&CONTROLLER_BUTTON_DPAD_UP);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_DOWN", (void*)&CONTROLLER_BUTTON_DPAD_DOWN);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_LEFT", (void*)&CONTROLLER_BUTTON_DPAD_LEFT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_RIGHT", (void*)&CONTROLLER_BUTTON_DPAD_RIGHT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_LEFTX", (void*)&CONTROLLER_AXIS_LEFTX);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_LEFTY", (void*)&CONTROLLER_AXIS_LEFTY);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_RIGHTX", (void*)&CONTROLLER_AXIS_RIGHTX);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_RIGHTY", (void*)&CONTROLLER_AXIS_RIGHTY);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_TRIGGERLEFT", (void*)&CONTROLLER_AXIS_TRIGGERLEFT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_TRIGGERRIGHT", (void*)&CONTROLLER_AXIS_TRIGGERRIGHT);
 }
 
 static Input* GetInput()
@@ -127,6 +148,7 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TouchState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("TouchState", "const int touchID", offsetof(TouchState, touchID_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 position", offsetof(TouchState, position_));
+    engine->RegisterObjectProperty("TouchState", "const IntVector2 lastPosition", offsetof(TouchState, lastPosition_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 delta", offsetof(TouchState, delta_));
     engine->RegisterObjectProperty("TouchState", "const float pressure", offsetof(TouchState, pressure_));
     
@@ -148,6 +170,9 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool DetectJoysticks()", asMETHOD(Input, DetectJoysticks), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_mouseVisible(bool)", asMETHOD(Input, SetMouseVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_mouseVisible() const", asMETHOD(Input, IsMouseVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_screenKeyboardVisible(bool)", asMETHOD(Input, SetScreenKeyboardVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_screenKeyboardVisible() const", asMETHOD(Input, IsScreenKeyboardVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_screenKeyboardSupport() const", asMETHOD(Input, GetScreenKeyboardSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);

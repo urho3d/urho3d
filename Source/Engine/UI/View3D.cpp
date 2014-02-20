@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@ View3D::View3D(Context* context) :
     autoUpdate_(true)
 {
     renderTexture_ = new Texture2D(context_);
+    depthTexture_ = new Texture2D(context_);
     viewport_ = new Viewport(context_);
 }
 
@@ -70,10 +71,12 @@ void View3D::OnResize()
     if (width > 0 && height >> 0)
     {
         renderTexture_->SetSize(width, height, rttFormat_, TEXTURE_RENDERTARGET);
+        depthTexture_->SetSize(width, height, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
         RenderSurface* surface = renderTexture_->GetRenderSurface();
         surface->SetViewport(0, viewport_);
         surface->SetUpdateMode(autoUpdate_ ? SURFACE_UPDATEALWAYS : SURFACE_MANUALUPDATE);
-
+        surface->SetLinkedDepthStencil(depthTexture_->GetRenderSurface());
+        
         SetTexture(renderTexture_);
         SetImageRect(IntRect(0, 0, width, height));
 
@@ -135,6 +138,11 @@ Node* View3D::GetCameraNode() const
 Texture2D* View3D::GetRenderTexture() const
 {
     return renderTexture_;
+}
+
+Texture2D* View3D::GetDepthTexture() const
+{
+    return depthTexture_;
 }
 
 Viewport* View3D::GetViewport() const

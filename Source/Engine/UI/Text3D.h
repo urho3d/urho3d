@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,7 +88,7 @@ public:
     void SetColor(Corner corner, const Color& color);
     /// Set opacity.
     void SetOpacity(float opacity);
-    /// Set whether to face camera automatically.
+    /// Set whether to face the camera automatically.
     void SetFaceCamera(bool enable);
     
     /// Return font.
@@ -121,13 +121,19 @@ public:
     int GetRowHeight() const;
     /// Return number of rows.
     unsigned GetNumRows() const;
-    /// Return width of each row.
-    const PODVector<int>& GetRowWidths() const;
+    /// Return number of characters.
+    unsigned GetNumChars() const;
+    /// Return width of row by index.
+    int GetRowWidth(unsigned index) const;
+    /// Return position of character by index relative to the text element origin.
+    IntVector2 GetCharPosition(unsigned index);
+    /// Return size of character by index.
+    IntVector2 GetCharSize(unsigned index);
     /// Return corner color.
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
-    /// Return whether faces camera automatically.
+    /// Return whether faces the camera automatically.
     bool GetFaceCamera() const { return faceCamera_; }
     
     /// Set font attribute.

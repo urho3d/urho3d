@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -145,6 +145,23 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
     }
 }
 
+void Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
+{
+    Vector3 forward = direction.Normalized();
+    Vector3 v = forward.CrossProduct(upDirection).Normalized(); 
+    Vector3 up = v.CrossProduct(forward);
+    Vector3 right = up.CrossProduct(forward);
+
+    Quaternion ret;
+    ret.w_ = sqrtf(1.0f + right.x_ + up.y_ + forward.z_) * 0.5f;
+    float w4Recip = 1.0f / (4.0f * ret.w_);
+    ret.x_ = (up.z_ - forward.y_) * w4Recip;
+    ret.y_ = (forward.x_ - right.z_) * w4Recip;
+    ret.z_ = (right.y_ - up.x_) * w4Recip;
+
+    (*this) = ret;
+}
+
 Vector3 Quaternion::EulerAngles() const
 {
     // Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
@@ -234,6 +251,18 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
     }
     
     return *this * t1 + rhs * t2;
+}
+
+Quaternion Quaternion::Nlerp(Quaternion rhs, float t, bool shortestPath) const
+{
+    Quaternion result;
+    float fCos = DotProduct(rhs);
+    if (fCos < 0.0f && shortestPath)
+        result = (*this) + (((-rhs) - (*this)) * t);
+    else
+        result = (*this) + ((rhs - (*this)) * t);
+    result.Normalize();
+    return result;
 }
 
 String Quaternion::ToString() const

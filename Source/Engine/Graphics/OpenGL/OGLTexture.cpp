@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@
 #include "Profiler.h"
 #include "RenderSurface.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Texture.h"
 #include "XMLFile.h"
 
@@ -77,6 +76,7 @@ Texture::Texture(Context* context) :
     requestedLevels_(0),
     width_(0),
     height_(0),
+    depth_(0),
     shadowCompare_(false),
     parametersDirty_(true),
     filterMode_(FILTER_DEFAULT),
@@ -263,6 +263,13 @@ int Texture::GetLevelHeight(unsigned level) const
     return Max(height_ >> level, 1);
 }
 
+int Texture::GetLevelDepth(unsigned level) const
+{
+    if (level > levels_)
+        return 0;
+    return Max(depth_ >> level, 1);
+}
+
 unsigned Texture::GetDataSize(int width, int height) const
 {
     if (IsCompressed())
@@ -276,6 +283,11 @@ unsigned Texture::GetDataSize(int width, int height) const
     }
     else
         return GetRowDataSize(width) * height;
+}
+
+unsigned Texture::GetDataSize(int width, int height, int depth) const
+{
+    return depth * GetDataSize(width, height);
 }
 
 unsigned Texture::GetRowDataSize(int width) const
@@ -367,7 +379,7 @@ unsigned Texture::GetDataType(unsigned format)
     else if (format == GL_RG16 || format == GL_RGBA16)
         return GL_UNSIGNED_SHORT;
     else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_RGBA16F_ARB ||
-        format == GL_RGBA32F_ARB)
+        format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F)
         return GL_FLOAT;
     else
         return GL_UNSIGNED_BYTE;
@@ -386,11 +398,9 @@ void Texture::LoadParameters()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    if (cache->Exists(xmlName))
-    {
-        XMLFile* file = cache->GetResource<XMLFile>(xmlName);
+    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
+    if (file)
         LoadParameters(file);
-    }
 }
 
 void Texture::LoadParameters(XMLFile* file)
@@ -443,7 +453,7 @@ void Texture::LoadParameters(const XMLElement& elem)
             if (paramElem.HasAttribute("high"))
                 SetMipsToSkip(QUALITY_HIGH, paramElem.GetInt("high"));
         }
-        
+
         if (name == "srgb")
             SetSRGB(paramElem.GetBool("enable"));
         

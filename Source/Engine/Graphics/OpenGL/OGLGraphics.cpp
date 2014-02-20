@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 #include "CustomGeometry.h"
 #include "DebugRenderer.h"
 #include "DecalSet.h"
+#include "File.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
@@ -42,16 +43,18 @@
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "RenderSurface.h"
+#include "ResourceCache.h"
 #include "Shader.h"
+#include "ShaderPrecache.h"
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
 #include "StaticModelGroup.h"
-#include "StringUtils.h"
 #include "Technique.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "Texture2D.h"
+#include "Texture3D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
 #include "Zone.h"
@@ -75,6 +78,14 @@
 #define glGenFramebuffersEXT glGenFramebuffers
 #define glDeleteFramebuffersEXT glDeleteFramebuffers
 #define glCheckFramebufferStatusEXT glCheckFramebufferStatus
+#endif
+
+#ifdef WIN32
+// On Intel / NVIDIA setups prefer the NVIDIA GPU
+#include <windows.h>
+extern "C" {
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
 #endif
 
 namespace Urho3D
@@ -140,6 +151,10 @@ static const unsigned glVertexAttrIndex[] =
 
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
+#ifdef GL_ES_VERSION_2_0
+static unsigned glesDepthStencilFormat = GL_DEPTH_COMPONENT16;
+#endif
+
 bool CheckExtension(String& extensions, const String& name)
 {
     if (extensions.Empty())
@@ -150,11 +165,13 @@ bool CheckExtension(String& extensions, const String& name)
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
+    windowIcon_(0),
     externalWindow_(0),
     width_(0),
     height_(0),
     multiSample_(1),
     fullscreen_(false),
+    borderless_(false),
     resizable_(false),
     vsync_(false),
     tripleBuffer_(false),
@@ -174,13 +191,15 @@ Graphics::Graphics(Context* context_) :
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     defaultTextureFilterMode_(FILTER_BILINEAR),
-    releasingGPUObjects_(false)
+    releasingGPUObjects_(false),
+    shaderPath_("Shaders/GLSL/"),
+    shaderExtension_(".glsl")
 {
     SetTextureUnitMappings();
     ResetCachedState();
     
     // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE);
     
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -212,22 +231,46 @@ void Graphics::SetWindowTitle(const String& windowTitle)
         SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
+void Graphics::SetWindowIcon(Image* windowIcon)
+{
+    windowIcon_ = windowIcon;
+    if (impl_->window_)
+        CreateWindowIcon();
+}
+
+void Graphics::SetWindowPosition(const IntVector2& position)
+{
+    if (impl_->window_)
+        SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
+}
+
+void Graphics::SetWindowPosition(int x, int y)
+{
+    SetWindowPosition(IntVector2(x, y));
+}
+
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
+
+    bool maximize = false;
     
-    // Fullscreen can not be resizable
-    if (fullscreen)
+    // Fullscreen or Borderless can not be resizable
+    if (fullscreen || borderless)
         resizable = false;
-    
+
+    // Borderless cannot be fullscreen, they are mutually exclusive
+    if (borderless)
+        fullscreen = false;
+
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && resizable == resizable_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && resizable == resizable_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
@@ -235,22 +278,40 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         return true;
     }
     
-    // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
-        if (!fullscreen)
-        {
-            width = 1024;
-            height = 768;
-        }
-        else
+        if (fullscreen || borderless)
         {
             SDL_DisplayMode mode;
             SDL_GetDesktopDisplayMode(0, &mode);
             width = mode.w;
             height = mode.h;
         }
+        else
+        {
+            maximize = resizable;
+            width = 1024;
+            height = 768;
+        }
     }
+    
+    // Check fullscreen mode validity (desktop only). If not valid, revert to windowed
+    #if !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
+    if (fullscreen)
+    {
+        PODVector<IntVector2> resolutions = GetResolutions();
+        fullscreen = false;
+        for (unsigned i = 0; i < resolutions.Size(); ++i)
+        {
+            if (width == resolutions[i].x_ && height == resolutions[i].y_)
+            {
+                fullscreen = true;
+                break;
+            }
+        }
+    }
+    #endif
     
     String extensions;
     
@@ -268,15 +329,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         #endif
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        #ifndef GL_ES_VERSION_2_0
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-        #ifndef GL_ES_VERSION_2_0
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-        #else
-        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
         #endif
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -297,9 +356,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
-            flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+            flags |= SDL_WINDOW_FULLSCREEN;
         if (resizable)
             flags |= SDL_WINDOW_RESIZABLE;
+        if (borderless)
+            flags |= SDL_WINDOW_BORDERLESS;
         
         for (;;)
         {
@@ -330,6 +391,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
                 }
             }
         }
+
+        CreateWindowIcon();
+
+        if (maximize)
+            Maximize();
         
         // Create/restore context and GPU objects and set initial renderstate
         Restore();
@@ -399,6 +465,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     
     fullscreen_ = fullscreen;
     resizable_ = resizable;
+    borderless_ = borderless;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
@@ -417,6 +484,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     #ifdef ENABLE_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    if (borderless_)
+        msg.Append(" borderless");
     if (resizable_)
         msg.Append(" resizable");
     if (multiSample > 1)
@@ -426,11 +495,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
 
     using namespace ScreenMode;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
     
     return true;
@@ -438,7 +508,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -454,7 +524,7 @@ void Graphics::SetSRGB(bool enable)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -474,6 +544,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
     
     destImage.SetSize(width_, height_, 3);
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
+    // On OpenGL we need to flip the image vertically after reading
+    destImage.FlipVertical();
     
     return true;
 }
@@ -524,7 +596,7 @@ void Graphics::EndFrame()
     SDL_GL_SwapWindow(impl_->window_);
     
     // Clean up FBO's that have not been used for a long time, and too large scratch buffers
-    CleanupFramebuffers(false);
+    CleanupFramebuffers();
     CleanupScratchBuffers();
 }
 
@@ -947,7 +1019,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     ClearParameterSources();
     
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
-    if (vs && !vs->IsCompiled())
+    if (vs && !vs->GetGPUObject())
     {
         if (vs->GetCompilerOutput().Empty())
         {
@@ -955,10 +1027,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             
             bool success = vs->Create();
             if (success)
-                LOGDEBUG("Compiled vertex shader " + vs->GetName());
+                LOGDEBUG("Compiled vertex shader " + vs->GetFullName());
             else
             {
-                LOGERROR("Failed to compile vertex shader " + vs->GetName() + ":\n" + vs->GetCompilerOutput());
+                LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                 vs = 0;
             }
         }
@@ -966,7 +1038,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             vs = 0;
     }
     
-    if (ps && !ps->IsCompiled())
+    if (ps && !ps->GetGPUObject())
     {
         if (ps->GetCompilerOutput().Empty())
         {
@@ -974,10 +1046,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             
             bool success = ps->Create();
             if (success)
-                LOGDEBUG("Compiled pixel shader " + ps->GetName());
+                LOGDEBUG("Compiled pixel shader " + ps->GetFullName());
             else
             {
-                LOGERROR("Failed to compile pixel shader " + ps->GetName() + ":\n" + ps->GetCompilerOutput());
+                LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                 ps = 0;
             }
         }
@@ -1003,7 +1075,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         if (i != shaderPrograms_.End())
         {
             // Use the existing linked program
-            if (i->second_->IsLinked())
+            if (i->second_->GetGPUObject())
             {
                 glUseProgram(i->second_->GetGPUObject());
                 shaderProgram_ = i->second_;
@@ -1022,14 +1094,14 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             SharedPtr<ShaderProgram> newProgram(new ShaderProgram(this, vs, ps));
             if (newProgram->Link())
             {
-                LOGDEBUG("Linked vertex shader " + vs->GetName() + " and pixel shader " + ps->GetName());
+                LOGDEBUG("Linked vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName());
                 // Note: Link() calls glUseProgram() to set the texture sampler uniforms,
                 // so it is not necessary to call it again
                 shaderProgram_ = newProgram;
             }
             else
             {
-                LOGERROR("Failed to link vertex shader " + vs->GetName() + " and pixel shader " + ps->GetName() + ":\n" +
+                LOGERROR("Failed to link vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName() + ":\n" +
                     newProgram->GetLinkerOutput());
                 glUseProgram(0);
                 shaderProgram_ = 0;
@@ -1038,6 +1110,11 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             shaderPrograms_[combination] = newProgram;
         }
     }
+    
+
+    // Store shader combination if shader dumping in progress
+    if (shaderPrecache_)
+        shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
@@ -1272,14 +1349,12 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
 bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
 {
     return shaderProgram_ && shaderProgram_->HasParameter(param);
-
 }
 
 bool Graphics::HasTextureUnit(TextureUnit unit)
 {
     return shaderProgram_ && shaderProgram_->HasTextureUnit(unit);
 }
-
 
 void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {
@@ -1326,7 +1401,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a rendertarget. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if (texture == viewTexture_ || (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture))
+        if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
     }
     
@@ -1512,20 +1587,6 @@ void Graphics::SetDepthStencil(Texture2D* texture)
         depthStencil = texture->GetRenderSurface();
     
     SetDepthStencil(depthStencil);
-}
-
-void Graphics::SetViewTexture(Texture* texture)
-{
-    viewTexture_ = texture;
-    
-    if (viewTexture_)
-    {
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        {
-            if (textures_[i] == viewTexture_)
-                SetTexture(i, textures_[i]->GetBackupTexture());
-        }
-    }
 }
 
 void Graphics::SetViewport(const IntRect& rect)
@@ -1740,6 +1801,34 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     }
 }
 
+void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection)
+{
+    #ifndef GL_ES_VERSION_2_0
+    if (enable != useClipPlane_)
+    {
+        if (enable)
+            glEnable(GL_CLIP_PLANE0);
+        else
+            glDisable(GL_CLIP_PLANE0);
+        useClipPlane_ = enable;
+    }
+    
+    if (enable)
+    {
+        Matrix4 viewProj = projection * view;
+        Vector4 planeVec =  clipPlane.Transformed(viewProj).ToVector4();
+        
+        GLdouble planeData[4];
+        planeData[0] = planeVec.x_;
+        planeData[1] = planeVec.y_;
+        planeData[2] = planeVec.z_;
+        planeData[3] = planeVec.w_;
+        
+        glClipPlane(GL_CLIP_PLANE0, &planeData[0]);
+    }
+    #endif
+}
+
 void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
 {
 }
@@ -1789,6 +1878,23 @@ void Graphics::SetForceSM2(bool enable)
 {
 }
 
+void Graphics::BeginDumpShaders(const String& fileName)
+{
+    shaderPrecache_ = new ShaderPrecache(context_, fileName);
+}
+
+void Graphics::EndDumpShaders()
+{
+    shaderPrecache_.Reset();
+}
+
+void Graphics::PrecacheShaders(Deserializer& source)
+{
+    PROFILE(PrecacheShaders);
+    
+    ShaderPrecache::LoadShaders(this, source);
+}
+
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0;
@@ -1801,8 +1907,18 @@ bool Graphics::IsDeviceLost() const
     if (impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED) != 0)
         return true;
     #endif
-    
+
     return impl_->context_ == 0;
+}
+
+IntVector2 Graphics::GetWindowPosition() const
+{
+    IntVector2 ret(IntVector2::ZERO);
+    
+    if (impl_->window_)
+        SDL_GetWindowPosition(impl_->window_, &ret.x_, &ret.y_);
+    
+    return ret;
 }
 
 PODVector<IntVector2> Graphics::GetResolutions() const
@@ -1845,6 +1961,18 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     return ret;
 }
 
+IntVector2 Graphics::GetDesktopResolution() const
+{
+#if !defined(ANDROID) && !defined(IOS)
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(0, &mode);
+    return IntVector2(mode.w, mode.h);
+#else
+    // SDL_GetDesktopDisplayMode() may not work correctly on mobile platforms. Rather return the window size
+    return IntVector2(width_, height_);
+#endif
+}
+
 unsigned Graphics::GetFormat(CompressedFormat format) const
 {
     switch (format)
@@ -1880,6 +2008,28 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     }
 }
 
+ShaderVariation* Graphics::GetShader(ShaderType type, const String& name, const String& defines) const
+{
+    return GetShader(type, name.CString(), defines.CString());
+}
+
+ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const char* defines) const
+{
+    if (lastShaderName_ != name || !lastShader_)
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        
+        String fullShaderName = shaderPath_ + name + shaderExtension_;
+        // Try to reduce repeated error log prints because of missing shaders
+        if (lastShaderName_ == name && !cache->Exists(fullShaderName))
+            return 0;
+        
+        lastShader_ = cache->GetResource<Shader>(fullShaderName);
+        lastShaderName_ = name;
+    }
+    
+    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)0;
+}
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
@@ -1955,15 +2105,16 @@ void Graphics::WindowResized()
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
     
-    LOGDEBUG(ToString("Window was resized to %dx%d", width_, height_));
+    LOGDEBUGF("Window was resized to %dx%d", width_, height_);
     
     using namespace ScreenMode;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
@@ -2003,9 +2154,6 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
             i->data_ = new unsigned char[size];
             i->size_ = size;
             i->reserved_ = true;
-            
-            LOGDEBUG("Resized scratch buffer to size " + String(size));
-            
             return i->data_.Get();
         }
     }
@@ -2017,8 +2165,6 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     newBuffer.reserved_ = true;
     scratchBuffers_.Push(newBuffer);
     return newBuffer.data_.Get();
-    
-    LOGDEBUG("Allocated scratch buffer with size " + String(size));
 }
 
 void Graphics::FreeScratchBuffer(void* buffer)
@@ -2046,8 +2192,6 @@ void Graphics::CleanupScratchBuffers()
         {
             i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
             i->size_ = maxScratchBufferRequest_;
-            
-            LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
         }
     }
     
@@ -2115,6 +2259,17 @@ void Graphics::Restore()
     if (!impl_->window_)
         return;
     
+    #ifdef ANDROID
+    // On Android the context may be lost behind the scenes as the application is minimized
+    if (impl_->context_ && !SDL_GL_GetCurrentContext())
+    {
+        impl_->context_ = 0;
+        // Mark GPU objects lost without a current context. In this case they just mark their internal state lost
+        // but do not perform OpenGL commands to delete the GL objects
+        Release(false, false);
+    }
+    #endif
+    
     // Ensure first that the context exists
     if (!impl_->context_)
     {
@@ -2129,6 +2284,22 @@ void Graphics::Restore()
     
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
+}
+
+void Graphics::Maximize()
+{
+    if (!impl_->window_)
+        return;
+
+    SDL_MaximizeWindow(impl_->window_);
+}
+
+void Graphics::Minimize()
+{
+    if (!impl_->window_)
+        return;
+
+    SDL_MinimizeWindow(impl_->window_);
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)
@@ -2292,7 +2463,7 @@ unsigned Graphics::GetDepthStencilFormat()
     #ifndef GL_ES_VERSION_2_0
     return GL_DEPTH24_STENCIL8_EXT;
     #else
-    return GL_DEPTH_COMPONENT;
+    return glesDepthStencilFormat;
     #endif
 }
 
@@ -2334,6 +2505,19 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
+void Graphics::CreateWindowIcon()
+{
+    if (windowIcon_)
+    {
+        SDL_Surface* surface = windowIcon_->GetSDLSurface();
+        if (surface)
+        {
+            SDL_SetWindowIcon(impl_->window_, surface);
+            SDL_FreeSurface(surface);
+        }
+    }
+}
+
 void Graphics::CheckFeatureSupport(String& extensions)
 {
     // Check supported features: light pre-pass, deferred rendering and hardware depth texture
@@ -2351,6 +2535,11 @@ void Graphics::CheckFeatureSupport(String& extensions)
     if (numSupportedRTs >= 4)
         deferredSupport_ = true;
     #else
+    // Check for best supported depth renderbuffer format for GLES2
+    if (CheckExtension(extensions, "GL_OES_depth24"))
+        glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
+    if (CheckExtension(extensions, "GL_OES_packed_depth_stencil"))
+        glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
     if (!CheckExtension(extensions, "GL_OES_depth_texture"))
     {
         shadowMapFormat_ = 0;
@@ -2358,6 +2547,11 @@ void Graphics::CheckFeatureSupport(String& extensions)
     }
     else
     {
+        #ifdef IOS
+        // iOS hack: depth renderbuffer seems to fail, so use depth textures for everything
+        // if supported
+        glesDepthStencilFormat = GL_DEPTH_COMPONENT;
+        #endif
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
     }
@@ -2461,7 +2655,7 @@ void Graphics::CommitFramebuffer()
             glDrawBuffer(GL_NONE);
         else
         {
-            int drawBufferIds[4];
+            int drawBufferIds[MAX_RENDERTARGETS];
             unsigned drawBufferCount = 0;
             
             for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -2512,9 +2706,9 @@ void Graphics::CommitFramebuffer()
         // Bind either a renderbuffer or a depth texture, depending on what is available
         Texture* texture = depthStencil_->GetParentTexture();
         #ifndef GL_ES_VERSION_2_0
-        bool hasStencil = texture->GetFormat() == GetDepthStencilFormat();
+        bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_EXT;
         #else
-        bool hasStencil = false;
+        bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_OES;
         #endif
         unsigned renderBufferID = depthStencil_->GetRenderBuffer();
         if (!renderBufferID)
@@ -2526,7 +2720,7 @@ void Graphics::CommitFramebuffer()
                 texture->UpdateParameters();
                 SetTexture(0, 0);
             }
-            
+
             if (i->second_.depthAttachment_ != depthStencil_)
             {
                 glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
@@ -2590,15 +2784,15 @@ bool Graphics::CheckFramebuffer()
     return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
 }
 
-void Graphics::CleanupFramebuffers(bool contextLost)
+void Graphics::CleanupFramebuffers(bool force)
 {
-    if (!contextLost)
+    if (!IsDeviceLost())
     {
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
             i != impl_->frameBuffers_.End();)
         {
-            if (i->second_.fbo_ != impl_->boundFbo_ && i->second_.useTimer_.GetMSec(false) >
-                MAX_FRAMEBUFFER_AGE)
+            if (i->second_.fbo_ != impl_->boundFbo_ && (force || i->second_.useTimer_.GetMSec(false) >
+                MAX_FRAMEBUFFER_AGE))
             {
                 glDeleteFramebuffersEXT(1, &i->second_.fbo_);
                 i = impl_->frameBuffers_.Erase(i);
@@ -2632,7 +2826,6 @@ void Graphics::ResetCachedState()
         renderTargets_[i] = 0;
     
     depthStencil_ = 0;
-    viewTexture_ = 0;
     viewport_ = IntRect(0, 0, 0, 0);
     indexBuffer_ = 0;
     vertexShader_ = 0;
@@ -2658,6 +2851,7 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     lastInstanceOffset_ = 0;
+    useClipPlane_ = false;
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
     impl_->boundFbo_ = impl_->systemFbo_;
@@ -2692,6 +2886,7 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
     textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
+    textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
 }
 
 void RegisterGraphicsLibrary(Context* context)
@@ -2702,6 +2897,7 @@ void RegisterGraphicsLibrary(Context* context)
     Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
+    Texture3D::RegisterObject(context);
     TextureCube::RegisterObject(context);
     Camera::RegisterObject(context);
     Drawable::RegisterObject(context);

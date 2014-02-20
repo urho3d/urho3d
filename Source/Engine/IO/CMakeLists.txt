@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,11 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME IO)
-
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-
 if (APPLE AND NOT IOS)
-    file (GLOB C_FILES *.m)
-endif()
-
-set (SOURCE_FILES ${CPP_FILES} ${C_FILES} ${H_FILES})
+    set (GLOB_OBJC_PATTERN *.m)
+endif ()
+define_source_files (GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} PARENT_SCOPE)
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../Math)
-
-# Setup target
-enable_pch ()
-setup_library ()
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/LZ4 PARENT_SCOPE)

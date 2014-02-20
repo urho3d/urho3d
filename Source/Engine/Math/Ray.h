@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,10 +43,9 @@ public:
     }
     
     /// Construct from origin and direction. The direction will be normalized.
-    Ray(const Vector3& origin, const Vector3& direction) :
-        origin_(origin),
-        direction_(direction.Normalized())
+    Ray(const Vector3& origin, const Vector3& direction)
     {
+        Define(origin, direction);
     }
     
     /// Copy-construct from another ray.
@@ -77,9 +76,19 @@ public:
     }
     
     /// Project a point on the ray.
-    Vector3 Project(const Vector3& point) const;
-    /// Return distance of a point from the ray
-    float Distance(const Vector3& point) const;
+    Vector3 Project(const Vector3& point) const
+    {
+        Vector3 offset = point - origin_;
+        return origin_ + offset.DotProduct(direction_) * direction_;
+    }
+
+    /// Return distance of a point from the ray.
+    float Distance(const Vector3& point) const
+    {
+        Vector3 projected = Project(point);
+        return (point - projected).Length();
+    }
+
     /// Return closest point to another ray.
     Vector3 ClosestPoint(const Ray& ray) const;
     /// Return hit distance to a plane, or infinity if no hit.
@@ -92,10 +101,12 @@ public:
     float HitDistance(const Sphere& sphere) const;
     /// Return hit distance to a triangle, or infinity if no hit.
     float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    /// Return hit distance to non-indexed geometry data, or infinity if no hit.
-    float HitDistance(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
+    /// Return hit distance to a triangle and out normal, or infinity if no hit.
+    float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal) const;
+    /// Return hit distance to non-indexed geometry data, or infinity if no hit. Optionally return normal.
+    float HitDistance(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = 0) const;
     /// Return hit distance to indexed geometry data, or infinity if no hit.
-    float HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
+    float HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = 0) const;
     /// Return whether ray is inside non-indexed geometry.
     bool InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
     /// Return whether ray is inside indexed geometry.

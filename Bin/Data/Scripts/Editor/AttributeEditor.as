@@ -24,6 +24,9 @@ Color nonEditableTextColor(0.7f, 0.7f, 0.7f);
 String sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 bool rememberResourcePath = true;
 
+// Exceptions for string attributes that should not be continuously edited
+Array<String> noTextChangedAttrs = {"Class Name", "Script Object Type"};
+
 WeakHandle testAnimState;
 
 UIElement@ SetEditable(UIElement@ element, bool editable)
@@ -31,7 +34,7 @@ UIElement@ SetEditable(UIElement@ element, bool editable)
     if (element is null)
         return element;
 
-    element.enabled = editable;
+    element.editable = editable;
     element.colors[C_TOPLEFT] = editable ? element.colors[C_BOTTOMRIGHT] : nonEditableTextColor;
     element.colors[C_BOTTOMLEFT] = element.colors[C_TOPLEFT];
     element.colors[C_TOPRIGHT] = element.colors[C_TOPLEFT];
@@ -131,7 +134,9 @@ UIElement@ CreateStringAttributeEditor(ListView@ list, Array<Serializable@>@ ser
     UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
     LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
     attrEdit.dragDropMode = DD_TARGET;
-    SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
+    // Do not subscribe to continuous edits of certain attributes (script class names) to prevent unnecessary errors getting printed
+    if (noTextChangedAttrs.Find(info.name) == -1)
+        SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
     SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
 
     return parent;
@@ -349,11 +354,14 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
             mapInfo.name = varName + " (Var)";
             mapInfo.type = value.type;
             parent = CreateAttributeEditor(list, serializables, mapInfo, index, i);
-            // Add the variant key to the parent
-            parent.vars["Key"] = keys[i].value;
-            // If variable name is not registered (i.e. it is an editor internal variable) then hide it
-            if (varName.empty)
-                parent.visible = false;
+            // Add the variant key to the parent. We may fail to add the editor in case it is unsupported
+            if (parent !is null)
+            {
+                parent.vars["Key"] = keys[i].value;
+                // If variable name is not registered (i.e. it is an editor internal variable) then hide it
+                if (varName.empty)
+                    parent.visible = false;
+            }
         }
     }
 
@@ -465,7 +473,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
     }
     else if (type == VAR_RESOURCEREF)
     {
-        SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(value.GetResourceRef().id), sameValue), editable && sameValue);
+        SetEditable(SetValue(parent.children[1].children[0], value.GetResourceRef().name, sameValue), editable && sameValue);
         SetEditable(parent.children[1].children[1], editable && sameValue);  // If editable then can pick
         for (uint i = 2; i < parent.children[1].numChildren; ++i)
             SetEditable(parent.children[1].children[i], sameValue); // If same value then can open/edit/test
@@ -480,22 +488,22 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             if (parent is null)
                 break;
 
-            StringHash firstID = refList.ids[subIndex];
-            bool idSameValue = true;
+            String firstName = refList.names[subIndex];
+            bool nameSameValue = true;
             if (!sameValue)
             {
-                // Reevaluate each ID in the list
+                // Reevaluate each name in the list
                 for (uint i = 0; i < values.length; ++i)
                 {
                     ResourceRefList refList = values[i].GetResourceRefList();
-                    if (subIndex >= refList.length || refList.ids[subIndex] != firstID)
+                    if (subIndex >= refList.length || refList.names[subIndex] != firstName)
                     {
-                        idSameValue = false;
+                        nameSameValue = false;
                         break;
                     }
                 }
             }
-            SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(firstID), idSameValue), editable && idSameValue);
+            SetEditable(SetValue(parent.children[1].children[0], firstName, nameSameValue), editable && nameSameValue);
         }
     }
     else if (type == VAR_VARIANTVECTOR)
@@ -619,7 +627,7 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
             Variant[] values(1);
             GetEditorValue(parent, VAR_RESOURCEREF, null, coordinate, values);
             ResourceRef ref = values[0].GetResourceRef();
-            refList.ids[subIndex] = ref.id;
+            refList.names[subIndex] = ref.name;
             serializables[i].attributes[index] = Variant(refList);
         }
     }
@@ -710,7 +718,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     {
         LineEdit@ attrEdit = parent.children[0];
         ResourceRef ref;
-        ref.id = StringHash(attrEdit.text.Trimmed());
+        ref.name = attrEdit.text.Trimmed();
         ref.type = ShortStringHash(attrEdit.vars[TYPE_VAR].GetUInt());
         FillValue(values, Variant(ref));
     }
@@ -780,7 +788,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     if (inLoadAttributeEditor)
         return;
 
-    UIElement@ attrEdit = eventData["Element"].GetUIElement();
+    UIElement@ attrEdit = eventData["Element"].GetPtr();
     UIElement@ parent = attrEdit.parent;
     Array<Serializable@>@ serializables = GetAttributeEditorTargets(attrEdit);
     if (serializables.empty)
@@ -893,7 +901,7 @@ ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
 
 void PickResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     Array<Serializable@>@ targets = GetAttributeEditorTargets(attrEdit);
@@ -965,7 +973,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         {
             ResourceRef ref = target.attributes[resourcePickIndex].GetResourceRef();
             ref.type = res.type;
-            ref.id = StringHash(res.name);
+            ref.name = res.name;
             target.attributes[resourcePickIndex] = Variant(ref);
             target.ApplyAttributes();
         }
@@ -974,7 +982,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             ResourceRefList refList = target.attributes[resourcePickIndex].GetResourceRefList();
             if (resourcePickSubIndex < refList.length)
             {
-                refList.ids[resourcePickSubIndex] = StringHash(res.name);
+                refList.names[resourcePickSubIndex] = res.name;
                 target.attributes[resourcePickIndex] = Variant(refList);
                 target.ApplyAttributes();
             }
@@ -984,7 +992,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             Array<Variant>@ attrs = target.attributes[resourcePickIndex].GetVariantVector();
             ResourceRef ref = attrs[resourcePickSubIndex].GetResourceRef();
             ref.type = res.type;
-            ref.id = StringHash(res.name);
+            ref.name = res.name;
             attrs[resourcePickSubIndex] = ref;
             target.attributes[resourcePickIndex] = Variant(attrs);
             target.ApplyAttributes();
@@ -1035,7 +1043,7 @@ String GetResourceNameFromFullName(const String&in resourceName)
 
 void OpenResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     String fileName = attrEdit.text.Trimmed();
@@ -1056,7 +1064,7 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
 
 void EditResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     String fileName = attrEdit.text.Trimmed();
@@ -1076,7 +1084,7 @@ void EditResource(StringHash eventType, VariantMap& eventData)
 
 void TestResource(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ button = eventData["Element"].GetUIElement();
+    UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
     ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
@@ -1203,6 +1211,12 @@ void InitVectorStructs()
         "   NodeID"
     };
     vectorStructs.Push(VectorStruct("StaticModelGroup", "Instance Nodes", staticModelGroupInstanceVariables, 1));
+    
+    Array<String> splineControlPointVariables = {
+        "Control Point Count",
+        "   Point"
+    };
+    vectorStructs.Push(VectorStruct("Spline", "Control Points", splineControlPointVariables, 1));
 }
 
 VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)

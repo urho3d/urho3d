@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,16 +85,11 @@ FileSelector::FileSelector(Context* context) :
 
     window_->AddChild(fileNameLayout_);
 
+    separatorLayout_ = new UIElement(context_);
+    window_->AddChild(separatorLayout_);
+
     buttonLayout_ = new UIElement(context_);
     buttonLayout_->SetLayout(LM_HORIZONTAL);
-
-    buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
-
-    okButton_ = new Button(context_);
-    okButtonText_ = new Text(context_);
-    okButtonText_->SetAlignment(HA_CENTER, VA_CENTER);
-    okButton_->AddChild(okButtonText_);
-    buttonLayout_->AddChild(okButton_);
 
     buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
 
@@ -104,7 +99,11 @@ FileSelector::FileSelector(Context* context) :
     cancelButton_->AddChild(cancelButtonText_);
     buttonLayout_->AddChild(cancelButton_);
 
-    buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
+    okButton_ = new Button(context_);
+    okButtonText_ = new Text(context_);
+    okButtonText_->SetAlignment(HA_CENTER, VA_CENTER);
+    okButton_->AddChild(okButtonText_);
+    buttonLayout_->AddChild(okButton_);
 
     window_->AddChild(buttonLayout_);
 
@@ -112,17 +111,13 @@ FileSelector::FileSelector(Context* context) :
     defaultFilters.Push("*.*");
     SetFilters(defaultFilters, 0);
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem)
-        SetPath(fileSystem->GetCurrentDir());
+    SetPath(fileSystem->GetCurrentDir());
 
     // Focus the fileselector's filelist initially when created, and bring to front
     UI* ui = GetSubsystem<UI>();
-    if (ui)
-    {
-        ui->GetRoot()->AddChild(window_);
-        ui->SetFocusElement(fileList_);
-        window_->SetModal(true);
-    }
+    ui->GetRoot()->AddChild(window_);
+    ui->SetFocusElement(fileList_);
+    window_->SetModal(true);
 
     SubscribeToEvent(filterList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFilterChanged));
     SubscribeToEvent(pathEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandlePathChanged));
@@ -160,9 +155,10 @@ void FileSelector::SetDefaultStyle(XMLFile* style)
     okButtonText_->SetStyle("FileSelectorButtonText");
     cancelButtonText_->SetStyle("FileSelectorButtonText");
 
-    titleLayout->SetStyle("FileSelectorTitleLayout");
+    titleLayout->SetStyle("FileSelectorLayout");
     fileNameLayout_->SetStyle("FileSelectorLayout");
     buttonLayout_->SetStyle("FileSelectorLayout");
+    separatorLayout_->SetStyle("EditorSeparator");
 
     fileList_->SetStyle("FileSelectorListView");
     fileNameEdit_->SetStyle("FileSelectorLineEdit");
@@ -198,9 +194,6 @@ void FileSelector::SetButtonTexts(const String& okText, const String& cancelText
 void FileSelector::SetPath(const String& path)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (!fileSystem)
-        return;
-
     if (fileSystem->DirExists(path))
     {
         path_ = AddTrailingSlash(path);
@@ -253,19 +246,6 @@ void FileSelector::SetDirectoryMode(bool enable)
 
 void FileSelector::UpdateElements()
 {
-    {
-        const IntRect& clipBorder = pathEdit_->GetClipBorder();
-        pathEdit_->SetFixedHeight(pathEdit_->GetTextElement()->GetRowHeight() + clipBorder.top_ + clipBorder.bottom_);
-    }
-
-    {
-        const IntRect& clipBorder = fileNameEdit_->GetClipBorder();
-        int fileNameHeight = fileNameEdit_->GetTextElement()->GetRowHeight() + clipBorder.top_ + clipBorder.bottom_;
-        fileNameEdit_->SetFixedHeight(fileNameHeight);
-        filterList_->SetFixedHeight(fileNameHeight);
-        fileNameLayout_->SetFixedHeight(fileNameHeight);
-    }
-
     buttonLayout_->SetFixedHeight(Max(okButton_->GetHeight(), cancelButton_->GetHeight()));
 }
 
@@ -308,8 +288,6 @@ void FileSelector::SetLineEditText(LineEdit* edit, const String& text)
 void FileSelector::RefreshFiles()
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (!fileSystem)
-        return;
 
     ignoreEvents_ = true;
 
@@ -394,8 +372,9 @@ bool FileSelector::EnterFile()
         {
             using namespace FileSelected;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_FILENAME] = path_ + fileEntries_[index].name_;
+            eventData[P_FILTER] = GetFilter();
             eventData[P_OK] = true;
             SendEvent(E_FILESELECTED, eventData);
         }
@@ -440,7 +419,8 @@ void FileSelector::HandleFileDoubleClicked(StringHash eventType, VariantMap& eve
     if (ignoreEvents_)
         return;
 
-    EnterFile();
+    if (eventData[ItemDoubleClicked::P_BUTTON] == MOUSEB_LEFT)
+        EnterFile();
 }
 
 void FileSelector::HandleFileListKey(StringHash eventType, VariantMap& eventData)
@@ -473,8 +453,9 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
         {
             using namespace FileSelected;
 
-            VariantMap newEventData;
+            VariantMap& newEventData = GetEventDataMap();
             newEventData[P_FILENAME] = path_ + GetFileName();
+            newEventData[P_FILTER] = GetFilter();
             newEventData[P_OK] = true;
             SendEvent(E_FILESELECTED, newEventData);
         }
@@ -483,8 +464,9 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
     {
         using namespace FileSelected;
 
-        VariantMap newEventData;
+        VariantMap& newEventData = GetEventDataMap();
         newEventData[P_FILENAME] = path_;
+        newEventData[P_FILTER] = GetFilter();
         newEventData[P_OK] = true;
         SendEvent(E_FILESELECTED, newEventData);
     }
@@ -500,8 +482,9 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
 
     using namespace FileSelected;
 
-    VariantMap newEventData;
+    VariantMap& newEventData = GetEventDataMap();
     newEventData[P_FILENAME] = String::EMPTY;
+    newEventData[P_FILTER] = GetFilter();
     newEventData[P_OK] = false;
     SendEvent(E_FILESELECTED, newEventData);
 }

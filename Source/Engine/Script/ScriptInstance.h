@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,22 +49,8 @@ enum ScriptInstanceMethod
     METHOD_READNETWORKUPDATE,
     METHOD_WRITENETWORKUPDATE,
     METHOD_APPLYATTRIBUTES,
+    METHOD_TRANSFORMCHANGED,
     MAX_SCRIPT_METHODS
-};
-
-/// Delay-executed method call.
-struct DelayedMethodCall
-{
-   /// Period for repeating calls.
-    float period_;
-    /// Delay time remaining until execution.
-    float delay_;
-    /// Repeat flag.
-    bool repeat_;
-    /// Method declaration.
-    String declaration_;
-    /// Parameters.
-    VariantVector parameters_;
 };
 
 /// %Script object component.
@@ -90,11 +76,22 @@ public:
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    /// Add an event handler. Called by script exposed version of SubscribeToEvent().
+
+    /// Add a scripted event handler.
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
-    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
+    /// Add a scripted event handler for a specific sender.
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
-    
+    /// Remove a scripted event handler.
+    virtual void RemoveEventHandler(StringHash eventType);
+    /// Remove a scripted event handler for a specific sender.
+    virtual void RemoveEventHandler(Object* sender, StringHash eventType);
+    /// Remove all scripted event handlers for a specific sender.
+    virtual void RemoveEventHandlers(Object* sender);
+    /// Remove all scripted event handlers.
+    virtual void RemoveEventHandlers();
+    /// Remove all scripted event handlers, except those listed.
+    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
+
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
     /// Set script file only. Recreate object if necessary.
@@ -124,7 +121,7 @@ public:
     /// Set script file attribute.
     void SetScriptFileAttr(ResourceRef value);
     /// Set delayed method calls attribute.
-    void SetDelayedMethodCallsAttr(PODVector<unsigned char> value);
+    void SetDelayedCallsAttr(PODVector<unsigned char> value);
     /// Set fixed update time accumulator attribute.
     void SetFixedUpdateAccAttr(float value);
     /// Set script file serialization attribute by calling a script function.
@@ -134,13 +131,17 @@ public:
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
-    PODVector<unsigned char> GetDelayedMethodCallsAttr() const;
+    PODVector<unsigned char> GetDelayedCallsAttr() const;
     /// Return fixed update time accumulator attribute.
     float GetFixedUpdateAccAttr() const;
     /// Get script file serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    
+protected:
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     
 private:
     /// (Re)create the script object and check for supported methods if successfully created.
@@ -191,7 +192,7 @@ private:
     /// Fixed post update time accumulator.
     float fixedPostUpdateAcc_;
     /// Delayed method calls.
-    Vector<DelayedMethodCall> delayedMethodCalls_;
+    Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
     /// Storage for unapplied node and component ID attributes

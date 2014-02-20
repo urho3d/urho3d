@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -155,7 +155,7 @@ enum DeferredLightPSVariation
 /// High-level rendering subsystem. Manages drawing of 3D views.
 class URHO3D_API Renderer : public Object
 {
-    OBJECT(Object);
+    OBJECT(Renderer);
     
 public:
     /// Construct.
@@ -171,6 +171,8 @@ public:
     void SetDefaultRenderPath(RenderPath* renderPath);
     /// Set default renderpath from an XML file.
     void SetDefaultRenderPath(XMLFile* file);
+    /// Set HDR rendering on/off.
+    void SetHDRRendering(bool enable);
     /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
     /// Set texture anisotropy.
@@ -216,6 +218,8 @@ public:
     Viewport* GetViewport(unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
+    /// Return whether HDR rendering is enabled.
+    bool GetHDRRendering() const { return hdrRendering_; }
     /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
@@ -282,16 +286,8 @@ public:
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
-    /// Return a vertex shader by name.
-    ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
-    /// Return a pixel shader by name.
-    ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
-    /// Return the stencil vertex shader.
-    ShaderVariation* GetStencilVS() const { return stencilVS_; }
-    /// Return the stencil pixel shader.
-    ShaderVariation* GetStencilPS() const { return stencilPS_; }
     /// Return the frame update parameters.
-    const FrameInfo& GetFrameInfo() { return frame_; }
+    const FrameInfo& GetFrameInfo() const { return frame_; }
     
     /// Update for rendering. Called by HandleRenderUpdate().
     void Update(float timeStep);
@@ -304,26 +300,22 @@ public:
     /// Queue a viewport for rendering. Null surface means backbuffer.
     void QueueViewport(RenderSurface* renderTarget, Viewport* viewport);
     
-    /// Populate light volume shaders.
-    void GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
-    Texture2D* GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb);
+    Texture2D* GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb, unsigned persistentKey = 0);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height);
     /// Allocate an occlusion buffer.
     OcclusionBuffer* GetOcclusionBuffer(Camera* camera);
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
     Camera* GetShadowCamera();
-    /// Get a shader program.
-    ShaderVariation* GetShader(ShaderType type, const String& name, bool checkExists) const;
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
-    /// Choose shaders for a light volume batch.
-    void SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS);
+    /// Choose shaders for a deferred light volume batch.
+    void SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName);
     /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
@@ -403,10 +395,6 @@ private:
     SharedPtr<TextureCube> faceSelectCubeMap_;
     /// Indirection cube map for shadowed pointlights.
     SharedPtr<TextureCube> indirectionCubeMap_;
-    /// Stencil rendering vertex shader.
-    SharedPtr<ShaderVariation> stencilVS_;
-    /// Stencil rendering pixel shader.
-    SharedPtr<ShaderVariation> stencilPS_;
     /// Reusable scene nodes with shadow camera components.
     Vector<SharedPtr<Node> > shadowCameraNodes_;
     /// Reusable occlusion buffers.
@@ -437,8 +425,8 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
-    /// Base directory for shaders.
-    String shaderPath_;
+    /// Current variation names for deferred light volume shaders.
+    Vector<String> deferredLightPSVariations_;
     /// Frame info for rendering.
     FrameInfo frame_;
     /// Texture anisotropy level.
@@ -483,6 +471,8 @@ private:
     unsigned shadersChangedFrameNumber_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
+    /// HDR rendering flag.
+    bool hdrRendering_;
     /// Specular lighting flag.
     bool specularLighting_;
     /// Draw shadows flag.

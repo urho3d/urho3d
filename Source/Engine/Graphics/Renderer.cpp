@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@
 #include "RenderPath.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "Shader.h"
 #include "ShaderVariation.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -173,85 +172,90 @@ static const unsigned short spotLightIndexData[] =
 
 static const char* shadowVariations[] =
 {
-    // No specific hardware shadow compare variation on OpenGL, it is always supported
     #ifdef USE_OPENGL
-    "LQ",
-    "LQ",
+    // No specific hardware shadow compare variation on OpenGL, it is always supported
+    "LQSHADOW ",
+    "LQSHADOW ",
     "",
     ""
     #else
-    "",
-    "LQHW",
-    "",
-    "HW"
+    // On Direct3D the quality is always "low" if not using hardware shadow compare
+    "SHADOWCMP",
+    "LQSHADOW",
+    "SHADOWCMP",
+    ""
     #endif
 };
 
 static const char* geometryVSVariations[] =
 {
     "",
-    "Skinned",
-    "Instanced",
-    "Billboard"
+    "SKINNED ",
+    "INSTANCED ",
+    "BILLBOARD "
 };
 
 static const char* lightVSVariations[] =
 {
-    "Dir",
-    "Spot",
-    "Point",
-    "DirSpec",
-    "SpotSpec",
-    "PointSpec",
-    "DirShadow",
-    "SpotShadow",
-    "PointShadow",
-    "DirSpecShadow",
-    "SpotSpecShadow",
-    "PointSpecShadow"
+    "PERPIXEL DIRLIGHT ",
+    "PERPIXEL SPOTLIGHT ",
+    "PERPIXEL POINTLIGHT ",
+    "PERPIXEL DIRLIGHT SPECULAR ",
+    "PERPIXEL SPOTLIGHT SPECULAR ",
+    "PERPIXEL POINTLIGHT SPECULAR ",
+    "PERPIXEL DIRLIGHT SHADOW ",
+    "PERPIXEL SPOTLIGHT SHADOW ",
+    "PERPIXEL POINTLIGHT SHADOW ",
+    "PERPIXEL DIRLIGHT SPECULAR SHADOW ",
+    "PERPIXEL SPOTLIGHT SPECULAR SHADOW ",
+    "PERPIXEL POINTLIGHT SPECULAR SHADOW "
 };
 
 static const char* vertexLightVSVariations[] =
 {
     "",
-    "1VL",
-    "2VL",
-    "3VL",
-    "4VL",
-    "5VL",
-    "6VL"
+    "NUMVERTEXLIGHTS=1 ",
+    "NUMVERTEXLIGHTS=2 ",
+    "NUMVERTEXLIGHTS=3 ",
+    "NUMVERTEXLIGHTS=4 ",
 };
 
 static const char* deferredLightVSVariations[] =
 {
     "",
-    "Dir",
-    "Ortho",
-    "OrthoDir"
+    "DIRLIGHT ",
+    "ORTHO ",
+    "DIRLIGHT ORTHO "
 };
 
 static const char* lightPSVariations[] = 
 {
-    "Dir",
-    "Spot",
-    "Point",
-    "PointMask",
-    "DirSpec",
-    "SpotSpec",
-    "PointSpec",
-    "PointMaskSpec",
-    "DirShadow",
-    "SpotShadow",
-    "PointShadow",
-    "PointMaskShadow",
-    "DirSpecShadow",
-    "SpotSpecShadow",
-    "PointSpecShadow",
-    "PointMaskSpecShadow"
+    "PERPIXEL DIRLIGHT ",
+    "PERPIXEL SPOTLIGHT ",
+    "PERPIXEL POINTLIGHT ",
+    "PERPIXEL POINTLIGHT CUBEMASK ",
+    "PERPIXEL DIRLIGHT SPECULAR ",
+    "PERPIXEL SPOTLIGHT SPECULAR ",
+    "PERPIXEL POINTLIGHT SPECULAR ",
+    "PERPIXEL POINTLIGHT CUBEMASK SPECULAR ",
+    "PERPIXEL DIRLIGHT SHADOW ",
+    "PERPIXEL SPOTLIGHT SHADOW ",
+    "PERPIXEL POINTLIGHT SHADOW ",
+    "PERPIXEL POINTLIGHT CUBEMASK SHADOW ",
+    "PERPIXEL DIRLIGHT SPECULAR SHADOW ",
+    "PERPIXEL SPOTLIGHT SPECULAR SHADOW ",
+    "PERPIXEL POINTLIGHT SPECULAR SHADOW ",
+    "PERPIXEL POINTLIGHT CUBEMASK SPECULAR SHADOW "
+};
+
+static const char* heightFogVariations[] =
+{
+    "",
+    "HEIGHTFOG "
 };
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
-static const unsigned MAX_BUFFER_AGE = 2000;
+static const unsigned MAX_BUFFER_AGE = 1000;
 
 Renderer::Renderer(Context* context) :
     Object(context),
@@ -275,6 +279,7 @@ Renderer::Renderer(Context* context) :
     numOcclusionBuffers_(0),
     numShadowCameras_(0),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
+    hdrRendering_(false),
     specularLighting_(true),
     drawShadows_(true),
     reuseShadowMaps_(true),
@@ -282,12 +287,6 @@ Renderer::Renderer(Context* context) :
     shadersDirty_(true),
     initialized_(false)
 {
-    #ifndef USE_OPENGL
-    shaderPath_ = "Shaders/HLSL/";
-    #else
-    shaderPath_ = "Shaders/GLSL/";
-    #endif
-
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
     
@@ -327,6 +326,11 @@ void Renderer::SetDefaultRenderPath(XMLFile* xmlFile)
         defaultRenderPath_ = newRenderPath;
 }
 
+void Renderer::SetHDRRendering(bool enable)
+{
+    hdrRendering_ = enable;
+}
+
 void Renderer::SetSpecularLighting(bool enable)
 {
     specularLighting_ = enable;
@@ -355,9 +359,14 @@ void Renderer::SetTextureQuality(int quality)
 
 void Renderer::SetMaterialQuality(int quality)
 {
-    materialQuality_ = Clamp(quality, QUALITY_LOW, QUALITY_MAX);
-    shadersDirty_ = true;
-    ResetViews();
+    quality = Clamp(quality, QUALITY_LOW, QUALITY_MAX);
+    
+    if (quality != materialQuality_)
+    {
+        materialQuality_ = quality;
+        shadersDirty_ = true;
+        ResetViews();
+    }
 }
 
 void Renderer::SetDrawShadows(bool enable)
@@ -490,16 +499,6 @@ RenderPath* Renderer::GetDefaultRenderPath() const
     return defaultRenderPath_;
 }
 
-ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const
-{
-    return GetShader(VS, name, checkExists);
-}
-
-ShaderVariation* Renderer::GetPixelShader(const String& name, bool checkExists) const
-{
-    return GetShader(PS, name, checkExists);
-}
-
 unsigned Renderer::GetNumGeometries(bool allViews) const
 {
     unsigned numGeometries = 0;
@@ -630,11 +629,11 @@ void Renderer::Update(float timeStep)
         // Update view. This may queue further views
         using namespace BeginViewUpdate;
         
-        VariantMap eventData;
-        eventData[P_SURFACE] = (void*)renderTarget.Get();
-        eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
-        eventData[P_SCENE] = (void*)scene;
-        eventData[P_CAMERA] = (void*)viewport->GetCamera();
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SURFACE] = renderTarget.Get();
+        eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+        eventData[P_SCENE] = scene;
+        eventData[P_CAMERA] = viewport->GetCamera();
         SendEvent(E_BEGINVIEWUPDATE, eventData);
         
         ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
@@ -692,11 +691,11 @@ void Renderer::Render()
             
             RenderSurface* renderTarget = views_[i]->GetRenderTarget();
             
-            VariantMap eventData;
-            eventData[P_SURFACE] = (void*)renderTarget;
-            eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
-            eventData[P_SCENE] = (void*)views_[i]->GetScene();
-            eventData[P_CAMERA] = (void*)views_[i]->GetCamera();
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_SURFACE] = renderTarget;
+            eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+            eventData[P_SCENE] = views_[i]->GetScene();
+            eventData[P_CAMERA] = views_[i]->GetCamera();
             SendEvent(E_BEGINVIEWRENDER, eventData);
             
             // Screen buffers can be reused between views, as each is rendered completely
@@ -775,32 +774,6 @@ void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
     {
         queuedViews_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
             WeakPtr<Viewport>(viewport)));
-    }
-}
-
-void Renderer::GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName)
-{
-    lightVS.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
-    lightPS.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-    
-    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-    
-    for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-        lightVS[i] = GetVertexShader(vsName + "_" + deferredLightVSVariations[i]);
-    
-    for (unsigned i = 0; i < lightPS.Size(); ++i)
-    {
-        String ortho;
-        if (i >= DLPS_ORTHO)
-            ortho = "Ortho";
-        
-        if (i & DLPS_SHADOW)
-        {
-            lightPS[i] = GetPixelShader(psName + "_" + ortho + lightPSVariations[i % DLPS_ORTHO] +
-                shadowVariations[shadows]);
-        }
-        else
-            lightPS[i] = GetPixelShader(psName + "_" + ortho + lightPSVariations[i % DLPS_ORTHO]);
     }
 }
 
@@ -959,7 +932,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb)
+Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb, unsigned persistentKey)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat());
     if (depthStencil)
@@ -973,6 +946,10 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
         searchKey |= 0x8000000000000000LL;
     if (srgb)
         searchKey |= 0x4000000000000000LL;
+    
+    // Add persistent key if defined
+    if (persistentKey)
+        searchKey += ((long long)persistentKey << 32);
     
     // If new size or format, initialize the allocation stats
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
@@ -991,6 +968,20 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
         newBuffer->SetFilterMode(filtered ? FILTER_BILINEAR : FILTER_NEAREST);
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
+        #ifdef USE_OPENGL
+        // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
+        // Otherwise eg. the AutoExposure post process will not work correctly
+        if (persistentKey && Texture::GetDataType(format) == GL_FLOAT)
+        {
+            // Note: this loses current rendertarget assignment
+            graphics_->ResetRenderTargets();
+            graphics_->SetRenderTarget(0, newBuffer);
+            graphics_->SetDepthStencil((RenderSurface*)0);
+            graphics_->SetViewport(IntRect(0, 0, width, height));
+            graphics_->Clear(CLEAR_COLOR);
+        }
+        #endif
+        
         LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }
@@ -1051,37 +1042,6 @@ Camera* Renderer::GetShadowCamera()
     return camera;
 }
 
-ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, bool checkExists) const
-{
-    if (name.Trimmed().Empty())
-        return 0;
-    
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String shaderName = shaderPath_;
-    String variationName;
-    
-    unsigned split = name.Find('_');
-    if (split != String::NPOS)
-    {
-        shaderName += name.Substring(0, split) + ".xml";
-        variationName = name.Substring(split + 1);
-    }
-    else
-        shaderName += name + ".xml";
-    
-    if (checkExists)
-    {
-        if (!cache->Exists(shaderName))
-            return 0;
-    }
-    
-    Shader* shader = cache->GetResource<Shader>(shaderName);
-    if (shader)
-        return shader->GetVariation(type, variationName);
-    else
-        return 0;
-}
-
 void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
 {
     // Check if shaders are unloaded or need reloading
@@ -1099,6 +1059,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     // Make sure shaders are loaded now
     if (vertexShaders.Size() && pixelShaders.Size())
     {
+        bool heightFog = graphics_->GetSM3Support() && batch.zone_ && batch.zone_->GetHeightFog();
+        
         // If instancing is not supported, but was requested, or the object is too large to be instanced,
         // choose static geometry vertex shader instead
         if (batch.geometryType_ == GEOM_INSTANCED && (!GetDynamicInstancing() || batch.geometry_->GetIndexCount() >
@@ -1157,24 +1119,14 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
                 break;
             }
             
+            if (heightFog)
+            {
+                vsi += MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS;
+                psi += MAX_LIGHT_PS_VARIATIONS;
+            }
+            
             batch.vertexShader_ = vertexShaders[vsi];
             batch.pixelShader_ = pixelShaders[psi];
-            
-            // If shadow or specular variations do not exist, try without them
-            if ((!batch.vertexShader_ || !batch.pixelShader_) && ((vsi % MAX_LIGHT_VS_VARIATIONS) >= LVS_SHADOW))
-            {
-                vsi -= LVS_SHADOW;
-                psi -= LPS_SHADOW;
-                batch.vertexShader_ = vertexShaders[vsi];
-                batch.pixelShader_ = pixelShaders[psi];
-            }
-            if ((!batch.vertexShader_ || !batch.pixelShader_) && ((vsi % MAX_LIGHT_VS_VARIATIONS) >= LVS_SPEC))
-            {
-                vsi -= LVS_SPEC;
-                psi -= LPS_SPEC;
-                batch.vertexShader_ = vertexShaders[vsi];
-                batch.pixelShader_ = pixelShaders[psi];
-            }
         }
         else
         {
@@ -1186,21 +1138,21 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
                     numVertexLights = batch.lightQueue_->vertexLights_.Size();
                 
                 unsigned vsi = batch.geometryType_ * MAX_VERTEXLIGHT_VS_VARIATIONS + numVertexLights;
+                if (heightFog)
+                    vsi += MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS;
+                
                 batch.vertexShader_ = vertexShaders[vsi];
-                // If vertex lights variations do not exist, try without them
-                if (!batch.vertexShader_)
-                {
-                    unsigned vsi = batch.geometryType_ * MAX_VERTEXLIGHT_VS_VARIATIONS;
-                    batch.vertexShader_ = vertexShaders[vsi];
-                }
             }
             else
             {
                 unsigned vsi = batch.geometryType_;
+                if (heightFog)
+                    vsi += MAX_GEOMETRYTYPES;
+                
                 batch.vertexShader_ = vertexShaders[vsi];
             }
             
-            batch.pixelShader_ = pixelShaders[0];
+            batch.pixelShader_ = pixelShaders[heightFog ? 1 : 0];
         }
     }
     
@@ -1215,8 +1167,10 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     }
 }
 
-void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS)
+void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName)
 {
+    assert(deferredLightPSVariations_.Size());
+    
     unsigned vsi = DLVS_NONE;
     unsigned psi = DLPS_NONE;
     Light* light = batch.lightQueue_->light_;
@@ -1226,7 +1180,7 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariatio
     case LIGHT_DIRECTIONAL:
         vsi += DLVS_DIR;
         break;
-            
+        
     case LIGHT_SPOT:
         psi += DLPS_SPOT;
         break;
@@ -1251,14 +1205,14 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariatio
         psi += DLPS_ORTHO;
     }
     
-    batch.vertexShader_ = lightVS[vsi];
-    batch.pixelShader_ = lightPS[psi];
+    batch.vertexShader_ = graphics_->GetShader(VS, vsName, deferredLightVSVariations[vsi]);
+    batch.pixelShader_ = graphics_->GetShader(PS, psName, deferredLightPSVariations_[psi]);
 }
 
 void Renderer::SetCullMode(CullMode mode, Camera* camera)
 {
-    // If a camera is specified, check for vertical flipping and reverse culling in that case
-    if (camera && camera->GetFlipVertical())
+    // If a camera is specified, check whether it reverses culling due to vertical flipping or reflection
+    if (camera && camera->GetReverseCulling())
     {
         if (mode == CULL_CW)
             mode = CULL_CCW;
@@ -1366,7 +1320,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
         graphics_->SetColorWrite(false);
         graphics_->SetDepthWrite(false);
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
-        graphics_->SetShaders(stencilVS_, stencilPS_);
+        graphics_->SetShaders(graphics_->GetShader(VS, "Stencil"), graphics_->GetShader(PS, "Stencil"));
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
         graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(camera));
         
@@ -1509,15 +1463,23 @@ void Renderer::ResetViews()
 
 void Renderer::LoadShaders()
 {
-    LOGINFO("Reloading shaders");
+    LOGDEBUG("Reloading shaders");
     
     // Release old material shaders, mark them for reload
     ReleaseMaterialShaders();
     shadersChangedFrameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
     
-    // Load inbuilt shaders
-    stencilVS_ = GetVertexShader("Stencil");
-    stencilPS_ = GetPixelShader("Stencil");
+    // Construct new names for deferred light volume pixel shaders based on rendering options
+    deferredLightPSVariations_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
+    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+    for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
+    {
+        deferredLightPSVariations_[i] = lightPSVariations[i % DLPS_ORTHO];
+        if (i & DLPS_SHADOW)
+            deferredLightPSVariations_[i] += shadowVariations[shadows];
+        if (i & DLPS_ORTHO)
+            deferredLightPSVariations_[i] += "ORTHO";
+    }
     
     shadersDirty_ = false;
 }
@@ -1532,15 +1494,6 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
     
-    String vertexShaderName = pass->GetVertexShader();
-    String pixelShaderName = pass->GetPixelShader();
-    
-    // Check if the shader name is already a variation in itself
-    if (!vertexShaderName.Contains('_'))
-        vertexShaderName += "_";
-    if (!pixelShaderName.Contains('_'))
-        pixelShaderName += "_";
-    
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
     
@@ -1551,21 +1504,31 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
         // Load forward pixel lit variations
-        vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-        pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
+        vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS * 2);
+        pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS * 2);
         
-        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS * 2; ++j)
         {
-            unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
-            unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-            vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
+            unsigned k = j % (MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
+            unsigned h = j / (MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
+            unsigned g = k / MAX_LIGHT_VS_VARIATIONS;
+            unsigned l = k % MAX_LIGHT_VS_VARIATIONS;
+            
+            vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                lightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
         }
-        for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
+        for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
-            if (j & LPS_SHADOW)
-                pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + shadowVariations[shadows]);
+            unsigned k = j % MAX_LIGHT_PS_VARIATIONS;
+            unsigned h = j / MAX_LIGHT_PS_VARIATIONS;
+            if (k & LPS_SHADOW)
+            {
+                pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                    lightPSVariations[k] + shadowVariations[shadows] + heightFogVariations[h]);
+            }
             else
-                pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j]);
+                pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                    lightPSVariations[k] + heightFogVariations[h]);
         }
     }
     else
@@ -1573,24 +1536,35 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         // Load vertex light variations
         if (pass->GetLightingMode() == LIGHTING_PERVERTEX)
         {
-            vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)
+            vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS * 2);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS * 2; ++j)
             {
-                unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
-                unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
-                vertexShaders[j] = GetVertexShader(vertexShaderName + vertexLightVSVariations[l] + geometryVSVariations[g],
-                    g != 0 || l != 0);
+                unsigned k = j % (MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
+                unsigned h = j / (MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
+                unsigned g = k / MAX_VERTEXLIGHT_VS_VARIATIONS;
+                unsigned l = k % MAX_VERTEXLIGHT_VS_VARIATIONS;
+                vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                    vertexLightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
             }
         }
         else
         {
-            vertexShaders.Resize(MAX_GEOMETRYTYPES);
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
-                vertexShaders[j] = GetVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
+            vertexShaders.Resize(MAX_GEOMETRYTYPES * 2);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * 2; ++j)
+            {
+                unsigned k = j % MAX_GEOMETRYTYPES;
+                unsigned h = j / MAX_GEOMETRYTYPES;
+                vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
+                    geometryVSVariations[k] + heightFogVariations[h]);
+            }
         }
         
-        pixelShaders.Resize(1);
-        pixelShaders[0] = GetPixelShader(pixelShaderName);
+        pixelShaders.Resize(2);
+        for (unsigned j = 0; j < 2; ++j)
+        {
+            pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
+                heightFogVariations[j]);
+        }
     }
     
     pass->MarkShadersLoaded(shadersChangedFrameNumber_);
@@ -1713,16 +1687,17 @@ void Renderer::SetIndirectionTextureData()
             for (unsigned x = 0; x < 256; ++x)
             {
                 #ifdef USE_OPENGL
-                *dest++ = x;
-                *dest++ = 255 - y;
-                *dest++ = faceX;
-                *dest++ = 255 * 2 / 3 - faceY;
+                dest[0] = x;
+                dest[1] = 255 - y;
+                dest[2] = faceX;
+                dest[3] = 255 * 2 / 3 - faceY;
                 #else
-                *dest++ = x;
-                *dest++ = y;
-                *dest++ = faceX;
-                *dest++ = faceY;
+                dest[0] = x;
+                dest[1] = y;
+                dest[2] = faceX;
+                dest[3] = faceY;
                 #endif
+                dest += 4;
             }
         }
         

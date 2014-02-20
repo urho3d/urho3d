@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Generic list support for FreeType (specification).                   */
 /*                                                                         */
-/*  Copyright 1996-2001, 2003, 2007 by                                     */
+/*  Copyright 1996-2001, 2003, 2007, 2010, 2013 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -173,7 +173,7 @@ FT_BEGIN_HEADER
   /*    FT_List_Iterator                                                   */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    An FT_List iterator function which is called during a list parse   */
+  /*    An FT_List iterator function that is called during a list parse    */
   /*    by @FT_List_Iterate.                                               */
   /*                                                                       */
   /* <Input>                                                               */
@@ -200,7 +200,7 @@ FT_BEGIN_HEADER
   /* <Input>                                                               */
   /*    list     :: A handle to the list.                                  */
   /*    iterator :: An iterator function, called on each node of the list. */
-  /*    user     :: A user-supplied field which is passed as the second    */
+  /*    user     :: A user-supplied field that is passed as the second     */
   /*                argument to the iterator.                              */
   /*                                                                       */
   /* <Return>                                                              */
@@ -218,7 +218,7 @@ FT_BEGIN_HEADER
   /*    FT_List_Destructor                                                 */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    An @FT_List iterator function which is called during a list        */
+  /*    An @FT_List iterator function that is called during a list         */
   /*    finalization by @FT_List_Finalize to destroy all elements in a     */
   /*    given list.                                                        */
   /*                                                                       */
@@ -250,10 +250,14 @@ FT_BEGIN_HEADER
   /*    destroy :: A list destructor that will be applied to each element  */
   /*               of the list.                                            */
   /*                                                                       */
-  /*    memory  :: The current memory object which handles deallocation.   */
+  /*    memory  :: The current memory object that handles deallocation.    */
   /*                                                                       */
-  /*    user    :: A user-supplied field which is passed as the last       */
+  /*    user    :: A user-supplied field that is passed as the last        */
   /*               argument to the destructor.                             */
+  /*                                                                       */
+  /* <Note>                                                                */
+  /*    This function expects that all nodes added by @FT_List_Add or      */
+  /*    @FT_List_Insert have been dynamically allocated.                   */
   /*                                                                       */
   FT_EXPORT( void )
   FT_List_Finalize( FT_List             list,

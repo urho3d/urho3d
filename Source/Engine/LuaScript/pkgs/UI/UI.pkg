@@ -1,0 +1,85 @@
+$#include "UI.h"
+
+class UI : public Object
+{
+    void SetCursor(Cursor* cursor);
+    void SetFocusElement(UIElement* element, bool byKey = false);
+    bool SetModalElement(UIElement* modalElement, bool enable);
+    void Clear();
+    void Update(float timeStep);
+    void RenderUpdate();
+    void Render();
+    void DebugDraw(UIElement* element);
+    bool SaveLayout(Serializer& dest, UIElement* element);
+
+    void SetClipBoardText(const String text);
+
+    void SetDoubleClickInterval(float interval);
+    void SetDragBeginInterval(float interval);
+    void SetDragBeginDistance(int pixels);
+    void SetDefaultToolTipDelay(float delay);
+    void SetMaxFontTextureSize(int size);
+    void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
+    void SetUseSystemClipBoard(bool enable);
+    void SetUseScreenKeyboard(bool enable);
+    void SetUseMutableGlyphs(bool enable);
+    void SetForceAutoHint(bool enable);
+
+    UIElement* GetRoot() const;
+    UIElement* GetRootModalElement() const;
+    Cursor* GetCursor() const;
+    IntVector2 GetCursorPosition() const;
+    UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
+    UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
+
+    UIElement* GetFocusElement() const;
+    UIElement* GetFrontElement() const;
+    UIElement* GetDragElement() const;
+    const String GetClipBoardText() const;
+    float GetDoubleClickInterval() const;
+    float GetDragBeginInterval() const;
+    int GetDragBeginDistance() const;
+    float GetDefaultToolTipDelay() const;
+    int GetMaxFontTextureSize() const;
+    bool IsNonFocusedMouseWheel() const;
+    bool GetUseSystemClipBoard() const;
+    bool GetUseScreenKeyboard() const;
+    bool GetUseMutableGlyphs() const;
+    bool GetForceAutoHint() const;
+    bool HasModalElement() const;
+
+    tolua_readonly tolua_property__get_set UIElement* root;
+    tolua_readonly tolua_property__get_set UIElement* rootModalElement;
+    tolua_property__get_set Cursor* cursor;
+    tolua_readonly tolua_property__get_set IntVector2 cursorPosition;
+    tolua_readonly tolua_property__get_set UIElement* focusElement;
+    tolua_readonly tolua_property__get_set UIElement* frontElement;
+    tolua_readonly tolua_property__get_set UIElement* dragElement;
+
+    tolua_property__get_set String clipBoardText;
+    tolua_property__get_set float doubleClickInterval;
+    tolua_property__get_set float dragBeginInterval;
+    tolua_property__get_set int dragBeginDistance;
+    tolua_property__get_set float defaultToolTipDelay;
+    tolua_property__get_set int maxFontTextureSize;
+    tolua_property__is_set bool nonFocusedMouseWheel;
+    tolua_property__get_set bool useSystemClipBoard;
+    tolua_property__get_set bool useScreenKeyboard;
+    tolua_property__get_set bool useMutableGlyphs;
+    tolua_property__get_set bool forceAutoHint;
+    tolua_readonly tolua_property__has_set bool modalElement;
+};
+
+UI* GetUI();
+tolua_readonly tolua_property__get_set UI* ui;
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_GetUI00
+static int tolua_UILuaAPI_GetUI00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<UI>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_ui_ptr
+#define tolua_get_ui_ptr tolua_UILuaAPI_GetUI00
+$}

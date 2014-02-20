@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 #include "Addons.h"
 #include "Context.h"
 #include "EngineEvents.h"
+#include "File.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Scene.h"
@@ -131,6 +133,21 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
     }
 }
 
+bool ComparePropertyStrings(const String& lhs, const String& rhs)
+{
+    int spaceLhs = lhs.Find(' ');
+    int spaceRhs = rhs.Find(' ');
+    if (spaceLhs != String::NPOS && spaceRhs != String::NPOS)
+        return String::Compare(lhs.CString() + spaceLhs, rhs.CString() + spaceRhs, true) < 0;
+    else
+        return String::Compare(lhs.CString(), rhs.CString(), true) < 0;
+}
+
+bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
+{
+    return String::Compare(lhs.name_.CString(), rhs.name_.CString(), true) < 0;
+}
+
 Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),
@@ -158,9 +175,10 @@ Script::Script(Context* context) :
     // Register Script library object factories
     RegisterScriptLibrary(context_);
 
-    // Register the Array & String API
+    // Register the Array, String & Dictionary API
     RegisterArray(scriptEngine_);
     RegisterString(scriptEngine_);
+    RegisterDictionary(scriptEngine_);
 
     // Register the rest of the script API
     RegisterMathAPI(scriptEngine_);
@@ -177,7 +195,7 @@ Script::Script(Context* context) :
     RegisterNavigationAPI(scriptEngine_);
     RegisterScriptAPI(scriptEngine_);
     RegisterEngineAPI(scriptEngine_);
-    
+
     // Subscribe to console commands
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(Script, HandleConsoleCommand));
 }
@@ -245,83 +263,58 @@ void Script::SetDefaultScene(Scene* scene)
     defaultScene_ = scene;
 }
 
-void Script::DumpAPI()
+void Script::DumpAPI(DumpMode mode)
 {
     // Does not use LOGRAW macro here to ensure the messages are always dumped regardless of ENABLE_LOGGING compiler directive and of Log subsystem availability
-    Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
+    if (mode == DOXYGEN)
+        Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("// Script API header intended to be 'force included' in IDE for AngelScript content assist / code completion\n\n"
+            "#define int8 signed char\n"
+            "#define int16 signed short\n"
+            "#define int64 long\n"
+            "#define uint8 unsigned char\n"
+            "#define uint16 unsigned short\n"
+            "#define uint64 unsigned long\n"
+            "#define null 0\n");
 
-    Vector<PropertyInfo> globalPropertyInfos;
-    Vector<String> globalFunctions;
-
-    unsigned functions = scriptEngine_->GetGlobalFunctionCount();
-    for (unsigned i = 0; i < functions; ++i)
-    {
-        asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
-        String functionName(function->GetName());
-        String declaration(function->GetDeclaration());
-
-        if (functionName.Contains("set_") || functionName.Contains("get_"))
-            ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
-        else
-            globalFunctions.Push(declaration);
-    }
-
-    Log::WriteRaw("\\section ScriptAPI_GlobalFunctions Global functions\n");
-
-    for (unsigned i = 0; i < globalFunctions.Size(); ++i)
-        OutputAPIRow(globalFunctions[i]);
-
-    Log::WriteRaw("\\section ScriptAPI_GlobalProperties Global properties\n");
-
-    for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
-        OutputAPIRow(globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
-
-    Log::WriteRaw("\\section ScriptAPI_GlobalConstants Global constants\n");
-
-    unsigned properties = scriptEngine_->GetGlobalPropertyCount();
-    for (unsigned i = 0; i < properties; ++i)
-    {
-        const char* propertyName;
-        const char* propertyDeclaration;
-        int typeId;
-        scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, 0, &typeId);
-        propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
-
-        String type(propertyDeclaration);
-        OutputAPIRow(type + " " + String(propertyName), true);
-    }
-
-    Log::WriteRaw("\\section ScriptAPI_Enums Enumerations\n");
-    
-    unsigned enums = scriptEngine_->GetEnumCount();
-    for (unsigned i = 0; i < enums; ++i)
-    {
-        int typeId;
-        Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(i, &typeId)) + "\n\n");
-        
-        for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
-        {
-            int value = 0;
-            const char* name = scriptEngine_->GetEnumValueByIndex(typeId, j, &value);
-            OutputAPIRow(String(name));
-        }
-        
-        Log::WriteRaw("\n");
-    }
-    
-    Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
+    if (mode == DOXYGEN)
+        Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Classes\n");
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
+    Vector<Pair<String, unsigned> > sortedTypes;
     for (unsigned i = 0; i < types; ++i)
     {
         asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(i);
         if (type)
         {
             String typeName(type->GetName());
+            sortedTypes.Push(MakePair(typeName, i));
+        }
+    }
+    Sort(sortedTypes.Begin(), sortedTypes.End());
+    
+    for (unsigned i = 0; i < sortedTypes.Size(); ++i)
+    {
+        asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
+        if (type)
+        {
+            String typeName(type->GetName());
             Vector<String> methodDeclarations;
             Vector<PropertyInfo> propertyInfos;
 
-            Log::WriteRaw("\n### " + typeName + "\n");
+            if (mode == DOXYGEN)
+                Log::WriteRaw("\n### " + typeName + "\n");
+            else if (mode == C_HEADER)
+            {
+                ///\todo Find a cleaner way to do this instead of hardcoding
+                if (typeName == "Array")
+                    Log::WriteRaw("\ntemplate <class T> class " + typeName + "\n{\n");
+                else
+                    Log::WriteRaw("\nclass " + typeName + "\n{\n");
+            }
 
             unsigned methods = type->GetMethodCount();
             for (unsigned j = 0; j < methods; ++j)
@@ -338,6 +331,24 @@ void Script::DumpAPI()
                     {
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
+                        ///\todo Is there a better way to mark deprecated API bindings for AngelScript?
+                        unsigned posBegin = declaration.FindLast("const String&in = \"deprecated:");
+                        if (posBegin != String::NPOS)
+                        {
+                            // Assume this 'mark' is added as the last parameter
+                            unsigned posEnd = declaration.Find(')', posBegin);
+                            if (posBegin != String::NPOS)
+                            {
+                                declaration.Replace(posBegin, posEnd - posBegin, "");
+                                posBegin = declaration.Find(", ", posBegin - 2);
+                                if (posBegin != String::NPOS)
+                                    declaration.Replace(posBegin, 2, "");
+                                if (mode == DOXYGEN)
+                                    declaration += " // deprecated";
+                                else if (mode == C_HEADER)
+                                    declaration = "/* deprecated */\n" + declaration;
+                            }
+                        }
                         methodDeclarations.Push(declaration);
                     }
                 }
@@ -360,34 +371,210 @@ void Script::DumpAPI()
                 newInfo.read_ = newInfo.write_ = true;
                 propertyInfos.Push(newInfo);
             }
-
+            
+            Sort(methodDeclarations.Begin(), methodDeclarations.End(), ComparePropertyStrings);
+            Sort(propertyInfos.Begin(), propertyInfos.End(), ComparePropertyInfos);
+            
             if (!methodDeclarations.Empty())
             {
-                Log::WriteRaw("\nMethods:\n\n");
+                if (mode == DOXYGEN)
+                    Log::WriteRaw("\nMethods:\n\n");
+                else if (mode == C_HEADER)
+                    Log::WriteRaw("// Methods:\n");
                 for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
-                    OutputAPIRow(methodDeclarations[j]);
+                    OutputAPIRow(mode, methodDeclarations[j]);
             }
 
             if (!propertyInfos.Empty())
             {
-                Log::WriteRaw("\nProperties:\n\n");
+                if (mode == DOXYGEN)
+                    Log::WriteRaw("\nProperties:\n\n");
+                else if (mode == C_HEADER)
+                    Log::WriteRaw("\n// Properties:\n");
                 for (unsigned j = 0; j < propertyInfos.Size(); ++j)
                 {
                     String remark;
+                    String cppdoc;
                     if (!propertyInfos[j].write_)
-                        remark = " (readonly)";
+                        remark = "readonly";
                     else if (!propertyInfos[j].read_)
-                        remark = " (writeonly)";
+                        remark = "writeonly";
+                    if (!remark.Empty())
+                    {
+                        if (mode == DOXYGEN)
+                        {
+                            remark = " // " + remark;
+                        }
+                        else if (mode == C_HEADER)
+                        {
+                            cppdoc = "/* " + remark + " */\n";
+                            remark.Clear();
+                        }
+                    }
 
-                    OutputAPIRow(propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
+                    OutputAPIRow(mode, cppdoc + propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
                 }
             }
 
-            Log::WriteRaw("\n");
+            if (mode == DOXYGEN)
+                Log::WriteRaw("\n");
+            else if (mode == C_HEADER)
+                Log::WriteRaw("};\n");
         }
     }
 
-    Log::WriteRaw("*/\n\n}\n");
+    Vector<PropertyInfo> globalPropertyInfos;
+    Vector<String> globalFunctions;
+
+    unsigned functions = scriptEngine_->GetGlobalFunctionCount();
+    for (unsigned i = 0; i < functions; ++i)
+    {
+        asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
+        String functionName(function->GetName());
+        String declaration(function->GetDeclaration());
+
+        if (functionName.Contains("set_") || functionName.Contains("get_"))
+            ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
+        else
+            globalFunctions.Push(declaration);
+    }
+
+    Sort(globalFunctions.Begin(), globalFunctions.End(), ComparePropertyStrings);
+    Sort(globalPropertyInfos.Begin(), globalPropertyInfos.End(), ComparePropertyInfos);
+
+    if (mode == DOXYGEN)
+        Log::WriteRaw("\\section ScriptAPI_Enums Enumerations\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Enumerations\n");
+
+    unsigned enums = scriptEngine_->GetEnumCount();
+    Vector<Pair<String, unsigned> > sortedEnums;
+    for (unsigned i = 0; i < enums; ++i)
+    {
+        int typeId;
+        sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i, &typeId)), i));
+    }
+    Sort(sortedEnums.Begin(), sortedEnums.End());
+    
+    for (unsigned i = 0; i < sortedEnums.Size(); ++i)
+    {
+        int typeId;
+        if (mode == DOXYGEN)
+            Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n\n");
+        else if (mode == C_HEADER)
+            Log::WriteRaw("\nenum " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n{\n");
+
+        for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
+        {
+            int value = 0;
+            const char* name = scriptEngine_->GetEnumValueByIndex(typeId, j, &value);
+            OutputAPIRow(mode, String(name), false, ",");
+        }
+
+        if (mode == DOXYGEN)
+            Log::WriteRaw("\n");
+        else if (mode == C_HEADER)
+            Log::WriteRaw("};\n");
+    }
+    
+    if (mode == DOXYGEN)
+        Log::WriteRaw("\\section ScriptAPI_GlobalFunctions Global functions\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Global functions\n");
+
+    for (unsigned i = 0; i < globalFunctions.Size(); ++i)
+        OutputAPIRow(mode, globalFunctions[i]);
+
+    if (mode == DOXYGEN)
+        Log::WriteRaw("\\section ScriptAPI_GlobalProperties Global properties\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Global properties\n");
+
+    for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
+        OutputAPIRow(mode, globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
+
+    if (mode == DOXYGEN)
+        Log::WriteRaw("\\section ScriptAPI_GlobalConstants Global constants\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Global constants\n");
+
+    Vector<String> globalConstants;
+    unsigned properties = scriptEngine_->GetGlobalPropertyCount();
+    for (unsigned i = 0; i < properties; ++i)
+    {
+        const char* propertyName;
+        const char* propertyDeclaration;
+        int typeId;
+        scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, 0, &typeId);
+        propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
+
+        String type(propertyDeclaration);
+        globalConstants.Push(type + " " + String(propertyName));
+    }
+    
+    Sort(globalConstants.Begin(), globalConstants.End(), ComparePropertyStrings);
+    
+    for (unsigned i = 0; i < globalConstants.Size(); ++i)
+        OutputAPIRow(mode, globalConstants[i], true);
+
+    // Dump event descriptions in Doxygen mode. This means going through the header files, as the information is not
+    // available otherwise
+    if (mode == DOXYGEN)
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        Vector<String> headerFiles;
+        String path = fileSystem->GetProgramDir();
+        path.Replace("/Bin", "/Source/Engine");
+        
+        fileSystem->ScanDir(headerFiles, path, "*.h", SCAN_FILES, true);
+        if (!headerFiles.Empty())
+        {
+            Log::WriteRaw("\n\\page EventList Event list\n");
+            Sort(headerFiles.Begin(), headerFiles.End());
+        }
+        
+        for (unsigned i = 0; i < headerFiles.Size(); ++i)
+        {
+            if (headerFiles[i].EndsWith("Events.h"))
+            {
+                SharedPtr<File> file(new File(context_, path + headerFiles[i], FILE_READ));
+                if (!file->IsOpen())
+                    continue;
+                
+                unsigned start = headerFiles[i].Find('/') + 1;
+                unsigned end = headerFiles[i].Find("Events.h");
+                Log::WriteRaw("\n## %" + headerFiles[i].Substring(start, end - start) + " events\n");
+                
+                while (!file->IsEof())
+                {
+                    String line = file->ReadLine();
+                    if (line.StartsWith("EVENT"))
+                    {
+                        Vector<String> parts = line.Split(',');
+                        if (parts.Size() == 2)
+                            Log::WriteRaw("\n### " + parts[1].Substring(0, parts[1].Length() - 1).Trimmed() + "\n");
+                    }
+                    if (line.Contains("PARAM"))
+                    {
+                        Vector<String> parts = line.Split(',');
+                        if (parts.Size() == 2)
+                        {
+                            String paramName = parts[1].Substring(0, parts[1].Find(')')).Trimmed();
+                            String paramType = parts[1].Substring(parts[1].Find("// ") + 3);
+                            if (!paramName.Empty() && !paramType.Empty())
+                                Log::WriteRaw("- %" + paramName + " : " + paramType + "\n");
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!headerFiles.Empty())
+            Log::WriteRaw("\n");
+    }
+
+    if (mode == DOXYGEN)
+        Log::WriteRaw("*/\n\n}\n");
 }
 
 void Script::MessageCallback(const asSMessageInfo* msg)
@@ -480,25 +667,48 @@ asIScriptContext* Script::GetScriptFileContext()
     return scriptFileContexts_[scriptNestingLevel_];
 }
 
-void Script::OutputAPIRow(const String& row, bool removeReference)
+void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, String separator)
 {
-    String out = row;
-    ///\todo We need Regex capability in String class to handle whole-word replacement correctly.
-    // Temporary fix to prevent property name like 'doubleClickInterval' from being wrongly replaced.
+    String out(row);
+    ///\todo We need C++11 <regex> in String class to handle REGEX whole-word replacement correctly. Can't do that since we still support VS2008.
+    // Commenting out to temporary fix property name like 'doubleClickInterval' from being wrongly replaced.
     // Fortunately, there is no occurence of type 'double' in the API at the moment.
-    //out.Replace("double", "float");
+    //out.Replace("double", "float");   // s/\bdouble\b/float/g
     out.Replace("&in", "&");
     out.Replace("&out", "&");
     if (removeReference)
         out.Replace("&", "");
 
-    Log::WriteRaw("- " + out + "\n");
+    if (mode == DOXYGEN)
+        Log::WriteRaw("- " + out + "\n");
+    else if (mode == C_HEADER)
+    {
+        out.Replace("@", "");
+        out.Replace("?&", "void*");
+
+        // s/(\w+)\[\]/Array<\1>/g
+        unsigned posBegin = String::NPOS;
+        while (1)   // Loop to cater for array of array of T
+        {
+            unsigned posEnd = out.Find("[]");
+            if (posEnd == String::NPOS)
+                break;
+            if (posBegin > posEnd)
+                posBegin = posEnd - 1;
+            while (posBegin < posEnd && isalnum(out[posBegin]))
+                --posBegin;
+            ++posBegin;
+            out.Replace(posBegin, posEnd - posBegin + 2, "Array<" + out.Substring(posBegin, posEnd - posBegin) + ">");
+        }
+
+        Log::WriteRaw(out + separator + "\n");
+    }
 }
 
 void Script::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-    
+
     Execute(eventData[P_COMMAND].GetString());
 }
 

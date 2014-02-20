@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,13 @@ namespace Urho3D
 
 StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
+StringHash VSP_BILLBOARDROT("BillboardRot");
 StringHash VSP_CAMERAPOS("CameraPos");
 StringHash VSP_CAMERAROT("CameraRot");
+StringHash VSP_NEARCLIP("NearClip");
+StringHash VSP_FARCLIP("FarClip");
 StringHash VSP_DEPTHMODE("DepthMode");
+StringHash VSP_DELTATIME("DeltaTime");
 StringHash VSP_ELAPSEDTIME("ElapsedTime");
 StringHash VSP_FRUSTUMSIZE("FrustumSize");
 StringHash VSP_GBUFFEROFFSETS("GBufferOffsets");
@@ -43,13 +47,12 @@ StringHash VSP_MODEL("Model");
 StringHash VSP_VIEWPROJ("ViewProj");
 StringHash VSP_UOFFSET("UOffset");
 StringHash VSP_VOFFSET("VOffset");
-StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
-StringHash VSP_VIEWUPVECTOR("ViewUpVector");
 StringHash VSP_ZONE("Zone");
 StringHash VSP_LIGHTMATRICES("LightMatrices");
 StringHash VSP_SKINMATRICES("SkinMatrices");
 StringHash VSP_VERTEXLIGHTS("VertexLights");
 StringHash PSP_AMBIENTCOLOR("AmbientColor");
+StringHash PSP_DELTATIME("DeltaTimePS");
 StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
 StringHash PSP_FOGCOLOR("FogColor");
 StringHash PSP_FOGPARAMS("FogParams");
@@ -61,6 +64,8 @@ StringHash PSP_MATDIFFCOLOR("MatDiffColor");
 StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
 StringHash PSP_MATENVMAPECOLOR("MatEnvMapColor");
 StringHash PSP_MATSPECCOLOR("MatSpecColor");
+StringHash PSP_NEARCLIP("NearClipPS");
+StringHash PSP_FARCLIP("FarClipPS");
 StringHash PSP_SHADOWCUBEADJUST("ShadowCubeAdjust");
 StringHash PSP_SHADOWDEPTHFADE("ShadowDepthFade");
 StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
@@ -77,7 +82,8 @@ StringHash PASS_SHADOW("shadow");
 StringHash PASS_DEFERRED("deferred");
 StringHash PASS_PREPASS("prepass");
 StringHash PASS_MATERIAL("material");
-StringHash PASS_PREALPHA("prealpha");
+StringHash PASS_POSTOPAQUE("postopaque");
+StringHash PASS_REFRACT("refract");
 StringHash PASS_POSTALPHA("postalpha");
 
 Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);

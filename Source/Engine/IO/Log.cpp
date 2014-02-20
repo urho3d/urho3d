@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,8 @@ const char* logLevelPrefixes[] =
     "DEBUG",
     "INFO",
     "WARNING",
-    "ERROR"
+    "ERROR",
+    0
 };
 
 static Log* logInstance = 0;
@@ -75,8 +76,15 @@ Log::~Log()
 void Log::Open(const String& fileName)
 {
     #if !defined(ANDROID) && !defined(IOS)
-    if ((logFile_ && logFile_->IsOpen()) || fileName.Empty())
+    if (fileName.Empty())
         return;
+    if (logFile_ && logFile_->IsOpen())
+    {
+        if (logFile_->GetName() == fileName)
+            return;
+        else
+            Close();
+    }
 
     logFile_ = new File(context_);
     if (logFile_->Open(fileName, FILE_WRITE))
@@ -85,6 +93,17 @@ void Log::Open(const String& fileName)
     {
         logFile_.Reset();
         Write(LOG_ERROR, "Failed to create log file " + fileName);
+    }
+    #endif
+}
+
+void Log::Close()
+{
+    #if !defined(ANDROID) && !defined(IOS)
+    if (logFile_ && logFile_->IsOpen())
+    {
+        logFile_->Close();
+        logFile_.Reset();
     }
     #endif
 }
@@ -147,7 +166,7 @@ void Log::Write(int level, const String& message)
 
     using namespace LogMessage;
 
-    VariantMap eventData;
+    VariantMap& eventData = logInstance->GetEventDataMap();
     eventData[P_MESSAGE] = formattedMessage;
     eventData[P_LEVEL] = level;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
@@ -188,7 +207,7 @@ void Log::WriteRaw(const String& message, bool error)
 
     using namespace LogMessage;
 
-    VariantMap eventData;
+    VariantMap& eventData = logInstance->GetEventDataMap();
     eventData[P_MESSAGE] = message;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
 

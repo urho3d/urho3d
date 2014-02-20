@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,11 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
-
+    /// React to the popup being hidden.
+    virtual void OnHidePopup();
+    /// React to editable status change.
+    virtual void OnSetEditable();
+    
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
     /// Insert item to a specific position.
@@ -102,8 +106,10 @@ protected:
     bool resizePopup_;
 
 private:
-    /// Handle listview item selected event.
-    void HandleItemSelected(StringHash eventType, VariantMap& eventData);
+    /// Handle listview item click event.
+    void HandleItemClicked(StringHash eventType, VariantMap& eventData);
+    /// Handle a key press from the listview
+    void HandleListViewKey(StringHash eventType, VariantMap& eventData);
 
     /// Selected item index attribute.
     unsigned selectionAttr_;

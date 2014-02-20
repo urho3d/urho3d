@@ -22,6 +22,7 @@
         <attribute name="Min Size" value="16 16" />
         <attribute name="Max Size" value="16 16" />
         <attribute name="Image Rect" value="144 0 160 16" />
+        <attribute name="Focus Mode" value="NotFocusable" />
     </element>
     <element type="Cursor">
         <attribute name="Shapes">
@@ -84,7 +85,6 @@
     </element>
     <element type="LineEdit" style="BorderImage">
         <attribute name="Border" value="4 4 4 4" />
-        <attribute name="Clip Border" value="2 2 2 2" />
         <attribute name="Image Rect" value="64 0 80 16" />
         <attribute name="Hover Image Offset" value="0 16" />    <!-- Background color of the hover image IS the hover color of LineEdit -->
         <element type="Text" internal="true">
@@ -97,8 +97,23 @@
             <attribute name="Image Rect" value="12 0 16 16" />
         </element>
     </element>
-    <element type="ListView" style="ScrollView" />  <!-- Shortcut to copy all the styles from ScrollView -->
-    <element type="ListViewHierarchyOverlay" style="BorderImage">
+    <element type="ListView" style="ScrollView">  <!-- Shortcut to copy all the styles from ScrollView -->
+        <element type="BorderImage" internal="true">
+            <element internal="true">
+                <attribute name="Layout Mode" value="Vertical" />
+            </element>
+        </element>
+    </element>
+    <element type="HierarchyListView" style="ListView" auto="false">
+        <attribute name="Hierarchy Mode" value="true" />
+        <attribute name="Base Indent" value="1" />  <!-- Allocate space for overlay icon at the first level -->
+        <element type="BorderImage" internal="true">
+            <element type="HierarchyContainer" internal="true">
+                <attribute name="Layout Mode" value="Vertical" />
+            </element>
+        </element>
+    </element>
+    <element type="HierarchyListViewOverlay" style="BorderImage">
         <attribute name="Min Size" value="16 16" />
         <attribute name="Max Size" value="16 16" />
         <attribute name="Image Rect" value="176 0 192 16" />
@@ -118,16 +133,16 @@
         <attribute name="Right Image Rect" value="48 32 64 48" />
         <attribute name="Down Image Rect" value="16 32 32 48" />
         <element type="Button" internal="true">
-            <attribute name="Size" value="12 12" />
+            <attribute name="Size" value="16 16" />
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Pressed Image Offset" value="64 0" />
             <attribute name="Hover Image Offset" value="0 16" />
         </element>
         <element type="Slider" internal="true">
-            <attribute name="Size" value="12 12" />
+            <attribute name="Size" value="16 16" />
         </element>
         <element type="Button" internal="true">
-            <attribute name="Size" value="12 12" />
+            <attribute name="Size" value="16 16" />
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Pressed Image Offset" value="64 0" />
             <attribute name="Hover Image Offset" value="0 16" />
@@ -135,19 +150,20 @@
     </element>
     <element type="ScrollView">
         <element type="ScrollBar" internal="true">
-            <attribute name="Size" value="0 12" />
+            <attribute name="Size" value="0 16" />
         </element>
         <element type="ScrollBar" internal="true">
-            <attribute name="Size" value="12 0" />
+            <attribute name="Size" value="16 0" />
         </element>
         <element type="BorderImage" internal="true">
             <attribute name="Image Rect" value="48 0 64 16" />
             <attribute name="Border" value="4 4 4 4" />
+            <attribute name="Hover Image Offset" value="16 16" />
             <attribute name="Clip Border" value="2 2 2 2" />
         </element>
     </element>
     <element type="Slider" style="BorderImage">
-        <attribute name="Size" value="12 12" />
+        <attribute name="Size" value="16 16" />
         <attribute name="Image Rect" value="48 0 64 16" />
         <attribute name="Border" value="4 4 4 4" />
         <element type="BorderImage" internal="true">
@@ -161,18 +177,33 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Resize Border" value="8 8 8 8" />
     </element>
-    <element type="PanelView" style="ListView">
-        <element type="BorderImage" internal="true" style="none">
+    <element type="DialogWindow" style="Window" auto="false">
+        <attribute name="Is Movable" value="true" />
+        <attribute name="Modal Shade Color" value="0.3 0.4 0.7 0.4" />
+        <attribute name="Modal Frame Color" value="0.3 0.4 0.7" />
+        <attribute name="Modal Frame Size" value="2 2" />
+    </element>
+    <element type="ListRow">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+    </element>
+    <element type="PanelView" style="ListView" auto="false">    <!-- todo: rename this to PanelListView -->
+        <element type="BorderImage" internal="true">
             <attribute name="Image Rect" value="48 16 64 32" />
-            <attribute name="Border" value="4 4 4 4" />
-            <element internal="true" style="none">
+            <attribute name="Hover Image Offset" value="80 32" />
+            <element internal="true">
                 <attribute name="Layout Spacing" value="4" />
                 <attribute name="Layout Border" value="4 4 4 4" />
             </element>
         </element>
     </element>
-    <element type="Panel" style="UIElement">
+    <element type="Panel" auto="false">
         <attribute name="Layout Mode" value="Vertical" />
+        <attribute name="Layout Spacing" value="4" />
+    </element>
+    <element type="HorizontalPanel" auto="false">
+        <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="4" />
     </element>
     <element type="Text">
@@ -180,7 +211,9 @@
         <attribute name="Font Size" value="11" />
         <attribute name="Color" value="0.85 0.85 0.85" />
     </element>
-    <element type="DebugHudText" style="Text" auto="false" />
+    <element type="DebugHudText" style="Text" auto="false">
+        <attribute name="Text Effect" value="Shadow" />
+    </element>
     <element type="ConsoleBackground" auto="false">
         <attribute name="Color" value="0.15 0.15 0.15 0.8" />
         <attribute name="Layout Border" value="4 4 4 4" />
@@ -190,32 +223,35 @@
         <attribute name="Color" value="1 0 0 1" />
     </element>
     <element type="ConsoleLineEdit" style="LineEdit" auto="false">
-        <element type="Text" internal="true" style="none">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <element type="Text" internal="true">
             <attribute name="Selection Color" value="0.3 0.4 0.7 0.75" />
         </element>
     </element>
-    <element type="FileSelector" style="Window" auto="false">
+    <element type="FileSelector" style="DialogWindow" auto="false">
         <attribute name="Size" value="400 300" />
-        <attribute name="Is Movable" value="true" />
         <attribute name="Is Resizable" value="true" />
         <attribute name="Resize Border" value="6 6 6 6" />
         <attribute name="Layout Mode" value="vertical" />
         <attribute name="Layout Spacing" value="4" />
         <attribute name="Layout Border" value="6 6 6 6" />
-        <attribute name="Modal Shade Color" value="0.3 0.4 0.7 0.05" />
-        <attribute name="Modal Frame Color" value="0.3 0.4 0.7" />
-        <attribute name="Modal Frame Size" value="2 2" />
     </element>
     <element type="FileSelectorButton" style="Button" auto="false">
-        <attribute name="Min Size" value="80 22" />
-        <attribute name="Max Size" value="80 22" />
+        <attribute name="Min Size" value="80 17" />
+        <attribute name="Max Size" value="80 17" />
     </element>
     <element type="FileSelectorButtonText" style="Text" auto="false" />
-    <element type="FileSelectorListView" style="ListView" auto="false" />
-    <element type="FileSelectorLineEdit" style="LineEdit" auto="false" />
+    <element type="FileSelectorListView" style="ListView" auto="false">
+        <attribute name="Highlight Mode" value="Always" />
+    </element>
+    <element type="FileSelectorLineEdit" style="LineEdit" auto="false">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+    </element>
     <element type="FileSelectorFilterList" style="DropDownList" auto="false">
-        <attribute name="Min Size" value="64 0" />
-        <attribute name="Max Size" value="64 2147483647" />
+        <attribute name="Min Size" value="64 17" />
+        <attribute name="Max Size" value="64 17" />
         <attribute name="Resize Popup" value="true" />
     </element>
     <element type="FileSelectorFilterText" style="Text" auto="false">
@@ -223,12 +259,9 @@
         <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
         <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
     </element>
-    <element type="FileSelectorTitleLayout" auto="false">
-        <attribute name="Min Size" value="0 16" />
-        <attribute name="Max Size" value="2147483647 16" />
-        <attribute name="Layout Spacing" value="4" />
-    </element>
     <element type="FileSelectorLayout" auto="false">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
         <attribute name="Layout Spacing" value="4" />
     </element>
     <element type="FileSelectorListText" style="Text" auto="false">
@@ -241,6 +274,10 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Min Size" value="0 11" />
         <attribute name="Max Size" value="2147483647 11" />
+    </element>
+    <element type="EditorSeparator" auto="false">
+        <attribute name="Min Size" value="0 2" />
+        <attribute name="Max Size" value="2147483647 2" />
     </element>
     <element type="EditorMenuBar" style="BorderImage" auto="false">
         <attribute name="Image Rect" value="112 0 128 16" />
@@ -256,5 +293,47 @@
         <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
         <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
     </element>
+    <element type="EditorToolBar" style="BorderImage">
+        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Border" value="4 4 4 4" />
+    </element>
+    <element type="ToolBarButton" style="Button">
+        <attribute name="Min Size" value="34 34" />
+        <attribute name="Max Size" value="34 34" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="2 2 2 2" />
+        <attribute name="Focus Mode" value="NotFocusable" />
+    </element>
+    <element type="ToolBarToggle" style="CheckBox">
+        <attribute name="Min Size" value="34 34" />
+        <attribute name="Max Size" value="34 34" />
+        <attribute name="Image Rect" value="208 0 224 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="2 2 2 2" />
+        <attribute name="Focus Mode" value="NotFocusable" />
+    </element>
+    <element type="ToolBarToggleGroupLeft" style="ToolBarToggle">
+        <attribute name="Image Rect" value="160 32 176 48" />
+    </element>
+    <element type="ToolBarToggleGroupMiddle" style="ToolBarToggle">
+        <attribute name="Image Rect" value="192 32 208 48" />
+    </element>
+    <element type="ToolBarToggleGroupRight" style="ToolBarToggle">
+        <attribute name="Image Rect" value="224 32 240 48" />
+    </element>
     <element type="EditorAttributeEdit" style="LineEdit" auto="false" />
+    <element type="ToolTipBorderImage" style="BorderImage">
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="6 2 6 2" />
+        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Border" value="6 2 2 2" />
+    </element>
+    <element type="ToolTipText" style="Text">
+        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font Size" value="12" />
+    </element>
+    <element type="ViewportBorder" style="BorderImage">
+        <attribute name="Image Rect" value="50 5 51 6" />
+        <attribute name="Border" value="0 0 0 0" />
+    </element>
 </elements>

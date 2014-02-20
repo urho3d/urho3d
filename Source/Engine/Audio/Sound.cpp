@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@ Sound::Sound(Context* context) :
     Resource(context),
     repeat_(0),
     end_(0),
+    dataSize_(0),
     frequency_(44100),
     looped_(false),
     sixteenBit_(false),
@@ -375,10 +376,7 @@ void Sound::LoadParameters()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    if (!cache->Exists(xmlName))
-        return;
-    
-    XMLFile* file = cache->GetResource<XMLFile>(xmlName);
+    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
     if (!file)
         return;
     

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,6 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "StringUtils.h"
 #include "UI.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"
@@ -81,6 +80,7 @@ extern const char* logLevelPrefixes[];
 Engine::Engine(Context* context) :
     Object(context),
     timeStep_(0.0f),
+    timeStepSmoothing_(2),
     minFps_(10),
     #if defined(ANDROID) || defined(IOS) || defined(RASPI)
     maxFps_(60),
@@ -91,6 +91,9 @@ Engine::Engine(Context* context) :
     maxInactiveFps_(60),
     pauseMinimized_(false),
     #endif
+#ifdef ENABLE_TESTING
+    timeOut_(0),
+#endif
     autoExit_(true),
     initialized_(false),
 #ifdef ANDROID
@@ -102,7 +105,7 @@ Engine::Engine(Context* context) :
 {
     // Register self as a subsystem
     context_->RegisterSubsystem(this);
-    
+
     // Create subsystems which do not depend on engine initialization or startup parameters
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
@@ -118,12 +121,12 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new Audio(context_));
     context_->RegisterSubsystem(new UI(context_));
-    
+
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
     RegisterPhysicsLibrary(context_);
     RegisterNavigationLibrary(context_);
-    
+
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
 }
 
@@ -135,12 +138,12 @@ bool Engine::Initialize(const VariantMap& parameters)
 {
     if (initialized_)
         return true;
-    
+
     PROFILE(InitEngine);
-    
+
     // Set headless mode
     headless_ = GetParameter(parameters, "Headless", false).GetBool();
-    
+
     // Register the rest of the subsystems
     if (!headless_)
     {
@@ -152,14 +155,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
     }
-    
-    // In debug mode, check now that all factory created objects can be created without crashing
-    #ifdef _DEBUG
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
-        SharedPtr<Object> object = i->second_->CreateObject();
-    #endif
-    
+
     // Start logging
     Log* log = GetSubsystem<Log>();
     if (log)
@@ -169,36 +165,36 @@ bool Engine::Initialize(const VariantMap& parameters)
         log->SetQuiet(GetParameter(parameters, "LogQuiet", false).GetBool());
         log->Open(GetParameter(parameters, "LogName", "Urho3D.log").GetString());
     }
-    
+
     // Set maximally accurate low res timer
     GetSubsystem<Time>()->SetTimerPeriod(1);
-    
+
     // Configure max FPS
     if (GetParameter(parameters, "FrameLimiter", true) == false)
         SetMaxFps(0);
-    
+
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
     unsigned numThreads = GetParameter(parameters, "WorkerThreads", true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
     if (numThreads)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
-        
-        LOGINFO(ToString("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : ""));
+
+        LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }
-    
+
     // Add resource paths
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String exePath = fileSystem->GetProgramDir();
-    
+
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData;Data").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
-    
+
     for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
         bool success = false;
-        
+
         // If path is not absolute, prefer to add it as a package if possible
         if (!IsAbsolutePath(resourcePaths[i]))
         {
@@ -212,7 +208,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                     success = true;
                 }
             }
-            
+
             if (!success)
             {
                 String pathName = exePath + resourcePaths[i];
@@ -226,19 +222,19 @@ bool Engine::Initialize(const VariantMap& parameters)
             if (fileSystem->DirExists(pathName))
                 success = cache->AddResourceDir(pathName);
         }
-        
+
         if (!success)
         {
             LOGERROR("Failed to add resource path " + resourcePaths[i]);
             return false;
         }
     }
-    
+
     // Then add specified packages
     for (unsigned i = 0; i < resourcePackages.Size(); ++i)
     {
         bool success = false;
-        
+
         String packageName = exePath + resourcePackages[i];
         if (fileSystem->FileExists(packageName))
         {
@@ -249,42 +245,45 @@ bool Engine::Initialize(const VariantMap& parameters)
                 success = true;
             }
         }
-        
+
         if (!success)
         {
             LOGERROR("Failed to add resource package " + resourcePackages[i]);
             return false;
         }
     }
-    
 
     // Initialize graphics & audio output
     if (!headless_)
     {
         Graphics* graphics = GetSubsystem<Graphics>();
         Renderer* renderer = GetSubsystem<Renderer>();
-        
+
         if (HasParameter(parameters, "ExternalWindow"))
-            graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetPtr());
+            graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
         graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
         graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
+        graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
             GetParameter(parameters, "WindowHeight", 0).GetInt(),
             GetParameter(parameters, "FullScreen", true).GetBool(),
+            GetParameter(parameters, "Borderless", false).GetBool(),
             GetParameter(parameters, "WindowResizable", false).GetBool(),
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
             GetParameter(parameters, "MultiSample", 1).GetInt()
         ))
             return false;
-        
+        if (HasParameter(parameters, "DumpShaders"))
+            graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
+
         if (HasParameter(parameters, "RenderPath"))
             renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
         renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
-        
+
         if (GetParameter(parameters, "Sound", true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
@@ -295,12 +294,24 @@ bool Engine::Initialize(const VariantMap& parameters)
             );
         }
     }
-    
+
     // Init FPU state of main thread
     InitFPU();
-    
+
+    #ifdef ENABLE_TESTING
+    if (HasParameter(parameters, "TimeOut"))
+        timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
+    #endif
+
+    // In debug mode, check now that all factory created objects can be created without crashing
+    #ifdef _DEBUG
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+        SharedPtr<Object> object = i->second_->CreateObject();
+    #endif
+
     frameTimer_.Reset();
-    
+
     initialized_ = true;
     return true;
 }
@@ -308,22 +319,22 @@ bool Engine::Initialize(const VariantMap& parameters)
 void Engine::RunFrame()
 {
     assert(initialized_);
-    
+
     // If not headless, and the graphics subsystem no longer has a window open, assume we should exit
     if (!headless_ && !GetSubsystem<Graphics>()->IsInitialized())
         exiting_ = true;
-    
+
     if (exiting_)
         return;
-    
+
     // Note: there is a minimal performance cost to looking up subsystems (uses a hashmap); if they would be looked up several
     // times per frame it would be better to cache the pointers
     Time* time = GetSubsystem<Time>();
     Input* input = GetSubsystem<Input>();
     Audio* audio = GetSubsystem<Audio>();
-    
+
     time->BeginFrame(timeStep_);
-    
+
     // If pause when minimized -mode is in use, stop updates and audio as necessary
     if (pauseMinimized_ && input->IsMinimized())
     {
@@ -341,13 +352,13 @@ void Engine::RunFrame()
             audio->Play();
             audioPaused_ = false;
         }
-        
+
         Update();
     }
-    
+
     Render();
     ApplyFrameLimit();
-    
+
     time->EndFrame();
 }
 
@@ -355,7 +366,7 @@ Console* Engine::CreateConsole()
 {
     if (headless_ || !initialized_)
         return 0;
-    
+
     // Return existing console if possible
     Console* console = GetSubsystem<Console>();
     if (!console)
@@ -363,7 +374,7 @@ Console* Engine::CreateConsole()
         console = new Console(context_);
         context_->RegisterSubsystem(console);
     }
-    
+
     return console;
 }
 
@@ -371,7 +382,7 @@ DebugHud* Engine::CreateDebugHud()
 {
     if (headless_ || !initialized_)
         return 0;
-    
+
      // Return existing debug HUD if possible
     DebugHud* debugHud = GetSubsystem<DebugHud>();
     if (!debugHud)
@@ -379,8 +390,13 @@ DebugHud* Engine::CreateDebugHud()
         debugHud = new DebugHud(context_);
         context_->RegisterSubsystem(debugHud);
     }
-    
+
     return debugHud;
+}
+
+void Engine::SetTimeStepSmoothing(int frames)
+{
+    timeStepSmoothing_ = Clamp(frames, 1, 20);
 }
 
 void Engine::SetMinFps(int fps)
@@ -441,20 +457,20 @@ void Engine::DumpResources()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
-    
+
     for (HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
         i != resourceGroups.End(); ++i)
     {
         unsigned num = i->second_.resources_.Size();
         unsigned memoryUse = i->second_.memoryUse_;
-        
+
         if (num)
         {
             LOGRAW("Resource type " + i->second_.resources_.Begin()->second_->GetTypeName() +
                 ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
         }
     }
-    
+
     LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
     #endif
 }
@@ -468,7 +484,7 @@ void Engine::DumpMemory()
     _CrtMemBlockHeader* block = state.pBlockHeader;
     unsigned total = 0;
     unsigned blocks = 0;
-    
+
     for (;;)
     {
         if (block && block->pBlockHeaderNext)
@@ -476,7 +492,7 @@ void Engine::DumpMemory()
         else
             break;
     }
-    
+
     while (block)
     {
         if (block->nBlockUse > 0)
@@ -485,13 +501,13 @@ void Engine::DumpMemory()
                 LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
             else
                 LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
-            
+
             total += block->nDataSize;
             ++blocks;
         }
         block = block->pBlockHeaderPrev;
     }
-    
+
     LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
     #else
     LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
@@ -502,20 +518,20 @@ void Engine::DumpMemory()
 void Engine::Update()
 {
     PROFILE(Update);
-    
+
     // Logic update event
     using namespace Update;
-    
-    VariantMap eventData;
+
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_TIMESTEP] = timeStep_;
     SendEvent(E_UPDATE, eventData);
-    
+
     // Logic post-update event
     SendEvent(E_POSTUPDATE, eventData);
-    
+
     // Rendering update event
     SendEvent(E_RENDERUPDATE, eventData);
-    
+
     // Post-render update event
     SendEvent(E_POSTRENDERUPDATE, eventData);
 }
@@ -524,14 +540,14 @@ void Engine::Render()
 {
     if (headless_)
         return;
-    
+
     PROFILE(Render);
-    
+
     // If device is lost, BeginFrame will fail and we skip rendering
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics->BeginFrame())
         return;
-    
+
     GetSubsystem<Renderer>()->Render();
     GetSubsystem<UI>()->Render();
     graphics->EndFrame();
@@ -541,27 +557,27 @@ void Engine::ApplyFrameLimit()
 {
     if (!initialized_)
         return;
-    
+
     int maxFps = maxFps_;
     Input* input = GetSubsystem<Input>();
     if (input && !input->HasFocus())
         maxFps = Min(maxInactiveFps_, maxFps);
-    
+
     long long elapsed = 0;
-    
+
     // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
         PROFILE(ApplyFrameLimit);
-        
+
         long long targetMax = 1000000LL / maxFps;
-        
+
         for (;;)
         {
             elapsed = frameTimer_.GetUSec(false);
             if (elapsed >= targetMax)
                 break;
-            
+
             // Sleep if 1 ms or more off the frame limiting goal
             if (targetMax - elapsed >= 1000LL)
             {
@@ -570,9 +586,17 @@ void Engine::ApplyFrameLimit()
             }
         }
     }
-    
+
     elapsed = frameTimer_.GetUSec(true);
-    
+    #ifdef ENABLE_TESTING
+    if (timeOut_ > 0)
+    {
+        timeOut_ -= elapsed;
+        if (timeOut_ <= 0)
+            Exit();
+    }
+    #endif
+
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)
     {
@@ -580,29 +604,35 @@ void Engine::ApplyFrameLimit()
         if (elapsed > targetMin)
             elapsed = targetMin;
     }
-    
-    timeStep_ = elapsed / 1000000.0f;
+
+    // Perform timestep smoothing
+    timeStep_ = 0.0f;
+    lastTimeSteps_.Push(elapsed / 1000000.0f);
+    if (lastTimeSteps_.Size() > timeStepSmoothing_)
+    {
+        // If the smoothing configuration was changed, ensure correct amount of samples
+        lastTimeSteps_.Erase(0, lastTimeSteps_.Size() - timeStepSmoothing_);
+        for (unsigned i = 0; i < lastTimeSteps_.Size(); ++i)
+            timeStep_ += lastTimeSteps_[i];
+        timeStep_ /= lastTimeSteps_.Size();
+    }
+    else
+        timeStep_ = lastTimeSteps_.Back();
 }
 
 VariantMap Engine::ParseParameters(const Vector<String>& arguments)
 {
     VariantMap ret;
-    
+
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
-        if (arguments[i][0] == '-' && arguments[i].Length() >= 2)
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
         {
             String argument = arguments[i].Substring(1).ToLower();
-            
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
             if (argument == "headless")
                 ret["Headless"] = true;
-            else if (argument.Substring(0, 3) == "log")
-            {
-                argument = argument.Substring(3);
-                int logLevel = GetStringListIndex(argument.CString(), logLevelPrefixes, -1);
-                if (logLevel != -1)
-                    ret["LogLevel"] = logLevel;
-            }
             else if (argument == "nolimit")
                 ret["FrameLimiter"] = false;
             else if (argument == "nosound")
@@ -623,62 +653,72 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["WorkerThreads"] = false;
             else if (argument == "sm2")
                 ret["ForceSM2"] = true;
-            else
+            else if (argument == "v")
+                ret["VSync"] = true;
+            else if (argument == "t")
+                ret["TripleBuffer"] = true;
+            else if (argument == "w")
+                ret["FullScreen"] = false;
+            else if (argument == "s")
+                ret["WindowResizable"] = true;
+            else if (argument == "borderless")
+                ret["Borderless"] = true;
+            else if (argument == "q")
+                ret["LogQuiet"] = true;
+            else if (argument == "log" && !value.Empty())
             {
-                int value;
-                if (argument.Length() > 1)
-                    value = ToInt(argument.Substring(1));
-                
-                switch (tolower(argument[0]))
+                int logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, -1);
+                if (logLevel != -1)
                 {
-                case 'x':
-                    ret["WindowWidth"] = value;
-                    break;
-                    
-                case 'y':
-                    ret["WindowHeight"] = value;
-                    break;
-                
-                case 'm':
-                    ret["MultiSample"] = value;
-                    break;
-                    
-                case 'b':
-                    ret["SoundBuffer"] = value;
-                    break;
-                    
-                case 'r':
-                    ret["SoundMixRate"] = value;
-                    break;
-                    
-                case 'v':
-                    ret["VSync"] = true;
-                    break;
-                    
-                case 't':
-                    ret["TripleBuffer"] = true;
-                    break;
-                    
-                case 'w':
-                    ret["FullScreen"] = false;
-                    break;
-                        
-                case 's':
-                    ret["WindowResizable"] = true;
-                    break;
-                    
-                case 'q':
-                    ret["LogQuiet"] = true;
-                    break;
-                    
-                case 'p':
-                    ret["ResourcePaths"] = arguments[i].Substring(2);
-                    break;
+                    ret["LogLevel"] = logLevel;
+                    ++i;
                 }
             }
+            else if (argument == "x" && !value.Empty())
+            {
+                ret["WindowWidth"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "y" && !value.Empty())
+            {
+                ret["WindowHeight"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "m" && !value.Empty())
+            {
+                ret["MultiSample"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "b" && !value.Empty())
+            {
+                ret["SoundBuffer"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "r" && !value.Empty())
+            {
+                ret["SoundMixRate"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "p" && !value.Empty())
+            {
+                ret["ResourcePaths"] = value;
+                ++i;
+            }
+            else if (argument == "ds" && !value.Empty())
+            {
+                ret["DumpShaders"] = value;
+                ++i;
+            }
+            #ifdef ENABLE_TESTING
+            else if (argument == "timeout" && !value.Empty())
+            {
+                ret["TimeOut"] = ToInt(value);
+                ++i;
+            }
+            #endif
         }
     }
-    
+
     return ret;
 }
 
@@ -710,7 +750,7 @@ void Engine::DoExit()
     Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics)
         graphics->Close();
-    
+
     exiting_ = true;
 }
 

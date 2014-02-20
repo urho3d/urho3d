@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "ArrayPtr.h"
 #include "BoundingBox.h"
 #include "Component.h"
+#include "HashSet.h"
 #include "Matrix3x4.h"
 
 class dtNavMesh;
@@ -100,6 +101,10 @@ public:
     bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
     bool Build(const BoundingBox& boundingBox);
+    /// Find the nearest point on the navigation mesh to a given point. Extens specifies how far out from the specified point to check along each axis.
+    Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents=Vector3::ONE);
+    /// Try to move along the surface from one point to another
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3);
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     /// Return a random point on the navigation mesh.

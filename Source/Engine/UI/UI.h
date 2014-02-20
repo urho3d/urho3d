@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,11 +53,9 @@ public:
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
     /// Set focused UI element.
-    void SetFocusElement(UIElement* element);
+    void SetFocusElement(UIElement* element, bool byKey = false);
     /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
     /// Only the modal element can clear its modal status or when it is being destructed.
-    /// UI subystem auto-removes modal element when an ESC key is pressed, however if this is not desirable, setting a user-defined variable "NoAutoRemove" in the modal element would prevent this.
-    /// In that case, the modal element will only have its modal flag reset and reparented back to its original parent.
     bool SetModalElement(UIElement* modalElement, bool enable);
     /// Clear the UI (excluding the cursor.)
     void Clear();
@@ -79,9 +77,25 @@ public:
     void SetClipBoardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
-    /// Set mouse wheel handling flag.
+    /// Set UI drag event start interval in seconds.
+    void SetDragBeginInterval(float interval);
+    /// Set UI drag event start distance threshold in pixels.
+    void SetDragBeginDistance(int pixels);
+    /// Set tooltip default display delay in seconds.
+    void SetDefaultToolTipDelay(float delay);
+    /// Set maximum font face texture size. Must be a power of two. Default is 2048.
+    void SetMaxFontTextureSize(int size);
+    /// Set whether mouse wheel can control also a non-focused element.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
-
+    /// Set whether to use system clipboard. Default false.
+    void SetUseSystemClipBoard(bool enable);
+    /// Set whether to show the on-screen keyboard (if supported) when a %LineEdit is focused. Default true on mobile devices.
+    void SetUseScreenKeyboard(bool enable);
+    /// Set whether to use mutable (eraseable) glyphs to ensure a font face never expands to more than one texture. Default false.
+    void SetUseMutableGlyphs(bool enable);
+    /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
+    void SetForceAutoHint(bool enable);
+    
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
     /// Return root modal element.
@@ -90,25 +104,43 @@ public:
     Cursor* GetCursor() const { return cursor_; }
     /// Return cursor position.
     IntVector2 GetCursorPosition() const;
-    /// Return UI element at screen coordinates.
+    /// Return UI element at screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
-    /// Return UI element at screen coordinates.
+    /// Return UI element at screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
+    /// Return currently dragged element.
+    UIElement* GetDragElement() const;
     /// Return clipboard text.
-    const String& GetClipBoardText() const { return clipBoard_; }
+    const String& GetClipBoardText() const;
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
-    /// Return mouse wheel handling flag.
+    /// Return UI drag start event interval in seconds.
+    float GetDragBeginInterval() const { return dragBeginInterval_; }
+    /// Return UI drag start event distance threshold in pixels.
+    int GetDragBeginDistance() const { return dragBeginDistance_; }
+    /// Return tooltip default display delay in seconds.
+    float GetDefaultToolTipDelay() const { return defaultToolTipDelay_; }
+    /// Return font texture maximum size.
+    int GetMaxFontTextureSize() const { return maxFontTextureSize_; }
+    /// Return whether mouse wheel can control also a non-focused element.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
+    /// Return whether is using the system clipboard.
+    bool GetUseSystemClipBoard() const { return useSystemClipBoard_; }
+    /// Return whether focusing a %LineEdit will show the on-screen keyboard.
+    bool GetUseScreenKeyboard() const { return useScreenKeyboard_; }
+    /// Return whether is using mutable (eraseable) glyphs for fonts.
+    bool GetUseMutableGlyphs() const { return useMutableGlyphs_; }
+    /// Return whether is using forced autohinting.
+    bool GetForceAutoHint() const { return forceAutoHint_; }
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 
 private:
-    /// Initialize when screen mode initially se.
+    /// Initialize when screen mode initially set.
     void Initialize();
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
@@ -126,6 +158,10 @@ private:
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
     /// Set active cursor's shape.
     void SetCursorShape(CursorShape shape);
+    /// Force release of font faces when global font properties change.
+    void ReleaseFontFaces();
+    /// Handle button or touch hover
+    void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
     void ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
@@ -156,25 +192,17 @@ private:
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
     /// Handle character event.
     void HandleChar(StringHash eventType, VariantMap& eventData);
+    /// Handle frame begin event.
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle logic post-update event.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle a file being drag-dropped into the application window.
+    void HandleDropFile(StringHash eventType, VariantMap& eventData);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Vertex shader for no texture.
-    SharedPtr<ShaderVariation> noTextureVS_;
-    /// Vertex shader for diffuse texture.
-    SharedPtr<ShaderVariation> diffTextureVS_;
-    /// Pixel shader for no texture.
-    SharedPtr<ShaderVariation> noTexturePS_;
-    /// Pixel shader for diffuse texture.
-    SharedPtr<ShaderVariation> diffTexturePS_;
-    /// Pixel shader for diffuse texture masking.
-    SharedPtr<ShaderVariation> diffMaskTexturePS_;
-    /// Pixel shader for alpha texture.
-    SharedPtr<ShaderVariation> alphaTexturePS_;
     /// UI root element.
     SharedPtr<UIElement> rootElement_;
     /// UI root modal element.
@@ -200,32 +228,55 @@ private:
     /// UI element query vector.
     PODVector<UIElement*> tempElements_;
     /// Clipboard text.
-    String clipBoard_;
+    mutable String clipBoard_;
+    /// Seconds between clicks to register a double click.
+    float doubleClickInterval_;
+    /// Seconds from mouse button down to begin a drag if there has been no movement exceeding pixel threshold.
+    float dragBeginInterval_;
+    /// Tooltip default display delay in seconds.
+    float defaultToolTipDelay_;
+    /// Drag begin event distance threshold in pixels.
+    int dragBeginDistance_;
     /// Mouse buttons held down.
     int mouseButtons_;
+    /// Last mouse button pressed.
+    int lastMouseButtons_;
     /// Qualifier keys held down.
     int qualifiers_;
+    /// Font texture maximum size.
+    int maxFontTextureSize_;
     /// Initialized flag.
     bool initialized_;
     /// Touch used flag.
     bool usingTouchInput_;
     /// Flag to switch mouse wheel event to be sent to non-focused element at cursor.
     bool nonFocusedMouseWheel_;
+    /// Flag for using operating system clipboard instead of internal.
+    bool useSystemClipBoard_;
+    /// Flag for showing the on-screen keyboard on focusing a %LineEdit.
+    bool useScreenKeyboard_;
+    /// Flag for using mutable (eraseable) font glyphs.
+    bool useMutableGlyphs_;
+    /// Flag for forcing FreeType autohinting.
+    bool forceAutoHint_;
+    /// Flag for a drag start event pending.
+    bool dragBeginPending_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.
-    Timer* clickTimer_;
+    Timer clickTimer_;
+    /// Timer used to trigger drag begin event.
+    Timer dragBeginTimer_;
+    /// Drag start position.
+    IntVector2 dragBeginPos_;
+    /// Timer used for drag begin.
     /// UI element last clicked for tracking click end.
     WeakPtr<UIElement> clickElement_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
-    /// Last mouse button pressed.
-    int lastMouseButtons_;
-    /// Seconds between clicks to register a double click.
-    float doubleClickInterval_;
 };
 
 /// Register UI library objects.
-void RegisterUILibrary(Context* context);
+void URHO3D_API RegisterUILibrary(Context* context);
 
 }

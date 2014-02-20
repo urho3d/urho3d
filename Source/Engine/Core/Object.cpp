@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,8 +99,12 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
 
 void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
 {
+    // If a null sender was specified, the event can not be subscribed to. Delete the handler in that case
     if (!sender || !handler)
+    {
+        delete handler;
         return;
+    }
     
     handler->SetSenderAndEventType(sender, eventType);
     // Remove old event handler first
@@ -313,6 +317,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
     
     context->EndSendEvent();
+}
+
+VariantMap& Object::GetEventDataMap() const
+{
+    return context_->GetEventDataMap();
 }
 
 Object* Object::GetSubsystem(ShortStringHash type) const

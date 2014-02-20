@@ -18,14 +18,17 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #ifndef _SDL_windowsvideo_h
 #define _SDL_windowsvideo_h
 
-#include "../SDL_sysvideo.h"
-
 #include "../../core/windows/SDL_windows.h"
+
+#include "../SDL_sysvideo.h"
 
 #if defined(_MSC_VER)
 #include <msctf.h>
@@ -123,6 +126,9 @@ typedef struct SDL_VideoData
     BOOL (WINAPI *GetTouchInputInfo)( HTOUCHINPUT, UINT, PTOUCHINPUT, int );
     BOOL (WINAPI *RegisterTouchWindow)( HWND, ULONG );
 
+    // Urho3D: added
+    BOOL (WINAPI *SetProcessDPIAware)();
+    
     SDL_bool ime_com_initialized;
     struct ITfThreadMgr *ime_threadmgr;
     SDL_bool ime_initialized;
@@ -169,6 +175,10 @@ typedef struct SDL_VideoData
     TSFSink *ime_uielemsink;
     TSFSink *ime_ippasink;
 } SDL_VideoData;
+
+
+typedef struct IDirect3D9 IDirect3D9;
+extern SDL_bool D3D_LoadDLL( void **pD3DDLL, IDirect3D9 **pDirect3D9Interface );
 
 #endif /* _SDL_windowsvideo_h */
 

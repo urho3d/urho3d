@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,7 @@ Vector<Vector<ModelSubGeometryLodLevel> > subGeometries_;
 Vector<Vector3> subGeometryCenters_;
 Vector<ModelBone> bones_;
 Vector<ModelMorph> morphs_;
+Vector<String> materialNames_;
 BoundingBox boundingBox_;
 unsigned numSubMeshes_ = 0;
 bool useOneBuffer_ = true;
@@ -58,9 +59,10 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void LoadSkeleton(const String& skeletonFileName);
 void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool exportMorphs);
-void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly);
+void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly, bool saveMaterialList);
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib);
 void CalculateScore(ModelVertex& vertex);
+String SanitateAssetName(const String& name);
 
 int main(int argc, char** argv)
 {
@@ -83,11 +85,12 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: OgreImporter <input file> <output file> [options]\n\n"
             "Options:\n"
-            "-na  Do not output animations\n"
-            "-nm  Do not output morphs\n"
-            "-r   Output only rotations from animations\n"
-            "-s   Split each submesh into own vertex buffer\n"
-            "-t   Generate tangents\n"
+            "-l      Output a material list file\n"
+            "-na     Do not output animations\n"
+            "-nm     Do not output morphs\n"
+            "-r      Output only rotations from animations\n"
+            "-s      Split each submesh into own vertex buffer\n"
+            "-t      Generate tangents\n"
         );
     }
     
@@ -96,36 +99,35 @@ void Run(const Vector<String>& arguments)
     bool exportAnimations = true;
     bool exportMorphs = true;
     bool rotationsOnly = false;
+    bool saveMaterialList = false;
     
     if (arguments.Size() > 2)
     {
         for (unsigned i = 2; i < arguments.Size(); ++i)
         {
-            if (arguments[i][0] == '-')
+            if (arguments[i].Length() > 1 && arguments[i][0] == '-')
             {
-                String arg = arguments[i].Substring(1).ToLower();
-                switch (arg[0])
-                {
-                case 't':
-                    generateTangents = true;
-                    break;
-                    
-                case 'n':
-                    if (arg.Length() > 1)
-                    {
-                        if (arg[1] == 'a')
-                            exportAnimations = false;
-                        if (arg[1] == 'm')
-                            exportMorphs = false;
-                    }
-                    break;
-                    
-                case 'r':
+                String argument = arguments[i].Substring(1).ToLower();
+                if (argument == "l")
+                    saveMaterialList = true;
+                else if (argument == "r")
                     rotationsOnly = true;
-                    break;
-                    
-                case 's':
+                else if (argument == "s")
                     splitSubMeshes = true;
+                else if (argument == "t")
+                    generateTangents = true;
+                else if (argument.Length() == 2 && argument[0] == 'n')
+                {
+                    switch (tolower(argument[1]))
+                    {
+                    case 'a':
+                        exportAnimations = false;
+                        break;
+                        
+                    case 'm':
+                        exportMorphs = false;
+                        break;
+                    }
                     break;
                 }
             }
@@ -133,7 +135,7 @@ void Run(const Vector<String>& arguments)
     }
     
     LoadMesh(arguments[0], generateTangents, splitSubMeshes, exportMorphs);
-    WriteOutput(arguments[1], exportAnimations, rotationsOnly);
+    WriteOutput(arguments[1], exportAnimations, rotationsOnly, saveMaterialList);
     
     PrintLine("Finished");
 }
@@ -260,6 +262,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     unsigned maxSubMeshVertices = 0;
     while (subMesh)
     {
+        materialNames_.Push(subMesh.GetAttribute("material"));
         XMLElement geometry = subMesh.GetChild("geometry");
         if (geometry)
         {
@@ -361,7 +364,11 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             if (bufferDef.HasAttribute("normals"))
                 vBuf->elementMask_ |= MASK_NORMAL;
             if (bufferDef.HasAttribute("texture_coords"))
+            {
                 vBuf->elementMask_ |= MASK_TEXCOORD1;
+                if (bufferDef.GetInt("texture_coords") > 1)
+                    vBuf->elementMask_ |= MASK_TEXCOORD2;
+            }
             
             unsigned vertexNum = vertexStart;
             if (vertices)
@@ -400,6 +407,19 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         Vector2 vec(x, y);
                         
                         vBuf->vertices_[vertexNum].texCoord1_ = vec;
+                        
+                        if (vBuf->elementMask_ & MASK_TEXCOORD2)
+                        {
+                            uv = uv.GetNext("texcoord");
+                            if (uv)
+                            {
+                                float x = uv.GetFloat("u");
+                                float y = uv.GetFloat("v");
+                                Vector2 vec(x, y);
+                                
+                                vBuf->vertices_[vertexNum].texCoord2_ = vec;
+                            }
+                        }
                     }
                     
                     vertexNum++;
@@ -819,7 +839,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     }
 }
 
-void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly)
+void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly, bool saveMaterialList)
 {
     // Begin serialization
     {
@@ -894,6 +914,22 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         // Geometry centers
         for (unsigned i = 0; i < subGeometryCenters_.Size(); ++i)
             dest.WriteVector3(subGeometryCenters_[i]);
+    }
+    
+    if (saveMaterialList)
+    {
+        String materialListName = ReplaceExtension(outputFileName, ".txt");
+        File listFile(context_);
+        if (listFile.Open(materialListName, FILE_WRITE))
+        {
+            for (unsigned i = 0; i < materialNames_.Size(); ++i)
+            {
+                // Assume the materials will be located inside the standard Materials subdirectory
+                listFile.WriteLine("Materials/" + ReplaceExtension(SanitateAssetName(materialNames_[i]), ".xml"));
+            }
+        }
+        else
+            PrintLine("Warning: could not write material list file " + materialListName);
     }
     
     XMLElement skeletonRoot = skelFile_->GetRoot("skeleton");
@@ -1173,4 +1209,20 @@ void CalculateScore(ModelVertex& vertex)
     float valenceBoost = powf((float)vertex.useCount_, -valenceBoostPower);
     score += valenceBoostScale * valenceBoost;
     vertex.score_ = score;
+}
+
+String SanitateAssetName(const String& name)
+{
+    String fixedName = name;
+    fixedName.Replace("<", "");
+    fixedName.Replace(">", "");
+    fixedName.Replace("?", "");
+    fixedName.Replace("*", "");
+    fixedName.Replace(":", "");
+    fixedName.Replace("\"", "");
+    fixedName.Replace("/", "");
+    fixedName.Replace("\\", "");
+    fixedName.Replace("|", "");
+    
+    return fixedName;
 }

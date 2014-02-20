@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,7 @@
 set (TARGET_NAME OgreBatchConverter)
 
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-
-# Define dependency libs
-set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/IO ../../Engine/Math)
+define_source_files ()
 
 # Setup target
 setup_executable ()

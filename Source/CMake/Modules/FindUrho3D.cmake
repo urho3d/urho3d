@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,79 +24,148 @@
 # For project root tree detection to work, Urho3D library must be already been built
 #
 #  URHO3D_FOUND
-#  URHO3D_INCLUDE_DIR
+#  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
+#  URHO3D_LIBRARIES_REL
+#  URHO3D_LIBRARIES_DBG
 #
 
-set (URHO3D_FOUND 0)
+if (URHO3D_FOUND)
+    return ()
+endif ()
+
+# If the URHO3D_LIB_TYPE build option changes then invalidate the found library cache
+if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
+    unset (URHO3D_LIBRARIES CACHE)
+    set (URHO3D_FOUND_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D library was last found")
+
+    # Urho3D prefers static library type by default while CMake prefers shared one, so we need to change CMake preference to agree with Urho3D
+    if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+        list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+    endif ()
+endif ()
 
 set (URHO3D_LIB_NAMES Urho3D)
 if (WIN32)
-    set (URHO3D_LIB_NAMES ${URHO3D_LIB_NAMES} Urho3D_d)
+    set (URHO3D_LIB_NAMES_DBG Urho3D_d)
 endif ()
 
-set (URHO3D_HOME $ENV{URHO3D_HOME})
+if (CMAKE_PROJECT_NAME MATCHES Urho3D.* AND PROJECT_ROOT_DIR)
+    set (URHO3D_HOME ${PROJECT_ROOT_DIR} CACHE PATH "Path to Urho3D project root tree" FORCE)
+    set (IS_INTERNAL 1)
+elseif (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
+    file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
+    set (URHO3D_HOME ${URHO3D_HOME} CACHE PATH "Path to Urho3D project root tree")
+endif ()
 if (URHO3D_HOME)
-    file (TO_CMAKE_PATH ${URHO3D_HOME} URHO3D_HOME)
-    
     # Construct source tree paths from URHO3D_HOME environment variable
     find_file (SOURCE_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     if (SOURCE_TREE_PATH)
         get_filename_component (SOURCE_TREE_PATH ${SOURCE_TREE_PATH} PATH)
-        set (URHO3D_INCLUDE_DIR
-            ${SOURCE_TREE_PATH}
-            ${SOURCE_TREE_PATH}/Audio
-            ${SOURCE_TREE_PATH}/Container
-            ${SOURCE_TREE_PATH}/Core
-            ${SOURCE_TREE_PATH}/Engine
-            ${SOURCE_TREE_PATH}/Graphics
-            ${SOURCE_TREE_PATH}/Input
-            ${SOURCE_TREE_PATH}/IO
-            ${SOURCE_TREE_PATH}/Math
-            ${SOURCE_TREE_PATH}/Navigation
-            ${SOURCE_TREE_PATH}/Network
-            ${SOURCE_TREE_PATH}/Physics
-            ${SOURCE_TREE_PATH}/Resource
-            ${SOURCE_TREE_PATH}/Scene
-            ${SOURCE_TREE_PATH}/Script
-            ${SOURCE_TREE_PATH}/UI
-            ${URHO3D_HOME}/Source/Extras/LuaScript
-            ${URHO3D_HOME}/Source/ThirdParty/SDL/include
-            ${URHO3D_HOME}/Source/ThirdParty/Bullet/src
-            ${URHO3D_HOME}/Source/ThirdParty/kNet/include
-        )
-
-        if (ANDROID)
-            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/android-Build/Engine)
-            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/android-Build/libs/${ANDROID_NDK_ABI_NAME})
-        elseif (RASPI AND CMAKE_CROSSCOMPILING)
-            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/raspi-Build/Engine)
-            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib-CC)
-        else ()
-            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/Build/Engine)
-            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib)
+        set (URHO3D_INCLUDE_DIRS ${SOURCE_TREE_PATH})
+        foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI)
+            list (APPEND URHO3D_INCLUDE_DIRS ${SOURCE_TREE_PATH}/${DIR})     # Note: variable change to list context after this
+        endforeach ()
+        set (DIRS Bullet/src kNet/include SDL/include)
+        if (ENABLE_ANGELSCRIPT)
+            list (APPEND DIRS AngelScript/include)
         endif ()
-        find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        foreach (DIR ${DIRS})
+            list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/Source/ThirdParty/${DIR})
+        endforeach ()
+
+        # For non Urho3D project using Urho3D as external library, Urho3D project itself must be built using predefined build directory as per specified in the provided build scripts.
+        if (IS_INTERNAL)
+            set (BINARY_DIR ${CMAKE_BINARY_DIR})
+        elseif (ANDROID AND CMAKE_HOST_WIN32 AND NOT USE_MKLINK)
+            set (BINARY_DIR ${URHO3D_HOME}/Source/Android)
+        else ()
+            set (BINARY_DIR ${URHO3D_HOME}/${PLATFORM_PREFIX}Build)
+        endif () 
+        list (APPEND URHO3D_INCLUDE_DIRS ${BINARY_DIR}/Engine)
+        if (ANDROID)
+            if (IS_INTERNAL)
+                set (URHO3D_LIB_SEARCH_PATH ${ANDROID_LIBRARY_OUTPUT_PATH})
+            else ()
+                set (URHO3D_LIB_SEARCH_PATH ${BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME})
+            endif ()
+        else ()
+            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/${PLATFORM_PREFIX}Lib)
+        endif ()
+        if (TARGET Urho3D)
+            set (URHO3D_LIBRARIES Urho3D)
+            set (FOUND_MESSAGE "Found Urho3D: as CMake target")
+        else ()
+            find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+            if (WIN32)
+                find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES_DBG} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+            endif ()
+        endif ()
     endif ()
 else ()
-    set (URHO3D_INC_SEARCH_PATH /opt/include)
-    find_path (URHO3D_INCLUDE_DIR Urho3D.h ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES Urho3D)
-    
-    set (URHO3D_LIB_SEARCH_PATH /opt/lib)
-    find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES Urho3D)
+    # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment variable to specify the prefix path to that location
+    # Note that the prefix path should not contain the "/include" or "/lib"
+    # For example on Windows platform: URHO3D_INSTALL_PREFIX=C:/Users/john/Urho3D if the SDK is installed using CMAKE_INSTALL_PREFIX=C:/Users/john/Urho3D
+    # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
+    if (NOT CMAKE_PREFIX_PATH AND DEFINED ENV{URHO3D_INSTALL_PREFIX})
+        file (TO_CMAKE_PATH "$ENV{URHO3D_INSTALL_PREFIX}" URHO3D_INSTALL_PREFIX)
+        set (CMAKE_PREFIX_PATH ${URHO3D_INSTALL_PREFIX} CACHE PATH "Prefix path to Urho3D SDK installation")
+    endif ()
+    if (WIN32)
+        set (URHO3D_INC_SEARCH_PATH include)
+        set (URHO3D_LIB_SEARCH_PATH lib)
+    else ()
+        set (PATH_SUFFIX Urho3D)
+        if (IOS)
+            set (CMAKE_LIBRARY_ARCHITECTURE ios)
+        endif ()
+        set (URHO3D_INC_SEARCH_PATH /opt/include)
+        set (URHO3D_LIB_SEARCH_PATH /opt/lib)
+    endif ()
+    find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
+    find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
+    if (WIN32)
+        find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES_DBG} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    endif ()
+
+    if (URHO3D_INCLUDE_DIRS)
+        set (BASE_DIR ${URHO3D_INCLUDE_DIRS})
+        set (DIRS Bullet kNet SDL)
+        if (ENABLE_ANGELSCRIPT)
+            list (APPEND DIRS AngelScript)
+        endif ()
+        foreach (DIR ${DIRS})
+            list (APPEND URHO3D_INCLUDE_DIRS ${BASE_DIR}/${DIR})     # Note: variable change to list context after this, so we need BASE_DIR to remain the same
+        endforeach ()
+    endif ()
 endif ()
 
-if (URHO3D_INCLUDE_DIR AND URHO3D_LIBRARIES)
+if (WIN32)
+    set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
+    if (URHO3D_LIBRARIES)
+        list (APPEND URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
+    else ()
+        set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
+    endif ()
+endif ()
+
+if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES)
     set (URHO3D_FOUND 1)
+    if (NOT FOUND_MESSAGE)
+        set (FOUND_MESSAGE "Found Urho3D: ${URHO3D_LIBRARIES}")
+    endif ()
 endif ()
 
 if (URHO3D_FOUND)
     include (FindPackageMessage)
-    FIND_PACKAGE_MESSAGE (Urho3D "Found Urho3D: ${URHO3D_LIBRARIES} ${URHO3D_INCLUDE_DIR}" "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIR}]")
+    FIND_PACKAGE_MESSAGE (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIRS}]")
 else ()
     if (Urho3D_FIND_REQUIRED)
-        message (FATAL_ERROR "Could not find Urho3D library installation or project root tree via ENV{URHO3D_HOME}")
+        message (FATAL_ERROR
+            "Could not find Urho3D library in default SDK installation location or Urho3D project root tree. "
+            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For searching in a build tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
     endif ()
 endif ()
 
-mark_as_advanced (URHO3D_INCLUDE_DIR URHO3D_LIBRARIES)
+mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES)

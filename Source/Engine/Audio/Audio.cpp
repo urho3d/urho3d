@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,28 +74,20 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     bufferLengthMSec = Max(bufferLengthMSec, MIN_BUFFERLENGTH);
     mixRate = Clamp(mixRate, MIN_MIXRATE, MAX_MIXRATE);
     
-    // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
-    fragmentSize_ = NextPowerOfTwo(mixRate >> 6);
-    
     SDL_AudioSpec desired;
     SDL_AudioSpec obtained;
     
     desired.freq = mixRate;
     desired.format = AUDIO_S16SYS;
     desired.channels = stereo ? 2 : 1;
-    
-    // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
-    if (desired.freq <= 11025)
-        desired.samples = 512;
-    else if (desired.freq <= 22050)
-        desired.samples = 1024;
-    else if (desired.freq <= 44100)
-        desired.samples = 2048;
-    else
-        desired.samples = 4096;
-    
     desired.callback = SDLAudioCallback;
     desired.userdata = this;
+    
+    // SDL uses power of two audio fragments. Determine the closest match
+    int bufferSamples = mixRate * bufferLengthMSec / 1000;
+    desired.samples = NextPowerOfTwo(bufferSamples);
+    if (Abs((int)desired.samples / 2 - bufferSamples) < Abs((int)desired.samples - bufferSamples))
+        desired.samples /= 2;
     
     deviceID_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
     if (!deviceID_)
@@ -114,7 +106,8 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     
     stereo_ = obtained.channels == 2;
     sampleSize_ = stereo_ ? sizeof(int) : sizeof(short);
-    fragmentSize_ = obtained.samples;
+    // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
+    fragmentSize_ = Min((int)NextPowerOfTwo(mixRate >> 6), (int)obtained.samples);
     mixRate_ = mixRate;
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1 : fragmentSize_];
@@ -247,7 +240,7 @@ void Audio::MixOutput(void *dest, unsigned samples)
             *destPtr++ = Clamp(*clipPtr++, -32768, 32767);
         
         samples -= workSamples;
-        ((unsigned char*&)destPtr) += sampleSize_ * workSamples;
+        ((unsigned char*&)dest) += sampleSize_ * workSamples;
     }
 }
 

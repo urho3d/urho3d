@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,13 +78,13 @@ public:
     void SetRotation(const Quaternion& rotation);
     /// Set constraint rotation relative to own body by specifying the axis.
     void SetAxis(const Vector3& axis);
-    /// Set constraint position relative to the other body. If connected to the static world, is a world-space position.
+    /// Set constraint position relative to the other body. If connected to the static world, is a world space position.
     void SetOtherPosition(const Vector3& position);
-    /// Set constraint rotation relative to the other body. If connected to the static world, is a world-space rotation.
+    /// Set constraint rotation relative to the other body. If connected to the static world, is a world space rotation.
     void SetOtherRotation(const Quaternion& rotation);
     /// Set constraint rotation relative to the other body by specifying the axis.
     void SetOtherAxis(const Vector3& axis);
-    /// Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
+    /// Set constraint world space position. Resets both own and other body relative position, ie. zeroes the constraint error.
     void SetWorldPosition(const Vector3& position);
     /// Set high limit. Interpretation is constraint type specific.
     void SetHighLimit(const Vector2& limit);

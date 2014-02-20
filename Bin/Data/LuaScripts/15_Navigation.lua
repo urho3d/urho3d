@@ -4,27 +4,18 @@
 --     - Performing path queries to the navigation mesh
 --     - Rebuilding the navigation mesh partially when adding or removing objects
 --     - Visualizing custom debug geometry
+--     - Raycasting drawable components
+--     - Making a node follow the Detour path
 
 require "LuaScripts/Utilities/Sample"
 
 local scene_ = nil
 local cameraNode = nil
-local startPos = nil
 local endPos = nil
-local currentPath = nil
+local currentPath = {}
 local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false
-local startPosDefined = false
-local endPosDefined = false
-
-local context = GetContext()
-
-local cache = GetCache()
-local input = GetInput()
-local graphics = GetGraphics()
-local renderer = GetRenderer()
-local ui = GetUI()
 
 function Start()
     -- Execute the common startup for samples
@@ -44,7 +35,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
@@ -72,7 +63,7 @@ function CreateScene()
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
     light.castShadows = true
-    light.shadowBias = BiasParameters(0.0001, 0.5)
+    light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
 
@@ -98,7 +89,15 @@ function CreateScene()
             boxObject.occluder = true
         end
     end
-    
+
+    -- Create Jack node that will follow the path
+    jackNode = scene_:CreateChild("Jack")
+    jackNode.position = Vector3(-5, 0, 20)
+    local modelObject = jackNode:CreateComponent("AnimatedModel")
+    modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
+    modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
+    modelObject.castShadows = true
+
     -- Create a NavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("NavigationMesh")
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -125,7 +124,7 @@ function CreateUI()
     -- Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
     -- control the camera, and when visible, it will point the raycast target
     local style = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
-    local cursor = Cursor:new(context)
+    local cursor = Cursor:new()
     cursor:SetStyleAuto(style)
     ui.cursor = cursor
     -- Set starting position of the cursor at the rendering window center
@@ -134,7 +133,7 @@ function CreateUI()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
-        "Shift+LMB to set path start, LMB to set path end\n"..
+        "LMB to set destination, SHIFT+LMB to teleport\n"..
         "MMB to add or remove obstacles\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
@@ -149,7 +148,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 
@@ -201,7 +200,7 @@ function MoveCamera(timeStep)
     if input:GetKeyDown(KEY_D) then
         cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
-    -- Set route start/endpoint with left mouse button, recalculate route if applicable
+    -- Set destination or teleport with left mouse button
     if input:GetMouseButtonPress(MOUSEB_LEFT) then
         SetPathPoint()
     end
@@ -217,18 +216,19 @@ end
 
 function SetPathPoint()
     local result, hitPos, hitDrawable = Raycast(250.0)
+    local navMesh = scene_:GetComponent("NavigationMesh")
     if result then
-        local setStart = input:GetQualifierDown(QUAL_SHIFT)
-        if setStart then
-            startPos = hitPos
-            startPosDefined = true
+        local pathPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
+
+        if input:GetQualifierDown(QUAL_SHIFT) then
+            -- Teleport
+            currentPath = {}
+            jackNode:LookAt(Vector3(pathPos.x, jackNode.position.y, pathPos.z), Vector3(0.0, 1.0, 0.0))
+            jackNode.position = pathPos;
         else
-            endPos = hitPos
-            endPosDefined = true
-        end
-        
-        if startPosDefined and endPosDefined then
-            RecalculatePath()
+            -- Calculate path from Jack's current position to the end point
+            endPos = pathPos;
+            currentPath = navMesh:FindPath(jackNode.position, endPos);
         end
     end
 end
@@ -254,7 +254,9 @@ function AddOrRemoveObject()
         -- Rebuild part of the navigation mesh, then recalculate path if applicable
         local navMesh = scene_:GetComponent("NavigationMesh")
         navMesh:Build(updateBox)
-        RecalculatePath()
+        if table.maxn(currentPath) > 0 then
+            currentPath = navMesh:FindPath(jackNode.position, endPos);
+        end
     end
 end
 
@@ -268,11 +270,6 @@ function CreateMushroom(pos)
     mushroomObject.material = cache:GetResource("Material", "Materials/Mushroom.xml")
     mushroomObject.castShadows = true
     return mushroomNode
-end
-
-function RecalculatePath()
-    local navMesh = scene_:GetComponent("NavigationMesh")
-    currentPath = navMesh:FindPath(startPos, endPos)
 end
 
 function Raycast(maxDistance)
@@ -306,6 +303,30 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+
+    -- Make Jack follow the Detour path
+    FollowPath(timeStep)
+end
+
+function FollowPath(timeStep)
+    if table.maxn(currentPath) > 0 then
+        local nextWaypoint = currentPath[1] -- NB: currentPath[1] is the next waypoint in order
+
+        -- Rotate Jack toward next waypoint to reach and move. Check for not overshooting the target
+        local move = 5 * timeStep
+        local distance = (jackNode.position - nextWaypoint):Length()
+        if move > distance then
+            move = distance
+        end
+
+        jackNode:LookAt(nextWaypoint, Vector3(0.0, 1.0, 0.0))
+        jackNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * move)
+
+        -- Remove waypoint if reached it
+        if (jackNode.position - nextWaypoint):Length() < 0.1 then
+            table.remove(currentPath, 1)
+        end
+    end
 end
 
 function HandlePostRenderUpdate(eventType, eventData)
@@ -316,21 +337,19 @@ function HandlePostRenderUpdate(eventType, eventData)
     end
     
     -- Visualize the start and end points and the last calculated path
-    -- Note the convenience accessor to the DebugRenderer component
-    local debug = scene_:GetComponent("DebugRenderer")
-    if startPosDefined then
-        debug:AddBoundingBox(BoundingBox(startPos - Vector3(0.1, 0.1, 0.1), startPos + Vector3(0.1, 0.1, 0.1)), Color(1.0, 1.0, 1.0))
-    end
-    
-    if endPosDefined then
+    local size = table.maxn(currentPath)
+    if size > 0 then
+        local debug = scene_:GetComponent("DebugRenderer")
         debug:AddBoundingBox(BoundingBox(endPos - Vector3(0.1, 0.1, 0.1), endPos + Vector3(0.1, 0.1, 0.1)), Color(1.0, 1.0, 1.0))
-    end
-    
-    if currentPath ~= nil and currentPath:Size() > 0 then
+        
         -- Draw the path with a small upward bias so that it does not clip into the surfaces
         local bias = Vector3(0.0, 0.05, 0.0)
-        for i = 0, currentPath:Size() - 2 do
-            debug:AddLine(currentPath[i] + bias, currentPath[i + 1] + bias, Color(1.0, 1.0, 1.0))
+        debug:AddLine(jackNode.position + bias, currentPath[1] + bias, Color(1.0, 1.0, 1.0))
+
+        if size > 1 then
+            for i = 1, size - 1 do
+                debug:AddLine(currentPath[i] + bias, currentPath[i + 1] + bias, Color(1.0, 1.0, 1.0))
+            end
         end
     end
 end

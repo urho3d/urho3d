@@ -1,0 +1,63 @@
+# Build directories
+Build/
+*-Build/
+
+# Output directories
+Bin/*
+!Bin/**/
+!Bin/*.bat
+!Bin/*.sh
+Bin/*.app/
+Bin/*.app.dSYM/
+Bin/Data/LuaScripts/jit/
+*-Bin/
+Lib/
+*-Lib/
+
+# Compiled shaders
+*.vs2
+*.vs3
+*.ps2
+*.ps3
+
+# Compiled AngelScript
+*.asc
+
+# Compiled Lua script
+*.luc
+
+# Generated documentation
+Docs/html/
+Docs/Doxyfile
+Docs/minimal-*
+
+# Eclipse project settings
+Source/.*project
+Source/.settings
+
+# Android in-the-source project settings
+Source/Android/project.properties
+Source/Android/local.properties
+Source/Android/proguard-project.txt
+
+# Android in-the-source build and output directories
+Source/Android/Engine
+Source/Android/ThirdParty
+Source/Android/libs
+
+# Android in-the-source CMake build files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Misc.
+configure*
+*~
+*.swp
+.DS_Store
+*.log
+*.bak
+Thumbs.db

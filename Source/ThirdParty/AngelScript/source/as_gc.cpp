@@ -72,19 +72,6 @@ asCGarbageCollector::~asCGarbageCollector()
 	freeNodes.SetLength(0);
 }
 
-bool asCGarbageCollector::IsObjectInGC(void *obj)
-{
-	asUINT n;
-	for( n = 0; n < gcNewObjects.GetLength(); n++ )
-		if( gcNewObjects[n].obj == obj )
-			return true;
-	for( n = 0; n < gcOldObjects.GetLength(); n++ )
-		if( gcOldObjects[n].obj == obj )
-			return true;
-
-	return false;
-}
-
 int asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 {
 	if( obj == 0 || objType == 0 )
@@ -151,7 +138,7 @@ int asCGarbageCollector::GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, a
 
 	ENTERCRITICALSECTION(gcCritical);
 	asSObjTypePair *o = 0;
-	asUINT newObjs = gcNewObjects.GetLength();
+	asUINT newObjs = asUINT(gcNewObjects.GetLength());
 	if( idx < newObjs )
 		o = &gcNewObjects[idx];
 	else if( idx < gcOldObjects.GetLength() + newObjs )
@@ -343,6 +330,9 @@ void asCGarbageCollector::MoveObjectToOldList(int idx)
 
 int asCGarbageCollector::DestroyNewGarbage()
 {
+	// This function will only be called within the critical section gcCollecting
+	asASSERT(isProcessing);
+
 	for(;;)
 	{
 		switch( destroyNewState )
@@ -452,6 +442,8 @@ int asCGarbageCollector::DestroyNewGarbage()
 
 int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
 {
+	// This function will only be called as the engine is shutting down
+
 	int items = 0;
 	for( asUINT n = 0; n < gcOldObjects.GetLength(); n++ )
 	{
@@ -469,7 +461,9 @@ int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
 		// Add additional info for builtin types
 		if( gcObj.type->name == "_builtin_function_" )
 		{
-			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetName());
+			// Unfortunately we can't show the function declaration here, because the engine may have released the parameter list already so the declaration would only be misleading
+			// We need to show the function type too as for example delegates do not have a name
+			msg.Format(TXT_PREV_FUNC_IS_NAMED_s_TYPE_IS_d, reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetName(), reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetFuncType());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
 		}
 		else if( gcObj.type->name == "_builtin_objecttype_" )
@@ -494,6 +488,9 @@ int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
 
 int asCGarbageCollector::DestroyOldGarbage()
 {
+	// This function will only be called within the critical section gcCollecting
+	asASSERT(isProcessing);
+
 	for(;;)
 	{
 		switch( destroyOldState )
@@ -603,6 +600,9 @@ int asCGarbageCollector::DestroyOldGarbage()
 
 int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 {
+	// This function will only be called within the critical section gcCollecting
+	asASSERT(isProcessing);
+
 	for(;;)
 	{
 		switch( detectState )
@@ -893,6 +893,9 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 
 asCGarbageCollector::asSMapNode_t *asCGarbageCollector::GetNode(void *obj, asSIntTypePair it)
 {
+	// This function will only be called within the critical section gcCollecting
+	asASSERT(isProcessing);
+
 	asSMapNode_t *node;
 	if( freeNodes.GetLength() )
 		node = freeNodes.PopLast();
@@ -905,12 +908,18 @@ asCGarbageCollector::asSMapNode_t *asCGarbageCollector::GetNode(void *obj, asSIn
 
 void asCGarbageCollector::ReturnNode(asSMapNode_t *node)
 {
+	// This function will only be called within the critical section gcCollecting
+	asASSERT(isProcessing);
+
 	if( node )
 		freeNodes.PushLast(node);
 }
 
 void asCGarbageCollector::GCEnumCallback(void *reference)
 {
+	// This function will only be called within the critical section gcCollecting
+	asASSERT(isProcessing);
+
 	if( detectState == countReferences_loop )
 	{
 		// Find the reference in the map

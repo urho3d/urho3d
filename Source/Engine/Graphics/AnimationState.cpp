@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -193,7 +193,7 @@ void AnimationState::SetTime(float time)
     }
 }
 
-void AnimationState::SetBoneWeight(unsigned index, float weight)
+void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive)
 {
     if (index >= stateTracks_.Size())
         return;
@@ -206,16 +206,31 @@ void AnimationState::SetBoneWeight(unsigned index, float weight)
         if (model_)
             model_->MarkAnimationDirty();
     }
+    
+    if (recursive)
+    {
+        Node* boneNode = stateTracks_[index].node_;
+        if (boneNode)
+        {
+            const Vector<SharedPtr<Node> >& children = boneNode->GetChildren();
+            for (unsigned i = 0; i < children.Size(); ++i)
+            {
+                unsigned childTrackIndex = GetTrackIndex(children[i]);
+                if (childTrackIndex != M_MAX_UNSIGNED)
+                    SetBoneWeight(childTrackIndex, weight, true);
+            }
+        }
+    }
 }
 
-void AnimationState::SetBoneWeight(const String& name, float weight)
+void AnimationState::SetBoneWeight(const String& name, float weight, bool recursive)
 {
-    SetBoneWeight(GetTrackIndex(name), weight);
+    SetBoneWeight(GetTrackIndex(name), weight, recursive);
 }
 
-void AnimationState::SetBoneWeight(StringHash nameHash, float weight)
+void AnimationState::SetBoneWeight(StringHash nameHash, float weight, bool recursive)
 {
-    SetBoneWeight(GetTrackIndex(nameHash), weight);
+    SetBoneWeight(GetTrackIndex(nameHash), weight, recursive);
 }
 
 void AnimationState::AddWeight(float delta)
@@ -272,8 +287,8 @@ void AnimationState::AddTime(float delta)
                 
                 Node* senderNode = model_ ? model_->GetNode() : node_;
                 
-                VariantMap eventData;
-                eventData[P_NODE] = (void*)senderNode;
+                VariantMap& eventData = senderNode->GetEventDataMap();
+                eventData[P_NODE] = senderNode;
                 eventData[P_NAME] = animation_->GetAnimationName();
                 eventData[P_TIME] = i->time_;
                 eventData[P_DATA] = i->data_;
@@ -332,6 +347,17 @@ unsigned AnimationState::GetTrackIndex(const String& name) const
             return i;
     }
     
+    return M_MAX_UNSIGNED;
+}
+
+unsigned AnimationState::GetTrackIndex(Node* node) const
+{
+    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    {
+        if (stateTracks_[i].node_ == node)
+            return i;
+    }
+
     return M_MAX_UNSIGNED;
 }
 

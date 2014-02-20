@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,19 +41,32 @@ enum TextEffect
     TE_STROKE
 };
 
-/// Glyph location.
+/// Cached character location and size within text. Used for queries related to text editing.
+struct CharLocation
+{
+    /// Position.
+    IntVector2 position_;
+    /// Size.
+    IntVector2 size_;
+};
+
+/// Glyph and its location within the text. Used when preparing text rendering.
 struct GlyphLocation
 {
-    int x_;
-    int y_;
-    const FontGlyph* glyph_;
-
+    // Construct.
     GlyphLocation(int x, int y, const FontGlyph* glyph) :
-    x_(x),
+        x_(x),
         y_(y),
         glyph_(glyph)
     {
     }
+
+    /// X coordinate.
+    int x_;
+    /// Y coordinate.
+    int y_;
+    /// Glyph.
+    const FontGlyph* glyph_;
 };
 
 /// %Text %UI element.
@@ -77,6 +90,8 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to resize.
     virtual void OnResize();
+    /// React to indent change.
+    virtual void OnIndentSet();
 
     /// Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
@@ -131,12 +146,14 @@ public:
     int GetRowHeight() const { return rowHeight_; }
     /// Return number of rows.
     unsigned GetNumRows() const { return rowWidths_.Size(); }
-    /// Return width of each row.
-    const PODVector<int>& GetRowWidths() const { return rowWidths_; }
-    /// Return position of each character.
-    const PODVector<IntVector2>& GetCharPositions() const { return charPositions_; }
-    /// Return size of each character.
-    const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
+    /// Return number of characters.
+    unsigned GetNumChars() const { return unicodeText_.Size(); }
+    /// Return width of row by index.
+    int GetRowWidth(unsigned index) const;
+    /// Return position of character by index relative to the text element origin.
+    IntVector2 GetCharPosition(unsigned index);
+    /// Return size of character by index.
+    IntVector2 GetCharSize(unsigned index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -152,31 +169,31 @@ protected:
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update text when text, font or spacing changed.
     void UpdateText();
+    /// Update cached character locations after text update, or when text alignment or indent has changed.
+    void UpdateCharLocations();
     /// Validate text selection to be within the text.
     void ValidateSelection();
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
-    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color = 0, float depthBias = 0.0f);
-    /// Contruct batch.
-    void ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color = 0, float depthBias = 0.0f);
+    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
 
     /// Font.
     SharedPtr<Font> font_;
+    /// Current face.
+    WeakPtr<FontFace> fontFace_;
     /// Font size.
     int fontSize_;
     /// UTF-8 encoded text.
     String text_;
-    /// Text as Unicode characters.
-    PODVector<unsigned> unicodeText_;
-    /// Text modified into printed form.
-    PODVector<unsigned> printText_;
     /// Row alignment.
     HorizontalAlignment textAlignment_;
     /// Row spacing.
     float rowSpacing_;
     /// Wordwrap mode.
     bool wordWrap_;
+    /// Char positions dirty flag.
+    bool charLocationsDirty_;
     /// Selection start.
     unsigned selectionStart_;
     /// Selection length.
@@ -193,12 +210,18 @@ protected:
     float effectDepthBias_;
     /// Row height.
     int rowHeight_;
+    /// Text as Unicode characters.
+    PODVector<unsigned> unicodeText_;
+    /// Text modified into printed form.
+    PODVector<unsigned> printText_;
+    /// Mapping of printed form back to original char indices.
+    PODVector<unsigned> printToText_;
     /// Row widths.
     PODVector<int> rowWidths_;
-    /// Positions of each character.
-    PODVector<IntVector2> charPositions_;
-    /// Sizes of each character.
-    PODVector<IntVector2> charSizes_;
+    /// Glyph locations per each texture in the font.
+    Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
+    /// Cached locations of each character in the text.
+    PODVector<CharLocation> charLocations_;
 };
 
 }

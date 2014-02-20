@@ -1,5 +1,5 @@
 ::
-:: Copyright (c) 2008-2013 the Urho3D project.
+:: Copyright (c) 2008-2014 the Urho3D project.
 ::
 :: Permission is hereby granted, free of charge, to any person obtaining a copy
 :: of this software and associated documentation files (the "Software"), to deal
@@ -20,4 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@cmake_vs2008.bat VERSION=10 %*
+@%~dp0\cmake_vs2008.bat VERSION=10 %*

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,9 @@ public:
     void RemoveAttribute(ShortStringHash objectType, const char* name);
     /// Update object attribute's default value.
     void UpdateAttributeDefaultValue(ShortStringHash objectType, const char* name, const Variant& defaultValue);
-
+    /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
+    VariantMap& GetEventDataMap();
+    
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
     /// Template version of registering an object factory.
@@ -87,7 +89,7 @@ public:
     /// Return active event handler. Set by Object. Null outside event handling.
     EventHandler* GetEventHandler() const { return eventHandler_; }
     /// Return object type name from hash, or empty if unknown.
-    const String& GetTypeName(ShortStringHash type) const;
+    const String& GetTypeName(ShortStringHash objectType) const;
     /// Return a specific attribute description for an object, or null if not found.
     AttributeInfo* GetAttribute(ShortStringHash objectType, const char* name);
     /// Template version of returning a subsystem.
@@ -145,7 +147,7 @@ private:
     /// Begin event send.
     void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
     /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent();
+    void EndSendEvent() { eventSenders_.Pop(); }
 
     /// Object factories.
     HashMap<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
@@ -161,6 +163,8 @@ private:
     HashMap<Object*, HashMap<StringHash, HashSet<Object*> > > specificEventReceivers_;
     /// Event sender stack.
     PODVector<Object*> eventSenders_;
+    /// Event data stack.
+    PODVector<VariantMap*> eventDataMaps_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     EventHandler* eventHandler_;
     /// Object categories.

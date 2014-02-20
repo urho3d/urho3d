@@ -46,6 +46,7 @@
 #include "as_scriptengine.h"
 #include "as_texts.h"
 #include "as_tokendef.h"
+#include "as_context.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -115,6 +116,14 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 #endif
 				{
 					// Copy the object's memory to the buffer
+					// TODO: bug: Must call the object's copy constructor instead of doing a memcpy, 
+					//            as the object may hold a pointer to itself. It's not enough to 
+					//            change only this memcpy as the assembler routine also makes a copy
+					//            of paramBuffer to the final stack location. To avoid the second 
+					//            copy the C++ routine should point paramBuffer to the final stack
+					//            position and copy the values directly to that location. The assembler
+					//            routines then don't need to copy anything, and will just be 
+					//            responsible for setting up the registers and the stack frame appropriately.
 					memcpy(&paramBuffer[dpos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
 
 					// Delete the original memory

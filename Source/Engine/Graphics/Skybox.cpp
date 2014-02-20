@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ extern const char* GEOMETRY_CATEGORY;
 
 Skybox::Skybox(Context* context) :
     StaticModel(context),
-    customWorldTransform_(Matrix3x4::IDENTITY)
+    lastFrame_(0)
 {
 }
 
@@ -60,15 +60,21 @@ void Skybox::UpdateBatches(const FrameInfo& frame)
 {
     distance_ = 0.0f;
 
-    // Follow only the camera rotation, not position
-    Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetNode()->GetWorldRotation().Inverse(), Vector3::ONE);
-    customWorldTransform_ = customView * node_->GetWorldTransform();
+    if (frame.frameNumber_ != lastFrame_)
+    {
+        customWorldTransforms_.Clear();
+        lastFrame_ = frame.frameNumber_;
+    }
+
+    // Add camera position to fix the skybox in space. Use effective world transform to take reflection into account
+    Matrix3x4 customWorldTransform = node_->GetWorldTransform();
+    customWorldTransform.SetTranslation(node_->GetWorldPosition() + frame.camera_->GetEffectiveWorldTransform().Translation());
+    HashMap<Camera*, Matrix3x4>::Iterator it = customWorldTransforms_.Insert(MakePair(frame.camera_, customWorldTransform));
 
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        batches_[i].worldTransform_ = &customWorldTransform_;
+        batches_[i].worldTransform_ = &it->second_;
         batches_[i].distance_ = 0.0f;
-        batches_[i].overrideView_ = true;
     }
 }
 

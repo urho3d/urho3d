@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,11 +45,11 @@ UIBatch::UIBatch() :
     blendMode_(BLEND_REPLACE),
     texture_(0),
     invTextureSize_(Vector2::ONE),
-    fixedColor_(0),
     vertexData_(0),
     vertexStart_(0),
     vertexEnd_(0)
 {
+    SetDefaultColor();
 }
 
 UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
@@ -58,30 +58,50 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
     scissor_(scissor),
     texture_(texture),
     invTextureSize_(texture ? Vector2(1.0f / (float)texture->GetWidth(), 1.0f / (float)texture->GetHeight()) : Vector2::ONE),
-    fixedColor_(element->GetDerivedColor().ToUInt()),
     vertexData_(vertexData),
     vertexStart_(vertexData->Size()),
     vertexEnd_(vertexData->Size())
 {
+    SetDefaultColor();
 }
 
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight,
-    Color* color)
+void UIBatch::SetColor(const Color& color, bool overrideAlpha)
+{
+    if (!element_)
+        overrideAlpha = true;
+
+    useGradient_ = false;
+    color_ = overrideAlpha ? color.ToUInt() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToUInt();
+}
+
+void UIBatch::SetDefaultColor()
+{
+    if (element_)
+    {
+        color_ = element_->GetDerivedColor().ToUInt();
+        useGradient_ = element_->HasColorGradient();
+    }
+    else
+    {
+        color_ = 0xffffffff;
+        useGradient_ = false;
+    }
+}
+
+void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
-    if (color || !element_->HasColorGradient())
+    if (!useGradient_)
     {
-        unsigned uintColor = color ? color->ToUInt() : fixedColor_;
-        
         // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(uintColor & 0xff000000))
+        if (!(color_ & 0xff000000))
             return;
         
-        topLeftColor = uintColor;
-        topRightColor = uintColor;
-        bottomLeftColor = uintColor;
-        bottomRightColor = uintColor;
+        topLeftColor = color_;
+        topRightColor = color_;
+        bottomLeftColor = color_;
+        bottomRightColor = color_;
     }
     else
     {
@@ -108,48 +128,48 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     float* dest = &(vertexData_->At(begin));
     vertexEnd_ = vertexData_->Size();
     
-    *dest++ = left; *dest++ = top; *dest++ = 0.0f;
-    *((unsigned*)dest) = topLeftColor; dest++;
-    *dest++ = leftUV; *dest++ = topUV;
+    dest[0] = left; dest[1] = top; dest[2] = 0.0f;
+    ((unsigned&)dest[3]) = topLeftColor;
+    dest[4] = leftUV; dest[5] = topUV;
     
-    *dest++ = right; *dest++ = top; *dest++ = 0.0f;
-    *((unsigned*)dest) = topRightColor; dest++;
-    *dest++ = rightUV; *dest++ = topUV;
+    dest[6] = right; dest[7] = top; dest[8] = 0.0f;
+    ((unsigned&)dest[9]) = topRightColor;
+    dest[10] = rightUV; dest[11] = topUV;
     
-    *dest++ = left; *dest++ = bottom; *dest++ = 0.0f;
-    *((unsigned*)dest) = bottomLeftColor; dest++;
-    *dest++ = leftUV; *dest++ = bottomUV;
+    dest[12] = left; dest[13] = bottom; dest[14] = 0.0f;
+    ((unsigned&)dest[15]) = bottomLeftColor;
+    dest[16] = leftUV; dest[17] = bottomUV;
     
-    *dest++ = right; *dest++ = top; *dest++ = 0.0f;
-    *((unsigned*)dest) = topRightColor; dest++;
-    *dest++ = rightUV; *dest++ = topUV;
+    dest[18] = right; dest[19] = top; dest[20] = 0.0f;
+    ((unsigned&)dest[21]) = topRightColor;
+    dest[22] = rightUV; dest[23] = topUV;
     
-    *dest++ = right; *dest++ = bottom; *dest++ = 0.0f;
-    *((unsigned*)dest) = bottomRightColor; dest++;
-    *dest++ = rightUV; *dest++ = bottomUV;
+    dest[24] = right; dest[25] = bottom; dest[26] = 0.0f;
+    ((unsigned&)dest[27]) = bottomRightColor;
+    dest[28] = rightUV; dest[29] = bottomUV;
 
-    *dest++ = left; *dest++ = bottom; *dest++ = 0.0f;
-    *((unsigned*)dest) = bottomLeftColor; dest++;
-    *dest++ = leftUV; *dest++ = bottomUV;
+    dest[30] = left; dest[31] = bottom; dest[32] = 0.0f;
+    ((unsigned&)dest[33]) = bottomLeftColor;
+    dest[34] = leftUV; dest[35] = bottomUV;
+
+    dest += 36;
 }
 
 void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
-    int texWidth, int texHeight, Color* color)
+    int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
     
-    if (color || !element_->HasColorGradient())
+    if (!useGradient_)
     {
-        unsigned uintColor = color ? color->ToUInt() : fixedColor_;
-        
         // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(uintColor & 0xff000000))
+        if (!(color_ & 0xff000000))
             return;
         
-        topLeftColor = uintColor;
-        topRightColor = uintColor;
-        bottomLeftColor = uintColor;
-        bottomRightColor = uintColor;
+        topLeftColor = color_;
+        topRightColor = color_;
+        bottomLeftColor = color_;
+        bottomRightColor = color_;
     }
     else
     {
@@ -174,29 +194,29 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
     float* dest = &(vertexData_->At(begin));
     vertexEnd_ = vertexData_->Size();
 
-    *dest++ = v1.x_; *dest++ = v1.y_; *dest++ = 0.0f;
-    *((unsigned*)dest) = topLeftColor; dest++;
-    *dest++ = leftUV; *dest++ = topUV;
+    dest[0] = v1.x_; dest[1] = v1.y_; dest[2] = 0.0f;
+    ((unsigned&)dest[3]) = topLeftColor;
+    dest[4] = leftUV; dest[5] = topUV;
     
-    *dest++ = v2.x_; *dest++ = v2.y_; *dest++ = 0.0f;
-    *((unsigned*)dest) = topRightColor; dest++;
-    *dest++ = rightUV; *dest++ = topUV;
+    dest[6] = v2.x_; dest[7] = v2.y_; dest[8] = 0.0f;
+    ((unsigned&)dest[9]) = topRightColor;
+    dest[10] = rightUV; dest[11] = topUV;
     
-    *dest++ = v3.x_; *dest++ = v3.y_; *dest++ = 0.0f;
-    *((unsigned*)dest) = bottomLeftColor; dest++;
-    *dest++ = leftUV; *dest++ = bottomUV;
+    dest[12] = v3.x_; dest[13] = v3.y_; dest[14] = 0.0f;
+    ((unsigned&)dest[15]) = bottomLeftColor;
+    dest[16] = leftUV; dest[17] = bottomUV;
     
-    *dest++ = v2.x_; *dest++ = v2.y_; *dest++ = 0.0f;
-    *((unsigned*)dest) = topRightColor; dest++;
-    *dest++ = rightUV; *dest++ = topUV;
+    dest[18] = v2.x_; dest[19] = v2.y_; dest[20] = 0.0f;
+    ((unsigned&)dest[21]) = topRightColor;
+    dest[22] = rightUV; dest[23] = topUV;
     
-    *dest++ = v4.x_; *dest++ = v4.y_; *dest++ = 0.0f;
-    *((unsigned*)dest) = bottomRightColor; dest++;
-    *dest++ = rightUV; *dest++ = bottomUV;
+    dest[24] = v4.x_; dest[25] = v4.y_; dest[26] = 0.0f;
+    ((unsigned&)dest[27]) = bottomRightColor;
+    dest[28] = rightUV; dest[29] = bottomUV;
 
-    *dest++ = v3.x_; *dest++ = v3.y_; *dest++ = 0.0f;
-    *((unsigned*)dest) = bottomLeftColor; dest++;
-    *dest++ = leftUV; *dest++ = bottomUV;
+    dest[30] = v3.x_; dest[31] = v3.y_; dest[32] = 0.0f;
+    ((unsigned&)dest[33]) = bottomLeftColor;
+    dest[34] = leftUV; dest[35] = bottomUV;
 }
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled)
@@ -231,13 +251,6 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
         
         tileY += tileH;
     }
-}
-
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight,
-    const Color& color)
-{
-    Color derivedColor(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity());
-    AddQuad(x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight, &derivedColor);
 }
 
 bool UIBatch::Merge(const UIBatch& batch)

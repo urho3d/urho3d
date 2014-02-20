@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@
 #include "Log.h"
 #include "Ptr.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Texture2D.h"
 #include "UI.h"
 
@@ -68,7 +67,8 @@ extern const char* UI_CATEGORY;
 Cursor::Cursor(Context* context) :
     BorderImage(context),
     shape_(CS_NORMAL),
-    useSystemShapes_(false)
+    useSystemShapes_(false),
+    osShapeDirty_(false)
 {
     // Subscribe to OS mouse cursor visibility changes to be able to reapply the cursor shape
     SubscribeToEvent(E_MOUSEVISIBLECHANGED, HANDLER(Cursor, HandleMouseVisibleChanged));
@@ -97,14 +97,17 @@ void Cursor::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
 }
 
-void Cursor::SetUseSystemShapes(bool enable)
+void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    if (enable != useSystemShapes_)
+    unsigned initialSize = vertexData.Size();
+    const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
+    Vector2 floatOffset(-(float)offset.x_, -(float)offset.y_);
+
+    BorderImage::GetBatches(batches, vertexData, currentScissor);
+    for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
     {
-        useSystemShapes_ = enable;
-        
-        // Reapply current shape
-        ApplyShape();
+        vertexData[i] += floatOffset.x_;
+        vertexData[i + 1] += floatOffset.y_;
     }
 }
 
@@ -115,27 +118,26 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
         LOGERROR("Shape index out of bounds, can not define cursor shape");
         return;
     }
-    
+
     if (!image)
         return;
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     CursorShapeInfo& info = shapeInfos_[shape];
-    
+
     // Prefer to get the texture with same name from cache to prevent creating several copies of the texture
-    if (cache->Exists(image->GetName()))
-        info.texture_ = cache->GetResource<Texture2D>(image->GetName());
-    else
+    info.texture_ = cache->GetResource<Texture2D>(image->GetName(), false);
+    if (!info.texture_)
     {
         Texture2D* texture = new Texture2D(context_);
         texture->Load(SharedPtr<Image>(image));
         info.texture_ = texture;
     }
-    
+
     info.image_ = image;
     info.imageRect_ = imageRect;
     info.hotSpot_ = hotSpot;
-    
+
     // Remove existing SDL cursor
     if (info.osCursor_)
     {
@@ -145,7 +147,10 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
 
     // Reset current shape if it was edited
     if (shape == shape_)
-        ApplyShape();
+    {
+        shape_ = CS_MAX_SHAPES;
+        SetShape(shape);
+    }
 }
 
 void Cursor::SetShape(CursorShape shape)
@@ -154,7 +159,27 @@ void Cursor::SetShape(CursorShape shape)
         return;
 
     shape_ = shape;
-    ApplyShape();
+    
+    CursorShapeInfo& info = shapeInfos_[shape_];
+    texture_ = info.texture_;
+    imageRect_ = info.imageRect_;
+    SetSize(info.imageRect_.Size());
+    
+    // To avoid flicker, the UI subsystem will apply the OS shape once per frame. Exception: if we are using the
+    // busy shape, set it immediately as we may block before that
+    osShapeDirty_ = true;
+    if (shape_ == CS_BUSY)
+        ApplyOSCursorShape();
+}
+
+void Cursor::SetUseSystemShapes(bool enable)
+{
+    if (enable != useSystemShapes_)
+    {
+        useSystemShapes_ = enable;
+        // Reapply current shape
+        osShapeDirty_ = true;
+    }
 }
 
 void Cursor::SetShapesAttr(VariantVector value)
@@ -172,7 +197,7 @@ void Cursor::SetShapesAttr(VariantVector value)
             ResourceRef ref = value[index++].GetResourceRef();
             IntRect imageRect = value[index++].GetIntRect();
             IntVector2 hotSpot = value[index++].GetIntVector2();
-            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.id_), imageRect, hotSpot);
+            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.name_), imageRect, hotSpot);
         }
         else
             index += 3;
@@ -205,92 +230,56 @@ VariantVector Cursor::GetShapesAttr() const
     return ret;
 }
 
-void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Cursor::ApplyOSCursorShape()
 {
-    unsigned initialSize = vertexData.Size();
-    const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
-    Vector2 floatOffset(-(float)offset.x_, -(float)offset.y_);
+    if (!osShapeDirty_ || !GetSubsystem<Input>()->IsMouseVisible() || GetSubsystem<UI>()->GetCursor() != this)
+        return;
 
-    BorderImage::GetBatches(batches, vertexData, currentScissor);
-    for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
-    {
-        vertexData[i] += floatOffset.x_;
-        vertexData[i + 1] += floatOffset.y_;
-    }
-}
-
-void Cursor::ApplyShape()
-{
     CursorShapeInfo& info = shapeInfos_[shape_];
-    texture_ = info.texture_;
-    imageRect_ = info.imageRect_;
-    SetSize(info.imageRect_.Size());
-
-    // If the OS cursor is being shown, define/set SDL cursor shape if necessary
-    // Only do this when we are the active UI cursor
-    if (GetSubsystem<Input>()->IsMouseVisible() && GetSubsystem<UI>()->GetCursor() == this)
+    
+    // Remove existing SDL cursor if is not a system shape while we should be using those, or vice versa
+    if (info.osCursor_ && info.systemDefined_ != useSystemShapes_)
     {
-        // Remove existing SDL cursor if is not a system shape while we should be using those, or vice versa
-        if (info.osCursor_ && info.systemDefined_ != useSystemShapes_)
-        {
-            SDL_FreeCursor(info.osCursor_);
-            info.osCursor_ = 0;
-        }
-        
-        // Create SDL cursor now if necessary
-        if (!info.osCursor_)
-        {
-            // Create from image
-            if (!useSystemShapes_ && info.image_)
-            {
-                unsigned comp = info.image_->GetComponents();
-                int imageWidth = info.image_->GetWidth();
-                int width = imageRect_.Width();
-                int height = imageRect_.Height();
-
-                // Assume little-endian for all the supported platforms
-                unsigned rMask = 0x000000ff;
-                unsigned gMask = 0x0000ff00;
-                unsigned bMask = 0x00ff0000;
-                unsigned aMask = 0xff000000;
-
-                SDL_Surface* surface = (comp >= 3 ? SDL_CreateRGBSurface(0, width, height, comp * 8, rMask, gMask, bMask, aMask) : 0);
-                if (surface)
-                {
-                    unsigned char* destination = reinterpret_cast<unsigned char*>(surface->pixels);
-                    unsigned char* source = info.image_->GetData() + comp * (imageWidth * imageRect_.top_ + imageRect_.left_);
-                    for (int i = 0; i < height; ++i)
-                    {
-                        memcpy(destination, source, comp * width);
-                        destination += comp * width;
-                        source += comp * imageWidth;
-                    }
-                    info.osCursor_ = SDL_CreateColorCursor(surface, info.hotSpot_.x_, info.hotSpot_.y_);
-                    info.systemDefined_ = false;
-                    if (!info.osCursor_)
-                        LOGERROR("Could not create cursor from image " + info.image_->GetName());
-                    SDL_FreeSurface(surface);
-                }
-            }
-            
-            // Create a system default shape
-            if (useSystemShapes_)
-            {
-                info.osCursor_ = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[shape_]);
-                info.systemDefined_ = true;
-                if (!info.osCursor_)
-                    LOGERROR("Could not create system cursor");
-            }
-        }
-        
-        if (info.osCursor_)
-            SDL_SetCursor(info.osCursor_);
+        SDL_FreeCursor(info.osCursor_);
+        info.osCursor_ = 0;
     }
+
+    // Create SDL cursor now if necessary
+    if (!info.osCursor_)
+    {
+        // Create a system default shape
+        if (useSystemShapes_)
+        {
+            info.osCursor_ = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[shape_]);
+            info.systemDefined_ = true;
+            if (!info.osCursor_)
+                LOGERROR("Could not create system cursor");
+        }
+        // Create from image
+        else if (info.image_)
+        {
+            SDL_Surface* surface = info.image_->GetSDLSurface(info.imageRect_);
+            
+            if (surface)
+            {
+                info.osCursor_ = SDL_CreateColorCursor(surface, info.hotSpot_.x_, info.hotSpot_.y_);
+                info.systemDefined_ = false;
+                if (!info.osCursor_)
+                    LOGERROR("Could not create cursor from image " + info.image_->GetName());
+                SDL_FreeSurface(surface);
+            }
+        }
+    }
+
+    if (info.osCursor_)
+        SDL_SetCursor(info.osCursor_);
+    
+    osShapeDirty_ = false;
 }
 
 void Cursor::HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData)
 {
-    ApplyShape();
+    ApplyOSCursorShape();
 }
 
 }

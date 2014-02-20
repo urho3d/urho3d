@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,13 +48,14 @@ static const char* typeNames[] =
     "Color",
     "String",
     "Buffer",
-    "Pointer",
+    "VoidPtr",
     "ResourceRef",
     "ResourceRefList",
     "VariantVector",
     "VariantMap",
     "IntRect",
     "IntVector2",
+    "Ptr",
     0
 };
 
@@ -88,6 +89,10 @@ Variant& Variant::operator = (const Variant& rhs)
         *(reinterpret_cast<VariantMap*>(&value_)) = *(reinterpret_cast<const VariantMap*>(&rhs.value_));
         break;
 
+    case VAR_PTR:
+        *(reinterpret_cast<WeakPtr<RefCounted>*>(&value_)) = *(reinterpret_cast<const WeakPtr<RefCounted>*>(&rhs.value_));
+        break;
+        
     default:
         value_ = rhs.value_;
         break;
@@ -98,9 +103,11 @@ Variant& Variant::operator = (const Variant& rhs)
 
 bool Variant::operator == (const Variant& rhs) const
 {
-    if (type_ != rhs.type_)
+    if (type_ == VAR_VOIDPTR || type_ == VAR_PTR)
+        return GetVoidPtr() == rhs.GetVoidPtr();
+    else if (type_ != rhs.type_)
         return false;
-
+    
     switch (type_)
     {
     case VAR_INT:
@@ -129,9 +136,6 @@ bool Variant::operator == (const Variant& rhs) const
 
     case VAR_BUFFER:
         return *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == *(reinterpret_cast<const PODVector<unsigned char>*>(&rhs.value_));
-
-    case VAR_PTR:
-        return value_.ptr_ == rhs.value_.ptr_;
 
     case VAR_RESOURCEREF:
         return *(reinterpret_cast<const ResourceRef*>(&value_)) == *(reinterpret_cast<const ResourceRef*>(&rhs.value_));
@@ -219,7 +223,8 @@ void Variant::FromString(VariantType type, const char* value)
         }
         break;
 
-    case VAR_PTR:
+    case VAR_VOIDPTR:
+        // From string to void pointer not supported, set to null
         *this = (void*)0;
         break;
 
@@ -231,7 +236,7 @@ void Variant::FromString(VariantType type, const char* value)
                 SetType(VAR_RESOURCEREF);
                 ResourceRef& ref = *(reinterpret_cast<ResourceRef*>(&value_));
                 ref.type_ = values[0];
-                ref.id_ = values[1];
+                ref.name_ = values[1];
             }
         }
         break;
@@ -244,9 +249,9 @@ void Variant::FromString(VariantType type, const char* value)
                 SetType(VAR_RESOURCEREFLIST);
                 ResourceRefList& refList = *(reinterpret_cast<ResourceRefList*>(&value_));
                 refList.type_ = values[0];
-                refList.ids_.Resize(values.Size() - 1);
+                refList.names_.Resize(values.Size() - 1);
                 for (unsigned i = 1; i < values.Size(); ++i)
-                    refList.ids_[i - 1] = values[i];
+                    refList.names_[i - 1] = values[i];
             }
         }
         break;
@@ -259,6 +264,11 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToIntVector2(value);
         break;
 
+    case VAR_PTR:
+        // From string to RefCounted pointer not supported, set to null
+        *this = (RefCounted*)0;
+        break;
+        
     default:
         SetType(VAR_NONE);
     }
@@ -320,6 +330,7 @@ String Variant::ToString() const
             return ret;
         }
 
+    case VAR_VOIDPTR:
     case VAR_PTR:
         // Pointer serialization not supported (convert to null)
         return String(0);
@@ -332,7 +343,7 @@ String Variant::ToString() const
 
     default:
         // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
-        // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
+        // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String::EMPTY;
     }
@@ -373,18 +384,18 @@ bool Variant::IsZero() const
     case VAR_BUFFER:
         return reinterpret_cast<const PODVector<unsigned char>*>(&value_)->Empty();
 
-    case VAR_PTR:
+    case VAR_VOIDPTR:
         return value_.ptr_ == 0;
 
     case VAR_RESOURCEREF:
-        return reinterpret_cast<const ResourceRef*>(&value_)->id_ == StringHash::ZERO;
+        return reinterpret_cast<const ResourceRef*>(&value_)->name_.Empty();
 
     case VAR_RESOURCEREFLIST:
     {
-        Vector<StringHash> ids = reinterpret_cast<const ResourceRefList*>(&value_)->ids_;
-        for (Vector<StringHash>::ConstIterator i = ids.Begin(); i != ids.End(); ++i)
+        const Vector<String>& names = reinterpret_cast<const ResourceRefList*>(&value_)->names_;
+        for (Vector<String>::ConstIterator i = names.Begin(); i != names.End(); ++i)
         {
-            if (*i != StringHash::ZERO)
+            if (!i->Empty())
                 return false;
         }
         return true;
@@ -402,6 +413,9 @@ bool Variant::IsZero() const
     case VAR_INTVECTOR2:
         return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
 
+    case VAR_PTR:
+        return *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_) == (RefCounted*)0;
+        
     default:
         return true;
     }
@@ -438,6 +452,10 @@ void Variant::SetType(VariantType newType)
         (reinterpret_cast<VariantMap*>(&value_))->~VariantMap();
         break;
 
+    case VAR_PTR:
+        (reinterpret_cast<WeakPtr<RefCounted>*>(&value_))->~WeakPtr<RefCounted>();
+        break;
+        
     default:
         break;
     }
@@ -470,6 +488,10 @@ void Variant::SetType(VariantType newType)
         new(reinterpret_cast<VariantMap*>(&value_)) VariantMap();
         break;
 
+    case VAR_PTR:
+        new(reinterpret_cast<WeakPtr<RefCounted>*>(&value_)) WeakPtr<RefCounted>();
+        break;
+        
     default:
         break;
     }
@@ -552,7 +574,7 @@ template<> const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned
 
 template<> void* Variant::Get<void*>() const
 {
-    return GetPtr();
+    return GetVoidPtr();
 }
 
 template<> ResourceRef Variant::Get<ResourceRef>() const
@@ -618,6 +640,11 @@ template<> IntVector2 Variant::Get<IntVector2>() const
 template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const
 {
     return GetBuffer();
+}
+
+template<> RefCounted* Variant::Get<RefCounted*>() const
+{
+    return GetPtr();
 }
 
 String Variant::GetTypeName(VariantType type)

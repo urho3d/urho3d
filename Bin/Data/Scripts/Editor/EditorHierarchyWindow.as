@@ -57,7 +57,7 @@ void CreateHierarchyWindow()
     ui.root.AddChild(hierarchyWindow);
     int height = Min(ui.root.height - 60, 500);
     hierarchyWindow.SetSize(300, height);
-    hierarchyWindow.SetPosition(20, 60);
+    hierarchyWindow.SetPosition(35, 100);
     hierarchyWindow.opacity = uiMaxOpacity;
     hierarchyWindow.BringToFront();
 
@@ -97,7 +97,7 @@ void HideHierarchyWindow()
 
 void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
 {
-    Button@ button = eventData["Element"].GetUIElement();
+    Button@ button = eventData["Element"].GetPtr();
     bool enable = button.name == "ExpandButton";
     CheckBox@ checkBox = hierarchyWindow.GetChild("AllCheckBox", true);
     bool all = checkBox.checked;
@@ -721,16 +721,16 @@ void HandleHierarchyListSelectionChange()
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ source = eventData["Source"].GetUIElement();
-    UIElement@ target = eventData["Target"].GetUIElement();
+    UIElement@ source = eventData["Source"].GetPtr();
+    UIElement@ target = eventData["Target"].GetPtr();
     int itemType;
     eventData["Accept"] = TestDragDrop(source, target, itemType);
 }
 
 void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 {
-    UIElement@ source = eventData["Source"].GetUIElement();
-    UIElement@ target = eventData["Target"].GetUIElement();
+    UIElement@ source = eventData["Source"].GetPtr();
+    UIElement@ target = eventData["Target"].GetPtr();
     int itemType = ITEM_NONE;
     bool accept = TestDragDrop(source, target, itemType);
     eventData["Accept"] = accept;
@@ -977,7 +977,7 @@ void HandleNodeAdded(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Node@ node = eventData["Node"].GetNode();
+    Node@ node = eventData["Node"].GetPtr();
     if (showTemporaryObject || !node.temporary)
         UpdateHierarchyItem(node);
 }
@@ -987,7 +987,7 @@ void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Node@ node = eventData["Node"].GetNode();
+    Node@ node = eventData["Node"].GetPtr();
     uint index = GetListIndex(node);
     UpdateHierarchyItem(index, null, null);
 }
@@ -998,8 +998,8 @@ void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     // Insert the newly added component at last component position but before the first child node position of the parent node
-    Node@ node = eventData["Node"].GetNode();
-    Component@ component = eventData["Component"].GetComponent();
+    Node@ node = eventData["Node"].GetPtr();
+    Component@ component = eventData["Component"].GetPtr();
     if (showTemporaryObject || !component.temporary)
     {
         uint nodeIndex = GetListIndex(node);
@@ -1016,7 +1016,7 @@ void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Component@ component = eventData["Component"].GetComponent();
+    Component@ component = eventData["Component"].GetPtr();
     uint index = GetComponentListIndex(component);
     if (index != NO_ITEM)
         hierarchyList.RemoveItem(index);
@@ -1027,7 +1027,7 @@ void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Node@ node = eventData["Node"].GetNode();
+    Node@ node = eventData["Node"].GetPtr();
     UpdateHierarchyItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
 }
 
@@ -1036,7 +1036,7 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Node@ node = eventData["Node"].GetNode();
+    Node@ node = eventData["Node"].GetPtr();
     UpdateHierarchyItemText(GetListIndex(node), node.enabled);
     attributesDirty = true;
 }
@@ -1046,7 +1046,7 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Component@ component = eventData["Component"].GetComponent();
+    Component@ component = eventData["Component"].GetPtr();
     UpdateHierarchyItemText(GetComponentListIndex(component), component.enabledEffective);
     attributesDirty = true;
 }
@@ -1056,7 +1056,7 @@ void HandleUIElementAdded(StringHash eventType, VariantMap& eventData)
     if (suppressUIElementChanges)
         return;
 
-    UIElement@ element = eventData["Element"].GetUIElement();
+    UIElement@ element = eventData["Element"].GetPtr();
     if ((showInternalUIElement || !element.internal) && (showTemporaryObject || !element.temporary))
         UpdateHierarchyItem(element);
 }
@@ -1066,7 +1066,7 @@ void HandleUIElementRemoved(StringHash eventType, VariantMap& eventData)
     if (suppressUIElementChanges)
         return;
 
-    UIElement@ element = eventData["Element"].GetUIElement();
+    UIElement@ element = eventData["Element"].GetPtr();
     UpdateHierarchyItem(GetListIndex(element), null, null);
 }
 
@@ -1075,7 +1075,7 @@ void HandleElementNameChanged(StringHash eventType, VariantMap& eventData)
     if (suppressUIElementChanges)
         return;
 
-    UIElement@ element = eventData["Element"].GetUIElement();
+    UIElement@ element = eventData["Element"].GetPtr();
     UpdateHierarchyItemText(GetListIndex(element), element.visible, GetUIElementTitle(element));
 }
 
@@ -1084,7 +1084,7 @@ void HandleElementVisibilityChanged(StringHash eventType, VariantMap& eventData)
     if (suppressUIElementChanges)
         return;
 
-    UIElement@ element = eventData["Element"].GetUIElement();
+    UIElement@ element = eventData["Element"].GetPtr();
     UpdateHierarchyItemText(GetListIndex(element), element.visible);
 }
 
@@ -1094,7 +1094,7 @@ void HandleElementAttributeChanged(StringHash eventType, VariantMap& eventData)
     if (suppressUIElementChanges || inEditAttribute)
         return;
 
-    UIElement@ element = eventData["Element"].GetUIElement();
+    UIElement@ element = eventData["Element"].GetPtr();
     for (uint i = 0; i < editUIElements.length; ++i)
     {
         if (editUIElements[i] is element)

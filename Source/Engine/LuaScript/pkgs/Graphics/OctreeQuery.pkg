@@ -1,0 +1,30 @@
+$#include "OctreeQuery.h"
+
+struct OctreeQueryResult
+{
+    OctreeQueryResult();
+    ~OctreeQueryResult();
+    
+    Drawable* drawable_ @ drawable;
+    Node* node_ @ node;
+};
+
+enum RayQueryLevel
+{
+    RAY_AABB = 0,
+    RAY_OBB,
+    RAY_TRIANGLE
+};
+
+struct RayQueryResult
+{
+    RayQueryResult();
+    ~RayQueryResult();
+    
+    Vector3 position_ @ position;
+    Vector3 normal_ @ normal;
+    float distance_ @ distance;
+    Drawable* drawable_ @ drawable;
+    Node* node_ @ node;
+    unsigned subObject_ @ subObject;
+};

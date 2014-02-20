@@ -60,9 +60,12 @@ struct asCTypeInfo
 	void SetConstantF(const asCDataType &dataType, float value);
 	void SetConstantD(const asCDataType &dataType, double value);
 	void SetNullConstant();
+	void SetUndefinedFuncHandle(asCScriptEngine *engine);
+	void SetVoidExpression();
 	void SetDummy();
 
-	bool IsNullConstant();
+	bool IsNullConstant() const;
+	bool IsVoidExpression() const;
 
 	asCDataType dataType;
 	bool  isLValue         :  1; // Can this value be updated in assignment, or increment operators, etc
@@ -70,7 +73,8 @@ struct asCTypeInfo
 	bool  isConstant       :  1;
 	bool  isVariable       :  1;
 	bool  isExplicitHandle :  1;
-	short dummy            : 11;
+	bool  isVoidExpression :  1;
+	short dummy            : 10;
 	short stackOffset;
 	union
 	{

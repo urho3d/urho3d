@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,14 @@
 
 #include <cstdio>
 #include <cstring>
+#include <lz4.h>
+#include <lz4hc.h>
 
 #include "DebugNew.h"
 
 using namespace Urho3D;
+
+static const unsigned COMPRESSED_BLOCK_SIZE = 32768;
 
 struct FileEntry
 {
@@ -50,6 +54,8 @@ SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String basePath_;
 Vector<FileEntry> entries_;
 unsigned checksum_ = 0;
+bool compress_ = false;
+unsigned blockSize_ = COMPRESSED_BLOCK_SIZE;
 
 String ignoreExtensions_[] = {
     ".bak",
@@ -61,6 +67,7 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void ProcessFile(const String& fileName, const String& rootDir);
 void WritePackageFile(const String& fileName, const String& rootDir);
+void WriteHeader(File& dest);
 
 int main(int argc, char** argv)
 {
@@ -79,12 +86,35 @@ int main(int argc, char** argv)
 void Run(const Vector<String>& arguments)
 {
     if (arguments.Size() < 2)
-        ErrorExit("Usage: PackageTool <directory to process> <package name> [basepath]\n");
+        ErrorExit(
+            "Usage: PackageTool <directory to process> <package name> [basepath] [options]\n"
+            "\n"
+            "Options:\n"
+            "-c      Enable package file LZ4 compression\n"
+        );
     
     const String& dirName = arguments[0];
     const String& packageName = arguments[1];
     if (arguments.Size() > 2)
-        basePath_ = AddTrailingSlash(arguments[2]);
+    {
+        for (unsigned i = 2; i < arguments.Size(); ++i)
+        {
+            if (arguments[i][0] != '-')
+                basePath_ = AddTrailingSlash(arguments[i]);
+            else
+            {
+                if (arguments[i].Length() > 1)
+                {
+                    switch (arguments[i][1])
+                    {
+                    case 'c':
+                        compress_ = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
     
     PrintLine("Scanning directory " + dirName + " for files");
     
@@ -140,9 +170,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         ErrorExit("Could not open output file " + fileName);
     
     // Write ID, number of files & placeholder for checksum
-    dest.WriteFileID("UPAK");
-    dest.WriteUInt(entries_.Size());
-    dest.WriteUInt(checksum_);
+    WriteHeader(dest);
     
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
@@ -153,11 +181,11 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
+    unsigned totalDataSize = 0;
+    
     // Write file data, calculate checksums & correct offsets
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
-        PrintLine("Writing file " + entries_[i].name_);
-        
         entries_[i].offset_ = dest.GetSize();
         String fileFullPath = rootDir + "/" + entries_[i].name_;
         
@@ -166,6 +194,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
             ErrorExit("Could not open file " + fileFullPath);
         
         unsigned dataSize = entries_[i].size_;
+        totalDataSize += dataSize;
         SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
         
         if (srcFile.Read(&buffer[0], dataSize) != dataSize)
@@ -178,14 +207,47 @@ void WritePackageFile(const String& fileName, const String& rootDir)
             entries_[i].checksum_ = SDBMHash(entries_[i].checksum_, buffer[j]);
         }
         
-        dest.Write(&buffer[0], entries_[i].size_);
+        if (!compress_)
+        {
+            PrintLine(entries_[i].name_ + " size " + String(dataSize));
+            dest.Write(&buffer[0], entries_[i].size_);
+        }
+        else
+        {
+            SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
+            
+            unsigned pos = 0;
+            unsigned totalPackedBytes = 0;
+            
+            while (pos < dataSize)
+            {
+                unsigned unpackedSize = blockSize_;
+                if (pos + unpackedSize > dataSize)
+                    unpackedSize = dataSize - pos;
+                
+                unsigned packedSize = LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
+                if (!packedSize)
+                    ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + pos);
+                
+                dest.WriteUShort(unpackedSize);
+                dest.WriteUShort(packedSize);
+                dest.Write(compressBuffer.Get(), packedSize);
+                totalPackedBytes += 6 + packedSize;
+                
+                pos += unpackedSize;
+            }
+            
+            PrintLine(entries_[i].name_ + " in " + String(dataSize) + " out " + String(totalPackedBytes));
+        }
     }
+    
+    // Write package size to the end of file to allow finding it linked to an executable file
+    unsigned currentSize = dest.GetSize();
+    dest.WriteUInt(currentSize + sizeof(unsigned));
     
     // Write header again with correct offsets & checksums
     dest.Seek(0);
-    dest.WriteFileID("UPAK");
-    dest.WriteUInt(entries_.Size());
-    dest.WriteUInt(checksum_);
+    WriteHeader(dest);
     
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
@@ -195,5 +257,17 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
-    PrintLine("Package total size " + String(dest.GetSize()) + " bytes");
+    PrintLine("Number of files " + String(entries_.Size()));
+    PrintLine("File data size " + String(totalDataSize));
+    PrintLine("Package size " + String(dest.GetSize()));
+}
+
+void WriteHeader(File& dest)
+{
+    if (!compress_)
+        dest.WriteFileID("UPAK");
+    else
+        dest.WriteFileID("ULZ4");
+    dest.WriteUInt(entries_.Size());
+    dest.WriteUInt(checksum_);
 }

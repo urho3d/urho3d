@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@
 #include "Scene.h"
 #include "StaticModel.h"
 #include "Text.h"
+#include "Touch.h"
 #include "UI.h"
 #include "Zone.h"
 
@@ -50,17 +51,18 @@
 
 #include "DebugNew.h"
 
-const float CAMERA_MIN_DIST = 1.0f;
-const float CAMERA_MAX_DIST = 5.0f;
-
 DEFINE_APPLICATION_MAIN(CharacterDemo)
 
 CharacterDemo::CharacterDemo(Context* context) :
     Sample(context),
-    firstPerson_(false)
+    touch_(new Touch(context))
 {
     // Register factory and attributes for the Character component so it can be created via CreateComponent, and loaded / saved
     Character::RegisterObject(context);
+}
+
+CharacterDemo::~CharacterDemo()
+{
 }
 
 void CharacterDemo::Start()
@@ -79,6 +81,13 @@ void CharacterDemo::Start()
     
     // Subscribe to necessary events
     SubscribeToEvents();
+
+    // Initialize touch input on Android & iOS
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+    {
+        SetLogoVisible(false);
+        touch_->InitTouchInput();
+    }
 }
 
 void CharacterDemo::CreateScene()
@@ -113,7 +122,7 @@ void CharacterDemo::CreateScene()
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
+    light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     light->SetSpecularIntensity(0.5f);
 
@@ -173,6 +182,10 @@ void CharacterDemo::CreateScene()
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
     }
+
+    // Pass knowledge of the scene & camera node to the Touch helper object
+    touch_->scene_ = scene_;
+    touch_->cameraNode_ = cameraNode_;
 }
 
 void CharacterDemo::CreateCharacter()
@@ -189,6 +202,9 @@ void CharacterDemo::CreateCharacter()
     object->SetCastShadows(true);
     objectNode->CreateComponent<AnimationController>();
     
+    // Set the head bone for manual control
+    object->GetSkeleton().GetBone("Bip01_Head")->animated_ = false;
+
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody* body = objectNode->CreateComponent<RigidBody>();
     body->SetCollisionLayer(1);
@@ -251,48 +267,57 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (character_)
     {
-        UI* ui = GetSubsystem<UI>();
-        
-        // Get movement controls and assign them to the character logic component. If UI has a focused element, clear controls
-        if (!ui->GetFocusElement())
-        {
-            character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
-            character_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
-            character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-            character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
-            character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
-            
-            // Add character yaw & pitch from the mouse motion
-            character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
-            character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
-            // Limit pitch
-            character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
-            
-            // Switch between 1st and 3rd person
-            if (input->GetKeyPress('F'))
-                firstPerson_ = !firstPerson_;
+        // Clear previous controls
+        character_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
 
-            // Check for loading / saving the scene
-            if (input->GetKeyPress(KEY_F5))
-            {
-                File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml",
-                    FILE_WRITE);
-                scene_->SaveXML(saveFile);
-            }
-            if (input->GetKeyPress(KEY_F7))
-            {
-                File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_READ);
-                scene_->LoadXML(loadFile);
-                // After loading we have to reacquire the weak pointer to the Character component, as it has been recreated
-                // Simply find the character's scene node by name as there's only one of them
-                Node* characterNode = scene_->GetChild("Jack", true);
-                if (characterNode)
-                    character_ = characterNode->GetComponent<Character>();
-            }
+        if (touch_->touchEnabled_)
+        {
+            // Update controls using touch (mobile)
+            touch_->UpdateTouches(character_->controls_);
         }
         else
-            character_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
-        
+        {
+            // Update controls using keys (desktop)
+            UI* ui = GetSubsystem<UI>();
+             
+            if (!ui->GetFocusElement())
+            {
+                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
+                character_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
+                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
+                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+                character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
+                
+                // Add character yaw & pitch from the mouse motion
+                character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
+                character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
+                // Limit pitch
+                character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+                
+                // Switch between 1st and 3rd person
+                if (input->GetKeyPress('F'))
+                    touch_->firstPerson_ = touch_->newFirstPerson_ = !touch_->firstPerson_;
+
+                // Check for loading / saving the scene
+                if (input->GetKeyPress(KEY_F5))
+                {
+                    File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml",
+                        FILE_WRITE);
+                    scene_->SaveXML(saveFile);
+                }
+                if (input->GetKeyPress(KEY_F7))
+                {
+                    File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_READ);
+                    scene_->LoadXML(loadFile);
+                    // After loading we have to reacquire the weak pointer to the Character component, as it has been recreated
+                    // Simply find the character's scene node by name as there's only one of them
+                    Node* characterNode = scene_->GetChild("Jack", true);
+                    if (characterNode)
+                        character_ = characterNode->GetComponent<Character>();
+                }
+            }
+        }
+
         // Set rotation already here so that it's updated every rendering frame instead of every physics frame
         character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
     }
@@ -309,15 +334,20 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     Quaternion rot = characterNode->GetRotation();
     Quaternion dir = rot * Quaternion(character_->controls_.pitch_, Vector3::RIGHT);
     
-    if (firstPerson_)
+    // Turn head to camera pitch, but limit to avoid unnatural animation
+    Node* headNode = characterNode->GetChild("Bip01_Head", true);
+    float limitPitch = Clamp(character_->controls_.pitch_, -45.0f, 45.0f);
+    Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
+    // This could be expanded to look at an arbitrary target, now just look at a point in front
+    Vector3 headWorldTarget = headNode->GetWorldPosition() + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    headNode->LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
+    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
+    headNode->Rotate(Quaternion(0.0f, 90.0f, 90.0f));
+
+    if (touch_->firstPerson_)
     {
-        // First person camera: position to the head bone + offset slightly forward & up
-        Node* headNode = characterNode->GetChild("Bip01_Head", true);
-        if (headNode)
-        {
-            cameraNode_->SetPosition(headNode->GetWorldPosition() + rot * Vector3(0.0f, 0.15f, 0.2f));
-            cameraNode_->SetRotation(dir);
-        }
+        cameraNode_->SetPosition(headNode->GetWorldPosition() + rot * Vector3(0.0f, 0.15f, 0.2f));
+        cameraNode_->SetRotation(dir);
     }
     else
     {
@@ -326,7 +356,7 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
         
         // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
         Vector3 rayDir = dir * Vector3::BACK;
-        float rayDistance = CAMERA_MAX_DIST;
+        float rayDistance = touch_->cameraDistance_;
         PhysicsRaycastResult result;
         scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, Ray(aimPoint, rayDir), rayDistance, 2);
         if (result.body_)

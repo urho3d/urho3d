@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -54,11 +54,9 @@ asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngi
 	ctx = asGetActiveContext();
 	if( ctx )
 	{
-		r = ctx->PushState();
-
 		// It may not always be possible to reuse the current context, 
 		// in which case we'll have to create a new one any way.
-		if( r == asSUCCESS )
+		if( ctx->GetEngine() == objType->GetEngine() && ctx->PushState() == asSUCCESS )
 			isNested = true;
 		else
 			ctx = 0;
@@ -157,6 +155,12 @@ static void ScriptObject_GetFlag_Generic(asIScriptGeneric *gen)
 	*(bool*)gen->GetAddressOfReturnLocation() = self->GetFlag();
 }
 
+static void ScriptObject_GetWeakRefFlag_Generic(asIScriptGeneric *gen)
+{
+	asCScriptObject *self = (asCScriptObject*)gen->GetObject();
+	*(asILockableSharedBool**)gen->GetAddressOfReturnLocation() = self->GetWeakRefFlag();
+}
+
 static void ScriptObject_EnumReferences_Generic(asIScriptGeneric *gen)
 {
 	asCScriptObject *self = (asCScriptObject*)gen->GetObject();
@@ -202,6 +206,9 @@ void RegisterScriptObject(asCScriptEngine *engine)
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_RELEASE, "void f()", asFUNCTION(ScriptObject_Release_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
 	r = engine->RegisterMethodToObjectType(&engine->scriptTypeBehaviours, "int &opAssign(int &in)", asFUNCTION(ScriptObject_Assignment_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
 
+	// Weakref behaviours
+	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_GET_WEAKREF_FLAG, "int &f()", asFUNCTION(ScriptObject_GetWeakRefFlag_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+
 	// Register GC behaviours
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_GETREFCOUNT, "int f()", asFUNCTION(ScriptObject_GetRefCount_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_SETGCFLAG, "void f()", asFUNCTION(ScriptObject_SetFlag_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
@@ -236,39 +243,29 @@ asCScriptObject::asCScriptObject(asCObjectType *ot, bool doInitialize)
 	objType->AddRef();
 	isDestructCalled = false;
 	weakRefFlag = 0;
+	hasRefCountReachedZero = false;
 
 	// Notify the garbage collector of this object
 	if( objType->flags & asOBJ_GC )
 		objType->engine->gc.AddScriptObjectToGC(this, objType);
 
+	// Initialize members to zero. Technically we only need to zero the pointer
+	// members, but just the memset is faster than having to loop and check the datatypes
+	memset(this+1, 0, objType->size - sizeof(asCScriptObject));
+
 	if( doInitialize )
 	{
-#ifndef AS_NO_MEMBER_INIT
-		// The actual initialization will be done by the bytecode, so here we should just clear the
-		// memory to guarantee that no pointers with have scratch values in case of an exception
-		// TODO: runtime optimize: Is it quicker to just do a memset on the entire object? 
-		for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
-		{
-			asCObjectProperty *prop = objType->properties[n];
-			if( prop->type.IsObject() )
-			{
-				asPWORD *ptr = reinterpret_cast<asPWORD*>(reinterpret_cast<asBYTE*>(this) + prop->byteOffset);
-				*ptr = 0;
-			}
-		}
-#else
+#ifdef AS_NO_MEMBER_INIT
 		// When member initialization is disabled the constructor must make sure
 		// to allocate and initialize all members with the default constructor
 		for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
 		{
 			asCObjectProperty *prop = objType->properties[n];
-			if( prop->type.IsObject() )
+			if( prop->type.IsObject() && !prop->type.IsObjectHandle() )
 			{
-				asPWORD *ptr = reinterpret_cast<asPWORD*>(reinterpret_cast<asBYTE*>(this) + prop->byteOffset);
-				if( prop->type.IsObjectHandle() )
-					*ptr = 0;
-				else
+				if( prop->type.IsReference() || prop->type.GetObjectType()->flags & asOBJ_REF )
 				{
+					asPWORD *ptr = reinterpret_cast<asPWORD*>(reinterpret_cast<asBYTE*>(this) + prop->byteOffset);
 					if( prop->type.GetObjectType()->flags & asOBJ_SCRIPT_OBJECT )
 						*ptr = (asPWORD)ScriptObjectFactory(prop->type.GetObjectType(), ot->engine);
 					else
@@ -285,13 +282,13 @@ asCScriptObject::asCScriptObject(asCObjectType *ot, bool doInitialize)
 		for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
 		{
 			asCObjectProperty *prop = objType->properties[n];
-			if( prop->type.IsObject() )
+			if( prop->type.IsObject() && !prop->type.IsObjectHandle() )
 			{
-				asPWORD *ptr = reinterpret_cast<asPWORD*>(reinterpret_cast<asBYTE*>(this) + prop->byteOffset);
-				if( prop->type.IsObjectHandle() )
-					*ptr = 0;
-				else
+				if( prop->type.IsReference() || (prop->type.GetObjectType()->flags & asOBJ_REF) )
+				{
+					asPWORD *ptr = reinterpret_cast<asPWORD*>(reinterpret_cast<asBYTE*>(this) + prop->byteOffset);
 					*ptr = (asPWORD)AllocateUninitializedObject(prop->type.GetObjectType(), engine);
+				}
 			}
 		}
 	}
@@ -312,33 +309,63 @@ void asCScriptObject::Destruct()
 asCScriptObject::~asCScriptObject()
 {
 	if( weakRefFlag )
+	{
 		weakRefFlag->Release();
+		weakRefFlag = 0;
+	}
 
 	// The engine pointer should be available from the objectType
 	asCScriptEngine *engine = objType->engine;
 
 	// Destroy all properties
-	for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+	// In most cases the members are initialized in the order they have been declared, 
+	// so it's safer to uninitialize them from last to first. The order may be different
+	// depending on the use of inheritance and or initialization in the declaration.
+	// TODO: Should the order of initialization be stored by the compiler so that the 
+	//       reverse order can be guaranteed during the destruction?
+	for( int n = (int)objType->properties.GetLength()-1; n >= 0; n-- )
 	{
 		asCObjectProperty *prop = objType->properties[n];
 		if( prop->type.IsObject() )
 		{
 			// Destroy the object
-			void **ptr = (void**)(((char*)this) + prop->byteOffset);
-			if( *ptr )
+			asCObjectType *propType = prop->type.GetObjectType();
+			if( prop->type.IsReference() || propType->flags & asOBJ_REF )
 			{
-				FreeObject(*ptr, prop->type.GetObjectType(), engine);
-				*(asDWORD*)ptr = 0;
+				void **ptr = (void**)(((char*)this) + prop->byteOffset);
+				if( *ptr )
+				{
+					FreeObject(*ptr, propType, engine);
+					*(asDWORD*)ptr = 0;
+				}
+			}
+			else
+			{
+				// The object is allocated inline. As only POD objects may be allocated inline
+				// it is not a problem to call the destructor even if the object may never have
+				// been initialized, e.g. if an exception interrupted the constructor.
+				asASSERT( propType->flags & asOBJ_POD );
+
+				void *ptr = (void**)(((char*)this) + prop->byteOffset);
+				if( propType->beh.destruct )
+					engine->CallObjectMethod(ptr, propType->beh.destruct);
 			}
 		}
 	}
 
 	objType->Release();
+	objType = 0;
+
+	// Something is really wrong if the refCount is not 0 by now
+	asASSERT( refCount.get() == 0 );
 }
 
 asILockableSharedBool *asCScriptObject::GetWeakRefFlag() const
 {
-	if( weakRefFlag )
+	// If the object's refCount has already reached zero then the object is already
+	// about to be destroyed so it's ok to return null if the weakRefFlag doesn't already
+	// exist
+	if( weakRefFlag || hasRefCountReachedZero )
 		return weakRefFlag;
 
 	// Lock globally so no other thread can attempt
@@ -365,6 +392,20 @@ asIScriptEngine *asCScriptObject::GetEngine() const
 
 int asCScriptObject::AddRef() const
 {
+	// Warn in case the application tries to increase the refCount after it has reached zero.
+	// This may happen for example if the application calls a method on the class while it is
+	// being destroyed. The application shouldn't do this because it may cause application
+	// crashes if members that have already been destroyed are accessed accidentally.
+	if( hasRefCountReachedZero )
+	{
+		if( objType && objType->engine )
+		{
+			asCString msg;
+			msg.Format(TXT_RESURRECTING_SCRIPTOBJECT_s, objType->name.AddressOf());
+			objType->engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+		}
+	}
+
 	// Increase counter and clear flag set by GC
 	gcFlag = false;
 	return refCount.atomicInc();
@@ -401,8 +442,18 @@ int asCScriptObject::Release() const
 	int r = refCount.atomicDec();
 	if( r == 0 )
 	{
-		// This cast is OK since we are the last reference
-		const_cast<asCScriptObject*>(this)->Destruct();
+		// Flag this object as being destroyed so the application
+		// can be warned if the code attempts to resurrect the object
+		// during the destructor. This also avoids a recursive call
+		// to the destructor which would crash the application if it
+		// really does resurrect the object.
+		if( !hasRefCountReachedZero )
+		{
+			hasRefCountReachedZero = true;
+
+			// This cast is OK since we are the last reference
+			const_cast<asCScriptObject*>(this)->Destruct();
+		}
 		return 0;
 	}
 
@@ -436,8 +487,7 @@ void asCScriptObject::CallDestructor()
 				ctx = asGetActiveContext();
 				if( ctx )
 				{
-					int r = ctx->PushState();
-					if( r == asSUCCESS )
+					if( ctx->GetEngine() == objType->GetEngine() && ctx->PushState() == asSUCCESS )
 						isNested = true;
 					else
 						ctx = 0;
@@ -565,7 +615,8 @@ void *asCScriptObject::GetAddressOfProperty(asUINT prop)
 
 	// Objects are stored by reference, so this must be dereferenced
 	asCDataType *dt = &objType->properties[prop]->type;
-	if( dt->IsObject() && !dt->IsObjectHandle() )
+	if( dt->IsObject() && !dt->IsObjectHandle() &&
+		(dt->IsReference() || dt->GetObjectType()->flags & asOBJ_REF) )
 		return *(void**)(((char*)this) + objType->properties[prop]->byteOffset);
 
 	return (void*)(((char*)this) + objType->properties[prop]->byteOffset);
@@ -579,7 +630,14 @@ void asCScriptObject::EnumReferences(asIScriptEngine *engine)
 		asCObjectProperty *prop = objType->properties[n];
 		if( prop->type.IsObject() )
 		{
-			void *ptr = *(void**)(((char*)this) + prop->byteOffset);
+			// TODO: gc: The members of the value type needs to be enumerated
+			//           too, since the value type may be holding a reference.
+			void *ptr;
+			if( prop->type.IsReference() || (prop->type.GetObjectType()->flags & asOBJ_REF) )
+				ptr = *(void**)(((char*)this) + prop->byteOffset);
+			else
+				ptr = (void*)(((char*)this) + prop->byteOffset);
+
 			if( ptr )
 				((asCScriptEngine*)engine)->GCEnumCallback(ptr);
 		}
@@ -591,6 +649,10 @@ void asCScriptObject::ReleaseAllHandles(asIScriptEngine *engine)
 	for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
 	{
 		asCObjectProperty *prop = objType->properties[n];
+
+		// TODO: gc: The members of the members needs to be released
+		//           too, since they may be holding a reference. Even
+		//           if the member is a value type.
 		if( prop->type.IsObject() && prop->type.IsObjectHandle() )
 		{
 			void **ptr = (void**)(((char*)this) + prop->byteOffset);
@@ -624,7 +686,14 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 {
 	if( &other != this )
 	{
-		asASSERT( other.objType->DerivesFrom(objType) );
+		if( !other.objType->DerivesFrom(objType) )
+		{
+			// We cannot allow a value assignment from a type that isn't the same or 
+			// derives from this type as the member properties may not have the same layout
+			asIScriptContext *ctx = asGetActiveContext();
+			ctx->SetException(TXT_MISMATCH_IN_VALUE_ASSIGN);
+			return *this;
+		}
 
 		// If the script class implements the opAssign method, it should be called
 		asCScriptEngine *engine = objType->engine;
@@ -640,7 +709,12 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 					void **dst = (void**)(((char*)this) + prop->byteOffset);
 					void **src = (void**)(((char*)&other) + prop->byteOffset);
 					if( !prop->type.IsObjectHandle() )
-						CopyObject(*src, *dst, prop->type.GetObjectType(), engine);
+					{
+						if( prop->type.IsReference() || (prop->type.GetObjectType()->flags & asOBJ_REF) )
+							CopyObject(*src, *dst, prop->type.GetObjectType(), engine);
+						else
+							CopyObject(src, dst, prop->type.GetObjectType(), engine);
+					}
 					else
 						CopyHandle((asPWORD*)src, (asPWORD*)dst, prop->type.GetObjectType(), engine);
 				}
@@ -662,8 +736,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 			ctx = asGetActiveContext();
 			if( ctx )
 			{
-				r = ctx->PushState();
-				if( r == asSUCCESS )
+				if( ctx->GetEngine() == engine && ctx->PushState() == asSUCCESS )
 					isNested = true;
 				else
 					ctx = 0;

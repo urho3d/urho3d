@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,6 @@
 //
 
 #include "Precompiled.h"
-#include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "File.h"
@@ -32,6 +31,8 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
+#include "Spline.h"
+#include "UnknownComponent.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
@@ -527,8 +528,8 @@ void Scene::Update(float timeStep)
 
     using namespace SceneUpdate;
 
-    VariantMap eventData;
-    eventData[P_SCENE] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_SCENE] = this;
     eventData[P_TIMESTEP] = timeStep;
 
     // Update variable timestep logic
@@ -546,10 +547,9 @@ void Scene::Update(float timeStep)
 
         using namespace UpdateSmoothing;
 
-        VariantMap eventData;
-        eventData[P_CONSTANT] = constant;
-        eventData[P_SQUAREDSNAPTHRESHOLD] = squaredSnapThreshold;
-        SendEvent(E_UPDATESMOOTHING, eventData);
+        smoothingData_[P_CONSTANT] = constant;
+        smoothingData_[P_SQUAREDSNAPTHRESHOLD] = squaredSnapThreshold;
+        SendEvent(E_UPDATESMOOTHING, smoothingData_);
     }
 
     // Post-update variable timestep logic
@@ -671,8 +671,15 @@ void Scene::NodeAdded(Node* node)
     
     node->SetScene(this);
 
-    // If we already have an existing node with the same ID, must remove the scene reference from it
+    // If the new node has an ID of zero (default), assign a replicated ID now
     unsigned id = node->GetID();
+    if (!id)
+    {
+        id = GetFreeNodeID(REPLICATED);
+        node->SetID(id);
+    }
+    
+    // If node with same ID exists, remove the scene reference from it and overwrite with the new node
     if (id < FIRST_LOCAL_ID)
     {
         HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);
@@ -883,6 +890,7 @@ void Scene::UpdateAsyncLoading()
         }
 
         // Read one child node with its full sub-hierarchy either from binary or XML
+        /// \todo Works poorly in scenes where one root-level child node contains all content
         if (!asyncProgress_.xmlFile_)
         {
             unsigned nodeID = asyncProgress_.file_->ReadUInt();
@@ -908,8 +916,8 @@ void Scene::UpdateAsyncLoading()
 
     using namespace AsyncLoadProgress;
 
-    VariantMap eventData;
-    eventData[P_SCENE] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_SCENE] = this;
     eventData[P_PROGRESS] = (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
     eventData[P_LOADEDNODES]  = asyncProgress_.loadedNodes_;
     eventData[P_TOTALNODES]  = asyncProgress_.totalNodes_;
@@ -925,8 +933,8 @@ void Scene::FinishAsyncLoading()
 
     using namespace AsyncLoadFinished;
 
-    VariantMap eventData;
-    eventData[P_SCENE] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_SCENE] = this;
     SendEvent(E_ASYNCLOADFINISHED, eventData);
 }
 
@@ -954,6 +962,8 @@ void RegisterSceneLibrary(Context* context)
     Node::RegisterObject(context);
     Scene::RegisterObject(context);
     SmoothedTransform::RegisterObject(context);
+    Spline::RegisterObject(context);
+    UnknownComponent::RegisterObject(context);
 }
 
 }

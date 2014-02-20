@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ URHO3D_API const Vector<String>& ParseArguments(int argc, char** argv);
 URHO3D_API const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 URHO3D_API String GetConsoleInput();
-/// Return the runtime platform identifier. Currently either "Windows", "Linux", "Mac OS X" or "Android".
+/// Return the runtime platform identifier, one of "Windows", "Linux", "Mac OS X", "Android", "iOS" or "Raspberry Pi".
 URHO3D_API String GetPlatform();
 /// Return the number of physical CPU cores.
 URHO3D_API unsigned GetNumPhysicalCPUs();

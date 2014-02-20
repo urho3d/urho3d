@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,9 +70,14 @@ Camera::Camera(Context* context) :
     viewOverrideFlags_(VO_NONE),
     fillMode_(FILL_SOLID),
     projectionOffset_(Vector2::ZERO),
+    reflectionPlane_(Plane::UP),
+    clipPlane_(Plane::UP),
     autoAspectRatio_(true),
-    flipVertical_(false)
+    flipVertical_(false),
+    useReflection_(false),
+    useClipping_(false)
 {
+    reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
 }
 
 Camera::~Camera()
@@ -97,6 +102,10 @@ void Camera::RegisterObject(Context* context)
     ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VO_NONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR4, "Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR4, "Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Reflection", GetUseReflection, SetUseReflection, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Clipping", GetUseClipping, SetUseClipping, bool, false, AM_DEFAULT);
 }
 
 void Camera::SetNearClip(float nearClip)
@@ -202,6 +211,38 @@ void Camera::SetProjectionOffset(const Vector2& offset)
     MarkNetworkUpdate();
 }
 
+void Camera::SetUseReflection(bool enable)
+{
+    useReflection_ = enable;
+    viewDirty_ = true;
+    frustumDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetReflectionPlane(const Plane& plane)
+{
+    reflectionPlane_ = plane;
+    reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
+    viewDirty_ = true;
+    frustumDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetUseClipping(bool enable)
+{
+    useClipping_ = enable;
+    projectionDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetClipPlane(const Plane& plane)
+{
+    clipPlane_ = plane;
+    projectionDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+
 void Camera::SetFlipVertical(bool enable)
 {
     flipVertical_ = enable;
@@ -222,8 +263,8 @@ float Camera::GetNearClip() const
 Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
-
-    const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+    
+    Matrix3x4 worldTransform = GetEffectiveWorldTransform();
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
@@ -274,7 +315,7 @@ Ray Camera::GetScreenRay(float x, float y) const
     if (!IsProjectionValid())
     {
         ret.origin_ = node_ ? node_->GetWorldPosition() : Vector3::ZERO;
-        ret.direction_ = GetForwardVector();
+        ret.direction_ = node_ ? node_->GetWorldDirection() : Vector3::FORWARD;
         return ret;
     }
 
@@ -323,7 +364,8 @@ const Frustum& Camera::GetFrustum() const
 {
     if (frustumDirty_)
     {
-        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+        Matrix3x4 worldTransform = GetEffectiveWorldTransform();
+        
         if (!orthographic_)
             frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
         else
@@ -350,6 +392,13 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
 {
     Matrix4 ret(Matrix4::ZERO);
 
+    // Whether to construct matrix using OpenGL or Direct3D clip space convention
+    #ifdef USE_OPENGL
+    bool openGLFormat = apiSpecific;
+    #else
+    bool openGLFormat = false;
+    #endif
+
     if (!orthographic_)
     {
         float nearClip = GetNearClip();
@@ -357,15 +406,10 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
         float w = h / aspectRatio_;
         float q, r;
 
-        if (apiSpecific)
+        if (openGLFormat)
         {
-            #ifdef USE_OPENGL
             q = (farClip_ + nearClip) / (farClip_ - nearClip);
             r = -2.0f * farClip_ * nearClip / (farClip_ - nearClip);
-            #else
-            q = farClip_ / (farClip_ - nearClip);
-            r = -q * nearClip;
-            #endif
         }
         else
         {
@@ -388,15 +432,10 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
         float w = h / aspectRatio_;
         float q, r;
 
-        if (apiSpecific)
+        if (openGLFormat)
         {
-            #ifdef USE_OPENGL
             q = 2.0f / farClip_;
             r = -1.0f;
-            #else
-            q = 1.0f / farClip_;
-            r = 0.0f;
-            #endif
         }
         else
         {
@@ -454,21 +493,6 @@ float Camera::GetHalfViewSize() const
         return orthoSize_ * 0.5f / zoom_;
 }
 
-Vector3 Camera::GetForwardVector() const
-{
-    return node_ ? node_->GetWorldDirection() : Vector3::FORWARD;
-}
-
-Vector3 Camera::GetRightVector() const
-{
-    return node_ ? node_->GetWorldRotation() * Vector3::RIGHT : Vector3::RIGHT;
-}
-
-Vector3 Camera::GetUpVector() const
-{
-    return node_ ? node_->GetWorldRotation() * Vector3::UP : Vector3::UP;
-}
-
 float Camera::GetDistance(const Vector3& worldPos) const
 {
     if (!orthographic_)
@@ -503,6 +527,12 @@ float Camera::GetLodDistance(float distance, float scale, float bias) const
         return orthoSize_ / d;
 }
 
+Matrix3x4 Camera::GetEffectiveWorldTransform() const
+{
+    Matrix3x4 worldTransform = node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f) : Matrix3x4::IDENTITY;
+    return useReflection_ ? reflectionMatrix_ * worldTransform : worldTransform;
+}
+
 bool Camera::IsProjectionValid() const
 {
     return farClip_ > GetNearClip();
@@ -513,11 +543,31 @@ const Matrix3x4& Camera::GetView() const
     if (viewDirty_)
     {
         // Note: view matrix is unaffected by node or parent scale
-        view_ = node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f).Inverse() : Matrix3x4::IDENTITY;
+        view_ = GetEffectiveWorldTransform().Inverse();
         viewDirty_ = false;
     }
     
     return view_;
+}
+
+void Camera::SetReflectionPlaneAttr(Vector4 value)
+{
+    SetReflectionPlane(Plane(value));
+}
+
+void Camera::SetClipPlaneAttr(Vector4 value)
+{
+    SetClipPlane(Plane(value));
+}
+
+Vector4 Camera::GetReflectionPlaneAttr() const
+{
+    return reflectionPlane_.ToVector4();
+}
+
+Vector4 Camera::GetClipPlaneAttr() const
+{
+    return clipPlane_.ToVector4();
 }
 
 void Camera::OnNodeSet(Node* node)

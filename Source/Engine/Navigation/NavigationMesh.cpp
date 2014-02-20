@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -201,7 +201,7 @@ void NavigationMesh::RegisterObject(Context* context)
 
 void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (!navMesh_ || !node_)
+    if (!debug || !navMesh_ || !node_)
         return;
     
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
@@ -459,6 +459,50 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
     
     LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
     return true;
+}
+
+Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents)
+{
+    if(!InitializeQuery())
+        return point;
+        
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+    
+    Vector3 localPoint = inverse * point;
+    Vector3 nearestPoint;
+    
+    dtPolyRef pointRef;
+    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter_, &pointRef, &nearestPoint.x_);
+    if (!pointRef)
+        return point;
+        
+    return transform*nearestPoint;
+}
+
+Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited)
+{
+    if (!InitializeQuery())
+        return end;
+    
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+    
+    Vector3 localStart = inverse * start;
+    Vector3 localEnd = inverse * end;
+    
+    dtPolyRef startRef;
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
+    if (!startRef)
+        return end;
+    
+    Vector3 resultPos;
+    int visitedCount = 0;
+    maxVisited = Max(maxVisited, 0);
+    PODVector<dtPolyRef> visited(maxVisited);
+    navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &resultPos.x_, maxVisited ?
+        &visited[0] : (dtPolyRef*)0, &visitedCount, maxVisited);
+    return transform * resultPos;
 }
 
 void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents)

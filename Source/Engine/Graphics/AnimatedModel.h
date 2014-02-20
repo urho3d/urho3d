@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,8 +84,8 @@ public:
     void RemoveAllAnimationStates();
     /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
-    /// Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible.)
-    void SetInvisibleLodFactor(float factor);
+    /// Set whether to update animation and the bounding box when not visible. Recommended to enable for physically controlled models like ragdolls.
+    void SetUpdateInvisible(bool enable);
     /// Set vertex morph weight by index.
     void SetMorphWeight(unsigned index, float weight);
     /// Set vertex morph weight by name.
@@ -111,8 +111,8 @@ public:
     AnimationState* GetAnimationState(unsigned index) const;
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
-    /// Return animation LOD distance factor when not visible.
-    float GetInvisibleLodFactor() const { return invisibleLodFactor_; }
+    /// Return whether to update animation when not visible.
+    bool GetUpdateInvisible() const { return updateInvisible_; }
     /// Return all vertex morphs.
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
     /// Return all morph vertex buffers.
@@ -219,8 +219,8 @@ private:
     float animationLodTimer_;
     /// Animation LOD distance, the minimum of all LOD view distances last frame.
     float animationLodDistance_;
-    /// Animation LOD distance factor when not visible.
-    float invisibleLodFactor_;
+    /// Update animation when invisible flag.
+    bool updateInvisible_;
     /// Animation dirty flag.
     bool animationDirty_;
     /// Animation order dirty flag.

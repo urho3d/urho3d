@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Sort.h"
-#include "StringUtils.h"
 #include "UI.h"
 #include "UIElement.h"
 #include "UIEvents.h"
@@ -119,6 +118,7 @@ UIElement::UIElement(Context* context) :
     sortChildren_(true),
     useDerivedOpacity_(true),
     enabled_(false),
+    editable_(true),
     selected_(false),
     visible_(true),
     hovering_(false),
@@ -181,6 +181,7 @@ void UIElement::RegisterObject(Context* context)
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
@@ -337,7 +338,7 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Write style
-    if (!appliedStyle_.Empty())
+    if (!appliedStyle_.Empty() && appliedStyle_ != "UIElement")
     {
         if (!dest.SetAttribute("style", appliedStyle_))
             return false;
@@ -365,10 +366,8 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Filter UI-style and implicit attributes
-    //\todo Fail the serialization when encountered error in filtering, for now let it passes until the filtering process is stable and fully tested in the field
-//    if (!FilterAttributes(dest))
-//        return false;
-    FilterAttributes(dest);
+    if (!FilterAttributes(dest))
+        return false;
 
     return true;
 }
@@ -406,14 +405,15 @@ void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float
         }
     }
 
+    batch.SetColor(DEBUG_DRAW_COLOR, true);
     // Left
-    batch.AddQuad(0, 0, horizontalThickness, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, 0, horizontalThickness, size_.y_, 0, 0);
     // Top
-    batch.AddQuad(0, 0, size_.x_, verticalThickness, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, 0, size_.x_, verticalThickness, 0, 0);
     // Right
-    batch.AddQuad(size_.x_ - horizontalThickness, 0, horizontalThickness, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(size_.x_ - horizontalThickness, 0, horizontalThickness, size_.y_, 0, 0);
     // Bottom
-    batch.AddQuad(0, size_.y_ - verticalThickness, size_.x_, verticalThickness, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, size_.y_ - verticalThickness, size_.x_, verticalThickness, 0, 0);
 
     UIBatch::AddOrMerge(batch, batches);
 }
@@ -480,63 +480,7 @@ const IntVector2& UIElement::GetScreenPosition() const
 
 void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (cursor && cursor->IsVisible())
-        cursor->SetShape(CS_NORMAL);
     hovering_ = true;
-}
-
-void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
-{
-}
-
-void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
-{
-}
-
-bool UIElement::OnDragDropTest(UIElement* source)
-{
-    return true;
-}
-
-bool UIElement::OnDragDropFinish(UIElement* source)
-{
-    return true;
-}
-
-void UIElement::OnWheel(int delta, int buttons, int qualifiers)
-{
-}
-
-void UIElement::OnKey(int key, int buttons, int qualifiers)
-{
-}
-
-void UIElement::OnChar(unsigned c, int buttons, int qualifiers)
-{
-}
-
-void UIElement::OnResize()
-{
-}
-
-void UIElement::OnPositionSet()
-{
 }
 
 bool UIElement::LoadXML(Deserializer& source)
@@ -564,7 +508,7 @@ bool UIElement::FilterAttributes(XMLElement& dest) const
             if (styleXPathQuery_.SetVariable("typeName", style))
             {
                 XMLElement styleElem = GetDefaultStyle()->GetRoot().SelectSinglePrepared(styleXPathQuery_);
-                if (!styleElem || !FilterUIStyleAttributes(dest, styleElem))
+                if (styleElem && !FilterUIStyleAttributes(dest, styleElem))
                     return false;
             }
         }
@@ -586,8 +530,8 @@ void UIElement::SetName(const String& name)
 
     using namespace NameChanged;
 
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = this;
 
     SendEvent(E_NAMECHANGED, eventData);
 }
@@ -602,8 +546,8 @@ void UIElement::SetPosition(const IntVector2& position)
 
         using namespace Positioned;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_X] = position_.x_;
         eventData[P_Y] = position_.y_;
         SendEvent(E_POSITIONED, eventData);
@@ -639,8 +583,8 @@ void UIElement::SetSize(const IntVector2& size)
 
             using namespace Resized;
 
-            VariantMap eventData;
-            eventData[P_ELEMENT] = (void*)this;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_ELEMENT] = this;
             eventData[P_WIDTH] = size_.x_;
             eventData[P_HEIGHT] = size_.y_;
             SendEvent(E_RESIZED, eventData);
@@ -734,21 +678,38 @@ void UIElement::SetFixedHeight(int height)
 
 void UIElement::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
 {
-    horizontalAlignment_ = hAlign;
-    verticalAlignment_ = vAlign;
-    MarkDirty();
+    SetHorizontalAlignment(hAlign);
+    SetVerticalAlignment(vAlign);
 }
 
 void UIElement::SetHorizontalAlignment(HorizontalAlignment align)
 {
-    horizontalAlignment_ = align;
-    MarkDirty();
+    if (align != HA_LEFT && parent_ && parent_->GetLayoutMode() == LM_HORIZONTAL)
+    {
+        LOGWARNING("Forcing left alignment because parent element has horizontal layout");
+        align = HA_LEFT;
+    }
+
+    if (horizontalAlignment_ != align)
+    {
+        horizontalAlignment_ = align;
+        MarkDirty();
+    }
 }
 
 void UIElement::SetVerticalAlignment(VerticalAlignment align)
 {
-    verticalAlignment_ = align;
-    MarkDirty();
+    if (align != VA_TOP && parent_ && parent_->GetLayoutMode() == LM_VERTICAL)
+    {
+        LOGWARNING("Forcing top alignment because parent element has vertical layout");
+        align = VA_TOP;
+    }
+
+    if (verticalAlignment_ != align)
+    {
+        verticalAlignment_ = align;
+        MarkDirty();
+    }
 }
 
 void UIElement::SetClipBorder(const IntRect& rect)
@@ -826,6 +787,12 @@ void UIElement::SetEnabled(bool enable)
     enabled_ = enable;
 }
 
+void UIElement::SetEditable(bool enable)
+{
+    editable_ = enable;
+    OnSetEditable();
+}
+
 void UIElement::SetFocusMode(FocusMode mode)
 {
     focusMode_ = mode;
@@ -837,9 +804,6 @@ void UIElement::SetFocus(bool enable)
         enable = false;
 
     UI* ui = GetSubsystem<UI>();
-    if (!ui)
-        return;
-
     if (enable)
     {
         if (ui->GetFocusElement() != this)
@@ -869,8 +833,8 @@ void UIElement::SetVisible(bool enable)
 
         using namespace VisibleChanged;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_VISIBLE] = visible_;
         SendEvent(E_VISIBLECHANGED, eventData);
     }
@@ -930,12 +894,14 @@ void UIElement::SetLayout(LayoutMode mode, int spacing, const IntRect& border)
     layoutMode_ = mode;
     layoutSpacing_ = Max(spacing, 0);
     layoutBorder_ = IntRect(Max(border.left_, 0), Max(border.top_, 0), Max(border.right_, 0), Max(border.bottom_, 0));
+    VerifyChildAlignment();
     UpdateLayout();
 }
 
 void UIElement::SetLayoutMode(LayoutMode mode)
 {
     layoutMode_ = mode;
+    VerifyChildAlignment();
     UpdateLayout();
 }
 
@@ -957,6 +923,7 @@ void UIElement::SetIndent(int indent)
     if (parent_)
         parent_->UpdateLayout();
     UpdateLayout();
+    OnIndentSet();
 }
 
 void UIElement::SetIndentSpacing(int indentSpacing)
@@ -965,6 +932,7 @@ void UIElement::SetIndentSpacing(int indentSpacing)
     if (parent_)
         parent_->UpdateLayout();
     UpdateLayout();
+    OnIndentSet();
 }
 
 void UIElement::UpdateLayout()
@@ -1019,10 +987,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            HorizontalAlignment horizontalAlignment = children_[i]->horizontalAlignment_;
-            children_[i]->horizontalAlignment_ = HA_LEFT;
             children_[i]->SetPosition(positions[j], GetLayoutChildPosition(children_[i]).y_);
-            children_[i]->horizontalAlignment_ = horizontalAlignment;
             children_[i]->SetSize(sizes[j], height - layoutBorder_.top_ - layoutBorder_.bottom_);
             ++j;
         }
@@ -1061,10 +1026,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            VerticalAlignment verticalAlignment = children_[i]->verticalAlignment_;
-            children_[i]->verticalAlignment_ = VA_TOP;
             children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_ + baseIndentWidth, positions[j]);
-            children_[i]->verticalAlignment_ = verticalAlignment;
             children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
         }
@@ -1072,8 +1034,8 @@ void UIElement::UpdateLayout()
 
     using namespace LayoutUpdated;
 
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = this;
     SendEvent(E_LAYOUTUPDATED, eventData);
 
     EnableLayoutUpdate();
@@ -1116,6 +1078,9 @@ void UIElement::BringToFront()
         if (other->IsEnabled() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
+            // M_MAX_INT is used by popups and tooltips. Disregard these to avoid an "arms race" with the priorities
+            if (priority == M_MAX_INT)
+                continue;
             usedPriorities.Insert(priority);
             maxPriority = Max(priority, maxPriority);
         }
@@ -1196,6 +1161,7 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     if (!previousStyleFile && !element->appliedStyle_.Empty() && GetDefaultStyle())
         element->SetStyle(element->appliedStyle_);
 
+    VerifyChildAlignment();
     UpdateLayout();
 
     // Send change event
@@ -1205,10 +1171,10 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     {
         using namespace ElementAdded;
 
-        VariantMap eventData;
-        eventData[P_ROOT] = (void*)root;
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_ELEMENT] = (void*)element;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ROOT] = root;
+        eventData[P_PARENT] = this;
+        eventData[P_ELEMENT] = element;
 
         sender->SendEvent(E_ELEMENTADDED, eventData);
     }
@@ -1226,10 +1192,10 @@ void UIElement::RemoveChild(UIElement* element, unsigned index)
             {
                 using namespace ElementRemoved;
 
-                VariantMap eventData;
-                eventData[P_ROOT] = (void*)GetRoot();
-                eventData[P_PARENT] = (void*)this;
-                eventData[P_ELEMENT] = (void*)element;
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_ROOT] = GetRoot();
+                eventData[P_PARENT] = this;
+                eventData[P_ELEMENT] = element;
 
                 sender->SendEvent(E_ELEMENTREMOVED, eventData);
             }
@@ -1253,10 +1219,10 @@ void UIElement::RemoveChildAtIndex(unsigned index)
     {
         using namespace ElementRemoved;
 
-        VariantMap eventData;
-        eventData[P_ROOT] = (void*)GetRoot();
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_ELEMENT] = (void*)children_[index];
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ROOT] = GetRoot();
+        eventData[P_PARENT] = this;
+        eventData[P_ELEMENT] = children_[index];
 
         sender->SendEvent(E_ELEMENTREMOVED, eventData);
     }
@@ -1278,10 +1244,10 @@ void UIElement::RemoveAllChildren()
         {
             using namespace ElementRemoved;
 
-            VariantMap eventData;
-            eventData[P_ROOT] = (void*)root;
-            eventData[P_PARENT] = (void*)this;
-            eventData[P_ELEMENT] = (void*)(*i).Get();
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_ROOT] = root;
+            eventData[P_PARENT] = this;
+            eventData[P_ELEMENT] = (*i).Get();
 
             sender->SendEvent(E_ELEMENTREMOVED, eventData);
         }
@@ -1354,8 +1320,7 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    UI* ui = GetSubsystem<UI>();
-    return ui ? ui->GetFocusElement() == this : false;
+    return GetSubsystem<UI>()->GetFocusElement() == this;
 }
 
 const String& UIElement::GetAppliedStyle() const
@@ -1672,7 +1637,7 @@ bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styl
     {
         if (!childElem.GetBool("internal"))
         {
-            LOGERROR("Invalid style style, style element can only contain internal child elements");
+            LOGERROR("Invalid style file, style element can only contain internal child elements");
             return false;
         }
         if (!FilterUIStyleAttributes(childDest, childElem))
@@ -1879,6 +1844,16 @@ void UIElement::Detach()
 {
     parent_ = 0;
     MarkDirty();
+}
+
+void UIElement::VerifyChildAlignment()
+{
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        // Reapply child alignments. If they are illegal compared to layout, they will be set left/top as neded
+        (*i)->SetHorizontalAlignment((*i)->GetHorizontalAlignment());
+        (*i)->SetVerticalAlignment((*i)->GetVerticalAlignment());
+    }
 }
 
 }

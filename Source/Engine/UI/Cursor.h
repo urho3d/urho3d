@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,10 +102,10 @@ public:
     void SetShapesAttr(VariantVector value);
     /// Return shapes attribute.
     VariantVector GetShapesAttr() const;
-
+    /// Apply pending OS cursor shape. Called by UI. No-op when the OS mouse pointer is not used.
+    void ApplyOSCursorShape();
+    
 protected:
-    /// Apply the current shape.
-    void ApplyShape();
     /// Handle operating system mouse cursor visibility change event.
     void HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData);
     
@@ -115,6 +115,8 @@ protected:
     CursorShapeInfo shapeInfos_[CS_MAX_SHAPES];
     /// Use system default shapes flag.
     bool useSystemShapes_;
+    /// OS cursor shape needs update flag.
+    bool osShapeDirty_;
 };
 
 }

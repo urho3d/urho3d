@@ -68,7 +68,7 @@ void CreateScene()
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
     light.castShadows = true;
-    light.shadowBias = BiasParameters(0.0001f, 0.5f);
+    light.shadowBias = BiasParameters(0.00025f, 0.5f);
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
     light.specularIntensity = 0.5f;
 

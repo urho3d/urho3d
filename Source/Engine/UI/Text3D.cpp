@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -366,9 +366,24 @@ unsigned Text3D::GetNumRows() const
     return text_.GetNumRows();
 }
 
-const PODVector<int>& Text3D::GetRowWidths() const
+unsigned Text3D::GetNumChars() const
 {
-    return text_.GetRowWidths();
+    return text_.GetNumChars();
+}
+
+int Text3D::GetRowWidth(unsigned index) const
+{
+    return text_.GetRowWidth(index);
+}
+
+IntVector2 Text3D::GetCharPosition(unsigned index)
+{
+    return text_.GetCharPosition(index);
+}
+
+IntVector2 Text3D::GetCharSize(unsigned index)
+{
+    return text_.GetCharSize(index);
 }
 
 const Color& Text3D::GetColor(Corner corner) const
@@ -410,13 +425,13 @@ void Text3D::MarkTextDirty()
 void Text3D::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void Text3D::SetFontAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    text_.font_ = cache->GetResource<Font>(value.id_);
+    text_.font_ = cache->GetResource<Font>(value.name_);
 }
 
 ResourceRef Text3D::GetMaterialAttr() const
@@ -504,8 +519,10 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Material* material = new Material(context_);
                 Technique* tech = new Technique(context_);
                 Pass* pass = tech->CreatePass(PASS_ALPHA);
-                pass->SetVertexShader("Basic_DiffVCol");
-                pass->SetPixelShader("Basic_AlphaVCol");
+                pass->SetVertexShader("Basic");
+                pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
+                pass->SetPixelShader("Basic");
+                pass->SetPixelShaderDefines("ALPHAMAP VERTEXCOLOR");
                 pass->SetBlendMode(BLEND_ALPHA);
                 pass->SetDepthWrite(false);
                 material->SetTechnique(0, tech);

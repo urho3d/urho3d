@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file types.h
  *  Basic data types and primitives, such as vectors or colors. 
  */
@@ -52,8 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory.h>
 #include <math.h>
 #include <stddef.h>
-// Urho3D: Added include
 #include <string.h>
+#include <limits.h>
 
 // Our compile configuration
 #include "defs.h"

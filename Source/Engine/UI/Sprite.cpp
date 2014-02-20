@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -267,7 +267,7 @@ const Matrix3x4& Sprite::GetTransform() const
 void Sprite::SetTextureAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetTexture(cache->GetResource<Texture2D>(value.id_));
+    SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 
 ResourceRef Sprite::GetTextureAttr() const

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,10 @@ protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
-    /// Custom world transform.
-    Matrix3x4 customWorldTransform_;
+    /// Custom world transform per camera.
+    HashMap<Camera*, Matrix3x4> customWorldTransforms_;
+    /// Last frame counter for knowing when to erase the custom world transforms of previous frame.
+    unsigned lastFrame_;
 };
 
 }

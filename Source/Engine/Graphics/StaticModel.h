@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,8 @@ public:
     bool SetMaterial(unsigned index, Material* material);
     /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
     void SetOcclusionLodLevel(unsigned level);
+    /// Apply default materials from a material list file. If filename is empty (default), the model's resource name with extension .txt will be used.
+    void ApplyMaterialList(const String& fileName = String::EMPTY);
     
     /// Return model.
     Model* GetModel() const { return model_; }

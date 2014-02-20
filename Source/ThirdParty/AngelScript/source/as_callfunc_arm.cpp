@@ -55,9 +55,12 @@
 #include "as_scriptengine.h"
 #include "as_texts.h"
 #include "as_tokendef.h"
+#include "as_context.h"
 
-#if !defined(AS_LINUX)
+#if defined(AS_SOFTFP)
 
+// This code supports the soft-float ABI, i.e. g++ -mfloat-abi=softfp
+//
 // The code for iOS, Android, Marmalade and Windows Phone goes here
 
 BEGIN_AS_NAMESPACE
@@ -86,14 +89,14 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	}
 
 	asDWORD paramBuffer[64+2];
-	// Android needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
+	// Android & Linux needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
 	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this 
 	//                         doesn't have to be done for functions that don't have any 64bit types
-#if !defined(AS_ANDROID)
+#if !defined(AS_ANDROID) && !defined(AS_LINUX)
 	if( sysFunc->takesObjByVal )
 #endif
 	{
-#if defined(AS_ANDROID)
+#if defined(AS_ANDROID) || defined(AS_LINUX)
 		// mask is used as a toggler to skip uneven registers.
 		int mask = 1;
 
@@ -133,7 +136,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				else
 #endif
 				{
-#if defined(AS_ANDROID)
+#if defined(AS_ANDROID) || defined(AS_LINUX)
 					if( (descr->parameterTypes[n].GetObjectType()->flags & asOBJ_APP_CLASS_ALIGN8) &&
 						((dpos & 1) == mask) )
 					{
@@ -154,7 +157,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			}
 			else
 			{
-#if defined(AS_ANDROID)
+#if defined(AS_ANDROID) || defined(AS_LINUX)
 				// Should an alignment be performed?
 				if( !descr->parameterTypes[n].IsObjectHandle() && 
 					!descr->parameterTypes[n].IsReference() && 
@@ -235,9 +238,10 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 END_AS_NAMESPACE
 
-#elif defined(AS_LINUX)
+#elif !defined(AS_SOFTFP)
 
-// The Linux code goes here
+// This code supports the hard-float ABI, i.e. g++ -mfloat-abi=hard
+// The main difference is that the floating point values are passed in the fpu registers
 
 #define VFP_OFFSET 70
 #define STACK_OFFSET 6
@@ -465,7 +469,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 					{
 						// 64 bit value align
 						dpos++;
-						paramSize++;						
+						paramSize++;
 					}
 
 					paramBuffer[dpos++] = args[spos++];
@@ -485,7 +489,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 					paramBuffer[stackPos++] = args[spos++];
 					stackSize += descr->parameterTypes[n].GetSizeOnStackDWords();
-				}				
+				}
 
 				if( descr->parameterTypes[n].GetSizeOnStackDWords() > 1 )
 				{

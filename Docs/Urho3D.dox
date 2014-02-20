@@ -4,14 +4,14 @@ namespace Urho3D
 /**
 \mainpage Urho3D - cross-platform rendering and game engine
 
-Urho3D (http://urho3d.googlecode.com) is a lightweight, cross-platform rendering and game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
+Urho3D (http://urho3d.github.io/) is a lightweight, cross-platform rendering and game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
 
 For getting started, see:
 
 \ref Building "Building Urho3D" <br>
-\ref Running "Running Urho3D script host application" <br>
+\ref Running "Running Urho3D player application" <br>
 \ref UsingLibrary "Using Urho3D as external library" <br>
-\ref Examples "Example applications" <br>
+\ref Examples "Examples" <br>
 \ref Structure "Overall structure" <br>
 \ref Conventions "Conventions" <br>
 \ref EditorInstructions "Editor instructions" <br>
@@ -42,6 +42,9 @@ For further reference, see:
 \ref CodingConventions "Coding conventions" <br>
 \ref ScriptAPI "Scripting API (generated)" <br>
 \ref LuaScriptAPI "Lua Scripting API (generated)" <br>
+\ref EventList "Event list (generated)" <br>
+
+For Urho3D related links and projects, see \ref ExternalLinks "External Links".
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 
@@ -56,20 +59,32 @@ Urho3D development, contributions and bugfixes by:
 - Colin Barrett
 - Erik Beran
 - Carlo Carollo
+- Pete Chown
 - Sebastian Delatorre (primitivewaste)
+- Josh Engebretson
 - Chris Friesen
 - Alex Fuller
 - Mika Heinonen
+- Graham King
 - Jason Kinzer
 - Gunnar Kriik
 - Ali K&auml;m&auml;r&auml;inen
 - Pete Leigh
 - Paul Noome
+- Alex Parlett
+- Jordan Patterson
 - Vladimir Pobedinsky
+- Nick Royer
 - Miika Santala
+- Joshua Tippetts
+- Daniel Wiberg
+- Steven Zhang
 - Firegorilla
 - Magic.Lixin
+- Mike3D
+- OvermindDL1
 - amadeus_osa
+- mightyCelu
 - reattiva
 - skaiware
 
@@ -88,43 +103,38 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 
 Urho3D uses the following third-party libraries:
 
-- AngelScript 2.27.0 (http://www.angelcode.com/angelscript/)
-- Bullet 2.81 (http://www.bulletphysics.org/)
+- AngelScript 2.28.1 (http://www.angelcode.com/angelscript/)
+- Bullet 2.82 (http://www.bulletphysics.org/)
 - Civetweb (http://sourceforge.net/projects/civetweb/)
-- FreeType 2.3.12 (http://www.freetype.org/)
+- FreeType 2.5.0 (http://www.freetype.org/)
 - GLEW 1.9.0 (http://glew.sourceforge.net/)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - Lua 5.1 (http://www.lua.org)
+- LuaJIT 2.0.2 (http://www.luajit.org)
+- LZ4 (http://code.google.com/p/lz4/)
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
 - Recast/Detour (http://code.google.com/p/recastnavigation/)
-- SDL 2.0.0 (http://www.libsdl.org/)
+- SDL 2.0.1 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
 - tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
-DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong %Engine.
-
-Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
-
-Ninja model and terrain / smoke / flare / status bar textures from OGRE.
-
-%Skybox cubemap from http://www.codemonsters.de.
-
-BlueHighway font from Larabie Fonts.
-
-Anonymous Pro font by Mark Simonson.
-
+DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong %Engine.<br>
+Jack and mushroom models from the realXtend project. (http://www.realxtend.org)<br>
+Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.<br>
+BlueHighway font from Larabie Fonts.<br>
+Anonymous Pro font by Mark Simonson.<br>
 NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
 
 
 \page License License
 
-Copyright (c) 2008-2013 the Urho3D project.
+Copyright (c) 2008-2014 the Urho3D project.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -255,6 +265,16 @@ V1.1
 V1.0
 
 - Original release.
+
+\page ExternalLinks External Links
+
+Related projects:
+
+- Blender to Urho3D mesh exporter (https://github.com/reattiva/Urho3D-Blender)
+
+- Urho3D Launcher (https://github.com/Hgdavidy/Urho3D_Launcher_Tools)
+
+- Urho3D libRocket Integration (https://github.com/realrunner/urho3d-librocket)
 
 */
 

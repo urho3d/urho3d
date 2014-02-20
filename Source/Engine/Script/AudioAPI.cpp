@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,10 +57,15 @@ void RegisterSoundSources(asIScriptEngine* engine)
     // Allow creation of sound sources also outside scene
     RegisterObjectConstructor<SoundSource>(engine, "SoundSource");
     engine->RegisterObjectMethod("SoundSource3D", "void SetDistanceAttenuation(float, float, float)", asMETHOD(SoundSource3D, SetDistanceAttenuation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SoundSource3D", "void SetAngleAttenuation(float, float)", asMETHOD(SoundSource3D, SetAngleAttenuation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void set_nearDistance(float)", asMETHOD(SoundSource3D, SetNearDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "float get_nearDistance() const", asMETHOD(SoundSource3D, GetNearDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void set_farDistance(float)", asMETHOD(SoundSource3D, SetFarDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "float get_farDistance() const", asMETHOD(SoundSource3D, GetFarDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SoundSource3D", "void set_innerAngle(float)", asMETHOD(SoundSource3D, SetInnerAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SoundSource3D", "float get_innerAngle() const", asMETHOD(SoundSource3D, GetInnerAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SoundSource3D", "void set_outerAngle(float)", asMETHOD(SoundSource3D, SetOuterAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SoundSource3D", "float get_outerAngle() const", asMETHOD(SoundSource3D, GetOuterAngle), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void set_rolloffFactor(float)", asMETHOD(SoundSource3D, SetRolloffFactor), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "float get_rolloffFactor() const", asMETHOD(SoundSource3D, RollAngleoffFactor), asCALL_THISCALL);
 }

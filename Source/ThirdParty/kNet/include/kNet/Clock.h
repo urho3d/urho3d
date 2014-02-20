@@ -17,7 +17,7 @@
 	@brief The Clock class. Supplies timing facilities. */
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 namespace kNet

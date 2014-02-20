@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ namespace Urho3D
 
 #undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
-
+static const float M_HALF_PI = M_PI * 0.5f;
 static const int M_MIN_INT = 0x80000000;
 static const int M_MAX_INT = 0x7fffffff;
 static const unsigned M_MIN_UNSIGNED = 0x00000000;
@@ -66,6 +66,8 @@ inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
 inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
 /// Return absolute value of a float.
 inline float Abs(float value) { return value >= 0.0f ? value : -value; }
+/// Return the sign of a float (-1, 0 or 1.)
+inline float Sign(float value) { return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f); }
 
 /// Clamp a float to a range.
 inline float Clamp(float value, float min, float max)
@@ -76,6 +78,13 @@ inline float Clamp(float value, float min, float max)
         return max;
     else
         return value;
+}
+
+/// Smoothly damp between values.
+inline float SmoothStep(float lhs, float rhs, float t)
+{
+    t = Clamp((t - lhs) / (rhs - lhs), 0.0f, 1.0f); // Saturate t
+    return t * t * (3.0f - 2.0f * t);
 }
 
 /// Return sine of an angle in degrees.
@@ -136,7 +145,13 @@ inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6
 inline float Random() { return Rand() / 32768.0f; }
 /// Return a random float between 0.0 and range, inclusive from both ends.
 inline float Random(float range) { return Rand() * range / 32767.0f; }
+/// Return a random float between min and max, inclusive from both ends.
+inline float Random(float min, float max) { return Rand() * (max - min) / 32767.0f + min; }
 /// Return a random integer between 0 and range - 1.
 inline int Random(int range) { return (Rand() * (range - 1) + 16384) / 32767; }
+/// Return a random integer between min and max - 1.
+inline int Random(int min, int max) { return (Rand() * (max - min - 1) + 16384) / 32767 + min; }
+/// Return a random normal distributed number with the given mean value and variance.
+inline float RandomNormal(float meanValue, float variance) { return RandStandardNormal() * sqrtf(variance) + meanValue; }
 
 }

@@ -1,0 +1,210 @@
+$#include "Renderer.h"
+
+static const int SHADOW_MIN_PIXELS;
+static const int INSTANCING_BUFFER_DEFAULT_SIZE;
+
+enum LightVSVariation
+{
+    LVS_DIR = 0,
+    LVS_SPOT,
+    LVS_POINT,
+    LVS_SPEC,
+    LVS_SPOTSPEC,
+    LVS_POINTSPEC,
+    LVS_SHADOW,
+    LVS_SPOTSHADOW,
+    LVS_POINTSHADOW,
+    LVS_DIRSPECSHADOW,
+    LVS_SPOTSPECSHADOW,
+    LVS_POINTSPECSHADOW,
+    MAX_LIGHT_VS_VARIATIONS
+};
+
+enum VertexLightVSVariation
+{
+    VLVS_NOLIGHTS = 0,
+    VLVS_1LIGHT,
+    VLVS_2LIGHTS,
+    VLVS_3LIGHTS,
+    VLVS_4LIGHTS,
+    MAX_VERTEXLIGHT_VS_VARIATIONS
+};
+
+enum LightPSVariation
+{
+    LPS_NONE = 0,
+    LPS_SPOT,
+    LPS_POINT,
+    LPS_POINTMASK,
+    LPS_SPEC,
+    LPS_SPOTSPEC,
+    LPS_POINTSPEC,
+    LPS_POINTMASKSPEC,
+    LPS_SHADOW,
+    LPS_SPOTSHADOW,
+    LPS_POINTSHADOW,
+    LPS_POINTMASKSHADOW,
+    LPS_SHADOWSPEC,
+    LPS_SPOTSHADOWSPEC,
+    LPS_POINTSHADOWSPEC,
+    LPS_POINTMASKSHADOWSPEC,
+    MAX_LIGHT_PS_VARIATIONS
+};
+
+enum DeferredLightVSVariation
+{
+    DLVS_NONE = 0,
+    DLVS_DIR,
+    DLVS_ORTHO,
+    DLVS_ORTHODIR,
+    MAX_DEFERRED_LIGHT_VS_VARIATIONS
+};
+
+enum DeferredLightPSVariation
+{
+    DLPS_NONE = 0,
+    DLPS_SPOT,
+    DLPS_POINT,
+    DLPS_POINTMASK,
+    DLPS_SPEC,
+    DLPS_SPOTSPEC,
+    DLPS_POINTSPEC,
+    DLPS_POINTMASKSPEC,
+    DLPS_SHADOW,
+    DLPS_SPOTSHADOW,
+    DLPS_POINTSHADOW,
+    DLPS_POINTMASKSHADOW,
+    DLPS_SHADOWSPEC,
+    DLPS_SPOTSHADOWSPEC,
+    DLPS_POINTSHADOWSPEC,
+    DLPS_POINTMASKSHADOWSPEC,
+    DLPS_ORTHO,
+    DLPS_ORTHOSPOT,
+    DLPS_ORTHOPOINT,
+    DLPS_ORTHOPOINTMASK,
+    DLPS_ORTHOSPEC,
+    DLPS_ORTHOSPOTSPEC,
+    DLPS_ORTHOPOINTSPEC,
+    DLPS_ORTHOPOINTMASKSPEC,
+    DLPS_ORTHOSHADOW,
+    DLPS_ORTHOSPOTSHADOW,
+    DLPS_ORTHOPOINTSHADOW,
+    DLPS_ORTHOPOINTMASKSHADOW,
+    DLPS_ORTHOSHADOWSPEC,
+    DLPS_ORTHOSPOTSHADOWSPEC,
+    DLPS_ORTHOPOINTSHADOWSPEC,
+    DLPS_ORTHOPOINTMASKSHADOWSPEC,
+    MAX_DEFERRED_LIGHT_PS_VARIATIONS
+};
+
+class Renderer
+{
+    void SetNumViewports(unsigned num);
+    void SetViewport(unsigned index, Viewport* viewport);
+    void SetDefaultRenderPath(RenderPath* renderPath);
+    void SetDefaultRenderPath(XMLFile* file);
+    void SetHDRRendering(bool enable);
+    void SetSpecularLighting(bool enable);
+    void SetTextureAnisotropy(int level);
+    void SetTextureFilterMode(TextureFilterMode mode);
+    void SetTextureQuality(int quality);
+    void SetMaterialQuality(int quality);
+    void SetDrawShadows(bool enable);
+    void SetShadowMapSize(int size);
+    void SetShadowQuality(int quality);
+    void SetReuseShadowMaps(bool enable);
+    void SetMaxShadowMaps(int shadowMaps);
+    void SetMaxShadowCascades(int cascades);
+    void SetDynamicInstancing(bool enable);
+    void SetMinInstances(int instances);
+    void SetMaxInstanceTriangles(int triangles);
+    void SetMaxSortedInstances(int instances);
+    void SetMaxOccluderTriangles(int triangles);
+    void SetOcclusionBufferSize(int size);
+    void SetOccluderSizeThreshold(float screenSize);
+    void ReloadShaders();
+    
+    unsigned GetNumViewports() const;
+    Viewport* GetViewport(unsigned index) const;
+    RenderPath* GetDefaultRenderPath() const;
+    bool GetHDRRendering() const;
+    bool GetSpecularLighting() const;
+    bool GetDrawShadows() const;
+    int GetTextureAnisotropy() const;
+    TextureFilterMode GetTextureFilterMode() const;
+    int GetTextureQuality() const;
+    int GetMaterialQuality() const;
+    int GetShadowMapSize() const;
+    int GetShadowQuality() const;
+    bool GetReuseShadowMaps() const;
+    int GetMaxShadowMaps() const;
+    int GetMaxShadowCascades() const;
+    bool GetDynamicInstancing() const;
+    int GetMinInstances() const;
+    int GetMaxInstanceTriangles() const;
+    int GetMaxSortedInstances() const;
+    int GetMaxOccluderTriangles() const;
+    int GetOcclusionBufferSize() const;
+    float GetOccluderSizeThreshold() const;
+    unsigned GetNumViews() const;
+    unsigned GetNumPrimitives() const;
+    unsigned GetNumBatches() const;
+    unsigned GetNumGeometries(bool allViews = false) const;
+    unsigned GetNumLights(bool allViews = false) const;
+    unsigned GetNumShadowMaps(bool allViews = false) const;
+    unsigned GetNumOccluders(bool allViews = false) const;
+    Zone* GetDefaultZone() const;
+    Light* GetQuadDirLight() const;
+    Material* GetDefaultMaterial() const;
+    Texture2D* GetDefaultLightRamp() const;
+    Texture2D* GetDefaultLightSpot() const;
+    TextureCube* GetFaceSelectCubeMap() const;
+    TextureCube* GetIndirectionCubeMap() const;
+    VertexBuffer* GetInstancingBuffer() const;
+    const FrameInfo& GetFrameInfo();
+    
+    void DrawDebugGeometry(bool depthTest);
+    
+    tolua_property__get_set unsigned numViewports;
+    tolua_property__get_set RenderPath* defaultRenderPath;
+    tolua_property__get_set bool HDRRendering;
+    tolua_property__get_set bool specularLighting;
+    tolua_property__get_set bool drawShadows;
+    tolua_property__get_set int textureAnisotropy;
+    tolua_property__get_set TextureFilterMode textureFilterMode;
+    tolua_property__get_set int textureQuality;
+    tolua_property__get_set int materialQuality;
+    tolua_property__get_set int shadowMapSize;
+    tolua_property__get_set int shadowQuality;
+    tolua_property__get_set bool reuseShadowMaps;
+    tolua_property__get_set int maxShadowMaps;
+    tolua_property__get_set int maxShadowCascades;
+    tolua_property__get_set bool dynamicInstancing;
+    tolua_property__get_set int minInstances;
+    tolua_property__get_set int maxInstanceTriangles;
+    tolua_property__get_set int maxSortedInstances;
+    tolua_property__get_set int maxOccluderTriangles;
+    tolua_property__get_set int occlusionBufferSize;
+    tolua_property__get_set float occluderSizeThreshold;
+    tolua_readonly tolua_property__get_set unsigned numViews;
+    tolua_readonly tolua_property__get_set unsigned numPrimitives;
+    tolua_readonly tolua_property__get_set unsigned numBatches;
+    tolua_readonly tolua_property__get_set Zone* defaultZone;
+    tolua_readonly tolua_property__get_set Material* defaultMaterial;
+    tolua_readonly tolua_property__get_set Texture2D* defaultLightRamp;
+    tolua_readonly tolua_property__get_set Texture2D* defaultLightSpot;
+};
+
+Renderer* GetRenderer();
+tolua_readonly tolua_property__get_set Renderer* renderer;
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetRenderer00
+static int tolua_GraphicsLuaAPI_GetRenderer00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Renderer>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_renderer_ptr
+#define tolua_get_renderer_ptr tolua_GraphicsLuaAPI_GetRenderer00
+$}

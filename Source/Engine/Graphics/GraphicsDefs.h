@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -198,9 +198,13 @@ enum ShaderType
 // Inbuilt shader parameters.
 extern StringHash VSP_AMBIENTSTARTCOLOR;
 extern StringHash VSP_AMBIENTENDCOLOR;
+extern StringHash VSP_BILLBOARDROT;
 extern StringHash VSP_CAMERAPOS;
 extern StringHash VSP_CAMERAROT;
+extern StringHash VSP_NEARCLIP;
+extern StringHash VSP_FARCLIP;
 extern StringHash VSP_DEPTHMODE;
+extern StringHash VSP_DELTATIME;
 extern StringHash VSP_ELAPSEDTIME;
 extern StringHash VSP_FRUSTUMSIZE;
 extern StringHash VSP_GBUFFEROFFSETS;
@@ -210,13 +214,12 @@ extern StringHash VSP_MODEL;
 extern StringHash VSP_VIEWPROJ;
 extern StringHash VSP_UOFFSET;
 extern StringHash VSP_VOFFSET;
-extern StringHash VSP_VIEWRIGHTVECTOR;
-extern StringHash VSP_VIEWUPVECTOR;
 extern StringHash VSP_ZONE;
 extern StringHash VSP_LIGHTMATRICES;
 extern StringHash VSP_SKINMATRICES;
 extern StringHash VSP_VERTEXLIGHTS;
 extern StringHash PSP_AMBIENTCOLOR;
+extern StringHash PSP_DELTATIME;
 extern StringHash PSP_ELAPSEDTIME;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;
@@ -228,6 +231,8 @@ extern StringHash PSP_MATDIFFCOLOR;
 extern StringHash PSP_MATEMISSIVECOLOR;
 extern StringHash PSP_MATENVMAPCOLOR;
 extern StringHash PSP_MATSPECCOLOR;
+extern StringHash PSP_NEARCLIP;
+extern StringHash PSP_FARCLIP;
 extern StringHash PSP_SHADOWCUBEADJUST;
 extern StringHash PSP_SHADOWDEPTHFADE;
 extern StringHash PSP_SHADOWINTENSITY;
@@ -245,7 +250,8 @@ extern StringHash PASS_SHADOW;
 extern StringHash PASS_DEFERRED;
 extern StringHash PASS_PREPASS;
 extern StringHash PASS_MATERIAL;
-extern StringHash PASS_PREALPHA;
+extern StringHash PASS_POSTOPAQUE;
+extern StringHash PASS_REFRACT;
 extern StringHash PASS_POSTALPHA;
 
 // Scale calculation from bounding box diagonal.
@@ -269,7 +275,8 @@ enum TextureUnit
     TU_INDIRECTION = 9,
     TU_DEPTHBUFFER = 10,
     TU_LIGHTBUFFER = 11,
-    MAX_TEXTURE_UNITS = 12
+    TU_VOLUMEMAP = 12,
+    MAX_TEXTURE_UNITS = 13
 };
 
 /// Shader parameter groups for determining need to update.
@@ -322,4 +329,5 @@ static const int MAX_VERTEX_STREAMS = 4;
 static const int MAX_SKIN_MATRICES = 64;
 static const int MAX_CONSTANT_REGISTERS = 256;
 
+static const int BITS_PER_COMPONENT = 8;
 }

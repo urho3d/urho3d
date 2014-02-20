@@ -1,7 +1,6 @@
 BlenderExporter
 
-- Contributed by reattiva. Read installation instructions from the Readme.txt
-  file within the subdirectory
+- Has moved to https://github.com/reattiva/Urho3D-Blender
 
 OgreBatchConverter
 
@@ -14,9 +13,3 @@ OgreMaxscriptExport
 - Contributed by Vladimir Pobedinsky. A modified version of the Maxscript
   Exporter from the Ogre SDK that will import Ogre .mesh.xml files (for feeding
   into OgreImporter) and materials in Urho3D .xml format.
-
-LuaScript
-
-- Lua bindings for Urho3D. Contributed by Aster Jian. Use the CMake option
-  ENABLE_LUA to include in the build.
-

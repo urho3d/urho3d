@@ -29,6 +29,7 @@ Array<XMLFile@> sceneCopyBuffer;
 
 bool suppressSceneChanges = false;
 bool inSelectionModify = false;
+bool skipMruScene = false;
 
 Array<EditActionGroup> undoStack;
 uint undoStackPos = 0;
@@ -55,14 +56,27 @@ void CreateScene()
 
     // Always pause the scene, and do updates manually
     editorScene.updateEnabled = false;
-
-    // Camera is not bounded to a scene but still need to be created once here
-    CreateCamera();
 }
 
 bool ResetScene()
 {
     ui.cursor.shape = CS_BUSY;
+
+    if (messageBoxCallback is null && sceneModified)
+    {
+        MessageBox@ messageBox = MessageBox("Scene has been modified.\nContinue to reset?", "Warning");
+        if (messageBox.window !is null)
+        {
+            Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
+            cancelButton.visible = true;
+            cancelButton.focus = true;
+            SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
+            messageBoxCallback = @ResetScene;
+            return false;
+        }
+    }
+    else
+        messageBoxCallback = null;
 
     suppressSceneChanges = true;
 
@@ -72,8 +86,11 @@ bool ResetScene()
     editorScene.CreateComponent("PhysicsWorld");
     editorScene.CreateComponent("DebugRenderer");
 
+    // Release resources that became unused after the scene clear
+    cache.ReleaseAllResources(false);
+
     sceneModified = false;
-    runUpdate = false;
+    StopSceneUpdate();
 
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
@@ -83,6 +100,8 @@ bool ResetScene()
 
     ResetCamera();
     CreateGizmo();
+    CreateGrid();
+    SetActiveViewport(viewports[0]);
 
     return true;
 }
@@ -106,7 +125,11 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
         cache.ReleaseAllResources(false);
         renderer.ReloadShaders();
 
-        if (!sceneResourcePath.empty && !sceneResourcePath.Contains(fileSystem.programDir))
+        String check = AddTrailingSlash(sceneResourcePath);
+        bool isDefaultResourcePath = check.Compare(fileSystem.programDir + "Data/", false) == 0 ||
+            check.Compare(fileSystem.programDir + "CoreData/", false) == 0;
+
+        if (!sceneResourcePath.empty && !isDefaultResourcePath)
             cache.RemoveResourceDir(sceneResourcePath);
     }
 
@@ -115,19 +138,21 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
     if (!additive)
     {
         sceneResourcePath = newPath;
-        SetResourceSubPath(uiScenePath, newPath, "Scenes");
-        SetResourceSubPath(uiElementPath, newPath, "UI");
-        SetResourceSubPath(uiNodePath, newPath, "Objects");
-        SetResourceSubPath(uiScriptPath, newPath, "Scripts");
+        uiScenePath = GetResourceSubPath(newPath, "Scenes");
+        uiElementPath = GetResourceSubPath(newPath, "UI");
+        uiNodePath = GetResourceSubPath(newPath, "Objects");
+        uiScriptPath = GetResourceSubPath(newPath, "Scripts");
+        uiParticlePath = GetResourceSubPath(newPath, "Particle");
     }
 }
 
-void SetResourceSubPath(String& outPath, const String&in basePath, const String&in subPath)
+String GetResourceSubPath(String basePath, const String&in subPath)
 {
-    if (fileSystem.DirExists(basePath + "/" + subPath))
-        outPath = AddTrailingSlash(basePath + "/" + subPath);
+    basePath = AddTrailingSlash(basePath);
+    if (fileSystem.DirExists(basePath + subPath))
+        return AddTrailingSlash(basePath + subPath);
     else
-        outPath = AddTrailingSlash(basePath);
+        return basePath;
 }
 
 bool LoadScene(const String&in fileName)
@@ -140,13 +165,16 @@ bool LoadScene(const String&in fileName)
     // Always load the scene from the filesystem, not from resource paths
     if (!fileSystem.FileExists(fileName))
     {
-        log.Error("No such scene: " + fileName);
+        MessageBox("No such scene.\n" + fileName);
         return false;
     }
 
     File file(fileName, FILE_READ);
     if (!file.open)
+    {
+        MessageBox("Could not open file.\n" + fileName);
         return false;
+    }
 
     // Add the scene's resource path in case it's necessary
     String newScenePath = GetPath(fileName);
@@ -154,6 +182,8 @@ bool LoadScene(const String&in fileName)
         SetResourcePath(newScenePath);
 
     suppressSceneChanges = true;
+    sceneModified = false;
+    StopSceneUpdate();
 
     String extension = GetExtension(fileName);
     bool loaded;
@@ -162,11 +192,11 @@ bool LoadScene(const String&in fileName)
     else
         loaded = editorScene.LoadXML(file);
 
+    // Release resources which are not used by the new scene
+    cache.ReleaseAllResources(false);
+
     // Always pause the scene, and do updates manually
     editorScene.updateEnabled = false;
-
-    sceneModified = false;
-    runUpdate = false;
 
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
@@ -174,8 +204,16 @@ bool LoadScene(const String&in fileName)
 
     suppressSceneChanges = false;
 
+    // global variable to mostly bypass adding mru upon importing tempscene
+    if (!skipMruScene)
+        UpdateSceneMru(fileName);
+
+    skipMruScene = false;
+
     ResetCamera();
     CreateGizmo();
+    CreateGrid();
+    SetActiveViewport(viewports[0]);
 
     return loaded;
 }
@@ -198,9 +236,12 @@ bool SaveScene(const String&in fileName)
 
     if (success)
     {
+        UpdateSceneMru(fileName);
         sceneModified = false;
         UpdateWindowTitle();
     }
+    else
+        MessageBox("Could not save scene successfully!\nSee Urho3D.log for more detail.");
 
     return success;
 }
@@ -268,13 +309,16 @@ void LoadNode(const String&in fileName)
 
     if (!fileSystem.FileExists(fileName))
     {
-        log.Error("No such node file " + fileName);
+        MessageBox("No such node file.\n" + fileName);
         return;
     }
 
     File file(fileName, FILE_READ);
     if (!file.open)
+    {
+        MessageBox("Could not open file.\n" + fileName);
         return;
+    }
 
     ui.cursor.shape = CS_BUSY;
 
@@ -312,12 +356,17 @@ bool SaveNode(const String&in fileName)
 
     File file(fileName, FILE_WRITE);
     if (!file.open)
+    {
+        MessageBox("Could not open file.\n" + fileName);
         return false;
+    }
 
     String extension = GetExtension(fileName);
     bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
     if (success)
         instantiateFileName = fileName;
+    else
+        MessageBox("Could not save node successfully!\nSee Urho3D.log for more detail.");
 
     return success;
 }
@@ -326,6 +375,31 @@ void UpdateScene(float timeStep)
 {
     if (runUpdate)
         editorScene.Update(timeStep);
+}
+
+void StopSceneUpdate()
+{
+    runUpdate = false;
+    audio.Stop();
+    toolBarDirty = true;
+}
+
+void StartSceneUpdate()
+{
+    runUpdate = true;
+    // Run audio playback only when scene is updating, so that audio components' time-dependent attributes stay constant when
+    // paused (similar to physics)
+    audio.Play();
+    toolBarDirty = true;
+}
+
+bool ToggleSceneUpdate()
+{
+    if (!runUpdate)
+        StartSceneUpdate();
+    else
+        StopSceneUpdate();
+    return true;
 }
 
 void SetSceneModified()
@@ -766,7 +840,7 @@ bool SceneRebuildNavigation()
 {
     ui.cursor.shape = CS_BUSY;
 
-    Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh");
+    Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh", true);
     bool success = true;
     for (uint i = 0; i < navMeshes.length; ++i)
     {
@@ -776,4 +850,52 @@ bool SceneRebuildNavigation()
     }
 
     return success;
+}
+
+bool LoadParticleData(const String&in fileName)
+{
+    if (fileName.empty)
+        return false;
+
+    XMLFile xmlFile;
+    if (!xmlFile.Load(File(fileName, FILE_READ)))
+        return false;
+
+    for (uint i = 0; i < editComponents.length; ++i)
+    {
+        ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[i]);
+        if (emitter !is null)
+            emitter.Load(xmlFile);
+    }
+    
+    return true;
+}
+
+bool SaveParticleData(const String&in fileName)
+{
+    if (fileName.empty || editComponents.length != 1)
+        return false;
+
+    ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[0]);
+    if (emitter !is null)
+    {
+        XMLFile xmlFile;
+        emitter.Save(xmlFile);
+        return xmlFile.Save(File(fileName, FILE_WRITE));
+    }
+
+    return false;
+}
+
+void UpdateSceneMru(String filename)
+{
+    while (uiRecentScenes.Find(filename) > -1)
+        uiRecentScenes.Erase(uiRecentScenes.Find(filename));
+
+    uiRecentScenes.Insert(0, filename);
+
+    for(uint i=uiRecentScenes.length-1;i>=maxRecentSceneCount;i--)
+        uiRecentScenes.Erase(i);
+
+    PopulateMruScenes();
 }

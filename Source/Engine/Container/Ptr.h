@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,6 +103,18 @@ public:
     
     /// Reset to null and release the object reference.
     void Reset() { ReleaseRef(); }
+    
+    /// Detach without destroying the object even if the refcount goes zero. To be used for scripting language interoperation.
+    void Detach()
+    {
+        if (ptr_)
+        {
+            RefCount* refCount = RefCountPtr();
+            ++refCount->refs_; // 2 refs
+            Reset(); // 1 ref
+            --refCount->refs_; // 0 refs
+        }
+    }
     
     /// Perform a static cast from a shared pointer of another type.
     template <class U> void StaticCast(const SharedPtr<U>& rhs)
@@ -308,7 +320,7 @@ public:
     /// Test for inequality with another weak pointer.
     bool operator != (const WeakPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
     /// Test for less than with another weak pointer.
-    bool operator < (const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
+    bool operator < (const WeakPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Convert to a raw pointer, null if the object is expired.
     operator T* () const { return Get(); }
     

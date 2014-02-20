@@ -1,0 +1,99 @@
+$#include "ResourceCache.h"
+
+class ResourceCache
+{    
+    void ReleaseAllResources(bool force = false);
+    bool ReloadResource(Resource* resource);
+
+    void SetMemoryBudget(ShortStringHash type, unsigned budget);
+    void SetMemoryBudget(const String type, unsigned budget);
+    
+    void SetAutoReloadResources(bool enable);
+    void SetSearchPackagesFirst(bool value);
+
+    // SharedPtr<File> GetFile(const String& name);
+    tolua_outside File* ResourceCacheGetFile @ GetFile(const String name);
+
+    Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true);
+    
+    bool Exists(const String name) const;
+    unsigned GetMemoryBudget(ShortStringHash type) const;
+    unsigned GetMemoryUse(ShortStringHash type) const;
+    unsigned GetTotalMemoryUse() const;
+    String GetResourceFileName(const String name) const;
+    
+    bool GetAutoReloadResources() const;
+    bool GetSearchPackagesFirst() const;
+    
+    String GetPreferredResourceDir(const String path) const;
+    String SanitateResourceName(const String name) const;
+    String SanitateResourceDirName(const String name) const;
+
+    tolua_readonly tolua_property__get_set unsigned totalMemoryUse;
+    tolua_readonly tolua_property__get_set bool autoReloadResources;
+    tolua_readonly tolua_property__get_set bool searchPackagesFirst;
+};
+
+ResourceCache* GetCache();
+tolua_readonly tolua_property__get_set ResourceCache* cache;
+
+${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_GetCache00
+static int tolua_ResourceLuaAPI_GetCache00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<ResourceCache>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_cache_ptr
+#define tolua_get_cache_ptr tolua_ResourceLuaAPI_GetCache00
+
+static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
+{
+    SharedPtr<File> filePtr = cache->GetFile(fileName);
+    if (!filePtr)
+        return 0;
+
+    File* file = filePtr.Get();
+    filePtr.Detach();
+    
+    return file;
+}
+
+// Disable generated GetResource function.
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_ResourceCache_GetResource00
+
+static int tolua_ResourceLuaAPI_ResourceCache_GetResource00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ResourceCache",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ResourceCache* self = (ResourceCache*)  tolua_tousertype(tolua_S,1,0);
+  const String type = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  const String name = ((const String)  tolua_tourho3dstring(tolua_S,3,0));
+  bool SendEventOnFailure = ((bool)  tolua_toboolean(tolua_S,4,true));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetResource'", NULL);
+#endif
+ {
+  Resource* tolua_ret = (Resource*)  self->GetResource(type,name,SendEventOnFailure);
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,type.CString());
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetResource'.",&tolua_err);
+ return 0;
+#endif
+}
+$}

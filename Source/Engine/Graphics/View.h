@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,6 +102,8 @@ struct PerThreadSceneResult
     float maxZ_;
 };
 
+static const unsigned MAX_VIEWPORT_TEXTURES = 2;
+
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class URHO3D_API View : public Object
 {
@@ -152,7 +154,7 @@ private:
     /// Update geometries and sort batches.
     void UpdateGeometries();
     /// Get pixel lit batches for a certain light and drawable.
-    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue, bool useLitBase);
+    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue);
     /// Execute render commands.
     void ExecuteRenderPathCommands();
     /// Set rendertargets for current render command.
@@ -161,8 +163,14 @@ private:
     void SetTextures(RenderPathCommand& command);
     /// Perform a quad rendering command.
     void RenderQuad(RenderPathCommand& command);
-    /// Check if a command reads the rendered scene.
+    /// Check if a command is enabled and has content to render. To be called only after render update has completed for the frame.
+    bool IsNecessary(const RenderPathCommand& command);
+    /// Check if a command reads the destination render target.
     bool CheckViewportRead(const RenderPathCommand& command);
+    /// Check if a command writes into the destination render target.
+    bool CheckViewportWrite(const RenderPathCommand& command);
+    /// Check whether a command should use pingponging instead of resolve from destination render target to viewport texture.
+    bool CheckPingpong(unsigned index);
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
@@ -256,8 +264,14 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Destination color rendertarget.
     RenderSurface* renderTarget_;
+    /// Substitute rendertarget for deferred rendering. Allocated if necessary.
+    RenderSurface* substituteRenderTarget_;
+    /// Texture(s) for sampling the viewport contents. Allocated if necessary.
+    Texture2D* viewportTextures_[MAX_VIEWPORT_TEXTURES];
     /// Color rendertarget active for the current renderpath command.
     RenderSurface* currentRenderTarget_;
+    /// Texture containing the latest viewport texture.
+    Texture2D* currentViewportTexture_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
@@ -266,10 +280,6 @@ private:
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
-    /// Write screenbuffer index.
-    unsigned writeBuffer_;
-    /// Read screenbuffer index.
-    unsigned readBuffer_;
     /// Minimum Z value of the visible scene.
     float minZ_;
     /// Maximum Z value of the visible scene.
@@ -290,10 +300,10 @@ private:
     bool deferred_;
     /// Deferred ambient pass flag. This means that the destination rendertarget is being written to at the same time as albedo/normal/depth buffers, and needs to be RGBA on OpenGL.
     bool deferredAmbient_;
+    /// Forward light base pass optimization flag. If in use, combine the base pass and first light for all opaque objects.
+    bool useLitBase_;
     /// Renderpath.
     RenderPath* renderPath_;
-    /// Intermediate screen buffers used in pingpong copies and OpenGL deferred framebuffer blit.
-    PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
     /// Per-thread geometries, lights and Z range collection results.
@@ -312,10 +322,6 @@ private:
     PODVector<Drawable*> occluders_;
     /// Lights.
     PODVector<Light*> lights_;
-    /// Light volume vertex shaders.
-    PODVector<ShaderVariation*> lightVS_;
-    /// Light volume pixel shaders.
-    PODVector<ShaderVariation*> lightPS_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Rendertargets defined by the renderpath.
@@ -342,6 +348,10 @@ private:
     StringHash litBasePassName_;
     /// Hash of the litalpha pass.
     StringHash litAlphaPassName_;
+    /// Name of light volume vertex shader.
+    String lightVolumeVSName_;
+    /// Name of light volume pixel shader.
+    String lightVolumePSName_;
 };
 
 }

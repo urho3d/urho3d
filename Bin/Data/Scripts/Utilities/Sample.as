@@ -1,7 +1,9 @@
 // Common sample initialization as a framework for all samples.
 //    - Create Urho3D logo at screen;
+//    - Set custom window title and icon;
 //    - Create Console and Debug HUD, and use F1 and F2 key to toggle them;
 //    - Toggle rendering options from the keys 1-8;
+//    - Take screenshots with key 9;
 //    - Handle Esc key down to hide Console or exit application;
 
 Sprite@ logoSprite;
@@ -10,6 +12,9 @@ void SampleStart()
 {
     // Create logo
     CreateLogo();
+
+    // Set custom window Title & Icon
+    SetWindowTitleAndIcon();
 
     // Create console and debug HUD
     CreateConsoleAndDebugHud();
@@ -23,7 +28,6 @@ void SetLogoVisible(bool enable)
     if (logoSprite !is null)
         logoSprite.visible = enable;
 }
-
 
 void CreateLogo()
 {
@@ -58,6 +62,13 @@ void CreateLogo()
     
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite.priority = -100;
+}
+
+void SetWindowTitleAndIcon()
+{
+    Image@ icon = cache.GetResource("Image", "Textures/UrhoIcon.png");
+    graphics.windowIcon = icon;
+    graphics.windowTitle = "Urho3D Sample";
 }
 
 void CreateConsoleAndDebugHud()
@@ -159,5 +170,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         // Instancing
         else if (key == '8')
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
+
+        // Take screenshot
+        else if (key == '9')
+        {
+            Image@ screenshot = Image();
+            graphics.TakeScreenShot(screenshot);
+            // Here we save in the Data folder with date and time appended
+            screenshot.SavePNG(fileSystem.programDir + "Data/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+        }
     }
 }

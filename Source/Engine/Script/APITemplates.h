@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 #include "Drawable.h"
 #include "File.h"
 #include "HashSet.h"
+#include "Log.h"
 #include "Node.h"
 #include "Renderer.h"
 #include "Resource.h"
@@ -54,15 +55,22 @@ template <class T, class U> U* RefCast(T* t)
 }
 
 /// Template function for returning a Variant pointer type cast to specific class.
-template <class T> T* GetVariantPtr(Variant* ptr)
+template <class T> T* GetVariantPtr(const String& binding, Variant* ptr)
 {
-    // An attempt at type safety. Probably can not guarantee that this could not be made to invoke UDB
-    T* ptrA = static_cast<T*>(ptr->GetPtr());
-    RefCounted* ptrB = static_cast<RefCounted*>(ptrA);
-    if (dynamic_cast<T*>(ptrB) == ptrA)
-        return ptrA;
-    else
-        return 0;
+    LOGWARNINGF("The %s API binding is deprecated, GetPtr() should be used instead.", binding.Substring(11).CString());
+
+    if (ptr->GetType() == VAR_PTR)
+        return dynamic_cast<T*>(ptr->GetPtr());
+    else if (ptr->GetType() == VAR_VOIDPTR)
+    {
+        // An attempt at type safety. Probably can not guarantee that this could not be made to invoke UDB
+        T* ptrA = static_cast<T*>(ptr->GetVoidPtr());
+        RefCounted* ptrB = static_cast<RefCounted*>(ptrA);
+        if (dynamic_cast<T*>(ptrB) == ptrA)
+            return ptrA;
+    }
+    
+    return 0;
 }
 
 /// Template function for Vector to array conversion.
@@ -326,6 +334,7 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
 {
     RegisterRefCounted<T>(engine, className);
     engine->RegisterObjectMethod(className, "ShortStringHash get_type() const", asMETHODPR(T, GetType, () const, ShortStringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ShortStringHash get_baseType() const", asMETHODPR(T, GetBaseType, () const, ShortStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
@@ -579,7 +588,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void LookAt(const Vector3&in, const Vector3&in upAxis = Vector3(0, 1, 0))", asMETHOD(T, LookAt), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", CreateMode mode = REPLICATED, uint id = 0)", asMETHODPR(T, CreateChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = String(), CreateMode mode = REPLICATED, uint id = 0)", asMETHODPR(T, CreateChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddChild(Node@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(Node@+)", asMETHODPR(T, RemoveChild, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
@@ -610,6 +619,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const Quaternion& get_rotation() const", asMETHOD(T, GetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_direction(const Vector3&in)", asMETHOD(T, SetDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_direction() const", asMETHOD(T, GetDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_up() const", asMETHOD(T, GetUp), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_right() const", asMETHOD(T, GetRight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_scale(const Vector3&in)", asMETHODPR(T, SetScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_scale() const", asMETHOD(T, GetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldPosition(const Vector3&in)", asMETHOD(T, SetWorldPosition), asCALL_THISCALL);
@@ -618,6 +629,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Quaternion get_worldRotation()", asMETHOD(T, GetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldDirection(const Vector3&in)", asMETHOD(T, SetWorldDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldDirection()", asMETHOD(T, GetWorldDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_worldUp()", asMETHOD(T, GetWorldUp), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_worldRight()", asMETHOD(T, GetWorldRight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldScale(const Vector3&in)", asMETHODPR(T, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldScale()", asMETHOD(T, GetWorldScale), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Matrix3x4 get_transform() const", asMETHOD(T, GetTransform), asCALL_THISCALL);
@@ -767,6 +780,7 @@ template <class T> void RegisterStaticModel(asIScriptEngine* engine, const char*
 {
     RegisterDrawable<T>(engine, className);
     RegisterSubclass<StaticModel, T>(engine, "StaticModel", className);
+    engine->RegisterObjectMethod(className, "void ApplyMaterialList(const String&in fileName = String())", asMETHOD(T, ApplyMaterialList), asCALL_THISCALL);
     if (registerSetModel)
         engine->RegisterObjectMethod(className, "void set_model(Model@+)", asMETHOD(T, SetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Model@+ get_model() const", asMETHOD(T, GetModel), asCALL_THISCALL);
@@ -988,6 +1002,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     {
         engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void set_editable(bool)", asMETHOD(T, SetEditable), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_editable() const", asMETHOD(T, IsEditable), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_focus() const", asMETHOD(T, HasFocus), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_selected(bool)", asMETHOD(T, SetSelected), asCALL_THISCALL);
@@ -1032,7 +1048,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_elementEventSender() const", asMETHOD(T, IsElementEventSender), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(UIElementGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(UIElementGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "uint get_numChildren(bool) const", asMETHOD(T, GetNumChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint GetNumChildren(bool) const", asMETHOD(T, GetNumChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_children(uint) const", asMETHODPR(T, GetChild, (unsigned) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_parent(UIElement@+)", asFUNCTION(UIElementSetParent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "UIElement@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);

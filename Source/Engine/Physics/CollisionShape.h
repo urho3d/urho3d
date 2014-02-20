@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,8 +62,6 @@ enum ShapeType
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
-    /// Original model name
-    String modelName_;
 };
 
 /// Triangle mesh geometry data.
@@ -229,7 +227,9 @@ private:
     void UpdateShape();
     /// Update terrain collision shape from the terrain component.
     void HandleTerrainCreated(StringHash eventType, VariantMap& eventData);
-    
+    /// Update trimesh or convex shape after a model has reloaded itself.
+    void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
+
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Rigid body.

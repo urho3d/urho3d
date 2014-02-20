@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,11 +70,11 @@ public:
     /// Register object factory. Node must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Load from binary data. Return true if successful.
+    /// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Save to binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    /// Load from XML data. Return true if successful.
+    /// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Add a replication state that is tracking this scene.
     virtual void AddReplicationState(NodeReplicationState* state);
@@ -124,7 +124,7 @@ public:
     Component* GetComponent(unsigned id) const;
     /// Return whether updates are enabled.
     bool IsUpdateEnabled() const { return updateEnabled_; }
-    /// Return asynchronous loading flag.
+    /// Return whether an asynchronous loading operation is in progress.
     bool IsAsyncLoading() const { return asyncLoading_; }
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
     float GetAsyncProgress() const;
@@ -220,6 +220,8 @@ private:
     PODVector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.
     Mutex sceneMutex_;
+    /// Preallocated event data map for smoothing update events.
+    VariantMap smoothingData_;
     /// Next free non-local node ID.
     unsigned replicatedNodeID_;
     /// Next free non-local component ID.
@@ -247,6 +249,6 @@ private:
 };
 
 /// Register Scene library objects.
-void RegisterSceneLibrary(Context* context);
+void URHO3D_API RegisterSceneLibrary(Context* context);
 
 }

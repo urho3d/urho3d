@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,18 @@
 #include "DebugRenderer.h"
 #include "DrawableEvents.h"
 #include "Geometry.h"
+#include "IndexBuffer.h"
 #include "Log.h"
 #include "Model.h"
 #include "PhysicsUtils.h"
 #include "PhysicsWorld.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "RigidBody.h"
 #include "Scene.h"
 #include "Terrain.h"
+#include "VertexBuffer.h"
 
 #include <BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
@@ -92,30 +95,29 @@ public:
                 continue;
             }
             
-            const unsigned char* vertexData;
-            const unsigned char* indexData;
+            SharedArrayPtr<unsigned char> vertexData;
+            SharedArrayPtr<unsigned char> indexData;
             unsigned vertexSize;
             unsigned indexSize;
             unsigned elementMask;
             
-            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+            geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elementMask);
             if (!vertexData || !indexData)
             {
                 LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
                 continue;
             }
             
-            // Keep a shared pointer to the referred geometry
-            /// \todo Model live reload is not handled properly, but at least we will not crash due to holding a pointer
-            /// to the original geometry
-            geometries_.Push(SharedPtr<Geometry>(geometry));
+            // Keep shared pointers to the vertex/index data so that if it's unloaded or changes size, we don't crash
+            dataArrays_.Push(vertexData);
+            dataArrays_.Push(indexData);
             
             unsigned indexStart = geometry->GetIndexStart();
             unsigned indexCount = geometry->GetIndexCount();
             
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = indexCount / 3;
-            meshIndex.m_triangleIndexBase = &indexData[indexStart];
+            meshIndex.m_triangleIndexBase = &indexData[indexStart * indexSize];
             meshIndex.m_triangleIndexStride = 3 * indexSize;
             meshIndex.m_numVertices = 0;
             meshIndex.m_vertexBase = vertexData;
@@ -127,8 +129,8 @@ public:
     }
     
 private:
-    /// Geometries used in the collision
-    Vector<SharedPtr<Geometry> > geometries_;
+    /// Shared vertex/index data used in the collision
+    Vector<SharedArrayPtr<unsigned char> > dataArrays_;
 };
 
 TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
@@ -136,8 +138,6 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
     shape_(0),
     infoMap_(0)
 {
-    modelName_ = model->GetName();
-    
     meshInterface_ = new TriangleMeshInterface(model, lodLevel);
     shape_ = new btBvhTriangleMeshShape(meshInterface_, true, true);
     
@@ -159,8 +159,6 @@ TriangleMeshData::~TriangleMeshData()
 
 ConvexData::ConvexData(Model* model, unsigned lodLevel)
 {
-    modelName_ = model->GetName();
-    
     PODVector<Vector3> vertices;
     unsigned numGeometries = model->GetNumGeometries();
     
@@ -305,6 +303,32 @@ HeightfieldData::~HeightfieldData()
 {
 }
 
+bool HasDynamicBuffers(Model* model, unsigned lodLevel)
+{
+    unsigned numGeometries = model->GetNumGeometries();
+
+    for (unsigned i = 0; i < numGeometries; ++i)
+    {
+        Geometry* geometry = model->GetGeometry(i, lodLevel);
+        if (!geometry)
+            continue;
+        unsigned numVertexBuffers = geometry->GetNumVertexBuffers();
+        for (unsigned j = 0; j < numVertexBuffers; ++j)
+        {
+            VertexBuffer* buffer = geometry->GetVertexBuffer(j);
+            if (!buffer)
+                continue;
+            if (buffer->IsDynamic())
+                return true;
+        }
+        IndexBuffer* buffer = geometry->GetIndexBuffer();
+        if (buffer && buffer->IsDynamic())
+            return true;
+    }
+
+    return false;
+}
+
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
     shape_(0),
@@ -406,6 +430,9 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void CollisionShape::SetBox(const Vector3& size, const Vector3& position, const Quaternion& rotation)
 {
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_BOX;
     size_ = size;
     position_ = position;
@@ -420,6 +447,9 @@ void CollisionShape::SetBox(const Vector3& size, const Vector3& position, const 
 
 void CollisionShape::SetSphere(float diameter, const Vector3& position, const Quaternion& rotation)
 {
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_SPHERE;
     size_ = Vector3(diameter, diameter, diameter);
     position_ = position;
@@ -434,6 +464,9 @@ void CollisionShape::SetSphere(float diameter, const Vector3& position, const Qu
 
 void CollisionShape::SetStaticPlane(const Vector3& position, const Quaternion& rotation)
 {
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_STATICPLANE;
     position_ = position;
     rotation_ = rotation;
@@ -447,6 +480,9 @@ void CollisionShape::SetStaticPlane(const Vector3& position, const Quaternion& r
 
 void CollisionShape::SetCylinder(float diameter, float height, const Vector3& position, const Quaternion& rotation)
 {
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_CYLINDER;
     size_ = Vector3(diameter, height, diameter);
     position_ = position;
@@ -461,6 +497,9 @@ void CollisionShape::SetCylinder(float diameter, float height, const Vector3& po
 
 void CollisionShape::SetCapsule(float diameter, float height, const Vector3& position, const Quaternion& rotation)
 {
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_CAPSULE;
     size_ = Vector3(diameter, height, diameter);
     position_ = position;
@@ -475,6 +514,9 @@ void CollisionShape::SetCapsule(float diameter, float height, const Vector3& pos
 
 void CollisionShape::SetCone(float diameter, float height, const Vector3& position, const Quaternion& rotation)
 {
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_CONE;
     size_ = Vector3(diameter, height, diameter);
     position_ = position;
@@ -495,6 +537,9 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
         return;
     }
     
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_TRIANGLEMESH;
     model_ = model;
     lodLevel_ = lodLevel;
@@ -516,6 +561,9 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector
         return;
     }
     
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_CONVEXHULL;
     model_ = model;
     lodLevel_ = lodLevel;
@@ -542,6 +590,9 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
         return;
     }
     
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_CONVEXHULL;
     model_.Reset();
     lodLevel_ = 0;
@@ -565,6 +616,9 @@ void CollisionShape::SetTerrain()
         return;
     }
     
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
     shapeType_ = SHAPE_TERRAIN;
     
     UpdateShape();
@@ -642,6 +696,9 @@ void CollisionShape::SetModel(Model* model)
 {
     if (model != model_)
     {
+        if (model_)
+            UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
         model_ = model;
         if (shapeType_ >= SHAPE_TRIANGLEMESH)
         {
@@ -721,7 +778,7 @@ void CollisionShape::NotifyRigidBody(bool updateMass)
 void CollisionShape::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    model_ = cache->GetResource<Model>(value.id_);
+    model_ = cache->GetResource<Model>(value.name_);
     recreateShape_ = true;
     MarkNetworkUpdate();
 }
@@ -879,20 +936,23 @@ void CollisionShape::UpdateShape()
             if (model_)
             {
                 // Check the geometry cache
-                String id = "TriMesh_" + model_->GetName() + "_" + String(lodLevel_);
-                
-                HashMap<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
-                HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
+                Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
+                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetTriMeshCache();
+                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
                 if (j != cache.End())
                     geometry_ = j->second_;
                 else
                 {
                     geometry_ = new TriangleMeshData(model_, lodLevel_);
-                    cache[id] = geometry_;
+                    // Check if model has dynamic buffers, do not cache in that case
+                    if (!HasDynamicBuffers(model_, lodLevel_))
+                        cache[id] = geometry_;
                 }
                 
                 TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry_.Get());
                 shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_, ToBtVector3(newWorldScale * size_));
+                // Watch for live reloads of the collision model to reload the geometry if necessary
+                SubscribeToEvent(model_, E_RELOADFINISHED, HANDLER(CollisionShape, HandleModelReloadFinished));
             }
             break;
             
@@ -916,21 +976,23 @@ void CollisionShape::UpdateShape()
             else if (model_)
             {
                 // Check the geometry cache
-                String id = "Convex_" + model_->GetName() + "_" + String(lodLevel_);
-                
-                HashMap<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
-                HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
+                Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
+                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetConvexCache();
+                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
                 if (j != cache.End())
                     geometry_ = j->second_;
                 else
                 {
                     geometry_ = new ConvexData(model_, lodLevel_);
-                    cache[id] = geometry_;
+                    // Check if model has dynamic buffers, do not cache in that case
+                    if (!HasDynamicBuffers(model_, lodLevel_))
+                        cache[id] = geometry_;
                 }
                 
                 ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
                 shape_ = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
                 shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
+                SubscribeToEvent(model_, E_RELOADFINISHED, HANDLER(CollisionShape, HandleModelReloadFinished));
             }
             break;
             
@@ -974,6 +1036,17 @@ void CollisionShape::UpdateShape()
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
 {
     if (shapeType_ == SHAPE_TERRAIN)
+    {
+        UpdateShape();
+        NotifyRigidBody();
+    }
+}
+
+void CollisionShape::HandleModelReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    if (physicsWorld_)
+        physicsWorld_->RemoveCachedGeometry(model_);
+    if (shapeType_ == SHAPE_TRIANGLEMESH || shapeType_ == SHAPE_CONVEXHULL)
     {
         UpdateShape();
         NotifyRigidBody();

@@ -122,16 +122,25 @@ void PositionGizmo()
     if (gizmo is null)
         return;
 
-    if (editNodes.empty)
+    Vector3 center(0, 0, 0);
+    bool containsScene = false;
+
+    for (uint i = 0; i < editNodes.length; ++i)
+    {
+        // Scene's transform should not be edited, so hide gizmo if it is included
+        if (editNodes[i] is editorScene)
+        {
+            containsScene = true;
+            break;
+        }
+        center += editNodes[i].worldPosition;
+    }
+
+    if (editNodes.empty || containsScene)
     {
         HideGizmo();
         return;
     }
-
-    Vector3 center(0, 0, 0);
-
-    for (uint i = 0; i < editNodes.length; ++i)
-        center += editNodes[i].worldPosition;
 
     center /= editNodes.length;
     gizmoNode.position = center;
@@ -161,9 +170,9 @@ void PositionGizmo()
         lastGizmoMode = editMode;
     }
 
-    if (editMode != EDIT_SELECT && !gizmo.enabled)
+    if ((editMode != EDIT_SELECT && !orbiting) && !gizmo.enabled)
         ShowGizmo();
-    else if (editMode == EDIT_SELECT && gizmo.enabled)
+    else if ((editMode == EDIT_SELECT || orbiting) && gizmo.enabled)
         HideGizmo();
 }
 
@@ -210,7 +219,10 @@ void UseGizmo()
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos) !is null)
         return;
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+    IntRect view = activeViewport.viewport.rect;
+    Ray cameraRay = camera.GetScreenRay(
+        float(pos.x - view.left) / view.width,
+        float(pos.y - view.top) / view.height);
     float scale = gizmoNode.scale.x;
 
     // Recalculate axes only when not left-dragging
@@ -323,6 +335,14 @@ bool MoveNodes(Vector3 adjust)
     {
         for (uint i = 0; i < editNodes.length; ++i)
         {
+            if (moveSnap)
+            {
+                float moveStepScaled = moveStep * snapScale;
+                adjust.x = Floor(adjust.x / moveStepScaled + 0.5) * moveStepScaled;
+                adjust.y = Floor(adjust.y / moveStepScaled + 0.5) * moveStepScaled;
+                adjust.z = Floor(adjust.z / moveStepScaled + 0.5) * moveStepScaled;
+            }
+
             Node@ node = editNodes[i];
             Vector3 nodeAdjust = adjust;
             if (axisMode == AXIS_LOCAL && editNodes.length == 1)
@@ -331,26 +351,7 @@ bool MoveNodes(Vector3 adjust)
             Vector3 worldPos = node.worldPosition;
             Vector3 oldPos = node.position;
 
-            if (!moveSnap)
-                worldPos += nodeAdjust;
-            else
-            {
-                if (nodeAdjust.x != 0)
-                {
-                    worldPos.x += nodeAdjust.x * moveStep;
-                    worldPos.x = Floor(worldPos.x / moveStep + 0.5) * moveStep;
-                }
-                if (nodeAdjust.y != 0)
-                {
-                    worldPos.y += nodeAdjust.y * moveStep;
-                    worldPos.y = Floor(worldPos.y / moveStep + 0.5) * moveStep;
-                }
-                if (nodeAdjust.z != 0)
-                {
-                    worldPos.z += nodeAdjust.z * moveStep;
-                    worldPos.z = Floor(worldPos.z / moveStep + 0.5) * moveStep;
-                }
-            }
+            worldPos += nodeAdjust;
 
             if (node.parent is null)
                 node.position = worldPos;
@@ -371,9 +372,10 @@ bool RotateNodes(Vector3 adjust)
 
     if (rotateSnap)
     {
-        adjust.x = Floor(adjust.x / rotateStep + 0.5) * rotateStep;
-        adjust.y = Floor(adjust.y / rotateStep + 0.5) * rotateStep;
-        adjust.z = Floor(adjust.z / rotateStep + 0.5) * rotateStep;
+        float rotateStepScaled = rotateStep * snapScale;
+        adjust.x = Floor(adjust.x / rotateStepScaled + 0.5) * rotateStepScaled;
+        adjust.y = Floor(adjust.y / rotateStepScaled + 0.5) * rotateStepScaled;
+        adjust.z = Floor(adjust.z / rotateStepScaled + 0.5) * rotateStepScaled;
     }
 
     if (adjust.length > M_EPSILON)
@@ -420,20 +422,21 @@ bool ScaleNodes(Vector3 adjust)
                 scale += adjust;
             else
             {
+                float scaleStepScaled = scaleStep * snapScale;
                 if (adjust.x != 0)
                 {
-                    scale.x += adjust.x * scaleStep;
-                    scale.x = Floor(scale.x / scaleStep + 0.5) * scaleStep;
+                    scale.x += adjust.x * scaleStepScaled;
+                    scale.x = Floor(scale.x / scaleStepScaled + 0.5) * scaleStepScaled;
                 }
                 if (adjust.y != 0)
                 {
-                    scale.y += adjust.y * scaleStep;
-                    scale.y = Floor(scale.y / scaleStep + 0.5) * scaleStep;
+                    scale.y += adjust.y * scaleStepScaled;
+                    scale.y = Floor(scale.y / scaleStepScaled + 0.5) * scaleStepScaled;
                 }
                 if (adjust.z != 0)
                 {
-                    scale.z += adjust.z * scaleStep;
-                    scale.z = Floor(scale.z / scaleStep + 0.5) * scaleStep;
+                    scale.z += adjust.z * scaleStepScaled;
+                    scale.z = Floor(scale.z / scaleStepScaled + 0.5) * scaleStepScaled;
                 }
             }
 

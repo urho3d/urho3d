@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,12 +47,12 @@ public:
     /// Construct.
     PackageFile(Context* context);
     /// Construct and open.
-    PackageFile(Context* context, const String& fileName);
+    PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.
     virtual ~PackageFile();
     
     /// Open the package file. Return true if successful.
-    bool Open(const String& fileName);
+    bool Open(const String& fileName, unsigned startOffset = 0);
     /// Check if a file exists within the package file.
     bool Exists(const String& fileName) const;
     /// Return the file entry corresponding to the name, or null if not found.
@@ -69,6 +69,8 @@ public:
     unsigned GetTotalSize() const { return totalSize_; }
     /// Return checksum of the package file contents.
     unsigned GetChecksum() const { return checksum_; }
+    /// Return whether the files are compressed.
+    bool IsCompressed() const { return compressed_; }
     
 private:
     /// File entries.
@@ -81,6 +83,8 @@ private:
     unsigned totalSize_;
     /// Package file checksum.
     unsigned checksum_;
+    /// Compressed flag.
+    bool compressed_;
 };
 
 }

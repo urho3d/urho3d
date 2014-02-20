@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +76,14 @@ public:
     void SetAutoAspectRatio(bool enable);
     /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
+    /// Set reflection mode.
+    void SetUseReflection(bool enable);
+    /// Set reflection plane in world space for reflection mode.
+    void SetReflectionPlane(const Plane& plane);
+    /// Set whether to use a custom clip plane.
+    void SetUseClipping(bool enable);
+    /// Set custom clipping plane in world space.
+    void SetClipPlane(const Plane& plane);
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     
@@ -127,24 +135,39 @@ public:
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
     // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
-    /// Return forward vector.
-    Vector3 GetForwardVector() const;
-    /// Return right vector.
-    Vector3 GetRightVector() const;
-    /// Return up vector.
-    Vector3 GetUpVector() const;
     /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
+    /// Return whether is using reflection.
+    bool GetUseReflection() const { return useReflection_; }
+    /// Return the reflection plane.
+    const Plane& GetReflectionPlane() const { return reflectionPlane_; }
+    /// Return whether is using a custom clipping plane.
+    bool GetUseClipping() const { return useClipping_; }
+    /// Return the custom clipping plane.
+    const Plane& GetClipPlane() const { return clipPlane_; }
     /// Return vertical flipping mode.
     bool GetFlipVertical() const { return flipVertical_; }
+    /// Return whether to reverse culling; affected by vertical flipping and reflection.
+    bool GetReverseCulling() const { return flipVertical_ ^ useReflection_; }
     /// Return distance to position. In orthographic mode uses only Z coordinate.
     float GetDistance(const Vector3& worldPos) const;
     /// Return squared distance to position. In orthographic mode uses only Z coordinate.
     float GetDistanceSquared(const Vector3& worldPos) const;
     /// Return a scene node's LOD scaled distance.
     float GetLodDistance(float distance, float scale, float bias) const;
+    /// Get effective world transform for matrix and frustum calculations including reflection but excluding node scaling.
+    Matrix3x4 GetEffectiveWorldTransform() const;
     /// Return if projection parameters are valid for rendering and raycasting.
     bool IsProjectionValid() const;
+    
+    /// Set reflection plane attribute.
+    void SetReflectionPlaneAttr(Vector4 value);
+    /// Return reflection plane attribute.
+    Vector4 GetReflectionPlaneAttr() const;
+    /// Set clipping plane attribute.
+    void SetClipPlaneAttr(Vector4 value);
+    /// Return clipping plane attribute.
+    Vector4 GetClipPlaneAttr() const;
     
 protected:
     /// Handle node being assigned.
@@ -189,10 +212,20 @@ private:
     FillMode fillMode_;
     /// Projection offset.
     Vector2 projectionOffset_;
+    /// Reflection plane.
+    Plane reflectionPlane_;
+    /// Clipping plane.
+    Plane clipPlane_;
+    /// Reflection matrix calculated from the plane.
+    Matrix3x4 reflectionMatrix_;
     /// Auto aspect ratio flag.
     bool autoAspectRatio_;
     /// Flip vertical flag.
     bool flipVertical_;
+    /// Reflection mode enabled flag.
+    bool useReflection_;
+    /// Use custom clip plane flag.
+    bool useClipping_;
 };
 
 }

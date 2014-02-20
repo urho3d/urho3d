@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,18 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Graphics)
-
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-
 if (USE_OPENGL)
-    file (GLOB SYS_CPP_FILES OpenGL/*.cpp)
-    file (GLOB SYS_H_FILES OpenGL/*.h)
+    set (GRAPHICS_SYS_DIR OpenGL)
 else ()
-    file (GLOB SYS_CPP_FILES Direct3D9/*.cpp)
-    file (GLOB SYS_H_FILES Direct3D9/*.h)
+    set (GRAPHICS_SYS_DIR Direct3D9)
 endif ()
-
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${SYS_CPP_FILES} ${SYS_H_FILES})
+define_source_files (GLOB_CPP_PATTERNS *.cpp ${GRAPHICS_SYS_DIR}/*.cpp GLOB_H_PATTERNS *.h ${GRAPHICS_SYS_DIR}/*.h PARENT_SCOPE)
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../IO ../Math ../Resource ../Scene)
-set (INCLUDE_DIRS_ONLY .)
-set (LINK_LIBS_ONLY SDL)
-
 if (USE_OPENGL AND NOT IOS AND NOT ANDROID AND NOT RASPI)
-    set (LIBS ${LIBS} ../../ThirdParty/GLEW)
+    set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/GLEW PARENT_SCOPE)
 endif ()
-
-# Setup target
-enable_pch ()
-setup_library ()
+if (NOT USE_OPENGL)
+    set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/MojoShader PARENT_SCOPE)
+endif ()

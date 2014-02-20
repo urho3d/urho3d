@@ -1,5 +1,5 @@
 ::
-:: Copyright (c) 2008-2013 the Urho3D project.
+:: Copyright (c) 2008-2014 the Urho3D project.
 ::
 :: Permission is hereby granted, free of charge, to any person obtaining a copy
 :: of this software and associated documentation files (the "Software"), to deal
@@ -21,14 +21,12 @@
 ::
 
 @echo off
+pushd %~dp0
 :: Define USE_MKLINK to 1 to enable out-of-source build and symbolic linking of resources from Bin directory
-if exist CMakeCache.txt. del /F CMakeCache.txt
-if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
-if exist CMakeFiles. rd /S /Q CMakeFiles
-if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
 set "build=Source\Android"
 set "source=.."
 set "use_mklink="
+if exist android-Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (android-Build\CMakeCache.txt) do if "%%i" == "USE_MKLINK" set "use_mklink=%%k"
 :loop
 if not "%1" == "" (
     if "%1" == "-DUSE_MKLINK" set "use_mklink=%~2"
@@ -37,15 +35,21 @@ if not "%1" == "" (
     goto loop
 )
 if "%use_mklink%" == "1" (
+    :: Remove cache file from opposite build directory
+    if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
+    if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
     cmake -E make_directory android-Build
-    if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
-    if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
     set "build=android-Build"
     set "source=..\Source"
-    for %%d in (CoreData Data) do mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
-    for %%d in (src res assets) do mklink /D "android-Build\%%d" "..\Source\Android\%%d"
-    for %%f in (AndroidManifest.xml build.xml project.properties) do mklink "android-Build\%%f" "..\Source\Android\%%f"
-)
-cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
+    for %%d in (CoreData Data) do if not exist "Source\Android\assets\%%d". mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
+    for %%d in (src res assets) do if not exist "android-Build\%%d". mklink /D "android-Build\%%d" "..\Source\Android\%%d"
+    for %%f in (AndroidManifest.xml build.xml) do if not exist "android-Build\%%f". mklink "android-Build\%%f" "..\Source\Android\%%f"
+) else (
+    if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
+    if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
+) 
 echo on
-cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
+:: \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
+set "OPT=-Wno-dev"
+cmake -E chdir %build% cmake %OPT% -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
+@popd

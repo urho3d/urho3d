@@ -36,7 +36,7 @@
 
 /* Make sure that this isn't included by Visual C++ */
 #ifdef _MSC_VER
-#error You should run hg revert SDL_config.h 
+#error You should run hg revert SDL_config.h
 #endif
 
 /* C language features */
@@ -277,12 +277,18 @@
 // Urho3D: Use OpenGL ES 2 implementation from Broadcom VideoCore for Raspberry Pi
 #ifdef RASPI
 #undef SDL_VIDEO_DRIVER_X11			/* No X */
-#define SDL_VIDEO_DRIVER_RASPI 1
+#define SDL_VIDEO_DRIVER_RPI 1
 
 /* Enable OpenGL ES 2 */
 #define SDL_VIDEO_OPENGL_ES2 1
+#define SDL_VIDEO_OPENGL_EGL 1
 #define SDL_VIDEO_RENDER_OGL_ES 1
 #define SDL_VIDEO_RENDER_OGL_ES2 1
+
+/* Linux device manager */
+#define HAVE_LIBUDEV_H 1
+/* Linux keyboard */
+#define SDL_INPUT_LINUXKD 1
 
 #else
 

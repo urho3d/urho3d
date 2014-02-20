@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,11 +68,15 @@ public:
     Node* GetCameraNode() const;
     /// Return render texture.
     Texture2D* GetRenderTexture() const;
+    /// Return depth stencil texture.
+    Texture2D* GetDepthTexture() const;
     /// Return viewport.
     Viewport* GetViewport() const;
     
     /// Renderable texture.
     SharedPtr<Texture2D> renderTexture_;
+    /// Depth stencil texture.
+    SharedPtr<Texture2D> depthTexture_;
     /// Viewport.
     SharedPtr<Viewport> viewport_;
     /// Scene.

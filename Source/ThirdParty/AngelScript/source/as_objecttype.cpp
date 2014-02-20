@@ -254,6 +254,10 @@ void asCObjectType::SetGCFlag()
 
 asCObjectType::~asCObjectType()
 {
+	// Skip this for list patterns as they do not increase the references
+	if( flags & asOBJ_LIST_PATTERN )
+		return;
+
 	// Release the object types held by the templateSubTypes
 	for( asUINT subtypeIndex = 0; subtypeIndex < templateSubTypes.GetLength(); subtypeIndex++ )
 	{
@@ -264,18 +268,16 @@ asCObjectType::~asCObjectType()
 	if( derivedFrom )
 		derivedFrom->Release();
 
-	asUINT n;
-
 	ReleaseAllProperties();
 
 	ReleaseAllFunctions();
 
+	asUINT n;
 	for( n = 0; n < enumValues.GetLength(); n++ )
 	{
 		if( enumValues[n] )
 			asDELETE(enumValues[n],asSEnumValue);
 	}
-
 	enumValues.SetLength(0);
 
 	// Clean the user data
@@ -552,7 +554,7 @@ int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, boo
 }
 
 // interface
-const char *asCObjectType::GetPropertyDeclaration(asUINT index) const
+const char *asCObjectType::GetPropertyDeclaration(asUINT index, bool includeNamespace) const
 {
 	if( index >= properties.GetLength() )
 		return 0;
@@ -562,7 +564,7 @@ const char *asCObjectType::GetPropertyDeclaration(asUINT index) const
 		*tempString = "private ";
 	else
 		*tempString = "";
-	*tempString += properties[index]->type.Format();
+	*tempString += properties[index]->type.Format(includeNamespace);
 	*tempString += " ";
 	*tempString += properties[index]->name;
 
@@ -660,7 +662,14 @@ asIScriptFunction *asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviour
 
 	if( beh.listFactory && count++ == index )
 	{
-		if( outBehaviour ) *outBehaviour = asBEHAVE_LIST_FACTORY;
+		if( outBehaviour ) 
+		{
+			if( flags & asOBJ_VALUE )
+				*outBehaviour = asBEHAVE_LIST_CONSTRUCT;
+			else
+				*outBehaviour = asBEHAVE_LIST_FACTORY;
+		}
+
 		return engine->scriptFunctions[beh.listFactory];
 	}
 
@@ -729,9 +738,18 @@ asCObjectProperty *asCObjectType::AddPropertyToClass(const asCString &name, cons
 	int propSize;
 	if( dt.IsObject() )
 	{
-		propSize = dt.GetSizeOnStackDWords()*4;
-		if( !dt.IsObjectHandle() )
-			prop->type.MakeReference(true);
+		// Non-POD value types can't be allocated inline,
+		// because there is a risk that the script might
+		// try to access the content without knowing that
+		// it hasn't been initialized yet.
+		if( dt.GetObjectType()->flags & asOBJ_POD )
+			propSize = dt.GetSizeInMemoryBytes();
+		else
+		{
+			propSize = dt.GetSizeOnStackDWords()*4;
+			if( !dt.IsObjectHandle() )
+				prop->type.MakeReference(true);
+		}
 	}
 	else
 		propSize = dt.GetSizeInMemoryBytes();
@@ -951,6 +969,9 @@ void asCObjectType::EnumReferences(asIScriptEngine *)
 
 	if( beh.getWeakRefFlag )
 		engine->GCEnumCallback(engine->scriptFunctions[beh.getWeakRefFlag]);
+
+	if( derivedFrom )
+		engine->GCEnumCallback(derivedFrom);
 }
 
 END_AS_NAMESPACE

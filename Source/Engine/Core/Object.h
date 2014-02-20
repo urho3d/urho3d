@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 #pragma once
 
 #include "LinkedList.h"
-#include "Ptr.h"
 #include "Variant.h"
 
 namespace Urho3D
@@ -32,9 +31,23 @@ namespace Urho3D
 class Context;
 class EventHandler;
 
+#define OBJECT(typeName) \
+    public: \
+        virtual Urho3D::ShortStringHash GetType() const { return GetTypeStatic(); } \
+        virtual Urho3D::ShortStringHash GetBaseType() const { return GetBaseTypeStatic(); } \
+        virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
+        static Urho3D::ShortStringHash GetTypeStatic() { static const Urho3D::ShortStringHash typeStatic(#typeName); return typeStatic; } \
+        static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
+
+#define BASEOBJECT(typeName) \
+    public: \
+        static Urho3D::ShortStringHash GetBaseTypeStatic() { static const Urho3D::ShortStringHash baseTypeStatic(#typeName); return baseTypeStatic; } \
+
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
 class URHO3D_API Object : public RefCounted
 {
+    BASEOBJECT(Object);
+    
     friend class Context;
     
 public:
@@ -45,6 +58,8 @@ public:
     
     /// Return type hash.
     virtual ShortStringHash GetType() const = 0;
+    /// Return base class type hash.
+    virtual ShortStringHash GetBaseType() const = 0;
     /// Return type name.
     virtual const String& GetTypeName() const = 0;
     /// Handle event.
@@ -68,6 +83,8 @@ public:
     void SendEvent(StringHash eventType);
     /// Send event with parameters to all subscribers.
     void SendEvent(StringHash eventType, VariantMap& eventData);
+    /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
+    VariantMap& GetEventDataMap() const;
     
     /// Return execution context.
     Context* GetContext() const { return context_; }
@@ -81,6 +98,8 @@ public:
     bool HasSubscribedToEvent(StringHash eventType) const;
     /// Return whether has subscribed to a specific sender's event.
     bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
+    /// Return whether has subscribed to any event.
+    bool HasEventHandlers() const { return !eventHandlers_.Empty(); }
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
@@ -124,6 +143,8 @@ public:
     Context* GetContext() const { return context_; }
     /// Return type hash of objects created by this factory.
     ShortStringHash GetType() const { return type_; }
+    /// Return base type hash of objects created by this factory.
+    ShortStringHash GetBaseType() const { return baseType_; }
     /// Return type name of objects created by this factory.
     const String& GetTypeName() const { return typeName_; }
     
@@ -132,6 +153,8 @@ protected:
     Context* context_;
     /// Object type.
     ShortStringHash type_;
+    /// Object base type.
+    ShortStringHash baseType_;
     /// Object type name.
     String typeName_;
 };
@@ -145,6 +168,7 @@ public:
         ObjectFactory(context)
     {
         type_ = T::GetTypeStatic();
+        baseType_ = T::GetBaseTypeStatic();
         typeName_ = T::GetTypeNameStatic();
     }
     
@@ -240,13 +264,6 @@ private:
     /// Class-specific pointer to handler function.
     HandlerFunctionPtr function_;
 };
-
-#define OBJECT(typeName) \
-    public: \
-        virtual Urho3D::ShortStringHash GetType() const { return GetTypeStatic(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static Urho3D::ShortStringHash GetTypeStatic() { static const Urho3D::ShortStringHash typeStatic(#typeName); return typeStatic; } \
-        static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
 
 #define EVENT(eventID, eventName) static const Urho3D::StringHash eventID(#eventName); namespace eventName
 #define PARAM(paramID, paramName) static const Urho3D::ShortStringHash paramID(#paramName)

@@ -3,7 +3,7 @@
 --     - Creating both static and moving physics objects to a scene
 --     - Displaying physics debug geometry
 --     - Using the Skybox component for setting up an unmoving sky
---     - Saving a scene to a file and loading it to restore a previous 
+--     - Saving a scene to a file and loading it to restore a previous state
 
 require "LuaScripts/Utilities/Sample"
 
@@ -12,14 +12,6 @@ local cameraNode = nil
 local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false
-
-local context = GetContext()
-
-local cache = GetCache()
-local fileSystem = GetFileSystem()
-local input = GetInput()
-local renderer = GetRenderer()
-local ui = GetUI()
 
 function Start()
     -- Execute the common startup for samples
@@ -39,7 +31,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Create a physics simulation world with default parameters, which will update at 60fps. Like the Octree must
@@ -54,8 +46,8 @@ function CreateScene()
     local zone = zoneNode:CreateComponent("Zone")
     zone.boundingBox = BoundingBox(-1000.0, 1000.0)
     zone.ambientColor = Color(0.15, 0.15, 0.15)
-    zone.fogColor = Color(0.7, 0.6, 0.5)
-    zone.fogStart = 150.0
+    zone.fogColor = Color(1.0, 1.0, 1.0)
+    zone.fogStart = 300.0
     zone.fogEnd = 500.0
 
     -- Create a directional light to the world. Enable cascaded shadows on it
@@ -64,7 +56,7 @@ function CreateScene()
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
     light.castShadows = true
-    light.shadowBias = BiasParameters(0.0001, 0.5)
+    light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
     
@@ -103,9 +95,9 @@ function CreateScene()
             boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
             boxObject.material = cache:GetResource("Material", "Materials/StoneEnvMapSmall.xml")
             boxObject.castShadows = true
-            
+
             -- Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
-            -- and also adjust friction. The actual mass is not important only the mass ratios between colliding 
+            -- and also adjust friction. The actual mass is not important only the mass ratios between colliding
             -- objects are significant
             local body = boxNode:CreateComponent("RigidBody")
             body.mass = 1.0
@@ -114,10 +106,10 @@ function CreateScene()
             shape:SetBox(Vector3(1.0, 1.0, 1.0))
         end
     end
-    
+
     -- Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load / save
-    cameraNode = Node(context)
+    cameraNode = Node()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 500.0
 
@@ -144,7 +136,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 
@@ -171,7 +163,7 @@ function MoveCamera(timeStep)
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     local mouseMove = input.mouseMove
     yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
-    pitch = pitch  +MOUSE_SENSITIVITY * mouseMove.y
+    pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
     pitch = Clamp(pitch, -90.0, 90.0)
 
     -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
@@ -199,10 +191,10 @@ function MoveCamera(timeStep)
     -- Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
     -- directory
     if input:GetKeyPress(KEY_F5) then
-        scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
+        scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/Physics.xml")
     end
     if input:GetKeyPress(KEY_F7) then
-        scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
+        scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/Physics.xml")
     end
 
     -- Toggle debug geometry with space

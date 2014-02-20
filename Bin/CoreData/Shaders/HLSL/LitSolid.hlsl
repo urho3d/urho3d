@@ -13,7 +13,7 @@
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
-    #ifdef LIGHTMAP
+    #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
     #ifdef NORMALMAP
@@ -30,6 +30,9 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
+    #ifdef HEIGHTFOG
+        out float3 oWorldPos : TEXCOORD8,
+    #endif
     #ifdef PERPIXEL
         out float4 oLightVec : TEXCOORD1,
         #ifndef NORMALMAP
@@ -58,7 +61,7 @@ void VS(float4 iPos : POSITION,
         #ifdef ENVCUBEMAP
             out float3 oReflectionVec : TEXCOORD6,
         #endif
-        #ifdef LIGHTMAP
+        #if defined(LIGHTMAP) || defined(AO)
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
@@ -68,6 +71,10 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
+
+    #ifdef HEIGHTFOG
+        oWorldPos = worldPos;
+    #endif
 
     #if defined(PERPIXEL) && defined(NORMALMAP)
         float3 oNormal;
@@ -116,12 +123,13 @@ void VS(float4 iPos : POSITION,
         #endif
     #else
         // Ambient & per-vertex lighting
-        #ifndef LIGHTMAP
-            oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
-        #else
+        #if defined(LIGHTMAP) || defined(AO)
             // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
             oVertexLight = float4(0.0, 0.0, 0.0, GetDepth(oPos));
             oTexCoord2 = iTexCoord2;
+        #else
+            oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
         #endif
 
         #ifdef NUMVERTEXLIGHTS
@@ -138,6 +146,9 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
+    #ifdef HEIGHTFOG
+        float3 iWorldPos : TEXCOORD8,
+    #endif
     #ifdef PERPIXEL
         float4 iLightVec : TEXCOORD1,
         #ifndef NORMALMAP
@@ -166,7 +177,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef ENVCUBEMAP
             float3 iReflectionVec : TEXCOORD6,
         #endif
-        #ifdef LIGHTMAP
+        #if defined(LIGHTMAP) || defined(AO)
             float2 iTexCoord2 : TEXCOORD7,
         #endif
     #endif
@@ -232,12 +243,19 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #else
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
+
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iLightVec.w, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iLightVec.w);
+        #endif
     
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
-            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
+            finalColor += cMatEmissiveColor;
+            oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
-            oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+            oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
@@ -270,20 +288,39 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float specPower = cMatSpecColor.a / 255.0;
 
         float3 finalColor = iVertexLight.rgb * diffColor.rgb;
+        #ifdef AO
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+        #endif
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
             finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
+        #ifdef EMISSIVEMAP
+            finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord).rgb;
+        #else
+            finalColor += cMatEmissiveColor;
+        #endif
 
-        oColor = float4(GetFog(finalColor, iVertexLight.a), 1.0);
-        oAlbedo = GetFogFactor(iVertexLight.a) * float4(diffColor.rgb, specIntensity);
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iVertexLight.a, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iVertexLight.a);
+        #endif
+
+        oColor = float4(GetFog(finalColor, fogFactor), 1.0);
+        oAlbedo = fogFactor * float4(diffColor.rgb, specIntensity);
         oNormal = float4(normal * 0.5 + 0.5, specPower);
         oDepth = iVertexLight.a;
     #else
         // Ambient & per-vertex lighting
         float3 finalColor = iVertexLight.rgb * diffColor.rgb;
+        #ifdef AO
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+        #endif
 
         #ifdef MATERIAL
             // Add light pre-pass accumulation result
@@ -307,7 +344,18 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef LIGHTMAP
             finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
+        #ifdef EMISSIVEMAP
+            finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord).rgb;
+        #else
+            finalColor += cMatEmissiveColor;
+        #endif
 
-        oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iVertexLight.a, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iVertexLight.a);
+        #endif
+
+        oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }

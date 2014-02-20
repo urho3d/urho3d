@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -191,19 +191,20 @@ bool Serializer::WriteResourceRef(const ResourceRef& value)
 {
     bool success = true;
     success &= WriteShortStringHash(value.type_);
-    success &= WriteStringHash(value.id_);
+    success &= WriteString(value.name_);
     return success;
 }
 
 bool Serializer::WriteResourceRefList(const ResourceRefList& value)
 {
     bool success = true;
-    unsigned size = value.ids_.Size() * sizeof(StringHash);
+    unsigned size = value.names_.Size() * sizeof(StringHash);
     
     success &= WriteShortStringHash(value.type_);
-    success &= WriteVLE(value.ids_.Size());
-    if (size)
-        success &= Write(&value.ids_[0], size) == size;
+    success &= WriteVLE(value.names_.Size());
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
+        success &= WriteString(value.names_[i]);
+    
     return success;
 }
 
@@ -254,6 +255,8 @@ bool Serializer::WriteVariantData(const Variant& value)
     case VAR_BUFFER:
         return WriteBuffer(value.GetBuffer());
         
+        // Serializing pointers is not supported. Write null
+    case VAR_VOIDPTR:
     case VAR_PTR:
         return WriteUInt(0);
         

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,8 @@ private:
     IDirect3DSurface9* defaultColorSurface_;
     /// Default depth-stencil surface.
     IDirect3DSurface9* defaultDepthStencilSurface_;
+    /// Frame query for flushing the GPU command queue.
+    IDirect3DQuery9* frameQuery_;
     /// Adapter number.
     DWORD adapter_;
     /// Device type.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -117,19 +117,23 @@ void Texture2D::Release()
 {
     if (object_)
     {
-        if (!graphics_ || graphics_->IsDeviceLost())
+        if (!graphics_)
             return;
         
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+            for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+            {
+                if (graphics_->GetTexture(i) == this)
+                    graphics_->SetTexture(i, 0);
+            }
+            
+            glDeleteTextures(1, &object_);
         }
         
         if (renderSurface_)
             renderSurface_->Release();
         
-        glDeleteTextures(1, &object_);
         object_ = 0;
     }
     else
@@ -210,12 +214,9 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
-    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
-    // Use Direct3D convention with the vertical coordinates ie. 0 is top
-    y = levelHeight - (y + height);
-    
     graphics_->SetTextureForUpdate(this);
     
+    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     
     if (!IsCompressed())
@@ -288,6 +289,9 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
             break;
         }
         
+        // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+        if (IsCompressed() && requestedLevels_ > 1)
+            requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
         if (!object_)
             return false;
@@ -408,7 +412,7 @@ bool Texture2D::Create()
         LOGWARNING("Texture creation while device is lost");
         return true;
     }
-    
+
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
@@ -418,7 +422,8 @@ bool Texture2D::Create()
     #ifndef GL_ES_VERSION_2_0
     if (format == Graphics::GetDepthStencilFormat())
     #else
-    if (!graphics_->GetShadowMapFormat() && externalFormat == GL_DEPTH_COMPONENT)
+    if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH24_STENCIL8_OES ||
+        (format == GL_DEPTH_COMPONENT && !graphics_->GetShadowMapFormat()))
     #endif
     {
         if (renderSurface_)

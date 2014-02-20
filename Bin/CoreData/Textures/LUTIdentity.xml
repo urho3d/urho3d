@@ -1,0 +1,5 @@
+<texture3d>
+    <colorlut name="LUTIdentity.png" />
+    <mipmap enable="false" />
+    <quality low="0" />
+</texture3d>

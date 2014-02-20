@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by OvermindDL1 for Urho3D
+
 /* Being a null driver, there's no event stream. We just define stubs for
    most of the API. */
 
@@ -97,7 +99,7 @@ void PSP_PumpEvents(_THIS)
                             &sym);
         */
                 SDL_SendKeyboardKey((keys & keymap_psp[i].id) ?
-                                    SDL_PRESSED : SDL_RELEASED, SDL_GetScancodeFromKey(keymap_psp[i].sym));
+                                    SDL_PRESSED : SDL_RELEASED, (Uint32)(keymap_psp[i].sym), SDL_GetScancodeFromKey(keymap_psp[i].sym));
             }
         }
     }
@@ -118,10 +120,10 @@ void PSP_PumpEvents(_THIS)
                         pressed = scanData->pressed;
                 sym.scancode = raw;
                 sym.sym = keymap[raw];
-                /* not tested*/
-                /*SDL_PrivateKeyboard(pressed?SDL_PRESSED:SDL_RELEASED, &sym); */
+                /* not tested */
+                /* SDL_PrivateKeyboard(pressed?SDL_PRESSED:SDL_RELEASED, &sym); */
                 SDL_SendKeyboardKey((keys & keymap_psp[i].id) ?
-                                    SDL_PRESSED : SDL_RELEASED, SDL_GetScancodeFromKey(keymap[raw]);
+                                    SDL_PRESSED : SDL_RELEASED, (Uint32)(keymap[raw]), SDL_GetScancodeFromKey(keymap[raw]);
 
                 }
             }

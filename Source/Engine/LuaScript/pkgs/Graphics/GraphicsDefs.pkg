@@ -1,0 +1,198 @@
+$#include "GraphicsDefs.h"
+
+enum PrimitiveType
+{
+    TRIANGLE_LIST = 0,
+    LINE_LIST
+};
+
+enum GeometryType
+{
+    GEOM_STATIC = 0,
+    GEOM_SKINNED = 1,
+    GEOM_INSTANCED = 2,
+    GEOM_BILLBOARD = 3,
+    GEOM_STATIC_NOINSTANCING = 4,
+    MAX_GEOMETRYTYPES = 4,
+};
+
+enum BlendMode
+{
+    BLEND_REPLACE = 0,
+    BLEND_ADD,
+    BLEND_MULTIPLY,
+    BLEND_ALPHA,
+    BLEND_ADDALPHA,
+    BLEND_PREMULALPHA,
+    BLEND_INVDESTALPHA,
+    MAX_BLENDMODES
+};
+
+enum CompareMode
+{
+    CMP_ALWAYS = 0,
+    CMP_EQUAL,
+    CMP_NOTEQUAL,
+    CMP_LESS,
+    CMP_LESSEQUAL,
+    CMP_GREATER,
+    CMP_GREATEREQUAL,
+    MAX_COMPAREMODES
+};
+
+enum CullMode
+{
+    CULL_NONE = 0,
+    CULL_CCW,
+    CULL_CW,
+    MAX_CULLMODES
+};
+
+enum FillMode
+{
+    FILL_SOLID = 0,
+    FILL_WIREFRAME,
+    FILL_POINT
+};
+
+enum StencilOp
+{
+    OP_KEEP = 0,
+    OP_ZERO,
+    OP_REF,
+    OP_INCR,
+    OP_DECR
+};
+
+enum LockState
+{
+    LOCK_NONE = 0,
+    LOCK_HARDWARE,
+    LOCK_SHADOW,
+    LOCK_SCRATCH
+};
+
+enum VertexElement
+{
+    ELEMENT_POSITION = 0,
+    ELEMENT_NORMAL,
+    ELEMENT_COLOR,
+    ELEMENT_TEXCOORD1,
+    ELEMENT_TEXCOORD2,
+    ELEMENT_CUBETEXCOORD1,
+    ELEMENT_CUBETEXCOORD2,
+    ELEMENT_TANGENT,
+    ELEMENT_BLENDWEIGHTS,
+    ELEMENT_BLENDINDICES,
+    ELEMENT_INSTANCEMATRIX1,
+    ELEMENT_INSTANCEMATRIX2,
+    ELEMENT_INSTANCEMATRIX3,
+    MAX_VERTEX_ELEMENTS
+};
+
+enum TextureFilterMode
+{
+    FILTER_NEAREST = 0,
+    FILTER_BILINEAR,
+    FILTER_TRILINEAR,
+    FILTER_ANISOTROPIC,
+    FILTER_DEFAULT,
+    MAX_FILTERMODES
+};
+
+enum TextureAddressMode
+{
+    ADDRESS_WRAP = 0,
+    ADDRESS_MIRROR,
+    ADDRESS_CLAMP,
+    ADDRESS_BORDER,
+    MAX_ADDRESSMODES
+};
+
+enum TextureCoordinate
+{
+    COORD_U = 0,
+    COORD_V,
+    COORD_W,
+    MAX_COORDS
+};
+
+enum TextureUsage
+{
+    TEXTURE_STATIC = 0,
+    TEXTURE_DYNAMIC,
+    TEXTURE_RENDERTARGET,
+    TEXTURE_DEPTHSTENCIL
+};
+
+enum CubeMapFace
+{
+    FACE_POSITIVE_X = 0,
+    FACE_NEGATIVE_X,
+    FACE_POSITIVE_Y,
+    FACE_NEGATIVE_Y,
+    FACE_POSITIVE_Z,
+    FACE_NEGATIVE_Z,
+    MAX_CUBEMAP_FACES
+};
+
+enum RenderSurfaceUpdateMode
+{
+    SURFACE_MANUALUPDATE = 0,
+    SURFACE_UPDATEVISIBLE,
+    SURFACE_UPDATEALWAYS
+};
+
+enum ShaderType
+{
+    VS = 0,
+    PS,
+};
+
+enum TextureUnit
+{
+    TU_DIFFUSE = 0,
+    TU_ALBEDOBUFFER = 0,
+    TU_NORMAL = 1,
+    TU_NORMALBUFFER = 1,
+    TU_SPECULAR = 2,
+    TU_EMISSIVE = 3,
+    TU_ENVIRONMENT = 4,
+    MAX_MATERIAL_TEXTURE_UNITS = 5,
+    TU_LIGHTRAMP = 5,
+    TU_LIGHTSHAPE = 6,
+    TU_SHADOWMAP = 7,
+    TU_FACESELECT = 8,
+    TU_INDIRECTION = 9,
+    TU_DEPTHBUFFER = 10,
+    TU_LIGHTBUFFER = 11,
+    TU_VOLUMEMAP = 12,
+    MAX_TEXTURE_UNITS = 13
+};
+
+enum ShaderParameterGroup
+{
+    SP_FRAME = 0,
+    SP_CAMERA,
+    SP_VIEWPORT,
+    SP_ZONE,
+    SP_LIGHT,
+    SP_VERTEXLIGHTS,
+    SP_MATERIAL,
+    SP_OBJECTTRANSFORM,
+    MAX_SHADER_PARAMETER_GROUPS
+};
+
+static const int QUALITY_LOW;
+static const int QUALITY_MEDIUM;
+static const int QUALITY_HIGH;
+static const int QUALITY_MAX;
+
+static const int SHADOWQUALITY_LOW_16BIT;
+static const int SHADOWQUALITY_LOW_24BIT;
+static const int SHADOWQUALITY_HIGH_16BIT;
+static const int SHADOWQUALITY_HIGH_24BIT;
+
+static const unsigned CLEAR_COLOR;
+static const unsigned CLEAR_DEPTH;
+static const unsigned CLEAR_STENCIL;

@@ -1,3 +1,4 @@
+#ifdef COMPILEVS
 float4 GetScreenPos(float4 clipPos)
 {
     return float4(
@@ -47,3 +48,4 @@ float3 GetNearRay(float4 clipPos)
 
     return mul(viewRay, cCameraRot) * cDepthMode.z;
 }
+#endif

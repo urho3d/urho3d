@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,19 +52,21 @@ ScrollBar::ScrollBar(Context* context) :
     backButton_ = CreateChild<Button>("SB_Back");
     backButton_->SetInternal(true);
     backButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
+    backButton_->SetFocusMode(FM_NOTFOCUSABLE);
     slider_ = CreateChild<Slider>("SB_Slider");
     slider_->SetInternal(true);
     slider_->SetRepeatRate(DEFAULT_REPEAT_RATE);
     forwardButton_ = CreateChild<Button>("SB_Forward");
     forwardButton_->SetInternal(true);
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
+    forwardButton_->SetFocusMode(FM_NOTFOCUSABLE);
 
     SubscribeToEvent(backButton_, E_PRESSED, HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, HANDLER(ScrollBar, HandleForwardButtonPressed));
     SubscribeToEvent(slider_, E_SLIDERCHANGED, HANDLER(ScrollBar, HandleSliderChanged));
     SubscribeToEvent(slider_, E_SLIDERPAGED, HANDLER(ScrollBar, HandleSliderPaged));
 
-    // Set default orientation/layout
+    // Set default orientation
     SetOrientation(O_HORIZONTAL);
 }
 
@@ -108,23 +110,37 @@ void ScrollBar::ApplyAttributes()
 
 void ScrollBar::OnResize()
 {
-    // Disable layout operations while setting the button sizes is incomplete
-    DisableLayoutUpdate();
-
     if (slider_->GetOrientation() == O_HORIZONTAL)
     {
         int height = GetHeight();
-        backButton_->SetFixedSize(height, height);
-        forwardButton_->SetFixedSize(height, height);
+        int sliderWidth = Max(GetWidth() - 2 * height, 0);
+
+        backButton_->SetSize(height, height);
+        slider_->SetSize(sliderWidth, height);
+        forwardButton_->SetSize(height, height);
+        
+        backButton_->SetPosition(0, 0);
+        slider_->SetPosition(height, 0);
+        forwardButton_->SetPosition(height + sliderWidth, 0);
     }
     else
     {
         int width = GetWidth();
-        backButton_->SetFixedSize(width, width);
-        forwardButton_->SetFixedSize(width, width);
-    }
+        int sliderHeight = Max(GetHeight() - 2 * width, 0);
 
-    EnableLayoutUpdate();
+        backButton_->SetSize(width, width);
+        slider_->SetSize(width, sliderHeight);
+        forwardButton_->SetSize(width, width);
+        
+        backButton_->SetPosition(0, 0);
+        slider_->SetPosition(0, width);
+        forwardButton_->SetPosition(0, sliderHeight + width);
+    }
+}
+
+void ScrollBar::OnSetEditable()
+{
+    slider_->SetEditable(editable_);
 }
 
 void ScrollBar::SetOrientation(Orientation orientation)
@@ -143,10 +159,6 @@ void ScrollBar::SetOrientation(Orientation orientation)
     }
 
     OnResize();
-    if (orientation == O_HORIZONTAL)
-        SetLayout(LM_HORIZONTAL);
-    else
-        SetLayout(LM_VERTICAL);
 }
 
 void ScrollBar::SetRange(float range)
@@ -253,26 +265,29 @@ bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& n
         return false;
     if (!RemoveChildXML(dest, "Max Size"))
         return false;
+    if (!RemoveChildXML(dest, "Focus Mode", "NotFocusable"))
+        return false;
 
     return true;
 }
 
 void ScrollBar::HandleBackButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    StepBack();
+    if (editable_)
+        StepBack();
 }
 
 void ScrollBar::HandleForwardButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    StepForward();
+    if (editable_)
+        StepForward();
 }
 
 void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     // Send the event forward
-    VariantMap newEventData;
-
-    newEventData[ScrollBarChanged::P_ELEMENT] = (void*)this;
+    VariantMap& newEventData = GetEventDataMap();
+    newEventData[ScrollBarChanged::P_ELEMENT] = this;
     newEventData[ScrollBarChanged::P_VALUE] = slider_->GetValue();
     SendEvent(E_SCROLLBARCHANGED, newEventData);
 }
@@ -291,28 +306,16 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     if (eventData[P_PRESSED].GetBool())
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-        {
-            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT,
-                0, 0);
-        }
+            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
         else
-        {
-            forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT,
-                MOUSEB_LEFT, 0, 0);
-        }
+            forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
     }
     else
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-        {
-            backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0,
-                backButton_);
-        }
+            backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0, backButton_);
         else
-        {
-            forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0,
-                forwardButton_);
-        }
+            forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0, forwardButton_);
     }
 }
 

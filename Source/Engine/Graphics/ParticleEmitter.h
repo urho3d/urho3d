@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -136,6 +136,8 @@ public:
     
     /// Load emitter parameters from an XML file.
     bool Load(XMLFile* file);
+    /// Save particle emitter parameters to an XML file. Return true if successful.
+    bool Save(XMLFile* file) const;
     /// Set maximum number of particles.
     void SetNumParticles(unsigned num);
     /// Set emission rate (both minimum and maximum.)

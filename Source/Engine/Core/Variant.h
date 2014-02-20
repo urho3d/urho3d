@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "Color.h"
 #include "HashMap.h"
 #include "Quaternion.h"
+#include "Ptr.h"
 #include "Rect.h"
 #include "StringHash.h"
 #include "Vector4.h"
@@ -46,13 +47,14 @@ enum VariantType
     VAR_COLOR,
     VAR_STRING,
     VAR_BUFFER,
-    VAR_PTR,
+    VAR_VOIDPTR,
     VAR_RESOURCEREF,
     VAR_RESOURCEREFLIST,
     VAR_VARIANTVECTOR,
     VAR_VARIANTMAP,
     VAR_INTRECT,
     VAR_INTVECTOR2,
+    VAR_PTR,
     MAX_VAR_TYPES
 };
 
@@ -103,29 +105,29 @@ struct URHO3D_API ResourceRef
     {
     }
 
-    /// Construct with type and id.
-    ResourceRef(ShortStringHash type, StringHash id) :
+    /// Construct with type and resource name.
+    ResourceRef(ShortStringHash type, const String& name) :
         type_(type),
-        id_(id)
+        name_(name)
     {
     }
 
     // Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),
-        id_(rhs.id_)
+        name_(rhs.name_)
     {
     }
 
     /// Object type.
     ShortStringHash type_;
-    /// Object identifier (name hash.)
-    StringHash id_;
+    /// Object name.
+    String name_;
 
     /// Test for equality with another reference.
-    bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && id_ == rhs.id_; }
+    bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && name_ == rhs.name_; }
     /// Test for inequality with another reference.
-    bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || id_ != rhs.id_; }
+    bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || name_ != rhs.name_; }
 };
 
 /// %List of typed resource references.
@@ -142,21 +144,21 @@ struct URHO3D_API ResourceRefList
     {
     }
     /// Construct with type and id list.
-    ResourceRefList(ShortStringHash type, const Vector<StringHash>& ids) :
+    ResourceRefList(ShortStringHash type, const Vector<String>& names) :
         type_(type),
-        ids_(ids)
+        names_(names)
     {
     }
 
     /// Object type.
     ShortStringHash type_;
-    /// List of object identifiers (name hashes).
-    Vector<StringHash> ids_;
+    /// List of object names.
+    Vector<String> names_;
 
     /// Test for equality with another reference list.
-    bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && ids_ == rhs.ids_; }
+    bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && names_ == rhs.names_; }
     /// Test for inequality with another reference list.
-    bool operator != (const ResourceRefList& rhs) const { return type_ != rhs.type_ || ids_ != rhs.ids_; }
+    bool operator != (const ResourceRefList& rhs) const { return type_ != rhs.type_ || names_ != rhs.names_; }
 };
 
 class Variant;
@@ -319,6 +321,13 @@ public:
 
     /// Construct from an IntVector2.
     Variant(const IntVector2& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+    
+    /// Construct from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
+    Variant(RefCounted* value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -486,10 +495,10 @@ public:
         return *this;
     }
 
-    /// Assign from a pointer.
+    /// Assign from a void pointer.
     Variant& operator = (void* rhs)
     {
-        SetType(VAR_PTR);
+        SetType(VAR_VOIDPTR);
         value_.ptr_ = rhs;
         return *this;
     }
@@ -541,7 +550,15 @@ public:
         *(reinterpret_cast<IntVector2*>(&value_)) = rhs;
         return *this;
     }
-
+    
+    /// Assign from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
+    Variant& operator = (RefCounted* rhs)
+    {
+        SetType(VAR_PTR);
+        *(reinterpret_cast<WeakPtr<RefCounted>*>(&value_)) = rhs;
+        return *this;
+    }
+    
     /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
     /// Test for equality with an integer. To return true, both the type and value must match.
@@ -566,8 +583,18 @@ public:
     bool operator == (const String& rhs) const { return type_ == VAR_STRING ? *(reinterpret_cast<const String*>(&value_)) == rhs : false; }
     /// Test for equality with a buffer. To return true, both the type and value must match.
     bool operator == (const PODVector<unsigned char>& rhs) const { return type_ == VAR_BUFFER ? *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == rhs : false; }
-    /// Test for equality with a pointer. To return true, both the type and value must match.
-    bool operator == (void* rhs) const { return type_ == VAR_PTR ? value_.ptr_ == rhs : false; }
+    
+    /// Test for equality with a void pointer. To return true, both the type and value must match, with the exception that a RefCounted pointer is also allowed.
+    bool operator == (void* rhs) const
+    {
+        if (type_ == VAR_VOIDPTR)
+            return value_.ptr_ == rhs;
+        else if (type_ == VAR_PTR)
+            return *(reinterpret_cast<const WeakPtr<RefCounted>*>(&value_)) == rhs;
+        else
+            return false;
+    }
+    
     /// Test for equality with a resource reference. To return true, both the type and value must match.
     bool operator == (const ResourceRef& rhs) const { return type_ == VAR_RESOURCEREF ? *(reinterpret_cast<const ResourceRef*>(&value_)) == rhs : false; }
     /// Test for equality with a resource reference list. To return true, both the type and value must match.
@@ -584,6 +611,18 @@ public:
     bool operator == (const StringHash& rhs) const { return type_ == VAR_INT ? (unsigned)value_.int_ == rhs.Value() : false; }
     /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
     bool operator == (const ShortStringHash& rhs) const { return type_ == VAR_INT ? value_.int_ == rhs.Value() : false; }
+    
+    /// Test for equality with a RefCounted pointer. To return true, both the type and value must match, with the exception that void pointer is also allowed.
+    bool operator == (RefCounted* rhs) const
+    {
+        if (type_ == VAR_PTR)
+            return *(reinterpret_cast<const WeakPtr<RefCounted>*>(&value_)) == rhs;
+        else if (type_ == VAR_VOIDPTR)
+            return value_.ptr_ == rhs;
+        else
+            return false;
+    }
+    
     /// Test for inequality with another variant.
     bool operator != (const Variant& rhs) const { return !(*this == rhs); }
     /// Test for inequality with an integer.
@@ -624,7 +663,9 @@ public:
     bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a ShortStringHash.
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
-
+    /// Test for inequality with a RefCounted pointer.
+    bool operator != (RefCounted* rhs) const { return !(*this == rhs); }
+    
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
@@ -662,8 +703,18 @@ public:
     const String& GetString() const { return type_ == VAR_STRING ? *reinterpret_cast<const String*>(&value_) : String::EMPTY; }
     /// Return buffer or empty on type mismatch.
     const PODVector<unsigned char>& GetBuffer() const { return type_ == VAR_BUFFER ? *reinterpret_cast<const PODVector<unsigned char>*>(&value_) : emptyBuffer; }
-    /// Return pointer or null on type mismatch.
-    void* GetPtr() const { return type_ == VAR_PTR ? value_.ptr_ : 0; }
+    
+    /// Return void pointer or null on type mismatch. RefCounted pointer will be converted.
+    void* GetVoidPtr() const
+    {
+        if (type_ == VAR_VOIDPTR)
+            return value_.ptr_;
+        else if (type_ == VAR_PTR)
+            return *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_);
+        else
+            return 0;
+    }
+    
     /// Return a resource reference or empty on type mismatch.
     const ResourceRef& GetResourceRef() const { return type_ == VAR_RESOURCEREF ? *reinterpret_cast<const ResourceRef*>(&value_) : emptyResourceRef; }
     /// Return a resource reference list or empty on type mismatch.
@@ -676,16 +727,8 @@ public:
     const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? *reinterpret_cast<const IntRect*>(&value_) : IntRect::ZERO; }
     /// Return an IntVector2 or empty on type mismatch.
     const IntVector2& GetIntVector2() const { return type_ == VAR_INTVECTOR2 ? *reinterpret_cast<const IntVector2*>(&value_) : IntVector2::ZERO; }
-
-    /// Return a pointer to a modifiable buffer or null on type mismatch.
-    PODVector<unsigned char>* GetBufferPtr() { return type_ == VAR_BUFFER ? reinterpret_cast<PODVector<unsigned char>*>(&value_) : 0; }
-    /// Return a pointer to a modifiable variant vector or null on type mismatch.
-    VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
-    /// Return a pointer to a modifiable variant map or null on type mismatch.
-    VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
-
-    /// Return the value, template version.
-    template <class T> T Get() const;
+    /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
+    RefCounted* GetPtr() const { return type_ == VAR_PTR ? *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_) : (RefCounted*)0; }
     /// Return value's type.
     VariantType GetType() const { return type_; }
     /// Return value's type name.
@@ -695,7 +738,16 @@ public:
     /// Return true when the variant value is considered zero according to its actual type.
     bool IsZero() const;
     /// Return true when the variant is empty (i.e. not initialized yet).
-    bool IsEmpty() const { return GetType() == VAR_NONE; }
+    bool IsEmpty() const { return type_ == VAR_NONE; }
+    /// Return the value, template version.
+    template <class T> T Get() const;
+    
+    /// Return a pointer to a modifiable buffer or null on type mismatch.
+    PODVector<unsigned char>* GetBufferPtr() { return type_ == VAR_BUFFER ? reinterpret_cast<PODVector<unsigned char>*>(&value_) : 0; }
+    /// Return a pointer to a modifiable variant vector or null on type mismatch.
+    VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
+    /// Return a pointer to a modifiable variant map or null on type mismatch.
+    VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
 
     /// Return name for variant type.
     static String GetTypeName(VariantType type);

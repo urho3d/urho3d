@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -223,13 +223,12 @@ unsigned short Geometry::GetBufferHash() const
     return hash;
 }
 
-
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
     unsigned& indexSize, unsigned& elementMask) const
 {
     if (rawVertexData_)
     {
-        vertexData = rawVertexData_.Get();
+        vertexData = rawVertexData_;
         vertexSize = rawVertexSize_;
         elementMask = rawElementMask_;
     }
@@ -259,7 +258,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
     
     if (rawIndexData_)
     {
-        indexData = rawIndexData_.Get();
+        indexData = rawIndexData_;
         indexSize = rawIndexSize_;
     }
     else
@@ -280,7 +279,63 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
     }
 }
 
-float Geometry::GetHitDistance(const Ray& ray) const
+void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize,
+    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, unsigned& elementMask) const
+{
+    if (rawVertexData_)
+    {
+        vertexData = rawVertexData_;
+        vertexSize = rawVertexSize_;
+        elementMask = rawElementMask_;
+    }
+    else
+    {
+        if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
+        {
+            vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowDataShared();
+            if (vertexData)
+            {
+                vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
+                elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
+            }
+            else
+            {
+                vertexSize = 0;
+                elementMask = 0;
+            }
+        }
+        else
+        {
+            vertexData = 0;
+            vertexSize = 0;
+            elementMask = 0;
+        }
+    }
+    
+    if (rawIndexData_)
+    {
+        indexData = rawIndexData_;
+        indexSize = rawIndexSize_;
+    }
+    else
+    {
+        if (indexBuffer_)
+        {
+            indexData = indexBuffer_->GetShadowDataShared();
+            if (indexData)
+                indexSize = indexBuffer_->GetIndexSize();
+            else
+                indexSize = 0;
+        }
+        else
+        {
+            indexData = 0;
+            indexSize = 0;
+        }
+    }
+}
+
+float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal) const
 {
     const unsigned char* vertexData;
     const unsigned char* indexData;
@@ -291,9 +346,9 @@ float Geometry::GetHitDistance(const Ray& ray) const
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     
     if (vertexData && indexData)
-        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
+        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal);
     else if (vertexData)
-        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_);
+        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal);
     else
         return M_INFINITY;
 }

@@ -15,6 +15,8 @@
 /** @file NetworkWorkerThread.cpp
 	@brief */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <utility>
 
 #ifdef KNET_USE_BOOST
@@ -171,7 +173,8 @@ void NetworkWorkerThread::MainLoop()
 		// which does not support aborting from the wait if the thread is signalled to interrupt and quit/join. To fix
 		// this, should add a custom "interrupt Event" into the WaitArray to wake the thread up when it is supposed to be killed.
 		// For now, just sleep only small periods of time at once to make this issue not a problem at application exit time.
-		const int maxWaitTime = 50; // msecs. ///\todo Make this a lot larger, like, 2000msecs, once the thread interrupts are handled in Sleep and EventArray::Wait.
+        // Urho3D: changed smaller for potentially less network latency
+		const int maxWaitTime = 10; // msecs. ///\todo Make this a lot larger, like, 2000msecs, once the thread interrupts are handled in Sleep and EventArray::Wait.
 		int waitTime = maxWaitTime;
 
 		waitEvents.Clear();

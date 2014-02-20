@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_DIRECTFB
@@ -42,12 +45,12 @@
 #if USE_MULTI_API
 #define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, id, relative, x, y, p)
 #define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, id, state, button)
-#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(id, state, scancode)
+#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(id, state, 0, scancode)
 #define SDL_SendKeyboardText_ex(id, text) SDL_SendKeyboardText(id, text)
 #else
 #define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, id, relative, x, y)
 #define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, id, state, button)
-#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(state, scancode)
+#define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(state, 0, scancode)
 #define SDL_SendKeyboardText_ex(id, text) SDL_SendKeyboardText(text)
 #endif
 
@@ -132,7 +135,7 @@ MotionAllMice(_THIS, int x, int y)
         SDL_Mouse *mouse = SDL_GetMouse(index);
         mouse->x = mouse->last_x = x;
         mouse->y = mouse->last_y = y;
-        /*SDL_SendMouseMotion(devdata->mouse_id[index], 0, x, y, 0);*/
+        /* SDL_SendMouseMotion(devdata->mouse_id[index], 0, x, y, 0); */
     }
 #endif
 }
@@ -233,7 +236,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
         case DWET_KEYDOWN:
             if (!devdata->use_linux_input) {
                 DirectFB_TranslateKey(_this, evt, &keysym, &unicode);
-                /*printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id);*/
+                /* printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id); */
                 SDL_SendKeyboardKey_ex(0, SDL_PRESSED, keysym.scancode);
                 if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
                     SDL_zero(text);
@@ -369,7 +372,7 @@ ProcessInputEvent(_THIS, DFBInputEvent * ievt)
         case DIET_KEYPRESS:
             kbd_idx = KbdIndex(_this, ievt->device_id);
             DirectFB_TranslateKeyInputEvent(_this, ievt, &keysym, &unicode);
-            /*printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id); */
+            /* printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id); */
             SDL_SendKeyboardKey_ex(kbd_idx, SDL_PRESSED, keysym.scancode);
             if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
                 SDL_zero(text);
@@ -742,7 +745,7 @@ DirectFB_InitKeyboard(_THIS)
 void
 DirectFB_QuitKeyboard(_THIS)
 {
-    /*SDL_DFB_DEVICEDATA(_this); */
+    /* SDL_DFB_DEVICEDATA(_this); */
 
     SDL_KeyboardQuit();
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,9 @@ static const char* methodDeclarations[] = {
     "void Save(Serializer&)",
     "void ReadNetworkUpdate(Deserializer&)",
     "void WriteNetworkUpdate(Serializer&)",
-    "void ApplyAttributes()"
+    "void ApplyAttributes()",
+    "void TransformChanged()"
 };
-
-extern const char* UI_CATEGORY;
 
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
@@ -84,11 +83,11 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
@@ -101,6 +100,17 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         // SceneResolver first. Delay searching for the object to ApplyAttributes
         AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
         idAttributes_[attrPtr] = src.GetUInt();
+    }
+    else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
+    {
+        Resource*& resourcePtr = *(reinterpret_cast<Resource**>(attr.ptr_));
+        // Decrease reference count of the old object if any, then increment the new
+        if (resourcePtr)
+            resourcePtr->ReleaseRef();
+        const ResourceRef& ref = src.GetResourceRef();
+        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_);
+        if (resourcePtr)
+            resourcePtr->AddRef();
     }
     else
         Serializable::OnSetAttribute(attr, src);
@@ -130,6 +140,12 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
             unsigned componentID = component ? component->GetID() : 0;
             dest = componentID;
         }
+    }
+    else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
+    {
+        Resource* resource = *(reinterpret_cast<Resource**>(attr.ptr_));
+        // If resource is non-null get its type and name hash. Otherwise get type from the default value
+        dest = GetResourceRef(resource, attr.defaultValue_.GetResourceRef().type_);
     }
     else
         Serializable::OnGetAttribute(attr, dest);
@@ -166,7 +182,6 @@ void ScriptInstance::ApplyAttributes()
     
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
-
 }
 
 void ScriptInstance::OnSetEnabled()
@@ -250,12 +265,12 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     if (!scriptObject_)
         return;
     
-    DelayedMethodCall call;
+    DelayedCall call;
     call.period_ = call.delay_ = Max(delay, 0.0f);
     call.repeat_ = repeat;
     call.declaration_ = declaration;
     call.parameters_ = parameters;
-    delayedMethodCalls_.Push(call);
+    delayedCalls_.Push(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
     if (!subscribed_)
@@ -265,13 +280,13 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
 void ScriptInstance::ClearDelayedExecute(const String& declaration)
 {
     if (declaration.Empty())
-        delayedMethodCalls_.Clear();
+        delayedCalls_.Clear();
     else
     {
-        for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End();)
+        for (Vector<DelayedCall>::Iterator i = delayedCalls_.Begin(); i != delayedCalls_.End();)
         {
             if (declaration == i->declaration_)
-                i = delayedMethodCalls_.Erase(i);
+                i = delayedCalls_.Erase(i);
             else
                 ++i;
         }
@@ -326,17 +341,42 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
     SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
+void ScriptInstance::RemoveEventHandler(StringHash eventType)
+{
+    UnsubscribeFromEvent(eventType);
+}
+
+void ScriptInstance::RemoveEventHandler(Object* sender, StringHash eventType)
+{
+    UnsubscribeFromEvent(sender, eventType);
+}
+
+void ScriptInstance::RemoveEventHandlers(Object* sender)
+{
+    UnsubscribeFromEvents(sender);
+}
+
+void ScriptInstance::RemoveEventHandlers()
+{
+    UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
+}
+
+void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
+{
+    UnsubscribeFromAllEventsExcept(exceptions, true);
+}
+
 void ScriptInstance::SetScriptFileAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetScriptFile(cache->GetResource<ScriptFile>(value.id_));
+    SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
-void ScriptInstance::SetDelayedMethodCallsAttr(PODVector<unsigned char> value)
+void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)
 {
     MemoryBuffer buf(value);
-    delayedMethodCalls_.Resize(buf.ReadVLE());
-    for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
+    delayedCalls_.Resize(buf.ReadVLE());
+    for (Vector<DelayedCall>::Iterator i = delayedCalls_.Begin(); i != delayedCalls_.End(); ++i)
     {
         i->period_ = buf.ReadFloat();
         i->delay_ = buf.ReadFloat();
@@ -345,7 +385,7 @@ void ScriptInstance::SetDelayedMethodCallsAttr(PODVector<unsigned char> value)
         i->parameters_ = buf.ReadVariantVector();
     }
     
-    if (delayedMethodCalls_.Size() && !subscribed_)
+    if (scriptObject_ && delayedCalls_.Size() && !subscribed_)
         UpdateEventSubscription();
 }
 
@@ -382,11 +422,11 @@ ResourceRef ScriptInstance::GetScriptFileAttr() const
     return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
 }
 
-PODVector<unsigned char> ScriptInstance::GetDelayedMethodCallsAttr() const
+PODVector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
 {
     VectorBuffer buf;
-    buf.WriteVLE(delayedMethodCalls_.Size());
-    for (Vector<DelayedMethodCall>::ConstIterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
+    buf.WriteVLE(delayedCalls_.Size());
+    for (Vector<DelayedCall>::ConstIterator i = delayedCalls_.Begin(); i != delayedCalls_.End(); ++i)
     {
         buf.WriteFloat(i->period_);
         buf.WriteFloat(i->delay_);
@@ -430,6 +470,19 @@ PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
     }
 }
 
+void ScriptInstance::OnMarkedDirty(Node* node)
+{
+    // Script functions are not safe from worker threads
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
+    if (scriptObject_ && methods_[METHOD_TRANSFORMCHANGED])
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_TRANSFORMCHANGED]);
+}
 
 void ScriptInstance::CreateObject()
 {
@@ -444,7 +497,6 @@ void ScriptInstance::CreateObject()
         // Map script object to script instance with userdata
         scriptObject_->SetUserData(this);
         
-        ClearDelayedExecute();
         GetScriptMethods();
         GetScriptAttributes();
         UpdateEventSubscription();
@@ -467,6 +519,8 @@ void ScriptInstance::ReleaseObject()
         exceptions.Push(E_RELOADSTARTED);
         exceptions.Push(E_RELOADFINISHED);
         UnsubscribeFromAllEventsExcept(exceptions, false);
+        if (node_)
+            node_->RemoveListener(this);
         subscribed_ = false;
         subscribedPostFixed_ = false;
         
@@ -484,7 +538,7 @@ void ScriptInstance::ClearScriptMethods()
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         methods_[i] = 0;
     
-    delayedMethodCalls_.Clear();
+    delayedCalls_.Clear();
 }
 
 void ScriptInstance::ClearScriptAttributes()
@@ -554,34 +608,25 @@ void ScriptInstance::GetScriptAttributes()
             // For a handle type, check if it's an Object subclass with a registered factory
             ShortStringHash typeHash(typeName);
             const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-            const HashMap<String, Vector<ShortStringHash> >& categories = context_->GetObjectCategories();
-            
-            if (factories.Find(typeHash) != factories.End())
+            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
+            if (j != factories.End())
             {
-                // There are four possibilities: the handle is for a Node, a Component or UIElement subclass, or for some
-                // other refcounted object. We can handle nodes & components with ID attributes, but want to skip the others
-                HashMap<String, Vector<ShortStringHash> >::ConstIterator ui = categories.Find(UI_CATEGORY);
-                if (ui != categories.End() && ui->second_.Contains(typeHash))
-                    continue; // Is handle to a UIElement; can not handle those
-                else if (typeHash == Node::GetTypeStatic() || typeHash == Scene::GetTypeStatic())
+                // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
+                ShortStringHash baseType = j->second_->GetBaseType();
+                if (baseType == Node::GetTypeStatic())
                 {
                     info.mode_ |= AM_NODEID;
                     info.type_ = VAR_INT;
                 }
-                else
+                else if (baseType == Component::GetTypeStatic())
                 {
-                    // If is found in one of the component categories, must be a component
-                    // Note: this requires that custom components are registered inside component categories as well
-                    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Begin(); i != categories.End();
-                        ++i)
-                    {
-                        if (i->second_.Contains(typeHash))
-                        {
-                            info.mode_ |= AM_COMPONENTID;
-                            info.type_ = VAR_INT;
-                            break;
-                        }
-                    }
+                    info.mode_ |= AM_COMPONENTID;
+                    info.type_ = VAR_INT;
+                }
+                else if (baseType == Resource::GetTypeStatic())
+                {
+                    info.type_ = VAR_RESOURCEREF;
+                    info.defaultValue_ = ResourceRef(typeHash);
                 }
             }
         }
@@ -596,7 +641,7 @@ void ScriptInstance::UpdateEventSubscription()
     Scene* scene = GetScene();
     if (!scene)
     {
-        LOGERROR("Node is detached from scene, can not subscribe script object to update events");
+        LOGWARNING("Node is detached from scene, can not subscribe script object to update events");
         return;
     }
     
@@ -604,7 +649,7 @@ void ScriptInstance::UpdateEventSubscription()
     
     if (enabled)
     {
-        if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedMethodCalls_.Size()))
+        if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedCalls_.Size()))
         {
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
             subscribed_ = true;
@@ -632,6 +677,9 @@ void ScriptInstance::UpdateEventSubscription()
             
             subscribedPostFixed_ = true;
         }
+        
+        if (methods_[METHOD_TRANSFORMCHANGED])
+            node_->AddListener(this);
     }
     else
     {
@@ -654,6 +702,9 @@ void ScriptInstance::UpdateEventSubscription()
             
             subscribedPostFixed_ = false;
         }
+        
+        if (methods_[METHOD_TRANSFORMCHANGED])
+            node_->RemoveListener(this);
     }
 }
 
@@ -666,10 +717,10 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     
-    // Execute delayed method calls
-    for (unsigned i = 0; i < delayedMethodCalls_.Size();)
+    // Execute delayed calls
+    for (unsigned i = 0; i < delayedCalls_.Size();)
     {
-        DelayedMethodCall& call = delayedMethodCalls_[i];
+        DelayedCall& call = delayedCalls_[i];
         bool remove = false;
         
         call.delay_ -= timeStep;
@@ -684,7 +735,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
         }
         
         if (remove)
-            delayedMethodCalls_.Erase(i);
+            delayedCalls_.Erase(i);
         else
             ++i;
     }
@@ -834,12 +885,12 @@ Scene* GetScriptContextScene()
 
 ScriptEventListener* GetScriptContextEventListener()
 {
-    // If context's this pointer is non-null, try to get the script instance. Else get the script file for procedural
-    // event handling
+    // If the context has an object and that object has user data set, try and get the ScriptInstance, otherwise try and get a ScriptFile.
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        if (context->GetThisPointer())
+        asIScriptObject* object = static_cast<asIScriptObject*>(context->GetThisPointer());
+        if (object && object->GetUserData())
             return GetScriptContextInstance();
         else
             return GetScriptContextFile();

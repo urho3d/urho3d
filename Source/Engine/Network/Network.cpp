@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@
 #include "Profiler.h"
 #include "Protocol.h"
 #include "Scene.h"
-#include "StringUtils.h"
 
 #include <kNet.h>
 
@@ -84,8 +83,8 @@ void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t p
         // If message was not handled internally, forward as an event
         using namespace NetworkMessage;
         
-        VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)connection;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_CONNECTION] = connection;
         eventData[P_MESSAGEID] = (int)msgId;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
@@ -127,8 +126,8 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     
     using namespace ClientConnected;
     
-    VariantMap eventData;
-    eventData[P_CONNECTION] = (void*)newConnection;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_CONNECTION] = newConnection;
     newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
 }
 
@@ -145,8 +144,8 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
         
         using namespace ClientDisconnected;
         
-        VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)connection;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_CONNECTION] = connection;
         connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
         
         clientConnections_.Erase(i);
@@ -314,15 +313,9 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
 {
     PROFILE(MakeHttpRequest);
     
+    // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
-    const String& error = request->GetError();
-    if (!error.Empty())
-    {
-        LOGERROR("Http request to " + url + " failed: " + error);
-        return SharedPtr<HttpRequest>();
-    }
-    else
-        return request;
+    return request;
 }
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const

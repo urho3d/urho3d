@@ -1,0 +1,110 @@
+$#include "File.h"
+$#include "Graphics.h"
+
+class Graphics : public Object
+{
+    void SetWindowTitle(const String windowTitle);
+    void SetWindowIcon(Image* windowIcon);
+    void SetWindowPosition(const IntVector2& position);
+    void SetWindowPosition(int x, int y);
+
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height);
+    
+    void SetSRGB(bool enable);
+    void SetFlushGPU(bool enable);
+    bool ToggleFullscreen();
+    void Maximize();
+    void Minimize();
+    void Close();
+    bool TakeScreenShot(Image& destImage);
+    void BeginDumpShaders(const String fileName);
+    void EndDumpShaders();
+    void PrecacheShaders(Deserializer& source);
+    tolua_outside void GraphicsPrecacheShaders @ PrecacheShaders(const String fileName);
+
+    bool IsInitialized() const;
+    void* GetExternalWindow() const;
+    const String GetWindowTitle() const;
+    IntVector2 GetWindowPosition() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    int GetMultiSample() const;
+    bool GetFullscreen() const;
+    bool GetResizable() const;
+    bool GetBorderless() const;
+    bool GetVSync() const;
+    bool GetTripleBuffer() const;
+    bool GetSRGB() const;
+    bool GetFlushGPU() const;
+    bool IsDeviceLost() const;
+    unsigned GetNumPrimitives() const;
+    unsigned GetNumBatches() const;
+    unsigned GetDummyColorFormat() const;
+    unsigned GetShadowMapFormat() const;
+    unsigned GetHiresShadowMapFormat() const;
+    bool GetSM3Support() const;
+    bool GetInstancingSupport() const;
+    bool GetLightPrepassSupport() const;
+    bool GetDeferredSupport() const;
+    bool GetHardwareShadowSupport() const;
+    bool GetStreamOffsetSupport() const;
+    bool GetSRGBSupport() const;
+    bool GetSRGBWriteSupport() const;
+    IntVector2 GetDesktopResolution() const;
+    
+    static unsigned GetRGBFormat();
+    
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_property__get_set String windowTitle;
+    tolua_property__get_set IntVector2 windowPosition;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set int multiSample;
+    tolua_readonly tolua_property__get_set bool fullscreen;
+    tolua_readonly tolua_property__get_set bool resizable;
+    tolua_readonly tolua_property__get_set bool borderless;
+    tolua_readonly tolua_property__get_set bool vSync;
+    tolua_readonly tolua_property__get_set bool tripleBuffer;
+    tolua_property__get_set bool sRGB;
+    tolua_property__get_set bool flushGPU;
+    tolua_readonly tolua_property__is_set bool deviceLost;
+    tolua_readonly tolua_property__get_set unsigned numPrimitives;
+    tolua_readonly tolua_property__get_set unsigned numBatches;
+    tolua_readonly tolua_property__get_set unsigned dummyColorFormat;
+    tolua_readonly tolua_property__get_set unsigned shadowMapFormat;
+    tolua_readonly tolua_property__get_set unsigned hiresShadowMapFormat;
+    tolua_readonly tolua_property__get_set bool sM3Support;
+    tolua_readonly tolua_property__get_set bool instancingSupport;
+    tolua_readonly tolua_property__get_set bool lightPrepassSupport;
+    tolua_readonly tolua_property__get_set bool deferredSupport;
+    tolua_readonly tolua_property__get_set bool hardwareShadowSupport;
+    tolua_readonly tolua_property__get_set bool streamOffsetSupport;
+    tolua_readonly tolua_property__get_set bool sRGBSupport;
+    tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
+    tolua_readonly tolua_property__get_set IntVector2 desktopResolution;
+};
+
+Graphics* GetGraphics();
+tolua_readonly tolua_property__get_set Graphics* graphics;
+
+${
+static void GraphicsPrecacheShaders(Graphics* graphics, const String& fileName)
+{
+    if (!graphics)
+        return;
+
+    File file(graphics->GetContext());
+    if (file.Open(fileName, FILE_READ))
+        graphics->PrecacheShaders(file);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetGraphics00
+static int tolua_GraphicsLuaAPI_GetGraphics00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Graphics>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_graphics_ptr
+#define tolua_get_graphics_ptr tolua_GraphicsLuaAPI_GetGraphics00
+$}

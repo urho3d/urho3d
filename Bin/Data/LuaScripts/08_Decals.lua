@@ -13,14 +13,6 @@ local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false
 
-local context = GetContext()
-
-local cache = GetCache()
-local input = GetInput()
-local graphics = GetGraphics()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -39,7 +31,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Also create a DebugRenderer component so that we can draw debug geometry
@@ -68,7 +60,7 @@ function CreateScene()
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
     light.castShadows = true
-    light.shadowBias = BiasParameters(0.0001, 0.5)
+    light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
 
@@ -140,7 +132,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 

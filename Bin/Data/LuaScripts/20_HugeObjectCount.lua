@@ -15,13 +15,6 @@ local pitch = 0.0
 local animate = false
 local useGroups = false
 
-local context = GetContext()
-
-local cache = GetCache()
-local input = GetInput()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -41,7 +34,7 @@ end
 
 function CreateScene()
     if scene_ == nil then
-        scene_ = Scene(context)
+        scene_ = Scene()
     else
         scene_:Clear()
         boxNodes = {}
@@ -109,7 +102,7 @@ function CreateScene()
 
     -- Create the camera. Create it outside the scene so that we can clear the whole scene without affecting it
     if cameraNode == nil then
-        cameraNode = Node(context)
+        cameraNode = Node()
         cameraNode.position = Vector3(0.0, 10.0, -100.0)
         local camera = cameraNode:CreateComponent("Camera")
         camera.farClip = 300.0
@@ -134,7 +127,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 

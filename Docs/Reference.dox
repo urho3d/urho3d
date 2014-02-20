@@ -119,7 +119,7 @@ Because the \ref Object::SendEvent "SendEvent()" function is public, an event ca
 
 \page MainLoop %Engine initialization and main loop
 
-Before an Urho3D program can enter its main loop, the Engine subsystem object must be created and initialized by calling its \ref Engine::Initialize "Initialize()" function. Parameters sent in a VariantMap can be used to direct how the Engine initializes itself and the subsystems. One way to configure the parameters is to parse them from the command line like Urho3D.exe does: this is accomplished by the helper function \ref Engine::ParseParameters "ParseParameters()".
+Before a Urho3D application can enter its main loop, the Engine subsystem object must be created and initialized by calling its \ref Engine::Initialize "Initialize()" function. Parameters sent in a VariantMap can be used to direct how the Engine initializes itself and the subsystems. One way to configure the parameters is to parse them from the command line like the Urho3DPlayer application does: this is accomplished by the helper function \ref Engine::ParseParameters "ParseParameters()".
 
 The full list of supported parameters, their datatypes and default values:
 
@@ -133,14 +133,17 @@ The full list of supported parameters, their datatypes and default values:
 - ResourcePackages (string) A semicolon-separated list of resource paths to use. Default empty.
 - ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
+- WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
 - WindowTitle (string) %Window title. Default "Urho3D".
 - WindowWidth (int) %Window horizontal dimension. Default 0 (use desktop resolution, or 1024 in windowed mode.)
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
 - WindowResizable (bool) Whether window is resizable. Default false.
 - FullScreen (bool) Whether to create a full-screen window. Default true.
+- Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
+- DumpShaders (string) Filename to dump used shader variations to for precaching.
 - %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
 - LowQualityShadows (bool) Low-quality (1 sample) shadow mode. Default false.
@@ -152,7 +155,7 @@ The full list of supported parameters, their datatypes and default values:
 
 \section MainLoop_Frame Main loop iteration
 
-The main loop iteration (also called a frame) is driven by the Engine. In contrast it is the program's (for example Urho3D.exe) responsibility to continuously loop this iteration by calling \ref Engine::RunFrame "RunFrame()". This function calls in turn the Time subsystem's \ref Time::BeginFrame "BeginFrame()" and \ref Time::EndFrame "EndFrame()" functions, and sends various update events in between. The event order is:
+The main loop iteration (also called a frame) is driven by the Engine. In contrast it is the program's (for example Urho3DPlayer) responsibility to continuously loop this iteration by calling \ref Engine::RunFrame "RunFrame()". This function calls in turn the Time subsystem's \ref Time::BeginFrame "BeginFrame()" and \ref Time::EndFrame "EndFrame()" functions, and sends various update events in between. The event order is:
 
 - E_BEGINFRAME: signals the beginning of the new frame. Input and Network react to this to check for operating system window messages and arrived network packets.
 - E_UPDATE: application-wide logic update event. By default each update-enabled Scene reacts to this and triggers the scene update (more on this below.)
@@ -190,7 +193,7 @@ Note that on iOS calling \ref Engine::Exit "Exit()" is a no-op as there is no of
 
 \section MainLoop_ApplicationFramework Application framework
 
-The Application class in the Engine library provides a minimal framework for an Urho3D C++ program with a main loop. It has virtual functions Setup(), Start() and Stop() which can be defined by the application subclass. The header file also provides a macro for defining a program entry point, which
+The Application class provides a minimal framework for a Urho3D C++ application with a main loop. It has virtual functions Setup(), Start() and Stop() which can be defined by the application subclass. The header file also provides a macro for defining a program entry point, which
 will instantiate the Context object and then the user-specified application class. A minimal example, which would just display a blank rendering window and exit by pressing ESC:
 
 \code
@@ -275,20 +278,45 @@ Whenever there is some hierarchical composition, it is recommended (and in fact 
 
 %Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
-It is also legal to create a Node that does not belong to a scene. This is useful with cameras, because then the camera will not be serialized along with the actual scene, which is perhaps not always wanted. However, note that creating geometry, physics or script components to an unattached node, and then moving it into a scene later will cause those components to not work correctly.
+It is also legal to create a Node that does not belong to a scene. This is useful for example with a camera moving in a scene that may be loaded or saved, because then the camera will not be saved along with the actual scene, and will not be destroyed when the scene is loaded. However, note that creating geometry, physics or script components to an unattached node, and then moving it into a scene later will cause those components to not work correctly.
 
-\section SceneModel_Update Scene updates and serialization
+\section SceneModel_Update Scene updates
 
 A Scene whose updates are enabled (default) will be automatically updated on each main loop iteration. See \ref Scene::SetUpdateEnabled "SetUpdateEnabled()".
 
 Nodes and components can be excluded from the scene update by disabling them, see \ref Node::SetEnabled "SetEnabled()". Disabling for example a drawable component also makes it invisible, a sound source component becomes inaudible etc. If a node is disabled, all of its components are treated as disabled regardless of their own enable/disable state.
 
-Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
+\section SceneModel_Logic Creating logic functionality
+
+To implement your game logic you typically either create script objects (when using scripting) or new components (when using C++). %Script objects exist in a C++ placeholder component, but can be basically thought of as components themselves. For a simple example to get you started, check the 05_AnimatingScene sample, which creates a Rotator object to scene nodes to perform rotation on each frame update.
+
+Unless you have extremely serious reasons for doing so, you should not subclass the Node class in C++ for implementing your own logic. Doing so will theoretically work, but has the following drawbacks:
+
+- Loading and saving will not work properly without changes. It assumes that the root node is a %Scene, and all the child nodes are of the %Node class. It will not know how to instantiate your custom subclass.
+- The Editor does not know how to edit your subclass.
+
+\section SceneModel_LoadSave Loading and saving scenes
+
+Scenes can be loaded and saved in either binary or XML format; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()". See \ref Serialization
+"Serialization" for the technical details on how this works. When a scene is loaded, all existing content in it (child nodes and components) is removed first.
+
+Nodes and components that are marked temporary will not be saved. See \ref Serializable::SetTemporary "SetTemporary()".
+
+To be able to track the progress of loading a (large) scene without having the program stall for the duration of the loading, a scene can also be loaded asynchronously. This means that on each frame the scene loads child nodes until a certain amount of milliseconds has been exceeded. See \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()". Use the functions \ref Scene::IsAsyncLoading "IsAsyncLoading()" and \ref Scene::GetAsyncProgress "GetAsyncProgress()" to track the loading progress; the latter returns a float value between 0 and 1, where 1 is fully loaded. The scene will not update or render before it is fully loaded.
+
+\section SceneModel_Instantiation Object prefabs
+
+Just loading or saving whole scenes is not flexible enough for eg. games where new objects need to be dynamically created. On the other hand, creating complex objects and setting their properties in code will also be tedious. For this reason, it is also possible to save a scene node (and its child nodes, components and attributes) to either binary or XML to be able to instantiate it later into a scene. Such a saved object is often referred to as a prefab. There are three ways to do this:
+
+- In code by calling \ref Node::Save "Save()" or \ref Node::SaveXML "SaveXML()" on the Node in question.
+- In the editor, by selecting the node in the hierarchy window and choosing "Save node as" from the "File" menu.
+- Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
+
+To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the Bin/Data/Objects directory.
 
 \section SceneModel_FurtherInformation Further information
 
-For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
-
+For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/. Note that the Urho3D scene model is not a pure Entity-Component-System design, which would have the components just as bare data containers, and only systems acting on them. Instead the Urho3D components contain logic of their own, and actively communicate with the systems (such as rendering, physics or script engine) they depend on.
 
 \page Resources Resources
 
@@ -308,7 +336,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 
 They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
-The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, Urho3D.exe registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist.
+The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, the engine registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist.
 
 If loading a resource fails, an error will be logged and a null pointer is returned.
 
@@ -331,7 +359,7 @@ Memory budgets can be set per resource type: if resources consume more memory th
 
 \page Scripting Scripting
 
-To enable AngelScript scripting support, the Script subsystem needs to be created and registered after initializing the Engine. This is accomplished by the following code, seen eg. in Tools/Urho3D/Urho3D.cpp:
+To enable AngelScript scripting support, the Script subsystem needs to be created and registered after initializing the Engine. This is accomplished by the following code, seen eg. in Tools/Urho3DPlayer/Urho3DPlayer.cpp:
 
 \code
 context_->RegisterSubsystem(new Script(context_));
@@ -388,14 +416,17 @@ The following methods that implement the component behaviour will be checked for
 - void WriteNetworkUpdate(Serializer&)
 - void ReadNetworkUpdate(Deserializer&)
 - void ApplyAttributes()
+- void TransformChanged()
 
 The update methods above correspond to the variable timestep scene update and post-update, and the fixed timestep physics world update and post-update. The application-wide update events are not handled by default.
 
-The Start() and Stop() methods do not have direct counterparts in C++ components. Start() is called just after the script object has been created. Stop() is called just before the script object is destroyed. This happens when the ScriptInstance is destroyed, or if the script class is changed. 
+The Start() and Stop() methods do not have direct counterparts in C++ components. Start() is called just after the script object has been created. Stop() is called just before the script object is destroyed. This happens when the ScriptInstance is destroyed, or if the script class is changed.
 
 When a scene node hierarchy with script objects is instantiated (such as when loading a scene) any child nodes may not have been created yet when Start() is executed, and can thus not be relied upon for initialization. The DelayedStart() method can be used in this case instead: if defined, it is called immediately before any of the Update() calls.
 
-Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an object method, the ScriptInstance becomes the event receiver on the C++ side, and forwards the events to the script object. If called from a function, the ScriptFile will be the event receiver. Note that object-based event handling only works when the script object in question is attached to a ScriptInstance component, as a C++ side proxy is always needed. If you simply create a new free-standing object in script, it will not be able to subscribe to events.
+TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function. Due to an optimization mechanism for repeated scene graph updates, you need to "undirty" the scene node by for example reading its world position to get further transform changed notifications.
+
+Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an instantiated script object, the ScriptInstance becomes the event receiver on the C++ side, and calls the specified handler method when the event arrives. If called from a function, the ScriptFile will be the event receiver and the handler must be a free function in the same script file. The third case is if the event is subscribed to from a script object that does not belong to a ScriptInstance. In that case the ScriptFile will create a proxy C++ object on demand to be able to forward the event to the script object.
 
 The script object's enabled state can be controlled through the \ref ScriptInstance::SetEnabled "SetEnabled()" function. When disabled, the scripted update methods or event handlers will not be called. This can be used to reduce CPU load in a large or densely populated scene.
 
@@ -405,7 +436,7 @@ There are shortcut methods on the script side for creating and accessing a node'
 ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 \endcode
 
-Note that these are not actual Node member functions on the C++ side, as the %Scene library is not allowed to depend on scripting.
+Note that these are not actual Node member functions on the C++ side, as the %Scene classes are not allowed to depend on scripting.
 
 \section Scripting_ObjectSerialization Script object serialization
 
@@ -537,7 +568,7 @@ Use \ref LuaScript::ExecuteString "ExecuteString()" to compile and run a line of
 
 In contrast to AngelScript modules, which exist as separate entities and do not share functions or variables unless explicitly marked shared, in the Lua subsystem everything is loaded and executed in one Lua state, so scripts can naturally access everything  loaded so far. To load and execute a Lua script file, call \ref LuaScript::ExecuteFile "ExecuteFile()".
 
-After that, the functions in the script file are available for calling. Use \ref LuaScript::ExecuteFunction "ExecuteFunction()" to call a Lua function. Parameters to the function can be supplied in a VariantVector.
+After that, the functions in the script file are available for calling. Use \ref LuaScript::GetFunction "GetFunction()" to get a Lua function by name. This returns a LuaFunction object, on which you should call \ref LuaFunction::BeginCall "BeginCall()" first, followed by pushing the function parameters if any, and finally execute the function with \ref LuaFunction::EndCall "EndCall()".
 
 \section LuaScripting_ScriptObjects Script objects
 
@@ -548,21 +579,22 @@ LuaScriptInstance* instance = node->CreateComponent<LuaScriptInstance>();
 instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
 \endcode
 
-After instantiation, functions can be \ref LuaScriptInstance::ExecuteFunction "called" on the script object; parameters are again supplied in a VariantVector.
+After instantiation, use \ref LuaScriptInstance::GetScriptObjectFunction "GetScriptObjectFunction()" to get the object's functions by name; calling happens like above.
 
 Like their AngelScript counterparts, script object classes can define functions which are automatically called by LuaScriptInstance for operations like initialization, scene update, or load/save. These functions are listed below. Refer to the \ref Scripting "AngelScript scripting" page for details.
 
-- void Start()
-- void Stop()
-- void Update(timeStep)
-- void PostUpdate(timeStep)
-- void FixedUpdate(timeStep)
-- void FixedPostUpdate(timeStep)
-- void Save(serializer)
-- void Load(deserializer)
-- void WriteNetworkUpdate(serializer)
-- void ReadNetworkUpdate(deserializer)
-- void ApplyAttributes()
+- Start()
+- Stop()
+- Update(timeStep)
+- PostUpdate(timeStep)
+- FixedUpdate(timeStep)
+- FixedPostUpdate(timeStep)
+- Save(serializer)
+- Load(deserializer)
+- WriteNetworkUpdate(serializer)
+- ReadNetworkUpdate(deserializer)
+- ApplyAttributes()
+- TransformChanged()
 
 \section LuaScripting_Events Event handling
 
@@ -579,7 +611,7 @@ function HandleUpdate(eventType, eventData)
 end
 \endcode
 
-When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function:
+When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function. Note that in Lua retrieving an object pointer from a VariantMap requires the object type as the first parameter:
 
 \code
 CollisionDetector = ScriptObject()
@@ -599,16 +631,38 @@ end
 
 The binding of Urho3D C++ classes is accomplished with the tolua++ library, which for the most part binds the exact same function parameters as C++. Compared to the AngelScript API, you will always have the classes' Get / Set functions available, but in addition convenience properties also exist.
 
-When constructing Object subclasses, you need to supply the Context pointer as the first parameter. Use the global function GetContext() to get it. Similarly, use eg. GetFileSystem() or GetInput() to access the subsystems.
-
 As seen above from the event handling examples, VariantMap handling has some differences to both C++ and AngelScript. To get a value, supply its key name as a string. To get a pointer to an object, supply first the object type, then the key name.
 
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the Bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
 
+\section LuaScripting_Allocation Object allocation & Lua garbage collection
+
+There are two ways to allocate a C++ object in Lua scripting, which behave differently with respect to Lua's automatic garbage collection:
+
+1) Call object's contructor:
+\code
+local scene = Scene()
+\endcode
+tolua++ will register this C++ object with garbage collection, and Lua will collect it eventually. Do not use this form if you will add the
+object to an object hierarchy that is kept alive on the C++ side with SharedPtr's, for example child scene nodes or %UI child elements.
+Otherwise the object will be double-deleted, resulting in a crash.
+
+
+2) Call the new function:
+\code
+local text = Text:new()
+\endcode
+When using this form the object will not collected by Lua, so it is safe to pass into C++ object hierarchies.
+Otherwise, to prevent memory leaks it needs to be deleted manually by calling the delete function on it:
+\code
+text:delete()
+\endcode
+
+When you call the \ref ResourceCache::GetFile "GetFile()" function of ResourceCache from Lua, the file you receive must also be manually deleted like described above once you are done with it.
 
 \page Rendering Rendering
 
-Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer, contained within the %Graphics library.
+Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer.
 
 \section Rendering_Graphics Graphics
 
@@ -618,6 +672,7 @@ Graphics implements the low-level functionality:
 - Setting the screen mode
 - Keeping track of GPU resources
 - Keeping track of rendering context state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
+- Loading shaders
 - Performing primitive rendering operations
 - Handling lost device
 
@@ -627,7 +682,7 @@ When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
-- Is hardware instancing supported? This requires shader model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
+- Is hardware instancing supported? This requires %Shader %Model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
 
@@ -655,9 +710,10 @@ In the default render paths, the rendering operations proceed in the following o
 - Opaque geometry ambient pass, or G-buffer pass in deferred rendering modes.
 - Opaque geometry per-pixel lighting passes. For shadow casting lights, the shadow map is rendered first.
 - (%Light pre-pass only) Opaque geometry material pass, which renders the objects with accumulated per-pixel lighting.
-- Pre-alpha rendering pass for custom render ordering such as the skybox.
-- Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
-- Post-alpha rendering pass.
+- Post-opaque pass for custom render ordering such as the skybox.
+- Refractive geometry pass.
+- Transparent geometry pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
+- Post-alpha pass, can be used for 3D overlays that should appear on top of everything else.
 
 \section Rendering_Drawable Rendering components
 
@@ -698,7 +754,7 @@ On Direct3D9 and Android OpenGL ES 2.0 it is possible to lose the rendering cont
 
 Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
 
-See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D and TextureCube classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
+See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D, TextureCube and Texture3D classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
 
 \section Rendering_Further Further details
 
@@ -717,7 +773,7 @@ The default render paths supplied with Urho3D implement forward, light pre-pass 
 
 Forward rendering begins with an ambient light pass for the objects; this also adds any per-vertex lights. Then, the objects are re-rendered for each per-pixel light affecting them (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
 
-Materials can also define an optimization pass for forward rendering where the ambient light and the first per-pixel light are combined. This pass can not be used, however, if there are per-vertex lights affecting the object, or if the ambient light has a per-vertex gradient.
+Materials can also define an optimization pass, called "litbase", for forward rendering where the ambient light and the first per-pixel light are combined. This pass can not be used, however, if there are per-vertex lights affecting the object, or if the ambient light has a per-vertex gradient.
 
 \section RenderingModes_Prepass Light pre-pass rendering
 
@@ -729,7 +785,7 @@ Materials can also define an optimization pass for forward rendering where the a
 
 After the G-buffer is complete, light volumes (spot and point lights) or fullscreen quads (directional lights) will be rendered to a light accumulation buffer to calculate the diffuse and specular light at each opaque pixel. Specular light is stored as intensity only. Stencil compare (AND operation) with the 8 low bits of the light's lightmask will be used for light culling. Similarly to forward rendering, shadow maps will be updated before each light as necessary.
 
-Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the pre-alpha pass, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
+Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the post-opaque and refract passes, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
 
 \section RenderingModes_Deferred Deferred rendering
 
@@ -741,7 +797,7 @@ Deferred rendering needs to render each opaque object only once to the G-buffer,
 - RT3: Linear depth (D3DFMT_R32F)
 - DS: Hardware depth and lightmask (D3DFMT_D24S8)
 
-After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to pre-alpha, transparent, and post-alpha passes, as in other rendering modes.
+After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to post-opaque, refract, transparent, and post-alpha passes, as in other rendering modes.
 
 \section RenderingModes_Comparision Advantages and disadvantages
 
@@ -790,19 +846,23 @@ OpenGL ES 2.0 has further limitations:
 
 - To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
 
-- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights can have a maximum of 2 cascades.
+- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the low shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS hardware.
+
+- Custom clip planes are not currently supported.
+
+- 3D textures are not currently supported.
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
 
-A material defines the textures, shader parameters and culling mode to use, and refers to techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
+A material defines the textures, shader parameters and culling mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
 A material definition looks like this:
 
 \code
 <material>
-    <technique name="TechniqueName" quality="q" loddistance="d" sm3="true|false" />
+    <technique name="TechniqueName" quality="q" loddistance="d" />
     <texture unit="diffuse|normal|specular|emissive|environment" name="TextureName" />
     <texture ... />
     <parameter name="name" value="x y z w" />
@@ -813,9 +873,9 @@ A material definition looks like this:
 </material>
 \endcode
 
-%Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
+Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". It is also possible for a technique to require %Shader %Model 3, in this case it will be skipped on SM2 hardware.
 
-When a material defines several techniques for different LOD levels and quality settings, they must appear in a specific order:
+The techniques for different LOD levels and quality settings must appear in a specific order:
 
 - Most distant & highest quality
 - ...
@@ -823,7 +883,7 @@ When a material defines several techniques for different LOD levels and quality 
 - Second most distant & highest quality
 - ...
 
-%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. Note that a built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
+%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. A built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
@@ -861,14 +921,26 @@ To control whether the backbuffer should use sRGB conversion on write, call \ref
 A technique definition looks like this:
 
 \code
-<technique>
-    <pass name="base|litbase|light|alpha|litalpha|prealpha|postalpha|prepass|material|deferred|depth|shadow" vs="VertexShaderName" ps="PixelShaderName"
-        lighting="unlit|pervertex|perpixel" alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
-        depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" alphamask="true|false" />
+<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" >
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow"
+        vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
+        lighting="unlit|pervertex|perpixel"
+        blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha" 
+        depthtest="always|equal|less|lessequal|greater|greaterequal"
+        depthwrite="true|false" 
+        alphamask="true|false" />
     <pass ... />
     <pass ... />
 </technique>
 \endcode
+
+The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.)
+
+Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
+
+Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
+
+The technique definition does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead the engine will add certain hardcoded compilation defines for these. See \ref Shaders "Shaders" for details.
 
 The purposes of the different passes are:
 
@@ -877,7 +949,8 @@ The purposes of the different passes are:
 - light: Renders one per-pixel light's contribution additively for an opaque object.
 - alpha: Renders ambient light, per-vertex lights and fog for a transparent object.
 - litalpha: Renders one per-pixel light's contribution additively for a transparent object
-- prealpha: Custom rendering pass after opaque geometry. Can be used for example to render the skybox.
+- postopaque: Custom rendering pass after opaque geometry. Can be used to render the skybox.
+- refract: Custom rendering pass after postopaque pass. Can sample the viewport texture from the environment texture unit to render refractive objects.
 - postalpha: Custom rendering pass after transparent geometry.
 - prepass: %Light pre-pass only - renders normals, specular power and depth to the G-buffer.
 - material: %Light pre-pass only - renders opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
@@ -885,99 +958,96 @@ The purposes of the different passes are:
 - depth: Renders linear depth to a rendertarget for post-processing effects.
 - shadow: Renders to a hardware shadow map (depth only) for shadow map generation.
 
-More custom passes can be defined and referred to in the \ref RenderPaths "render path definition". For the built-in passes listed above, the lighting shader combinations to load (unlit, per-vertex or per-pixel) are recognized automatically, but for custom passes they need to be explicitly specified. The default is unlit.
-
-By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
-
-Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See \ref Shaders "Shaders" for details.
+More custom passes can be defined and referred to in the \ref RenderPaths "render path definition". For the built-in passes listed above, the lighting shader permutations to load (unlit, per-vertex or per-pixel) are recognized automatically, but for custom passes they need to be explicitly specified. The default is unlit.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
 
 "Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
 
+The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
 
 \page Shaders Shaders
 
-Urho3D uses an ubershader-like approach: permutations of each shader will be built with different defines, to produce eg. static or skinned, deferred or forward or shadowed/unshadowed rendering.
+Urho3D uses an ubershader-like approach: permutations of each shader will be built with different compilation defines, to produce eg. static or skinned, deferred or forward or shadowed/unshadowed rendering.
 
-The building of these variations is controlled by an XML shader definition file, which always accompanies the shader source code.
+The building of these permutations happens on demand: technique and renderpath definition files both refer to shaders and the compilation defines to use with them. In addition the engine will add inbuilt defines related to geometry type and lighting. It is not generally possible to enumerate beforehand all the possible permutations that can be built out of a single shader.
 
-For example, the Basic shader in Bin/CoreData/Shaders/HLSL has the following definition file:
+On Direct3D9 compiled shader bytecode is saved to disk in a "Cache" subdirectory next to the shader source code, so that the possibly time-consuming compile can be skipped on the next time the shader permutation is needed. On OpenGL such mechanism is not available.
 
-\code
-<shaders>
-    <shader type="vs">
-        <option name="Diff" define="DIFFMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />
-        <variation name="" />
-        <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" require="SM3" />
-        <variation name="Billboard" define="BILLBOARD" />
-    </shader>
-    <shader type="ps">
-        <option name="Diff" define="DIFFMAP" exclude="Alpha" />
-        <option name="Alpha" define="ALPHAMAP" exclude="Diff" />
-        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />
-    </shader>
-</shaders>
-\endcode
+\section Shaders_InbuiltDefines Inbuilt compilation defines
 
-Permutations can be defined separately for both the vertex and the pixel shader. There exist two different mechanisms for adding permutations: a "variation" and an "option". A variation always excludes other variations within the same "variation group" and is most often used to define the geometry types for the vertex shader. In contrast, an
-option does not exclude other options by default.
-
-For both variations and options, a name is required, and one or more defines to be passed to the shader compiler. If there is only one define, it can be listed as an attribute of the permutation, as shown. If many defines are needed, they can be included as child elements of the permutation, eg. (from the LitSolid shader)
-
-\code
-<variation name="Dir">
-    <define name="DIRLIGHT" />
-    <define name="PERPIXEL" />
-</variation>
-\endcode
-
-A variation or option can "require" other defines, for example in HLSL shaders instancing requires the SM3 define which tells that we are compiling for %Shader %Model 3. Like defines, requires can be listed either as an attribute (if only one) or as a child element (if many.)
-
-Additionally, an option can "include" or "exclude" other options. Use this mechanism instead of variations if complex dependencies between options is required, instead of simple exclusion. Again, includes or excludes can be listed either as attributes or child elements.
-
-The final name of a shader permutation is formed by taking the shader's name, adding an underscore (if there are active variations/options) and then listing the names of all active variations/options in top-to-bottom order. For example the Basic vertex shader with vertex color and skinning active would be
-Basic_VColSkinned. This final name is used to request shaders from the Renderer subsystem.
-
-\section Shaders_Required Required shader permutations
-
-When rendering scene objects, the engine expects certain shader permutations to exist for different geometry types and lighting conditions. These must appear in the specific order listed below. Use the LitSolid shader for reference.
+When rendering scene objects, the engine expects certain shader permutations to exist for different geometry types and lighting conditions. These correspond to the following compilation defines:
 
 Vertex shader:
 
-- 1VL, 2VL, 3VL, 4VL: number of vertex lights influencing the object
-- Dir, Spot, Point: a per-pixel forward light is being used
-- Spec: the per-pixel forward light has specular calculations
-- Shadow: the per-pixel forward light has shadowing
-- Skinned, Instanced, %Billboard: choosing the geometry type
+- NUMVERTEXLIGHTS=1,2,3 or 4: number of vertex lights influencing the object
+- DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
+- SPEC: the per-pixel forward light has specular calculations
+- SHADOW: the per-pixel forward light has shadowing
+- SKINNED, INSTANCED, BILLBOARD: choosing the geometry type
+- HEIGHTFOG: object's zone has height fog mode
 
 Pixel shader:
 
-- Dir, Spot, Point: a per-pixel forward light is being used
-- Mask: the point light has a cube map mask
-- Spec: the per-pixel forward light has specular calculations
-- Shadow: the per-pixel forward light has shadowing
-- LQ: use low-quality shadowing (1 hardware PCF sample instead of 4)
-- HW: use hardware shadow depth compare, Direct3D9 only
+- DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
+- CUBEMASK: the point light has a cube map mask
+- SPEC: the per-pixel forward light has specular calculations
+- SHADOW: the per-pixel forward light has shadowing
+- LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
+- SHADOWCMP: use manual shadow depth compare, Direct3D9 only for DF16 & DF24 shadow map formats
+- HEIGHTFOG: object's zone has height fog mode
 
 \section Shaders_Writing Writing shaders
 
 Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
 
-To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the required include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
-Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code (for HLSL) verbatim:
+To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the shader include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
 
+Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code verbatim:
+
+For HLSL:
 \code
 float4x3 modelMatrix = iModelMatrix;
 float3 worldPos = GetWorldPos(modelMatrix);
 oPos = GetClipPos(worldPos);
 \endcode
 
-Note that for HLSL shaders both the vertex and the pixel shader are written into the same file, and the functions must be called VS() and PS(), while for GLSL they are put into separate .vert and .frag files, and are called main().
+For GLSL:
+\code
+mat4 modelMatrix = iModelMatrix;
+vec3 worldPos = GetWorldPos(modelMatrix);
+gl_Position = GetClipPos(worldPos);
+\endcode
 
+On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time. When compiling for %Shader %Model 3 on Direct3D9, the compilation define "SM3" is present: this can be used to separate code which would not compile on SM2.
+
+The uniforms must be prefixed in a certain way so that the engine understands them:
+
+- c for uniform constants, for example cMatDiffColor. The c is stripped when referred to inside the engine, so it would be called "MatDiffColor" in eg. \ref Material::SetShaderParameter "SetShaderParameter()"
+- s for texture samplers, for example sDiffMap.
+
+In GLSL shaders it is important that the samplers are assigned to the correct texture units. If you are using sampler names that are not predefined in the engine like sDiffMap, just make sure there is a number somewhere in the sampler's name and it will be interpreted as the texture unit. For example the terrain shader uses texture units 0-3 in the following way:
+
+\code
+uniform sampler2D sWeightMap0;
+uniform sampler2D sDetailMap1;
+uniform sampler2D sDetailMap2;
+uniform sampler2D sDetailMap3;
+\endcode
+
+\section Shaders_Migration Migration of old shaders
+
+In Urho3D version 1.3 and before an XML description file was used for shaders, which would enumerate the compilation defines used by shaders into named "options" or "variations".
+The shader would then be referred to with these option names, for example a pixel shader LitSolid_Diff would use the LitSolid source code and the define DIFFMAP. To convert to the
+current system, look up the defines from the description files and add them directly to the technique or renderpath XML descriptions ("vsdefines" or "psdefines" attributes). Also make sure the shader references ("vs" and "ps" attributes) are just the bare shader names with no underscore or option names attached. Finally, delete the shader XML description files.
+
+GLSL shaders in 1.3 and before used separate .vert and .frag files for the vertex and pixel shader source code. Now these are combined into .glsl files that include both shaders. Include files are likewise merged into .glsl files instead of separate vertex and pixel shader includes. To merge your shader code, append the pixel shader source into the vertex shader source file without the varyings definition (which should already be in the vertex shader code). Merge and fix include statements: change the file extension to .glsl. Note that some include files depend on each other so it is safest to always include Uniforms.glsl and Samplers.glsl first. Finally change the file extension of the vertex shader source file from .vert to .glsl and delete the .frag file. If you have pieces of pixel shader code (for example additional functions or variables) that produce errors when included in the vertex shader compile, wrap these with #ifdef COMPILEPS, and vice versa for vertex shader code.
+
+\section Shaders_Precaching Shader precaching
+
+The shader variations that are potentially used by a material technique in different lighting conditions and rendering passes are enumerated at material load time, but because of their large amount, they are not actually compiled or loaded from bytecode before being used in rendering. Especially on OpenGL the compiling of shaders just before rendering can cause hitches in the framerate. To avoid this, used shader combinations can be dumped out to an XML file, then preloaded. See \ref Graphics::BeginDumpShaders "BeginDumpShaders()", \ref Graphics::EndDumpShaders "EndDumpShaders()" and \ref Graphics::PrecacheShaders "PrecacheShaders()" in the Graphics subsystem. The command line parameters -ds <file> can be used to instruct the Engine to begin dumping shaders automatically on startup.
+
+Note that the used shader variations will vary with graphics settings, for example shadow quality high/low or instancing on/off.
 
 \page RenderPaths Render path
 
@@ -985,26 +1055,26 @@ Note that for HLSL shaders both the vertex and the pixel shader are written into
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. For an example of rendertarget definitions, see the inbuilt bloom effect in Bin/Data/PostProcess/Bloom.xml.
+A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
 
 The available commands are:
 
 - clear: Clear any of color, depth and stencil. Color clear can optionally use the fog color from the Zone visible at the far clip distance.
 - scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a 2D texture resource identified with its pathname.
-- quad: Render a viewport-sized quad using the specified shaders. Textures can be bound and additionally shader parameters can be specified.
+- quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters can be specified.
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
-It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before the first command which samples it.
+It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before sampling it.
 
 The render path XML definition looks like this:
 
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" />
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" persistent="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
         <output index="0" name="RTName1" />
@@ -1012,7 +1082,7 @@ The render path XML definition looks like this:
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
-    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
+    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <parameter name="ParameterName" value="x y z w" />
     </command>
@@ -1023,7 +1093,7 @@ The render path XML definition looks like this:
 </renderpath>
 \endcode
 
-Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The file Samplers.frag in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
+Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
@@ -1209,7 +1279,11 @@ A Zone controls ambient lighting and fogging. Each geometry object determines th
 
 The viewport will be initially cleared to the fog color of the zone found at the camera's far clip distance. If no zone is found either for the far clip or an object, a default zone with black ambient and fog color will be used.
 
-Zones have two special flags: override mode and ambient gradient. If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect. When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
+Zones have three special flags: height fog mode, override mode and ambient gradient. 
+
+- When height fog mode is enabled, objects inside the zone receive height fog in addition of distance fog. The fog's \ref Zone::SetFogHeight "height level" is specified relative to the zone's world position. The width of the fog band on the Y-axis is specified by the \ref Zone::SetFogHeightScale "fog height scale" parameter.
+- If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect.
+- When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
 
 Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 
@@ -1251,6 +1325,9 @@ The input events include:
 - E_JOYSTICKBUTTONUP: a joystick button was released.
 - E_JOYSTICKAXISMOVE: a joystick axis was moved.
 - E_JOYSTICKHATMOVE: a joystick POV hat was moved.
+- E_CONTROLLERBUTTONDOWN: a joystick button on an SDL controller was pressed.
+- E_CONTROLLERBUTTONUP: a joystick button on an SDL controller was released.
+- E_CONTROLLERAXISMOVE: a joystick axis on an SDL controller was moved.
 
 The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
 
@@ -1258,7 +1335,11 @@ In script, the polling API is accessed via properties: input.keyDown[], input.ke
 
 To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
 
+If the joystick model is recognized by SDL you will also get the "controller" variety of events shown above, and the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them.
+
 From the input subsystem you can also query whether the application window has input focus, or is minimized.
+
+On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as char events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
 
 \page Audio %Audio
 
@@ -1300,7 +1381,7 @@ The Audio subsystem is always instantiated, but in headless mode it is not activ
 
 \page Physics Physics
 
-The %Physics library in Urho3D implements rigid body physics simulation using the Bullet library.
+Urho3D implements rigid body physics simulation using the Bullet library.
 
 To use, a PhysicsWorld component must first be created to the Scene.
 
@@ -1364,8 +1445,8 @@ An example of reading collision event and contact point data in script, from Nin
 \code
 void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
 {
-    Node@ otherNode = eventData["OtherNode"].GetNode();
-    RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
+    Node@ otherNode = eventData["OtherNode"].GetPtr();
+    RigidBody@ otherBody = eventData["OtherBody"].GetPtr();
     VectorBuffer contacts = eventData["Contacts"].GetBuffer();
 
     while (!contacts.eof)
@@ -1423,6 +1504,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - Slider: a horizontal or vertical slider bar
 - Sprite: a texture image which supports subpixel positioning, scaling and rotating.
 - Text: static text that can be multiline
+- ToolTip: a popup which automatically displays itself when the cursor hovers on its parent element.
 - UIElement: container for other elements, renders nothing by itself
 - View3D: a window that renders a 3D viewport
 - Window: a movable and resizable window
@@ -1432,6 +1514,19 @@ The root %UI element can be queried from the UI subsystem. It is an empty canvas
 Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
 
 To allow the elements react to mouse input, either a mouse cursor element must be defined using \ref UI::SetCursor "SetCursor()" or the operating system mouse cursor must be set visible from the Input subsystem.
+
+\section UI_Textures UI textures
+
+The BorderImage and elements deriving from it specify a texture and an absolute pixel rect within it to use for rendering; see \ref BorderImage::SetTexture "SetTexture()" and \ref BorderImage::SetImageRect "SetImageRect()". The texture is modulated with the element's color. To allow for more versatile scaling the element can be divided into 9 sub-quads or patches by specifying the width of each of its borders, see \ref BorderImage::SetBorder "SetBorder()". Setting zero borders (the default) causes the element to be drawn as one quad.
+
+The absolute pixel rects interact poorly with the Renderer's texture quality setting, which reduces texture sizes by skipping the topmost mipmaps. Generating mipmaps is also often unnecessary for %UI textures, as they are usually displayed with 1:1 ratio on the screen. Therefore it's a good practice to use the following accompanying settings XML file for %UI textures to disable quality reduction and mipmaps:
+
+\code
+<texture>
+    <mipmap enable="false" />
+    <quality low="0" />
+</texture>
+\endcode
 
 \section UI_Defining Defining UI elements in XML
 
@@ -1485,7 +1580,7 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -1502,7 +1597,7 @@ The default flags are AM_FILE and AM_NET. Note that it is legal to define neithe
 
 \page Network Networking
 
-The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
+The Network subsystem provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
 
 %Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 30 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
@@ -1576,7 +1671,7 @@ The controls update message also includes the client's observer position for int
 
 \section Network_Messages Raw network messages
 
-All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network library's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
 
 To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
 
@@ -1604,7 +1699,7 @@ Connection* remoteSender = static_cast<Connection*>(eventData[P_CONNECTION].GetP
 
 %Script:
 \code
-Connection@ remoteSender = eventData["Connection"].GetConnection();
+Connection@ remoteSender = eventData["Connection"].GetPtr();
 \endcode
 
 \section Network_HttpRequests HTTP requests
@@ -1627,7 +1722,14 @@ The thread index ranges from 0 to n, where 0 represents the main thread and n is
 
 Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
 
-Note that as the Profiler currently manages only a single hierarchy tree, profiling blocks may only appear in main thread code, not in the work functions.
+When making your own work functions, observe that the following things are (at least currently) unsafe and will result in undefined behavior and crashes, if done outside the main thread:
+
+- Sending events
+- Using profiler blocks
+- Modifying scene or UI content
+- Modifying GPU resources
+- Requesting resources from ResourceCache
+- Executing script functions
 
 \page Tools Tools
 
@@ -1641,41 +1743,45 @@ Usage:
 AssetImporter <command> <input file> <output file> [options]
 
 Commands:
-model Output a model and a material list
-scene Output a scene
-dump  Dump scene node structure. No output file is generated
-lod   Combine several Urho3D models as LOD levels of the output model
-      Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
+model       Output a model
+scene       Output a scene
+node        Output a node and its children (prefab)
+dump        Dump scene node structure. No output file is generated
+lod         Combine several Urho3D models as LOD levels of the output model
+            Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
 
 Options:
--b    Save scene in binary format, default format is XML
--h    Generate hard instead of smooth normals if input file has no normals
--i    Use local ID's for scene nodes
--na   Do not output animations
--nm   Do not output materials
--ns   Do not create subdirectories for resources
--nz   Do not create a zone and a directional light (scene mode only)
--nf   Do not fix infacing normals
--pX   Set path X for scene resources. Default is output file path
--rX   Use scene node X as root node
--fX   Animation tick frequency to use if unspecified. Default 4800
--o    Optimize redundant submeshes. Loses scene hierarchy and animations
--t    Generate tangents
+-b          Save scene in binary format, default format is XML
+-h          Generate hard instead of smooth normals if input file has no normals
+-i          Use local ID's for scene nodes
+-l          Output a material list file for models
+-na         Do not output animations
+-nm         Do not output materials
+-nt         Do not output material textures
+-nc         Do not use material diffuse color value, instead output white
+-nh         Do not save full node hierarchy (scene mode only)\n"
+-ns         Do not create subdirectories for resources
+-nz         Do not create a zone and a directional light (scene mode only)
+-nf         Do not fix infacing normals
+-p <path>   Set path for scene resources. Default is output file path
+-r <name>   Use the named scene node as root node\n"
+-f <freq>   Animation tick frequency to use if unspecified. Default 4800
+-o          Optimize redundant submeshes. Loses scene hierarchy and animations
+-s <filter> Include non-skinning bones in the model's skeleton. Can be given a
+            case-insensitive semicolon separated filter list. Bone is included
+            if its name contains any of the filters. Prefix filter with minus
+            sign to use as an exclude. For example -s "Bip01;-Dummy;-Helper"
+-t          Generate tangents
+-v          Enable verbose Assimp library logging
+-eao        Interpret material emissive texture as ambient occlusion
+-cm         Check and do not overwrite if material exists
+-ct         Check and do not overwrite if texture exists
+-ctn        Check and do not overwrite if texture has newer timestamp
 \endverbatim
 
-The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, AnimatedModel or Skybox component. The list files can safely be deleted if not needed, and should not be included in production builds of Urho3D applications.
+The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
 
 In model or scene mode, the AssetImporter utility will also automatically save non-skeletal node animations into the output file directory.
-
-\section Tools_DocConverter DocConverter
-
-Automatically converts the Urho3D Doxygen pages to Google Code wiki format.
-
-Usage:
-
-\verbatim
-DocConverter <dox input path> <wiki output path> <mainpage name>
-\endverbatim
 
 \section Tools_OgreImporter OgreImporter
 
@@ -1687,23 +1793,27 @@ Usage:
 OgreImporter <input file> <output file> [options]
 
 Options:
--na  Do not output animations
--nm  Do not output morphs
--r   Output only rotations from animations
--s   Split each submesh into own vertex buffer
--t   Generate tangents
+-l      Output a material list file
+-na     Do not output animations
+-nm     Do not output morphs
+-r      Output only rotations from animations
+-s      Split each submesh into own vertex buffer
+-t      Generate tangents
 \endverbatim
 
 Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
 
 \section Tools_PackageTool PackageTool
 
-Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem.
+Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem. The file data can optionally be compressed using the LZ4 compression library.
 
 Usage:
 
 \verbatim
-PackageTool <directory to process> <package name> [basepath]
+PackageTool <directory to process> <package name> [basepath] [options]
+
+Options:
+-c      Enable package file LZ4 compression
 \endverbatim
 
 When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
@@ -1713,6 +1823,8 @@ For example, this would convert all the resource files inside the Urho3D Data di
 \verbatim
 PackageTool Data Data.pak
 \endverbatim
+
+The -c option enables LZ4 compression on the files.
 
 \section Tools_RampGenerator RampGenerator
 
@@ -1734,39 +1846,13 @@ Usage:
 
 \verbatim
 ScriptCompiler <input file> [resource path for includes]
-ScriptCompiler -dumpapi [output file]
+ScriptCompiler -dumpapi <Doxygen output file> [C header output file]
 
 \endverbatim
 
 The output files are saved with the extension .asc (compiled AngelScript.) Binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
 
 The script API dump mode can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
-
-\section Tools_ShaderCompiler ShaderCompiler
-
-Compiles HLSL shaders using an XML definition file that describes the shader permutations, and their associated HLSL preprocessor defines.
-
-The output consists of shader bytecode for each permutation, as well as information of the constant parameters and texture units used. See \ref FileFormats_Shader "Binary shader format" for details.
-
-Usage:
-
-\verbatim
-ShaderCompiler <definitionfile> <outputpath> [options]
-
-Options:
--tVS|PS Compile only vertex or pixel shaders, by default compile both
--vX     Compile only the shader variation X
--dX     Add a define. Add SM3 to compile for Shader Model 3
--dDefine Add an arbitrary define
-
-If output path is not specified, shader binaries will be output into the same
-directory as the definition file. Specify a wildcard to compile multiple
-shaders.
-\endverbatim
-
-The D3DX library from the DirectX runtime or SDK needs to be installed. Note that when running in Direct3D9 mode, the engine will automatically invoke ShaderCompiler if it can not find a shader in binary form. Depending on shader complexity this can take a substantial amount of time. To avoid this, execute the file CompileAllShaders.bat in the Bin directory to precompile all shader permutations. It is also highly recommended to not ship ShaderCompiler with Urho3D applications, but to instead precompile all shaders. After precompiling you can delete all .hlsl files from the CoreData directory of the shipping build.
-
-Note that GLSL shaders in the Bin/CoreData/Shaders/GLSL directory also use similar XML definition files, but no precompiling tool exists for them; they are always compiled during runtime.
 
 \page Unicode Unicode support
 
@@ -1915,13 +2001,31 @@ uint       Bytecode size
 byte[]     Bytecode
 \endverbatim
 
+\section FileFormats_Package Package file (.pak)
+
+\verbatim
+byte[4]    Identifier "UPAK" or "ULZ4" if compressed
+uint       Number of file entries
+uint       Whole package checksum
+
+    For each file entry:
+    cstring    Name
+    uint       Start offset
+    uint       Size
+    uint       Checksum
+
+    The compressed data for each file is the following, repeated until the file is done:
+    ushort     Uncompressed length of block
+    ushort     Compressed length of block
+    byte[]     Compressed data
+\endverbatim
+
 \section FileFormats_Script Compiled AngelScript (.asc)
 
 \verbatim
 byte[4]    Identifier "ASBC"
-?          Bytecode, produced by AngelScript serializer
+byte[]     Bytecode, produced by AngelScript serializer
 \endverbatim
-
 
 \page CodingConventions Coding conventions
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -157,23 +157,25 @@ void RenderSurface::Release()
     if (!graphics)
         return;
     
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+    if (!graphics->IsDeviceLost())
     {
-        if (graphics->GetRenderTarget(i) == this)
-            graphics->ResetRenderTarget(i);
+        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        {
+            if (graphics->GetRenderTarget(i) == this)
+                graphics->ResetRenderTarget(i);
+        }
+        
+        if (graphics->GetDepthStencil() == this)
+            graphics->ResetDepthStencil();
+        
+        // Clean up also from non-active FBOs
+        graphics->CleanupRenderSurface(this);
+        
+        if (renderBuffer_)
+            glDeleteRenderbuffersEXT(1, &renderBuffer_);
     }
     
-    if (graphics->GetDepthStencil() == this)
-        graphics->ResetDepthStencil();
-    
-    // Clean up also from non-active FBOs
-    graphics->CleanupRenderSurface(this);
-    
-    if (renderBuffer_)
-    {
-        glDeleteRenderbuffersEXT(1, &renderBuffer_);
-        renderBuffer_ = 0;
-    }
+    renderBuffer_ = 0;
 }
 
 int RenderSurface::GetWidth() const

@@ -1,0 +1,42 @@
+$#include "Console.h"
+
+class Console : public Object
+{
+    void SetDefaultStyle(XMLFile* style);
+    void SetVisible(bool enable);
+    void Toggle();
+    void SetNumRows(unsigned rows);
+    void SetNumHistoryRows(unsigned rows);
+    void UpdateElements();
+    
+    XMLFile* GetDefaultStyle() const;
+    BorderImage* GetBackground() const;
+    LineEdit* GetLineEdit() const;
+    bool IsVisible() const;
+    unsigned GetNumRows() const;
+    unsigned GetNumHistoryRows() const;
+    unsigned GetHistoryPosition() const;
+    const String GetHistoryRow(unsigned index) const;
+    
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_readonly tolua_property__get_set BorderImage* background;
+    tolua_readonly tolua_property__get_set LineEdit* lineEdit;
+    tolua_property__is_set bool visible;
+    tolua_property__get_set unsigned numRows;
+    tolua_property__get_set unsigned numHistoryRows;
+    tolua_readonly tolua_property__get_set unsigned historyPosition;
+};
+
+Console* GetConsole();
+tolua_readonly tolua_property__get_set Console* console;
+
+${
+#define TOLUA_DISABLE_tolua_EngineLuaAPI_GetConsole00
+static int tolua_EngineLuaAPI_GetConsole00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Console>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_console_ptr
+#define tolua_get_console_ptr tolua_EngineLuaAPI_GetConsole00
+$}

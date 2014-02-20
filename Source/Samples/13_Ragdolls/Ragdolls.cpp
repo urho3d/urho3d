@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -108,7 +108,7 @@ void Ragdolls::CreateScene()
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
+    light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
@@ -144,6 +144,9 @@ void Ragdolls::CreateScene()
             modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
             modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
             modelObject->SetCastShadows(true);
+            // Set the model to also update when invisible to avoid staying invisible when the model should come into
+            // view, but does not as the bounding box is not updated
+            modelObject->SetUpdateInvisible(true);
             
             // Create a rigid body and a collision shape. These will act as a trigger for transforming the
             // model into a ragdoll when hit by a moving object

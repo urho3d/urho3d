@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -107,7 +107,10 @@ void Chat::CreateUI()
 
     UpdateButtons();
 
-    chatHistory_.Resize((graphics->GetHeight() - 20) / chatHistoryText_->GetRowHeight());
+    int rowHeight = chatHistoryText_->GetRowHeight();
+    // Row height would be zero if the font failed to load
+    if (rowHeight)
+        chatHistory_.Resize((graphics->GetHeight() - 20) / rowHeight);
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -260,7 +263,7 @@ void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
         // If we are a client, just display the message
         if (network->IsServerRunning())
         {
-            Connection* sender = (Connection*)eventData[P_CONNECTION].GetPtr();
+            Connection* sender = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
             
             text = sender->ToString() + " " + text;
             

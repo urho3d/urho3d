@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,13 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Log.h"
-#include "StringUtils.h"
 
 #include <cstdio>
 #include <cstring>
 
 #ifdef WIN32
 #ifndef _MSC_VER
-#define _WIN32_IE 0x400
+#define _WIN32_IE 0x501
 #endif
 #include <windows.h>
 #include <shellapi.h>
@@ -248,8 +247,10 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
     }
 
     SharedPtr<File> srcFile(new File(context_, srcFileName, FILE_READ));
+    if (!srcFile->IsOpen())
+        return false;
     SharedPtr<File> destFile(new File(context_, destFileName, FILE_WRITE));
-    if (!srcFile->IsOpen() || !destFile->IsOpen())
+    if (!destFile->IsOpen())
         return false;
 
     unsigned fileSize = srcFile->GetSize();
@@ -401,7 +402,7 @@ bool FileSystem::DirExists(const String& pathName) const
     #ifndef WIN32
     // Always return true for the root directory
     if (pathName == "/")
-	return true;
+        return true;
     #endif
 
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
@@ -477,6 +478,9 @@ String FileSystem::GetProgramDir() const
     if (!DirExists(programDir_ + "CoreData") && !DirExists(programDir_ + "Data") && (DirExists(currentDir + "CoreData") ||
         DirExists(currentDir + "Data")))
         programDir_ = currentDir;
+    
+    // Sanitate /./ construct away
+    programDir_.Replace("/./", "/");
     
     return programDir_;
 }
@@ -653,7 +657,7 @@ String ReplaceExtension(const String& fullPath, const String& newExtension)
 
 String AddTrailingSlash(const String& pathName)
 {
-    String ret = pathName;
+    String ret = pathName.Trimmed();
     ret.Replace('\\', '/');
     if (!ret.Empty() && ret.Back() != '/')
         ret += '/';
@@ -662,7 +666,7 @@ String AddTrailingSlash(const String& pathName)
 
 String RemoveTrailingSlash(const String& pathName)
 {
-    String ret = pathName;
+    String ret = pathName.Trimmed();
     ret.Replace('\\', '/');
     if (!ret.Empty() && ret.Back() == '/')
         ret.Resize(ret.Length() - 1);

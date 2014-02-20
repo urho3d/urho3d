@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -148,24 +148,56 @@ public:
     Frustum frustum_;
 };
 
+/// General octree query result. Used for Lua bindings only.
+struct URHO3D_API OctreeQueryResult
+{
+    /// Construct with defaults.
+    OctreeQueryResult() :
+        drawable_(0),
+        node_(0)
+    {
+    }
+
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const OctreeQueryResult& rhs) const { return drawable_ != rhs.drawable_ || node_ != rhs.node_; }
+    
+    /// Drawable.
+    Drawable* drawable_;
+    /// Scene node.
+    Node* node_;
+};
+
 /// Graphics raycast detail level.
 enum RayQueryLevel
 {
-    RAY_AABB_NOSUBOBJECTS = 0,
-    RAY_AABB,
+    RAY_AABB = 0,
     RAY_OBB,
     RAY_TRIANGLE
 };
 
 /// Raycast result.
-struct RayQueryResult
+struct URHO3D_API RayQueryResult
 {
+    /// Construct with defaults.
+    RayQueryResult() :
+        drawable_(0),
+        node_(0)
+    {
+    }
+
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const RayQueryResult& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || drawable_ != rhs.drawable_ || node_ != rhs.node_ || subObject_ != rhs.subObject_; }
+    
+    /// Hit position in world space.
+    Vector3 position_;
+    /// Hit normal in world space. Negation of ray direction if per-triangle data not available.
+    Vector3 normal_;
+    /// Distance from ray origin.
+    float distance_;
     /// Drawable.
     Drawable* drawable_;
     /// Scene node.
     Node* node_;
-    /// Distance from ray origin.
-    float distance_;
     /// Drawable specific subobject if applicable.
     unsigned subObject_;
 };

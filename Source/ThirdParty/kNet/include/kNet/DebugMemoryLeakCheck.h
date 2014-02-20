@@ -16,7 +16,7 @@
 /** @file DebugMemoryLeakCheck.h
 	@brief Provides overloads of operators new and delete for tracking memory leaks. */
 
-#if defined (WIN32) && defined(_DEBUG) && defined(KNET_MEMORY_LEAK_CHECK)
+#if defined(_MSC_VER) && defined(_DEBUG) && defined(KNET_MEMORY_LEAK_CHECK)
 
 #include <new>
 #include <crtdbg.h>

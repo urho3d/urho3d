@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,14 @@ class Scene;
 class ScriptFile;
 class ScriptInstance;
 
+/// Output mode for DumpAPI method.
+enum DumpMode
+{
+    DOXYGEN = 0,
+    C_HEADER,
+    MAX_DUMP_MODES
+};
+
 /// Scripting subsystem. Allows execution of AngelScript.
 class URHO3D_API Script : public Object
 {
@@ -60,7 +68,7 @@ public:
     /// Set immediate mode scene.
     void SetDefaultScene(Scene* scene);
     /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when ENABLE_LOGGING not defined.
-    void DumpAPI();
+    void DumpAPI(DumpMode mode= DOXYGEN);
     /// Log a message from the script engine.
     void MessageCallback(const asSMessageInfo* msg);
     /// Handle a script exception.
@@ -91,10 +99,10 @@ private:
     /// Return a script function/method execution context for the current execution nesting level.
     asIScriptContext* GetScriptFileContext();
     /// Output a sanitated row of script API. No-ops when ENABLE_LOGGING not defined.
-    void OutputAPIRow(const String& row, bool removeReference = false);
+    void OutputAPIRow(DumpMode mode, const String& row, bool removeReference = false, String separator = ";");
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
-    
+
     /// AngelScript engine.
     asIScriptEngine* scriptEngine_;
     /// Immediate execution script context.
@@ -112,6 +120,6 @@ private:
 };
 
 /// Register Script library objects.
-void RegisterScriptLibrary(Context* context);
+void URHO3D_API RegisterScriptLibrary(Context* context);
 
 }

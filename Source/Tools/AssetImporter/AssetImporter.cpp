@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "AnimatedModel.h"
 #include "Animation.h"
 #include "Context.h"
 #include "DebugRenderer.h"
@@ -37,7 +38,6 @@
 #include "Quaternion.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "StaticModel.h"
 #include "StringUtils.h"
 #include "Vector3.h"
 #include "VertexBuffer.h"
@@ -54,6 +54,8 @@
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/DefaultLogger.hpp>
+
 #include <cstring>
 
 #include "DebugNew.h"
@@ -102,7 +104,19 @@ bool localIDs_ = false;
 bool saveBinary_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
+bool noHierarchy_ = false;
 bool noMaterials_ = false;
+bool noTextures_ = false;
+bool noMaterialDiffuseColor_ = false;
+bool saveMaterialList_ = false;
+bool includeNonSkinningBones_ = false;
+bool verboseLog_ = false;
+bool emissiveAO_ = false;
+bool noOverwriteMaterial_ = false;
+bool noOverwriteTexture_ = false;
+bool noOverwriteNewerTexture_ = false;
+Vector<String> nonSkinningBoneIncludes_;
+Vector<String> nonSkinningBoneExcludes_;
 
 HashSet<aiAnimation*> allAnimations_;
 PODVector<aiAnimation*> sceneAnimations_;
@@ -122,9 +136,10 @@ void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
 void BuildAndSaveAnimations(OutModel* model = 0);
 
-void ExportScene(const String& outName);
+void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
-void BuildAndSaveScene(OutScene& scene);
+Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, WeakPtr<Node> >& nodeMapping);
+void BuildAndSaveScene(OutScene& scene, bool asPrefab);
 
 void ExportMaterials(HashSet<String>& usedTextures);
 void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
@@ -150,8 +165,8 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
 unsigned GetElementMask(aiMesh* mesh);
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
-aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode);
-aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
+aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive = true);
+aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode, bool rootInclusive = true);
 aiMatrix4x4 GetMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode);
 void GetPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
 
@@ -184,26 +199,40 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model Output a model and a material list\n"
-            "scene Output a scene\n"
-            "dump  Dump scene node structure. No output file is generated\n"
-            "lod   Combine several Urho3D models as LOD levels of the output model\n"
-            "      Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "model      Output a model\n"
+            "scene      Output a scene\n"
+            "node       Output a node and its children (prefab)\n"
+            "dump       Dump scene node structure. No output file is generated\n"
+            "lod        Combine several Urho3D models as LOD levels of the output model\n"
+            "           Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
-            "-b    Save scene in binary format, default format is XML\n"
-            "-h    Generate hard instead of smooth normals if input file has no normals\n"
-            "-i    Use local ID's for scene nodes\n"
-            "-na   Do not output animations\n"
-            "-nm   Do not output materials\n"
-            "-ns   Do not create subdirectories for resources\n"
-            "-nz   Do not create a zone and a directional light (scene mode only)\n"
-            "-nf   Do not fix infacing normals\n"
-            "-pX   Set path X for scene resources. Default is output file path\n"
-            "-rX   Use scene node X as root node\n"
-            "-fX   Animation tick frequency to use if unspecified. Default 4800\n"
-            "-o    Optimize redundant submeshes. Loses scene hierarchy and animations\n"
-            "-t    Generate tangents\n"
+            "-b          Save scene in binary format, default format is XML\n"
+            "-h          Generate hard instead of smooth normals if input file has no normals\n"
+            "-i          Use local ID's for scene nodes\n"
+            "-l          Output a material list file for models\n"
+            "-na         Do not output animations\n"
+            "-nm         Do not output materials\n"
+            "-nt         Do not output material textures\n"
+            "-nc         Do not use material diffuse color value, instead output white\n"
+            "-nh         Do not save full node hierarchy (scene mode only)\n"
+            "-ns         Do not create subdirectories for resources\n"
+            "-nz         Do not create a zone and a directional light (scene mode only)\n"
+            "-nf         Do not fix infacing normals\n"
+            "-p <path>   Set path for scene resources. Default is output file path\n"
+            "-r <name>   Use the named scene node as root node\n"
+            "-f <freq>   Animation tick frequency to use if unspecified. Default 4800\n"
+            "-o          Optimize redundant submeshes. Loses scene hierarchy and animations\n"
+            "-s <filter> Include non-skinning bones in the model's skeleton. Can be given a\n"
+            "            case-insensitive semicolon separated filter list. Bone is included\n"
+            "            if its name contains any of the filters. Prefix filter with minus\n"
+            "            sign to use as an exclude. For example -s \"Bip01;-Dummy;-Helper\"\n"
+            "-t          Generate tangents\n"
+            "-v          Enable verbose Assimp library logging\n"
+            "-eao        Interpret material emissive texture as ambient occlusion\n"
+            "-cm         Check and do not overwrite if material exists\n"
+            "-ct         Check and do not overwrite if texture exists\n"
+            "-ctn        Check and do not overwrite if texture has newer timestamp\n"
         );
     }
     
@@ -233,79 +262,107 @@ void Run(const Vector<String>& arguments)
     
     for (unsigned i = 2; i < arguments.Size(); ++i)
     {
-        if (arguments[i].Length() >= 2 && arguments[i][0] == '-')
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
         {
-            String parameter;
-            if (arguments[i].Length() >= 3)
-                parameter = arguments[i].Substring(2);
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
             
-            switch (tolower(arguments[i][1]))
-            {
-            case 'b':
+            if (argument == "b")
                 saveBinary_ = true;
-                break;
-                
-            case 'h':
+            else if (argument == "h")
+            {
                 flags &= ~aiProcess_GenSmoothNormals;
                 flags |= aiProcess_GenNormals;
-                break;
-                
-            case 'i':
+            }
+            else if (argument == "i")
                 localIDs_ = true;
-                break;
-                
-            case 'p':
-                resourcePath_ = AddTrailingSlash(parameter);
-                break;
-                
-            case 'r':
-                rootNodeName = parameter;
-                break;
-                
-            case 't':
+            else if (argument == "l")
+                saveMaterialList_ = true;
+            else if (argument == "t")
                 flags |= aiProcess_CalcTangentSpace;
-                break;
-                
-            case 'f':
-                defaultTicksPerSecond_ = ToFloat(parameter);
-                break;
-                
-            case 'o':
+            else if (argument == "o")
                 flags |= aiProcess_PreTransformVertices;
-                break;
-                
-            case 'n':
-                if (!parameter.Empty())
+            else if (argument.Length() == 2 && argument[0] == 'n')
+            {
+                switch (tolower(argument[1]))
                 {
-                    switch (tolower(parameter[0]))
+                case 'a':
+                    noAnimations_ = true;
+                    break;
+                    
+                case 'c':
+                    noMaterialDiffuseColor_ = true;
+                    break;
+                    
+                case 'm':
+                    noMaterials_ = true;
+                    break;
+
+                case 'h':
+                    noHierarchy_ = true;
+                    break;
+
+                case 's':
+                    useSubdirs_ = false;
+                    break;
+                    
+                case 't':
+                    noTextures_ = true;
+                    break;
+                    
+                case 'z':
+                    createZone_ = false;
+                    break;
+                    
+                case 'f':
+                    flags &= ~aiProcess_FixInfacingNormals;
+                    break;
+                }
+            }
+            else if (argument == "p" && !value.Empty())
+            {
+                resourcePath_ = AddTrailingSlash(value);
+                ++i;
+            }
+            else if (argument == "r" && !value.Empty())
+            {
+                rootNodeName = value;
+                ++i;
+            }
+            else if (argument == "f" && !value.Empty())
+            {
+                defaultTicksPerSecond_ = ToFloat(value);
+                ++i;
+            }
+            else if (argument == "s")
+            {
+                includeNonSkinningBones_ = true;
+                if (value.Length() && (value[0] != '-' || value.Length() > 3))
+                {
+                    Vector<String> filters = value.Split(';');
+                    for (unsigned i = 0; i < filters.Size(); ++i)
                     {
-                    case 'a':
-                        noAnimations_ = true;
-                        break;
-                        
-                    case 'm':
-                        noMaterials_ = true;
-                        break;
-                        
-                    case 's':
-                        useSubdirs_ = false;
-                        break;
-                        
-                    case 'z':
-                        createZone_ = false;
-                        break;
-                        
-                    case 'f':
-                        flags &= ~aiProcess_FixInfacingNormals;
-                        break;
+                        if (filters[i][0] == '-')
+                            nonSkinningBoneExcludes_.Push(filters[i].Substring(1));
+                        else
+                            nonSkinningBoneIncludes_.Push(filters[i]);
                     }
                 }
-                break;
             }
+            else if (argument == "v")
+                verboseLog_ = true;
+            else if (argument == "eao")
+                emissiveAO_ = true;
+            else if (argument == "cm")
+                noOverwriteMaterial_ = true;
+            else if (argument == "ct")
+                noOverwriteTexture_ = true;
+            else if (argument == "ctn")
+                noOverwriteNewerTexture_ = true;
         }
     }
     
-    if (command == "model" || command == "scene" || command == "dump")
+    if (command == "model" || command == "scene" || command == "node" || command == "dump")
     {
         String inFile = arguments[1];
         String outFile;
@@ -332,10 +389,16 @@ void Run(const Vector<String>& arguments)
         if (command != "dump" && outFile.Empty())
             ErrorExit("No output file defined");
         
+        if (verboseLog_)
+            Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
+        
         PrintLine("Reading file " + inFile);
         scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile);
+        
+        if (verboseLog_)
+            Assimp::DefaultLogger::kill();
         
         rootNode_ = scene_->mRootNode;
         if (!rootNodeName.Empty())
@@ -354,14 +417,21 @@ void Run(const Vector<String>& arguments)
         if (command == "model")
             ExportModel(outFile);
         
-        if (command == "scene")
-            ExportScene(outFile);
+        if (command == "scene" || command == "node")
+        {
+            bool asPrefab = command == "node";
+            // Saving as prefab requires the hierarchy, especially the root node
+            if (asPrefab)
+                noHierarchy_ = false;
+            ExportScene(outFile, asPrefab);
+        }
         
         if (!noMaterials_)
         {
             HashSet<String> usedTextures;
             ExportMaterials(usedTextures);
-            CopyTextures(usedTextures, GetPath(inFile));
+            if (!noTextures_)
+                CopyTextures(usedTextures, GetPath(inFile));
         }
     }
     else if (command == "lod")
@@ -548,12 +618,43 @@ void CollectBones(OutModel& model)
 
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
 {
-    if (necessary.Find(node) != necessary.End())
+    bool includeBone = necessary.Find(node) != necessary.End();
+    String boneName = FromAIString(node->mName);
+    
+    // Check include/exclude filters for non-skinned bones
+    if (!includeBone && includeNonSkinningBones_)
     {
-        dest.Push(node);
-        for (unsigned i = 0; i < node->mNumChildren; ++i)
-            CollectBonesFinal(dest, necessary, node->mChildren[i]);
+        // If no includes specified, include by default but check for excludes
+        if (nonSkinningBoneIncludes_.Empty())
+            includeBone = true;
+        
+        // Check against includes/excludes
+        for (unsigned i = 0; i < nonSkinningBoneIncludes_.Size(); ++i)
+        {
+            if (boneName.Contains(nonSkinningBoneIncludes_[i], false))
+            {
+                includeBone = true;
+                break;
+            }
+        }
+        for (unsigned i = 0; i < nonSkinningBoneExcludes_.Size(); ++i)
+        {
+            if (boneName.Contains(nonSkinningBoneExcludes_[i], false))
+            {
+                includeBone = false;
+                break;
+            }
+        }
+        
+        if (includeBone)
+            PrintLine("Including non-skinning bone " + boneName);
     }
+    
+    if (includeBone)
+        dest.Push(node);
+        
+    for (unsigned i = 0; i < node->mNumChildren; ++i)
+        CollectBonesFinal(dest, necessary, node->mChildren[i]);
 }
 
 void CollectAnimations(OutModel* model)
@@ -853,7 +954,7 @@ void BuildAndSaveModel(OutModel& model)
     outModel->Save(outFile);
     
     // If exporting materials, also save material list for use by the editor
-    if (!noMaterials_)
+    if (!noMaterials_ && saveMaterialList_)
     {
         String materialListName = ReplaceExtension(model.outName_, ".txt");
         File listFile(context_);
@@ -1035,7 +1136,7 @@ void BuildAndSaveAnimations(OutModel* model)
     }
 }
 
-void ExportScene(const String& outName)
+void ExportScene(const String& outName, bool asPrefab)
 {
     OutScene outScene;
     outScene.outName_ = outName;
@@ -1058,7 +1159,7 @@ void ExportScene(const String& outName)
     }
     
     // Save scene
-    BuildAndSaveScene(outScene);
+    BuildAndSaveScene(outScene, asPrefab);
 }
 
 void CollectSceneModels(OutScene& scene, aiNode* node)
@@ -1117,46 +1218,102 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
         CollectSceneModels(scene, node->mChildren[i]);
 }
 
-void BuildAndSaveScene(OutScene& scene)
+Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping)
 {
-    PrintLine("Writing scene");
-    
+    if (nodeMapping.Contains(srcNode))
+        return nodeMapping[srcNode];
+    // Flatten hierarchy if requested
+    if (noHierarchy_)
+    {
+        Node* outNode = scene->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(GetDerivedTransform(srcNode, rootNode_), pos, rot, scale);
+        outNode->SetTransform(pos, rot, scale);
+        nodeMapping[srcNode] = outNode;
+
+        return outNode;
+    }
+
+    if (srcNode == rootNode_ || !srcNode->mParent)
+    {
+        Node* outNode = scene->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(srcNode->mTransformation, pos, rot, scale);
+        outNode->SetTransform(pos, rot, scale);
+        nodeMapping[srcNode] = outNode;
+
+        return outNode;
+    }
+    else
+    {
+        // Ensure the existence of the parent chain as in the original file
+        if (!nodeMapping.Contains(srcNode->mParent))
+            CreateSceneNode(scene, srcNode->mParent, nodeMapping);
+        
+        Node* parent = nodeMapping[srcNode->mParent];
+        Node* outNode = parent->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(srcNode->mTransformation, pos, rot, scale);
+        outNode->SetTransform(pos, rot, scale);
+        nodeMapping[srcNode] = outNode;
+
+        return outNode;
+    }
+}
+
+void BuildAndSaveScene(OutScene& scene, bool asPrefab)
+{
+    if (!asPrefab)
+        PrintLine("Writing scene");
+    else
+        PrintLine("Writing node hierarchy");
+
     SharedPtr<Scene> outScene(new Scene(context_));
     
-    /// \todo Make the physics properties configurable
-    outScene->CreateComponent<PhysicsWorld>();
-    
-    /// \todo Make the octree properties configurable, or detect from the scene contents
-    outScene->CreateComponent<Octree>();
-    
-    outScene->CreateComponent<DebugRenderer>();
-    
-    if (createZone_)
+    if (!asPrefab)
     {
-        Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
-        Zone* zone = zoneNode->CreateComponent<Zone>();
-        zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
-        zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
+        /// \todo Make the physics properties configurable
+        outScene->CreateComponent<PhysicsWorld>();
+    
+        /// \todo Make the octree properties configurable, or detect from the scene contents
+        outScene->CreateComponent<Octree>();
+
+        outScene->CreateComponent<DebugRenderer>();
         
-        // Create default light only if scene does not define them
-        if (!scene_->HasLights())
+        if (createZone_)
         {
-            Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
-            Light* light = lightNode->CreateComponent<Light>();
-            light->SetLightType(LIGHT_DIRECTIONAL);
-            lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
+            Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
+            Zone* zone = zoneNode->CreateComponent<Zone>();
+            zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
+            zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
+            
+            // Create default light only if scene does not define them
+            if (!scene_->HasLights())
+            {
+                Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
+                Light* light = lightNode->CreateComponent<Light>();
+                light->SetLightType(LIGHT_DIRECTIONAL);
+                lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
+            }
         }
     }
-    
+
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
+
+    HashMap<aiNode*, Node*> nodeMapping;
+    Node* outRootNode = 0;
+    if (asPrefab || !noHierarchy_)
+        outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
     
     // Create geometry nodes
     for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
     {
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
-        
-        Node* modelNode = outScene->CreateChild(FromAIString(scene.nodes_[i]->mName), localIDs_ ? LOCAL : REPLICATED);
-        StaticModel* staticModel = modelNode->CreateComponent<StaticModel>();
+        Node* modelNode = CreateSceneNode(outScene, scene.nodes_[i], nodeMapping);
+        StaticModel* staticModel = model.bones_.Empty() ? modelNode->CreateComponent<StaticModel>() : modelNode->CreateComponent<AnimatedModel>();
         
         // Create a dummy model so that the reference can be stored
         String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
@@ -1169,11 +1326,6 @@ void BuildAndSaveScene(OutScene& scene)
         }
         staticModel->SetModel(cache->GetResource<Model>(modelName));
         
-        // Set a flattened transform
-        Vector3 pos, scale;
-        Quaternion rot;
-        GetPosRotScale(GetDerivedTransform(scene.nodes_[i], rootNode_), pos, rot, scale);
-        modelNode->SetTransform(pos, rot, scale);
         // Set materials if they are known
         for (unsigned j = 0; j < model.meshes_.Size(); ++j)
         {
@@ -1193,64 +1345,81 @@ void BuildAndSaveScene(OutScene& scene)
     }
     
     // Create lights
-    for (unsigned i = 0; i < scene_->mNumLights; ++i)
+    if (!asPrefab)
     {
-        aiLight* light = scene_->mLights[i];
-        aiNode* lightNode = GetNode(FromAIString(light->mName), rootNode_, true);
-        if (!lightNode)
-            continue;
-        Matrix3x4 lightNodeTransform = ToMatrix3x4(GetDerivedTransform(lightNode, rootNode_));
-        Vector3 lightWorldPosition = lightNodeTransform * ToVector3(light->mPosition);
-        Vector3 lightWorldDirection = lightNodeTransform.RotationMatrix() * ToVector3(light->mDirection);
-        
-        Node* outNode = outScene->CreateChild(FromAIString(light->mName));
-        Light* outLight = outNode->CreateComponent<Light>();
-        outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
-        
-        switch (light->mType)
+        for (unsigned i = 0; i < scene_->mNumLights; ++i)
         {
-        case aiLightSource_DIRECTIONAL:
-            outNode->SetDirection(lightWorldDirection);
-            outLight->SetLightType(LIGHT_DIRECTIONAL);
-            break;
-        case aiLightSource_SPOT:
-            outNode->SetPosition(lightWorldPosition);
-            outNode->SetDirection(lightWorldDirection);
-            outLight->SetLightType(LIGHT_SPOT);
-            outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
-            break;
-        case aiLightSource_POINT:
-            outNode->SetPosition(lightWorldPosition);
-            outLight->SetLightType(LIGHT_POINT);
-            break;
-        default:
-            break;
-        }
-        
-        // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance
-        if (light->mType != aiLightSource_DIRECTIONAL)
-        {
-            float a = light->mAttenuationQuadratic;
-            float b = light->mAttenuationLinear;
-            float c = -10.0f;
-            if (!Equals(a, 0.0f))
+            aiLight* light = scene_->mLights[i];
+            aiNode* lightNode = GetNode(FromAIString(light->mName), rootNode_, true);
+            if (!lightNode)
+                continue;
+            Node* outNode = CreateSceneNode(outScene, lightNode, nodeMapping);
+
+            Vector3 lightAdjustPosition = ToVector3(light->mPosition);
+            Vector3 lightAdjustDirection = ToVector3(light->mDirection);
+            // If light is not aligned at the scene node, an adjustment node needs to be created
+            if (!lightAdjustPosition.Equals(Vector3::ZERO) || (light->mType != aiLightSource_POINT &&
+                !lightAdjustDirection.Equals(Vector3::FORWARD)))
             {
-                float root1 = (-b + sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
-                float root2 = (-b - sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
-                outLight->SetRange(Max(root1, root2));
+                outNode = outNode->CreateChild("LightAdjust");
+                outNode->SetPosition(lightAdjustPosition);
+                outNode->SetDirection(lightAdjustDirection);
             }
-            else if (!Equals(b, 0.0f))
-                outLight->SetRange(-c / b);
+
+            Light* outLight = outNode->CreateComponent<Light>();
+            outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
+            
+            switch (light->mType)
+            {
+            case aiLightSource_DIRECTIONAL:
+                outLight->SetLightType(LIGHT_DIRECTIONAL);
+                break;
+            case aiLightSource_SPOT:
+                outLight->SetLightType(LIGHT_SPOT);
+                outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
+                break;
+            case aiLightSource_POINT:
+                outLight->SetLightType(LIGHT_POINT);
+                break;
+            default:
+                break;
+            }
+            
+            // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance
+            if (light->mType != aiLightSource_DIRECTIONAL)
+            {
+                float a = light->mAttenuationQuadratic;
+                float b = light->mAttenuationLinear;
+                float c = -10.0f;
+                if (!Equals(a, 0.0f))
+                {
+                    float root1 = (-b + sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
+                    float root2 = (-b - sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
+                    outLight->SetRange(Max(root1, root2));
+                }
+                else if (!Equals(b, 0.0f))
+                    outLight->SetRange(-c / b);
+            }
         }
     }
     
     File file(context_);
     if (!file.Open(scene.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + scene.outName_);
-    if (!saveBinary_)
-        outScene->SaveXML(file);
+    if (!asPrefab)
+    {
+        if (!saveBinary_)
+            outScene->SaveXML(file);
+        else
+            outScene->Save(file);
+    }
     else
-        outScene->Save(file);
+    {
+        if (!saveBinary_)
+            outRootNode->SaveXML(file);
+        else
+            outRootNode->Save(file);
+    }
 }
 
 void ExportMaterials(HashSet<String>& usedTextures)
@@ -1271,8 +1440,6 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     if (matName.Empty())
         return;
     
-    PrintLine("Writing material " + matName);
-    
     // Do not actually create a material instance, but instead craft an xml file manually
     XMLFile outMaterial(context_);
     XMLElement materialElem = outMaterial.CreateRoot("material");
@@ -1281,8 +1448,10 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     String normalTexName;
     String specularTexName;
     String lightmapTexName;
-    Color diffuseColor;
+    String emissiveTexName;
+    Color diffuseColor = Color::WHITE;
     Color specularColor;
+    Color emissiveColor = Color::BLACK;
     bool hasAlpha = false;
     bool twoSided = false;
     float specPower = 1.0f;
@@ -1300,10 +1469,20 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
-    if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
-        diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
+        emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (!noMaterialDiffuseColor_)
+    {
+        if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
+            diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    }
     if (material->Get(AI_MATKEY_COLOR_SPECULAR, colorVal) == AI_SUCCESS)
         specularColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (!emissiveAO_)
+    {
+        if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
+            emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    }
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {
         if (floatVal < 1.0f)
@@ -1326,6 +1505,8 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         // For now lightmap does not coexist with normal & specular
         if (normalTexName.Empty() && specularTexName.Empty() && !lightmapTexName.Empty())
             techniqueName += "LightMap";
+        if (lightmapTexName.Empty() && !emissiveTexName.Empty())
+            techniqueName += emissiveAO_ ? "AO" : "Emissive";
     }
     if (hasAlpha)
         techniqueName += "Alpha";
@@ -1349,17 +1530,24 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     }
     if (!specularTexName.Empty())
     {
-        XMLElement normalElem = materialElem.CreateChild("texture");
-        normalElem.SetString("unit", "specular");
-        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
+        XMLElement specularElem = materialElem.CreateChild("texture");
+        specularElem.SetString("unit", "specular");
+        specularElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
         usedTextures.Insert(specularTexName);
     }
     if (!lightmapTexName.Empty())
     {
-        XMLElement normalElem = materialElem.CreateChild("texture");
-        normalElem.SetString("unit", "emissive");
-        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
+        XMLElement lightmapElem = materialElem.CreateChild("texture");
+        lightmapElem.SetString("unit", "emissive");
+        lightmapElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
         usedTextures.Insert(lightmapTexName);
+    }
+    if (!emissiveTexName.Empty())
+    {
+        XMLElement emissiveElem = materialElem.CreateChild("texture");
+        emissiveElem.SetString("unit", "emissive");
+        emissiveElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + emissiveTexName);
+        usedTextures.Insert(emissiveTexName);
     }
     
     XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
@@ -1368,6 +1556,9 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     XMLElement specularElem = materialElem.CreateChild("parameter");
     specularElem.SetString("name", "MatSpecColor");
     specularElem.SetVector4("value", Vector4(specularColor.r_, specularColor.g_, specularColor.b_, specPower));
+    XMLElement emissiveColorElem = materialElem.CreateChild("parameter");
+    emissiveColorElem.SetString("name", "MatEmissiveColor");
+    emissiveColorElem.SetColor("value", emissiveColor);
     
     if (twoSided)
     {
@@ -1377,8 +1568,18 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         shadowCullElem.SetString("value", "none");
     }
     
-    File outFile(context_);
+    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    
     String outFileName = resourcePath_ + (useSubdirs_ ? "Materials/" : "" ) + matName + ".xml";
+    if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
+    {
+        PrintLine("Skipping save of existing material " + matName);
+        return;
+    }
+    
+    PrintLine("Writing material " + matName);
+    
+    File outFile(context_);
     if (!outFile.Open(outFileName, FILE_WRITE))
         ErrorExit("Could not open output file " + outFileName);
     outMaterial.Save(outFile);
@@ -1386,13 +1587,45 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 
 void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 {
+    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    
     if (useSubdirs_)
-        context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Textures");
+        fileSystem->CreateDir(resourcePath_ + "Textures");
     
     for (HashSet<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
-        PrintLine("Copying texture " + (*i));
-        context_->GetSubsystem<FileSystem>()->Copy(sourcePath + *i, resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i);
+        String fullSourceName = sourcePath + *i;
+        String fullDestName = resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i;
+        
+        if (!fileSystem->FileExists(fullSourceName))
+        {
+            PrintLine("Skipping copy of nonexisting material texture " + *i);
+            continue;
+        }
+        {
+            File test(context_, fullSourceName);
+            if (!test.GetSize())
+            {
+                PrintLine("Skipping copy of zero-size material texture " + *i);
+                continue;
+            }
+        }
+        
+        bool destExists = fileSystem->FileExists(fullDestName);
+        if (destExists && noOverwriteTexture_)
+        {
+            PrintLine("Skipping copy of existing texture " + *i);
+            continue;
+        }
+        if (destExists && noOverwriteNewerTexture_ && fileSystem->GetLastModifiedTime(fullDestName) >
+            fileSystem->GetLastModifiedTime(fullSourceName))
+        {
+            PrintLine("Skipping copying of material texture " + *i + ", destination is newer");
+            continue;
+        }
+
+        PrintLine("Copying material texture " + *i);
+        fileSystem->Copy(fullSourceName, fullDestName);
     }
 }
 
@@ -1752,17 +1985,19 @@ aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
     return 0;
 }
 
-aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode)
+aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive)
 {
-    return GetDerivedTransform(node->mTransformation, node, rootNode);
+    return GetDerivedTransform(node->mTransformation, node, rootNode, rootInclusive);
 }
 
-aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode)
+aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode, bool rootInclusive)
 {
     // If basenode is defined, go only up to it in the parent chain
     while (node && node != rootNode)
     {
         node = node->mParent;
+        if (!rootInclusive && node == rootNode)
+            break;
         if (node)
             transform = node->mTransformation * transform;
     }

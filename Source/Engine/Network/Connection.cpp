@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
-#include "StringUtils.h"
 
 #include <kNet.h>
 
@@ -877,7 +876,7 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
     using namespace ClientIdentity;
     
     VariantMap eventData = identity_;
-    eventData[P_CONNECTION] = (void*)this;
+    eventData[P_CONNECTION] = this;
     eventData[P_ALLOW] = true;
     SendEvent(E_CLIENTIDENTITY, eventData);
     
@@ -933,8 +932,8 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
         
         using namespace ClientSceneLoaded;
         
-        VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_CONNECTION] = this;
         SendEvent(E_CLIENTSCENELOADED, eventData);
     }
 }
@@ -953,7 +952,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         }
         
         VariantMap eventData = msg.ReadVariantMap();
-        eventData[P_CONNECTION] = (void*)this;
+        eventData[P_CONNECTION] = this;
         SendEvent(eventType, eventData);
     }
     else
@@ -979,7 +978,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
             LOGWARNING("Missing sender for remote node event, discarding");
             return;
         }
-        eventData[P_CONNECTION] = (void*)this;
+        eventData[P_CONNECTION] = this;
         sender->SendEvent(eventType, eventData);
     }
 }
@@ -1360,8 +1359,8 @@ void Connection::OnSceneLoadFailed()
     
     using namespace NetworkSceneLoadFailed;
     
-    VariantMap eventData;
-    eventData[P_CONNECTION] = (void*)this;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_CONNECTION] = this;
     SendEvent(E_NETWORKSCENELOADFAILED, eventData);
 }
 

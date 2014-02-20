@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -109,7 +109,7 @@ void SkeletalAnimation::CreateScene()
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
+    light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
@@ -134,9 +134,13 @@ void SkeletalAnimation::CreateScene()
         // but we need to update the model's position manually in any case
         Animation* walkAnimation = cache->GetResource<Animation>("Models/Jack_Walk.ani");
         AnimationState* state = modelObject->AddAnimationState(walkAnimation);
-        // Enable full blending weight and looping
-        state->SetWeight(1.0f);
-        state->SetLooped(true);
+        // The state would fail to create (return null) if the animation was not found
+        if (state)
+        {
+            // Enable full blending weight and looping
+            state->SetWeight(1.0f);
+            state->SetLooped(true);
+        }
         
         // Create our custom Mover component that will move & animate the model during each frame's update
         Mover* mover = modelNode->CreateComponent<Mover>();

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,8 +58,14 @@ public:
     void SetFogStart(float start);
     /// Set fog end distance.
     void SetFogEnd(float end);
+    /// Set fog height distance relative to the scene node's world position. Effective only in height fog mode.
+    void SetFogHeight(float height);
+    /// Set fog height scale. Effective only in height fog mode.
+    void SetFogHeightScale(float scale);
     /// Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
     void SetPriority(int priority);
+    /// Set height fog mode.
+    void SetHeightFog(bool enable);
     /// Set override mode. If camera is inside an override zone, it will also be used for all drawables.
     void SetOverride(bool enable);
     /// Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
@@ -79,9 +85,15 @@ public:
     float GetFogStart() const { return fogStart_; }
     /// Return fog end distance.
     float GetFogEnd() const { return fogEnd_; }
+    /// Return fog height distance relative to the scene node's world position.
+    float GetFogHeight() const { return fogHeight_; }
+    /// Return fog height scale.
+    float GetFogHeightScale() const { return fogHeightScale_; }
     /// Return zone priority.
     int GetPriority() const { return priority_; }
-    /// Return override mode.
+    /// Return whether height fog mode is enabled.
+    bool GetHeightFog() const { return heightFog_; }
+    /// Return whether override mode is enabled.
     bool GetOverride() const { return override_; }
     /// Return whether ambient gradient mode is enabled.
     bool GetAmbientGradient() const { return ambientGradient_; }
@@ -101,6 +113,8 @@ protected:
     mutable Matrix3x4 inverseWorld_;
     /// Inverse transform dirty flag.
     mutable bool inverseWorldDirty_;
+    /// Height fog mode flag.
+    bool heightFog_;
     /// Override mode flag.
     bool override_;
     /// Ambient gradient mode flag.
@@ -119,6 +133,10 @@ protected:
     float fogStart_;
     /// Fog end distance.
     float fogEnd_;
+    /// Fog height distance.
+    float fogHeight_;
+    /// Fog height cale.
+    float fogHeightScale_;
     /// Zone priority.
     int priority_;
     /// Last zone used for ambient gradient start color.

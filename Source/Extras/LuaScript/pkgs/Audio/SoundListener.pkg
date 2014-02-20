@@ -1,5 +1,0 @@
-$#include "SoundListener.h"
-
-class SoundListener : public Component
-{
-};

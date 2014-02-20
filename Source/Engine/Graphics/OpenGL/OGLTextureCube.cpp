@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -105,13 +105,18 @@ void TextureCube::Release()
 {
     if (object_)
     {
-        if (!graphics_ || graphics_->IsDeviceLost())
+        if (!graphics_)
             return;
         
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+            for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+            {
+                if (graphics_->GetTexture(i) == this)
+                    graphics_->SetTexture(i, 0);
+            }
+            
+            glDeleteTextures(1, &object_);
         }
         
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
@@ -120,7 +125,6 @@ void TextureCube::Release()
                 renderSurfaces_[i]->Release();
         }
         
-        glDeleteTextures(1, &object_);
         object_ = 0;
     }
 }
@@ -213,12 +217,9 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
     
-    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
-    // Use Direct3D convention with the vertical coordinates ie. 0 is top
-    y = levelHeight - (y + height);
-    
     graphics_->SetTextureForUpdate(this);
     
+    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     
     if (!IsCompressed())
@@ -367,7 +368,12 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         
         // Create the texture when face 0 is being loaded, check that rest of the faces are same size & format
         if (!face)
+        {
+            // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+            if (IsCompressed() && requestedLevels_ > 1)
+                requestedLevels_ = 0;
             SetSize(levelWidth, format);
+        }
         else
         {
             if (!object_)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
+#include "UnknownComponent.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -122,7 +123,7 @@ bool Node::Save(Serializer& dest) const
         if (component->IsTemporary())
             continue;
         
-        // Create a separate buffer to be able to skip unknown components during deserialization
+        // Create a separate buffer to be able to skip failing components during deserialization
         VectorBuffer compBuffer;
         if (!component->Save(compBuffer))
             return false;
@@ -242,9 +243,9 @@ void Node::SetName(const String& name)
         {
             using namespace NodeNameChanged;
 
-            VariantMap eventData;
-            eventData[P_SCENE] = (void*)scene_;
-            eventData[P_NODE] = (void*)this;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_SCENE] = scene_;
+            eventData[P_NODE] = this;
 
             scene_->SendEvent(E_NODENAMECHANGED, eventData);
         }
@@ -399,11 +400,9 @@ void Node::Roll(float angle, bool fixedAxis)
 
 void Node::LookAt(const Vector3& target, const Vector3& upAxis)
 {
-    Vector3 targetZ = (target - GetWorldPosition()).Normalized();
-    Vector3 targetX = upAxis.CrossProduct(targetZ).Normalized();
-    Vector3 targetY = targetZ.CrossProduct(targetX).Normalized();
-    
-    Quaternion rotation(targetX, targetY, targetZ);
+    Vector3 lookDir = (target - GetWorldPosition()).Normalized();
+    Quaternion rotation;
+    rotation.FromLookRotation(lookDir, upAxis);
     SetRotation((parent_ == scene_ || !parent_) ? rotation : parent_->GetWorldRotation().Inverse() * rotation);
 }
 
@@ -458,9 +457,9 @@ void Node::SetEnabled(bool enable, bool recursive)
         {
             using namespace NodeEnabledChanged;
 
-            VariantMap eventData;
-            eventData[P_SCENE] = (void*)scene_;
-            eventData[P_NODE] = (void*)this;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_SCENE] = scene_;
+            eventData[P_NODE] = this;
 
             scene_->SendEvent(E_NODEENABLEDCHANGED, eventData);
         }
@@ -474,10 +473,10 @@ void Node::SetEnabled(bool enable, bool recursive)
             {
                 using namespace ComponentEnabledChanged;
 
-                VariantMap eventData;
-                eventData[P_SCENE] = (void*)scene_;
-                eventData[P_NODE] = (void*)this;
-                eventData[P_COMPONENT] = (void*)(*i);
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_SCENE] = scene_;
+                eventData[P_NODE] = this;
+                eventData[P_COMPONENT] = (*i);
 
                 scene_->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
             }
@@ -558,10 +557,10 @@ void Node::AddChild(Node* node)
     {
         using namespace NodeAdded;
 
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_NODE] = (void*)node;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_PARENT] = this;
+        eventData[P_NODE] = node;
 
         scene_->SendEvent(E_NODEADDED, eventData);
     }
@@ -1058,7 +1057,8 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash compType = compBuffer.ReadShortStringHash();
         unsigned compID = compBuffer.ReadUInt();
-        Component* newComponent = CreateComponent(compType,
+        
+        Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
@@ -1099,7 +1099,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = CreateComponent(typeName,
+        Component* newComponent = SafeCreateComponent(typeName, ShortStringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
@@ -1316,10 +1316,10 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     {
         using namespace ComponentAdded;
 
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_NODE] = (void*)this;
-        eventData[P_COMPONENT] = (void*)component;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_NODE] = this;
+        eventData[P_COMPONENT] = component;
 
         scene_->SendEvent(E_COMPONENTADDED, eventData);
     }
@@ -1351,6 +1351,26 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
+Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
+{
+    // First check if factory for type exists
+    if (!context_->GetTypeName(type).Empty())
+        return CreateComponent(type, mode, id);
+    else
+    {
+        LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
+        // Else create as UnknownComponent
+        SharedPtr<UnknownComponent> newComponent(new UnknownComponent(context_));
+        if (typeName.Empty() || typeName.StartsWith("Unknown", false))
+            newComponent->SetType(type);
+        else
+            newComponent->SetTypeName(typeName);
+        
+        AddComponent(newComponent, id, mode);
+        return newComponent;
+    }
+}
+
 void Node::UpdateWorldTransform() const
 {
     Matrix3x4 transform = GetTransform();
@@ -1377,10 +1397,10 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
     {
         using namespace NodeRemoved;
 
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_PARENT] = (void*)this;
-        eventData[P_NODE] = (void*)(*i).Get();
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_PARENT] = this;
+        eventData[P_NODE] = (*i).Get();
 
         scene_->SendEvent(E_NODEREMOVED, eventData);
     }
@@ -1432,16 +1452,21 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     resolver.AddNode(id_, cloneNode);
 
     // Copy attributes
-    unsigned numAttributes = GetNumAttributes();
-    for (unsigned j = 0; j < numAttributes; ++j)
-        cloneNode->SetAttribute(j, GetAttribute(j));
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    for (unsigned j = 0; j < attributes->Size(); ++j)
+    {
+        const AttributeInfo& attr = attributes->At(j);
+        // Do not copy network-only attributes, as they may have unintended side effects
+        if (attr.mode_ & AM_FILE)
+            cloneNode->SetAttribute(j, GetAttribute(j));
+    }
 
     // Clone components
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        Component* cloneComponent = cloneNode->CreateComponent(component->GetType(), (mode == REPLICATED && component->GetID() <
-            FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
+        Component* cloneComponent = cloneNode->SafeCreateComponent(component->GetTypeName(), component->GetType(), 
+            (mode == REPLICATED && component->GetID() < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, 0);
         if (!cloneComponent)
         {
             LOGERROR("Could not clone component " + component->GetTypeName());
@@ -1449,9 +1474,16 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         }
         resolver.AddComponent(component->GetID(), cloneComponent);
 
-        numAttributes = component->GetNumAttributes();
-        for (unsigned j = 0; j < numAttributes; ++j)
-            cloneComponent->SetAttribute(j, component->GetAttribute(j));
+        const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
+        if (compAttributes)
+        {
+            for (unsigned j = 0; j < compAttributes->Size(); ++j)
+            {
+                const AttributeInfo& attr = compAttributes->At(j);
+                if (attr.mode_ & AM_FILE)
+                    cloneComponent->SetAttribute(j, component->GetAttribute(j));
+            }
+        }
     }
 
     // Clone child nodes recursively
@@ -1473,10 +1505,10 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     {
         using namespace ComponentRemoved;
 
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_NODE] = (void*)this;
-        eventData[P_COMPONENT] = (void*)(*i).Get();
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_NODE] = this;
+        eventData[P_COMPONENT] = (*i).Get();
 
         scene_->SendEvent(E_COMPONENTREMOVED, eventData);
     }

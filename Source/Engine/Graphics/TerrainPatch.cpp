@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,6 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
     
     switch (level)
     {
-    case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         break;
@@ -87,31 +86,18 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
+        
+        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
+            distance = geometry_->GetHitDistance(localRay);
+        
         if (distance < query.maxDistance_)
         {
-            if (level == RAY_TRIANGLE)
-            {
-                distance = geometry_->GetHitDistance(localRay);
-                if (distance < query.maxDistance_)
-                {
-                    RayQueryResult result;
-                    result.drawable_ = this;
-                    result.node_ = node_;
-                    result.distance_ = distance;
-                    result.subObject_ = M_MAX_UNSIGNED;
-                    results.Push(result);
-                    break;
-                }
-            }
-            else
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = node_;
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
+            RayQueryResult result;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.distance_ = distance;
+            result.subObject_ = M_MAX_UNSIGNED;
+            results.Push(result);
         }
         break;
     }

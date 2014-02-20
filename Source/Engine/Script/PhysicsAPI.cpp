@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,9 @@ static PhysicsWorld* GetPhysicsWorld()
 static void ConstructPhysicsRaycastResult(PhysicsRaycastResult* ptr)
 {
     new(ptr) PhysicsRaycastResult();
+    ptr->position_ = Vector3::ZERO;
+    ptr->normal_ = Vector3::ZERO;
+    ptr->distance_ = 0.0f;
 }
 
 static void DestructPhysicsRaycastResult(PhysicsRaycastResult* ptr)
@@ -98,8 +101,8 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "uint get_lodLevel() const", asMETHOD(CollisionShape, GetLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "BoundingBox get_worldBoundingBox() const", asMETHOD(CollisionShape, GetWorldBoundingBox), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for CollisionShape
-    engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for CollisionShape. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape(const String&in binding = \"deprecated:GetCollisionShape\") const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
 }
 
 static CScriptArray* RigidBodyGetCollidingBodies(RigidBody* ptr)
@@ -153,6 +156,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float get_angularDamping() const", asMETHOD(RigidBody, GetAngularDamping), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_friction(float)", asMETHOD(RigidBody, SetFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_friction() const", asMETHOD(RigidBody, GetFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_anisotropicFriction(Vector3)", asMETHOD(RigidBody, SetAnisotropicFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "Vector3 get_anisotropicFriction() const", asMETHOD(RigidBody, GetAnisotropicFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_rollingFriction(float)", asMETHOD(RigidBody, SetRollingFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_rollingFriction() const", asMETHOD(RigidBody, GetRollingFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_restitution(float)", asMETHOD(RigidBody, SetRestitution), asCALL_THISCALL);
@@ -181,8 +186,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "CollisionEventMode get_collisionEventMode() const", asMETHOD(RigidBody, GetCollisionEventMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "Array<RigidBody@>@ get_collidingBodies() const", asFUNCTION(RigidBodyGetCollidingBodies), asCALL_CDECL_OBJLAST);
 
-    // Register Variant GetPtr() for RigidBody
-    engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody() const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for RigidBody. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody(const String&in binding = \"deprecated:GetRigidBody\") const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterConstraint(asIScriptEngine* engine)
@@ -286,6 +291,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetRigidBodiesBody), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHODPR(PhysicsWorld, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void RemoveCachedGeometry(Model@+)", asMETHOD(PhysicsWorld, RemoveCachedGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_numIterations(int)", asMETHOD(PhysicsWorld, SetNumIterations), asCALL_THISCALL);
@@ -301,8 +307,8 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
     
-    // Register Variant GetPtr() for PhysicsWorld
-    engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld() const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for PhysicsWorld. This is deprecated, GetPtr() should be used instead.
+    engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld(const String&in binding = \"deprecated:GetPhysicWorld\") const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
 }
 
 void RegisterPhysicsAPI(asIScriptEngine* engine)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,9 +47,10 @@ enum CreateMode
 class URHO3D_API Node : public Serializable
 {
     OBJECT(Node);
-
+    BASEOBJECT(Node);
+    
     friend class Connection;
-
+    
 public:
     /// Construct.
     Node(Context* context);
@@ -198,6 +199,11 @@ public:
     const Quaternion& GetRotation() const { return rotation_; }
     /// Return forward direction in parent space. Positive Z axis equals identity rotation.
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
+    /// Return up direction in parent space. Positive Y axis equals identity rotation.
+    Vector3 GetUp() const { return rotation_ * Vector3::UP; }
+    /// Return right direction in parent space. Positive X axis equals identity rotation.
+    Vector3 GetRight() const { return rotation_ * Vector3::RIGHT; }
+
     /// Return scale in parent space.
     const Vector3& GetScale() const { return scale_; }
     /// Return parent space transform matrix.
@@ -228,6 +234,24 @@ public:
             UpdateWorldTransform();
         
         return worldRotation_ * Vector3::FORWARD;
+    }
+
+    /// Return node's up vector in world space.
+    Vector3 GetWorldUp() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_ * Vector3::UP;
+    }
+
+    /// Return node's right vector in world space.
+    Vector3 GetWorldRight() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_ * Vector3::RIGHT;
     }
 
     /// Return scale in world space.
@@ -351,6 +375,8 @@ protected:
     VariantMap vars_;
 
 private:
+    /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
+    Component* SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id);
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.

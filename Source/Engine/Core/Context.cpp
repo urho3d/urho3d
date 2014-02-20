@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,11 @@ Context::~Context()
     
     subsystems_.Clear();
     factories_.Clear();
+    
+    // Delete allocated event data maps
+    for (PODVector<VariantMap*>::Iterator i = eventDataMaps_.Begin(); i != eventDataMaps_.End(); ++i)
+        delete *i;
+    eventDataMaps_.Clear();
 }
 
 SharedPtr<Object> Context::CreateObject(ShortStringHash objectType)
@@ -117,8 +122,8 @@ void Context::RemoveSubsystem(ShortStringHash objectType)
 
 void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr)
 {
-    // None or Pointer types can not be supported
-    if (attr.type_ == VAR_NONE || attr.type_ == VAR_PTR)
+    // None or pointer types can not be supported
+    if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
         return;
 
     attributes_[objectType].Push(attr);
@@ -139,6 +144,18 @@ void Context::UpdateAttributeDefaultValue(ShortStringHash objectType, const char
     if (info)
         info->defaultValue_ = defaultValue;
 }
+
+VariantMap& Context::GetEventDataMap()
+{
+    unsigned nestingLevel = eventSenders_.Size();
+    while (eventDataMaps_.Size() < nestingLevel + 1)
+        eventDataMaps_.Push(new VariantMap());
+    
+    VariantMap& ret = *eventDataMaps_[nestingLevel];
+    ret.Clear();
+    return ret;
+}
+
 
 void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType)
 {
@@ -172,10 +189,10 @@ Object* Context::GetEventSender() const
         return 0;
 }
 
-const String& Context::GetTypeName(ShortStringHash type) const
+const String& Context::GetTypeName(ShortStringHash objectType) const
 {
     // Search factories to find the hash-to-name mapping
-    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
+    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
     return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 
@@ -232,11 +249,6 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
     HashSet<Object*>* group = GetEventReceivers(sender, eventType);
     if (group)
         group->Erase(receiver);
-}
-
-void Context::EndSendEvent()
-{
-    eventSenders_.Pop();
 }
 
 }

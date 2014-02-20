@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "VertexBuffer.h"
@@ -533,13 +532,13 @@ void Terrain::UpdatePatchLod(TerrainPatch* patch)
 void Terrain::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void Terrain::SetHeightMapAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Image* image = cache->GetResource<Image>(value.id_);
+    Image* image = cache->GetResource<Image>(value.name_);
     SetHeightMapInternal(image, false);
 }
 
@@ -717,8 +716,8 @@ void Terrain::CreateGeometry()
     {
         using namespace TerrainCreated;
 
-        VariantMap eventData;
-        eventData[P_NODE] = (void*)node_;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
         node_->SendEvent(E_TERRAINCREATED, eventData);
     }
 }

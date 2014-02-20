@@ -6,7 +6,14 @@
 #    source groups and library command)
 #
 
-# Modified by Lasse Oorni for Urho3D
+# Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
+
+if (CMAKE_CROSSCOMPILING AND MINGW)
+    # The IFCReaderGen.cpp.obj has too many sections in DEBUG configuration build
+    # Since GCC does not support /bigobj compiler flags as in MSVC, we use optimization flags to reduce the object file size
+    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O1")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
+endif ()
 
 INCLUDE_DIRECTORIES( include )
 INCLUDE_DIRECTORIES( code/BoostWorkaround )
@@ -364,6 +371,8 @@ SET(COB_SRCS
 SOURCE_GROUP( COB FILES ${COB_SRCS})
 
 SET(BLENDER_SRCS
+	code/BlenderBMesh.cpp
+	code/BlenderBMesh.h
 	code/BlenderLoader.cpp
 	code/BlenderLoader.h
 	code/BlenderDNA.cpp
@@ -372,6 +381,8 @@ SET(BLENDER_SRCS
 	code/BlenderScene.cpp
 	code/BlenderScene.h
 	code/BlenderSceneGen.h
+	code/BlenderTessellator.cpp
+	code/BlenderTessellator.h
 	code/BlenderIntermediate.h
 	code/BlenderModifier.h
 	code/BlenderModifier.cpp
@@ -609,6 +620,12 @@ SET( zlib_SRCS
 	contrib/zlib/crc32.h
 	contrib/zlib/deflate.c
 	contrib/zlib/deflate.h
+#	contrib/zlib/gzclose.c
+#	contrib/zlib/gzguts.h
+#	contrib/zlib/gzlib.c
+#	contrib/zlib/gzread.c
+#	contrib/zlib/gzwrite.c
+	contrib/zlib/infback.c
 	contrib/zlib/inffast.c
 	contrib/zlib/inffast.h
 	contrib/zlib/inffixed.h
@@ -692,13 +709,6 @@ SET( CONTRIB_FILES
 	${Boost_SRCS}
 )
 
-ADD_LIBRARY( Assimp STATIC
-	${SOURCE_FILES}
-	${CONTRIB_FILES}
-	${PUBLIC_HEADERS}
-	${COMPILER_HEADERS}
-)
-
 if (MSVC)
     foreach(FILE ${SOURCE_FILES})
         if (${FILE} MATCHES "[A-Za-z0-9 _/]*[.]cpp")
@@ -710,3 +720,7 @@ if (MSVC)
         endif ()
     endforeach ()
 endif ()
+
+set (TARGET_NAME Assimp)
+list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+setup_library ()

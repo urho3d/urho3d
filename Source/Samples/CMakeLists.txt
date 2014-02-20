@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,18 @@
 # THE SOFTWARE.
 #
 
+# Set project name
+project (Urho3D-Samples)
+
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIRS})
+
 # Include common to all samples
 set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRENT_SOURCE_DIR}/Sample.inl")
 
 # Define dependency libs
-set (LIBS ../../Engine/Audio
-          ../../Engine/Container
-          ../../Engine/Core
-          ../../Engine/Engine
-          ../../Engine/Graphics
-          ../../Engine/Input
-          ../../Engine/IO
-          ../../Engine/Math
-          ../../Engine/Navigation
-          ../../Engine/Network
-          ../../Engine/Physics
-          ../../Engine/Resource
-          ../../Engine/Scene
-          ../../Engine/UI)
-
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add samples
 add_subdirectory (01_HelloWorld)
@@ -62,7 +54,10 @@ add_subdirectory (17_SceneReplication)
 add_subdirectory (18_CharacterDemo)
 add_subdirectory (19_VehicleDemo)
 add_subdirectory (20_HugeObjectCount)
-add_subdirectory (21_AngelScriptIntegration)
+if (ENABLE_ANGELSCRIPT)
+    add_subdirectory (21_AngelScriptIntegration)
+endif ()
 if (ENABLE_LUA)
     add_subdirectory (22_LuaIntegration)
 endif ()
+add_subdirectory (23_Water)

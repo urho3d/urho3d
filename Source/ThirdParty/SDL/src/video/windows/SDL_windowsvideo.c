@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -25,6 +28,7 @@
 #include "SDL_main.h"
 #include "SDL_video.h"
 #include "SDL_mouse.h"
+#include "SDL_system.h"
 #include "../SDL_sysvideo.h"
 #include "../SDL_pixels_c.h"
 
@@ -75,9 +79,7 @@ WIN_CreateDevice(int devindex)
         data = NULL;
     }
     if (!data) {
-        if (device) {
-            SDL_free(device);
-        }
+        SDL_free(device);
         SDL_OutOfMemory();
         return NULL;
     }
@@ -88,6 +90,11 @@ WIN_CreateDevice(int devindex)
         data->CloseTouchInputHandle = (BOOL (WINAPI *)( HTOUCHINPUT )) SDL_LoadFunction(data->userDLL, "CloseTouchInputHandle");
         data->GetTouchInputInfo = (BOOL (WINAPI *)( HTOUCHINPUT, UINT, PTOUCHINPUT, int )) SDL_LoadFunction(data->userDLL, "GetTouchInputInfo");
         data->RegisterTouchWindow = (BOOL (WINAPI *)( HWND, ULONG )) SDL_LoadFunction(data->userDLL, "RegisterTouchWindow");
+        
+        // Urho3D: call SetProcessDPIAware if available to prevent Windows 8.1 from performing unwanted scaling
+        data->SetProcessDPIAware = (BOOL (WINAPI *)()) SDL_LoadFunction(data->userDLL, "SetProcessDPIAware");
+        if (data->SetProcessDPIAware)
+            data->SetProcessDPIAware();
     }
 
     /* Set the function pointers */
@@ -174,6 +181,76 @@ WIN_VideoQuit(_THIS)
     WIN_QuitModes(_this);
     WIN_QuitKeyboard(_this);
     WIN_QuitMouse(_this);
+}
+
+
+#define D3D_DEBUG_INFO
+#include <d3d9.h>
+
+SDL_bool 
+D3D_LoadDLL( void **pD3DDLL, IDirect3D9 **pDirect3D9Interface )
+{
+	*pD3DDLL = SDL_LoadObject("D3D9.DLL");
+	if (*pD3DDLL) {
+		IDirect3D9 *(WINAPI * D3DCreate) (UINT SDKVersion);
+
+		D3DCreate =
+			(IDirect3D9 * (WINAPI *) (UINT)) SDL_LoadFunction(*pD3DDLL,
+			"Direct3DCreate9");
+		if (D3DCreate) {
+			*pDirect3D9Interface = D3DCreate(D3D_SDK_VERSION);
+		}
+		if (!*pDirect3D9Interface) {
+			SDL_UnloadObject(*pD3DDLL);
+			*pD3DDLL = NULL;
+			return SDL_FALSE;
+		}
+
+		return SDL_TRUE;
+	} else {
+		*pDirect3D9Interface = NULL;
+		return SDL_FALSE;
+	}
+}
+
+
+int
+SDL_Direct3D9GetAdapterIndex( int displayIndex )
+{
+	void *pD3DDLL;
+	IDirect3D9 *pD3D;
+	if (!D3D_LoadDLL(&pD3DDLL, &pD3D)) {
+		SDL_SetError("Unable to create Direct3D interface");
+		return D3DADAPTER_DEFAULT;
+	} else {
+		SDL_DisplayData *pData = (SDL_DisplayData *)SDL_GetDisplayDriverData(displayIndex);
+		int adapterIndex = D3DADAPTER_DEFAULT;
+
+		if (!pData) {
+			SDL_SetError("Invalid display index");
+			adapterIndex = -1; /* make sure we return something invalid */
+		} else {
+			char *displayName = WIN_StringToUTF8(pData->DeviceName);
+			unsigned int count = IDirect3D9_GetAdapterCount(pD3D);
+			unsigned int i;
+			for (i=0; i<count; i++) {
+				D3DADAPTER_IDENTIFIER9 id;
+				IDirect3D9_GetAdapterIdentifier(pD3D, i, 0, &id);
+
+				if (SDL_strcmp(id.DeviceName, displayName) == 0) {
+					adapterIndex = i;
+					break;
+				}
+			}
+			SDL_free(displayName);
+		}
+
+		/* free up the D3D stuff we inited */
+		IDirect3D9_Release(pD3D);
+		SDL_UnloadObject(pD3DDLL);
+
+		return adapterIndex;
+	}
 }
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */

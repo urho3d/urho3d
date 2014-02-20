@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni & OvermindDL1 for Urho3D
 
 #include "SDL_config.h"
 
@@ -250,8 +250,8 @@
 {
     if ([string length] == 0) {
         /* it wants to replace text with nothing, ie a delete */
-        SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_DELETE);
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_DELETE);
+        SDL_SendKeyboardKey(SDL_PRESSED, 0, SDL_SCANCODE_BACKSPACE);
+        SDL_SendKeyboardKey(SDL_RELEASED, 0, SDL_SCANCODE_BACKSPACE);
     }
     else {
         /* go through all the characters in the string we've been sent
@@ -277,14 +277,14 @@
 
             if (mod & KMOD_SHIFT) {
                 /* If character uses shift, press shift down */
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LSHIFT);
+                SDL_SendKeyboardKey(SDL_PRESSED, 0, SDL_SCANCODE_LSHIFT);
             }
             /* send a keydown and keyup even for the character */
-            SDL_SendKeyboardKey(SDL_PRESSED, code);
-            SDL_SendKeyboardKey(SDL_RELEASED, code);
+            SDL_SendKeyboardKey(SDL_PRESSED, 0, code);
+            SDL_SendKeyboardKey(SDL_RELEASED, 0, code);
             if (mod & KMOD_SHIFT) {
                 /* If character uses shift, press shift back up */
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LSHIFT);
+                SDL_SendKeyboardKey(SDL_RELEASED, 0, SDL_SCANCODE_LSHIFT);
             }
         }
         SDL_SendKeyboardText([string UTF8String]);
@@ -295,8 +295,8 @@
 /* Terminates the editing session */
 - (BOOL)textFieldShouldReturn:(UITextField*)_textField
 {
-    SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RETURN);
-    SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RETURN);
+    SDL_SendKeyboardKey(SDL_PRESSED, 0, SDL_SCANCODE_RETURN);
+    SDL_SendKeyboardKey(SDL_RELEASED, 0, SDL_SCANCODE_RETURN);
     SDL_StopTextInput();
     return YES;
 }

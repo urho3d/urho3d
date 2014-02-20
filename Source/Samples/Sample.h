@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 
 #include "Application.h"
 
+
 namespace Urho3D
 {
 
@@ -38,8 +39,10 @@ using namespace Urho3D;
 ///    - Initialization of the Urho3D engine (in Application class)
 ///    - Modify engine parameters for windowed mode and to show the class name as title
 ///    - Create Urho3D logo at screen;
+///    - Set custom window title and icon;
 ///    - Create Console and Debug HUD, and use F1 and F2 key to toggle them;
 ///    - Toggle rendering options from the keys 1-8;
+///    - Take screenshot with key 9
 ///    - Handle Esc key down to hide Console or exit application;
 class Sample : public Application
 {
@@ -65,6 +68,8 @@ protected:
 private:
     /// Create logo.
     void CreateLogo();
+    /// Set custom window Title & Icon
+    void SetWindowTitleAndIcon();
     /// Create console and debug HUD.
     void CreateConsoleAndDebugHud();
     /// Handle key down event to process key controls common to all samples.

@@ -1,0 +1,113 @@
+$#include "LuaScriptInstance.h"
+
+class LuaScriptInstance : public Component
+{
+    bool CreateObject(const String scriptObjectType);
+    bool CreateObject(const String scriptFileName, const String scriptObjectType);
+    void SetScriptFileName(const String scriptFileName);
+    void SetScriptObjectType(const String scriptObjectType);
+    void ScriptSubscribeToEvent @ SubscribeToEvent(const String eventName, const String functionName);
+    void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(const String eventName);
+    void ScriptUnsubscribeFromAllEvents @ UnsubscribeFromAllEvents();    
+    void ScriptSubscribeToEvent @ SubscribeToEvent(void* sender, const String eventName, const String functionName);
+    void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(void* sender, const String eventName);
+    void ScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* sender);
+    const String GetScriptFileName() const;
+    const String GetScriptObjectType() const;
+    
+    tolua_property__get_set const String scriptFileName;
+    tolua_property__get_set const String scriptObjectType;
+};
+
+$[
+LuaScriptObject = {}
+
+function LuaScriptObject:Start()
+end
+
+function LuaScriptObject:Stop()
+end
+
+function LuaScriptObject:GetNode()
+    return self.node
+end
+
+function LuaScriptObject:SubscribeToEvent(param1, param2, param3)
+    local instance = self.instance    
+    if instance == nil then
+        return
+    end
+
+    if param3 == nil then
+        instance:SubscribeToEvent(param1, param2)
+    else
+        instance:SubscribeToEvent(param1, param2, param3)
+    end
+end
+
+function LuaScriptObject:UnsubscribeFromEvent(param1, param2)
+    local instance = self.instance
+    if instance == nil then
+        return
+    end
+
+    if param2 == nil then
+        instance:UnsubscribeFromEvent(param1)
+    else
+        instance:UnsubscribeFromEvent(param1, param2)
+    end
+end
+
+function LuaScriptObject:UnsubscribeFromAllEvents()
+    local instance = self.instance
+    if instance == nil then
+        return
+    end 
+    instance:UnsubscribeFromAllEvents()
+end
+
+function LuaScriptObject:UnsubscribeFromEvents(sender)
+    local instance = self.instance
+    if instance == nil then
+        return
+    end
+
+    instance:UnsubscribeFromEvents(sender)
+end
+
+function ScriptObject()
+    local o = {}
+    setmetatable(o, LuaScriptObject)
+    LuaScriptObject.__index = LuaScriptObject
+    return o
+end
+
+function CreateScriptObjectInstance(object, instance)
+    local o = {}
+    setmetatable(o, object)
+    object.__index = object
+    
+    instance.object = o
+    o.instance = instance
+    o.node = instance:GetNode()
+    
+    -- Call start function
+    o:Start()
+    
+    return o
+end
+
+function DestroyScriptObjectInstance(instance)
+    local object = instance.object
+    if object == nil then
+        return
+    end
+    
+    -- Call stop function
+    object:Stop()
+    
+    object.node = nil
+    object.instance = nil
+    instance.object = nil
+end
+$]

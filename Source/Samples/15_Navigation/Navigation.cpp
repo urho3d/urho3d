@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "AnimatedModel.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Cursor.h"
@@ -108,7 +109,7 @@ void Navigation::CreateScene()
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
+    light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
@@ -132,7 +133,15 @@ void Navigation::CreateScene()
         if (size >= 3.0f)
             boxObject->SetOccluder(true);
     }
-    
+
+    // Create Jack node that will follow the path
+    jackNode_ = scene_->CreateChild("Jack");
+    jackNode_->SetPosition(Vector3(-5.0f, 0.0f, 20.0f));
+    AnimatedModel* modelObject = jackNode_->CreateComponent<AnimatedModel>();
+    modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
+    modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
+    modelObject->SetCastShadows(true);
+
     // Create a NavigationMesh component to the scene root
     NavigationMesh* navMesh = scene_->CreateComponent<NavigationMesh>();
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -175,7 +184,7 @@ void Navigation::CreateUI()
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
-        "Shift+LMB to set path start, LMB to set path end\n"
+        "LMB to set destination, SHIFT+LMB to teleport\n"
         "MMB to add or remove obstacles\n"
         "Space to toggle debug geometry"
     );
@@ -247,7 +256,7 @@ void Navigation::MoveCamera(float timeStep)
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
     
-    // Set route start/endpoint with left mouse button, recalculate route if applicable
+    // Set destination or teleport with left mouse button
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
         SetPathPoint();
     // Add or remove objects with middle mouse button, then rebuild navigation mesh partially
@@ -263,23 +272,25 @@ void Navigation::SetPathPoint()
 {
     Vector3 hitPos;
     Drawable* hitDrawable;
+    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
     
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
-        bool setStart = GetSubsystem<Input>()->GetQualifierDown(QUAL_SHIFT);
-        if (setStart)
+        Vector3 pathPos = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+
+        if (GetSubsystem<Input>()->GetQualifierDown(QUAL_SHIFT))
         {
-            startPos_ = hitPos;
-            startPosDefined_ = true;
+            // Teleport
+            currentPath_.Clear();
+            jackNode_->LookAt(Vector3(pathPos.x_, jackNode_->GetPosition().y_, pathPos.z_), Vector3::UP);
+            jackNode_->SetPosition(pathPos);
         }
         else
         {
-            endPos_ = hitPos;
-            endPosDefined_ = true;
+            // Calculate path from Jack's current position to the end point
+            endPos_ = pathPos;
+            navMesh->FindPath(currentPath_, jackNode_->GetPosition(), endPos_);
         }
-        
-        if (startPosDefined_ && endPosDefined_)
-            RecalculatePath();
     }
 }
 
@@ -308,8 +319,10 @@ void Navigation::AddOrRemoveObject()
         }
         
         // Rebuild part of the navigation mesh, then recalculate path if applicable
-        scene_->GetComponent<NavigationMesh>()->Build(updateBox);
-        RecalculatePath();
+        NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
+        navMesh->Build(updateBox);
+        if (currentPath_.Size())
+            navMesh->FindPath(currentPath_, jackNode_->GetPosition(), endPos_);
     }
 }
 
@@ -327,12 +340,6 @@ Node* Navigation::CreateMushroom(const Vector3& pos)
     mushroomObject->SetCastShadows(true);
     
     return mushroomNode;
-}
-
-void Navigation::RecalculatePath()
-{
-    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
-    navMesh->FindPath(currentPath_, startPos_, endPos_);
 }
 
 bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
@@ -355,14 +362,33 @@ bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawa
     if (results.Size())
     {
         RayQueryResult& result = results[0];
-        
-        // Calculate hit position in world space
-        hitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
+        hitPos = result.position_;
         hitDrawable = result.drawable_;
         return true;
     }
     
     return false;
+}
+
+void Navigation::FollowPath(float timeStep)
+{
+    if (currentPath_.Size())
+    {
+        Vector3 nextWaypoint = currentPath_[0]; // NB: currentPath[0] is the next waypoint in order
+
+        // Rotate Jack toward next waypoint to reach and move. Check for not overshooting the target
+        float move = 5.0f * timeStep;
+        float distance = (jackNode_->GetPosition() - nextWaypoint).Length();
+        if (move > distance)
+            move = distance;
+        
+        jackNode_->LookAt(nextWaypoint, Vector3::UP);
+        jackNode_->TranslateRelative(Vector3::FORWARD * move);
+
+        // Remove waypoint if reached it
+        if ((jackNode_->GetPosition() - nextWaypoint).Length() < 0.1f)
+            currentPath_.Erase(0);
+    }
 }
 
 void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -374,6 +400,9 @@ void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Make Jack follow the Detour path
+    FollowPath(timeStep);
 }
 
 void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -382,17 +411,21 @@ void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventD
     if (drawDebug_)
         scene_->GetComponent<NavigationMesh>()->DrawDebugGeometry(true);
     
-    // Visualize the start and end points and the last calculated path
-    DebugRenderer* debug = scene_->GetComponent<DebugRenderer>();
-    if (startPosDefined_)
-        debug->AddBoundingBox(BoundingBox(startPos_ - 0.1f * Vector3::ONE, startPos_ + 0.1f * Vector3::ONE), Color::WHITE);
-    if (endPosDefined_)
-        debug->AddBoundingBox(BoundingBox(endPos_ - 0.1f * Vector3::ONE, endPos_ + 0.1f * Vector3::ONE), Color::WHITE);
-    if (currentPath_.Size() > 1)
+    if (currentPath_.Size())
     {
+        // Visualize the current calculated path
+        DebugRenderer* debug = scene_->GetComponent<DebugRenderer>();
+        debug->AddBoundingBox(BoundingBox(endPos_ - Vector3(0.1f, 0.1f, 0.1f), endPos_ + Vector3(0.1f, 0.1f, 0.1f)),
+            Color(1.0f, 1.0f, 1.0f));
+
         // Draw the path with a small upward bias so that it does not clip into the surfaces
-        Vector3 bias = 0.05f * Vector3::UP;
-        for (unsigned i = 0; i < currentPath_.Size() - 1; ++i)
-            debug->AddLine(currentPath_[i] + bias, currentPath_[i + 1] + bias, Color::WHITE);
+        Vector3 bias(0.0f, 0.05f, 0.0f);
+        debug->AddLine(jackNode_->GetPosition() + bias, currentPath_[0] + bias, Color(1.0f, 1.0f, 1.0f));
+
+        if (currentPath_.Size() > 1)
+        {
+            for (unsigned i = 0; i < currentPath_.Size() - 1; ++i)
+                debug->AddLine(currentPath_[i] + bias, currentPath_[i + 1] + bias, Color(1.0f, 1.0f, 1.0f));
+        }
     }
 }

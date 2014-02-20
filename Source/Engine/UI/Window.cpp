@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,8 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
             UIElement* rootElement = GetRoot();
             const IntVector2& rootSize = rootElement->GetSize();
             UIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
-            batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, modalShadeColor_);
+            batch.SetColor(modalShadeColor_);
+            batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0);
             UIBatch::AddOrMerge(batch, batches);
         }
 
@@ -101,7 +102,8 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
             int x = GetIndentWidth();
             IntVector2 size = GetSize();
             size.x_ -= x;
-            batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_, size.y_ + 2 * modalFrameSize_.y_, 0, 0, 0, 0, modalFrameColor_);
+            batch.SetColor(modalFrameColor_);
+            batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_, size.y_ + 2 * modalFrameSize_.y_, 0, 0);
             UIBatch::AddOrMerge(batch, batches);
         }
     }
@@ -248,19 +250,14 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    // UI may be null at shutdown if for example a script was holding a reference to this window
-    UI* ui = GetSubsystem<UI>();
-    if (!ui)
-        return;
-
-    if (ui->SetModalElement(this, modal))
+    if (GetSubsystem<UI>()->SetModalElement(this, modal))
     {
         modal_ = modal;
 
         using namespace ModalChanged;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         eventData[P_MODAL] = modal;
         SendEvent(E_MODALCHANGED, eventData);
     }

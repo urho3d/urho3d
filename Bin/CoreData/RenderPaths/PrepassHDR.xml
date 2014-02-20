@@ -1,0 +1,3 @@
+<renderpath inherit="RenderPaths/Prepass.xml">
+    <replace sel="/renderpath/rendertarget[@name='light']/@format">rgba16f</replace>
+</renderpath>

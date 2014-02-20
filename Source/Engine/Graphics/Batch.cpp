@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -214,11 +214,18 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash)))
     {
-        // Calculate camera rotation just once
-        Matrix3 cameraWorldRotation = cameraNode->GetWorldRotation().RotationMatrix();
+        Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
         
-        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
-        graphics->SetShaderParameter(VSP_CAMERAROT, cameraWorldRotation);
+        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
+        graphics->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
+        
+        float nearClip = camera_->GetNearClip();
+        float farClip = camera_->GetFarClip();
+        graphics->SetShaderParameter(VSP_NEARCLIP, nearClip);
+        graphics->SetShaderParameter(VSP_FARCLIP, farClip);
+        graphics->SetShaderParameter(PSP_NEARCLIP, nearClip);
+        graphics->SetShaderParameter(PSP_FARCLIP, farClip);
+
         Vector4 depthMode = Vector4::ZERO;
         if (camera_->IsOrthographic())
         {
@@ -247,7 +254,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
         // so use a higher constant bias
         #ifdef GL_ES_VERSION_2_0
-        constantBias *= 1.5f;
+        constantBias *= 2.0f;
         #endif
         projection.m22_ += projection.m32_ * constantBias;
         projection.m23_ += projection.m33_ * constantBias;
@@ -257,9 +264,6 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             graphics->SetShaderParameter(VSP_VIEWPROJ, projection);
         else
             graphics->SetShaderParameter(VSP_VIEWPROJ, projection * camera_->GetView());
-        
-        graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, cameraWorldRotation * Vector3::RIGHT);
-        graphics->SetShaderParameter(VSP_VIEWUPVECTOR, cameraWorldRotation * Vector3::UP);
     }
     
     // Set viewport shader parameters
@@ -298,12 +302,24 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         }
         else
             graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
+        
+        // Set the orientation for billboards, either from the object itself or from the camera
+        if (geometryType_ == GEOM_BILLBOARD)
+        {
+            if (numWorldTransforms_ > 1)
+                graphics->SetShaderParameter(VSP_BILLBOARDROT, worldTransform_[1].RotationMatrix());
+            else
+                graphics->SetShaderParameter(VSP_BILLBOARDROT, cameraNode->GetWorldRotation().RotationMatrix());
+        }
     }
     
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
-    Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
-    unsigned zoneHash = (unsigned)(size_t)zone_ + (unsigned)(size_t)fogColorZone;
+    // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
+    bool overrideFogColorToBlack = blend == BLEND_ADD || blend == BLEND_ADDALPHA;
+    unsigned zoneHash = (unsigned)(size_t)zone_;
+    if (overrideFogColorToBlack)
+        zoneHash += 0x80000000;
     if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<void*>(zoneHash)))
     {
         graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
@@ -318,9 +334,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         graphics->SetShaderParameter(VSP_ZONE, zoneTransform);
         
         graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
-        
-        // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
-        graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor());
+        graphics->SetShaderParameter(PSP_FOGCOLOR, overrideFogColorToBlack ? Color::BLACK : zone_->GetFogColor());
         
         float farClip = camera_->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
@@ -329,6 +343,15 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
         float fogRange = Max(fogEnd - fogStart, M_EPSILON);
         Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
+        
+        Node* zoneNode = zone_->GetNode();
+        if (zone_->GetHeightFog() && zoneNode)
+        {
+            Vector3 worldFogHeightVec = zoneNode->GetWorldTransform() * Vector3(0.0f, zone_->GetFogHeight(), 0.0f);
+            fogParams.z_ = worldFogHeightVec.y_;
+            fogParams.w_ = zone_->GetFogHeightScale() / Max(zoneNode->GetWorldScale().y_, M_EPSILON);
+        }
+        
         graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
     }
     
@@ -394,6 +417,12 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     
     if (light && graphics->NeedParameterUpdate(SP_LIGHT, light))
     {
+        // Deferred light volume batches operate in a camera-centered space. Detect from material, zone & pass all being null
+        bool isLightVolume = !material_ && !pass_ && !zone_;
+        
+        Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
+        Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
+
         Node* lightNode = light->GetNode();
         Matrix3 lightWorldRotation = lightNode->GetWorldRotation().RotationMatrix();
         
@@ -455,7 +484,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         
         graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor(), light->GetSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraNode->GetWorldPosition(), atten));
+        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4((isLightVolume ? (lightNode->GetWorldPosition() -
+            cameraEffectivePos) : lightNode->GetWorldPosition()), atten));
         
         if (graphics->HasShaderParameter(PS, PSP_LIGHTMATRICES))
         {
@@ -466,8 +496,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraNode->GetWorldPosition());
-                    
+                    {
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, isLightVolume ? cameraEffectivePos :
+                            Vector3::ZERO);
+                    }
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
                 break;
@@ -476,10 +508,13 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                 {
                     Matrix4 shadowMatrices[2];
                     
-                    CalculateSpotMatrix(shadowMatrices[0], light, cameraNode->GetWorldPosition());
+                    CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraNode->GetWorldPosition());
+                    {
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, isLightVolume ? cameraEffectivePos :
+                            Vector3::ZERO);
+                    }
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }
@@ -587,7 +622,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         {
             TextureUnit unit = (TextureUnit)i;
-            if (graphics->HasTextureUnit(unit))
+            if (textures[i] && graphics->HasTextureUnit(unit))
                 graphics->SetTexture(i, textures[i]);
         }
     }

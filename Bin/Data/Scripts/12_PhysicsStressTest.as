@@ -57,7 +57,7 @@ void CreateScene()
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
     light.castShadows = true;
-    light.shadowBias = BiasParameters(0.0001f, 0.5f);
+    light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
 

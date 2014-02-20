@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,8 @@ Menu::Menu(Context* context) :
     acceleratorQualifiers_(0),
     autoPopup_(true)
 {
+    focusMode_ = FM_NOTFOCUSABLE;
+
     SubscribeToEvent(this, E_PRESSED, HANDLER(Menu, HandlePressedReleased));
     SubscribeToEvent(this, E_RELEASED, HANDLER(Menu, HandlePressedReleased));
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(Menu, HandleFocusChanged));
@@ -64,6 +66,7 @@ void Menu::RegisterObject(Context* context)
     context->RegisterFactory<Menu>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Menu, Button);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Menu, "Focus Mode", FM_NOTFOCUSABLE);
     REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
@@ -292,15 +295,19 @@ void Menu::ShowPopup(bool enable)
     {
         OnShowPopup();
 
-        popup_->SetVar(VAR_ORIGIN, (void*)this);
+        popup_->SetVar(VAR_ORIGIN, this);
         static_cast<Window*>(popup_.Get())->SetModal(true);
 
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
-        popup_->BringToFront();
+        // BringToFront() is unreliable in this case as it takes into account only input-enabled elements.
+        // Rather just force priority to max
+        popup_->SetPriority(M_MAX_INT);
     }
     else
     {
+        OnHidePopup();
+
         // If the popup has child menus, hide their popups as well
         PODVector<UIElement*> children;
         popup_->GetChildren(children, true);
@@ -368,8 +375,8 @@ void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)
     {
         using namespace MenuSelected;
 
-        VariantMap newEventData;
-        newEventData[P_ELEMENT] = (void*)this;
+        VariantMap& newEventData = GetEventDataMap();
+        newEventData[P_ELEMENT] = this;
         SendEvent(E_MENUSELECTED, newEventData);
     }
 }
@@ -422,8 +429,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)
     {
         // Ignore if UI has modal element
-        UI* ui = GetSubsystem<UI>();
-        if (ui->HasModalElement())
+        if (GetSubsystem<UI>()->HasModalElement())
             return;
 
         HandlePressedReleased(eventType, eventData);

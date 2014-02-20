@@ -1,3 +1,4 @@
+#ifdef COMPILEPS
 sampler2D sDiffMap : register(S0);
 samplerCUBE sDiffCubeMap : register(S0);
 sampler2D sAlbedoBuffer : register(S0);
@@ -15,6 +16,7 @@ samplerCUBE sFaceSelectCubeMap : register(S8);
 samplerCUBE sIndirectionCubeMap : register(S9);
 sampler2D sDepthBuffer : register(S10);
 sampler2D sLightBuffer : register(S11);
+sampler3D sVolumeMap : register(S12);
 
 float4 Sample(sampler2D map, float2 texCoord)
 {
@@ -37,3 +39,4 @@ float3 DecodeNormal(float4 normalInput)
         return normalize(normalInput.rgb * 2.0 - 1.0);
     #endif
 }
+#endif

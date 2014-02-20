@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ static const int MAX_LIGHT_SPLITS = 6;
 #if !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
 static const int MAX_CASCADE_SPLITS = 4;
 #else
-static const int MAX_CASCADE_SPLITS = 2;
+static const int MAX_CASCADE_SPLITS = 1;
 #endif
 
 /// Shadow depth bias parameters.

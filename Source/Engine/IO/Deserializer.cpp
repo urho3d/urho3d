@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -251,7 +251,7 @@ ResourceRef Deserializer::ReadResourceRef()
 {
     ResourceRef ret;
     ret.type_ = ReadShortStringHash();
-    ret.id_ = ReadStringHash();
+    ret.name_ = ReadString();
     return ret;
 }
 
@@ -259,9 +259,9 @@ ResourceRefList Deserializer::ReadResourceRefList()
 {
     ResourceRefList ret;
     ret.type_ = ReadShortStringHash();
-    ret.ids_.Resize(ReadVLE());
-    if (ret.ids_.Size())
-        Read(&ret.ids_[0], ret.ids_.Size() * sizeof(StringHash));
+    ret.names_.Resize(ReadVLE());
+    for (unsigned i = 0; i < ret.names_.Size(); ++i)
+        ret.names_[i] = ReadString();
     return ret;
 }
 
@@ -305,6 +305,8 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_BUFFER:
         return Variant(ReadBuffer());
         
+        // Deserializing pointers is not supported. Return null
+    case VAR_VOIDPTR:
     case VAR_PTR:
         ReadUInt();
         return Variant((void*)0);

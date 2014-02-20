@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,8 @@
 namespace pugi
 {
     class xml_document;
+    class xml_node;
+    class xpath_node;
 }
 
 namespace Urho3D
@@ -58,8 +60,27 @@ public:
     XMLElement GetRoot(const String& name = String::EMPTY);
     /// Return the pugixml document.
     pugi::xml_document* GetDocument() const { return document_; }
+
+    /// Patch the XMLFile with another XMLFile. Based on RFC 5261.
+    void Patch(XMLFile* patchFile);
+    /// Patch the XMLFile with another XMLElement. Based on RFC 5261.
+    void Patch(XMLElement patchElement);
     
 private:
+    /// Add an node in the Patch.
+    void PatchAdd(const pugi::xml_node& patch, pugi::xpath_node& original);
+    /// Replace a node or attribute in the Patch.
+    void PatchReplace(const pugi::xml_node& patch, pugi::xpath_node& original);
+    /// Remove a node or attribute in the Patch.
+    void PatchRemove(const pugi::xpath_node& original);
+
+    /// Add a node in the Patch.
+    void AddNode(const pugi::xml_node& patch, pugi::xpath_node& original);
+    /// Add an attribute in the Patch.
+    void AddAttribute(const pugi::xml_node& patch, pugi::xpath_node& original);
+    /// Combine two text nodes.
+    bool CombineText(const pugi::xml_node& patch, pugi::xml_node original, bool prepend);
+
     /// Pugixml document.
     pugi::xml_document* document_;
 };

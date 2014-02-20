@@ -5,12 +5,15 @@
 
 /* @(#) $Id$ */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "zutil.h"
 
 #ifndef STDC
 extern void exit OF((int));
 #endif
 
+// Urho3D: quick fix for debug build
 #ifdef DEBUG
 
 #  ifndef verbose

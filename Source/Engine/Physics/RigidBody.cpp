@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -106,6 +106,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Anisotropic Friction", GetAnisotropicFriction, SetAnisotropicFriction, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Rolling Friction", GetRollingFriction, SetRollingFriction, float, DEFAULT_ROLLING_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
@@ -237,7 +238,6 @@ void RigidBody::SetPosition(Vector3 position)
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
-        body_->updateInertiaTensor();
 
         Activate();
         MarkNetworkUpdate();
@@ -248,7 +248,6 @@ void RigidBody::SetRotation(Quaternion rotation)
 {
     if (body_)
     {
-        // Due to center of mass offset, we may need to adjust position also
         Vector3 oldPosition = GetPosition();
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
@@ -367,6 +366,15 @@ void RigidBody::SetFriction(float friction)
     if (body_)
     {
         body_->setFriction(friction);
+        MarkNetworkUpdate();
+    }
+}
+
+void RigidBody::SetAnisotropicFriction(Vector3 friction)
+{
+    if (body_)
+    {
+        body_->setAnisotropicFriction(ToBtVector3(friction));
         MarkNetworkUpdate();
     }
 }
@@ -633,6 +641,11 @@ float RigidBody::GetFriction() const
     return body_ ? body_->getFriction() : 0.0f;
 }
 
+Vector3 RigidBody::GetAnisotropicFriction() const
+{
+    return body_ ? ToVector3(body_->getAnisotropicFriction()) : Vector3::ZERO;
+}
+
 float RigidBody::GetRollingFriction() const
 {
     return body_ ? body_->getRollingFriction() : 0.0f;
@@ -700,74 +713,74 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
 
 void RigidBody::UpdateMass()
 {
-    if (body_)
+    if (!body_)
+        return;
+    
+    btTransform principal;
+    principal.setRotation(btQuaternion::getIdentity());
+    principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
+    
+    // Calculate center of mass shift from all the collision shapes
+    unsigned numShapes = compoundShape_->getNumChildShapes();
+    if (numShapes)
     {
-        btTransform principal;
-        principal.setRotation(btQuaternion::getIdentity());
-        principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
-        
-        // Calculate center of mass shift from all the collision shapes
-        unsigned numShapes = compoundShape_->getNumChildShapes();
-        if (numShapes)
-        {
-            PODVector<float> masses(numShapes);
-            for (unsigned i = 0; i < numShapes; ++i)
-            {
-                // The actual mass does not matter, divide evenly between child shapes
-                masses[i] = 1.0f;
-            }
-            
-            btVector3 inertia(0.0f, 0.0f, 0.0f);
-            compoundShape_->calculatePrincipalAxisTransform(&masses[0], principal, inertia);
-        }
-        
-        // Add child shapes to shifted compound shape with adjusted offset
-        while (shiftedCompoundShape_->getNumChildShapes())
-            shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
+        PODVector<float> masses(numShapes);
         for (unsigned i = 0; i < numShapes; ++i)
         {
-            btTransform adjusted = compoundShape_->getChildTransform(i);
-            adjusted.setOrigin(adjusted.getOrigin() - principal.getOrigin());
-            shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
+            // The actual mass does not matter, divide evenly between child shapes
+            masses[i] = 1.0f;
         }
         
-        // If shifted compound shape has only one child with no offset/rotation, use the child shape
-        // directly as the rigid body collision shape for better collision detection performance
-        bool useCompound = !numShapes || numShapes > 1;
-        if (!useCompound)
-        {
-            const btTransform& childTransform = shiftedCompoundShape_->getChildTransform(0);
-            if (!ToVector3(childTransform.getOrigin()).Equals(Vector3::ZERO) ||
-                !ToQuaternion(childTransform.getRotation()).Equals(Quaternion::IDENTITY))
-                useCompound = true;
-        }
-        body_->setCollisionShape(useCompound ? shiftedCompoundShape_ : shiftedCompoundShape_->getChildShape(0));
-        
-        // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
-        if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE &&
-            physicsWorld_->GetInternalEdge())
-            body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-        else
-            body_->setCollisionFlags(body_->getCollisionFlags() & ~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+        btVector3 inertia(0.0f, 0.0f, 0.0f);
+        compoundShape_->calculatePrincipalAxisTransform(&masses[0], principal, inertia);
+    }
+    
+    // Add child shapes to shifted compound shape with adjusted offset
+    while (shiftedCompoundShape_->getNumChildShapes())
+        shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
+    for (unsigned i = 0; i < numShapes; ++i)
+    {
+        btTransform adjusted = compoundShape_->getChildTransform(i);
+        adjusted.setOrigin(adjusted.getOrigin() - principal.getOrigin());
+        shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
+    }
+    
+    // If shifted compound shape has only one child with no offset/rotation, use the child shape
+    // directly as the rigid body collision shape for better collision detection performance
+    bool useCompound = !numShapes || numShapes > 1;
+    if (!useCompound)
+    {
+        const btTransform& childTransform = shiftedCompoundShape_->getChildTransform(0);
+        if (!ToVector3(childTransform.getOrigin()).Equals(Vector3::ZERO) ||
+            !ToQuaternion(childTransform.getRotation()).Equals(Quaternion::IDENTITY))
+            useCompound = true;
+    }
+    body_->setCollisionShape(useCompound ? shiftedCompoundShape_ : shiftedCompoundShape_->getChildShape(0));
+    
+    // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
+    if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE &&
+        physicsWorld_->GetInternalEdge())
+        body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+    else
+        body_->setCollisionFlags(body_->getCollisionFlags() & ~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
-        // Reapply rigid body position with new center of mass shift
-        Vector3 oldPosition = GetPosition();
-        centerOfMass_ = ToVector3(principal.getOrigin());
-        SetPosition(oldPosition);
-        
-        // Calculate final inertia
-        btVector3 localInertia(0.0f, 0.0f, 0.0f);
-        if (mass_ > 0.0f)
-            shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
-        body_->setMassProps(mass_, localInertia);
-        body_->updateInertiaTensor();
-        
-        // Reapply constraint positions for new center of mass shift
-        if (node_)
-        {
-            for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
-                (*i)->ApplyFrames();
-        }
+    // Reapply rigid body position with new center of mass shift
+    Vector3 oldPosition = GetPosition();
+    centerOfMass_ = ToVector3(principal.getOrigin());
+    SetPosition(oldPosition);
+    
+    // Calculate final inertia
+    btVector3 localInertia(0.0f, 0.0f, 0.0f);
+    if (mass_ > 0.0f)
+        shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
+    body_->setMassProps(mass_, localInertia);
+    body_->updateInertiaTensor();
+    
+    // Reapply constraint positions for new center of mass shift
+    if (node_)
+    {
+        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+            (*i)->ApplyFrames();
     }
 }
 
@@ -846,7 +859,8 @@ void RigidBody::OnMarkedDirty(Node* node)
     // If node transform changes, apply it back to the physics transform. However, do not do this when a SmoothedTransform
     // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
     // states; rather follow the SmoothedTransform target transform directly
-    if ((!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !hasSmoothedTransform_)
+    // Also, for kinematic objects Bullet asks the position from us, so we do not need to apply ourselves
+    if (!kinematic_ && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !hasSmoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = GetScene();
@@ -955,7 +969,8 @@ void RigidBody::AddBodyToWorld()
     else
         flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
     body_->setCollisionFlags(flags);
-
+    body_->forceActivationState(kinematic_ ? DISABLE_DEACTIVATION : ISLAND_SLEEPING);
+    
     if (!IsEnabledEffective())
         return;
 

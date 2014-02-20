@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "HashSet.h"
 #include "Sphere.h"
 #include "Vector3.h"
+#include "VectorBuffer.h"
 
 #include <LinearMath/btIDebugDraw.h>
 
@@ -44,6 +45,7 @@ namespace Urho3D
 class CollisionShape;
 class Deserializer;
 class Constraint;
+class Model;
 class Node;
 class Ray;
 class RigidBody;
@@ -54,16 +56,20 @@ class XMLElement;
 struct CollisionGeometryData;
 
 /// Physics raycast hit.
-struct PhysicsRaycastResult
+struct URHO3D_API PhysicsRaycastResult
 {
+    /// Construct with defaults.
     PhysicsRaycastResult() :
         body_(0)
     {
     }
 
-    /// Hit position.
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const PhysicsRaycastResult& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_; }
+    
+    /// Hit worldspace position.
     Vector3 position_;
-    /// Hit normal.
+    /// Hit worldspace normal.
     Vector3 normal_;
     /// Hit distance from ray origin.
     float distance_;
@@ -89,10 +95,10 @@ static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 /// Physics simulation world component. Should be added only to the root scene node.
 class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 {
+    OBJECT(PhysicsWorld);
+
     friend void InternalPreTickCallback(btDynamicsWorld *world, btScalar timeStep);
     friend void InternalTickCallback(btDynamicsWorld *world, btScalar timeStep);
-
-    OBJECT(PhysicsWorld);
 
 public:
     /// Construct.
@@ -143,6 +149,8 @@ public:
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Invalidate cached collision geometry for a model.
+    void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
@@ -190,8 +198,10 @@ public:
     btDiscreteDynamicsWorld* GetWorld() { return world_; }
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
-    /// Return the collision geometry cache.
-    HashMap<String, SharedPtr<CollisionGeometryData> >& GetGeometryCache() { return geometryCache_; }
+    /// Return trimesh collision geometry cache.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetTriMeshCache() { return triMeshCache_; }
+    /// Return convex collision geometry cache.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetConvexCache() { return convexCache_; }
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
     /// Return whether node dirtying should be disregarded.
@@ -204,6 +214,8 @@ protected:
 private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle collision model reload finished.
+    void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Trigger update before each physics simulation step.
     void PreStep(float timeStep);
     /// Trigger update after ecah physics simulation step.
@@ -235,8 +247,16 @@ private:
     HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold* > previousCollisions_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
-    /// Cache for collision geometry data.
-    HashMap<String, SharedPtr<CollisionGeometryData> > geometryCache_;
+    /// Cache for trimesh geometry data by model and LOD level.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > triMeshCache_;
+    /// Cache for convex geometry data by model and LOD level.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > convexCache_;
+    /// Preallocated event data map for physics collision events.
+    VariantMap physicsCollisionData_;
+    /// Preallocated event data map for node collision events.
+    VariantMap nodeCollisionData_;
+    /// Preallocated buffer for physics collision contact data.
+    VectorBuffer contacts_;
     /// Simulation steps per second.
     unsigned fps_;
     /// Time accumulator for non-interpolated mode.
@@ -258,6 +278,6 @@ private:
 };
 
 /// Register Physics library objects.
-void RegisterPhysicsLibrary(Context* context);
+void URHO3D_API RegisterPhysicsLibrary(Context* context);
 
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<element type="Window" style="DialogWindow">
+	<attribute name="Name" value="MessageBox" />
+	<attribute name="Position" value="500 500" />
+	<attribute name="Size" value="400 83" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Resize Border" value="6 6 6 6" />
+	<element style="HorizontalPanel">
+		<attribute name="Min Size" value="60 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<element type="Text">
+			<attribute name="Name" value="TitleText" />
+			<attribute name="Text" value="Error" />
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element>
+		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Layout Border" value="5 0 5 0" />
+		<element type="Text">
+			<attribute name="Name" value="MessageText" />
+			<attribute name="Text" value="message text" />
+			<attribute name="Text Alignment" value="Center" />
+		</element>
+	</element>
+    <element style="EditorSeparator" />
+	<element style="HorizontalPanel">
+		<attribute name="Min Size" value="74 17" />
+		<attribute name="Max Size" value="2147483647 17" />
+		<element />
+		<element type="Button">
+			<attribute name="Name" value="CancelButton" />
+			<attribute name="Min Size" value="80 17" />
+			<attribute name="Max Size" value="80 17" />
+			<attribute name="Is Visible" value="false" />
+			<element type="Text">
+				<attribute name="Horiz Alignment" value="Center" />
+				<attribute name="Vert Alignment" value="Center" />
+				<attribute name="Text" value="Cancel" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="OkButton" />
+			<attribute name="Min Size" value="80 17" />
+			<attribute name="Max Size" value="80 17" />
+			<element type="Text">
+				<attribute name="Horiz Alignment" value="Center" />
+				<attribute name="Vert Alignment" value="Center" />
+				<attribute name="Text" value="OK" />
+			</element>
+		</element>
+	</element>
+</element>

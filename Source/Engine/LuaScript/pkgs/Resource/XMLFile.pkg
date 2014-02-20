@@ -1,0 +1,27 @@
+$#include "XMLFile.h"
+
+class XMLFile : public Resource
+{
+    XMLFile();
+    ~XMLFile();
+
+    XMLElement CreateRoot(const String name = String::EMPTY);
+    XMLElement GetRoot(const String name = String::EMPTY);
+            
+    void Patch(XMLFile* patchFile);
+    void Patch(XMLElement patchElement);
+};
+
+${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_XMLFile_new00
+static int tolua_ResourceLuaAPI_XMLFile_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<XMLFile>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_XMLFile_new00_local
+static int tolua_ResourceLuaAPI_XMLFile_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<XMLFile>(tolua_S);
+}
+$}

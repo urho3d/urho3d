@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,8 +45,9 @@ struct ShaderParameter
     }
     
     /// Construct with parameters.
-    ShaderParameter(ShaderType type, unsigned reg, unsigned regCount) :
+    ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) :
         type_(type),
+        name_(name),
         register_(reg),
         regCount_(regCount)
     {
@@ -54,6 +55,8 @@ struct ShaderParameter
     
     /// %Shader type.
     ShaderType type_;
+    /// Name of the parameter.
+    String name_;
     /// Hardware register.
     unsigned register_;
     /// Number of registers.
@@ -69,34 +72,28 @@ public:
     /// Destruct.
     virtual ~ShaderVariation();
     
-    /// Create the shader program. Return true if successful.
-    bool Create();
-    /// Release shader.
+    /// Release the shader.
     virtual void Release();
     
+    /// Compile the shader. Return true if successful.
+    bool Create();
     /// Set name.
     void SetName(const String& name);
-    /// Set bytecode.
-    void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
-    /// Add a parameter.
-    void AddParameter(StringHash param, const ShaderParameter& definition);
-    /// Add a texture unit.
-    void AddTextureUnit(TextureUnit unit);
-    /// Clear parameters and texture unit use flags.
-    void ClearParameters();
-    /// Optimize the parameter map for optimal query speed
-    void OptimizeParameters();
+    /// Set defines.
+    void SetDefines(const String& defines);
     
-    /// Return shader type.
-    ShaderType GetShaderType() const { return shaderType_; }
-    /// Return full shader name.
-    const String& GetName() const { return name_; }
-    /// Return parent shader resource.
+    /// Return the owner resource.
     Shader* GetOwner() const;
-    /// Return whether created successfully.
-    bool IsCreated() const;
-    /// Return whether compile failed.
-    bool IsFailed() const { return failed_; }
+    /// Return shader type.
+    ShaderType GetShaderType() const { return type_; }
+    /// Return shader name.
+    const String& GetName() const { return name_; }
+    /// Return defines.
+    const String& GetDefines() const { return defines_; }
+    /// Return full shader name.
+    String GetFullName() const { return name_ + "(" + defines_ + ")"; }
+    /// Return compile error/warning string.
+    const String& GetCompilerOutput() const { return compilerOutput_; }
     /// Return whether uses a parameter.
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders.)
@@ -105,16 +102,27 @@ public:
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
     
 private:
-    /// Parent shader resource.
+    /// Load bytecode from a file. Return true if successful.
+    bool LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName);
+    /// Compile from source. Return true if successful.
+    bool Compile(PODVector<unsigned>& byteCode);
+    /// Inspect the constant parameters of the shader bytecode using MojoShader.
+    void ParseParameters(unsigned char* bufData, unsigned bufSize);
+    /// Strip comments from shader bytecode and store it.
+    void CopyStrippedCode(PODVector<unsigned>& byteCode, unsigned char* bufData, unsigned bufSize);
+    /// Save bytecode to a file.
+    void SaveByteCode(const PODVector<unsigned>& byteCode, const String& binaryShaderName);
+    
+    /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;
     /// Shader type.
-    ShaderType shaderType_;
-    /// Full shader name.
+    ShaderType type_;
+    /// Shader name.
     String name_;
-    /// Shader bytecode.
-    SharedArrayPtr<unsigned char> byteCode_;
-    /// Compile failed flag.
-    bool failed_;
+    /// Defines to use in compiling.
+    String defines_;
+    /// Shader compile error string.
+    String compilerOutput_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.

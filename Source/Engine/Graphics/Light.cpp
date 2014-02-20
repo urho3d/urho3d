@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -167,7 +167,6 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     float distance;
     switch (query.level_)
     {
-    case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         return;
@@ -189,7 +188,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
             if (distance >= query.maxDistance_)
                 return;
         }
-        else // if (lightType_ == LIGHT_POINT)
+        else
         {
             distance = query.ray_.HitDistance(Sphere(node_->GetWorldPosition(), range_));
             if (distance >= query.maxDistance_)
@@ -200,9 +199,11 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
 
     // If the code reaches here then we have a hit
     RayQueryResult result;
+    result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+    result.normal_ = -query.ray_.direction_;
+    result.distance_ = distance;
     result.drawable_ = this;
     result.node_ = node_;
-    result.distance_ = distance;
     result.subObject_ = M_MAX_UNSIGNED;
     results.Push(result);
 }
@@ -427,13 +428,13 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 void Light::SetRampTextureAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.id_));
+    rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
 void Light::SetShapeTextureAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.id_));
+    shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
 ResourceRef Light::GetRampTextureAttr() const

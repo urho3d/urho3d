@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@ EVENT(E_SCREENMODE, ScreenMode)
     PARAM(P_HEIGHT, Height);                // int
     PARAM(P_FULLSCREEN, Fullscreen);        // bool
     PARAM(P_RESIZABLE, Resizable);          // bool
+    PARAM(P_BORDERLESS, Borderless);        // bool
 }
 
 /// Graphics features checked.

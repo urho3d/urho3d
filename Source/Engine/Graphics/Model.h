@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,7 @@ public:
     
     /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// Set vertex buffers.
+    /// Set vertex buffers and their morph ranges.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts);
     /// Set index buffers.
     bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers);

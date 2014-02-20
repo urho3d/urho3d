@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,24 @@
 
 #include "ArrayPtr.h"
 #include "Color.h"
+#include "HashSet.h"
 #include "Image.h"
 #include "Object.h"
+#include "Plane.h"
 #include "Rect.h"
 #include "GraphicsDefs.h"
 
 namespace Urho3D
 {
 
+class File;
 class Image;
 class IndexBuffer;
-class Matrix3;
-class Matrix4;
-class Matrix3x4;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
+class Shader;
+class ShaderPrecache;
 class ShaderVariation;
 class Texture;
 class Texture2D;
@@ -83,12 +85,20 @@ public:
     void SetExternalWindow(void* window);
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
+    /// Set window icon.
+    void SetWindowIcon(Image* windowIcon);
+    /// Set window position.
+    void SetWindowPosition(const IntVector2& position);
+    /// Set window position.
+    void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
-    bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
+    /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Default off, may decrease performance if enabled.
+    void SetFlushGPU(bool enable);
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
@@ -175,8 +185,6 @@ public:
     void SetDepthStencil(RenderSurface* depthStencil);
     /// Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// Set view texture (deferred rendering final output rendertarget) to prevent it from being sampled.
-    void SetViewTexture(Texture* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
     /// Set blending mode.
@@ -199,12 +207,20 @@ public:
     void SetScissorTest(bool enable, const IntRect& rect);
     /// Set stencil test.
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
+    void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY, const Matrix4& projection = Matrix4::IDENTITY);
     /// Set vertex buffer stream frequency.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
     void ResetStreamFrequencies();
     /// Set force Shader Model 2 flag. Only effective before setting the initial screen mode.
     void SetForceSM2(bool enable);
+    /// Begin dumping shader variation names to an XML file for precaching.
+    void BeginDumpShaders(const String& fileName);
+    /// End dumping shader variations names.
+    void EndDumpShaders();
+    /// Precache shader variations from an XML file generated with BeginDumpShaders().
+    void PrecacheShaders(Deserializer& source);
     
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -214,6 +230,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return window position.
+    IntVector2 GetWindowPosition() const;
     /// Return window width.
     int GetWidth() const { return width_; }
     /// Return window height.
@@ -224,12 +242,16 @@ public:
     bool GetFullscreen() const { return fullscreen_; }
     /// Return whether window is resizable.
     bool GetResizable() const { return resizable_; }
+    /// Return whether window is borderless.
+    bool GetBorderless() const { return borderless_; }
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
+    /// Return whether the GPU command buffer is flushed each frame.
+    bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
     /// Return number of primitives drawn this frame.
@@ -262,9 +284,15 @@ public:
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
+    /// Return the desktop resolution.
+    IntVector2 GetDesktopResolution() const;
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
-    /// Return vertex buffer by index.
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const char* name, const char* defines) const;
+    /// Return current vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return current index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
@@ -276,6 +304,8 @@ public:
     ShaderVariation* GetPixelShader() const { return pixelShader_; }
     /// Return texture unit index by name.
     TextureUnit GetTextureUnit(const String& name);
+    /// Return texture unit name by index.
+    const String& GetTextureUnitName(TextureUnit unit);
     /// Return current texture by texture unit index.
     Texture* GetTexture(unsigned index) const;
     /// Return default texture filtering mode.
@@ -324,6 +354,8 @@ public:
     unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
     /// Return stencil write bitmask.
     unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
+    /// Return whether a custom clipping plane is in use.
+    bool GetUseClipPlane() const { return useClipPlane_; }
     /// Return stream frequency by vertex buffer index.
     unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
@@ -333,6 +365,10 @@ public:
     
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
+    /// Maximize the Window.
+    void Maximize();
+    /// Minimize the Window.
+    void Minimize();
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -379,9 +415,11 @@ public:
     
 private:
     /// Create the application window.
-    bool OpenWindow(int width, int height, bool resizable);
+    bool OpenWindow(int width, int height, bool resizable, bool borderless);
+    /// Create the application window icon.
+    void CreateWindowIcon();
     /// Adjust the window for new resolution and fullscreen mode.
-    void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen);
+    void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless);
     /// Create the Direct3D interface.
     bool CreateInterface();
     /// Create the Direct3D device.
@@ -403,6 +441,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
+    /// Window Icon File Name
+    Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width.
@@ -411,22 +451,24 @@ private:
     int height_;
     /// Multisampling mode.
     int multiSample_;
-    /// Stored window X-position.
-    int windowPosX_;
-    /// Stored window Y-position.
-    int windowPosY_;
     /// Fullscreen flag.
     bool fullscreen_;
+    /// Borderless flag.
+    bool borderless_;
     /// Resizable flag.
     bool resizable_;
     /// Vertical sync flag.
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
+    /// Flush GPU command buffer flag.
+    bool flushGPU_;
     /// sRGB conversion on write flag for the main window.
     bool sRGB_;
     /// Direct3D device lost flag.
     bool deviceLost_;
+    /// Flush query issued flag.
+    bool queryIssued_;
     /// Light pre-pass rendering support flag.
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.
@@ -485,8 +527,6 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
-    /// View texture.
-    Texture* viewTexture_;
     /// Viewport coordinates.
     IntRect viewport_;
     /// Texture anisotropy level.
@@ -527,13 +567,25 @@ private:
     unsigned stencilCompareMask_;
     /// Stencil write bitmask.
     unsigned stencilWriteMask_;
+    /// Custom clip plane enable flag.
+    bool useClipPlane_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
+    /// Base directory for shaders.
+    String shaderPath_;
+    /// File extension for shaders.
+    String shaderExtension_;
+    /// Last used shader in shader variation query.
+    mutable WeakPtr<Shader> lastShader_;
+    /// Last used shader name in shader variation query.
+    mutable String lastShaderName_;
+    /// Shader precache utility.
+    SharedPtr<ShaderPrecache> shaderPrecache_;
 };
 
 /// Register Graphics library objects.
-void RegisterGraphicsLibrary(Context* context);
+void URHO3D_API RegisterGraphicsLibrary(Context* context);
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -387,11 +387,10 @@ void Constraint::ReleaseConstraint()
 
 void Constraint::ApplyFrames()
 {
-    if (!constraint_)
+    if (!constraint_ || !node_ || (otherBody_ && !otherBody_->GetNode()))
         return;
     
-    if (node_)
-        cachedWorldScale_ = node_->GetWorldScale();
+    cachedWorldScale_ = node_->GetWorldScale();
     
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
     Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -

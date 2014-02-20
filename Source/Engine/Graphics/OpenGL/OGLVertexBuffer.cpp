@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -144,16 +144,20 @@ void VertexBuffer::Release()
     
     if (object_)
     {
-        if (!graphics_ || graphics_->IsDeviceLost())
+        if (!graphics_)
             return;
         
-        for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+        if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetVertexBuffer(i) == this)
-                graphics_->SetVertexBuffer(0);
+            for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+            {
+                if (graphics_->GetVertexBuffer(i) == this)
+                    graphics_->SetVertexBuffer(0);
+            }
+            
+            glDeleteBuffers(1, &object_);
         }
         
-        glDeleteBuffers(1, &object_);
         object_ = 0;
     }
 }

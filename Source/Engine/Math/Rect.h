@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -167,6 +167,15 @@ public:
     /// Test for equality with another rect with epsilon.
     bool Equals(const Rect& rhs) const { return min_.Equals(rhs.min_) && max_.Equals(rhs.max_); }
     
+    /// Test whether a point is inside.
+    Intersection IsInside(const Vector2& point) const
+    {
+        if (point.x_ < min_.x_ || point.y_ < min_.y_ || point.x_ > max_.x_ || point.y_ > max_.y_)
+            return OUTSIDE;
+        else
+            return INSIDE;
+    }
+    
     /// Return float data.
     const void* Data() const { return &min_.x_; }
     /// Return as a vector.
@@ -227,6 +236,16 @@ public:
     int Width() const { return right_ - left_; }
     /// Return height.
     int Height() const { return bottom_ - top_; }
+    
+    /// Test whether a point is inside.
+    Intersection IsInside(const IntVector2& point) const
+    {
+        if (point.x_ < left_ || point.y_ < top_ || point.x_ >= right_ || point.y_ >= bottom_)
+            return OUTSIDE;
+        else
+            return INSIDE;
+    }
+    
     /// Return integer data.
     const int* Data() const { return &left_; }
     /// Return as string.

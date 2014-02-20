@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include "Button.h"
 #include "Context.h"
 #include "InputEvents.h"
+#include "UI.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -43,6 +44,7 @@ Button::Button(Context* context) :
     pressed_(false)
 {
     enabled_ = true;
+    focusMode_ = FM_FOCUSABLE;
 }
 
 Button::~Button()
@@ -55,6 +57,7 @@ void Button::RegisterObject(Context* context)
 
     COPY_BASE_ATTRIBUTES(Button, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Button, "Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Button, "Focus Mode", FM_FOCUSABLE);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Child Offset", GetPressedChildOffset, SetPressedChildOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);
@@ -76,8 +79,8 @@ void Button::Update(float timeStep)
 
             using namespace Pressed;
 
-            VariantMap eventData;
-            eventData[P_ELEMENT] = (void*)this;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_ELEMENT] = this;
             SendEvent(E_PRESSED, eventData);
         }
     }
@@ -86,7 +89,7 @@ void Button::Update(float timeStep)
 void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (hovering_)
+    if (hovering_ || HasFocus())
         offset += hoverOffset_;
     if (pressed_ || selected_)
         offset += pressedOffset_;
@@ -104,8 +107,8 @@ void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPo
 
         using namespace Pressed;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         SendEvent(E_PRESSED, eventData);
     }
 }
@@ -118,8 +121,8 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
 
         using namespace Released;
 
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
         SendEvent(E_RELEASED, eventData);
     }
 }
@@ -127,6 +130,16 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
 void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     SetPressed(true);
+}
+
+void Button::OnKey(int key, int buttons, int qualifiers)
+{
+    if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
+    {
+        // Simulate LMB click
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
+        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0, 0);
+    }
 }
 
 void Button::SetPressedOffset(const IntVector2& offset)

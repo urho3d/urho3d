@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -239,13 +239,10 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
-    unsigned rowOffset = GetRowDataSize(x);
+    
     // GetRowDataSize() returns CPU-side (source) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
-    {
         rowSize = rowSize / 3 * 4;
-        rowOffset = rowOffset / 3 * 4;
-    }
     
     // Perform conversion from RGB / RGBA as necessary
     switch (format_)
@@ -253,7 +250,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     default:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             memcpy(dest, src, rowSize);
             src += rowSize;
         }
@@ -262,7 +259,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     case D3DFMT_X8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             for (int j = 0; j < width; ++j)
             {
                 *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = 255;
@@ -274,7 +271,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     case D3DFMT_A8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             for (int j = 0; j < width; ++j)
             {
                 *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = src[3];
@@ -411,7 +408,12 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         
         // Create the texture when face 0 is being loaded, check that rest of the faces are same size & format
         if (!face)
+        {
+            // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
+            if (IsCompressed() && requestedLevels_ > 1)
+                requestedLevels_ = 0;
             SetSize(levelWidth, format);
+        }
         else
         {
             if (!object_)

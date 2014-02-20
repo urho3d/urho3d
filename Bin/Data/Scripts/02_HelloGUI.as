@@ -3,10 +3,15 @@
 //     - Creation of controls and building a UI hierarchy
 //     - Loading UI style from XML and applying it to controls
 //     - Handling of global and per-control events
+// For more advanced users (beginners can skip this section):
+//     - Dragging UIElements
+//     - Displaying tooltips
+//     - Accessing available Events data (eventData)
 
 #include "Scripts/Utilities/Sample.as"
 
 Window@ window;
+IntVector2 dragBeginPosition = IntVector2(0, 0);
 
 void Start()
 {
@@ -27,8 +32,9 @@ void Start()
 
     // Create and add some controls to the Window
     InitControls();
-
-    SubscribeToEvents();
+    
+    // Create a draggable Fish
+    CreateDraggableFish();
 }
 
 void InitControls()
@@ -97,14 +103,54 @@ void InitWindow()
     windowTitle.SetStyleAuto();
     buttonClose.style = "CloseButton";
 
-    // Lastly, subscribe to buttonClose release (following a 'press') events
+    // Subscribe to buttonClose release (following a 'press') events
     SubscribeToEvent(buttonClose, "Released", "HandleClosePressed");
+
+    // Subscribe also to all UI mouse clicks just to see where we have clicked
+    SubscribeToEvent("UIMouseClick", "HandleControlClicked");
 }
 
-void SubscribeToEvents()
+void CreateDraggableFish()
 {
-    // Subscribe handler; invoked whenever a mouse click event is dispatched
-    SubscribeToEvent("UIMouseClick", "HandleControlClicked");
+    // Create a draggable Fish button
+    Button@ draggableFish = ui.root.CreateChild("Button", "Fish");
+    draggableFish.texture = cache.GetResource("Texture2D", "Textures/UrhoDecal.dds"); // Set texture
+    draggableFish.blendMode = BLEND_ADD;
+    draggableFish.SetSize(128, 128);
+    draggableFish.SetPosition((graphics.width - draggableFish.width) / 2, 200);
+
+    // Add a tooltip to Fish button
+    ToolTip@ toolTip = draggableFish.CreateChild("ToolTip");
+    toolTip.position = IntVector2(draggableFish.width + 5, draggableFish.width/2); // slightly offset from fish
+    BorderImage@ textHolder = toolTip.CreateChild("BorderImage");
+    textHolder.SetStyle("ToolTipBorderImage");
+    Text@ toolTipText = textHolder.CreateChild("Text");
+    toolTipText.SetStyle("ToolTipText");
+    toolTipText.text = "Please drag me!";
+
+    // Subscribe draggableFish to Drag Events (in order to make it draggable)
+    // See "Event list" in documentation's Main Page for reference on available Events and their eventData
+    SubscribeToEvent(draggableFish, "DragBegin", "HandleDragBegin");
+    SubscribeToEvent(draggableFish, "DragMove", "HandleDragMove");
+    SubscribeToEvent(draggableFish, "DragEnd", "HandleDragEnd");
+}
+
+void HandleDragBegin(StringHash eventType, VariantMap& eventData)
+{
+    // Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+    dragBeginPosition = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
+}
+
+void HandleDragMove(StringHash eventType, VariantMap& eventData)
+{
+    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
+    // Get the element (fish) that is being dragged. GetPtr() returns a RefCounted handle which can be cast implicitly
+    UIElement@ draggedElement = eventData["Element"].GetPtr();
+    draggedElement.position = dragCurrentPosition - dragBeginPosition;
+}
+
+void HandleDragEnd(StringHash eventType, VariantMap& eventData) // For reference (not used here)
+{
 }
 
 void HandleClosePressed(StringHash eventType, VariantMap& eventData)
@@ -118,9 +164,7 @@ void HandleControlClicked(StringHash eventType, VariantMap& eventData)
     Text@ windowTitle = window.GetChild("WindowTitle", true);
 
     // Get control that was clicked
-    // Note difference to C++: in C++ we would call GetPtr() and cast the void pointer to UIElement, here we must specify
-    // what kind of object we are getting. Null will be returned on type mismatch
-    UIElement@ clicked = eventData["Element"].GetUIElement();
+    UIElement@ clicked = eventData["Element"].GetPtr();
 
     String name = "...?";
     if (clicked !is null)

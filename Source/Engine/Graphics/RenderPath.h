@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,8 @@ struct RenderTargetInfo
         sizeMode_(SIZE_ABSOLUTE),
         enabled_(true),
         filtered_(false),
-        sRGB_(false)
+        sRGB_(false),
+        persistent_(false)
     {
     }
     
@@ -92,6 +93,8 @@ struct RenderTargetInfo
     bool filtered_;
     /// sRGB sampling/writing mode flag.
     bool sRGB_;
+    /// Should be persistent and not shared/reused between other buffers of same size.
+    bool persistent_;
 };
 
 /// Rendering path command.
@@ -141,6 +144,20 @@ struct RenderPathCommand
     String pass_;
     /// Command/pass metadata.
     String metadata_;
+    /// Vertex shader name.
+    String vertexShaderName_;
+    /// Pixel shader name.
+    String pixelShaderName_;
+    /// Vertex shader defines.
+    String vertexShaderDefines_;
+    /// Pixel shader defines.
+    String pixelShaderDefines_;
+    /// Textures.
+    String textureNames_[MAX_TEXTURE_UNITS];
+    /// %Shader parameters.
+    HashMap<StringHash, Variant> shaderParameters_;
+    /// Output rendertarget names.
+    Vector<String> outputNames_;
     /// Clear flags.
     unsigned clearFlags_;
     /// Clear color.
@@ -161,16 +178,6 @@ struct RenderPathCommand
     bool useScissor_;
     /// Vertex lights flag.
     bool vertexLights_;
-    /// Vertex shader name.
-    String vertexShaderName_;
-    /// Pixel shader name.
-    String pixelShaderName_;
-    /// Textures.
-    String textureNames_[MAX_TEXTURE_UNITS];
-    /// %Shader parameters.
-    HashMap<StringHash, Variant> shaderParameters_;
-    /// Output rendertarget names.
-    Vector<String> outputNames_;
 };
 
 /// Rendering path definition.

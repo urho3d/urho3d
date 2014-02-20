@@ -1,0 +1,54 @@
+#
+# Copyright (c) 2008-2014 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - DISPLAY=:99.0
+  matrix:
+    - WINDOWS=1 ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC
+    - WINDOWS=1 ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
+    - LINUX=1   ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC SITE_UPDATE=1
+    - LINUX=1   ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
+    - LINUX=1                  URHO3D_LIB_TYPE=STATIC
+    - LINUX=1                  URHO3D_LIB_TYPE=SHARED
+    - ANDROID=1                URHO3D_LIB_TYPE=STATIC
+    - ANDROID=1                URHO3D_LIB_TYPE=SHARED
+#matrix:
+#  fast_finish: true
+#  allow_failures:
+#    - env:
+language: cpp
+compiler: gcc
+before_install:
+    - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9c-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
+    - bash -c "[ $SITE_UPDATE ] && [ $TRAVIS_PULL_REQUEST == 'false' ]" && sudo add-apt-repository ppa:george-edison55/precise-backports -y || true
+    - sudo apt-get update -q -y
+install:
+    - sudo apt-get install -q -y --no-install-recommends libasound2-dev
+    - rvm gemset use global && gem install rake
+    - bash -c "[ x$ENABLE_64BIT == 'x' ]" && sudo apt-get remove -q -y gvfs-daemons && sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true
+    - bash -c "[ $SITE_UPDATE ] && [ $TRAVIS_PULL_REQUEST == 'false' ]" && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true
+    - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/x86_64-w64 MINGW_ROOT=/usr/x86_64-w64-mingw32 || true
+    - bash -e /etc/init.d/xvfb start
+script: rake travis_ci
+after_success: rake travis_ci_site_update && rake travis_ci_rebase

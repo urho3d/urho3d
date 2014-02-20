@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,6 +74,8 @@ public:
     unsigned GetElementOffset(VertexElement element) const { return elementOffset_[element]; }
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
+    /// Return shared array pointer to the CPU memory shadow data.
+    SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
     
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);

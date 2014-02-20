@@ -1,0 +1,21 @@
+$#include "Model.h"
+
+class Model : public Resource
+{
+    const BoundingBox& GetBoundingBox() const;
+    Skeleton& GetSkeleton();
+    unsigned GetNumGeometries() const;
+    unsigned GetNumGeometryLodLevels(unsigned index) const;
+    Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
+    unsigned GetNumMorphs() const;
+    const ModelMorph* GetMorph(const String name) const;
+    const ModelMorph* GetMorph(StringHash nameHash) const;
+    const ModelMorph* GetMorph(unsigned index) const;
+    unsigned GetMorphRangeStart(unsigned bufferIndex) const;
+    unsigned GetMorphRangeCount(unsigned bufferIndex) const;
+    
+    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set Skeleton skeleton;
+    tolua_readonly tolua_property__get_set unsigned numGeometries;
+    tolua_readonly tolua_property__get_set unsigned numMorphs;
+};

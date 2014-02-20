@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,12 @@
 #include "ArrayPtr.h"
 #include "Resource.h"
 
+struct SDL_Surface;
+
 namespace Urho3D
 {
+
+static const int COLOR_LUT_SIZE = 16;
 
 /// Supported compressed image formats.
 enum CompressedFormat
@@ -50,6 +54,7 @@ struct CompressedLevel
         data_(0),
         width_(0),
         height_(0),
+        depth_(0),
         blockSize_(0),
         dataSize_(0),
         rowSize_(0),
@@ -68,6 +73,8 @@ struct CompressedLevel
     int width_;
     /// Height.
     int height_;
+    /// Depth.
+    int depth_;
     /// Block size in bytes.
     unsigned blockSize_;
     /// Total data size in bytes.
@@ -94,25 +101,47 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Set size and number of color components.
-    void SetSize(int width, int height, unsigned components);
-    /// Set data.
+    /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
+    bool SetSize(int width, int height, unsigned components);
+    /// Set 3D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
+    bool SetSize(int width, int height, int depth, unsigned components);
+    /// Set new image data.
     void SetData(const unsigned char* pixelData);
+    /// Set a 2D pixel.
+    void SetPixel(int x, int y, const Color& color);
+    /// Set a 3D pixel.
+    void SetPixel(int x, int y, int z, const Color& color);
+    /// Load as color LUT. Return true if successful.
+    bool LoadColorLUT(Deserializer& source);
     /// Flip image vertically.
     void FlipVertical();
+    /// Resize image by bilinear resampling. Return true if successful.
+    bool Resize(int width, int height);
+    /// Clear the image with a color.
+    void Clear(const Color& color);
     /// Save in BMP format. Return true if successful.
-    bool SaveBMP(const String& fileName);
+    bool SaveBMP(const String& fileName) const;
     /// Save in PNG format. Return true if successful.
-    bool SavePNG(const String& fileName);
+    bool SavePNG(const String& fileName) const;
     /// Save in TGA format. Return true if successful.
-    bool SaveTGA(const String& fileName);
+    bool SaveTGA(const String& fileName) const;
     /// Save in JPG format with compression quality. Return true if successful.
-    bool SaveJPG(const String& fileName, int quality);
+    bool SaveJPG(const String& fileName, int quality) const;
     
+    /// Return a 2D pixel color.
+    Color GetPixel(int x, int y) const;
+    /// Return a 3D pixel color.
+    Color GetPixel(int x, int y, int z) const;
+    /// Return a bilinearly sampled 2D pixel color. X and Y have the range 0-1.
+    Color GetPixelBilinear(float x, float y) const;
+    /// Return a trilinearly sampled 3D pixel color. X, Y and Z have the range 0-1.
+    Color GetPixelTrilinear(float x, float y, float z) const;
     /// Return width.
     int GetWidth() const { return width_; }
     /// Return height.
     int GetHeight() const { return height_; }
+    /// Return depth.
+    int GetDepth() const { return depth_; }
     /// Return number of color components.
     unsigned GetComponents() const { return components_; }
     /// Return pixel data.
@@ -127,6 +156,8 @@ public:
     SharedPtr<Image> GetNextLevel() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
+    /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
+    SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     
 private:
     /// Decode an image using stb_image.
@@ -138,6 +169,8 @@ private:
     int width_;
     /// Height.
     int height_;
+    /// Depth.
+    int depth_;
     /// Number of color components.
     unsigned components_;
     /// Number of compressed mip levels.

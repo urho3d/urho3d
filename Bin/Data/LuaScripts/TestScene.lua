@@ -8,18 +8,6 @@ local yaw = 0
 local pitch = 0
 local drawDebug = 0
 
-local context = GetContext()
-
-local audio = GetAudio()
-local cache = GetCache()
-local engine = GetEngine()
-local fileSystem = GetFileSystem()
-local graphics = GetGraphics()
-local input = GetInput()
-local network = GetNetwork()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     if not engine:IsHeadless() then
         InitConsole()
@@ -65,18 +53,18 @@ end
 function InitConsole()
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
 
-    local debugHud = engine:CreateDebugHud()
+    engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
     debugHud.mode = DEBUGHUD_SHOW_ALL
 
-    local console = engine:CreateConsole()
+    engine:CreateConsole()
     console.defaultStyle = uiStyle
 end
 
 function InitUI()
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
     
-    local newCursor = Cursor:new(context)
+    local newCursor = Cursor:new()
     newCursor.styleAuto = uiStyle
     newCursor.position = IntVector2(graphics:GetWidth()/ 2, graphics:GetHeight() / 2)
     ui.cursor = newCursor
@@ -87,15 +75,15 @@ function InitUI()
 end
 
 function InitScene()
-    testScene = Scene(context)
+    testScene = Scene()
     
     -- Create the camera outside the scene so it is unaffected by scene load/save
-    cameraNode = Node(context)
+    cameraNode = Node()
     camera = cameraNode:CreateComponent("Camera")
     cameraNode.position = Vector3(0, 2, 0)
 
     if not engine:IsHeadless() then
-        renderer:SetViewport(0, Viewport:new(context, testScene, camera))
+        renderer:SetViewport(0, Viewport:new(testScene, camera))
         
         -- Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         -- local newRenderPathPtr = renderer:GetViewport(0):GetRenderPath():Clone()
@@ -132,7 +120,7 @@ function InitScene()
         local light = lightNode:CreateComponent("Light")
         light.lightType = LIGHT_DIRECTIONAL
         light.castShadows = true
-        light.shadowBias = BiasParameters(0.0001, 0.5)
+        light.shadowBias = BiasParameters(0.00025, 0.5)
         light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
         light.specularIntensity = 0.5
     end
@@ -259,13 +247,11 @@ function HandleKeyDown(eventType, eventData)
         if ui:GetFocusElement() == nil then
             engine:Exit()
         else
-            local console = GetConsole()
             console:SetVisible(false)
         end
     end
 
     if key == KEY_F1 then
-        local console = GetConsole()
         console:Toggle()
     end
     
@@ -343,7 +329,6 @@ function HandleKeyDown(eventType, eventData)
         end
 
         if key == KEY_T then
-            local debugHud = GetDebugHud()
             debugHud:Toggle(DEBUGHUD_SHOW_PROFILER)
         end
         

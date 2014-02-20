@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@
 #include "Light.h"
 #include "Polyhedron.h"
 #include "Profiler.h"
-#include "Renderer.h"
 #include "ResourceCache.h"
 #include "ShaderVariation.h"
 #include "VertexBuffer.h"
@@ -195,30 +194,33 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
     }
 }
 
+static Vector3 PointOnSphere(const Sphere& sphere, unsigned theta, unsigned phi)
+{
+    return Vector3(
+        sphere.center_.x_ + sphere.radius_ * Sin((float)theta) * Sin((float)phi),
+        sphere.center_.y_ + sphere.radius_ * Cos((float)phi),
+        sphere.center_.z_ + sphere.radius_ * Cos((float)theta) * Sin((float)phi)
+    );
+}
+
 void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool depthTest)
 {
-    const Vector3& center = sphere.center_;
-    float radius = sphere.radius_;
     unsigned uintColor = color.ToUInt();
-
-    for (unsigned i = 0; i < 360; i += 45)
+    
+    for (unsigned j = 0; j < 180; j += 45)
     {
-        unsigned j = i + 45;
-        float a = radius * Sin((float)i);
-        float b = radius * Cos((float)i);
-        float c = radius * Sin((float)j);
-        float d = radius * Cos((float)j);
-        Vector3 start, end;
-
-        start = center + Vector3(a, b, 0.0f);
-        end = center + Vector3(c, d, 0.0f);
-        AddLine(start, end, uintColor, depthTest);
-        start = center + Vector3(a, 0.0f, b);
-        end = center + Vector3(c, 0.0f, d);
-        AddLine(start, end, uintColor, depthTest);
-        start = center + Vector3(0.0f, a, b);
-        end = center + Vector3(0.0f, c, d);
-        AddLine(start, end, uintColor, depthTest);
+        for (unsigned i = 0; i < 360; i += 45)
+        {
+            Vector3 p1 = PointOnSphere(sphere, i, j);
+            Vector3 p2 = PointOnSphere(sphere, i + 45, j);
+            Vector3 p3 = PointOnSphere(sphere, i, j + 45);
+            Vector3 p4 = PointOnSphere(sphere, i + 45, j + 45);
+            
+            AddLine(p1, p2, uintColor, depthTest);
+            AddLine(p3, p4, uintColor, depthTest);
+            AddLine(p1, p3, uintColor, depthTest);
+            AddLine(p2, p4, uintColor, depthTest);
+        }
     }
 }
 
@@ -307,18 +309,14 @@ void DebugRenderer::Render()
         return;
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    Renderer* renderer = GetSubsystem<Renderer>();
 
     if (!graphics || graphics->IsDeviceLost())
         return;
 
     PROFILE(RenderDebugGeometry);
 
-    // Cache shaders
-    if (!vs_)
-        vs_ = renderer->GetVertexShader("Basic_VCol");
-    if (!ps_)
-        ps_ = renderer->GetPixelShader("Basic_VCol");
+    ShaderVariation* vs = graphics->GetShader(VS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* ps = graphics->GetShader(PS, "Basic", "VERTEXCOLOR");
     
     unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
     // Resize the vertex buffer if too small or much too large
@@ -333,22 +331,24 @@ void DebugRenderer::Render()
     {
         const DebugLine& line = lines_[i];
 
-        *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest[0] = line.start_.x_; dest[1] = line.start_.y_; dest[2] = line.start_.z_;
+        ((unsigned&)dest[3]) = line.color_;
+        dest[4] = line.end_.x_; dest[5] = line.end_.y_; dest[6] = line.end_.z_;
+        ((unsigned&)dest[7]) = line.color_;
 
-        *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest += 8;
     }
 
     for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
     {
         const DebugLine& line = noDepthLines_[i];
 
-        *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest[0] = line.start_.x_; dest[1] = line.start_.y_; dest[2] = line.start_.z_;
+        ((unsigned&)dest[3]) = line.color_;
+        dest[4] = line.end_.x_; dest[5] = line.end_.y_; dest[6] = line.end_.z_;
+        ((unsigned&)dest[7]) = line.color_;
 
-        *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest += 8;
     }
 
     vertexBuffer_->Unlock();
@@ -359,7 +359,7 @@ void DebugRenderer::Render()
     graphics->SetDepthWrite(true);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
-    graphics->SetShaders(vs_, ps_);
+    graphics->SetShaders(vs, ps);
     graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));

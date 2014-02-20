@@ -1,0 +1,166 @@
+$#include "ParticleEmitter.h"
+
+enum EmitterType
+{
+    EMITTER_SPHERE,
+    EMITTER_BOX
+};
+
+/*
+struct Particle
+{
+    Vector3 velocity_;
+    Vector2 size_;
+    float timer_;
+    float timeToLive_;
+    float scale_;
+    float rotationSpeed_;
+    unsigned colorIndex_;
+    unsigned texIndex_;
+};
+*/
+
+struct ColorFrame
+{
+    ColorFrame();
+    ColorFrame(const Color& color);
+    ColorFrame(const Color& color, float time);
+    ~ColorFrame();
+    
+    Color Interpolate(const ColorFrame& next, float time);
+    Color color_ @ color;
+    float time_ @ time;
+};
+
+struct TextureFrame
+{
+    TextureFrame();
+    ~TextureFrame();
+
+    Rect uv_ @ uv;
+    float time_ @ time;
+};
+
+class ParticleEmitter : public BillboardSet
+{
+    bool Load(XMLFile* file);
+    bool Save(XMLFile* file);
+    void SetNumParticles(unsigned num);
+    void SetEmissionRate(float rate);
+    void SetMinEmissionRate(float rate);
+    void SetMaxEmissionRate(float rate);
+    void SetEmitterType(EmitterType type);
+    void SetEmitterSize(const Vector3& size);
+    void SetActiveTime(float time);
+    void SetInactiveTime(float time);
+    void SetEmitting(bool enable, bool resetPeriod = false);
+    void SetUpdateInvisible(bool enable);
+    void SetTimeToLive(float time);
+    void SetMinTimeToLive(float time);
+    void SetMaxTimeToLive(float time);
+    void SetParticleSize(const Vector2& size);
+    void SetMinParticleSize(const Vector2& size);
+    void SetMaxParticleSize(const Vector2& size);
+    void SetMinDirection(const Vector3& direction);
+    void SetMaxDirection(const Vector3& direction);
+    void SetVelocity(float velocity);
+    void SetMinVelocity(float velocity);
+    void SetMaxVelocity(float velocity);
+    void SetRotation(float rotation);
+    void SetMinRotation(float rotation);
+    void SetMaxRotation(float rotation);
+    void SetRotationSpeed(float speed);
+    void SetMinRotationSpeed(float speed);
+    void SetMaxRotationSpeed(float speed);
+    void SetConstantForce(const Vector3& force);
+    void SetDampingForce(float force);
+    void SetSizeAdd(float sizeAdd);
+    void SetSizeMul(float sizeMul);
+    void SetColor(const Color& color);
+    void SetNumColors(unsigned num);
+    void SetNumTextureFrames(unsigned num);
+    
+    unsigned GetNumParticles() const;
+    bool IsEmitting() const;
+    bool GetUpdateInvisible() const;
+    float GetMinEmissionRate() const;
+    float GetMaxEmissionRate() const;
+    EmitterType GetEmitterType() const;
+    const Vector3& GetEmitterSize() const;
+    float GetActiveTime() const;
+    float GetInactiveTime() const;
+    float GetMinTimeToLive() const;
+    float GetMaxTimeToLive() const;
+    const Vector2& GetMinParticleSize() const;
+    const Vector2& GetMaxParticleSize() const;
+    const Vector3& GetMinDirection() const;
+    const Vector3& GetMaxDirection() const;
+    float GetMinVelocity() const;
+    float GetMaxVelocity() const;
+    float GetMinRotation() const;
+    float GetMaxRotation() const;
+    float GetMinRotationSpeed() const;
+    float GetMaxRotationSpeed() const;
+    const Vector3& GetConstantForce() const;
+    float GetDampingForce() const;
+    float GetSizeAdd() const;
+    float GetSizeMul() const;
+    unsigned GetNumColors() const;
+    ColorFrame* GetColor(unsigned index);
+    unsigned GetNumTextureFrames() const;
+    TextureFrame* GetTextureFrame(unsigned index);
+    
+    tolua_property__get_set unsigned numParticles;
+    tolua_property__get_set float emissionRate; // Write only property.
+    tolua_property__is_set bool emitting;
+    tolua_property__get_set bool updateInvisible;
+    tolua_property__get_set float minEmissionRate;
+    tolua_property__get_set float maxEmissionRate;
+    tolua_property__get_set EmitterType emitterType;
+    tolua_property__get_set Vector3& emitterSize;
+    tolua_property__get_set float activeTime;
+    tolua_property__get_set float inactiveTime;
+    tolua_property__get_set float timeToLive; // Write only property.
+    tolua_property__get_set float minTimeToLive;
+    tolua_property__get_set float maxTimeToLive;
+    tolua_property__get_set Vector2& particleSize; // Write only property.
+    tolua_property__get_set Vector2& minParticleSize;
+    tolua_property__get_set Vector2& maxParticleSize;
+    tolua_property__get_set Vector3& minDirection;
+    tolua_property__get_set Vector3& maxDirection;
+    tolua_property__get_set float velocity; // Write only property.
+    tolua_property__get_set float minVelocity;
+    tolua_property__get_set float maxVelocity;
+    tolua_property__get_set float rotation; // Write only property.
+    tolua_property__get_set float minRotation;
+    tolua_property__get_set float maxRotation;
+    tolua_property__get_set float rotationSpeed; // Write only property.
+    tolua_property__get_set float minRotationSpeed;
+    tolua_property__get_set float maxRotationSpeed;
+    tolua_property__get_set Vector3& constantForce;
+    tolua_property__get_set float dampingForce;
+    tolua_property__get_set float sizeAdd;
+    tolua_property__get_set float sizeMul;
+    tolua_property__get_set unsigned numColors;
+    tolua_property__get_set unsigned numTextureFrames;
+};
+
+${
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_emissionRate
+#define tolua_get_ParticleEmitter_emissionRate NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_timeToLive
+#define tolua_get_ParticleEmitter_timeToLive NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_particleSize_ref
+#define tolua_get_ParticleEmitter_particleSize_ref NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_velocity
+#define tolua_get_ParticleEmitter_velocity NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_rotation
+#define tolua_get_ParticleEmitter_rotation NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_rotationSpeed
+#define tolua_get_ParticleEmitter_rotationSpeed NULL
+$}

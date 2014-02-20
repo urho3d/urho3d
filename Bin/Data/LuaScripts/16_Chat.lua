@@ -19,15 +19,6 @@ local connectButton = nil
 local disconnectButton = nil
 local startServerButton = nil
 
-local context = GetContext()
-
-local cache = GetCache()
-local input = GetInput()
-local graphics = GetGraphics()
-local network = GetNetwork()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()

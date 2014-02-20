@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,6 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
     
     switch (level)
     {
-    case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         break;
@@ -91,38 +90,38 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
-        if (distance < query.maxDistance_)
+        Vector3 normal = -query.ray_.direction_;
+        
+        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
-            if (level == RAY_TRIANGLE)
+            distance = M_INFINITY;
+            
+            for (unsigned i = 0; i < batches_.Size(); ++i)
             {
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                Geometry* geometry = batches_[i].geometry_;
+                if (geometry)
                 {
-                    Geometry* geometry = batches_[i].geometry_;
-                    if (geometry)
+                    Vector3 geometryNormal;
+                    float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
+                    if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
                     {
-                        distance = geometry->GetHitDistance(localRay);
-                        if (distance < query.maxDistance_)
-                        {
-                            RayQueryResult result;
-                            result.drawable_ = this;
-                            result.node_ = node_;
-                            result.distance_ = distance;
-                            result.subObject_ = M_MAX_UNSIGNED;
-                            results.Push(result);
-                            break;
-                        }
+                        distance = geometryDistance;
+                        normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
                     }
                 }
             }
-            else
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = node_;
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
+        }
+        
+        if (distance < query.maxDistance_)
+        {
+            RayQueryResult result;
+            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+            result.normal_ = normal;
+            result.distance_ = distance;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.subObject_ = M_MAX_UNSIGNED;
+            results.Push(result);
         }
         break;
     }
@@ -421,8 +420,8 @@ void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> value)
 void CustomGeometry::SetMaterialsAttr(const ResourceRefList& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < value.ids_.Size(); ++i)
-        SetMaterial(i, cache->GetResource<Material>(value.ids_[i]));
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
+        SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }
 
 PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
@@ -458,9 +457,9 @@ PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
 
 const ResourceRefList& CustomGeometry::GetMaterialsAttr() const
 {
-    materialsAttr_.ids_.Resize(batches_.Size());
+    materialsAttr_.names_.Resize(batches_.Size());
     for (unsigned i = 0; i < batches_.Size(); ++i)
-        materialsAttr_.ids_[i] = batches_[i].material_ ? batches_[i].material_->GetNameHash() : StringHash();
+        materialsAttr_.names_[i] = GetResourceName(batches_[i].material_);
     
     return materialsAttr_;
 }

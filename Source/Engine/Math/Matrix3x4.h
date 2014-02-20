@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -370,6 +370,29 @@ public:
             m20_,
             m21_,
             m22_
+        );
+    }
+    
+    /// Convert to a 4x4 matrix by filling in an identity last row.
+    Matrix4 ToMatrix4() const
+    {
+        return Matrix4(
+            m00_,
+            m01_,
+            m02_,
+            m03_,
+            m10_,
+            m11_,
+            m12_,
+            m13_,
+            m20_,
+            m21_,
+            m22_,
+            m23_,
+            0.0f,
+            0.0f,
+            0.0f,
+            1.0f
         );
     }
     

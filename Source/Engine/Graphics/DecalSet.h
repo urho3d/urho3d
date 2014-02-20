@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -212,8 +212,6 @@ private:
     Vector<Bone> bones_;
     /// Skinning matrices.
     PODVector<Matrix3x4> skinMatrices_;
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Vertices in the current decals.
     unsigned numVertices_;
     /// Indices in the current decals.

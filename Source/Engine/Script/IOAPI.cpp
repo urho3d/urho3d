@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -134,6 +134,8 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int LOG_NONE", (void*)&LOG_NONE);
 
     RegisterObject<Log>(engine, "Log");
+    engine->RegisterObjectMethod("Log", "void Open(const String&in)", asMETHOD(Log, Open), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void Close()", asMETHOD(Log, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
@@ -345,22 +347,23 @@ static PackageFile* ConstructPackageFile()
     return new PackageFile(GetScriptContext());
 }
 
-static PackageFile* ConstructAndOpenPackageFile(const String& fileName)
+static PackageFile* ConstructAndOpenPackageFile(const String& fileName, unsigned startOffset)
 {
-    return new PackageFile(GetScriptContext(), fileName);
+    return new PackageFile(GetScriptContext(), fileName, startOffset);
 }
 
 static void RegisterPackageFile(asIScriptEngine* engine)
 {
     RegisterObject<PackageFile>(engine, "PackageFile");
     engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
-    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset = 0)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint startOffset = 0) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHOD(PackageFile, Exists), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHOD(PackageFile, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHOD(PackageFile, GetNumFiles), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHOD(PackageFile, GetTotalSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHOD(PackageFile, GetChecksum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "bool compressed() const", asMETHOD(PackageFile, IsCompressed), asCALL_THISCALL);
 }
 
 void RegisterIOAPI(asIScriptEngine* engine)

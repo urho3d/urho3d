@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #ifndef SDL_BAPP_H
 #define SDL_BAPP_H
 
@@ -271,7 +274,7 @@ private:
             return;
         }
         BE_SetKeyState(scancode, state);
-        SDL_SendKeyboardKey(state, BE_GetScancodeFromBeKey(scancode));
+        SDL_SendKeyboardKey(state, (Uint32)(scancode), BE_GetScancodeFromBeKey(scancode));
     }
 
     void _HandleMouseFocus(BMessage *msg) {
@@ -371,7 +374,7 @@ private:
 
 
     /* Members */
-    vector<SDL_Window*> _window_map; /* Keeps track of SDL_Windows by index-id*/
+    std::vector<SDL_Window*> _window_map; /* Keeps track of SDL_Windows by index-id */
 
     display_mode *_saved_mode;
     BGLView      *_current_context;

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -84,6 +84,7 @@
 #define TXT_EXPECTED_DATA_TYPE            "Expected data type"
 #define TXT_EXPECTED_EXPRESSION_VALUE     "Expected expression value"
 #define TXT_EXPECTED_IDENTIFIER           "Expected identifier"
+#define TXT_EXPECTED_LIST                 "Expected a list enclosed by { } to match pattern"
 #define TXT_EXPECTED_METHOD_OR_PROPERTY   "Expected method or property"
 #define TXT_EXPECTED_ONE_OF               "Expected one of: "
 #define TXT_EXPECTED_OPERATOR             "Expected operator"
@@ -95,10 +96,11 @@
 #define TXT_EXPR_MUST_BE_BOOL             "Expression must be of boolean type"
 
 #define TXT_FAILED_TO_COMPILE_DEF_ARG_d_IN_FUNC_s "Failed while compiling default arg for parameter %d in function '%s'"
-#define TXT_FAILED_TO_CREATE_TEMP_OBJ     "Previous error occurred while attempting to create a temporary copy of object"
-#define TXT_FOUND_MULTIPLE_ENUM_VALUES    "Found multiple matching enum values"
-#define TXT_FUNCTION_ALREADY_EXIST        "A function with the same name and parameters already exist"
-#define TXT_FUNCTION_s_NOT_FOUND          "Function '%s' not found"
+#define TXT_FAILED_TO_CREATE_TEMP_OBJ             "Previous error occurred while attempting to create a temporary copy of object"
+#define TXT_FLOAT_CONV_TO_INT_CAUSE_TRUNC         "Float value truncated in implicit conversion to integer"
+#define TXT_FOUND_MULTIPLE_ENUM_VALUES            "Found multiple matching enum values"
+#define TXT_FUNCTION_ALREADY_EXIST                "A function with the same name and parameters already exists"
+#define TXT_FUNCTION_s_NOT_FOUND                  "Function '%s' not found"
 
 #define TXT_GET_SET_ACCESSOR_TYPE_MISMATCH_FOR_s "The property '%s' has mismatching types for the get and set accessors"
 #define TXT_GLOBAL_VARS_NOT_ALLOWED              "Global variables have been disabled by the application"
@@ -169,6 +171,7 @@
 #define TXT_NONTERMINATED_STRING                   "Non-terminated string literal"
 #define TXT_NOT_A_FUNC_s_IS_VAR                    "Expression doesn't form a function call. '%s' is a variable of a non-function type"
 #define TXT_NOT_ALL_PATHS_RETURN                   "Not all paths return a value"
+#define TXT_NOT_ENOUGH_VALUES_FOR_LIST             "Not enough values to match pattern"
 #define TXT_s_NOT_DECLARED                         "'%s' is not declared"
 #define TXT_NOT_EXACT                              "Implicit conversion of value is not exact"
 #define TXT_s_NOT_INITIALIZED                      "'%s' is not initialized."
@@ -176,6 +179,7 @@
 #define TXT_s_NOT_MEMBER_OF_s                      "'%s' is not a member of '%s'"
 #define TXT_NOT_VALID_REFERENCE                    "Not a valid reference"
 #define TXT_NOT_VALID_LVALUE                       "Not a valid lvalue"
+#define TXT_NOTHING_WAS_BUILT                      "Nothing was built in the module"
 
 #define TXT_OBJECT_DOESNT_SUPPORT_INDEX_OP "Type '%s' doesn't support the indexing operator"
 #define TXT_OBJECT_HANDLE_NOT_SUPPORTED    "Object handle is not supported for this type"
@@ -187,7 +191,6 @@
 
 #define TXT_PARAMETER_ALREADY_DECLARED            "Parameter already declared"
 #define TXT_PARAMETER_CANT_BE_s                   "Parameter type can't be '%s', because the type cannot be instanciated."
-#define TXT_POSSIBLE_LOSS_OF_PRECISION            "Conversion from double to float, possible loss of precision"
 #define TXT_PRIVATE_METHOD_CALL_s                 "Illegal call to private method '%s'"
 #define TXT_PRIVATE_PROP_ACCESS_s                 "Illegal access to private property '%s'"
 #define TXT_PROPERTY_ACCESSOR_DISABLED            "Property accessors have been disabled by the application"
@@ -211,6 +214,7 @@
 #define TXT_SHARED_CANNOT_INHERIT_FROM_NON_SHARED_s    "Shared class cannot inherit from non-shared class '%s'"
 #define TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s        "Shared code cannot use non-shared type '%s'"
 #define TXT_SHARED_s_DOESNT_MATCH_ORIGINAL             "Shared type '%s' doesn't match the original declaration in other module"
+#define TXT_SECTION_IS_EMPTY                           "The script section is empty"
 #define TXT_SIGNED_UNSIGNED_MISMATCH                   "Signed/Unsigned mismatch"
 #define TXT_STRINGS_NOT_RECOGNIZED                     "Strings are not recognized by the application"
 #define TXT_SWITCH_CASE_MUST_BE_CONSTANT               "Case expressions must be constants"
@@ -219,6 +223,7 @@
 #define TXT_TMPL_s_EXPECTS_d_SUBTYPES          "Template '%s' expects %d sub type(s)"
 #define TXT_TMPL_SUBTYPE_MUST_NOT_BE_READ_ONLY "Template subtype must not be read-only"
 #define TXT_TOO_MANY_JUMP_LABELS               "The function has too many jump labels to handle. Split the function into smaller ones."
+#define TXT_TOO_MANY_VALUES_FOR_LIST           "Too many values to match pattern"
 #define TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE    "Type '%s' is not available for this module"
 
 #define TXT_UNEXPECTED_END_OF_FILE        "Unexpected end of file"
@@ -230,6 +235,7 @@
 #define TXT_UNUSED_SCRIPT_NODE            "Unused script node"
 
 #define TXT_VALUE_TOO_LARGE_FOR_TYPE      "Value is too large for data type"
+#define TXT_VOID_CANT_BE_OPERAND          "Void cannot be an operand in expressions"
 
 #define TXT_WARNINGS_TREATED_AS_ERROR     "Warnings are treated as errors by the application"
 #define TXT_WHILE_PARSING_ARG_LIST        "While parsing argument list"
@@ -246,35 +252,41 @@
 
 // Engine message
 
-#define TXT_AUTOHANDLE_CANNOT_BE_USED_FOR_NOCOUNT     "Autohandles cannot be used with types that have been registered with NOCOUNT"
-#define TXT_INVALID_CONFIGURATION                     "Invalid configuration. Verify the registered application interface."
-#define TXT_VALUE_TYPE_MUST_HAVE_SIZE                 "A value type must be registered with a non-zero size"
-#define TXT_TYPE_s_IS_MISSING_BEHAVIOURS              "Type '%s' is missing behaviours"
-#define TXT_ILLEGAL_BEHAVIOUR_FOR_TYPE                "The behaviour is not compatible with the type"
-#define TXT_GC_REQUIRE_ADD_REL_GC_BEHAVIOUR           "A garbage collected type must have the addref, release, and all gc behaviours"
-#define TXT_SCOPE_REQUIRE_REL_BEHAVIOUR               "A scoped reference type must have the release behaviour"
-#define TXT_REF_REQUIRE_ADD_REL_BEHAVIOUR             "A reference type must have the addref and release behaviours"
-#define TXT_NON_POD_REQUIRE_CONSTR_DESTR_BEHAVIOUR    "A non-pod value type must have the default constructor and destructor behaviours"
-#define TXT_CANNOT_PASS_TYPE_s_BY_VAL                 "Can't pass type '%s' by value unless the application type is informed in the registration"
-#define TXT_CANNOT_RET_TYPE_s_BY_VAL                  "Can't return type '%s' by value unless the application type is informed in the registration"
+#define TXT_AUTOHANDLE_CANNOT_BE_USED_FOR_NOCOUNT        "Autohandles cannot be used with types that have been registered with NOCOUNT"
+#define TXT_FIRST_PARAM_MUST_BE_REF_FOR_TEMPLATE_FACTORY "First parameter to template factory must be a reference. This will be used to pass the object type of the template"
+#define TXT_INVALID_CONFIGURATION                        "Invalid configuration. Verify the registered application interface."
+#define TXT_VALUE_TYPE_MUST_HAVE_SIZE                    "A value type must be registered with a non-zero size"
+#define TXT_TYPE_s_IS_MISSING_BEHAVIOURS                 "Type '%s' is missing behaviours"
+#define TXT_ILLEGAL_BEHAVIOUR_FOR_TYPE                   "The behaviour is not compatible with the type"
+#define TXT_GC_REQUIRE_ADD_REL_GC_BEHAVIOUR              "A garbage collected type must have the addref, release, and all gc behaviours"
+#define TXT_SCOPE_REQUIRE_REL_BEHAVIOUR                  "A scoped reference type must have the release behaviour"
+#define TXT_REF_REQUIRE_ADD_REL_BEHAVIOUR                "A reference type must have the addref and release behaviours"
+#define TXT_NON_POD_REQUIRE_CONSTR_DESTR_BEHAVIOUR       "A non-pod value type must have the default constructor and destructor behaviours"
+#define TXT_CANNOT_PASS_TYPE_s_BY_VAL                    "Can't pass type '%s' by value unless the application type is informed in the registration"
+#define TXT_CANNOT_RET_TYPE_s_BY_VAL                     "Can't return type '%s' by value unless the application type is informed in the registration"
 // TODO: Should be something like "This platform requires that AngelScript knows the exact content of the type '%s' in order to pass by value to application in native calling convention"
-#define TXT_DONT_SUPPORT_TYPE_s_BY_VAL                "Don't support passing type '%s' by value to application in native calling convention on this platform"
+#define TXT_DONT_SUPPORT_TYPE_s_BY_VAL                   "Don't support passing type '%s' by value to application in native calling convention on this platform"
 // TODO: Should be something like "This platform requires that AngelScript knows the exact content of the type '%s' in order to return by value from application in native calling convention"
-#define TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL            "Don't support returning type '%s' by value from application in native calling convention on this platform"
-#define TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s              "Object {%d}. GC cannot destroy an object of type '%s' as it doesn't know how many references to there are."
-#define TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s_REF_COUNT_d  "Object {%d}. GC cannot destroy an object of type '%s' as it can't see all references. Current ref count is %d."
-#define TXT_OBJECT_TYPE_s_DOESNT_EXIST                "Object type '%s' doesn't exist"
-#define TXT_TEMPLATE_TYPE_s_DOESNT_EXIST              "Template type '%s' doesn't exist"
-#define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST           "Template subtype '%s' doesn't exist"
-#define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s         "Failed to read subtype of template type '%s'"
-#define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s            "Attempting to instanciate invalid template type '%s<%s>'"
-#define TXT_FAILED_IN_FUNC_s_d                        "Failed in call to function '%s' (Code: %d)"
-#define TXT_FAILED_IN_FUNC_s_WITH_s_d                 "Failed in call to function '%s' with '%s' (Code: %d)"
-#define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s_d           "Failed in call to function '%s' with '%s' and '%s' (Code: %d)"
-#define TXT_GC_RECEIVED_NULL_PTR                      "AddScriptObjectToGC called with null pointer"
-#define TXT_EXCEPTION_IN_NESTED_CALL                  "An exception occurred in a nested call"
-#define TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s            "Type '%s' is still used by function '%s'"
-#define TXT_PREV_TYPE_IS_NAMED_s                      "The builtin type in previous message is named '%s'"
+#define TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL               "Don't support returning type '%s' by value from application in native calling convention on this platform"
+#define TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s               "Object {%d}. GC cannot destroy an object of type '%s' as it doesn't know how many references to there are."
+#define TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s_REF_COUNT_d   "Object {%d}. GC cannot destroy an object of type '%s' as it can't see all references. Current ref count is %d."
+#define TXT_OBJECT_TYPE_s_DOESNT_EXIST                   "Object type '%s' doesn't exist"
+#define TXT_TEMPLATE_TYPE_s_DOESNT_EXIST                 "Template type '%s' doesn't exist"
+#define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST              "Template subtype '%s' doesn't exist"
+#define TXT_TEMPLATE_LIST_FACTORY_EXPECTS_2_REF_PARAMS   "Template list factory expects two reference parameters. The last is the pointer to the initialization buffer"
+#define TXT_LIST_FACTORY_EXPECTS_1_REF_PARAM             "List factory expects only one reference parameter. The pointer to the initialization buffer will be passed in this parameter"
+#define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s            "Failed to read subtype of template type '%s'"
+#define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s               "Attempting to instanciate invalid template type '%s<%s>'"
+#define TXT_FAILED_IN_FUNC_s_d                           "Failed in call to function '%s' (Code: %d)"
+#define TXT_FAILED_IN_FUNC_s_WITH_s_d                    "Failed in call to function '%s' with '%s' (Code: %d)"
+#define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s_d              "Failed in call to function '%s' with '%s' and '%s' (Code: %d)"
+#define TXT_GC_RECEIVED_NULL_PTR                         "AddScriptObjectToGC called with null pointer"
+#define TXT_EXCEPTION_IN_NESTED_CALL                     "An exception occurred in a nested call"
+#define TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s               "Type '%s' is still used by function '%s'"
+#define TXT_PREV_TYPE_IS_NAMED_s                         "The builtin type in previous message is named '%s'"
+#define TXT_PREV_FUNC_IS_NAMED_s_TYPE_IS_d               "The function in previous message is named '%s'. The func type is %d"
+#define TXT_RESURRECTING_SCRIPTOBJECT_s                  "The script object of type '%s' is being resurrected illegally during destruction"
+#define TXT_INVALID_BYTECODE_d                           "LoadByteCode failed. The bytecode is invalid. Number of bytes read from stream: %d"
 
 // Internal names
 
@@ -288,10 +300,12 @@
 #define TXT_NULL_POINTER_ACCESS           "Null pointer access"
 #define TXT_DIVIDE_BY_ZERO                "Divide by zero"
 #define TXT_DIVIDE_OVERFLOW               "Overflow in integer division"
+#define TXT_POW_OVERFLOW                  "Overflow in exponent operation"
 #define TXT_UNRECOGNIZED_BYTE_CODE        "Unrecognized byte code"
 #define TXT_INVALID_CALLING_CONVENTION    "Invalid calling convention"
 #define TXT_UNBOUND_FUNCTION              "Unbound function called"
 #define TXT_OUT_OF_BOUNDS                 "Out of range"
 #define TXT_EXCEPTION_CAUGHT              "Caught an exception from the application"
+#define TXT_MISMATCH_IN_VALUE_ASSIGN      "Mismatching types in value assignment"
 
 #endif

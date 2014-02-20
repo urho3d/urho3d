@@ -1,0 +1,9 @@
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="base" psdefines="EMISSIVEMAP" />
+    <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP" />
+    <pass name="material" psdefines="MATERIAL EMISSIVEMAP" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="NORMALMAP" psdefines="DEFERRED NORMALMAP EMISSIVEMAP" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

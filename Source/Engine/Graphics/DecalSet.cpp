@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -504,7 +504,7 @@ Material* DecalSet::GetMaterial() const
 void DecalSet::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void DecalSet::SetDecalsAttr(PODVector<unsigned char> value)
@@ -1011,10 +1011,11 @@ void DecalSet::UpdateBuffers()
     
     float* vertices = (float*)vertexBuffer_->Lock(0, numVertices_);
     unsigned short* indices = (unsigned short*)indexBuffer_->Lock(0, numIndices_);
-    unsigned short indexStart = 0;
     
     if (vertices && indices)
     {
+        unsigned short indexStart = 0;
+        
         for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
         {
             for (unsigned j = 0; j < i->vertices_.Size(); ++j)

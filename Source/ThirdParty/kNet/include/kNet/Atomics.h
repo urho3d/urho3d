@@ -14,7 +14,7 @@
 #pragma once
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 /** @file Atomics.h

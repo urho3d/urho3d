@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "Str.h"
 #include "Swap.h"
 
@@ -394,6 +395,10 @@ void String::Resize(unsigned newLength)
 {
     if (!capacity_)
     {
+        // If zero length requested, do not allocate buffer yet
+        if (!newLength)
+            return;
+        
         // Calculate initial capacity
         capacity_ = newLength + 1;
         if (capacity_ < MIN_CAPACITY)
@@ -687,7 +692,8 @@ bool String::StartsWith(const String& str, bool caseSensitive) const
 
 bool String::EndsWith(const String& str, bool caseSensitive) const
 {
-    return FindLast(str, Length() - 1, caseSensitive) == Length() - str.Length();
+    unsigned pos = FindLast(str, Length() - 1, caseSensitive);
+    return pos != NPOS && pos == Length() - str.Length();
 }
 
 int String::Compare(const String& str, bool caseSensitive) const
@@ -868,38 +874,43 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
         *dest++ = unicodeChar;
     else if (unicodeChar < 0x800)
     {
-        *dest++ = 0xc0 | ((unicodeChar >> 6) & 0x1f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xc0 | ((unicodeChar >> 6) & 0x1f);
+        dest[1] = 0x80 | (unicodeChar & 0x3f);
+        dest += 2;
     }
     else if (unicodeChar < 0x10000)
     {
-        *dest++ = 0xe0 | ((unicodeChar >> 12) & 0xf);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xe0 | ((unicodeChar >> 12) & 0xf);
+        dest[1] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[2] = 0x80 | (unicodeChar & 0x3f);
+        dest += 3;
     }
     else if (unicodeChar < 0x200000)
     {
-        *dest++ = 0xf0 | ((unicodeChar >> 18) & 0x7);
-        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xf0 | ((unicodeChar >> 18) & 0x7);
+        dest[1] = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        dest[2] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[3] = 0x80 | (unicodeChar & 0x3f);
+        dest += 4;
     }
     else if (unicodeChar < 0x4000000)
     {
-        *dest++ = 0xf8 | ((unicodeChar >> 24) & 0x3);
-        *dest++ = 0x80 | ((unicodeChar >> 18) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xf8 | ((unicodeChar >> 24) & 0x3);
+        dest[1] = 0x80 | ((unicodeChar >> 18) & 0x3f);
+        dest[2] = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        dest[3] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[4] = 0x80 | (unicodeChar & 0x3f);
+        dest += 5;
     }
     else
     {
-        *dest++ = 0xfc | ((unicodeChar >> 30) & 0x1);
-        *dest++ = 0x80 | ((unicodeChar >> 24) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 18) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xfc | ((unicodeChar >> 30) & 0x1);
+        dest[1] = 0x80 | ((unicodeChar >> 24) & 0x3f);
+        dest[2] = 0x80 | ((unicodeChar >> 18) & 0x3f);
+        dest[3] = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        dest[4] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[5] = 0x80 | (unicodeChar & 0x3f);
+        dest += 6;
     }
 }
 
@@ -1257,9 +1268,9 @@ WString::~WString()
     delete[] buffer_;
 }
 
-void WString::Resize(unsigned newSize)
+void WString::Resize(unsigned newLength)
 {
-    if (!newSize)
+    if (!newLength)
     {
         delete[] buffer_;
         buffer_ = 0;
@@ -1267,12 +1278,16 @@ void WString::Resize(unsigned newSize)
     }
     else
     {
-        wchar_t* newBuffer = new wchar_t[newSize + 1];
+        wchar_t* newBuffer = new wchar_t[newLength + 1];
         if (buffer_)
-            memcpy(newBuffer, buffer_, length_ * sizeof(wchar_t));
-        newBuffer[newSize] = 0;
+        {
+            unsigned copyLength = length_ < newLength ? length_ : newLength;
+            memcpy(newBuffer, buffer_, copyLength * sizeof(wchar_t));
+            delete[] buffer_;
+        }
+        newBuffer[newLength] = 0;
         buffer_ = newBuffer;
-        length_ = newSize;
+        length_ = newLength;
     }
 }
 

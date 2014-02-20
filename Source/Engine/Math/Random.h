@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,5 +33,7 @@ URHO3D_API void SetRandomSeed(unsigned seed);
 URHO3D_API unsigned GetRandomSeed();
 /// Return a random number between 0-32767. Should operate similarly to MSVC rand().
 URHO3D_API int Rand();
+/// Return a standard normal distributed number.
+URHO3D_API float RandStandardNormal();
 
 }

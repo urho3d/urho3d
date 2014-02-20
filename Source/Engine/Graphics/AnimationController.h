@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,8 @@ struct AnimationControl
     {
     }
 
+    /// Animation resource name.
+    String name_;
     /// Animation resource name hash.
     StringHash hash_;
     /// Animation speed.
@@ -151,6 +153,10 @@ public:
     float GetFadeTime(const String& name) const;
     /// Return animation autofade time.
     float GetAutoFade(const String& name) const;
+    /// Find an animation state by animation name.
+    AnimationState* GetAnimationState(const String& name) const;
+    /// Find an animation state by animation name hash
+    AnimationState* GetAnimationState(StringHash nameHash) const;
     
     /// Set animation control structures attribute.
     void SetAnimationsAttr(VariantVector value);
@@ -174,8 +180,6 @@ private:
     AnimationState* AddAnimationState(Animation* animation);
     /// Remove an animation state.
     void RemoveAnimationState(AnimationState* state);
-    /// Find an animation state.
-    AnimationState* GetAnimationState(StringHash nameHash) const;
     /// Find the internal index and animation state of an animation.
     void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;
     /// Handle scene post-update event.

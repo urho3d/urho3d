@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 
 #include "Color.h"
 #include "Drawable.h"
+#include "Matrix3x4.h"
 #include "Rect.h"
 #include "VectorBuffer.h"
 
@@ -67,6 +68,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Process octree raycast. May be called from a worker thread.
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
@@ -78,12 +81,14 @@ public:
     void SetMaterial(Material* material);
     /// Set number of billboards.
     void SetNumBillboards(unsigned num);
-    /// Set whether billboards are relative to the scene node.
+    /// Set whether billboards are relative to the scene node. Default true.
     void SetRelative(bool enable);
-    /// Set whether scene node scale affects billboards' size.
+    /// Set whether scene node scale affects billboards' size. Default true.
     void SetScaled(bool enable);
-    /// Set whether billboards are sorted by distance.
+    /// Set whether billboards are sorted by distance. Default false.
     void SetSorted(bool enable);
+    /// Set whether billboards face the camera automatically. Default true.
+    void SetFaceCamera(bool enable);
     /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
     /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
@@ -103,6 +108,8 @@ public:
     bool IsScaled() const { return scaled_; }
     /// Return whether billboards are sorted.
     bool IsSorted() const { return sorted_; }
+    /// Return whether faces the camera automatically.
+    bool GetFaceCamera() const { return faceCamera_; }
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
     
@@ -137,6 +144,8 @@ protected:
     bool scaled_;
     /// Billboards sorted flag.
     bool sorted_;
+    /// Face camera flag.
+    bool faceCamera_;
     
 private:
     /// Resize billboard vertex and index buffers.
@@ -150,6 +159,8 @@ private:
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
+    /// Transform matrices for position and billboard orientation.
+    Matrix3x4 transforms_[2];
     /// Buffers need resize flag.
     bool bufferSizeDirty_;
     /// Vertex buffer needs rewrite flag.

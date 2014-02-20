@@ -1,8 +1,0 @@
-$pfile "Resource/Image.pkg"
-$pfile "Resource/Resource.pkg"
-$pfile "Resource/ResourceCache.pkg"
-$pfile "Resource/XMLElement.pkg"
-$pfile "Resource/XMLFile.pkg"
-
-$using namespace Urho3D;
-$#pragma warning(disable:4800)

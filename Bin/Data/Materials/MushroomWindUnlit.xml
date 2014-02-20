@@ -1,0 +1,9 @@
+<material>
+    <technique name="Techniques/VegetationDiffUnlit.xml" />
+    <texture unit="diffuse" name="Textures/Mushroom.dds" />
+    <parameter name="MatSpecColor" value="0.1 0.1 0.1 16" />
+    <parameter name="WindPeriod" value="1" />
+    <parameter name="WindHeightFactor" value="0.2" />
+    <parameter name="WindHeightPivot" value="0.2" />
+    <parameter name="WindWorldSpacing" value="0.1 0.1" />
+</material>

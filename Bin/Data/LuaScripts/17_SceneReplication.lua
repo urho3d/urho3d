@@ -29,15 +29,6 @@ local yaw = 0.0
 local pitch = 1.0
 local clientObjectID = 0
 
-local context = GetContext()
-
-local cache = GetCache()
-local input = GetInput()
-local graphics = GetGraphics()
-local network = GetNetwork()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -56,7 +47,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create octree and physics world with default settings. Create them as local so that they are not needlessly replicated
     -- when a client connects
@@ -147,7 +138,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 

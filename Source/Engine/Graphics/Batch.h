@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ struct Batch
     ShaderVariation* pixelShader_;
     /// %Geometry type.
     GeometryType geometryType_;
-    /// Override view transform flag.
+    /// Override view transform flag. When set, the camera's view transform is replaced with an identity matrix.
     bool overrideView_;
     /// Base batch flag. This tells to draw the object fully without light optimizations.
     bool isBase_;

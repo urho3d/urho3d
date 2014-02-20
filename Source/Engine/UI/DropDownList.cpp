@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,11 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "DropDownList.h"
+#include "InputEvents.h"
 #include "ListView.h"
+#include "Log.h"
 #include "Text.h"
+#include "UI.h"
 #include "UIEvents.h"
 #include "Window.h"
 
@@ -40,6 +43,8 @@ DropDownList::DropDownList(Context* context) :
     resizePopup_(false),
     selectionAttr_(0)
 {
+    focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
+
     Window* window = new Window(context_);
     window->SetInternal(true);
     SetPopup(window);
@@ -47,7 +52,6 @@ DropDownList::DropDownList(Context* context) :
     listView_ = new ListView(context_);
     listView_->SetInternal(true);
     listView_->SetScrollBarsVisible(false, false);
-    listView_->SetFocusMode(FM_NOTFOCUSABLE);
     popup_->SetLayout(LM_VERTICAL);
     popup_->AddChild(listView_);
     placeholder_ = CreateChild<UIElement>("DDL_Placeholder");
@@ -56,7 +60,8 @@ DropDownList::DropDownList(Context* context) :
     text->SetInternal(true);
     text->SetVisible(false);
 
-    SubscribeToEvent(listView_, E_ITEMSELECTED, HANDLER(DropDownList, HandleItemSelected));
+    SubscribeToEvent(listView_, E_ITEMCLICKED, HANDLER(DropDownList, HandleItemClicked));
+    SubscribeToEvent(listView_, E_UNHANDLEDKEY, HANDLER(DropDownList, HandleListViewKey));
 }
 
 DropDownList::~DropDownList()
@@ -68,6 +73,7 @@ void DropDownList::RegisterObject(Context* context)
     context->RegisterFactory<DropDownList>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(DropDownList, Menu);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(DropDownList, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }
@@ -124,6 +130,25 @@ void DropDownList::OnShowPopup()
             showAbove = true;
     }
     SetPopupOffset(0, showAbove ? -popup_->GetHeight() : GetHeight());
+
+    // Focus the ListView to allow making the selection with keys
+    GetSubsystem<UI>()->SetFocusElement(listView_);
+}
+
+void DropDownList::OnHidePopup()
+{
+    // When the popup is hidden, propagate the selection
+    using namespace ItemSelected;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = this;
+    eventData[P_SELECTION] = GetSelection();
+    SendEvent(E_ITEMSELECTED, eventData);
+}
+
+void DropDownList::OnSetEditable()
+{
+    listView_->SetEditable(editable_);
 }
 
 void DropDownList::AddItem(UIElement* item)
@@ -291,24 +316,27 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
     return true;
 }
 
-void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventData)
+void DropDownList::HandleItemClicked(StringHash eventType, VariantMap& eventData)
 {
     // Resize the selection placeholder to match the selected item
     UIElement* selectedItem = GetSelectedItem();
     if (selectedItem)
         placeholder_->SetSize(selectedItem->GetSize());
 
-    // Close the popup as the selection was made
-    if (GetShowPopup())
-        ShowPopup(false);
+    // Close and defocus the popup. This will actually send the selection forward
+    if (listView_->HasFocus())
+        GetSubsystem<UI>()->SetFocusElement(focusMode_ < FM_FOCUSABLE ? 0 : this);
+    ShowPopup(false);
+}
 
-    // Send the event forward
-    using namespace ItemSelected;
+void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData)
+{
+    using namespace UnhandledKey;
 
-    VariantMap newEventData;
-    newEventData[P_ELEMENT] = (void*)this;
-    newEventData[P_SELECTION] = GetSelection();
-    SendEvent(E_ITEMSELECTED, newEventData);
+    // If enter pressed in the list view, close and propagate selection
+    int key = eventData[P_KEY].GetInt();
+    if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
+        HandleItemClicked(eventType, eventData);
 }
 
 }

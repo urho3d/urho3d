@@ -11,6 +11,7 @@ void CreateEditorSettingsDialog()
     settingsDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSettingsDialog.xml"));
     ui.root.AddChild(settingsDialog);
     settingsDialog.opacity = uiMaxOpacity;
+    settingsDialog.height = 440;
     CenterDialog(settingsDialog);
     UpdateEditorSettingsDialog();
     HideEditorSettingsDialog();
@@ -22,16 +23,19 @@ void UpdateEditorSettingsDialog()
         return;
 
     LineEdit@ nearClipEdit = settingsDialog.GetChild("NearClipEdit", true);
-    nearClipEdit.text = String(camera.nearClip);
-    
+    nearClipEdit.text = String(viewNearClip);
+
     LineEdit@ farClipEdit = settingsDialog.GetChild("FarClipEdit", true);
-    farClipEdit.text = String(camera.farClip);
-    
+    farClipEdit.text = String(viewFarClip);
+
     LineEdit@ fovEdit = settingsDialog.GetChild("FOVEdit", true);
-    fovEdit.text = String(camera.fov);
+    fovEdit.text = String(viewFov);
 
     LineEdit@ speedEdit = settingsDialog.GetChild("SpeedEdit", true);
     speedEdit.text = String(cameraBaseSpeed);
+
+    CheckBox@ limitRotationToggle = settingsDialog.GetChild("LimitRotationToggle", true);
+    limitRotationToggle.checked = limitRotation;
 
     LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
@@ -50,9 +54,6 @@ void UpdateEditorSettingsDialog()
     scaleStepEdit.text = String(scaleStep);
     CheckBox@ scaleSnapToggle = settingsDialog.GetChild("ScaleSnapToggle", true);
     scaleSnapToggle.checked = scaleSnap;
-
-    CheckBox@ localIDToggle = settingsDialog.GetChild("LocalIDToggle", true);
-    localIDToggle.checked = useLocalIDs;
 
     CheckBox@ applyMaterialListToggle = settingsDialog.GetChild("ApplyMaterialListToggle", true);
     applyMaterialListToggle.checked = applyMaterialList;
@@ -100,6 +101,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(fovEdit, "TextFinished", "EditCameraFOV");
         SubscribeToEvent(speedEdit, "TextChanged", "EditCameraSpeed");
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
+        SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
         SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
         SubscribeToEvent(moveStepEdit, "TextChanged", "EditMoveStep");
@@ -111,7 +113,6 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(moveSnapToggle, "Toggled", "EditMoveSnap");
         SubscribeToEvent(rotateSnapToggle, "Toggled", "EditRotateSnap");
         SubscribeToEvent(scaleSnapToggle, "Toggled", "EditScaleSnap");
-        SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
         SubscribeToEvent(rememberResourcePathToggle, "Toggled", "EditRememberResourcePath");
         SubscribeToEvent(applyMaterialListToggle, "Toggled", "EditApplyMaterialList");
         SubscribeToEvent(importOptionsEdit, "TextChanged", "EditImportOptions");
@@ -146,39 +147,48 @@ void HideEditorSettingsDialog()
 
 void EditCameraNearClip(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
-    camera.nearClip = edit.text.ToFloat();
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    viewNearClip = edit.text.ToFloat();
+    UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(camera.nearClip);
 }
 
 void EditCameraFarClip(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
-    camera.farClip = edit.text.ToFloat();
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    viewFarClip = edit.text.ToFloat();
+    UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(camera.farClip);
 }
 
 void EditCameraFOV(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
-    camera.fov = edit.text.ToFloat();
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    viewFov = edit.text.ToFloat();
+    UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(camera.fov);
 }
 
 void EditCameraSpeed(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     cameraBaseSpeed = Max(edit.text.ToFloat(), 1.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(cameraBaseSpeed);
 }
 
+void EditLimitRotation(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    limitRotation = edit.checked;
+}
+
 void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     newNodeDistance = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(newNodeDistance);
@@ -186,7 +196,7 @@ void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)
 
 void EditMoveStep(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     moveStep = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(moveStep);
@@ -194,7 +204,7 @@ void EditMoveStep(StringHash eventType, VariantMap& eventData)
 
 void EditRotateStep(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     rotateStep = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(rotateStep);
@@ -202,7 +212,7 @@ void EditRotateStep(StringHash eventType, VariantMap& eventData)
 
 void EditScaleStep(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     scaleStep = Max(edit.text.ToFloat(), 0.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(scaleStep);
@@ -210,79 +220,76 @@ void EditScaleStep(StringHash eventType, VariantMap& eventData)
 
 void EditMoveSnap(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     moveSnap = edit.checked;
+    toolBarDirty = true;
 }
 
 void EditRotateSnap(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     rotateSnap = edit.checked;
+    toolBarDirty = true;
 }
 
 void EditScaleSnap(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     scaleSnap = edit.checked;
-}
-
-void EditUseLocalIDs(StringHash eventType, VariantMap& eventData)
-{
-    CheckBox@ edit = eventData["Element"].GetUIElement();
-    useLocalIDs = edit.checked;
+    toolBarDirty = true;
 }
 
 void EditRememberResourcePath(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     rememberResourcePath = edit.checked;
 }
 
 void EditApplyMaterialList(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     applyMaterialList = edit.checked;
 }
 
 void EditImportOptions(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     importOptions = edit.text.Trimmed();
 }
 
 void EditPickMode(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     pickMode = edit.selection;
 }
 
 void EditTextureQuality(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     renderer.textureQuality = edit.selection;
 }
 
 void EditMaterialQuality(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     renderer.materialQuality = edit.selection;
 }
 
 void EditShadowResolution(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     SetShadowResolution(edit.selection);
 }
 
 void EditShadowQuality(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList@ edit = eventData["Element"].GetUIElement();
+    DropDownList@ edit = eventData["Element"].GetPtr();
     renderer.shadowQuality = edit.selection;
 }
 
 void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
 {
-    LineEdit@ edit = eventData["Element"].GetUIElement();
+    LineEdit@ edit = eventData["Element"].GetPtr();
     renderer.maxOccluderTriangles = edit.text.ToInt();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(renderer.maxOccluderTriangles);
@@ -290,18 +297,18 @@ void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
 
 void EditSpecularLighting(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     renderer.specularLighting = edit.checked;
 }
 
 void EditDynamicInstancing(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     renderer.dynamicInstancing = edit.checked;
 }
 
 void EditFrameLimiter(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
+    CheckBox@ edit = eventData["Element"].GetPtr();
     engine.maxFps = edit.checked ? 200 : 0;
 }

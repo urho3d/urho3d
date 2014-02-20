@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ AnimatedModel::AnimatedModel(Context* context) :
     animationLodBias_(1.0f),
     animationLodTimer_(-1.0f),
     animationLodDistance_(0.0f),
-    invisibleLodFactor_(0.0f),
+    updateInvisible_(false),
     animationDirty_(false),
     animationOrderDirty_(false),
     morphsDirty_(false),
@@ -89,11 +89,11 @@ void AnimatedModel::RegisterObject(Context* context)
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Invisible Anim LOD", GetInvisibleLodFactor, SetInvisibleLodFactor, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedModel, Drawable);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
@@ -181,9 +181,11 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
 
         // If the code reaches here then we have a hit
         RayQueryResult result;
+        result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+        result.normal_ = -query.ray_.direction_;
+        result.distance_ = distance;
         result.drawable_ = this;
         result.node_ = node_;
-        result.distance_ = distance;
         result.subObject_ = i;
         results.Push(result);
     }
@@ -191,26 +193,25 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
 
 void AnimatedModel::Update(const FrameInfo& frame)
 {
-    // Update animation here
-    if (!animationDirty_ && !animationOrderDirty_)
-        return;
-
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
     if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
     {
-        if (invisibleLodFactor_ == 0.0f)
+        // First check for no update at all when invisible
+        if (!updateInvisible_)
             return;
         float distance = frame.camera_->GetDistance(node_->GetWorldPosition());
         // If distance is greater than draw distance, no need to update at all
         if (drawDistance_ > 0.0f && distance > drawDistance_)
             return;
-        // Multiply the distance by a constant so that invisible nodes don't update that often
         float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
-        animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_) * invisibleLodFactor_;
+        animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_);
     }
 
-    UpdateAnimation(frame);
+    if (animationDirty_ || animationOrderDirty_)
+        UpdateAnimation(frame);
+    else if (boneBoundingBoxDirty_)
+        UpdateBoneBoundingBox();
 }
 
 void AnimatedModel::UpdateBatches(const FrameInfo& frame)
@@ -251,9 +252,6 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (morphsDirty_)
         UpdateMorphs();
-    
-    if (boneBoundingBoxDirty_)
-        UpdateBoneBoundingBox();
     
     if (skinningDirty_)
         UpdateSkinning();
@@ -477,16 +475,12 @@ void AnimatedModel::SetAnimationLodBias(float bias)
     MarkNetworkUpdate();
 }
 
-void AnimatedModel::SetInvisibleLodFactor(float factor)
+void AnimatedModel::SetUpdateInvisible(bool enable)
 {
-    if (factor < 0.0f)
-        factor = 0.0f;
-    else if (factor != 0.0f && factor < 1.0f)
-        factor = 1.0f;
-
-    invisibleLodFactor_ = factor;
+    updateInvisible_ = enable;
     MarkNetworkUpdate();
 }
+
 
 void AnimatedModel::SetMorphWeight(unsigned index, float weight)
 {
@@ -714,8 +708,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
         using namespace BoneHierarchyCreated;
 
-        VariantMap eventData;
-        eventData[P_NODE] = (void*)node_;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
         node_->SendEvent(E_BONEHIERARCHYCREATED, eventData);
     }
     else
@@ -747,7 +741,7 @@ void AnimatedModel::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // When loading a scene, set model without creating the bone nodes (will be assigned later during post-load)
-    SetModel(cache->GetResource<Model>(value.id_), !loading_);
+    SetModel(cache->GetResource<Model>(value.name_), !loading_);
 }
 
 void AnimatedModel::SetBonesEnabledAttr(VariantVector value)
@@ -776,7 +770,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
         {
             // Note: null animation is allowed here for editing
             const ResourceRef& animRef = value[index++].GetResourceRef();
-            SharedPtr<AnimationState> newState(new AnimationState(this, cache->GetResource<Animation>(animRef.id_)));
+            SharedPtr<AnimationState> newState(new AnimationState(this, cache->GetResource<Animation>(animRef.name_)));
             animationStates_.Push(newState);
 
             newState->SetStartBone(skeleton_.GetBone(value[index++].GetString()));
@@ -827,7 +821,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
         Bone* startBone = state->GetStartBone();
-        ret.Push(ResourceRef(Animation::GetTypeStatic(), animation ? animation->GetNameHash() : StringHash()));
+        ret.Push(GetResourceRef(animation, Animation::GetTypeStatic()));
         ret.Push(startBone ? startBone->name_ : String::EMPTY);
         ret.Push(state->IsLooped());
         ret.Push(state->GetWeight());
@@ -1034,24 +1028,27 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
         if (mask & MASK_POSITION)
         {
             float* posSrc = (float*)src;
-            *dest++ = posSrc[0];
-            *dest++ = posSrc[1];
-            *dest++ = posSrc[2];
+            dest[0] = posSrc[0];
+            dest[1] = posSrc[1];
+            dest[2] = posSrc[2];
+            dest += 3;
         }
         if (mask & MASK_NORMAL)
         {
             float* normalSrc = (float*)(src + normalOffset);
-            *dest++ = normalSrc[0];
-            *dest++ = normalSrc[1];
-            *dest++ = normalSrc[2];
+            dest[0] = normalSrc[0];
+            dest[1] = normalSrc[1];
+            dest[2] = normalSrc[2];
+            dest += 3;
         }
         if (mask & MASK_TANGENT)
         {
             float* tangentSrc = (float*)(src + tangentOffset);
-            *dest++ = tangentSrc[0];
-            *dest++ = tangentSrc[1];
-            *dest++ = tangentSrc[2];
-            *dest++ = tangentSrc[3];
+            dest[0] = tangentSrc[0];
+            dest[1] = tangentSrc[1];
+            dest[2] = tangentSrc[2];
+            dest[3] = tangentSrc[3];
+            dest += 4;
         }
 
         src += vertexSize;
