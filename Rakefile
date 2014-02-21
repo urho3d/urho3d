@@ -56,13 +56,9 @@ task :travis_ci do
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master SITE_UPDATE=1 rake travis_ci_site_update)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_site_update)
 desc 'Update site documentation to GitHub Pages'
 task :travis_ci_site_update do
-  # Skip documentation update if one of the following conditions is met
-  if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master' or ENV['SITE_UPDATE'] != '1'
-    abort
-  end
   # Pull or clone
   system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
   # Update credits from Readme.txt to about.md
@@ -78,14 +74,27 @@ task :travis_ci_site_update do
   system "pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && ( git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci skip]' || true ) && git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation'
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master SITE_UPDATE=1 rake travis_ci_rebase)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
 desc 'Rebase OSX-CI mirror branch'
 task :travis_ci_rebase do
-  # Skip rebase if one of the following conditions is met
-  if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master' or ENV['SITE_UPDATE'] != '1'
-    abort
-  end
   system "git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1"
+end
+
+# Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
+desc 'Make binary package and upload it to a designated central hosting server'
+task :travis_ci_package_upload do
+  if ENV['ANDROID']
+    platform_prefix = 'android-'
+  elsif ENV['WINDOWS']
+    platform_prefix = 'mingw-'
+  elsif ENV['IOS']
+    platform_prefix = 'ios-'
+  else
+    platform_prefix = ''
+  end
+  system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
+  # \todo: upload the package
+  system "ls -l #{platform_prefix}Build/Urho3D-*"
 end
 
 def scaffolding(dir)

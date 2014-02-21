@@ -40,15 +40,19 @@ env:
 language: cpp
 compiler: gcc
 before_install:
+    - bash -c "[ $SITE_UPDATE ] && [ '$TRAVIS_BRANCH' == 'master' ] && [ '$TRAVIS_PULL_REQUEST' == 'false' ]" && export SITE_UPDATE_ON_MASTER_COMMIT=1 || true
+    - bash -c "msg=$(git log --format=%%B -n 1 $TRAVIS_COMMIT); [[ '$msg' =~ '[ci package]' ]]" && export PACKAGE_UPLOAD=1 || true
     - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9c-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
-    - bash -c "[ $SITE_UPDATE ] && [ $TRAVIS_PULL_REQUEST == 'false' ]" && sudo add-apt-repository ppa:george-edison55/precise-backports -y || true
+    - bash -c "( [ $SITE_UPDATE_ON_MASTER_COMMIT ] || [ $PACKAGE_UPLOAD ] )" && sudo add-apt-repository ppa:george-edison55/precise-backports -y || true
     - sudo apt-get update -q -y
 install:
     - sudo apt-get install -q -y --no-install-recommends libasound2-dev
     - rvm gemset use global && gem install rake
     - bash -c "[ x$ENABLE_64BIT == 'x' ]" && sudo apt-get remove -q -y gvfs-daemons && sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true
-    - bash -c "[ $SITE_UPDATE ] && [ $TRAVIS_PULL_REQUEST == 'false' ]" && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true
+    - bash -c "( [ $SITE_UPDATE_ON_MASTER_COMMIT ] || [ $PACKAGE_UPLOAD ] )" && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true
     - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/x86_64-w64 MINGW_ROOT=/usr/x86_64-w64-mingw32 || true
     - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
-after_success: rake travis_ci_site_update && rake travis_ci_rebase
+after_success:
+    - bash -c "[ $SITE_UPDATE_ON_MASTER_COMMIT ]" && rake travis_ci_site_update && rake travis_ci_rebase
+    - bash -c "[ $PACKAGE_UPLOAD ]" && rake travis_ci_package_upload
