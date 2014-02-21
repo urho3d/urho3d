@@ -92,8 +92,11 @@ task :travis_ci_package_upload do
   else
     platform_prefix = ''
   end
-  if ENV['XCODE']
-    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
+  if ENV['IOS']     # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
+    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false) or abort 'Failed to generate documentation'
+    system "cd #{platform_prefix}Build && cpack -G TGZ" or abort 'Failed to make binary package'
+  elsif ENV['XCODE']
+    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package', false) or abort 'Failed to make binary package'
   else
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
@@ -208,13 +211,15 @@ def xcode_travis_ci()
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 
-def xcode_build(ios, project, scheme = 'ALL_BUILD')
-  # Save auto-created schemes from Xcode project file
-  system "ruby -i -pe 'gsub(/refType = 0; /, %q{})' #{project}/project.pbxproj" or 'Failed to remove legacy refType attributes from the generated Xcode project file'
-  system "ruby -i -e 'puts ARGF.read.gsub(/buildSettings = \\{\n\s*?\\};\n\s*?buildStyles = \(.*?\);/m, %q{})' #{project}/project.pbxproj" or 'Failed to remove unsupported PBXProject attributes from the generated Xcode project file'
-  xcproj = Xcodeproj::Project.open(project)
-  xcproj.recreate_user_schemes
-  xcproj.save or true   # There is a bug in this gem, it does not appear to exit with proper exit status (assume always success for now)
+def xcode_build(ios, project, scheme = 'ALL_BUILD', auto = true)
+  if auto
+    # Save auto-created schemes from Xcode project file
+    system "ruby -i -pe 'gsub(/refType = 0; /, %q{})' #{project}/project.pbxproj" or 'Failed to remove legacy refType attributes from the generated Xcode project file'
+    system "ruby -i -e 'puts ARGF.read.gsub(/buildSettings = \\{\n\s*?\\};\n\s*?buildStyles = \(.*?\);/m, %q{})' #{project}/project.pbxproj" or 'Failed to remove unsupported PBXProject attributes from the generated Xcode project file'
+    xcproj = Xcodeproj::Project.open(project)
+    xcproj.recreate_user_schemes
+    xcproj.save     # There is a bug in this gem, it does not appear to exit with proper exit status (assume always success for now)
+  end
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
   if ENV['PACKAGE_UPLOAD']
     configuration = 'Release'
