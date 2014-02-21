@@ -92,7 +92,11 @@ task :travis_ci_package_upload do
   else
     platform_prefix = ''
   end
-  system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
+  if ENV['XCODE']
+    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
+  else
+    system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
+  end
   # \todo: upload the package
   system "ls -l #{platform_prefix}Build/Urho3D-*"
 end
@@ -139,6 +143,11 @@ EOF" or abort 'Failed to create new project using Urho3D as external library'
 end
 
 def makefile_travis_ci()
+  if ENV['PACKAGE_UPLOAD']
+    configuration = 'Release'
+  else
+    configuration = 'Debug'
+  end
   if ENV['WINDOWS']
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
@@ -151,7 +160,7 @@ def makefile_travis_ci()
     jit = 'JIT'
     amalg = '-DENABLE_LUAJIT_AMALG=1'
   end
-  system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 #{amalg} -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 #{amalg} -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=#{configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
@@ -174,7 +183,7 @@ def makefile_travis_ci()
   system "cd #{platform_prefix}Build && make #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd #{platform_prefix}Build && make #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=#{configuration} && cd #{platform_prefix}Build && make #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
 def xcode_travis_ci()
@@ -207,8 +216,13 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD')
   xcproj.recreate_user_schemes
   xcproj.save or true   # There is a bug in this gem, it does not appear to exit with proper exit status (assume always success for now)
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
+  if ENV['PACKAGE_UPLOAD']
+    configuration = 'Release'
+  else
+    configuration = 'Debug'
+  end
   # Use xctool when building as its output is nicer
-  system "xctool -project #{project} -scheme #{scheme} #{sdk}" or return 1
+  system "xctool -project #{project} -scheme #{scheme} -configuration #{configuration} #{sdk}" or return 1
   if ios.to_i != 1 and scheme == 'ALL_BUILD'     # Disable testing for IOS as we don't have unit tests for IOS platform yet
     # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
     system "xcodebuild -project #{project} -scheme RUN_TESTS #{sdk}" or return 1
