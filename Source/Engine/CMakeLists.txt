@@ -165,7 +165,7 @@ if (NOT XCODE AND NOT MSVC)
         endif ()
     endif ()
 endif ()
-# \todo This is a deprecated property in CMake version 2.8.12 - Remove below macros when CMake minimum version is 2.8.12
+# \todo This is a deprecated property in CMake version 2.8.12 - Remove below commands when CMake minimum version is 2.8.12
 set_target_properties (${TARGET_NAME} PROPERTIES LINK_INTERFACE_LIBRARIES "")
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     if (NOT MSVC AND CMAKE_VERSION VERSION_LESS 2.8.11)
