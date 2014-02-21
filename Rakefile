@@ -225,7 +225,7 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD')
   system "xctool -project #{project} -scheme #{scheme} -configuration #{configuration} #{sdk}" or return 1
   if ios.to_i != 1 and scheme == 'ALL_BUILD'     # Disable testing for IOS as we don't have unit tests for IOS platform yet
     # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
-    system "xcodebuild -project #{project} -scheme RUN_TESTS #{sdk}" or return 1
+    system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{configuration} #{sdk}" or return 1
   end
   return 0
 end
