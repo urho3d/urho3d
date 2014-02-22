@@ -3929,8 +3929,8 @@ Properties:
 Methods:
 
 - bool AddManualResource(Resource@)
-- void AddPackageFile(PackageFile@, uint = - 1)
-- bool AddResourceDir(const String&, uint = - 1)
+- void AddPackageFile(PackageFile@, uint = M_MAX_UNSIGNED)
+- bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&) const
