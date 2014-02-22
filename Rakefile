@@ -60,7 +60,7 @@ end
 desc 'Update site documentation to GitHub Pages'
 task :travis_ci_site_update do
   # Pull or clone
-  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
+  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth=1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
   # Update credits from Readme.txt to about.md
   system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.txt |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' doc-Build/about.md" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
@@ -77,7 +77,7 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
 desc 'Rebase OSX-CI mirror branch'
 task :travis_ci_rebase do
-  system "git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1"
+  system "git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1" or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
@@ -92,8 +92,8 @@ task :travis_ci_package_upload do
   else
     platform_prefix = ''
   end
-  if ENV['IOS']     # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
-    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false) or abort 'Failed to generate documentation'
+  if ENV['IOS']     # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling documentation generation and cpack directly
+    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
     system "cd #{platform_prefix}Build && cpack -G TGZ" or abort 'Failed to make binary package'
   elsif ENV['XCODE']
     xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package', false) or abort 'Failed to make binary package'
@@ -211,8 +211,8 @@ def xcode_travis_ci()
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 
-def xcode_build(ios, project, scheme = 'ALL_BUILD', auto = true)
-  if auto
+def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = '')
+  if autosave
     # Save auto-created schemes from Xcode project file
     system "ruby -i -pe 'gsub(/refType = 0; /, %q{})' #{project}/project.pbxproj" or 'Failed to remove legacy refType attributes from the generated Xcode project file'
     system "ruby -i -e 'puts ARGF.read.gsub(/buildSettings = \\{\n\s*?\\};\n\s*?buildStyles = \(.*?\);/m, %q{})' #{project}/project.pbxproj" or 'Failed to remove unsupported PBXProject attributes from the generated Xcode project file'
@@ -227,10 +227,10 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD', auto = true)
     configuration = 'Debug'
   end
   # Use xctool when building as its output is nicer
-  system "xctool -project #{project} -scheme #{scheme} -configuration #{configuration} #{sdk}" or return 1
+  system "xctool -project #{project} -scheme #{scheme} -configuration #{configuration} #{sdk} #{extras}" or return 1
   if ios.to_i != 1 and scheme == 'ALL_BUILD'     # Disable testing for IOS as we don't have unit tests for IOS platform yet
     # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
-    system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{configuration} #{sdk}" or return 1
+    system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{configuration} #{sdk} #{extras}" or return 1
   end
   return 0
 end
