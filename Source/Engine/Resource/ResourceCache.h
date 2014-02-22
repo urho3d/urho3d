@@ -90,16 +90,18 @@ public:
     bool ReloadResource(Resource* resource);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
-    /// Enable or disable automatic reloading of resources as files are modified.
+    /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
+    /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
+    void SetReturnFailedResources(bool enable);
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
+    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
     Resource* GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
+    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
     Resource* GetResource(ShortStringHash type, const char* name, bool sendEventOnFailure = true);
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
@@ -127,6 +129,8 @@ public:
     String GetResourceFileName(const String& name) const;
     /// Return whether automatic resource reloading is enabled.
     bool GetAutoReloadResources() const { return autoReloadResources_; }
+    /// Return whether resources that failed to load are returned.
+    bool GetReturnFailedResources() const { return returnFailedResources_; }
     /// Define whether when getting resources should check package files or directories first.
     bool GetSearchPackagesFirst() const { return searchPackagesFirst_; }
 
@@ -169,6 +173,8 @@ private:
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
+    /// Return failed resources flag.
+    bool returnFailedResources_;
     /// Search priority flag.
     bool searchPackagesFirst_;
 };

@@ -115,9 +115,7 @@ Material::Material(Context* context) :
     occlusion_(true),
     specular_(false)
 {
-    SetNumTechniques(1);
     ResetToDefaults();
-    RefreshMemoryUse();
 }
 
 Material::~Material()
@@ -140,7 +138,10 @@ bool Material::Load(Deserializer& source)
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
+    {
+        ResetToDefaults();
         return false;
+    }
     
     XMLElement rootElem = xml->GetRoot();
     return Load(rootElem);
@@ -504,6 +505,9 @@ void Material::CheckOcclusion()
 
 void Material::ResetToDefaults()
 {
+    SetNumTechniques(1);
+    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
+    
     for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         textures_[i] = 0;
     
@@ -519,6 +523,8 @@ void Material::ResetToDefaults()
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
     depthBias_ = BiasParameters(0.0f, 0.0f);
+    
+    RefreshMemoryUse();
 }
 
 void Material::RefreshMemoryUse()

@@ -61,6 +61,7 @@ static const SharedPtr<Resource> noResource;
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false),
+    returnFailedResources_(false),
     searchPackagesFirst_(true)
 {
     // Register Resource library object factories
@@ -383,6 +384,11 @@ void ResourceCache::SetAutoReloadResources(bool enable)
     }
 }
 
+void ResourceCache::SetReturnFailedResources(bool enable)
+{
+    returnFailedResources_ = enable;
+}
+
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
@@ -469,7 +475,8 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
         eventData[P_RESOURCENAME] = name;
         SendEvent(E_LOADFAILED, eventData);
 
-        return 0;
+        if (!returnFailedResources_)
+            return 0;
     }
     
     // Store to cache

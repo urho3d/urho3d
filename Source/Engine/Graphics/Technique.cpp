@@ -165,6 +165,9 @@ bool Technique::Load(Deserializer& source)
 {
     PROFILE(LoadTechnique);
     
+    passes_.Clear();
+    SetMemoryUse(sizeof(Technique));
+    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
@@ -255,9 +258,8 @@ bool Technique::Load(Deserializer& source)
         passElem = passElem.GetNext("pass");
     }
     
-    // Calculate memory use
-    unsigned memoryUse = sizeof(Technique) + numPasses * sizeof(Pass);
-    SetMemoryUse(memoryUse);
+    // Calculate memory use now
+    SetMemoryUse(sizeof(Technique) + numPasses * sizeof(Pass));
     return true;
 }
 
@@ -276,6 +278,7 @@ void Technique::ReleaseShaders()
 
 Pass* Technique::CreatePass(StringHash type)
 {
+    /// \todo Memory use is not tracked when creating passes programmatically due to HashTable not returning the element count
     Pass* oldPass = GetPass(type);
     if (oldPass)
         return oldPass;
