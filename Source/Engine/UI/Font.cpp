@@ -408,7 +408,8 @@ bool Font::Load(Deserializer& source)
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
-        
+    
+    fontType_ = FONT_NONE;
     faces_.Clear();
     
     fontDataSize_ = source.GetSize();
@@ -625,7 +626,7 @@ FontFace* Font::GetFaceFreeType(int pointSize)
     
     if (!fontDataSize_)
     {
-        LOGERROR("Font not loaded");
+        LOGERROR("Could not create font face from zero size data");
         return 0;
     }
     

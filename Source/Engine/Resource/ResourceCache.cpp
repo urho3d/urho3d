@@ -465,6 +465,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
 
     LOGDEBUG("Loading resource " + name);
     resource->SetName(file->GetName());
+
     if (!resource->Load(*(file.Get())))
     {
         // Error should already been logged by corresponding resource descendant class
