@@ -3960,6 +3960,7 @@ Properties:
 - PackageFile@[]@ packageFiles // readonly
 - int refs // readonly
 - String[]@ resourceDirs // readonly
+- bool returnFailedResources
 - bool seachPackagesFirst // readonly
 - bool searchPackagesFirst // writeonly
 - uint totalMemoryUse // readonly

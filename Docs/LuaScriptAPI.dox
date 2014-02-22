@@ -3147,6 +3147,7 @@ Methods:
 - void SetMemoryBudget(ShortStringHash type, unsigned budget)
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
+- void SetReturnFailedResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
 - File* GetFile(const String name)
 - Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
@@ -3156,6 +3157,7 @@ Methods:
 - unsigned GetTotalMemoryUse() const
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
+- bool GetReturnFailedResources() const
 - bool GetSearchPackagesFirst() const
 - String GetPreferredResourceDir(const String path) const
 - String SanitateResourceName(const String name) const
@@ -3165,6 +3167,7 @@ Properties:
 
 - unsigned totalMemoryUse (readonly)
 - bool autoReloadResources (readonly)
+- bool returnFailedResources (readonly)
 - bool searchPackagesFirst (readonly)
 
 ### ResourceRef

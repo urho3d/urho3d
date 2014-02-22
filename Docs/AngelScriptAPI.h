@@ -4706,6 +4706,7 @@ Array<PackageFile> packageFiles;
 int refs;
 /* readonly */
 Array<String> resourceDirs;
+bool returnFailedResources;
 /* readonly */
 bool seachPackagesFirst;
 /* writeonly */
