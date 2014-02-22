@@ -187,23 +187,7 @@ void PerformQuickMenuSearch(const String&in query)
             }
         }
 
-        {
-            QuickMenuItem@ a;
-            QuickMenuItem@ b;
-            for (uint x=0; x < filtered.length; x++)
-            {
-                for (uint y=0; y < filtered.length-1; y++)
-                {
-                    @a = filtered[y];
-                    @b = filtered[y+1];
-                    if(a.sortScore > b.sortScore)
-                    {
-                        @filtered[y+1] = a;
-                        @filtered[y] = b;
-                    }
-                }
-            }
-        }
+        filtered.Sort();
 
         {
             QuickMenuItem@ qi;
@@ -234,6 +218,10 @@ class QuickMenuItem
     {
         this.action = action;
         this.callback = callback;
+    }
+    int opCmp(QuickMenuItem@ b)
+    {
+        return sortScore - b.sortScore;
     }
 }
 
