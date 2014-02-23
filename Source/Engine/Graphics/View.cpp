@@ -275,6 +275,7 @@ void SortBatchQueueBackToFrontWork(const WorkItem* item, unsigned threadIndex)
 void SortLightQueueWork(const WorkItem* item, unsigned threadIndex)
 {
     LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
+    start->litBaseBatches_.SortFrontToBack();
     start->litBatches_.SortFrontToBack();
 }
 
@@ -356,7 +357,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.pass_ = command.pass_;
             info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
             info.markToStencil_ = command.markToStencil_;
-            info.useScissor_ = command.useScissor_;
             info.vertexLights_ = command.vertexLights_;
             
             // Check scenepass metadata for defining custom passes which interact with lighting
@@ -818,6 +818,7 @@ void View::GetBatches()
                 light->SetLightQueue(&lightQueue);
                 lightQueue.light_ = light;
                 lightQueue.shadowMap_ = 0;
+                lightQueue.litBaseBatches_.Clear(maxSortedInstances);
                 lightQueue.litBatches_.Clear(maxSortedInstances);
                 lightQueue.volumeBatches_.Clear();
                 
@@ -1201,7 +1202,12 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         destBatch.zone_ = zone;
         
         if (!isLitAlpha)
-            AddBatchToQueue(lightQueue.litBatches_, destBatch, tech);
+        {
+            if (destBatch.isBase_)
+                AddBatchToQueue(lightQueue.litBaseBatches_, destBatch, tech);
+            else
+                AddBatchToQueue(lightQueue.litBatches_, destBatch, tech);
+        }
         else if (alphaQueue)
         {
             // Transparent batches can not be instanced
@@ -1337,7 +1343,7 @@ void View::ExecuteRenderPathCommands()
                     SetTextures(command);
                     graphics_->SetFillMode(camera_->GetFillMode());
                     graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
-                    batchQueues_[command.pass_].Draw(this, command.useScissor_, command.markToStencil_);
+                    batchQueues_[command.pass_].Draw(this, command.markToStencil_, false);
                 }
                 break;
                 
@@ -1371,7 +1377,17 @@ void View::ExecuteRenderPathCommands()
                         SetTextures(command);
                         graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
-                        i->litBatches_.Draw(i->light_, this);
+                        
+                        // Draw base (replace blend) batches first
+                        i->litBaseBatches_.Draw(this);
+                        
+                        // Then, if there are additive passes, optimize the light and draw them
+                        if (!i->litBatches_.IsEmpty())
+                        {
+                            renderer_->OptimizeLightByScissor(i->light_, camera_);
+                            renderer_->OptimizeLightByStencil(i->light_, camera_);
+                            i->litBatches_.Draw(this, false, true);
+                        }
                     }
                     
                     graphics_->SetScissorTest(false);
@@ -2545,11 +2561,10 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
     
     if (batch.geometryType_ == GEOM_INSTANCED)
     {
-        HashMap<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &batchQueue.baseBatchGroups_ : &batchQueue.batchGroups_;
         BatchGroupKey key(batch);
         
-        HashMap<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
-        if (i == groups->End())
+        HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchQueue.batchGroups_.Find(key);
+        if (i == batchQueue.batchGroups_.End())
         {
             // Create a new group based on the batch
             // In case the group remains below the instancing limit, do not enable instancing shaders yet
@@ -2557,7 +2572,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
             newGroup.geometryType_ = GEOM_STATIC;
             renderer_->SetBatchShaders(newGroup, tech, allowShadows);
             newGroup.CalculateSortKey();
-            i = groups->Insert(MakePair(key, newGroup));
+            i = batchQueue.batchGroups_.Insert(MakePair(key, newGroup));
         }
 
         int oldSize = i->second_.instances_.Size();
@@ -2591,6 +2606,7 @@ void View::PrepareInstancingBuffer()
     {
         for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
             totalInstances += i->shadowSplits_[j].shadowBatches_.GetNumInstances();
+        totalInstances += i->litBaseBatches_.GetNumInstances();
         totalInstances += i->litBatches_.GetNumInstances();
     }
     
@@ -2610,6 +2626,7 @@ void View::PrepareInstancingBuffer()
         {
             for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
                 i->shadowSplits_[j].shadowBatches_.SetTransforms(dest, freeIndex);
+            i->litBaseBatches_.SetTransforms(dest, freeIndex);
             i->litBatches_.SetTransforms(dest, freeIndex);
         }
         

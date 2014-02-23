@@ -766,16 +766,13 @@ unsigned BatchGroupKey::ToHash() const
 void BatchQueue::Clear(int maxSortedInstances)
 {
     batches_.Clear();
-    sortedBaseBatches_.Clear();
     sortedBatches_.Clear();
-    baseBatchGroups_.Clear();
     batchGroups_.Clear();
     maxSortedInstances_ = maxSortedInstances;
 }
 
 void BatchQueue::SortBackToFront()
 {
-    sortedBaseBatches_.Clear();
     sortedBatches_.Resize(batches_.Size());
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -784,52 +781,23 @@ void BatchQueue::SortBackToFront()
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
     
     // Do not actually sort batch groups, just list them
-    sortedBaseBatchGroups_.Resize(baseBatchGroups_.Size());
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
     unsigned index = 0;
-    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-        sortedBaseBatchGroups_[index++] = &i->second_;
-    index = 0;
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
 }
 
 void BatchQueue::SortFrontToBack()
 {
-    sortedBaseBatches_.Clear();
     sortedBatches_.Clear();
     
-    // Need to divide into base and non-base batches here to ensure proper order in relation to grouped batches
     for (unsigned i = 0; i < batches_.Size(); ++i)
-    {
-        if (batches_[i].isBase_)
-            sortedBaseBatches_.Push(&batches_[i]);
-        else
-            sortedBatches_.Push(&batches_[i]);
-    }
+        sortedBatches_.Push(&batches_[i]);
     
-    SortFrontToBack2Pass(sortedBaseBatches_);
     SortFrontToBack2Pass(sortedBatches_);
     
     // Sort each group front to back
-    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-    {
-        if (i->second_.instances_.Size() <= maxSortedInstances_)
-        {
-            Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
-            if (i->second_.instances_.Size())
-                i->second_.distance_ = i->second_.instances_[0].distance_;
-        }
-        else
-        {
-            float minDistance = M_INFINITY;
-            for (PODVector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
-                minDistance = Min(minDistance, j->distance_);
-            i->second_.distance_ = minDistance;
-        }
-    }
-    
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {
         if (i->second_.instances_.Size() <= maxSortedInstances_)
@@ -847,17 +815,12 @@ void BatchQueue::SortFrontToBack()
         }
     }
     
-    sortedBaseBatchGroups_.Resize(baseBatchGroups_.Size());
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
     unsigned index = 0;
-    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-        sortedBaseBatchGroups_[index++] = &i->second_;
-    index = 0;
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
     
-    SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBaseBatchGroups_));
     SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBatchGroups_));
 }
 
@@ -923,25 +886,27 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
 
 void BatchQueue::SetTransforms(void* lockedData, unsigned& freeIndex)
 {
-    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-        i->second_.SetTransforms(lockedData, freeIndex);
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         i->second_.SetTransforms(lockedData, freeIndex);
 }
 
-void BatchQueue::Draw(View* view, bool useScissor, bool markToStencil) const
+void BatchQueue::Draw(View* view, bool markToStencil, bool usingLightOptimization) const
 {
     Graphics* graphics = view->GetGraphics();
     Renderer* renderer = view->GetRenderer();
     
-    graphics->SetScissorTest(false);
+    // If View has set up its own light optimizations, do not disturb the stencil/scissor test settings
+    if (!usingLightOptimization)
+    {
+        graphics->SetScissorTest(false);
+        
+        // During G-buffer rendering, mark opaque pixels' lightmask to stencil buffer if requested
+        if (!markToStencil)
+            graphics->SetStencilTest(false);
+    }
     
-    // During G-buffer rendering, mark opaque pixels to stencil buffer
-    if (!markToStencil)
-        graphics->SetStencilTest(false);
-    
-    // Base instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = sortedBaseBatchGroups_.Begin(); i != sortedBaseBatchGroups_.End(); ++i)
+    // Instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
         if (markToStencil)
@@ -949,91 +914,21 @@ void BatchQueue::Draw(View* view, bool useScissor, bool markToStencil) const
         
         group->Draw(view);
     }
-    // Base non-instanced
-    for (PODVector<Batch*>::ConstIterator i = sortedBaseBatches_.Begin(); i != sortedBaseBatches_.End(); ++i)
+    // Non-instanced
+    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
         if (markToStencil)
             graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
-        
-        batch->Draw(view);
-    }
-    
-    // Non-base instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
-    {
-        BatchGroup* group = *i;
-        if (useScissor && group->lightQueue_)
-            renderer->OptimizeLightByScissor(group->lightQueue_->light_, group->camera_);
-        if (markToStencil)
-            graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
-        
-        group->Draw(view);
-    }
-    // Non-base non-instanced
-    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
-    {
-        Batch* batch = *i;
-        if (useScissor)
+        if (!usingLightOptimization)
         {
+            // If drawing an alpha batch, we can optimize fillrate by scissor test
             if (!batch->isBase_ && batch->lightQueue_)
                 renderer->OptimizeLightByScissor(batch->lightQueue_->light_, batch->camera_);
             else
                 graphics->SetScissorTest(false);
         }
-        if (markToStencil)
-            graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
         
-        batch->Draw(view);
-    }
-}
-
-void BatchQueue::Draw(Light* light, View* view) const
-{
-    Graphics* graphics = view->GetGraphics();
-    Renderer* renderer = view->GetRenderer();
-    
-    graphics->SetScissorTest(false);
-    graphics->SetStencilTest(false);
-    
-    // Base instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = sortedBaseBatchGroups_.Begin(); i != sortedBaseBatchGroups_.End(); ++i)
-    {
-        BatchGroup* group = *i;
-        group->Draw(view);
-    }
-    // Base non-instanced
-    for (PODVector<Batch*>::ConstIterator i = sortedBaseBatches_.Begin(); i != sortedBaseBatches_.End(); ++i)
-    {
-        Batch* batch = *i;
-        batch->Draw(view);
-    }
-    
-    // All base passes have been drawn. Optimize at this point by both stencil volume and scissor
-    bool optimized = false;
-    
-    // Non-base instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
-    {
-        BatchGroup* group = *i;
-        if (!optimized)
-        {
-            renderer->OptimizeLightByStencil(light, group->camera_);
-            renderer->OptimizeLightByScissor(light, group->camera_);
-            optimized = true;
-        }
-        group->Draw(view);
-    }
-    // Non-base non-instanced
-    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
-    {
-        Batch* batch = *i;
-        if (!optimized)
-        {
-            renderer->OptimizeLightByStencil(light, batch->camera_);
-            renderer->OptimizeLightByScissor(light, batch->camera_);
-            optimized = true;
-        }
         batch->Draw(view);
     }
 }
@@ -1042,11 +937,6 @@ unsigned BatchQueue::GetNumInstances() const
 {
     unsigned total = 0;
     
-    for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-    {
-        if (i->second_.geometryType_ == GEOM_INSTANCED)
-            total += i->second_.instances_.Size();
-    }
     for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {
        if (i->second_.geometryType_ == GEOM_INSTANCED)
