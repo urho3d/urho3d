@@ -4530,7 +4530,6 @@ Array<String> textureNames;
 RenderCommandType type;
 bool useFogColor;
 bool useLitBase;
-bool useScissor;
 bool vertexLights;
 String vertexShaderDefines;
 String vertexShaderName;
