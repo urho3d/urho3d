@@ -71,7 +71,7 @@ task :travis_ci_site_update do
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
   system "msg=`git log --format=%B -n 1 $TRAVIS_COMMIT`; export msg && cd doc-Build && pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/urho3d/Urho3D/commit/$TRAVIS_COMMIT\n\nMessage: $msg\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
   # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if detached HEAD is not a fast forward of remote master)
-  system "pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && ( git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci skip]' || true ) && git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation'
+  system "pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && ( git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci skip]' || true ) && git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
@@ -100,8 +100,8 @@ task :travis_ci_package_upload do
   else
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
-  # \todo: upload the package
-  system "ls -l #{platform_prefix}Build/Urho3D-*"
+  setup_digital_keys
+  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D/Snapshots" or abort 'Failed to upload binary package'
 end
 
 def scaffolding(dir)
@@ -145,7 +145,7 @@ add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_Physic
 EOF" or abort 'Failed to create new project using Urho3D as external library'
 end
 
-def makefile_travis_ci()
+def makefile_travis_ci
   if ENV['PACKAGE_UPLOAD']
     configuration = 'Release'
   else
@@ -189,7 +189,7 @@ def makefile_travis_ci()
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=$ENABLE_64BIT -DENABLE_LUA#{jit}=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=#{configuration} && cd #{platform_prefix}Build && make #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
-def xcode_travis_ci()
+def xcode_travis_ci
   if ENV['IOS']
     # IOS platform does not support LuaJIT
     jit = ''
@@ -233,4 +233,41 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = ''
     system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{configuration} #{sdk} #{extras}" or return 1
   end
   return 0
+end
+
+def setup_digital_keys
+  system 'mkdir -p ~/.ssh && chmod 700 ~/.ssh' or abort 'Failed to create ~/.ssh directory'
+  system "cat <<EOF >>~/.ssh/known_hosts
+frs.sourceforge.net,216.34.181.57 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==
+EOF" or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
+  # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portions are encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case. 
+  system "cat <<EOF >~/.ssh/id_rsa
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA6ciMhglP+1+1a+LEzrMx6sH8MUlRLte6/ve1z52c0Gx3dtZb
+bnUaCM1K7hkyZ5EHv6/gCPnijvF+lcNUbE94K2+gsy8iieFa3upsV8L49nu+0Nvm
+682lAAZsQ53EArMp3OVf9owycKNOKyGxQ5+KQCYl8+nYlNA9yg8Gx+UaZ/ai+3Sb
+IhPsozd1SdPKuegLD4+vHMe2NHxxPvhXnZg9g4ZMxoZlZNF8VrZ0Y9ENxWZwysxD
+xpHEMR72bM5vqm2Tj7uQ+n/DLpOl6R34kvYtvuS1GVkzpy29ELkITKb+TNSs3fX2
+AglaL/p89PRjmyK3srupG1Ee5vwLkIO7GkQIgwIDAQABAoIBAHJVDTxkA4SpSv2H${SF_KEY1}
+Or7n7iqkUiT8eUKSaLZXCMiPiWh5E3e/35lGlcPmOpX1Jqx1xjdd2RAqvT0xJ7ow
+e/I4b0m23v2iuJ574sgQF4pYJQ/OdwSH9wgtW1uGyJ3M41Z6rqeEWgkmiWiCxTDc
+2md6987lmTwPikdFDGLsNGHATsi2a601/zar3jWKx3TLqvuysF0qoXVe/k5csuob
+U2WB1HZnJSlIXpeFqrPPMjl3A22nloe2BxfyM7/WVmkClpwDWLyPaRL2O2EQ4VE3
+rs/ypLW2Vab3vZesxp01OoOlgxeGdtgIVOi+ZuI540/MadJ7T7PuvQuYrXCa7n9W
+KN8XE6ECgYEA+Sc7lZbdxg1sfz5yaw+Fsqkc1Xo3Gg47MPVplYIpiA9lN9TfsVIC
+Erzr7OYmE+TQEzUvIcoz/Ajt38e9grX9AKUmU4YE2J1gKsEdkGC5qBVowwUHzfGd${SF_KEY2}
+2OfUzYYXBh5E7stl7lzClw2ZQ0Ol43X5EqDPYQSxp6aVI/GtTA1R34+tYZANNOku
+HocMBMObfCLhsSIkrECxS1V6pmS51PbfNCVpx92d4XCA/zijeNUyuxMxDS8CZDFf
+3GjrWOWNHfPYGQzHf5eDrK6q52LzjQd8I8EH9HECgYEAr41ONXOMpbzVor58XiUc
+vircLyqi4o/+ctuoXnjNDJpUZkduqgEvhsZosY3kbIX/elkx8WwIvuAHw3J4fD4A${SF_KEY3}
+m1DCNX2rsnkIxnc1foI4rk8PdsH3ostIroAFnRLwBtbRVQFyFeTiYIDnNH5eR0QY
+Iz2mV3ljJJIqCqSM4FjzMPMCgYB4Ep6wTnLZqcWokUjz9UimtkevKmUKcq5h3X78
+CNahMK99lo/Gv/BYq+/ZSQDqXA+9+zHKoMcpOn5mtykKWn7qfAwkFD6THpamFiHM
+90bBWc6p+osBCVbt9+S8DwPeCzmuy9+XVfsPHPBFoLbNDs5KwXpYv5c+wv/r52nu
+lXdcgQKBgQDWu9mz9kJFJNrX/ipCJherwT2g29Nut5wwVmYirvUKcEvh31iJVo25
+hiZDvPXzoOigadbXd05tICfP72gxenWyJXNwIG6+atIqBydS94rn3AzF7TEmKq6Z
+AS61aRTDBf17Ql/HMyfweb8gEt+JUeCOKkxCLMhbwVnZeijKYz2ODQ==
+-----END RSA PRIVATE KEY-----
+EOF" or abort 'Failed to create user private key to id_rsa'
+  system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
 end

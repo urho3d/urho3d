@@ -23,6 +23,7 @@
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: BEyc6TovUd9mdCyQSnXo0CF10pluClebXjNdppHdZwemUvs0RAkbG6+FuMW6ui6X4WVArtWPDH0vnLPAOOimyHouIwcPKNQNWs8jyJxTvO52APZddUb/ZCKXc37zlXY5AR1VDi5EBNZQSaxasqAcovhO/HqVgWWSmUFeJt2i35g=
     - DISPLAY=:99.0
   matrix:
     - WINDOWS=1 ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC
@@ -53,4 +54,6 @@ install:
     - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/x86_64-w64 MINGW_ROOT=/usr/x86_64-w64-mingw32 || true
     - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
-after_success: bash -c "[ $SITE_UPDATE_ON_MASTER_COMMIT ]" && rake travis_ci_site_update && rake travis_ci_rebase && bash -c "[ $PACKAGE_UPLOAD ]" && rake travis_ci_package_upload
+after_success:
+    - bash -c "[ $SITE_UPDATE_ON_MASTER_COMMIT ]" && rake travis_ci_site_update && rake travis_ci_rebase
+    - bash -c "[ $PACKAGE_UPLOAD ]" && rake travis_ci_package_upload
