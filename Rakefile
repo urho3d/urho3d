@@ -240,33 +240,34 @@ def setup_digital_keys
   system "cat <<EOF >>~/.ssh/known_hosts
 frs.sourceforge.net,216.34.181.57 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==
 EOF" or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
-  # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portions are encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case. 
+  # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portion is encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case. 
   system "cat <<EOF >~/.ssh/id_rsa
 -----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA6ciMhglP+1+1a+LEzrMx6sH8MUlRLte6/ve1z52c0Gx3dtZb
-bnUaCM1K7hkyZ5EHv6/gCPnijvF+lcNUbE94K2+gsy8iieFa3upsV8L49nu+0Nvm
-682lAAZsQ53EArMp3OVf9owycKNOKyGxQ5+KQCYl8+nYlNA9yg8Gx+UaZ/ai+3Sb
-IhPsozd1SdPKuegLD4+vHMe2NHxxPvhXnZg9g4ZMxoZlZNF8VrZ0Y9ENxWZwysxD
-xpHEMR72bM5vqm2Tj7uQ+n/DLpOl6R34kvYtvuS1GVkzpy29ELkITKb+TNSs3fX2
-AglaL/p89PRjmyK3srupG1Ee5vwLkIO7GkQIgwIDAQABAoIBAHJVDTxkA4SpSv2H${SF_KEY1}
-Or7n7iqkUiT8eUKSaLZXCMiPiWh5E3e/35lGlcPmOpX1Jqx1xjdd2RAqvT0xJ7ow
-e/I4b0m23v2iuJ574sgQF4pYJQ/OdwSH9wgtW1uGyJ3M41Z6rqeEWgkmiWiCxTDc
-2md6987lmTwPikdFDGLsNGHATsi2a601/zar3jWKx3TLqvuysF0qoXVe/k5csuob
-U2WB1HZnJSlIXpeFqrPPMjl3A22nloe2BxfyM7/WVmkClpwDWLyPaRL2O2EQ4VE3
-rs/ypLW2Vab3vZesxp01OoOlgxeGdtgIVOi+ZuI540/MadJ7T7PuvQuYrXCa7n9W
-KN8XE6ECgYEA+Sc7lZbdxg1sfz5yaw+Fsqkc1Xo3Gg47MPVplYIpiA9lN9TfsVIC
-Erzr7OYmE+TQEzUvIcoz/Ajt38e9grX9AKUmU4YE2J1gKsEdkGC5qBVowwUHzfGd${SF_KEY2}
-2OfUzYYXBh5E7stl7lzClw2ZQ0Ol43X5EqDPYQSxp6aVI/GtTA1R34+tYZANNOku
-HocMBMObfCLhsSIkrECxS1V6pmS51PbfNCVpx92d4XCA/zijeNUyuxMxDS8CZDFf
-3GjrWOWNHfPYGQzHf5eDrK6q52LzjQd8I8EH9HECgYEAr41ONXOMpbzVor58XiUc
-vircLyqi4o/+ctuoXnjNDJpUZkduqgEvhsZosY3kbIX/elkx8WwIvuAHw3J4fD4A${SF_KEY3}
-m1DCNX2rsnkIxnc1foI4rk8PdsH3ostIroAFnRLwBtbRVQFyFeTiYIDnNH5eR0QY
-Iz2mV3ljJJIqCqSM4FjzMPMCgYB4Ep6wTnLZqcWokUjz9UimtkevKmUKcq5h3X78
-CNahMK99lo/Gv/BYq+/ZSQDqXA+9+zHKoMcpOn5mtykKWn7qfAwkFD6THpamFiHM
-90bBWc6p+osBCVbt9+S8DwPeCzmuy9+XVfsPHPBFoLbNDs5KwXpYv5c+wv/r52nu
-lXdcgQKBgQDWu9mz9kJFJNrX/ipCJherwT2g29Nut5wwVmYirvUKcEvh31iJVo25
-hiZDvPXzoOigadbXd05tICfP72gxenWyJXNwIG6+atIqBydS94rn3AzF7TEmKq6Z
-AS61aRTDBf17Ql/HMyfweb8gEt+JUeCOKkxCLMhbwVnZeijKYz2ODQ==
+MIIEpQIBAAKCAQEAnZGzFEypdXKY3KDT0Q3NLY4Bv74yKgJ4LIgbXothx8w4CfM0
+VeWBL/AE2iRISEWGB07LruM9y+U/wt58WlCVu001GuJuvXwWenlljsvH8qQlErYi
+oXlCwAeVVeanILGL8CPS7QlyzOwwnVF6NdcmfDJjTthBVFbvHrWGo5if86zcZyMR
+2BB5QVEr5fU0yOPFp0+2p7J3cA6HQSKwjUiDtJ+lM62UQp7InCCT3qeh5KYHQcYb
+KVJTyj5iycVuBujHDwNAivLq82ojG7LcKjP+Ia8fblardCOQyFk6pSDM79NJJ2Dg
+3ZbYIJeUmqSqFhRW/13Bro7Z1aNGrdh/XZkkHwIDAQABAoIBACHcBFJxYtzVIloO
+yVWcFKIcaO3OLjNu0monWVJIu1tW3BfvRijLJ6aoejJyJ4I4RmPdn9FWDZp6CeiT
+LL+vn21fWvELBWb8ekwZOCSmT7IpaboKn4h5aUmgl4udA/73iC2zVQkQxbWZb5zu
+vEdDk4aOwV5ZBDjecYX01hjjnEOdZHGJlF/H/Xs0hYX6WDG3/r9QCJJ0nfd1/Fk2
+zdbZRtAbyRz6ZHiYKnFQ441qRRaEbzunkvTBEwu9iqzlE0s/g49LJL0mKEp7rt/J
+4iS3LZTQbJNx5J0ti8ZJKHhvoWb5RJxNimwKvVHC0XBZKTiLMrhnADmcpjLz53F8
+$SF_KEY
+sx27yCaeBeKXV0tFOeZmgK664VM9EgesjIX4sVOJ5mA3xBJBOtz9n66LjoIlIM58
+dvsAnJt7MUBdclL/RBHEjbUxgGBDcazfWSuJe0sGczhnXMN94ox4MSECgYEAx5cv
+cs/2KurjtWPanDGSz71LyGNdL/xQrAud0gi49H0tyYr0XmzNoe2CbZ/T5xGSZB92
+PBcz4rnHQ/oujo/qwjNpDD0xVLEU70Uy/XiY5/v2111TFC4clfE/syZPywKAztt3
+y2l5z+QdsNigRPDhKw+7CFYaAnYBEISxR6nabT8CgYEAqHrM8fdn2wsCNE6XvkZQ
+O7ZANHNIKVnaRqW/8HW7EFAWQrlQTgzFbtR4uNBIqAtPsvwSx8Pk652+OR1VKfSv
+ya3dtqY3rY/ErXWyX0nfPQEbYj/oh8LbS6zPw75yIorP3ACIwMw3GRNWIvkdAGTn
+BMUgpWHUDLWWpWRrSzNi90ECgYEAkxxzQ6vW5OFGv17/NdswO+BpqCTc/c5646SY
+ScRWFxbhFclOvv5xPqYiWYzRkmIYRaYO7tGnU7jdD9SqVjfrsAJWrke4QZVYOdgG
+cl9eTLchxLGr15b5SOeNrQ1TCO4qZM3M6Wgv+bRI0h2JW+c0ABpTIBzehOvXcwZq
+6MhgD98CgYEAtOPqc4aoIRUy+1oijpWs+wU7vAc8fe4sBHv5fsv7naHuPqZgyQYY
+32a54xZxlsBw8T5P4BDy40OR7fu+6miUfL+WxUdII4fD3grlIPw6bpNE0bCDykv5
+RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 -----END RSA PRIVATE KEY-----
 EOF" or abort 'Failed to create user private key to id_rsa'
   system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
