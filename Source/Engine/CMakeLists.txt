@@ -105,7 +105,7 @@ endif ()
 if (APPLE)
     if (IOS)
         setup_ios_linker_flags (LINKER_FLAGS)
-        # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs) and iphonesimulator (i386 arch)
+        # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
         add_custom_target (${TARGET_NAME}_universal
             COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphonesimulator
             COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator}
