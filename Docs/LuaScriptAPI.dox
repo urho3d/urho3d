@@ -3302,6 +3302,8 @@ Methods:
 - Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - bool LoadAsync(File* file)
 - bool LoadAsyncXML(File* file)
+- bool LoadAsync(const String fileName)
+- bool LoadAsyncXML(const String fileName)
 - void StopAsyncLoading()
 - void Clear(bool clearReplicated = true, bool clearLocal = true)
 - void SetUpdateEnabled(bool enable)
