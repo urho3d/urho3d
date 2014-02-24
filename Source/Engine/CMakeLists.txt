@@ -107,14 +107,9 @@ if (APPLE)
         setup_ios_linker_flags (LINKER_FLAGS)
         # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
         add_custom_target (${TARGET_NAME}_universal
-            COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphonesimulator
-            COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator}
-            COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphoneos
-            COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.iphoneos}
-            COMMAND lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator,.iphoneos}
-            COMMAND rm $<TARGET_FILE:${TARGET_NAME}>{.iphonesimulator,.iphoneos}
+            COMMAND lipo -info $<TARGET_FILE:${TARGET_NAME}> |egrep -v 'i386.+armv7' && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphonesimulator && mv $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator} && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphoneos && mv $<TARGET_FILE:${TARGET_NAME}>{,.iphoneos} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator,.iphoneos} && rm $<TARGET_FILE:${TARGET_NAME}>{.iphonesimulator,.iphoneos} || echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Creating Mach-O universal binary library")
+            COMMENT "Creating Mach-O universal binary library consisting of both iphoneos and iphonesimulator archs")
     else ()
         # Intentionally use built-in CMAKE_EXE_LINKER_FLAGS here although CMake does not use it when building library, but the variable would be used later when configuring Urho3D.pc for MacOSX platform
         setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)

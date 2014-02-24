@@ -67,11 +67,17 @@ task :travis_ci_site_update do
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
   # Generate and sync doxygen pages
-  system 'cd Build && make doc >/dev/null && rsync -a --delete ../Docs/html/ ../doc-Build/documentation' or abort 'Failed to generate/rsync doxygen pages'
+  system 'cd Build && make doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation' or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
-  system "msg=`git log --format=%B -n 1 $TRAVIS_COMMIT`; export msg && cd doc-Build && pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/urho3d/Urho3D/commit/$TRAVIS_COMMIT\n\nMessage: $msg\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
+  system "cd doc-Build && pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/urho3d/Urho3D/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
+  # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
+  if ENV['PACKAGE_UPLOAD']
+    instruction = 'skip'
+  else
+    instruction = 'package'
+  end
   # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if detached HEAD is not a fast forward of remote master)
-  system "pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && ( git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci skip]' || true ) && git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
+  system "pwd && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && ( git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]' || true ) && git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
@@ -94,18 +100,20 @@ task :travis_ci_package_upload do
   end
   # Generate the documentation if necessary
   unless ENV['SITE_UPDATE_ON_MASTER_COMMIT']
+    system 'echo Generating documentation...'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
     else
       system "cd #{platform_prefix}Build && make doc >/dev/null" or abort 'Failed to generate documentation'
     end
+    system 'echo Done generating documentation'
   end
   # Make the package
   if ENV['IOS']
     # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false, '>/dev/null') or abort 'Failed to build Mach-O universal binary'
+    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
     # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
-    system "cd #{platform_prefix}Build && cpack -G TGZ" or abort 'Failed to make binary package'
+    system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
   elsif ENV['XCODE']
     xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package', false) or abort 'Failed to make binary package'
   else

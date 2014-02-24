@@ -207,7 +207,13 @@ else ()
             # TODO: Revisit this again when ARM also support 64bit
             # For now just reference it to suppress "unused variable" warning
         endif ()
-    elseif (NOT IOS)
+    elseif (IOS)
+        # Using the fact that ENABLE_TESTING option is provided when performing CI build, suppress all the warnings for iOS build because 3rd party libraries produce too many of them and yet we don't want to touch the 3rd party library's source codes unnecessarily
+        if (ENABLE_TESTING)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+        endif ()
+    else ()
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
         if (RASPI)
             add_definitions (-DRASPI)
