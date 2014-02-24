@@ -851,9 +851,11 @@ void View::GetBatches()
                         k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
                     {
                         Drawable* drawable = *k;
-                        if (!drawable->IsInView(frame_, false))
+                        if (!drawable->IsInView(frame_, true))
                         {
-                            drawable->MarkInView(frame_, false);
+                            // May be called from multiple threads, so don't manipulate the Drawable's viewCameras set,
+                            // just update the frame number
+                            drawable->MarkInView(frame_.frameNumber_, 0);
                             shadowGeometries_.Push(drawable);
                         }
                         
@@ -1878,7 +1880,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         Drawable* occluder = *i;
         bool erase = false;
         
-        if (!occluder->IsInView(frame_, false))
+        if (!occluder->IsInView(frame_, true))
             occluder->UpdateBatches(frame_);
         
         // Check occluder's draw distance (in main camera view)
@@ -2090,7 +2092,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
         float drawDistance = drawable->GetDrawDistance();
-        bool batchesUpdated = drawable->IsInView(frame_, false);
+        bool batchesUpdated = drawable->IsInView(frame_, true);
         if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
             maxShadowDistance = drawDistance;
         if (maxShadowDistance > 0.0f)

@@ -25,6 +25,7 @@
 #include "BoundingBox.h"
 #include "Component.h"
 #include "GraphicsDefs.h"
+#include "HashSet.h"
 
 namespace Urho3D
 {
@@ -187,6 +188,10 @@ public:
     bool IsOccluder() const { return occluder_; }
     /// Return occludee flag.
     bool IsOccludee() const { return occludee_; }
+    /// Return whether is in view this frame from any viewport camera. Excludes shadow map cameras.
+    bool IsInView() const;
+    /// Return whether is in view of a specific camera this frame. Pass in a null camera to allow any camera, including shadow map cameras.
+    bool IsInView(Camera* camera) const;
     /// Return draw call source data.
     const Vector<SourceBatch>& GetBatches() const { return batches_; }
     
@@ -196,8 +201,10 @@ public:
     void SetSortValue(float value);
     /// Set view-space depth bounds.
     void SetMinMaxZ(float minZ, float maxZ);
-    /// Mark in view (either the main camera, or a shadow camera view) this frame.
-    void MarkInView(const FrameInfo& frame, bool mainView = true);
+    /// Mark in view.
+    void MarkInView(const FrameInfo& frame);
+    /// Mark in view of a specific camera. Specify null camera to update just the frame number.
+    void MarkInView(unsigned frameNumber, Camera* camera);
     /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
@@ -218,10 +225,8 @@ public:
     float GetLodDistance() const { return lodDistance_; }
     /// Return sorting value.
     float GetSortValue() const { return sortValue_; }
-    /// Return whether is in view this frame.
-    bool IsInView(unsigned frameNumber) const { return viewFrameNumber_ == frameNumber; }
-    /// Return whether is visible in a specific view this frame.
-    bool IsInView(const FrameInfo& frame, bool mainView = true) const { return viewFrameNumber_ == frame.frameNumber_ && viewFrame_ == &frame && (!mainView || viewCamera_ == frame.camera_); }
+    /// Return whether is in view on the current frame. Called by View.
+    bool IsInView(const FrameInfo& frame, bool anyCamera = false) const;
     /// Return whether has a base pass.
     bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
     /// Return per-pixel lights.
@@ -332,12 +337,10 @@ protected:
     Zone* zone_;
     /// Previous zone.
     Zone* lastZone_;
-    /// Last view's frameinfo. Not safe to dereference.
-    const FrameInfo* viewFrame_;
-    /// Last view's camera. Not safe to dereference.
-    Camera* viewCamera_;
     /// Zone assignment dirty flag.
     bool zoneDirty_;
+    /// Set of cameras from which is seen on the current frame.
+    HashSet<Camera*> viewCameras_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

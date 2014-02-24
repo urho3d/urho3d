@@ -35,6 +35,7 @@
 #include "Material.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"
+#include "Renderer.h"
 #include "RenderPath.h"
 #include "Scene.h"
 #include "SmoothedTransform.h"
