@@ -25,6 +25,8 @@ class Scene : public Node
 
     bool LoadAsync(File* file);
     bool LoadAsyncXML(File* file);
+    tolua_outside bool SceneLoadAsync @ LoadAsync(const String fileName);
+    tolua_outside bool SceneLoadAsyncXML @ LoadAsyncXML(const String fileName);
     void StopAsyncLoading();
     void Clear(bool clearReplicated = true, bool clearLocal = true);
     void SetUpdateEnabled(bool enable);
@@ -142,6 +144,22 @@ static bool SceneSaveXML(const Scene* scene, const String& fileName)
     if (!file.IsOpen())
         return false;
     return scene->SaveXML(file);
+}
+
+static bool SceneLoadAsync(Scene* scene, const String& fileName)
+{
+    SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
+    if (!file->IsOpen())
+        return false;
+    return scene->LoadAsync(file);
+}
+
+static bool SceneLoadAsyncXML(Scene* scene, const String& fileName)
+{
+    SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
+    if (!file->IsOpen())
+        return false;
+    return scene->LoadAsyncXML(file);
 }
 
 static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
