@@ -15,6 +15,7 @@ Urho3D development, contributions and bugfixes by:
 - Aster Jian
 - Colin Barrett
 - Erik Beran
+- Danny B.
 - Carlo Carollo
 - Pete Chown
 - Sebastian Delatorre (primitivewaste)
