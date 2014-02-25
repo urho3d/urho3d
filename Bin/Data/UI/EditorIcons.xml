@@ -295,4 +295,8 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="128 160 158 190" />
     </element>
+    <element type="Settings">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 16 126 30" />
+    </element>
 </elements>
