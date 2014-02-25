@@ -7974,6 +7974,10 @@ Properties:
 
 ### ReloadFailed
 
+### FileChanged
+- %FileName : String
+- %ResourceName : String
+
 ### LoadFailed
 - %ResourceName : String
 
