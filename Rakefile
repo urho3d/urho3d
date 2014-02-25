@@ -100,17 +100,17 @@ task :travis_ci_package_upload do
   end
   # Generate the documentation if necessary
   unless ENV['SITE_UPDATE_ON_MASTER_COMMIT']
-    system 'echo Generating documentation...'
+    system 'echo Generate documentation'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
     else
       system "cd #{platform_prefix}Build && make doc >/dev/null" or abort 'Failed to generate documentation'
     end
-    system 'echo Done generating documentation'
   end
   # Make the package
   if ENV['IOS']
     # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
+    system 'echo Rebuild Urho3D library as Mach-O universal binary'
     xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
     # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
     system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
