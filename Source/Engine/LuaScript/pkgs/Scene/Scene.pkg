@@ -107,17 +107,13 @@ static bool SceneSave(const Scene* scene, File* file)
 static bool SceneLoad(Scene* scene, const String& fileName)
 {
     File file(scene->GetContext(), fileName, FILE_READ);
-    if (!file.IsOpen())
-        return false;
-    return scene->Load(file);
+    return file.IsOpen() && scene->Load(file);
 }
 
 static bool SceneSave(const Scene* scene, const String& fileName)
 {
     File file(scene->GetContext(), fileName, FILE_WRITE);
-    if (!file.IsOpen())
-        return false;
-    return scene->Save(file);
+    return file.IsOpen() && scene->Save(file);
 }
 
 static bool SceneLoadXML(Scene* scene, File* file)
@@ -133,9 +129,7 @@ static bool SceneSaveXML(const Scene* scene, File* file)
 static bool SceneLoadXML(Scene* scene, const String& fileName)
 {
     File file(scene->GetContext(), fileName, FILE_READ);
-    if (!file.IsOpen())
-        return false;
-    return scene->LoadXML(file);
+    return file.IsOpen() && scene->LoadXML(file);
 }
 
 static bool SceneSaveXML(const Scene* scene, const String& fileName)
@@ -149,17 +143,13 @@ static bool SceneSaveXML(const Scene* scene, const String& fileName)
 static bool SceneLoadAsync(Scene* scene, const String& fileName)
 {
     SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
-    if (!file->IsOpen())
-        return false;
-    return scene->LoadAsync(file);
+    return file->IsOpen() && scene->LoadAsync(file);
 }
 
 static bool SceneLoadAsyncXML(Scene* scene, const String& fileName)
 {
     SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
-    if (!file->IsOpen())
-        return false;
-    return scene->LoadAsyncXML(file);
+    return file->IsOpen() && scene->LoadAsyncXML(file);
 }
 
 static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
@@ -170,9 +160,7 @@ static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position,
 static Node* SceneInstantiate(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
     File file(scene->GetContext(), fileName, FILE_READ);
-    if (!file.IsOpen())
-        return 0;
-    return scene->Instantiate(file, position, rotation, mode);
+    return file.IsOpen() ? scene->Instantiate(file, position, rotation, mode) : 0;
 }
 
 static Node* SceneInstantiateXML(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
@@ -183,10 +171,6 @@ static Node* SceneInstantiateXML(Scene* scene, File* file, const Vector3& positi
 static Node* SceneInstantiateXML(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
     File file(scene->GetContext(), fileName, FILE_READ);
-    if (!file.IsOpen())
-        return 0;
-    return scene->InstantiateXML(file, position, rotation, mode);
+    return file.IsOpen() ? scene->InstantiateXML(file, position, rotation, mode) : 0;
 }
-
 $}
-

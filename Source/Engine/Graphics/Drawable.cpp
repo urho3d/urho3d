@@ -255,19 +255,13 @@ bool Drawable::IsInView() const
     // Note: in headless mode there is no renderer subsystem and no view frustum tests are performed, so return
     // always false in that case
     Renderer* renderer = GetSubsystem<Renderer>();
-    if (renderer)
-        return viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && !viewCameras_.Empty();
-    else
-        return false;
+    return renderer && viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && !viewCameras_.Empty();
 }
 
 bool Drawable::IsInView(Camera* camera) const
 {
     Renderer* renderer = GetSubsystem<Renderer>();
-    if (renderer)
-        return viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && (!camera || viewCameras_.Contains(camera));
-    else
-        return false;
+    return renderer && viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && (!camera || viewCameras_.Contains(camera));
 }
 
 bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera) const
