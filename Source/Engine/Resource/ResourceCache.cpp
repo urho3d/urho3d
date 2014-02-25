@@ -469,7 +469,6 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     if (!resource->Load(*(file.Get())))
     {
         // Error should already been logged by corresponding resource descendant class
-
         using namespace LoadFailed;
 
         VariantMap& eventData = GetEventDataMap();
@@ -807,6 +806,14 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
                     }
                 }
             }
+
+            // Finally send a general file changed event even if the file was not a tracked resource
+            using namespace FileChanged;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_FILENAME] = fileWatchers_[i]->GetPath() + fileName;
+            eventData[P_RESOURCENAME] = fileName;
+            SendEvent(E_FILECHANGED, eventData);
         }
     }
 }

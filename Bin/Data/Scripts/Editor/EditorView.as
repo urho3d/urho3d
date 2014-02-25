@@ -306,10 +306,7 @@ class ViewportContext
         else if (element is cameraZoom)
             camera.zoom = element.text.ToFloat();
         else if (element is cameraOrthoSize)
-        {
-            Print(element.text);
             camera.orthoSize = element.text.ToFloat();
-        }
     }
 }
 

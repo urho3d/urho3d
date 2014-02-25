@@ -42,6 +42,13 @@ EVENT(E_RELOADFAILED, ReloadFailed)
 {
 }
 
+/// Tracked file changed in the resource directories.
+EVENT(E_FILECHANGED, FileChanged)
+{
+    PARAM(P_FILENAME, FileName);                    // String
+    PARAM(P_RESOURCENAME, ResourceName);            // String
+}
+
 /// Resource loading failed.
 EVENT(E_LOADFAILED, LoadFailed)
 {
