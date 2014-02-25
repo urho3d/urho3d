@@ -217,12 +217,11 @@ void AnimatedModel::Update(const FrameInfo& frame)
 void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    // To prevent LOD changes during animation, do not use the actual world bounding box (which changes with animation),
-    // but the model's bounding box transformed to world space
-    BoundingBox transformedBoundingBox = boundingBox_.Transformed(worldTransform);
-    distance_ = frame.camera_->GetDistance(transformedBoundingBox.Center());
+    const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
+    distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
-    // Note: per-geometry distances do not take skinning into account
+    // Note: per-geometry distances do not take skinning into account. Especially in case of a ragdoll they may be
+    // much off base if the node's own transform is not updated
     if (batches_.Size() > 1)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -231,6 +230,9 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     else if (batches_.Size() == 1)
         batches_[0].distance_ = distance_;
 
+    // Use a transformed version of the model's bounding box instead of world bounding box for LOD scale
+    // determination so that animation does not change the scale
+    BoundingBox transformedBoundingBox = boundingBox_.Transformed(worldTransform);
     float scale = transformedBoundingBox.Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
 
