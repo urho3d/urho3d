@@ -21,11 +21,13 @@
 //
 
 #include "Application.h"
+#include "BorderImage.h"
 #include "Console.h"
 #include "DebugHud.h"
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Graphics.h"
+#include "GraphicsEvents.h"
 #include "InputEvents.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
@@ -51,6 +53,10 @@ void Sample::Setup()
 
 void Sample::Start()
 {
+    // Display splash screen
+    if (GetPlatform() == "Android" or GetPlatform() == "iOS")
+        SplashScreen();
+
     // Create logo
     CreateLogo();
 
@@ -62,6 +68,31 @@ void Sample::Start()
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
+}
+
+
+void Sample::SplashScreen()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    UI* ui = GetSubsystem<UI>();
+
+    BorderImage* splashUI = new BorderImage(context_);
+    splashUI->SetName("Splash");
+    Texture2D* texture = cache->GetResource<Texture2D>("Textures/LogoLarge.png");
+    splashUI->SetTexture(texture); // Set texture
+    splashUI->SetSize(texture->GetWidth(), texture->GetHeight());
+    splashUI->SetAlignment(HA_CENTER, VA_CENTER);
+    ui->GetRoot()->AddChild(splashUI);
+    GetSubsystem<Engine>()->RunFrame(); // Render Splash immediately
+    SubscribeToEvent(E_ENDRENDERING, HANDLER(Sample, HandleSplash)); // Keep visible until rendering of the scene
+}
+
+void Sample::HandleSplash(StringHash eventType, VariantMap& eventData)
+{
+    // Remove splash screen when scene fully rendered
+    UIElement* splashUI = GetSubsystem<UI>()->GetRoot()->GetChild("Splash", true);
+    if (splashUI)
+        splashUI->Remove();
 }
 
 void Sample::SetLogoVisible(bool enable)

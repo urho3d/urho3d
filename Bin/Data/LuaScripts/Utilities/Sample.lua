@@ -5,10 +5,14 @@
 --    - Toggle rendering options from the keys 1-8
 --    - Take screenshots with key 9
 --    - Handle Esc key down to hide Console or exit application
+--    - Display a splash screen during loading time (activated by default for mobiles)
 
 local logoSprite = nil
 
 function SampleStart()
+    -- Display splash screen (comment to disable)
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" then SplashScreen() end
+
     -- Create logo
     CreateLogo()
 
@@ -20,6 +24,21 @@ function SampleStart()
 
     -- Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleKeyDown")
+end
+
+function SplashScreen()
+    local splashUI = ui.root:CreateChild("BorderImage", "Splash")
+    local texture = cache:GetResource("Texture2D", "Textures/LogoLarge.png") -- Get texture
+    splashUI.texture = texture -- Set texture
+    splashUI:SetSize(texture.width, texture.height)
+    splashUI:SetAlignment(HA_CENTER, VA_CENTER)
+    engine:RunFrame() -- Render Splash immediately
+    SubscribeToEvent("EndRendering", "HandleSplash") -- Keep visible until rendering of the scene
+end
+
+function HandleSplash(eventType, eventData)
+    -- Remove splash screen when the scene gets rendered
+    if ui.root:GetChild("Splash") ~= nil then ui.root:GetChild("Splash"):Remove() end
 end
 
 function SetLogoVisible(enable)
@@ -34,31 +53,31 @@ function CreateLogo()
     if logoTexture == nil then
         return
     end
-    
+
     -- Create logo sprite and add to the UI layout
     logoSprite = ui.root:CreateChild("Sprite")
-    
+
     -- Set logo sprite texture
     logoSprite:SetTexture(logoTexture)
-    
+
     local textureWidth = logoTexture.width
     local textureHeight = logoTexture.height
-    
+
     -- Set logo sprite scale
     logoSprite:SetScale(256 / textureWidth)
-    
+
     -- Set logo sprite size
     logoSprite:SetSize(textureWidth, textureHeight)
-    
+
     -- Set logo sprite hot spot
     logoSprite.hotSpot = IntVector2(0, textureHeight)
-    
+
     -- Set logo sprite alignment
-    logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
-    
+    logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM)
+
     -- Make logo not fully opaque to show the scene underneath
     logoSprite.opacity = 0.75
-    
+
     -- Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite.priority = -100
 end
@@ -75,11 +94,11 @@ function CreateConsoleAndDebugHud()
     if uiStyle == nil then
         return
     end
-    
+
     -- Create console
     engine:CreateConsole()
     console.defaultStyle = uiStyle
-    
+
     -- Create debug HUD
     engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
@@ -160,7 +179,7 @@ function HandleKeyDown(eventType, eventData)
         -- Instancing
         elseif key == KEY_8 then
             renderer.dynamicInstancing = not renderer.dynamicInstancing
-        
+
         -- Take screenshot
         elseif key == KEY_9 then
             local screenshot = Image()
