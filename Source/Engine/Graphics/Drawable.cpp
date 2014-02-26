@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "Material.h"
 #include "Octree.h"
+#include "Renderer.h"
 #include "Scene.h"
 #include "Sort.h"
 #include "Zone.h"
@@ -80,8 +81,6 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     firstLight_(0),
     zone_(0),
     lastZone_(0),
-    viewFrame_(0),
-    viewCamera_(0),
     zoneDirty_(false)
 {
 }
@@ -251,6 +250,25 @@ const BoundingBox& Drawable::GetWorldBoundingBox()
     return worldBoundingBox_;
 }
 
+bool Drawable::IsInView() const
+{
+    // Note: in headless mode there is no renderer subsystem and no view frustum tests are performed, so return
+    // always false in that case
+    Renderer* renderer = GetSubsystem<Renderer>();
+    return renderer && viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && !viewCameras_.Empty();
+}
+
+bool Drawable::IsInView(Camera* camera) const
+{
+    Renderer* renderer = GetSubsystem<Renderer>();
+    return renderer && viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && (!camera || viewCameras_.Contains(camera));
+}
+
+bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera) const
+{
+    return viewFrameNumber_ == frame.frameNumber_ && (anyCamera || viewCameras_.Contains(frame.camera_));
+}
+
 void Drawable::SetZone(Zone* zone, bool temporary)
 {
     zone_ = zone;
@@ -271,23 +289,27 @@ void Drawable::SetMinMaxZ(float minZ, float maxZ)
     maxZ_ = maxZ;
 }
 
-void Drawable::MarkInView(const FrameInfo& frame, bool mainView)
+void Drawable::MarkInView(const FrameInfo& frame)
 {
-    if (mainView)
+    if (frame.frameNumber_ != viewFrameNumber_)
     {
         viewFrameNumber_ = frame.frameNumber_;
-        viewFrame_ = &frame;
-        viewCamera_ = frame.camera_;
+        viewCameras_.Clear();
     }
-    else
+    
+    viewCameras_.Insert(frame.camera_);
+}
+
+void Drawable::MarkInView(unsigned frameNumber, Camera* camera)
+{
+    if (frameNumber != viewFrameNumber_)
     {
-        if (viewFrameNumber_ != frame.frameNumber_ || viewFrame_ != &frame)
-        {
-            viewFrameNumber_ = frame.frameNumber_;
-            viewFrame_ = &frame;
-            viewCamera_ = 0;
-        }
+        viewFrameNumber_ = frameNumber;
+        viewCameras_.Clear();
     }
+    
+    if (camera)
+        viewCameras_.Insert(camera);
 }
 
 void Drawable::LimitLights()

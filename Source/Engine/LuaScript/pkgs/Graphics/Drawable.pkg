@@ -11,13 +11,6 @@ static const unsigned DEFAULT_ZONEMASK;
 static const int MAX_VERTEX_LIGHTS;
 static const float ANIMATION_LOD_BASESCALE;
 
-enum UpdateGeometryType
-{
-    UPDATE_NONE = 0,
-    UPDATE_MAIN_THREAD,
-    UPDATE_WORKER_THREAD
-};
-
 class Drawable : public Component
 {
     void SetDrawDistance(float distance);
@@ -47,30 +40,11 @@ class Drawable : public Component
     bool GetCastShadows() const;
     bool IsOccluder() const;
     bool IsOccludee() const;
-    
-    void SetZone(Zone* zone, bool temporary = false);
-    void SetSortValue(float value);
-    void SetMinMaxZ(float minZ, float maxZ);
-    void MarkInView(const FrameInfo& frame, bool mainView = true);
-    void ClearLights();
-    void AddLight(Light* light);
-    void AddVertexLight(Light* light);
-    void LimitLights();
-    void LimitVertexLights();
-    void SetBasePass(unsigned batchIndex);
-    Octant* GetOctant() const;
+    bool IsInView() const;
+    bool IsInView(Camera*) const;
+
     Zone* GetZone() const;
-    Zone* GetLastZone() const;
-    bool IsZoneDirty() const;
-    float GetDistance() const;
-    float GetLodDistance() const;
-    float GetSortValue() const;
-    bool HasBasePass(unsigned batchIndex) const;
-    Light* GetFirstLight() const;
-    float GetMinZ() const;
-    float GetMaxZ() const;
-    
-    tolua_readonly tolua_property__is_set bool inView;
+
     tolua_readonly tolua_property__get_set BoundingBox& worldBoundingBox;
     tolua_readonly tolua_property__get_set unsigned char drawableFlags;
     tolua_property__get_set float drawDistance;
@@ -84,36 +58,7 @@ class Drawable : public Component
     tolua_property__get_set bool castShadows;
     tolua_property__is_set bool occluder;
     tolua_property__is_set bool occludee;
-    tolua_readonly tolua_property__get_set Octant* octant;
-    tolua_property__get_set Zone* zone;
-    tolua_readonly tolua_property__get_set Zone* lastZone;
-    tolua_readonly tolua_property__is_set bool zoneDirty;
-    tolua_readonly tolua_property__get_set float distance;
-    tolua_readonly tolua_property__get_set float lodDistance;
-    tolua_property__get_set float sortValue;
-    tolua_readonly tolua_property__get_set Light* firstLight;
-    tolua_readonly tolua_property__get_set float minZ;
-    tolua_readonly tolua_property__get_set float maxZ;
+    tolua_readonly tolua_property__is_set bool inView;
+    tolua_readonly tolua_property__get_set Zone* zone;
 };
 
-${
-static bool DrawableIsInView(Drawable* drawable)
-{
-    // Get the last frame number processed by the Renderer to be able to check
-    Renderer* renderer = drawable->GetContext()->GetSubsystem<Renderer>();
-    if (!renderer)
-        return false;
-    const FrameInfo& frame = renderer->GetFrameInfo();
-    return drawable->IsInView(frame.frameNumber_);
-}
-#define TOLUA_DISABLE_tolua_get_Drawable_inView
-static int tolua_get_Drawable_inView(lua_State* tolua_S)
-{
-  Drawable* self = (Drawable*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'inView'",NULL);
-#endif
- tolua_pushboolean(tolua_S,(bool)DrawableIsInView(self));
- return 1;
-}
-$}

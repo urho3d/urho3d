@@ -59,8 +59,8 @@ void HelloGUI::Start()
     GetSubsystem<Input>()->SetMouseVisible(true);
 
     // Load XML file containing default UI style sheet
-    SharedPtr<ResourceCache> cache(GetSubsystem<ResourceCache>());
-    SharedPtr<XMLFile> style(cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
 
     // Set the loaded style as default style
     uiRoot_->SetDefaultStyle(style);
@@ -105,7 +105,7 @@ void HelloGUI::InitControls()
 void HelloGUI::InitWindow()
 {
     // Create the Window and add it to the UI's root node
-    window_ = SharedPtr<Window>(new Window(context_));
+    window_ = new Window(context_);
     uiRoot_->AddChild(window_);
 
     // Set Window size and layout settings
@@ -206,7 +206,7 @@ void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
 void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
 {
     // Get the Text control acting as the Window's title
-    SharedPtr<Text> windowTitle((Text*)window_->GetChild("WindowTitle", true));
+    Text* windowTitle = static_cast<Text*>(window_->GetChild("WindowTitle", true));
 
     // Get control that was clicked
     UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());

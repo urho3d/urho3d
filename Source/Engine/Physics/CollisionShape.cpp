@@ -933,7 +933,7 @@ void CollisionShape::UpdateShape()
             
         case SHAPE_TRIANGLEMESH:
             size_ = size_.Abs();
-            if (model_)
+            if (model_ && model_->GetNumGeometries())
             {
                 // Check the geometry cache
                 Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
@@ -973,7 +973,7 @@ void CollisionShape::UpdateShape()
                 else
                     LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) + " for convex shape creation");
             }
-            else if (model_)
+            else if (model_ && model_->GetNumGeometries())
             {
                 // Check the geometry cache
                 Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);

@@ -216,11 +216,12 @@ void AnimatedModel::Update(const FrameInfo& frame)
 
 void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
-    const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
-    // Note: per-geometry distances do not take skinning into account
+    // Note: per-geometry distances do not take skinning into account. Especially in case of a ragdoll they may be
+    // much off base if the node's own transform is not updated
     if (batches_.Size() > 1)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -229,7 +230,10 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     else if (batches_.Size() == 1)
         batches_[0].distance_ = distance_;
 
-    float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
+    // Use a transformed version of the model's bounding box instead of world bounding box for LOD scale
+    // determination so that animation does not change the scale
+    BoundingBox transformedBoundingBox = boundingBox_.Transformed(worldTransform);
+    float scale = transformedBoundingBox.Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
 
     // If model is rendered from several views, use the minimum LOD distance for animation LOD
@@ -868,8 +872,19 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 
 void AnimatedModel::OnWorldBoundingBoxUpdate()
 {
-    // Note: do not update bone bounding box here, instead do it in either of the threaded updates
-    worldBoundingBox_ = boneBoundingBox_.Transformed(node_->GetWorldTransform());
+    if (isMaster_)
+    {
+        // Note: do not update bone bounding box here, instead do it in either of the threaded updates
+        worldBoundingBox_ = boneBoundingBox_.Transformed(node_->GetWorldTransform());
+    }
+    else
+    {
+        // Non-master animated models get the bounding box from the master
+        /// \todo If it's a skinned attachment that does not cover the whole body, it will have unnecessarily large bounds
+        AnimatedModel* master = node_->GetComponent<AnimatedModel>();
+        if (master)
+            worldBoundingBox_ = master->GetWorldBoundingBox();
+    }
 }
 
 void AnimatedModel::AssignBoneNodes()
@@ -1112,13 +1127,17 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
         animationOrderDirty_ = false;
     }
 
-    // Reset skeleton, then apply all animations
-    skeleton_.Reset();
-    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
-        (*i)->Apply();
-
-    // Calculate new bone bounding box
-    UpdateBoneBoundingBox();
+    // Reset skeleton, apply all animations, calculate bones' bounding box. Make sure this is only done for the master model
+    // (first AnimatedModel in a node)
+    if (isMaster_)
+    {
+        skeleton_.Reset();
+        for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+            (*i)->Apply();
+        
+        // Calculate new bone bounding box
+        UpdateBoneBoundingBox();
+    }
     
     animationDirty_ = false;
 }

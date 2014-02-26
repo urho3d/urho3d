@@ -19,6 +19,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetMorphWeight(uint) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -309,6 +310,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -1339,6 +1341,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -1471,6 +1474,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -1596,6 +1600,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -2281,6 +2286,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -3439,6 +3445,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(XMLFile@)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -3811,7 +3818,6 @@ Properties:
 - RenderCommandType type
 - bool useFogColor
 - bool useLitBase
-- bool useScissor
 - bool vertexLights
 - String vertexShaderDefines
 - String vertexShaderName
@@ -3929,8 +3935,8 @@ Properties:
 Methods:
 
 - bool AddManualResource(Resource@)
-- void AddPackageFile(PackageFile@, uint = - 1)
-- bool AddResourceDir(const String&, uint = - 1)
+- void AddPackageFile(PackageFile@, uint = M_MAX_UNSIGNED)
+- bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&) const
@@ -3960,6 +3966,7 @@ Properties:
 - PackageFile@[]@ packageFiles // readonly
 - int refs // readonly
 - String[]@ resourceDirs // readonly
+- bool returnFailedResources
 - bool seachPackagesFirst // readonly
 - bool searchPackagesFirst // writeonly
 - uint totalMemoryUse // readonly
@@ -4674,6 +4681,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -5269,6 +5277,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
 - bool Load(File@, bool = false)
@@ -5330,6 +5339,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -5552,6 +5562,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -5754,6 +5765,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -6989,6 +7001,7 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -7960,6 +7973,10 @@ Properties:
 ### ReloadFinished
 
 ### ReloadFailed
+
+### FileChanged
+- %FileName : String
+- %ResourceName : String
 
 ### LoadFailed
 - %ResourceName : String

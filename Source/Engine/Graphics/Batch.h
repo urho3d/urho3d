@@ -229,16 +229,12 @@ public:
     /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Draw.
-    void Draw(View* view, bool useScissor = false, bool markToStencil = false) const;
-    /// Draw with forward light optimizations.
-    void Draw(Light* light, View* view) const;
+    void Draw(View* view, bool markToStencil = false, bool usingLightOptimization = false) const;
     /// Return the combined amount of instances.
     unsigned GetNumInstances() const;
     /// Return whether the batch group is empty.
-    bool IsEmpty() const { return batches_.Empty() && baseBatchGroups_.Empty() && batchGroups_.Empty(); }
+    bool IsEmpty() const { return batches_.Empty() && batchGroups_.Empty(); }
     
-    /// Instanced draw calls with base flag.
-    HashMap<BatchGroupKey, BatchGroup> baseBatchGroups_;
     /// Instanced draw calls.
     HashMap<BatchGroupKey, BatchGroup> batchGroups_;
     /// Shader remapping table for 2-pass state and distance sort.
@@ -250,12 +246,8 @@ public:
     
     /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
-    /// Sorted non-instanced draw calls with base flag.
-    PODVector<Batch*> sortedBaseBatches_;
     /// Sorted non-instanced draw calls.
     PODVector<Batch*> sortedBatches_;
-    /// Sorted instanced draw calls with base flag.
-    PODVector<BatchGroup*> sortedBaseBatchGroups_;
     /// Sorted instanced draw calls.
     PODVector<BatchGroup*> sortedBatchGroups_;
     /// Maximum sorted instances.
@@ -284,7 +276,9 @@ struct LightBatchQueue
     Light* light_;
     /// Shadow map depth texture.
     Texture2D* shadowMap_;
-    /// Lit geometry draw calls.
+    /// Lit geometry draw calls, base (replace blend mode)
+    BatchQueue litBaseBatches_;
+    /// Lit geometry draw calls, non-base (additive)
     BatchQueue litBatches_;
     /// Shadow map split queues.
     Vector<ShadowBatchQueue> shadowSplits_;

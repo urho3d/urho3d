@@ -1042,31 +1042,12 @@ Methods:
 - bool GetCastShadows() const
 - bool IsOccluder() const
 - bool IsOccludee() const
-- void SetZone(Zone* zone, bool temporary = false)
-- void SetSortValue(float value)
-- void SetMinMaxZ(float minZ, float maxZ)
-- void MarkInView(const FrameInfo& frame, bool mainView = true)
-- void ClearLights()
-- void AddLight(Light* light)
-- void AddVertexLight(Light* light)
-- void LimitLights()
-- void LimitVertexLights()
-- void SetBasePass(unsigned batchIndex)
-- Octant* GetOctant() const
+- bool IsInView() const
+- bool IsInView(Camera* tolua_var_1) const
 - Zone* GetZone() const
-- Zone* GetLastZone() const
-- bool IsZoneDirty() const
-- float GetDistance() const
-- float GetLodDistance() const
-- float GetSortValue() const
-- bool HasBasePass(unsigned batchIndex) const
-- Light* GetFirstLight() const
-- float GetMinZ() const
-- float GetMaxZ() const
 
 Properties:
 
-- bool inView (readonly)
 - BoundingBox& worldBoundingBox (readonly)
 - char drawableFlags (readonly)
 - float drawDistance
@@ -1080,16 +1061,8 @@ Properties:
 - bool castShadows
 - bool occluder
 - bool occludee
-- Octant* octant (readonly)
-- Zone* zone
-- Zone* lastZone (readonly)
-- bool zoneDirty (readonly)
-- float distance (readonly)
-- float lodDistance (readonly)
-- float sortValue
-- Light* firstLight (readonly)
-- float minZ (readonly)
-- float maxZ (readonly)
+- bool inView (readonly)
+- Zone* zone (readonly)
 
 ### DropDownList : Menu
 
@@ -3147,6 +3120,7 @@ Methods:
 - void SetMemoryBudget(ShortStringHash type, unsigned budget)
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
+- void SetReturnFailedResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
 - File* GetFile(const String name)
 - Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
@@ -3156,6 +3130,7 @@ Methods:
 - unsigned GetTotalMemoryUse() const
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
+- bool GetReturnFailedResources() const
 - bool GetSearchPackagesFirst() const
 - String GetPreferredResourceDir(const String path) const
 - String SanitateResourceName(const String name) const
@@ -3165,6 +3140,7 @@ Properties:
 
 - unsigned totalMemoryUse (readonly)
 - bool autoReloadResources (readonly)
+- bool returnFailedResources (readonly)
 - bool searchPackagesFirst (readonly)
 
 ### ResourceRef
@@ -3326,6 +3302,8 @@ Methods:
 - Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - bool LoadAsync(File* file)
 - bool LoadAsyncXML(File* file)
+- bool LoadAsync(const String fileName)
+- bool LoadAsyncXML(const String fileName)
 - void StopAsyncLoading()
 - void Clear(bool clearReplicated = true, bool clearLocal = true)
 - void SetUpdateEnabled(bool enable)
@@ -5503,12 +5481,6 @@ Properties:
 
 - int TM_BREADTH_FIRST
 - int TM_DEPTH_FIRST
-
-### UpdateGeometryType
-
-- int UPDATE_NONE
-- int UPDATE_MAIN_THREAD
-- int UPDATE_WORKER_THREAD
 
 ### VariantType
 

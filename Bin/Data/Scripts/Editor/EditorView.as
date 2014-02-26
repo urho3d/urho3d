@@ -81,6 +81,17 @@ class ViewportContext
     UIElement@ statusBar;
     Text@ cameraPosText;
 
+    Window@ settingsWindow;
+    LineEdit@ cameraPosX;
+    LineEdit@ cameraPosY;
+    LineEdit@ cameraPosZ;
+    LineEdit@ cameraRotX;
+    LineEdit@ cameraRotY;
+    LineEdit@ cameraRotZ;
+    LineEdit@ cameraZoom;
+    LineEdit@ cameraOrthoSize;
+    CheckBox@ cameraOrthographic;
+
     ViewportContext(IntRect viewRect, uint index_, uint viewportId_)
     {
         cameraNode = Node();
@@ -90,7 +101,7 @@ class ViewportContext
         viewport = Viewport(editorScene, camera, viewRect);
         index = index_;
         viewportId = viewportId_;
-        camera.viewMask = 0x80000000 + (1 << index); // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
+        camera.viewMask = 0x80000000 + (uint(1) << index); // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
     }
 
     void ResetCamera()
@@ -99,6 +110,7 @@ class ViewportContext
         // Look at the origin so user can see the scene.
         cameraNode.rotation = Quaternion(Vector3(0, 0, 1), -cameraNode.position);
         ReacquireCameraYawPitch();
+        UpdateSettingsUI();
     }
 
     void ReacquireCameraYawPitch()
@@ -126,6 +138,9 @@ class ViewportContext
         statusBar.layoutSpacing = 4;
         statusBar.opacity = uiMaxOpacity;
 
+        Button@ settingsButton = CreateSmallToolBarButton("Settings");
+        statusBar.AddChild(settingsButton);
+
         cameraPosText = Text();
         statusBar.AddChild(cameraPosText);
         
@@ -134,6 +149,35 @@ class ViewportContext
         cameraPosText.textEffect = TE_SHADOW;
         cameraPosText.priority = -100;
 
+        settingsWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorViewport.xml"));
+        settingsWindow.opacity = uiMaxOpacity;
+        settingsWindow.visible = false;
+        viewportContextUI.AddChild(settingsWindow);
+
+        cameraPosX = settingsWindow.GetChild("PositionX", true);
+        cameraPosY = settingsWindow.GetChild("PositionY", true);
+        cameraPosZ = settingsWindow.GetChild("PositionZ", true);
+        cameraRotX = settingsWindow.GetChild("RotationX", true);
+        cameraRotY = settingsWindow.GetChild("RotationY", true);
+        cameraRotZ = settingsWindow.GetChild("RotationZ", true);
+        cameraOrthographic = settingsWindow.GetChild("Orthographic", true);
+        cameraZoom = settingsWindow.GetChild("Zoom", true);
+        cameraOrthoSize = settingsWindow.GetChild("OrthoSize", true);
+
+        SubscribeToEvent(cameraPosX, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraPosY, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraPosZ, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraRotX, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraRotY, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraRotZ, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraZoom, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraOrthoSize, "TextChanged", "HandleSettingsLineEditTextChange");
+        SubscribeToEvent(cameraOrthographic, "Toggled", "HandleOrthographicToggled");
+
+        SubscribeToEvent(settingsButton, "Released", "ToggleViewportSettingsWindow");
+        SubscribeToEvent(settingsWindow.GetChild("ResetCamera", true), "Released", "ResetCamera");
+        SubscribeToEvent(settingsWindow.GetChild("CloseButton", true), "Released", "CloseViewportSettingsWindow");
+        SubscribeToEvent(settingsWindow.GetChild("Refresh", true), "Released", "UpdateSettingsUI");
         HandleResize();
     }
 
@@ -142,9 +186,19 @@ class ViewportContext
         viewportContextUI.SetPosition(viewport.rect.left, viewport.rect.top);
         viewportContextUI.SetFixedSize(viewport.rect.width, viewport.rect.height);
         if (viewport.rect.left < 34)
+        {
             statusBar.layoutBorder = IntRect(34 - viewport.rect.left, 4, 4, 8);
+            IntVector2 pos = settingsWindow.position;
+            pos.x = 32 - viewport.rect.left;
+            settingsWindow.position = pos;
+        }
         else
+        {
             statusBar.layoutBorder = IntRect(8, 4, 4, 8);
+            IntVector2 pos = settingsWindow.position;
+            pos.x = 5;
+            settingsWindow.position = pos;
+        }
 
         statusBar.SetFixedSize(viewport.rect.width, 22);
     }
@@ -156,10 +210,12 @@ class ViewportContext
     
     void SetOrthographic(bool orthographic)
     {
-        if (orthographic)
-            camera.orthoSize = (cameraNode.position - GetScreenCollision(IntVector2(viewport.rect.width, viewport.rect.height))).length;
+        // This doesn't work that great
+        /* if (orthographic) */
+        /*     camera.orthoSize = (cameraNode.position - GetScreenCollision(IntVector2(viewport.rect.width, viewport.rect.height))).length; */
 
         camera.orthographic = orthographic;
+        UpdateSettingsUI();
     }
 
     void Update(float timeStep)
@@ -177,6 +233,80 @@ class ViewportContext
             " Zoom: " + camera.zoom);
 
         cameraPosText.size = cameraPosText.minSize;
+    }
+
+    void ToggleViewportSettingsWindow()
+    {
+        if (settingsWindow.visible)
+            CloseViewportSettingsWindow();
+        else
+            OpenViewportSettingsWindow();
+    }
+
+    void OpenViewportSettingsWindow()
+    {
+        UpdateSettingsUI();
+        /* settingsWindow.position = */ 
+        settingsWindow.visible = true;
+    }
+
+    void CloseViewportSettingsWindow()
+    {
+        settingsWindow.visible = false;
+    }
+
+    void UpdateSettingsUI()
+    {
+        cameraPosX.text = Floor(cameraNode.position.x * 1000) / 1000;
+        cameraPosY.text = Floor(cameraNode.position.y * 1000) / 1000;
+        cameraPosZ.text = Floor(cameraNode.position.z * 1000) / 1000;
+        cameraRotX.text = Floor(cameraNode.rotation.pitch * 1000) / 1000;
+        cameraRotY.text = Floor(cameraNode.rotation.yaw * 1000) / 1000;
+        cameraRotZ.text = Floor(cameraNode.rotation.roll * 1000) / 1000;
+        cameraZoom.text = Floor(camera.zoom * 1000) / 1000;
+        cameraOrthoSize.text = Floor(camera.orthoSize * 1000) / 1000;
+        cameraOrthographic.checked = camera.orthographic;
+    }
+
+    void HandleOrthographicToggled(StringHash eventType, VariantMap& eventData)
+    {
+        SetOrthographic(cameraOrthographic.checked);
+    }
+
+    void HandleSettingsLineEditTextChange(StringHash eventType, VariantMap& eventData)
+    {
+        LineEdit@ element = eventData["Element"].GetPtr();
+        if (element.text == "")
+            return;
+
+        if (element is cameraRotX ||  element is cameraRotY || element is cameraRotZ)
+        {
+            Vector3 euler = cameraNode.rotation.eulerAngles;
+            if (element is cameraRotX)
+                euler.x = element.text.ToFloat();
+            else if (element is cameraRotY)
+                euler.y = element.text.ToFloat();
+            else if (element is cameraRotZ)
+                euler.z = element.text.ToFloat();
+
+            cameraNode.rotation = Quaternion(euler);
+        }
+        else if (element is cameraPosX ||  element is cameraPosY || element is cameraPosZ)
+        {
+            Vector3 pos = cameraNode.position;
+            if (element is cameraPosX)
+                pos.x = element.text.ToFloat();
+            else if (element is cameraPosY)
+                pos.y = element.text.ToFloat();
+            else if (element is cameraPosZ)
+                pos.z = element.text.ToFloat();
+
+            cameraNode.position = pos;
+        }
+        else if (element is cameraZoom)
+            camera.zoom = element.text.ToFloat();
+        else if (element is cameraOrthoSize)
+            camera.orthoSize = element.text.ToFloat();
     }
 }
 

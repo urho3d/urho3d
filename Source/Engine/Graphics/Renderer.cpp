@@ -1430,11 +1430,7 @@ void Renderer::Initialize()
     
     defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
     defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
-    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
-    
-    // If default material not found, create one. This will actually not render properly, but prevents crashing
-    if (!defaultMaterial_)
-        defaultMaterial_ = new Material(context_);
+    defaultMaterial_ = new Material(context_);
     
     defaultRenderPath_ = new RenderPath();
     defaultRenderPath_->Load(cache->GetResource<XMLFile>("RenderPaths/Forward.xml"));

@@ -129,8 +129,6 @@ void RenderPathCommand::Load(const XMLElement& element)
             markToStencil_ = element.GetBool("marktostencil");
         if (element.HasAttribute("vertexlights"))
             vertexLights_ = element.GetBool("vertexlights");
-        if (element.HasAttribute("usescissor"))
-            useScissor_ = element.GetBool("usescissor");
         break;
         
     case CMD_FORWARDLIGHTS:

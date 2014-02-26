@@ -30,7 +30,6 @@
 #include "HashSet.h"
 #include "Log.h"
 #include "Node.h"
-#include "Renderer.h"
 #include "Resource.h"
 #include "Script.h"
 #include "ScriptInstance.h"
@@ -44,6 +43,8 @@
 
 namespace Urho3D
 {
+
+class Camera;
 
 /// Template function for dynamic cast between two script classes.
 template <class T, class U> U* RefCast(T* t)
@@ -677,22 +678,13 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "uint get_useTimer()" ,asMETHODPR(T, GetUseTimer, (), unsigned), asCALL_THISCALL);
 }
 
-static bool DrawableIsInView(Drawable* ptr)
-{
-    // Get the last frame number processed by the Renderer to be able to check
-    Renderer* renderer = GetScriptContext()->GetSubsystem<Renderer>();
-    if (!renderer)
-        return false;
-    const FrameInfo& frame = renderer->GetFrameInfo();
-    return ptr->IsInView(frame.frameNumber_);
-}
-
 /// Template function for registering a class derived from Drawable.
 template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* className)
 {
     RegisterComponent<T>(engine, className);
     RegisterSubclass<Drawable, T>(engine, "Drawable", className);
-    engine->RegisterObjectMethod(className, "bool get_inView() const", asFUNCTION(DrawableIsInView), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool IsInView(Camera@+) const", asMETHODPR(Drawable, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_inView() const", asMETHODPR(Drawable, IsInView, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_castShadows(bool)", asMETHOD(T, SetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_castShadows() const", asMETHOD(T, GetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_occluder(bool)", asMETHOD(T, SetOccluder), asCALL_THISCALL);
