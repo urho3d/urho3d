@@ -1645,6 +1645,64 @@ Properties:
 - uint zoneMask
 
 
+### Drawable2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- BlendMode blendMode
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- float drawDistance
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- Sprite2D@ sprite
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- float unitPerPixel
+- uint viewMask
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- float zValue
+- uint zoneMask
+
+
 ### DropDownList
 
 Methods:
@@ -3535,6 +3593,86 @@ Properties:
 - uint zoneMask
 
 
+### ParticleEmitter2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- BlendMode blendMode
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- float drawDistance
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inView // readonly
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- ParticleModel2D@ model
+- Node@ node // readonly
+- uint numAttributes // readonly
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- Sprite2D@ sprite
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- float unitPerPixel
+- uint viewMask
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- float zValue
+- uint zoneMask
+
+
+### ParticleModel2D
+
+Methods:
+
+- bool Load(File@)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+
 ### Pass
 
 Properties:
@@ -5268,6 +5406,55 @@ Properties:
 - int width
 
 
+### Sprite2D
+
+Methods:
+
+- bool Load(File@)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- Vector2 hotSpot
+- uint memoryUse // readonly
+- String name
+- IntRect rectangle
+- int refs // readonly
+- Texture2D@ texture
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+
+### SpriteSheet2D
+
+Methods:
+
+- void DefineSprite(const String&, const IntRect&, const Vector2&)
+- Sprite2D@ GetSprite(const String&)
+- bool Load(File@)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void UpdateSprite(const String&, const IntRect&, const Vector2&)
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- Texture2D@ texture // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+
 ### StaticModel
 
 Methods:
@@ -5391,6 +5578,68 @@ Properties:
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - Zone@ zone // readonly
+- uint zoneMask
+
+
+### StaticSprite2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetFlip(bool, bool)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- BlendMode blendMode
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- Color color
+- float drawDistance
+- bool enabled
+- bool enabledEffective // readonly
+- bool flipX
+- bool flipY
+- uint id // readonly
+- bool inView // readonly
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- Sprite2D@ sprite
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- float unitPerPixel
+- uint viewMask
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- float zValue
 - uint zoneMask
 
 
@@ -7150,6 +7399,12 @@ Properties:
 
 - EMITTER_SPHERE
 - EMITTER_BOX
+
+
+### EmitterType2D
+
+- EMITTER_TYPE_GRAVITY
+- EMITTER_TYPE_RADIAL
 
 
 ### FileMode

@@ -1064,6 +1064,29 @@ Properties:
 - bool inView (readonly)
 - Zone* zone (readonly)
 
+### Drawable2D : Drawable
+
+Methods:
+
+- void SetUnitPerPixel(float unitPerPixel)
+- void SetSprite(Sprite2D* sprite)
+- void SetMaterial(Material* material)
+- void SetBlendMode(BlendMode mode)
+- void SetZValue(float zValue)
+- float GetUnitPerPixel() const
+- Sprite2D* GetSprite() const
+- Material* GetMaterial() const
+- BlendMode GetBlendMode() const
+- float GetZValue() const
+
+Properties:
+
+- float unitPerPixel
+- Sprite2D* sprite
+- Material* material
+- BlendMode blendMode
+- float zValue
+
 ### DropDownList : Menu
 
 Methods:
@@ -2644,6 +2667,19 @@ Properties:
 - unsigned numColors
 - unsigned numTextureFrames
 
+### ParticleEmitter2D : Drawable2D
+
+Methods:
+
+- void SetModel(ParticleModel2D* model)
+- ParticleModel2D* GetModel() const
+
+Properties:
+
+- ParticleModel2D* model
+
+### ParticleModel2D : Resource
+
 ### Pass : RefCounted
 
 ### PhysicsRaycastResult
@@ -3759,6 +3795,37 @@ Properties:
 - BlendMode blendMode
 - Matrix3x4& transform (readonly)
 
+### Sprite2D : Resource
+
+Methods:
+
+- void SetTexture(Texture2D* texture)
+- void SetRectangle(const IntRect& rectangle)
+- void SetHotSpot(const Vector2& hotSpot)
+- void SetSpriteSheet(SpriteSheet2D* spriteSheet)
+- Texture2D* GetTexture() const
+- const IntRect& GetRectangle() const
+- const Vector2& GetHotSpot() const
+- SpriteSheet2D* GetSpriteSheet() const
+
+Properties:
+
+- Texture2D* texture
+- IntRect rectangle
+- Vector2 hotSpot
+- SpriteSheet2D* spriteSheet
+
+### SpriteSheet2D : Resource
+
+Methods:
+
+- Texture2D* GetTexture() const
+- Sprite2D* GetSprite(const String name) const
+- void DefineSprite(const String name, const IntRect& rectangle)
+- void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
+- void UpdateSprite(const String name, const IntRect& rectangle)
+- void UpdateSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
+
 ### StaticModel : Drawable
 
 Methods:
@@ -3804,6 +3871,24 @@ Methods:
 Properties:
 
 - unsigned numInstanceNodes (readonly)
+
+### StaticSprite2D : Drawable2D
+
+Methods:
+
+- void SetFlip(bool flipX, bool flipY)
+- void SetFlipX(bool flipX)
+- void SetFlipY(bool flipY)
+- void SetColor(const Color& color)
+- bool GetFlipX() const
+- bool GetFlipY() const
+- const Color& GetColor() const
+
+Properties:
+
+- bool flipX
+- bool flipY
+- Color& color
 
 ### StringHash
 
@@ -5224,6 +5309,11 @@ Properties:
 
 - int EMITTER_SPHERE
 - int EMITTER_BOX
+
+### EmitterType2D
+
+- int EMITTER_TYPE_GRAVITY
+- int EMITTER_TYPE_RADIAL
 
 ### FileMode
 
