@@ -1,0 +1,25 @@
+$#include "Drawable2D.h"
+
+enum BlendMode {};
+
+class Drawable2D : public Drawable
+{
+public:
+    void SetUnitPerPixel(float unitPerPixel);
+    void SetSprite(Sprite2D* sprite);
+    void SetMaterial(Material* material);
+    void SetBlendMode(BlendMode mode);
+    void SetZValue(float zValue);
+
+    float GetUnitPerPixel() const;
+    Sprite2D* GetSprite() const;
+    Material* GetMaterial() const;
+    BlendMode GetBlendMode() const;
+    float GetZValue() const;
+
+    tolua_property__get_set float unitPerPixel;
+    tolua_property__get_set Sprite2D* sprite;
+    tolua_property__get_set Material* material;
+    tolua_property__get_set BlendMode blendMode;
+    tolua_property__get_set float zValue;
+};
