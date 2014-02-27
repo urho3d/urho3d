@@ -62,7 +62,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-set (SOURCES Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene UI)
+set (SOURCES Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene UI Urho2D)
 if (ENABLE_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
