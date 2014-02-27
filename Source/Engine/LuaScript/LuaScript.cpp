@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "CoreEvents.h"
 #include "EngineEvents.h"
 #include "File.h"
 #include "Log.h"
@@ -58,6 +59,7 @@ extern int tolua_PhysicsLuaAPI_open(lua_State*);
 extern int tolua_ResourceLuaAPI_open(lua_State*);
 extern int tolua_SceneLuaAPI_open(lua_State*);
 extern int tolua_UILuaAPI_open(lua_State*);
+extern int tolua_Urho2DLuaAPI_open(lua_State*);
 extern int tolua_LuaScriptLuaAPI_open(lua_State*);
 
 namespace Urho3D
@@ -100,6 +102,11 @@ LuaScript::LuaScript(Context* context) :
     tolua_PhysicsLuaAPI_open(luaState_);
     tolua_UILuaAPI_open(luaState_);
     tolua_LuaScriptLuaAPI_open(luaState_);
+
+    coroutineUpdate_ = GetFunction("coroutine.update");
+
+    // Subscribe to post update
+    SubscribeToEvent(E_POSTUPDATE, HANDLER(LuaScript, HandlePostUpdate));
 
     // Subscribe to console commands
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
@@ -214,7 +221,7 @@ void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName
     if (i != objectToEventTypeToFunctionMap_[object].End())
     {
         UnsubscribeFromEvent(object, eventType);
-        
+
         objectToEventTypeToFunctionMap_[object].Erase(i);
     }
 }
@@ -363,6 +370,17 @@ void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
         function->PushUserType(eventType, "StringHash");
         function->PushUserType(eventData, "VariantMap");
         function->EndCall();
+    }
+}
+
+void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (coroutineUpdate_ && coroutineUpdate_->BeginCall())
+    {
+        using namespace PostUpdate;
+        float timeStep = eventData[P_TIMESTEP].GetFloat();
+        coroutineUpdate_->PushFloat(timeStep);
+        coroutineUpdate_->EndCall();
     }
 }
 

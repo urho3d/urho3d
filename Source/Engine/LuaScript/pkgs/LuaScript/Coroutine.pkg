@@ -1,0 +1,55 @@
+$[
+
+-- Total time
+coroutine.totaltime = 0
+
+-- Suspended coroutines
+coroutine.suspendedcoroutines = {}
+
+-- Start a coroutine
+function coroutine.start(func)
+    if func == nil then
+        return nil
+    end
+
+    local co = coroutine.create(func)
+    return coroutine.resume(co)
+end
+
+-- Sleep a coroutine
+function coroutine.sleep(time)
+    -- Return running coroutine
+    local co = coroutine.running()
+    if co == nil then
+        return
+    end
+
+    -- Calculate wake up time
+    local wakeuptime = coroutine.totaltime + time
+    coroutine.suspendedcoroutines[co] = wakeuptime
+
+    -- Suspend running coroutine
+    return coroutine.yield(co)
+end
+
+-- Update suspended coroutines
+function coroutine.update(steptime)
+    -- Update total time
+    coroutine.totaltime = coroutine.totaltime + steptime
+
+    -- Find all coroutines
+    local coroutines = {}
+    for co, wakeuptime in pairs(coroutine.suspendedcoroutines) do
+        if wakeuptime < coroutine.totaltime then
+            table.insert(coroutines, co)
+        end
+    end
+
+    -- Resume all coroutines
+    for _, co in ipairs(coroutines) do
+        coroutine.suspendedcoroutines[co] = nil
+        coroutine.resume(co)
+    end
+end
+
+$]

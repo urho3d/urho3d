@@ -1,3 +1,4 @@
+$pfile "LuaScript/Coroutine.pkg"
 $pfile "LuaScript/LuaScript.pkg"
 $pfile "LuaScript/LuaScriptInstance.pkg"
 
