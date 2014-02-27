@@ -193,6 +193,7 @@ Script::Script(Context* context) :
     RegisterNetworkAPI(scriptEngine_);
     RegisterPhysicsAPI(scriptEngine_);
     RegisterNavigationAPI(scriptEngine_);
+    RegisterUrho2DAPI(scriptEngine_);
     RegisterScriptAPI(scriptEngine_);
     RegisterEngineAPI(scriptEngine_);
 
