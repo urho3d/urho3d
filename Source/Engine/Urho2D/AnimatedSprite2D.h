@@ -40,7 +40,7 @@ enum CycleMode
     CM_PINGPONG,
 };
 
-/// Static sprite component.
+/// Animated sprite component.
 class URHO3D_API AnimatedSprite2D : public StaticSprite2D
 {
     OBJECT(AnimatedSprite2D);
@@ -61,7 +61,7 @@ public:
     /// Set cycle mode.
     void SetCycleMode(CycleMode cycleMode);
     /// Set animation.
-    void SetAnimation(Animation2D* animation, float startTime = 0.0f);
+    void SetAnimation(Animation2D* animation);
 
     /// Return speed.
     float GetSpeed() const { return speed_; }

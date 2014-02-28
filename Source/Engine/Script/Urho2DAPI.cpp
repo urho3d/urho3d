@@ -21,13 +21,15 @@
 //
 
 #include "Precompiled.h"
+#include "AnimatedSprite2D.h"
+#include "Animation2D.h"
 #include "APITemplates.h"
 #include "Drawable2D.h"
+#include "ParticleEmitter2D.h"
+#include "ParticleModel2D.h"
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
-#include "ParticleModel2D.h"
-#include "ParticleEmitter2D.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4345)
@@ -60,7 +62,7 @@ static void RegisterSpriteSheet2D(asIScriptEngine* engine)
 template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* className)
 {
     RegisterDrawable<T>(engine, className);
-    RegisterSubclass<Drawable2D, T>(engine, "Drawable2D", className);    
+    RegisterSubclass<Drawable2D, T>(engine, "Drawable2D", className);
     engine->RegisterObjectMethod(className, "void set_unitPerPixel(float)", asMETHOD(T, SetUnitPerPixel), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_unitPerPixel() const", asMETHOD(T, GetUnitPerPixel), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_sprite(Sprite2D@+)", asMETHODPR(T, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
@@ -78,16 +80,46 @@ static void RegisterDrawable2D(asIScriptEngine* engine)
     RegisterDrawable2D<Drawable2D>(engine, "Drawable2D");
 }
 
+/// Template function for registering a class derived from StaticSprite2D.
+template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const char* className)
+{
+    RegisterDrawable2D<T>(engine, className);
+    RegisterSubclass<StaticSprite2D, T>(engine, "StaticSprite2D", className);
+    engine->RegisterObjectMethod(className, "void SetFlip(bool, bool)", asMETHODPR(T, SetFlip, (bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_flipX(bool)", asMETHOD(T, SetFlipX), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_flipX() const", asMETHOD(T, GetFlipX), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_flipY(bool)", asMETHOD(T, SetFlipY), asCALL_THISCALL);    
+    engine->RegisterObjectMethod(className, "bool get_flipY() const", asMETHOD(T, GetFlipY), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_color(const Color&in)", asMETHOD(T, SetColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Color& get_color() const", asMETHOD(T, GetColor), asCALL_THISCALL);
+}
+
 static void RegisterStaticSprite2D(asIScriptEngine* engine)
 {
-    RegisterDrawable2D<StaticSprite2D>(engine, "StaticSprite2D");
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlip(bool, bool)", asMETHODPR(StaticSprite2D, SetFlip, (bool, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_flipX(bool)", asMETHOD(StaticSprite2D, SetFlipX), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_flipX() const", asMETHOD(StaticSprite2D, GetFlipX), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_flipY(bool)", asMETHOD(StaticSprite2D, SetFlipY), asCALL_THISCALL);    
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_flipY() const", asMETHOD(StaticSprite2D, GetFlipY), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_color(const Color&in)", asMETHOD(StaticSprite2D, SetColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const Color& get_color() const", asMETHOD(StaticSprite2D, GetColor), asCALL_THISCALL);
+    RegisterStaticSprite2D<StaticSprite2D>(engine, "StaticSprite2D");
+}
+
+static void RegisterAnimation2D(asIScriptEngine* engine)
+{
+    RegisterResource<Animation2D>(engine, "Animation2D");
+    engine->RegisterObjectMethod("Animation2D", "float get_totalTime() const", asMETHOD(Animation2D, GetTotalTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation2D", "uint get_numKeyFrames() const", asMETHOD(Animation2D, GetNumKeyFrames), asCALL_THISCALL);
+}
+
+static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("CycleMode");
+    engine->RegisterEnumValue("CycleMode", "CM_LOOP", CM_LOOP);
+    engine->RegisterEnumValue("CycleMode", "CM_CLAMP", CM_CLAMP);
+    engine->RegisterEnumValue("CycleMode", "CM_PINGPONG", CM_PINGPONG);
+
+    RegisterStaticSprite2D<AnimatedSprite2D>(engine, "AnimatedSprite2D");
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_cycleMode(CycleMode)", asMETHOD(AnimatedSprite2D, SetCycleMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "CycleMode get_cycleMode() const", asMETHOD(AnimatedSprite2D, GetCycleMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animation(Animation2D@+)", asMETHOD(AnimatedSprite2D, SetAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "Animation2D@+ get_animation() const", asMETHOD(AnimatedSprite2D, GetAnimation), asCALL_THISCALL);
 }
 
 static void RegisterParticleModel2D(asIScriptEngine* engine)
@@ -112,6 +144,8 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterSpriteSheet2D(engine);
     RegisterDrawable2D(engine);
     RegisterStaticSprite2D(engine);
+    RegisterAnimation2D(engine);
+    RegisterAnimatedSprite2D(engine);
     RegisterParticleModel2D(engine);
     RegisterParticleEmitter2D(engine);
 }

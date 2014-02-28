@@ -100,7 +100,7 @@ bool Animation2D::Load(Deserializer& source)
 
             keyFrame.sprite_ = sprite;
         }
-        else
+        else if (names.Size() == 2)
         {
             SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(names[0]);
             if (!spriteSheet)
@@ -118,7 +118,7 @@ bool Animation2D::Load(Deserializer& source)
 
             keyFrame.sprite_ = sprite;
         }
-
+        
         keyFrames_.Push(keyFrame);
 
         totalTime += keyFrame.duration_;

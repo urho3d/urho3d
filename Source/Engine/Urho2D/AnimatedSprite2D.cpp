@@ -93,9 +93,9 @@ void AnimatedSprite2D::SetCycleMode(CycleMode cycleMode)
     cycleMode_ = cycleMode;
 }
 
-void AnimatedSprite2D::SetAnimation(Animation2D* animation, float startTime)
+void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 {
-    animationTime_ = startTime;
+    animationTime_ = 0.0f;
 
     if (animation_ == animation)
         return;

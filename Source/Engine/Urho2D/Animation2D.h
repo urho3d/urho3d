@@ -55,7 +55,7 @@ public:
     virtual bool Load(Deserializer& source);
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-
+    
     /// Return total time.
     float GetTotalTime() const;
     /// Return num key frame.

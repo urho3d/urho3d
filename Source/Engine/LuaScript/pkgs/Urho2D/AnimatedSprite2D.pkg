@@ -11,7 +11,7 @@ class AnimatedSprite2D : public StaticSprite2D
 {
     void SetSpeed(float speed);
     void SetCycleMode(CycleMode cycleMode);
-    void SetAnimation(Animation2D* animation, float startTime = 0.0f);
+    void SetAnimation(Animation2D* animation);
 
     float GetSpeed() const;
     CycleMode GetCycleMode() const;
