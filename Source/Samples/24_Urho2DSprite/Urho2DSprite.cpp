@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "AnimatedSprite2D.h"
+#include "Animation2D.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Engine.h"
@@ -38,7 +40,7 @@
 
 #include "DebugNew.h"
 
-// Number of sprites to draw
+// Number of static sprites to draw
 static const unsigned NUM_SPRITES = 200;
 static const ShortStringHash VAR_MOVESPEED("MoveSpeed");
 static const ShortStringHash VAR_ROTATESPEED("RotateSpeed");
@@ -70,8 +72,6 @@ void Urho2DSprite::Start()
 
 void Urho2DSprite::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
 
@@ -88,27 +88,50 @@ void Urho2DSprite::CreateScene()
     float height = (float)graphics->GetHeight();
     camera->SetOrthoSize(Vector2(width, height));
 
-    Sprite2D* sprite = cache->GetResource<Sprite2D>("Textures/Aster.png");
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    // Get sprite
+    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Aster.png");
     if (!sprite)
         return;
 
     float halfWidth = width * 0.5f;
     float halfHeight = height * 0.5f;
+
     for (unsigned i = 0; i < NUM_SPRITES; ++i)
     {
-        SharedPtr<Node> spriteNode(scene_->CreateChild("Urho2DSprite"));
+        SharedPtr<Node> spriteNode(scene_->CreateChild("StaticSprite2D"));
         spriteNode->SetPosition(Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0f));
-        spriteNode->SetScale(0.2f + Random(0.2f));
-
+        
         StaticSprite2D* staticSprite = spriteNode->CreateComponent<StaticSprite2D>();
+        // Set random color
         staticSprite->SetColor(Color(Random(1.0f), Random(1.0f), Random(1.0f), 1.0f));
+        // Set blend mode
         staticSprite->SetBlendMode(BLEND_ALPHA);
+        // Set sprite
         staticSprite->SetSprite(sprite);
 
+        // Set move speed
         spriteNode->SetVar(VAR_MOVESPEED, Vector3(Random(-200.0f, 200.0f), Random(-200.0f, 200.0f), 0.0f));
+        // Set rotate speed
         spriteNode->SetVar(VAR_ROTATESPEED, Random(-90.0f, 90.0f));
+
+        // Add to sprite node vector
         spriteNodes_.Push(spriteNode);
-    }    
+    }
+
+    // Get animation
+    Animation2D* animation = cache->GetResource<Animation2D>("Urho2D/GoldIcon.anm");
+    if (!animation)
+        return;
+
+    SharedPtr<Node> spriteNode(scene_->CreateChild("AnimatedSprite2D"));
+    spriteNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
+    
+    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
+    // Set animation
+    animatedSprite->SetAnimation(animation);
+    // Set blend mode
+    animatedSprite->SetBlendMode(BLEND_ALPHA);
 }
 
 void Urho2DSprite::CreateInstructions()
@@ -158,18 +181,19 @@ void Urho2DSprite::MoveCamera(float timeStep)
         cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+    
     if (input->GetKeyDown(KEY_PAGEUP))
     {
         Camera* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 1.01f);
     }
+
     if (input->GetKeyDown(KEY_PAGEDOWN))
     {
         Camera* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 0.99f);
     }
 }
-
 
 void Urho2DSprite::SubscribeToEvents()
 {
@@ -210,7 +234,7 @@ void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
             moveSpeed.y_ = -moveSpeed.y_;
             node->SetVar(VAR_MOVESPEED, moveSpeed);
         }
-        
+
         node->SetPosition(newPosition);
 
         float rotateSpeed = node->GetVar(VAR_ROTATESPEED).GetFloat();
