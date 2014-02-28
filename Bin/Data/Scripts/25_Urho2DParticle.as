@@ -1,4 +1,4 @@
-// Static 3D scene example.
+// Urho2D particle example.
 // This sample demonstrates:
 //     - Creating a 2D scene with particle
 //     - Displaying the scene using the Renderer subsystem
@@ -49,17 +49,13 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-
-    uint width = graphics.width;
-    uint height = graphics.height;
-    camera.SetOrthoSize(Vector2(width, height));
+    camera.SetOrthoSize(Vector2(graphics.width, graphics.height));
 
     ParticleModel2D@ particleModel = cache.GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist");
     if (particleModel is null)
         return;
 
     particleNode = scene_.CreateChild("ParticleEmitter2D");
-
     ParticleEmitter2D@ particleEmitter = particleNode.CreateComponent("ParticleEmitter2D");
     particleEmitter.model = particleModel;
 }

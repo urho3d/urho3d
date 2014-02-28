@@ -1,8 +1,9 @@
--- Urho2D spriteexample.
+-- Urho2D particle example.
 -- This sample demonstrates:
 --     - Creating a 2D scene with particle
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling mouse move to move particle
+
 require "LuaScripts/Utilities/Sample"
 
 local scene_ = nil
@@ -44,10 +45,7 @@ function CreateScene()
     cameraNode.position = Vector3(0.0, 0.0, -10.0)
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
-
-    local width = graphics.width
-    local height = graphics.height
-    camera:SetOrthoSize(Vector2(width, height))
+    camera:SetOrthoSize(Vector2(graphics.width, graphics.height))
 
     local particleModel = cache:GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist")
     if particleModel == nil then
@@ -57,7 +55,6 @@ function CreateScene()
     particleNode = scene_:CreateChild("ParticleEmitter2D")
     local particleEmitter = particleNode:CreateComponent("ParticleEmitter2D")
     particleEmitter.model = particleModel
-
 end
 
 function CreateInstructions()
