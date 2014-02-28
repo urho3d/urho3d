@@ -1,12 +1,9 @@
 $[
 
--- Total time
-coroutine.totaltime = 0
+local totalTime_ = 0
+local sleepedCoroutines_ = {}
+local waitEventCoroutines_ = {}
 
--- Suspended coroutines
-coroutine.suspendedcoroutines = {}
-
--- Start a coroutine
 function coroutine.start(func)
     if func == nil then
         return nil
@@ -16,38 +13,57 @@ function coroutine.start(func)
     return coroutine.resume(co)
 end
 
--- Sleep a coroutine
 function coroutine.sleep(time)
-    -- Return running coroutine
     local co = coroutine.running()
     if co == nil then
         return
     end
 
-    -- Calculate wake up time
-    local wakeuptime = coroutine.totaltime + time
-    coroutine.suspendedcoroutines[co] = wakeuptime
+    sleepedCoroutines_[co] = totalTime_ + time
 
-    -- Suspend running coroutine
     return coroutine.yield(co)
 end
 
--- Update suspended coroutines
 function coroutine.update(steptime)
-    -- Update total time
-    coroutine.totaltime = coroutine.totaltime + steptime
+    totalTime_ = totalTime_ + steptime
 
-    -- Find all coroutines
     local coroutines = {}
-    for co, wakeuptime in pairs(coroutine.suspendedcoroutines) do
-        if wakeuptime < coroutine.totaltime then
+    for co, wakeupTime in pairs(sleepedCoroutines_) do
+        if wakeupTime < totalTime_ then
             table.insert(coroutines, co)
         end
     end
 
-    -- Resume all coroutines
     for _, co in ipairs(coroutines) do
-        coroutine.suspendedcoroutines[co] = nil
+        sleepedCoroutines_[co] = nil
+        coroutine.resume(co)
+    end
+end
+
+function coroutine.waitevent(event)
+    local co = coroutine.running()
+    if co == nil then
+        return
+    end
+
+    if waitEventCoroutines_[event] == nil then
+        waitEventCoroutines_[event] = { co }
+    else
+        table.insert(waitEventCoroutines_[event], co)
+    end
+
+    return coroutine.yield(co)
+end
+
+function coroutine.sendevent(event)
+    local coroutines = waitEventCoroutines_[event]
+    if coroutines == nil then
+        return
+    end
+
+    waitEventCoroutines_[event] = nil
+    
+    for _, co in ipairs(coroutines) do
         coroutine.resume(co)
     end
 end
