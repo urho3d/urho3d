@@ -152,7 +152,7 @@ const KeyFrame2D* Animation2D::GetKeyFrameByTime(float time) const
 
     for (unsigned i = 0; i < keyFrameTimes_.Size(); ++i)
     {
-        if (time < keyFrameTimes_[i])
+        if (time <= keyFrameTimes_[i])
             return &keyFrames_[i];
     }
 
