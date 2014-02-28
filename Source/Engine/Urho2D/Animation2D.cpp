@@ -65,7 +65,7 @@ bool Animation2D::Load(Deserializer& source)
 
     SetMemoryUse(source.GetSize());
 
-    XMLElement rootElem = xmlFile->GetRoot("Animaiton");
+    XMLElement rootElem = xmlFile->GetRoot("Animation");
     if (!rootElem)
     {
         LOGERROR("Invalid animation");
@@ -80,7 +80,7 @@ bool Animation2D::Load(Deserializer& source)
         LOGERROR("Could not found key frame");
         return false;
     }
-    
+
     float totalTime = 0.0f;
 
     while (keyFrameElem)
