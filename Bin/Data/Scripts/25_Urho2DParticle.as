@@ -2,7 +2,7 @@
 // This sample demonstrates:
 //     - Creating a 2D scene with particle
 //     - Displaying the scene using the Renderer subsystem
-//     - Handling keyboard to move and zoom 2D camera
+//     - Handling mouse move to move particle
 
 #include "Scripts/Utilities/Sample.as"
 
