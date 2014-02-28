@@ -48,6 +48,23 @@ Properties:
 - unsigned numMorphs (readonly)
 - bool master (readonly)
 
+### AnimatedSprite2D : StaticSprite2D
+
+Methods:
+
+- void SetSpeed(float speed)
+- void SetCycleMode(CycleMode cycleMode)
+- void SetAnimation(Animation2D* animation)
+- float GetSpeed() const
+- CycleMode GetCycleMode() const
+- Animation2D* GetAnimation() const
+
+Properties:
+
+- float speed
+- CycleMode cycleMode
+- Animation2D* animation
+
 ### Animation : Resource
 
 Methods:
@@ -68,6 +85,20 @@ Properties:
 - float length (readonly)
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
+
+### Animation2D : Resource
+
+Methods:
+
+- float GetTotalTime() const
+- unsigned GetNumKeyFrames() const
+- const KeyFrame2D* GetKeyFrameByTime(float time) const
+- const KeyFrame2D* GetKeyFrameByIndex(unsigned index) const
+
+Properties:
+
+- float totalTime (readonly)
+- unsigned numKeyFrames (readonly)
 
 ### AnimationControl
 
@@ -1671,6 +1702,9 @@ Properties:
 - unsigned numButtons (readonly)
 - unsigned numAxes (readonly)
 - unsigned numHats (readonly)
+
+### KeyFrame2D
+
 
 ### Light : Drawable
 
@@ -5260,6 +5294,12 @@ Properties:
 - int CS_REJECTDROP
 - int CS_BUSY
 - int CS_MAX_SHAPES
+
+### CycleMode
+
+- int CM_LOOP
+- int CM_CLAMP
+- int CM_PINGPONG
 
 ### DeferredLightPSVariation
 

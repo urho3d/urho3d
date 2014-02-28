@@ -84,6 +84,71 @@ Properties:
 - uint zoneMask
 
 
+### AnimatedSprite2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetFlip(bool, bool)
+
+Properties:
+
+- Animation2D@ animation
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- BlendMode blendMode
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- Color color
+- CycleMode cycleMode
+- float drawDistance
+- bool enabled
+- bool enabledEffective // readonly
+- bool flipX
+- bool flipY
+- uint id // readonly
+- bool inView // readonly
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- float speed
+- Sprite2D@ sprite
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- float unitPerPixel
+- uint viewMask
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- float zValue
+- uint zoneMask
+
+
 ### Animation
 
 Methods:
@@ -107,6 +172,29 @@ Properties:
 - uint numTriggers
 - int refs // readonly
 - AnimationTriggerPoint@[] triggers // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+
+### Animation2D
+
+Methods:
+
+- bool Load(File@)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- uint numKeyFrames // readonly
+- int refs // readonly
+- float totalTime // readonly
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -7387,6 +7475,13 @@ Properties:
 - CS_ACCEPTDROP
 - CS_REJECTDROP
 - CS_BUSY
+
+
+### CycleMode
+
+- CM_LOOP
+- CM_CLAMP
+- CM_PINGPONG
 
 
 ### DumpMode
