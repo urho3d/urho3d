@@ -109,6 +109,84 @@ Zone zone;
 uint zoneMask;
 };
 
+class AnimatedSprite2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool IsInView(Camera) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetFlip(bool, bool);
+
+// Properties:
+Animation2D animation;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+BlendMode blendMode;
+/* readonly */
+BoundingBox boundingBox;
+bool castShadows;
+/* readonly */
+String category;
+Color color;
+CycleMode cycleMode;
+float drawDistance;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+bool flipX;
+bool flipY;
+/* readonly */
+uint id;
+/* readonly */
+bool inView;
+uint lightMask;
+float lodBias;
+Material material;
+uint maxLights;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+bool occludee;
+bool occluder;
+/* readonly */
+int refs;
+float shadowDistance;
+uint shadowMask;
+float speed;
+Sprite2D sprite;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float unitPerPixel;
+uint viewMask;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+float zValue;
+uint zoneMask;
+};
+
 class Animation
 {
 // Methods:
@@ -138,6 +216,37 @@ uint numTriggers;
 int refs;
 /* readonly */
 Array<AnimationTriggerPoint> triggers;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
+class Animation2D
+{
+// Methods:
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+uint numKeyFrames;
+/* readonly */
+int refs;
+/* readonly */
+float totalTime;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -8796,6 +8905,13 @@ CS_RESIZEDIAGONAL_TOPLEFT,
 CS_ACCEPTDROP,
 CS_REJECTDROP,
 CS_BUSY,
+};
+
+enum CycleMode
+{
+CM_LOOP,
+CM_CLAMP,
+CM_PINGPONG,
 };
 
 enum DumpMode
