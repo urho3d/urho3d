@@ -1,9 +1,8 @@
 -- Urho2D spriteexample.
 -- This sample demonstrates:
---     - Creating a 2D scene with static sprite
+--     - Creating a 2D scene with sprite
 --     - Displaying the scene using the Renderer subsystem
---     - Handling keyboard to move and zoom camera
-
+--     - Handling keyboard to move and zoom 2D camera
 require "LuaScripts/Utilities/Sample"
 
 local scene_ = nil
@@ -41,7 +40,6 @@ function CreateScene()
     cameraNode = scene_:CreateChild("Camera")
     -- Set an initial position for the camera scene node above the plane
     cameraNode.position = Vector3(0.0, 0.0, -10.0)
-
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
 
@@ -49,29 +47,47 @@ function CreateScene()
     local height = graphics.height
     camera:SetOrthoSize(Vector2(width, height))
 
-    local sprite = cache:GetResource("Sprite2D", "Textures/Aster.png")
+    local sprite = cache:GetResource("Sprite2D", "Urho2D/Aster.png")
     if sprite == nil then
         return
     end
 
+    local NUM_SPRITES = 200
     local halfWidth = width * 0.5
     local halfHeight = height * 0.5
-
-    local NUM_SPRITES = 200
     for i = 1, NUM_SPRITES do
-        local spriteNode = scene_:CreateChild("Urho2DSprite")
+        local spriteNode = scene_:CreateChild("StaticSprite2D")
         spriteNode.position = Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0)
-        spriteNode:SetScale(0.2 + Random(0.2))
-
+        
         local staticSprite = spriteNode:CreateComponent("StaticSprite2D")
+        -- Set color
         staticSprite.color = Color(Random(1.0), Random(1.0), Random(1.0), 1.0)
+        -- Set blend mode
         staticSprite.blendMode = BLEND_ALPHA
+        -- Set sprite
         staticSprite.sprite = sprite
 
+        -- Set move speed
         spriteNode.moveSpeed = Vector3(Random(-200.0, 200.0), Random(-200.0, 200.0), 0.0)
+        -- Set rotate speed
         spriteNode.rotateSpeed = Random(-90.0, 90.0)
+
         table.insert(spriteNodes, spriteNode)
     end
+
+    local animation = cache:GetResource("Animation2D", "Urho2D/GoldIcon.anm")
+    if animation == nil then
+        return
+    end
+
+    local spriteNode = scene_:CreateChild("AnimatedSprite2D")
+    spriteNode.position = Vector3(0.0, 0.0, -1.0)
+    
+    local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
+    -- Set animation
+    animatedSprite.animation = animation
+    -- Set blend mode
+    animatedSprite.blendMode = BLEND_ALPHA
 end
 
 function CreateInstructions()
@@ -141,4 +157,25 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+
+    local halfWidth = graphics.width * 0.5
+    local halfHeight = graphics.height * 0.5
+
+    for _, spriteNode in ipairs(spriteNodes) do
+        local position = spriteNode.position
+        local moveSpeed = spriteNode.moveSpeed
+        local newPosition = position + moveSpeed * timeStep
+        if newPosition.x < -halfWidth or newPosition.x > halfWidth then
+            newPosition.x = position.x
+            moveSpeed.x = -moveSpeed.x
+        end
+
+        if newPosition.y < -halfHeight or newPosition.y > halfHeight then
+            newPosition.y = position.y
+            moveSpeed.y = -moveSpeed.y
+        end
+
+        spriteNode.position = newPosition
+        spriteNode:Roll(spriteNode.rotateSpeed * timeStep)
+    end
 end
