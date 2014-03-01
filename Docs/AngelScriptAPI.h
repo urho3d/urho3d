@@ -229,6 +229,8 @@ int weakRefs;
 class Animation2D
 {
 // Methods:
+Sprite GetFrameSprite(uint) const;
+Sprite GetFrameSpriteByTime(float) const;
 bool Load(File);
 bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
