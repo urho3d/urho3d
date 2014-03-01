@@ -119,7 +119,25 @@ bool Animation2D::Load(Deserializer& source)
 
 bool Animation2D::Save(Serializer& dest) const
 {
-    return false;
+    XMLFile xmlFile(context_);
+    XMLElement rootElem = xmlFile.CreateRoot("Animation");
+    
+    float endTime = 0.0f;
+    for (unsigned i = 0; i < frameSprites_.Size(); ++i)
+    {
+        XMLElement frameElem = rootElem.CreateChild("Frame");
+        frameElem.SetFloat("duration", frameEndTimes_[i] - endTime);
+        endTime = frameEndTimes_[i];
+
+        Sprite2D* sprite = frameSprites_[i];
+        SpriteSheet2D* spriteSheet = sprite->GetSpriteSheet();
+        if (!spriteSheet)
+            frameElem.SetString("sprite", sprite->GetName());
+        else
+            frameElem.SetString("sprite", spriteSheet->GetName() + "@" + sprite->GetName());
+    }
+
+    return xmlFile.Save(dest);
 }
 
 float Animation2D::GetTotalTime() const
@@ -132,7 +150,15 @@ unsigned Animation2D::GetNumFrames() const
     return frameSprites_.Size();
 }
 
-Sprite2D* Animation2D::GetFrameByTime(float time) const
+Sprite2D* Animation2D::GetFrameSprite(unsigned index) const
+{
+    if (index < frameSprites_.Size())
+        return frameSprites_[index];
+
+    return 0;
+}
+
+Sprite2D* Animation2D::GetFrameSpriteByTime(float time) const
 {
     if (time < 0.0f)
         return 0;
@@ -142,14 +168,6 @@ Sprite2D* Animation2D::GetFrameByTime(float time) const
         if (time <= frameEndTimes_[i])
             return frameSprites_[i];
     }
-
-    return 0;
-}
-
-Sprite2D* Animation2D::GetFrameByIndex(unsigned index) const
-{
-    if (index < frameSprites_.Size())
-        return frameSprites_[index];
 
     return 0;
 }

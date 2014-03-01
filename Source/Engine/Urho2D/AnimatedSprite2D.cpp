@@ -107,7 +107,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 
     if (animation_)
     {
-        SetSprite(animation_->GetFrameByIndex(0));
+        SetSprite(animation_->GetFrameSprite(0));
         animationTotalTime_ = animation_->GetTotalTime();
     }
 }
@@ -159,7 +159,7 @@ void AnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& e
         break;
     }
 
-    Sprite2D* sprite = animation_->GetFrameByTime(time);
+    Sprite2D* sprite = animation_->GetFrameSpriteByTime(time);
     if (GetSprite() != sprite)
         SetSprite(sprite);
 

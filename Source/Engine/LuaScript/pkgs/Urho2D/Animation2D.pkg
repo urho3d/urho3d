@@ -4,9 +4,9 @@ class Animation2D : public Resource
 {
     float GetTotalTime() const;
     unsigned GetNumFrames() const;
-    Sprite2D* GetFrameByTime(float time) const;
-    Sprite2D* GetFrameByIndex(unsigned index) const;
-
+    Sprite2D* GetFrameSprite(unsigned index) const;
+    Sprite2D* GetFrameSpriteByTime(float time) const;
+    
     tolua_readonly tolua_property__get_set float totalTime;
     tolua_readonly tolua_property__get_set unsigned numFrames;
 };

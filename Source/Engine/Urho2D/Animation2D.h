@@ -46,16 +46,16 @@ public:
     virtual bool Load(Deserializer& source);
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    
+
     /// Return total time.
     float GetTotalTime() const;
-    /// Return num key frame.
+    /// Return number of frames.
     unsigned GetNumFrames() const;
-    /// Return frame by time.
-    Sprite2D* GetFrameByTime(float time) const;
-    /// Return frame by index.
-    Sprite2D* GetFrameByIndex(unsigned index) const;
-    
+    /// Return Frame sprite.
+    Sprite2D* GetFrameSprite(unsigned index) const;
+    /// Return frame sprite by time.
+    Sprite2D* GetFrameSpriteByTime(float time) const;
+
 private:
     /// Frame end times.
     PODVector<float> frameEndTimes_;
