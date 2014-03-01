@@ -72,9 +72,6 @@ void ParticleEmitter2D::OnSetEnabled()
 
 void ParticleEmitter2D::UpdateBatches(const FrameInfo& frame)
 {
-    if (materialDirty_)
-        UpdateMaterial();
-
     // const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 

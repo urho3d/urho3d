@@ -47,12 +47,12 @@ Drawable2D::Drawable2D(Context* context) : Drawable(context, DRAWABLE_GEOMETRY),
     blendMode_(BLEND_REPLACE),
     zValue_(0.0f),
     vertexBuffer_(new VertexBuffer(context_)),
-    geometryDirty_(true),
-    materialDirty_(true)
+    geometryDirty_(true)
 {
     geometry_ = new Geometry(context);
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
+    CreateDefaultMaterial();
 }
 
 Drawable2D::~Drawable2D()
@@ -71,14 +71,11 @@ void Drawable2D::RegisterObject(Context* context)
 void Drawable2D::ApplyAttributes()
 {
     UpdateVertices();
-    UpdateMaterial(true);
+    UpdateMaterial();
 }
 
 void Drawable2D::UpdateBatches(const FrameInfo& frame)
 {
-    if (materialDirty_)
-        UpdateMaterial();
-
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
@@ -156,15 +153,22 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
     sprite_ = sprite;
     MarkVerticesDirty();
     MarkGeometryDirty();
-    MarkMaterialDirty();
+    UpdateMaterial();
 }
 
 void Drawable2D::SetMaterial(Material* material)
 {
-    if (material_ != material)
+    if (material != material_)
     {
         material_ = material;
-        MarkMaterialDirty();
+        // If a null material was specified, create one with defaults, otherwise clone the material so that
+        // the diffuse texture can be changed according to the sprite being used
+        if (!material_)
+            CreateDefaultMaterial();
+        else
+            batches_[0].material_ = material_->Clone();
+        
+        UpdateMaterial();
     }
 }
 
@@ -173,7 +177,7 @@ void Drawable2D::SetBlendMode(BlendMode mode)
     if (blendMode_ != mode)
     {
         blendMode_ = mode;
-        MarkMaterialDirty();
+        UpdateMaterial();
     }
 }
 
@@ -256,40 +260,46 @@ void Drawable2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
-void Drawable2D::UpdateMaterial(bool forceUpdate)
+void Drawable2D::CreateDefaultMaterial()
 {
-    if (!materialDirty_ && !forceUpdate)
-        return;
+    SharedPtr<Material> material(new Material(context_));
+    
+    Technique* tech = new Technique(context_);
+    Pass* pass = tech->CreatePass(PASS_ALPHA);
+    pass->SetVertexShader("Basic");
+    pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
 
-    SharedPtr<Material> material;
+    pass->SetPixelShader("Basic");
+    pass->SetPixelShaderDefines("DIFFMAP VERTEXCOLOR");
+    
+    pass->SetDepthWrite(false);
+
+    material->SetTechnique(0, tech);
+    material->SetCullMode(CULL_NONE);
+
+    batches_[0].material_ = material;
+}
+
+void Drawable2D::UpdateMaterial()
+{
+    Material* material = batches_[0].material_;
+    assert(material);
+    
+    // If we are using the default created material, we can update blend mode. Otherwise must respect what is set in the material
     if (!material_)
     {
-        material = new Material(context_);
-        Technique* tech = new Technique(context_);
-        Pass* pass = tech->CreatePass(PASS_ALPHA);
-        pass->SetVertexShader("Basic");
-        pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
-
-        pass->SetPixelShader("Basic");
-        pass->SetPixelShaderDefines("DIFFMAP VERTEXCOLOR");
-        
-        pass->SetBlendMode(blendMode_);
-        pass->SetDepthWrite(false);
-
-        material->SetTechnique(0, tech);
-        material->SetCullMode(CULL_NONE);
+        Technique* technique = material->GetTechnique(0);
+        Pass* pass = technique->GetPass(PASS_ALPHA);
+        if (pass)
+            pass->SetBlendMode(blendMode_);
     }
-    else
-        material = material_->Clone();
-
+    
+    // Update diffuse texture from sprite
     if (sprite_)
     {
         Texture2D* texture = sprite_->GetTexture();
         material->SetTexture(TU_DIFFUSE, texture);
     }
-
-    batches_[0].material_ = material;
-    materialDirty_ = false;
 }
 
 }

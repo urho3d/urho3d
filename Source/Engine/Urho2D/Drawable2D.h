@@ -91,20 +91,20 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices() = 0;
-    /// Update material.
-    virtual void UpdateMaterial(bool forceUpdate = false);    
     /// Mark vertices dirty.
     void MarkVerticesDirty() { verticesDirty_ = true; }
     /// Mark geometry dirty.
     void MarkGeometryDirty() { geometryDirty_ = true; }
-    /// Mark material dirty.
-    void MarkMaterialDirty() { materialDirty_ = true; }
+    /// Create a default material when a material is not specified.
+    void CreateDefaultMaterial();
+    /// Update the material's properties (blend mode and texture).
+    void UpdateMaterial();
 
     /// Unit per pixel.
     float unitPerPixel_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
-    /// Material.
+    /// Material. If null, use a default material. If non-null, use a clone of this for updating the diffuse texture.
     SharedPtr<Material> material_;
     /// Blend mode.
     BlendMode blendMode_;
@@ -121,8 +121,6 @@ protected:
     bool verticesDirty_;
     /// Geometry dirty flag.
     bool geometryDirty_;
-    /// Material dirty flag.
-    bool materialDirty_;
 };
 
 }
