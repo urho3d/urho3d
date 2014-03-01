@@ -192,7 +192,7 @@ Properties:
 - String category // readonly
 - uint memoryUse // readonly
 - String name
-- uint numKeyFrames // readonly
+- uint numFrames // readonly
 - int refs // readonly
 - float totalTime // readonly
 - ShortStringHash type // readonly

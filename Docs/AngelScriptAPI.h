@@ -242,7 +242,7 @@ String category;
 uint memoryUse;
 String name;
 /* readonly */
-uint numKeyFrames;
+uint numFrames;
 /* readonly */
 int refs;
 /* readonly */

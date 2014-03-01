@@ -91,14 +91,14 @@ Properties:
 Methods:
 
 - float GetTotalTime() const
-- unsigned GetNumKeyFrames() const
-- const KeyFrame2D* GetKeyFrameByTime(float time) const
-- const KeyFrame2D* GetKeyFrameByIndex(unsigned index) const
+- unsigned GetNumFrames() const
+- Sprite2D* GetFrameByTime(float time) const
+- Sprite2D* GetFrameByIndex(unsigned index) const
 
 Properties:
 
 - float totalTime (readonly)
-- unsigned numKeyFrames (readonly)
+- unsigned numFrames (readonly)
 
 ### AnimationControl
 
@@ -1702,9 +1702,6 @@ Properties:
 - unsigned numButtons (readonly)
 - unsigned numAxes (readonly)
 - unsigned numHats (readonly)
-
-### KeyFrame2D
-
 
 ### Light : Drawable
 
