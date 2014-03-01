@@ -53,8 +53,8 @@ void Animation2D::RegisterObject(Context* context)
 
 bool Animation2D::Load(Deserializer& source)
 {
-    keyFrames_.Clear();
-    keyFrameTimes_.Clear();
+    frameEndTimes_.Clear();
+    frameSprites_.Clear();
 
     SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
     if(!xmlFile->Load(source))
@@ -74,32 +74,24 @@ bool Animation2D::Load(Deserializer& source)
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    XMLElement keyFrameElem = rootElem.GetChild("KeyFrame");
+    XMLElement keyFrameElem = rootElem.GetChild("Frame");
     if (!keyFrameElem)
     {
         LOGERROR("Could not found key frame");
         return false;
     }
 
-    float totalTime = 0.0f;
+    float endTime = 0.0f;
 
     while (keyFrameElem)
     {
-        KeyFrame2D keyFrame;
-        keyFrame.duration_ = keyFrameElem.GetFloat("duration");
+        endTime += keyFrameElem.GetFloat("duration");
+        frameEndTimes_.Push(endTime);
 
+        SharedPtr<Sprite2D> sprite;
         Vector<String> names = keyFrameElem.GetAttribute("sprite").Split('@');
         if (names.Size() == 1)
-        {
-            Sprite2D* sprite = cache->GetResource<Sprite2D>(names[0]);
-            if (!sprite)
-            {
-                LOGERROR("Could not get sprite");
-                return false;
-            }
-
-            keyFrame.sprite_ = sprite;
-        }
+            sprite = cache->GetResource<Sprite2D>(names[0]);
         else if (names.Size() == 2)
         {
             SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(names[0]);
@@ -109,22 +101,17 @@ bool Animation2D::Load(Deserializer& source)
                 return false;
             }
 
-            Sprite2D* sprite = spriteSheet->GetSprite(names[1]);
-            if (!sprite)
-            {
-                LOGERROR("Could not get sprite");
-                return false;
-            }
-
-            keyFrame.sprite_ = sprite;
+            sprite = spriteSheet->GetSprite(names[1]);
         }
-        
-        keyFrames_.Push(keyFrame);
 
-        totalTime += keyFrame.duration_;
-        keyFrameTimes_.Push(totalTime);
+        if (!sprite)
+        {
+            LOGERROR("Could not get sprite");
+            return false;
+        }
 
-        keyFrameElem = keyFrameElem.GetNext("KeyFrame");
+        frameSprites_.Push(sprite);
+        keyFrameElem = keyFrameElem.GetNext("Frame");
     }
 
     return true;
@@ -137,31 +124,34 @@ bool Animation2D::Save(Serializer& dest) const
 
 float Animation2D::GetTotalTime() const
 {
-    return keyFrameTimes_.Empty() ? 0.0f : keyFrameTimes_.Back();
+    return frameEndTimes_.Empty() ? 0.0f : frameEndTimes_.Back();
 }
 
-unsigned Animation2D::GetNumKeyFrames() const
+unsigned Animation2D::GetNumFrames() const
 {
-    return keyFrames_.Size();
+    return frameSprites_.Size();
 }
 
-const KeyFrame2D* Animation2D::GetKeyFrameByTime(float time) const
+Sprite2D* Animation2D::GetFrameByTime(float time) const
 {
     if (time < 0.0f)
         return 0;
 
-    for (unsigned i = 0; i < keyFrameTimes_.Size(); ++i)
+    for (unsigned i = 0; i < frameEndTimes_.Size(); ++i)
     {
-        if (time <= keyFrameTimes_[i])
-            return &keyFrames_[i];
+        if (time <= frameEndTimes_[i])
+            return frameSprites_[i];
     }
 
     return 0;
 }
 
-const KeyFrame2D* Animation2D::GetKeyFrameByIndex(unsigned index) const
+Sprite2D* Animation2D::GetFrameByIndex(unsigned index) const
 {
-    return index < keyFrames_.Size() ? &keyFrames_[index] : 0;
+    if (index < frameSprites_.Size())
+        return frameSprites_[index];
+
+    return 0;
 }
 
 }

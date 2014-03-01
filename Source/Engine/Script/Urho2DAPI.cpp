@@ -103,7 +103,7 @@ static void RegisterAnimation2D(asIScriptEngine* engine)
 {
     RegisterResource<Animation2D>(engine, "Animation2D");
     engine->RegisterObjectMethod("Animation2D", "float get_totalTime() const", asMETHOD(Animation2D, GetTotalTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation2D", "uint get_numKeyFrames() const", asMETHOD(Animation2D, GetNumKeyFrames), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation2D", "uint get_numFrames() const", asMETHOD(Animation2D, GetNumFrames), asCALL_THISCALL);
 }
 
 static void RegisterAnimatedSprite2D(asIScriptEngine* engine)

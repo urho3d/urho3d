@@ -1,16 +1,12 @@
 $#include "Animation2D.h"
 
-struct KeyFrame2D
-{
-};
-
 class Animation2D : public Resource
 {
     float GetTotalTime() const;
-    unsigned GetNumKeyFrames() const;
-    const KeyFrame2D* GetKeyFrameByTime(float time) const;
-    const KeyFrame2D* GetKeyFrameByIndex(unsigned index) const;
+    unsigned GetNumFrames() const;
+    Sprite2D* GetFrameByTime(float time) const;
+    Sprite2D* GetFrameByIndex(unsigned index) const;
 
     tolua_readonly tolua_property__get_set float totalTime;
-    tolua_readonly tolua_property__get_set unsigned numKeyFrames;
+    tolua_readonly tolua_property__get_set unsigned numFrames;
 };

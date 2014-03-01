@@ -29,15 +29,6 @@ namespace Urho3D
 
 class Sprite2D;
 
-/// 2D animation key frame.
-struct KeyFrame2D
-{
-    /// duration_;
-    float duration_;
-    /// Sprite.
-    SharedPtr<Sprite2D> sprite_;
-};
-
 /// 2D animation.
 class URHO3D_API Animation2D : public Resource
 {
@@ -59,17 +50,17 @@ public:
     /// Return total time.
     float GetTotalTime() const;
     /// Return num key frame.
-    unsigned GetNumKeyFrames() const;
-    /// Return key frame by time.
-    const KeyFrame2D* GetKeyFrameByTime(float time) const;
-    /// Return key frame by index.
-    const KeyFrame2D* GetKeyFrameByIndex(unsigned index) const;
+    unsigned GetNumFrames() const;
+    /// Return frame by time.
+    Sprite2D* GetFrameByTime(float time) const;
+    /// Return frame by index.
+    Sprite2D* GetFrameByIndex(unsigned index) const;
     
 private:
-    /// Key frames.
-    Vector<KeyFrame2D> keyFrames_;
-    /// Key frame times.
-    PODVector<float> keyFrameTimes_;
+    /// Frame end times.
+    PODVector<float> frameEndTimes_;
+    /// Frame sprites.
+    Vector<SharedPtr<Sprite2D> > frameSprites_;
 };
 
 }
