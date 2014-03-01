@@ -10,10 +10,12 @@ class UI : public Object
     void RenderUpdate();
     void Render();
     void DebugDraw(UIElement* element);
+    tolua_outside UIElement* UILoadLayout @ LoadLayout(File* source, XMLFile* styleFile = 0);
+    tolua_outside UIElement* UILoadLayout @ LoadLayout(const String fileName, XMLFile* styleFile = 0);
+    tolua_outside UIElement* UILoadLayout @ LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
     bool SaveLayout(Serializer& dest, UIElement* element);
 
     void SetClipBoardText(const String text);
-
     void SetDoubleClickInterval(float interval);
     void SetDragBeginInterval(float interval);
     void SetDragBeginDistance(int pixels);
@@ -74,6 +76,52 @@ UI* GetUI();
 tolua_readonly tolua_property__get_set UI* ui;
 
 ${
+static UIElement* UILoadLayout(UI* ui, File* source, XMLFile* styleFile)
+{
+    if (!source)
+        return 0;
+
+    SharedPtr<UIElement> elementPtr = ui->LoadLayout(*source, styleFile);
+    if (!elementPtr)
+        return 0;
+
+    UIElement* element = elementPtr.Get();
+    elementPtr.Detach();
+
+    return element;
+}
+
+static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFile)
+{
+    File file(ui->GetContext(), fileName, FILE_READ);
+    if (!file.IsOpen())
+        return 0;
+
+    SharedPtr<UIElement> elementPtr = ui->LoadLayout(file, styleFile);
+    if (!elementPtr)
+        return 0;
+
+    UIElement* element = elementPtr.Get();
+    elementPtr.Detach();
+
+    return element;
+}
+
+static UIElement* UILoadLayout(UI* ui, XMLFile* source, XMLFile* styleFile)
+{
+    if (!source)
+        return 0;
+
+    SharedPtr<UIElement> elementPtr = ui->LoadLayout(source, styleFile);
+    if (!elementPtr)
+        return 0;
+
+    UIElement* element = elementPtr.Get();
+    elementPtr.Detach();
+
+    return element;
+}
+
 #define TOLUA_DISABLE_tolua_UILuaAPI_GetUI00
 static int tolua_UILuaAPI_GetUI00(lua_State* tolua_S)
 {

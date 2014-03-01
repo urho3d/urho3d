@@ -230,11 +230,11 @@ float Color::Hue(float min, float max) const
 {
     float chroma = max - min;
 
-    // if chroma equals zero, hue is undefined
+    // If chroma equals zero, hue is undefined
     if (chroma <= M_EPSILON)
         return 0.0f;
 
-    // calculate and return hue
+    // Calculate and return hue
     if (Equals(g_, max))
     {
         return (b_ + 2.0f*chroma - r_) / (6.0f * chroma);
@@ -253,21 +253,21 @@ float Color::Hue(float min, float max) const
 
 float Color::SaturationHSV(float min, float max) const
 {
-    // avoid div-by-zero: result undefined
+    // Avoid div-by-zero: result undefined
     if (max <= M_EPSILON)
         return 0.0f;
 
-    // saturation equals chroma:value ratio
+    // Saturation equals chroma:value ratio
     return 1.0f - (min / max);
 }
 
 float Color::SaturationHSL(float min, float max) const
 {
-    // avoid div-by-zero: result undefined
+    // Avoid div-by-zero: result undefined
     if (max <= M_EPSILON || min >= 1.0f - M_EPSILON)
         return 0.0f;
 
-    // chroma = max - min, lightness = (max + min) * 0.5
+    // Chroma = max - min, lightness = (max + min) * 0.5
     float hl = (max + min);
     if (hl <= 1.0f)
         return (max - min) / hl;
@@ -284,7 +284,7 @@ void Color::FromHCM(float h, float c, float m)
     float hs = h * 6.0f;
     float x  = c * (1.0f - Abs(fmodf(hs, 2.0f) - 1.0f));
 
-    // reconstruct r', g', b' from hue
+    // Reconstruct r', g', b' from hue
     if (hs < 2.0f)
     {
         b_ = 0.0f;
