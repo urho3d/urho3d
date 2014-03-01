@@ -66,9 +66,9 @@ void Color::FromHSL(float h, float s, float l, float a)
 {
     float c;
     if (l < 0.5f)
-        c = (1.0f + (2.0f*l - 1.0f)) * s;
+        c = (1.0f + (2.0f * l - 1.0f)) * s;
     else
-        c = (1.0f - (2.0f*l - 1.0f)) * s;
+        c = (1.0f - (2.0f * l - 1.0f)) * s;
 
     float m = l - 0.5f * c;
 
@@ -278,10 +278,11 @@ float Color::SaturationHSL(float min, float max) const
 
 void Color::FromHCM(float h, float c, float m)
 {
-    assert(h >= 0.0f && h < 1.0f);
+    if (h < 0.0f || h >= 1.0f)
+        h -= floorf(h);
 
     float hs = h * 6.0f;
-    float x  = c * (1.0f - (hs - std::floor(hs / 2.0f)*2.0f- 1.0f));
+    float x  = c * (1.0f - Abs(fmodf(hs, 2.0f) - 1.0f));
 
     // reconstruct r', g', b' from hue
     if (hs < 2.0f)
