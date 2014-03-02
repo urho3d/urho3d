@@ -22,6 +22,3 @@
 
 # Define source files
 define_source_files (PARENT_SCOPE)
-
-# Define dependency libs
-set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} PARENT_SCOPE)
