@@ -1,0 +1,12 @@
+$#include "ParticleModel2D.h"
+
+enum EmitterType2D
+{
+    EMITTER_TYPE_GRAVITY = 0,
+    EMITTER_TYPE_RADIAL
+};
+
+class ParticleModel2D : public Resource
+{
+    
+};

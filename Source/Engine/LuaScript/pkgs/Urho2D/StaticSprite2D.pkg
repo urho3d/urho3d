@@ -1,0 +1,18 @@
+$#include "StaticSprite2D.h"
+
+class StaticSprite2D : public Drawable2D
+{    
+public:
+    void SetFlip(bool flipX, bool flipY);
+    void SetFlipX(bool flipX);
+    void SetFlipY(bool flipY);
+    void SetColor(const Color& color);
+
+    bool GetFlipX() const;
+    bool GetFlipY() const;
+    const Color& GetColor() const;
+    
+    tolua_property__get_set bool flipX;
+    tolua_property__get_set bool flipY;
+    tolua_property__get_set Color& color;
+};

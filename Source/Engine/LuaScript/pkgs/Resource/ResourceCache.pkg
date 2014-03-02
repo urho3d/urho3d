@@ -12,11 +12,10 @@ class ResourceCache
     void SetReturnFailedResources(bool enable);
     void SetSearchPackagesFirst(bool value);
 
-    // SharedPtr<File> GetFile(const String& name);
     tolua_outside File* ResourceCacheGetFile @ GetFile(const String name);
 
     Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true);
-    
+
     bool Exists(const String name) const;
     unsigned GetMemoryBudget(ShortStringHash type) const;
     unsigned GetMemoryUse(ShortStringHash type) const;
@@ -26,7 +25,7 @@ class ResourceCache
     bool GetAutoReloadResources() const;
     bool GetReturnFailedResources() const;
     bool GetSearchPackagesFirst() const;
-    
+
     String GetPreferredResourceDir(const String path) const;
     String SanitateResourceName(const String name) const;
     String SanitateResourceDirName(const String name) const;
@@ -58,7 +57,7 @@ static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
 
     File* file = filePtr.Get();
     filePtr.Detach();
-    
+
     return file;
 }
 

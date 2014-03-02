@@ -48,6 +48,23 @@ Properties:
 - unsigned numMorphs (readonly)
 - bool master (readonly)
 
+### AnimatedSprite2D : StaticSprite2D
+
+Methods:
+
+- void SetSpeed(float speed)
+- void SetCycleMode(CycleMode cycleMode)
+- void SetAnimation(Animation2D* animation)
+- float GetSpeed() const
+- CycleMode GetCycleMode() const
+- Animation2D* GetAnimation() const
+
+Properties:
+
+- float speed
+- CycleMode cycleMode
+- Animation2D* animation
+
 ### Animation : Resource
 
 Methods:
@@ -68,6 +85,20 @@ Properties:
 - float length (readonly)
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
+
+### Animation2D : Resource
+
+Methods:
+
+- float GetTotalTime() const
+- unsigned GetNumFrames() const
+- Sprite2D* GetFrameSprite(unsigned index) const
+- Sprite2D* GetFrameSpriteByTime(float time) const
+
+Properties:
+
+- float totalTime (readonly)
+- unsigned numFrames (readonly)
 
 ### AnimationControl
 
@@ -1063,6 +1094,29 @@ Properties:
 - bool occludee
 - bool inView (readonly)
 - Zone* zone (readonly)
+
+### Drawable2D : Drawable
+
+Methods:
+
+- void SetUnitPerPixel(float unitPerPixel)
+- void SetSprite(Sprite2D* sprite)
+- void SetMaterial(Material* material)
+- void SetBlendMode(BlendMode mode)
+- void SetZValue(float zValue)
+- float GetUnitPerPixel() const
+- Sprite2D* GetSprite() const
+- Material* GetMaterial() const
+- BlendMode GetBlendMode() const
+- float GetZValue() const
+
+Properties:
+
+- float unitPerPixel
+- Sprite2D* sprite
+- Material* material
+- BlendMode blendMode
+- float zValue
 
 ### DropDownList : Menu
 
@@ -2644,6 +2698,19 @@ Properties:
 - unsigned numColors
 - unsigned numTextureFrames
 
+### ParticleEmitter2D : Drawable2D
+
+Methods:
+
+- void SetModel(ParticleModel2D* model)
+- ParticleModel2D* GetModel() const
+
+Properties:
+
+- ParticleModel2D* model
+
+### ParticleModel2D : Resource
+
 ### Pass : RefCounted
 
 ### PhysicsRaycastResult
@@ -3759,6 +3826,37 @@ Properties:
 - BlendMode blendMode
 - Matrix3x4& transform (readonly)
 
+### Sprite2D : Resource
+
+Methods:
+
+- void SetTexture(Texture2D* texture)
+- void SetRectangle(const IntRect& rectangle)
+- void SetHotSpot(const Vector2& hotSpot)
+- void SetSpriteSheet(SpriteSheet2D* spriteSheet)
+- Texture2D* GetTexture() const
+- const IntRect& GetRectangle() const
+- const Vector2& GetHotSpot() const
+- SpriteSheet2D* GetSpriteSheet() const
+
+Properties:
+
+- Texture2D* texture
+- IntRect rectangle
+- Vector2 hotSpot
+- SpriteSheet2D* spriteSheet
+
+### SpriteSheet2D : Resource
+
+Methods:
+
+- Texture2D* GetTexture() const
+- Sprite2D* GetSprite(const String name) const
+- void DefineSprite(const String name, const IntRect& rectangle)
+- void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
+- void UpdateSprite(const String name, const IntRect& rectangle)
+- void UpdateSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
+
 ### StaticModel : Drawable
 
 Methods:
@@ -3804,6 +3902,24 @@ Methods:
 Properties:
 
 - unsigned numInstanceNodes (readonly)
+
+### StaticSprite2D : Drawable2D
+
+Methods:
+
+- void SetFlip(bool flipX, bool flipY)
+- void SetFlipX(bool flipX)
+- void SetFlipY(bool flipY)
+- void SetColor(const Color& color)
+- bool GetFlipX() const
+- bool GetFlipY() const
+- const Color& GetColor() const
+
+Properties:
+
+- bool flipX
+- bool flipY
+- Color& color
 
 ### StringHash
 
@@ -4212,6 +4328,9 @@ Methods:
 - void RenderUpdate()
 - void Render()
 - void DebugDraw(UIElement* element)
+- UIElement* LoadLayout(File* source, XMLFile* styleFile = 0)
+- UIElement* LoadLayout(const String fileName, XMLFile* styleFile = 0)
+- UIElement* LoadLayout(XMLFile* file, XMLFile* styleFile = 0)
 - bool SaveLayout(Serializer& dest, UIElement* element)
 - void SetClipBoardText(const String text)
 - void SetDoubleClickInterval(float interval)
@@ -5176,6 +5295,12 @@ Properties:
 - int CS_BUSY
 - int CS_MAX_SHAPES
 
+### CycleMode
+
+- int CM_LOOP
+- int CM_CLAMP
+- int CM_PINGPONG
+
 ### DeferredLightPSVariation
 
 - int DLPS_NONE
@@ -5224,6 +5349,11 @@ Properties:
 
 - int EMITTER_SPHERE
 - int EMITTER_BOX
+
+### EmitterType2D
+
+- int EMITTER_TYPE_GRAVITY
+- int EMITTER_TYPE_RADIAL
 
 ### FileMode
 

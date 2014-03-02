@@ -1,0 +1,23 @@
+$#include "AnimatedSprite2D.h"
+
+enum CycleMode
+{
+    CM_LOOP = 0,
+    CM_CLAMP,
+    CM_PINGPONG,
+};
+
+class AnimatedSprite2D : public StaticSprite2D
+{
+    void SetSpeed(float speed);
+    void SetCycleMode(CycleMode cycleMode);
+    void SetAnimation(Animation2D* animation);
+
+    float GetSpeed() const;
+    CycleMode GetCycleMode() const;
+    Animation2D* GetAnimation() const;
+
+    tolua_property__get_set float speed;
+    tolua_property__get_set CycleMode cycleMode;
+    tolua_property__get_set Animation2D* animation;
+};

@@ -689,6 +689,14 @@ LUA_API lua_State *lua_newthread(lua_State *L)
   return L1;
 }
 
+/* Modified by Aster Jian for Urho3D */
+LUA_API lua_State *lua_getmainthread(lua_State *L)
+{
+    lua_State *L1;
+    L1 = mainthread(G(L));
+    return L1;
+}
+
 LUA_API void *lua_newuserdata(lua_State *L, size_t size)
 {
   GCudata *ud;

@@ -66,7 +66,7 @@ public:
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
-    
+
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function.
@@ -81,11 +81,13 @@ private:
     void HandleEvent(StringHash eventType, VariantMap& eventData);
     /// Handle object event.
     void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
+    /// Handle post update.
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
     /// Push script function.
     bool PushScriptFunction(const String& functionName, bool silentIfNotfound = false);
-    
+
     /// At panic.
     static int AtPanic(lua_State* L);
     /// Loader.
@@ -95,6 +97,8 @@ private:
 
     /// Lua state.
     lua_State* luaState_;
+    /// Coroutine update function.
+    WeakPtr<LuaFunction> coroutineUpdate_;
     /// Function name to function map.
     HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
     /// Event type to function map.

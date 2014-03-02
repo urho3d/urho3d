@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animation >
+    <Frame duration="0.1" sprite="Urho2D/GoldIcon.xml@0" />
+    <Frame duration="0.1" sprite="Urho2D/GoldIcon.xml@1" />
+    <Frame duration="0.1" sprite="Urho2D/GoldIcon.xml@2" />
+    <Frame duration="0.1" sprite="Urho2D/GoldIcon.xml@3" />
+    <Frame duration="0.1" sprite="Urho2D/GoldIcon.xml@4" />
+</Animation>

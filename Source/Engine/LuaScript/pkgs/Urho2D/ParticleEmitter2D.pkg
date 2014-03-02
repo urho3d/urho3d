@@ -1,0 +1,10 @@
+$#include "ParticleEmitter2D.h"
+
+class ParticleEmitter2D : public Drawable2D
+{    
+public:
+    void SetModel(ParticleModel2D* model);
+    ParticleModel2D* GetModel() const;
+
+    tolua_property__get_set ParticleModel2D* model;
+};

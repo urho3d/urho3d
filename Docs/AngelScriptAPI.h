@@ -109,6 +109,84 @@ Zone zone;
 uint zoneMask;
 };
 
+class AnimatedSprite2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool IsInView(Camera) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetFlip(bool, bool);
+
+// Properties:
+Animation2D animation;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+BlendMode blendMode;
+/* readonly */
+BoundingBox boundingBox;
+bool castShadows;
+/* readonly */
+String category;
+Color color;
+CycleMode cycleMode;
+float drawDistance;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+bool flipX;
+bool flipY;
+/* readonly */
+uint id;
+/* readonly */
+bool inView;
+uint lightMask;
+float lodBias;
+Material material;
+uint maxLights;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+bool occludee;
+bool occluder;
+/* readonly */
+int refs;
+float shadowDistance;
+uint shadowMask;
+float speed;
+Sprite2D sprite;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float unitPerPixel;
+uint viewMask;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+float zValue;
+uint zoneMask;
+};
+
 class Animation
 {
 // Methods:
@@ -138,6 +216,39 @@ uint numTriggers;
 int refs;
 /* readonly */
 Array<AnimationTriggerPoint> triggers;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
+class Animation2D
+{
+// Methods:
+Sprite GetFrameSprite(uint) const;
+Sprite GetFrameSpriteByTime(float) const;
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+uint numFrames;
+/* readonly */
+int refs;
+/* readonly */
+float totalTime;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1947,6 +2058,77 @@ uint viewMask;
 int weakRefs;
 /* readonly */
 BoundingBox worldBoundingBox;
+uint zoneMask;
+};
+
+class Drawable2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool IsInView(Camera) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+BlendMode blendMode;
+/* readonly */
+BoundingBox boundingBox;
+bool castShadows;
+/* readonly */
+String category;
+float drawDistance;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+bool inView;
+uint lightMask;
+float lodBias;
+Material material;
+uint maxLights;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+bool occludee;
+bool occluder;
+/* readonly */
+int refs;
+float shadowDistance;
+uint shadowMask;
+Sprite2D sprite;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float unitPerPixel;
+uint viewMask;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+float zValue;
 uint zoneMask;
 };
 
@@ -4237,6 +4419,105 @@ Zone zone;
 uint zoneMask;
 };
 
+class ParticleEmitter2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool IsInView(Camera) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+BlendMode blendMode;
+/* readonly */
+BoundingBox boundingBox;
+bool castShadows;
+/* readonly */
+String category;
+float drawDistance;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+bool inView;
+uint lightMask;
+float lodBias;
+Material material;
+uint maxLights;
+ParticleModel2D model;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+bool occludee;
+bool occluder;
+/* readonly */
+int refs;
+float shadowDistance;
+uint shadowMask;
+Sprite2D sprite;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float unitPerPixel;
+uint viewMask;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+float zValue;
+uint zoneMask;
+};
+
+class ParticleModel2D
+{
+// Methods:
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+int refs;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
 class Pass
 {
 
@@ -6269,6 +6550,68 @@ int weakRefs;
 int width;
 };
 
+class Sprite2D
+{
+// Methods:
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+Vector2 hotSpot;
+/* readonly */
+uint memoryUse;
+String name;
+IntRect rectangle;
+/* readonly */
+int refs;
+Texture2D texture;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
+class SpriteSheet2D
+{
+// Methods:
+void DefineSprite(const String&, const IntRect&, const Vector2&);
+Sprite2D GetSprite(const String&);
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void UpdateSprite(const String&, const IntRect&, const Vector2&);
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+int refs;
+/* readonly */
+Texture2D texture;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
 class StaticModel
 {
 // Methods:
@@ -6425,6 +6768,81 @@ int weakRefs;
 BoundingBox worldBoundingBox;
 /* readonly */
 Zone zone;
+uint zoneMask;
+};
+
+class StaticSprite2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool IsInView(Camera) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetFlip(bool, bool);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+BlendMode blendMode;
+/* readonly */
+BoundingBox boundingBox;
+bool castShadows;
+/* readonly */
+String category;
+Color color;
+float drawDistance;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+bool flipX;
+bool flipY;
+/* readonly */
+uint id;
+/* readonly */
+bool inView;
+uint lightMask;
+float lodBias;
+Material material;
+uint maxLights;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+bool occludee;
+bool occluder;
+/* readonly */
+int refs;
+float shadowDistance;
+uint shadowMask;
+Sprite2D sprite;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float unitPerPixel;
+uint viewMask;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+float zValue;
 uint zoneMask;
 };
 
@@ -8491,6 +8909,13 @@ CS_REJECTDROP,
 CS_BUSY,
 };
 
+enum CycleMode
+{
+CM_LOOP,
+CM_CLAMP,
+CM_PINGPONG,
+};
+
 enum DumpMode
 {
 DOXYGEN,
@@ -8501,6 +8926,12 @@ enum EmitterType
 {
 EMITTER_SPHERE,
 EMITTER_BOX,
+};
+
+enum EmitterType2D
+{
+EMITTER_TYPE_GRAVITY,
+EMITTER_TYPE_RADIAL,
 };
 
 enum FileMode

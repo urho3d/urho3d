@@ -1,0 +1,11 @@
+$pfile "Urho2D/Sprite2D.pkg"
+$pfile "Urho2D/SpriteSheet2D.pkg"
+$pfile "Urho2D/Drawable2D.pkg"
+$pfile "Urho2D/StaticSprite2D.pkg"
+$pfile "Urho2D/Animation2D.pkg"
+$pfile "Urho2D/AnimatedSprite2D.pkg"
+$pfile "Urho2D/ParticleModel2D.pkg"
+$pfile "Urho2D/ParticleEmitter2D.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
