@@ -717,6 +717,7 @@ void HandleHierarchyListSelectionChange()
 
     PositionGizmo();
     UpdateAttributeInspector();
+    UpdateCameraPreview();
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)

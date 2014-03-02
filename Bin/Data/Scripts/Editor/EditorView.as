@@ -1,5 +1,6 @@
 // Urho3D editor view & camera functions
 
+WeakHandle previewCamera;
 Node@ cameraNode;
 Camera@ camera;
 
@@ -400,6 +401,8 @@ void CreateCamera()
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("UIMouseClick", "ViewMouseClick");
     SubscribeToEvent("MouseMove", "ViewMouseMove");
+    SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
+    SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
 }
 
 // Create any UI associated with changing the editor viewports
@@ -613,7 +616,58 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
     
     ReacquireCameraYawPitch();
     UpdateViewParameters();
+    UpdateCameraPreview();
     CreateViewportUI();
+}
+
+// Create a preview viewport if a camera component is selected
+void UpdateCameraPreview()
+{
+    previewCamera = null;
+    ShortStringHash cameraType("Camera");
+
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        if (selectedComponents[i].type == cameraType)
+        {
+            // Take the first encountered camera
+            previewCamera = selectedComponents[i];
+            break;
+        }
+    }
+    // Also try nodes if not found from components
+    if (previewCamera.Get() is null)
+    {
+        for (uint i = 0; i < selectedNodes.length; ++i)
+        {
+            previewCamera = selectedNodes[i].GetComponent("Camera");
+            if (previewCamera.Get() !is null)
+                break;
+        }
+    }
+
+    // Remove extra viewport if it exists and no camera is selected
+    if (previewCamera.Get() is null)
+    {
+        if (renderer.numViewports > viewports.length)
+            renderer.numViewports = viewports.length;
+    }
+    else
+    {
+        if (renderer.numViewports < viewports.length + 1)
+            renderer.numViewports = viewports.length + 1;
+
+        int previewWidth = graphics.width / 4;
+        int previewHeight = previewWidth * 9 / 16;
+        int previewX = graphics.width - 10 - previewWidth;
+        int previewY = graphics.height - 30 - previewHeight;
+
+        Viewport@ previewView = Viewport();
+        previewView.scene = editorScene;
+        previewView.camera = previewCamera.Get();
+        previewView.rect = IntRect(previewX, previewY, previewX + previewWidth, previewY + previewHeight);
+        renderer.viewports[viewports.length] = previewView;
+    }
 }
 
 void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
@@ -1545,4 +1599,18 @@ Vector3 GetScreenCollision(IntVector2 pos)
     }
 
     return res;
+}
+
+void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // Hide gizmo from preview camera
+    if (eventData["Camera"].GetPtr() is previewCamera.Get() && gizmo !is null)
+        gizmo.viewMask = 0;
+}
+
+void HandleEndViewUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // Restore gizmo after preview view update
+    if (eventData["Camera"].GetPtr() is previewCamera.Get() && gizmo !is null)
+        gizmo.viewMask = 0x80000000;
 }
