@@ -252,53 +252,46 @@ void ParticleEmitter2D::EmitParticle()
     if (lifespan <= 0.0f) 
         return;
 
-    Particle2D& particle = particles_[numParticles_++];
-    
-    particle.timeToLive_ = lifespan;
+    float invLifespan = 1.0f / lifespan;
+
     Vector3 worldPosition = GetNode()->GetWorldPosition();
+    float worldAngle = GetNode()->GetWorldRotation().RollAngle();
+    float worldScale = GetNode()->GetWorldScale().x_;
+
+    Particle2D& particle = particles_[numParticles_++];    
+    particle.timeToLive_ = lifespan;
     particle.startPos_.x_ = worldPosition.x_;
     particle.startPos_.y_ = worldPosition.y_;
     particle.position_.x_ = worldPosition.x_ + model_->GetSourcePositionVariance().x_ * Random(-1.0f, 1.0f);
     particle.position_.y_ = worldPosition.y_ + model_->GetSourcePositionVariance().y_ * Random(-1.0f, 1.0f);
 
-    float angle = model_->GetEmitAngle() + model_->GetEmitAngleVariance() * Random(-1.0f, 1.0f);
-    float speed = model_->GetSpeed() + model_->GetSpeedVariance() * Random(-1.0f, 1.0f);
+    float angle = worldAngle + model_->GetEmitAngle() + model_->GetEmitAngleVariance() * Random(-1.0f, 1.0f);
+    float speed = worldScale * (model_->GetSpeed() + model_->GetSpeedVariance() * Random(-1.0f, 1.0f));
     particle.velocity_.x_ = speed * Cos(angle);
     particle.velocity_.y_ = speed * Sin(angle);
 
-    float worldScale = GetNode()->GetWorldScale().x_;
-    particle.velocity_ *= worldScale;
+    particle.radius_ = worldScale * (model_->GetMaxRadius() + model_->GetMaxRadiusVariance() * Random(-1.0f, 1.0f));
+    particle.radiusDelta_ = worldScale * (model_->GetMaxRadius() * invLifespan);
 
-    particle.radius_ = model_->GetMaxRadius() + model_->GetMaxRadiusVariance() * Random(-1.0f, 1.0f);
-    particle.radiusDelta_ = model_->GetMaxRadius() / lifespan;
-    particle.radius_ *= worldScale;
-    particle.radiusDelta_ *= worldScale;
-
-    particle.rotation_ = model_->GetEmitAngle() + model_->GetEmitAngleVariance() * Random(-1.0f, 1.0f);
+    particle.rotation_ = worldAngle + model_->GetEmitAngle() + model_->GetEmitAngleVariance() * Random(-1.0f, 1.0f);
     particle.rotationDelta_ = model_->GetRotatePerSecond() + model_->GetRotatePerSecondVariance() * Random(-1.0f, 1.0f);
 
-    particle.radialAccel_ = model_->GetRadialAcceleration() + model_->GetRadialAccelerationVariance() * Random(-1.0f, 1.0f);
-    particle.tangentialAccel_ = model_->GetTangentialAcceleration() + model_->GetTangentialAccelerationVariance() * Random(-1.0f, 1.0f);
+    particle.radialAccel_ = worldScale * (model_->GetRadialAcceleration() + model_->GetRadialAccelerationVariance() * Random(-1.0f, 1.0f));
+    particle.tangentialAccel_ = worldScale * (model_->GetTangentialAcceleration() + model_->GetTangentialAccelerationVariance() * Random(-1.0f, 1.0f));
 
-    particle.radialAccel_ *= worldScale;
-    particle.tangentialAccel_ *= worldScale;
-
-    float particleStartSize  = Max(0.1f, model_->GetStartParticleSize() + model_->GetStartParticleSizeVariance() * Random(-1.0f, 1.0f));
-    float particleFinishSize = Max(0.1f, model_->GetEndParticleSize() + model_->GetEndParticleSizeVariance() * Random(-1.0f, 1.0f)); 
+    float particleStartSize  = worldScale * Max(0.1f, model_->GetStartParticleSize() + model_->GetStartParticleSizeVariance() * Random(-1.0f, 1.0f));
+    float particleFinishSize = worldScale * Max(0.1f, model_->GetEndParticleSize() + model_->GetEndParticleSizeVariance() * Random(-1.0f, 1.0f)); 
     particle.size_ = particleStartSize;
-    particle.sizeDelta_ = (particleFinishSize - particleStartSize)/ lifespan ;
-    
-    particle.size_ *= worldScale;
-    particle.sizeDelta_ *= worldScale;
+    particle.sizeDelta_ = (particleFinishSize - particleStartSize) * invLifespan;
 
     Color startColor = model_->GetStartColor() + model_->GetStartColorVariance() * Random(-1.0f, 1.0f);
-    Color endColor   = model_->GetEndColor() +   model_->GetEndColorVariance() * Random(-1.0f, 1.0f);
+    Color endColor = model_->GetEndColor() +   model_->GetEndColorVariance() * Random(-1.0f, 1.0f);
 
     Color colorDelta;
-    colorDelta.r_ = (endColor.r_ - startColor.r_) / lifespan;
-    colorDelta.g_ = (endColor.g_ - startColor.g_) / lifespan;
-    colorDelta.b_ = (endColor.b_ - startColor.b_) / lifespan;
-    colorDelta.a_ = (endColor.a_ - startColor.a_) / lifespan;
+    colorDelta.r_ = (endColor.r_ - startColor.r_) * invLifespan;
+    colorDelta.g_ = (endColor.g_ - startColor.g_) * invLifespan;
+    colorDelta.b_ = (endColor.b_ - startColor.b_) * invLifespan;
+    colorDelta.a_ = (endColor.a_ - startColor.a_) * invLifespan;
 
     particle.color_ = startColor;
     particle.colorDelta_ = colorDelta;
