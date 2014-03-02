@@ -80,7 +80,6 @@ LuaScript::LuaScript(Context* context) :
 
     SetContext(luaState_, context_);
 
-    lua_gc(luaState_, LUA_GCSETPAUSE, 125);
     lua_atpanic(luaState_, &LuaScript::AtPanic);
 
     luaL_openlibs(luaState_);
@@ -383,6 +382,9 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         coroutineUpdate_->PushFloat(timeStep);
         coroutineUpdate_->EndCall();
     }
+
+    // Collect garbage
+    lua_gc(luaState_, LUA_GCCOLLECT, 0);
 }
 
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)

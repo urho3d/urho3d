@@ -69,7 +69,7 @@ function CreateScene()
         staticSprite.sprite = sprite
 
         -- Set move speed
-        spriteNode.moveSpeed = { Random(-200.0, 200.0), Random(-200.0, 200.0) }
+        spriteNode.moveSpeed = Vector3(Random(-200.0, 200.0), Random(-200.0, 200.0), 0.0)
         -- Set rotate speed
         spriteNode.rotateSpeed = Random(-90.0, 90.0)
 
@@ -164,22 +164,21 @@ function HandleUpdate(eventType, eventData)
 
     for _, spriteNode in ipairs(spriteNodes) do
         
-        local x, y, z = spriteNode:GetPositionXYZ()
+        local position = spriteNode.position
         local moveSpeed = spriteNode.moveSpeed
-        local newPositionX = x + moveSpeed[1] * timeStep
-        local newPositionY = y + moveSpeed[2] * timeStep
+        local newPosition = position + moveSpeed * timeStep
 
-        if newPositionX < -halfWidth or newPositionX > halfWidth then
-            newPositionX = x
-            moveSpeed[1] = -moveSpeed[1]
+        if newPosition.x < -halfWidth or newPosition.x > halfWidth then
+            newPosition.x =  position.x
+            moveSpeed.x = -moveSpeed.x
         end
 
-        if newPositionY < -halfHeight or newPositionY > halfHeight then
-            newPositionY = y
-            moveSpeed[2] = -moveSpeed[2]
+        if newPosition.y < -halfHeight or newPosition.y > halfHeight then
+            newPosition.y = position.y
+            moveSpeed.y = -moveSpeed.y
         end
 
-        spriteNode:SetPositionXYZ(newPositionX, newPositionY, z)
+        spriteNode.position = newPosition
         spriteNode:Roll(spriteNode.rotateSpeed * timeStep)
     end
 end
