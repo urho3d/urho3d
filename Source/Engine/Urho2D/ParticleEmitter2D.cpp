@@ -87,7 +87,7 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
     float timeStep = frame.timeStep_;
     float worldScale = GetNode()->GetWorldScale().x_;
 
-    int particleIndex = 0;
+    unsigned particleIndex = 0;
     while (particleIndex < numParticles_)
     {
         Particle2D& currentParticle = particles_[particleIndex];
@@ -213,7 +213,7 @@ void ParticleEmitter2D::UpdateVertices()
     vertex2.uv_ = Vector2(1.0f, 0.0f);
     vertex3.uv_ = Vector2(1.0f, 1.0f);
 
-    for (int i = 0; i < numParticles_; ++i)
+    for (unsigned i = 0; i < numParticles_; ++i)
     {
         Particle2D& p = particles_[i];
 
