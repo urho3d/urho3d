@@ -33,8 +33,6 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
 static const int srcBlendFuncs[] =
 {
     1,      // GL_ONE
@@ -96,7 +94,7 @@ ParticleModel2D::~ParticleModel2D()
 
 void ParticleModel2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ParticleModel2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ParticleModel2D>();
 }
 
 bool ParticleModel2D::Load(Deserializer& source)
