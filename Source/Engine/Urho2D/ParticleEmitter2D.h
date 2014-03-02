@@ -102,16 +102,16 @@ private:
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Emit particle.
-    void EmitParticle();
+    void EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale);
     /// Update particle.
-    void UpdateParticle(Particle2D& particle, float timeStep);
+    void UpdateParticle(Particle2D& particle, float timeStep, float worldScale);
 
     /// Particle model.
     SharedPtr<ParticleModel2D> model_;
     /// Life time;
     float lifeTime_;
     /// Num particles.
-    int numParticles_;    
+    unsigned numParticles_;
     /// Particles.
     Vector<Particle2D> particles_;
     /// Time to emit particle.

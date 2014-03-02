@@ -85,32 +85,34 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
         return;
 
     float timeStep = frame.timeStep_;
+    float worldScale = GetNode()->GetWorldScale().x_;
 
-    int particleIndex = 0;    
+    int particleIndex = 0;
     while (particleIndex < numParticles_)
     {
         Particle2D& currentParticle = particles_[particleIndex];
         if (currentParticle.timeToLive_ > timeStep) 
         {
-            UpdateParticle(currentParticle, timeStep);
-
+            UpdateParticle(currentParticle, timeStep, worldScale);
             ++particleIndex;
         } 
         else 
         {            
             if (particleIndex != numParticles_ - 1)
                 particles_[particleIndex] = particles_[numParticles_ - 1];
-
             --numParticles_;
         }
     }
 
     if (lifeTime_< 0.0f || lifeTime_ > 0.0f)
     {
-        emitParticleTime_ += timeStep;
+        Vector3 worldPosition = GetNode()->GetWorldPosition();
+        float worldAngle = GetNode()->GetWorldRotation().RollAngle();
+
+        emitParticleTime_ += timeStep;        
         while (emitParticleTime_ > 0.0f)
         {
-            EmitParticle();
+            EmitParticle(worldPosition, worldAngle, worldScale);
             emitParticleTime_ -= timeBetweenParticles_;
         }
 
@@ -243,7 +245,7 @@ void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& 
     MarkForUpdate();
 }
 
-void ParticleEmitter2D::EmitParticle()
+void ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
 {
     if (numParticles_ >= model_->GetMaxParticles())
         return;
@@ -253,10 +255,6 @@ void ParticleEmitter2D::EmitParticle()
         return;
 
     float invLifespan = 1.0f / lifespan;
-
-    Vector3 worldPosition = GetNode()->GetWorldPosition();
-    float worldAngle = GetNode()->GetWorldRotation().RollAngle();
-    float worldScale = GetNode()->GetWorldScale().x_;
 
     Particle2D& particle = particles_[numParticles_++];    
     particle.timeToLive_ = lifespan;
@@ -297,7 +295,7 @@ void ParticleEmitter2D::EmitParticle()
     particle.colorDelta_ = colorDelta;
 }
 
-void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep)
+void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep, float worldScale)
 {
     timeStep = Min(timeStep, particle.timeToLive_);
     particle.timeToLive_ -= timeStep;
@@ -311,7 +309,7 @@ void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep)
         particle.position_.x_ = worldPosition.x_ - cosf(particle.rotation_) * particle.radius_;
         particle.position_.y_ = worldPosition.y_ - sinf(particle.rotation_) * particle.radius_;
 
-        if (particle.radius_ < model_->GetMinRadius())
+        if (particle.radius_ < model_->GetMinRadius() * worldScale)
             particle.timeToLive_ = 0.0f;                
     } 
     else 
