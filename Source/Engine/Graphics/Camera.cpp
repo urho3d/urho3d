@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "Context.h"
+#include "DebugRenderer.h"
 #include "Drawable.h"
 #include "Node.h"
 
@@ -106,6 +107,11 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR4, "Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Reflection", GetUseReflection, SetUseReflection, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Clipping", GetUseClipping, SetUseClipping, bool, false, AM_DEFAULT);
+}
+
+void Camera::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    debug->AddFrustum(GetFrustum(), Color::WHITE, depthTest);
 }
 
 void Camera::SetNearClip(float nearClip)

@@ -403,6 +403,8 @@ void CreateCamera()
     SubscribeToEvent("MouseMove", "ViewMouseMove");
     SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
     SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
+    SubscribeToEvent("BeginViewRender", "HandleBeginViewRender");
+    SubscribeToEvent("EndViewRender", "HandleEndViewRender");
 }
 
 // Create any UI associated with changing the editor viewports
@@ -1614,3 +1616,37 @@ void HandleEndViewUpdate(StringHash eventType, VariantMap& eventData)
     if (eventData["Camera"].GetPtr() is previewCamera.Get() && gizmo !is null)
         gizmo.viewMask = 0x80000000;
 }
+
+bool debugWasEnabled = true;
+
+void HandleBeginViewRender(StringHash eventType, VariantMap& eventData)
+{
+    // Hide debug geometry from preview camera
+    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    {
+        DebugRenderer@ debug = editorScene.GetComponent("DebugRenderer");
+        if (debug !is null)
+        {
+            suppressSceneChanges = true; // Do not want UI update now
+            debugWasEnabled = debug.enabled;
+            debug.enabled = false;
+            suppressSceneChanges = false;
+        }
+    }
+}
+
+void HandleEndViewRender(StringHash eventType, VariantMap& eventData)
+{
+    // Restore debug geometry after preview camera render
+    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    {
+        DebugRenderer@ debug = editorScene.GetComponent("DebugRenderer");
+        if (debug !is null)
+        {
+            suppressSceneChanges = true; // Do not want UI update now
+            debug.enabled = debugWasEnabled;
+            suppressSceneChanges = false;
+        }
+    }
+}
+

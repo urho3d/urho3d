@@ -732,7 +732,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         if (!octree)
             continue;
         DebugRenderer* debug = octree->GetComponent<DebugRenderer>();
-        if (!debug)
+        if (!debug || !debug->IsEnabledEffective())
             continue;
         
         const PODVector<Drawable*>& geometries = view->GetGeometries();

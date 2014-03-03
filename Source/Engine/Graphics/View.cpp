@@ -554,7 +554,7 @@ void View::Render()
     if (!renderTarget_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
-        if (debug)
+        if (debug && debug->IsEnabledEffective())
         {
             debug->SetView(camera_);
             debug->Render();
