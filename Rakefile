@@ -122,6 +122,10 @@ task :travis_ci_package_upload do
   # Upload the package
   setup_digital_keys
   system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D/Snapshots" or abort 'Failed to upload binary package'
+  # Upload readme file
+  if ENV['SITE_UPDATE']
+    system 'scp Readme.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D' or abort 'Failed to upload readme file'
+  end
 end
 
 def scaffolding(dir)

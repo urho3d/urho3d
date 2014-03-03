@@ -3,12 +3,12 @@
 --     - Creating a 2D scene with sprite
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling keyboard to move and zoom 2D camera
+--     - Using Lua Closure to update scene
 
 require "LuaScripts/Utilities/Sample"
 
 local scene_ = nil
 local cameraNode = nil
-local spriteNodes = {}
 
 function Start()
     -- Execute the common startup for samples
@@ -53,6 +53,7 @@ function CreateScene()
         return
     end
 
+    local spriteNodes = {}
     local NUM_SPRITES = 200
     local halfWidth = width * 0.5
     local halfHeight = height * 0.5
@@ -74,6 +75,27 @@ function CreateScene()
         spriteNode.rotateSpeed = Random(-90.0, 90.0)
 
         table.insert(spriteNodes, spriteNode)
+    end
+
+    scene_.Update = function(self, timeStep)
+        for _, spriteNode in ipairs(spriteNodes) do
+            local position = spriteNode.position
+            local moveSpeed = spriteNode.moveSpeed
+            local newPosition = position + moveSpeed * timeStep
+
+            if newPosition.x < -halfWidth or newPosition.x > halfWidth then
+                newPosition.x = position.x
+                moveSpeed.x = -moveSpeed.x
+            end
+
+            if newPosition.y < -halfHeight or newPosition.y > halfHeight then
+                newPosition.y = position.y
+                moveSpeed.y = -moveSpeed.y
+            end
+
+            spriteNode.position = newPosition
+            spriteNode:Roll(spriteNode.rotateSpeed * timeStep)
+        end
     end
 
     local animation = cache:GetResource("Animation2D", "Urho2D/GoldIcon.anm")
@@ -159,26 +181,6 @@ function HandleUpdate(eventType, eventData)
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
 
-    local halfWidth = graphics.width * 0.5
-    local halfHeight = graphics.height * 0.5
-
-    for _, spriteNode in ipairs(spriteNodes) do
-        
-        local position = spriteNode.position
-        local moveSpeed = spriteNode.moveSpeed
-        local newPosition = position + moveSpeed * timeStep
-
-        if newPosition.x < -halfWidth or newPosition.x > halfWidth then
-            newPosition.x =  position.x
-            moveSpeed.x = -moveSpeed.x
-        end
-
-        if newPosition.y < -halfHeight or newPosition.y > halfHeight then
-            newPosition.y = position.y
-            moveSpeed.y = -moveSpeed.y
-        end
-
-        spriteNode.position = newPosition
-        spriteNode:Roll(spriteNode.rotateSpeed * timeStep)
-    end
+    -- Update scene
+    scene_:Update(timeStep)
 end
