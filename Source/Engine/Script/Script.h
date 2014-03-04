@@ -67,6 +67,8 @@ public:
     void SetDefaultScriptFile(ScriptFile* file);
     /// Set immediate mode scene.
     void SetDefaultScene(Scene* scene);
+    /// Set whether to execute engine console commands as script code. Default true.
+    void SetExecuteConsoleCommands(bool enable);
     /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when ENABLE_LOGGING not defined.
     void DumpAPI(DumpMode mode= DOXYGEN);
     /// Log a message from the script engine.
@@ -84,6 +86,8 @@ public:
     ScriptFile* GetDefaultScriptFile() const;
     /// Return immediate mode scene.
     Scene* GetDefaultScene() const;
+    /// Return whether is executing engine console commands as script code.
+    bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
     /// Clear the inbuild object type cache.
     void ClearObjectTypeCache();
     /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
@@ -117,6 +121,8 @@ private:
     HashMap<const char*, asIObjectType*> objectTypes_;
     /// Current script execution nesting level.
     unsigned scriptNestingLevel_;
+    /// Flag for executing engine console commands as script code.
+    bool executeConsoleCommands_;
 };
 
 /// Register Script library objects.

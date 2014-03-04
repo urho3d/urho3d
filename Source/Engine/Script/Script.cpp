@@ -152,7 +152,8 @@ Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),
     immediateContext_(0),
-    scriptNestingLevel_(0)
+    scriptNestingLevel_(0),
+    executeConsoleCommands_(true)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
@@ -262,6 +263,11 @@ void Script::SetDefaultScriptFile(ScriptFile* file)
 void Script::SetDefaultScene(Scene* scene)
 {
     defaultScene_ = scene;
+}
+
+void Script::SetExecuteConsoleCommands(bool enable)
+{
+    executeConsoleCommands_ = enable;
 }
 
 void Script::DumpAPI(DumpMode mode)
@@ -710,7 +716,8 @@ void Script::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
 
-    Execute(eventData[P_COMMAND].GetString());
+    if (executeConsoleCommands_)
+        Execute(eventData[P_COMMAND].GetString());
 }
 
 void RegisterScriptLibrary(Context* context)
