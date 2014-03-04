@@ -99,7 +99,7 @@ task :travis_ci_package_upload do
     platform_prefix = ''
   end
   # Generate the documentation if necessary
-  unless ENV['SITE_UPDATE_ON_MASTER_COMMIT']
+  unless ENV['SITE_UPDATE']
     system 'echo Generate documentation'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
@@ -122,9 +122,10 @@ task :travis_ci_package_upload do
   # Upload the package
   setup_digital_keys
   system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D/Snapshots" or abort 'Failed to upload binary package'
-  # Upload readme file
+  # Sync readme and license files, just in case they are updated in the repo
   if ENV['SITE_UPDATE']
-    system 'scp Readme.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D' or abort 'Failed to upload readme file'
+    system 'for f in Readme.txt License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
+    system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D' or abort 'Failed to sync readme and license files'
   end
 end
 
