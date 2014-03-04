@@ -111,7 +111,8 @@ void Console::SetVisible(bool enable)
     if (enable)
     {
         // Check if we have handler for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
-        bool hasConsoleCommandEventHandler = context_->GetEventReceivers(this, E_CONSOLECOMMAND) != 0 || context_->GetEventReceivers(E_CONSOLECOMMAND) != 0;
+        bool hasConsoleCommandEventHandler = context_->GetEventReceivers(this, E_CONSOLECOMMAND) != 0 ||
+            context_->GetEventReceivers(E_CONSOLECOMMAND) != 0;
         lineEdit_->SetVisible(hasConsoleCommandEventHandler);
         if (hasConsoleCommandEventHandler)
             GetSubsystem<UI>()->SetFocusElement(lineEdit_);
@@ -144,9 +145,15 @@ void Console::SetNumRows(unsigned rows)
     }
     else
     {
-        // We have less, add more rows at the bottom (text element style will be set initially in SetDefaultStyle() when the stylesheet is available and subsequently in HandlePostUpdate())
+        // We have less, add more rows at the bottom
         for (int i = 0; i > delta; --i)
-            rowContainer_->CreateChild<Text>();
+        {
+            Text* text = rowContainer_->CreateChild<Text>();
+            // If style is already set, apply here to ensure proper height of the console when
+            // amount of rows is changed
+            if (background_->GetDefaultStyle())
+                text->SetStyle("ConsoleText");
+        }
     }
 
     rowContainer_->EnableLayoutUpdate();

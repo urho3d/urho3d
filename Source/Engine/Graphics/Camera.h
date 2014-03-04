@@ -48,6 +48,9 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    
     /// Set near clip distance.
     void SetNearClip(float nearClip);
     /// Set far clip distance.

@@ -151,6 +151,8 @@ void LoadConfig()
         if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
         if (objectElem.HasAttribute("importoptions")) importOptions = objectElem.GetAttribute("importoptions");
         if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
+        if (objectElem.HasAttribute("axismode")) axisMode = AxisMode(objectElem.GetInt("axismode"));
+        if (objectElem.HasAttribute("revertonpause")) revertOnPause = objectElem.GetBool("revertonpause");
     }
 
     if (!resourcesElem.isNull)
@@ -256,6 +258,8 @@ void SaveConfig()
     objectElem.SetBool("applymateriallist", applyMaterialList);
     objectElem.SetAttribute("importoptions", importOptions);
     objectElem.SetInt("pickmode", pickMode);
+    objectElem.SetInt("axismode", axisMode);
+    objectElem.SetBool("revertonpause", revertOnPause);
 
     resourcesElem.SetBool("rememberresourcepath", rememberResourcePath);
     resourcesElem.SetAttribute("resourcepath", sceneResourcePath);

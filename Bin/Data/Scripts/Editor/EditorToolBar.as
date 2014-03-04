@@ -20,6 +20,7 @@ void CreateToolBar()
     UIElement@ runUpdateGroup = CreateGroup("RunUpdateGroup", LM_HORIZONTAL);
     runUpdateGroup.AddChild(CreateToolBarToggle("RunUpdatePlay"));
     runUpdateGroup.AddChild(CreateToolBarToggle("RunUpdatePause"));
+    runUpdateGroup.AddChild(CreateToolBarToggle("RevertOnPause"));
     FinalizeGroupHorizontal(runUpdateGroup, "ToolBarToggle");
     toolBar.AddChild(runUpdateGroup);
 
@@ -185,6 +186,13 @@ void ToolBarRunUpdatePause(StringHash eventType, VariantMap& eventData)
     CheckBox@ edit = eventData["Element"].GetPtr();
     if (edit.checked)
         StopSceneUpdate();
+    toolBarDirty = true;
+}
+
+void ToolBarRevertOnPause(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    revertOnPause = edit.checked;
     toolBarDirty = true;
 }
 
@@ -384,6 +392,10 @@ void UpdateDirtyToolBar()
     if (runUpdatePauseToggle.checked != (runUpdate == false))
         runUpdatePauseToggle.checked = runUpdate == false;
 
+    CheckBox@ revertOnPauseToggle = toolBar.GetChild("RevertOnPause", true);
+    if (revertOnPauseToggle.checked != revertOnPause)
+        revertOnPauseToggle.checked = revertOnPause;
+
     CheckBox@ editMoveToggle = toolBar.GetChild("EditMove", true);
     if (editMoveToggle.checked != (editMode == EDIT_MOVE))
         editMoveToggle.checked = editMode == EDIT_MOVE;
@@ -464,6 +476,7 @@ void UpdateDirtyToolBar()
     {
         SubscribeToEvent(runUpdatePlayToggle, "Toggled", "ToolBarRunUpdatePlay");
         SubscribeToEvent(runUpdatePauseToggle, "Toggled", "ToolBarRunUpdatePause");
+        SubscribeToEvent(revertOnPauseToggle, "Toggled", "ToolBarRevertOnPause");
         SubscribeToEvent(editMoveToggle, "Toggled", "ToolBarEditModeMove");
         SubscribeToEvent(editRotateToggle, "Toggled", "ToolBarEditModeRotate");
         SubscribeToEvent(editScaleToggle, "Toggled", "ToolBarEditModeScale");
