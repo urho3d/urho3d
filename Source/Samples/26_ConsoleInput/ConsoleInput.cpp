@@ -66,9 +66,7 @@ void ConsoleInput::Start()
     
     // Subscribe to console commands and the frame update
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
-    #ifndef ENABLE_TESTING
     SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
-    #endif
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
@@ -81,6 +79,9 @@ void ConsoleInput::Start()
     Console* console = GetSubsystem<Console>();
     console->SetNumRows(GetSubsystem<Graphics>()->GetHeight() / 16);
     console->SetVisible(true);
+    
+    // Show OS mouse cursor
+    GetSubsystem<Input>()->SetMouseVisible(true);
     
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();

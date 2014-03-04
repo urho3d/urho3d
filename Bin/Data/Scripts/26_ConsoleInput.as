@@ -49,6 +49,9 @@ void Start()
     console.numRows = graphics.height / 16;
     console.visible = true;
     
+    // Show OS mouse cursor
+    input.mouseVisible = true;
+
     // Disable default execution of AngelScript from the console
     script.executeConsoleCommands = false;
 
