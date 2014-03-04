@@ -141,10 +141,10 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (key == KEY_ESC)
     {
         Console* console = GetSubsystem<Console>();
-        if (!console->IsVisible())
-            engine_->Exit();
-        else
+        if (console->IsVisible())
             console->SetVisible(false);
+        else
+            engine_->Exit();
     }
 
     // Toggle console with F1

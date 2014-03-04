@@ -57,13 +57,13 @@ public:
     /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
     /// Script unsubscribe from an event.
-    void ScriptUnsubscribeFromEvent(const String& eventName);
+    void ScriptUnsubscribeFromEvent(const String& eventName, const String& functionName = String::EMPTY);
     /// Script unsubscribe from all events.
     void ScriptUnsubscribeFromAllEvents();
     /// Script subscribe to a specific sender's event.
     void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
     /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
+    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName = String::EMPTY);
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
 
@@ -101,10 +101,12 @@ private:
     WeakPtr<LuaFunction> coroutineUpdate_;
     /// Function name to function map.
     HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
-    /// Event type to function map.
-    HashMap<StringHash, WeakPtr<LuaFunction> > eventTypeToFunctionMap_;
-    /// Object to event type to function map.
-    HashMap<Object*, HashMap<StringHash, WeakPtr<LuaFunction> > > objectToEventTypeToFunctionMap_;
+    /// Typedef Lua function vector.
+    typedef Vector<WeakPtr<LuaFunction> > LuaFunctionVector;
+    /// Event handle functions.
+    HashMap<StringHash, LuaFunctionVector> eventHandleFunctions_;
+    /// Object event handle funcitons.
+    HashMap<Object*, HashMap<StringHash, LuaFunctionVector> > objectHandleFunctions_;
 };
 
 /// Register Lua script library objects.

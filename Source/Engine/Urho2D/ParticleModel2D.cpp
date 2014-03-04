@@ -160,7 +160,7 @@ bool ParticleModel2D::Load(Deserializer& source)
     sourcePositionVariance_.x_ = keyValueMapping["sourcePositionVariancex"].GetFloat();
     sourcePositionVariance_.y_ = keyValueMapping["sourcePositionVariancey"].GetFloat();    
 
-    maxParticles_ = (int)keyValueMapping["maxParticles"].GetFloat();
+    maxParticles_ = (unsigned)keyValueMapping["maxParticles"].GetFloat();
     particleLifeSpan_ = keyValueMapping["particleLifespan"].GetFloat();
 
     particleLifeSpanVariance_ = keyValueMapping["particleLifespanVariance"].GetFloat();

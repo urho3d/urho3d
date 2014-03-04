@@ -34,8 +34,8 @@ namespace Urho3D
     class Scene;
 }
 
-const float TOUCH_SENSITIVITY = 5.0;
-const float GYROSCOPE_THRESHOLD = 0.1;
+const float TOUCH_SENSITIVITY = 5.0f;
+const float GYROSCOPE_THRESHOLD = 0.1f;
 const float CAMERA_MIN_DIST = 1.0f;
 const float CAMERA_INITIAL_DIST = 5.0f;
 const float CAMERA_MAX_DIST = 20.0f;

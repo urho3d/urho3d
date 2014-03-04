@@ -28,7 +28,7 @@
 #include "Log.h"
 #include "ProcessUtils.h"
 #include "Random.h"
-#include "Time.h"
+#include "Timer.h"
 
 #include "ConsoleInput.h"
 
@@ -66,7 +66,12 @@ void ConsoleInput::Start()
     
     // Subscribe to console commands and the frame update
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
+    #ifndef ENABLE_TESTING
     SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
+    #endif
+
+    // Subscribe key down event
+    SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
     
     // Hide logo to make room for the console
     SetLogoVisible(false);
@@ -100,6 +105,13 @@ void ConsoleInput::HandleUpdate(StringHash eventType, VariantMap& eventData)
     String input = GetConsoleInput();
     if (input.Length())
         HandleInput(input);
+}
+
+void ConsoleInput::HandleEscKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    // Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
+    if (eventData[KeyDown::P_KEY].GetInt() == KEY_ESC)
+        engine_->Exit();
 }
 
 void ConsoleInput::StartGame()
@@ -183,9 +195,8 @@ void ConsoleInput::HandleInput(const String& input)
     }
     
     if (inputLower == "quit" || inputLower == "exit")
-        GetSubsystem<Engine>()->Exit();
-    
-    if (gameOn_)
+        engine_->Exit();
+    else if (gameOn_)
     {
         // Game is on
         if (inputLower == "help")
@@ -245,7 +256,7 @@ void ConsoleInput::HandleInput(const String& input)
         if (inputLower[0] == 'y')
             StartGame();
         else if (inputLower[0] == 'n')
-            GetSubsystem<Engine>()->Exit();
+            engine_->Exit();
         else
             Print("Please answer 'y' or 'n'.\n");
     }
