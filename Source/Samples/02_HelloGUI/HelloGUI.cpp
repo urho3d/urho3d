@@ -200,7 +200,7 @@ void HelloGUI::HandleDragEnd(StringHash eventType, VariantMap& eventData) // For
 
 void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
 {
-    GetSubsystem<Engine>()->Exit();
+    engine_->Exit();
 }
 
 void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
