@@ -219,7 +219,7 @@ void ConsoleInput::HandleInput(const String& input)
         }
         else if (inputLower == "hide")
         {
-            if (urhoThreat_)
+            if (urhoThreat_ > 0)
             {
                 bool evadeSuccess = hunger_ > 2 || Random() < 0.5f;
                 if (evadeSuccess)
