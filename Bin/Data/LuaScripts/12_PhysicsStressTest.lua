@@ -95,25 +95,33 @@ function CreateScene()
         shape:SetTriangleMesh(mushroomObject.model)
     end
 
-    -- Create a large amount of falling physics objects
-    local NUM_OBJECTS = 1000
-    for i = 1, NUM_OBJECTS do
-        local boxNode = scene_:CreateChild("Box")
-        boxNode.position = Vector3(0.0, i * 2.0 + 100.0, 0.0)
-        local boxObject = boxNode:CreateComponent("StaticModel")
-        boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
-        boxObject.material = cache:GetResource("Material", "Materials/StoneSmall.xml")
-        boxObject.castShadows = true
+    -- Start coroutine to create a large amount of falling physics objects
+    coroutine.start(function()
+            local NUM_OBJECTS = 1000
+            for i = 1, NUM_OBJECTS do
+                local boxNode = scene_:CreateChild("Box")
+                boxNode.position = Vector3(0.0, 100.0, 0.0)
+                local boxObject = boxNode:CreateComponent("StaticModel")
+                boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
+                boxObject.material = cache:GetResource("Material", "Materials/StoneSmall.xml")
+                boxObject.castShadows = true
 
-        -- Give the RigidBody mass to make it movable and also adjust friction
-        local body = boxNode:CreateComponent("RigidBody")
-        body.mass = 1.0
-        body.friction = 1.0
-        -- Disable collision event signaling to reduce CPU load of the physics simulation
-        body.collisionEventMode = COLLISION_NEVER
-        local shape = boxNode:CreateComponent("CollisionShape")
-        shape:SetBox(Vector3(1.0, 1.0, 1.0))
-    end
+                -- Give the RigidBody mass to make it movable and also adjust friction
+                local body = boxNode:CreateComponent("RigidBody")
+                body.mass = 1.0
+                body.friction = 1.0
+
+                -- Set linear velocity
+                body.linearVelocity = Vector3(0.0, -50.0, 0.0)
+
+                -- Disable collision event signaling to reduce CPU load of the physics simulation
+                body.collisionEventMode = COLLISION_NEVER
+                local shape = boxNode:CreateComponent("CollisionShape")
+                shape:SetBox(Vector3(1.0, 1.0, 1.0))
+                -- sleep coroutine
+                coroutine.sleep(0.1)
+            end
+        end)
 
     -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load/save
