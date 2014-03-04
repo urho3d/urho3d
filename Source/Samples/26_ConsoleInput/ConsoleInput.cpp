@@ -128,7 +128,23 @@ void ConsoleInput::EndGame(const String& message)
 
 void ConsoleInput::Advance()
 {
-    ++numTurns_;
+    if (urhoThreat_ > 0)
+    {
+        ++urhoThreat_;
+        if (urhoThreat_ > 3)
+        {
+            EndGame("Urho has eaten you!\n");
+            return;
+        }
+    }
+    else if (urhoThreat_ < 0)
+        ++urhoThreat_;
+    if (urhoThreat_ == 0 && Random() < 0.2f)
+        ++urhoThreat_;
+    
+    if (urhoThreat_ > 0)
+        Print(urhoThreatLevels[urhoThreat_ - 1] + ".\n");
+    
     if ((numTurns_ & 3) == 0 && !eatenLastTurn_)
     {
         ++hunger_;
@@ -154,22 +170,7 @@ void ConsoleInput::Advance()
         foodAvailable_ = true;
     }
     
-    if (urhoThreat_ > 0)
-    {
-        ++urhoThreat_;
-        if (urhoThreat_ > 3)
-        {
-            EndGame("Urho has eaten you!\n");
-            return;
-        }
-    }
-    else if (urhoThreat_ < 0)
-        ++urhoThreat_;
-    if (urhoThreat_ == 0 && Random() < 0.2f)
-        ++urhoThreat_;
-    
-    if (urhoThreat_ > 0)
-        Print(urhoThreatLevels[urhoThreat_ - 1] + ".\n");
+    ++numTurns_;
 }
 
 void ConsoleInput::HandleInput(const String& input)
