@@ -29,8 +29,8 @@ vec4 GaussianBlur(int blurKernelSize, vec2 blurDir, vec2 blurRadius, float sigma
 
     for (int i = 1; i <= blurKernelSizeHalfSize; i++)
     {
-        avgValue += texture2D(texSampler, texCoord - i * blurVec) * gaussCoeff.x;
-        avgValue += texture2D(texSampler, texCoord + i * blurVec) * gaussCoeff.x;
+        avgValue += texture2D(texSampler, texCoord - float(i) * blurVec) * gaussCoeff.x;
+        avgValue += texture2D(texSampler, texCoord + float(i) * blurVec) * gaussCoeff.x;
 
         gaussCoeffSum += 2.0 * gaussCoeff.x;
         gaussCoeff.xy *= gaussCoeff.yz;
