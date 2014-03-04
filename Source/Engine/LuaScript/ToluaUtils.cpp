@@ -51,7 +51,10 @@ Context* GetContext(lua_State* L)
 {
     HashMap<void*, Context*>::ConstIterator i = contextMapping.Find(L);
     if (i == contextMapping.End())
-        return GetContext(lua_getmainthread(L));
+    {
+        lua_State* L1 = lua_getmainthread(L);
+        return (L == L1) ? 0 : GetContext(L1);
+    }
 
     return i->second_;
 }
