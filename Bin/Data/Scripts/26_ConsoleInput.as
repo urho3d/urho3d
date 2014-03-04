@@ -32,7 +32,7 @@ String[] urhoThreatLevels = {
 
 void Start()
 {
-    // Execute base class startup
+    // Execute the common startup for samples
     SampleStart();
     
     // Subscribe to console commands and the frame update
