@@ -66,7 +66,7 @@ public:
     /// Return source position variance.
     const Vector2& GetSourcePositionVariance() const { return sourcePositionVariance_; }
     /// Return max particles.
-    int GetMaxParticles() const { return maxParticles_; }
+    unsigned GetMaxParticles() const { return maxParticles_; }
     /// Return particle lifespan
     float GetParticleLifeSpan() const { return particleLifeSpan_; }
     /// Return particle lifespan variance.
@@ -128,7 +128,7 @@ private:
     /// Source position variance.
     Vector2 sourcePositionVariance_;
     /// Max particles.
-    int maxParticles_;
+    unsigned maxParticles_;
     /// Particle lifespan
     float particleLifeSpan_;
     /// Particle lifespan variance.

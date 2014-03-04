@@ -135,7 +135,7 @@ void ParticleEmitter2D::SetModel(ParticleModel2D* model)
 
     lifeTime_ = model_->GetDuration();
 
-    numParticles_ = Min(model_->GetMaxParticles(), numParticles_);    
+    numParticles_ = Min((int)model_->GetMaxParticles(), (int)numParticles_);    
     particles_.Resize(model_->GetMaxParticles());
     vertices_.Reserve(model_->GetMaxParticles() * 4);
 
