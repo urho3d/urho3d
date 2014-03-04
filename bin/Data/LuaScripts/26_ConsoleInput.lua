@@ -2,7 +2,7 @@
 -- This sample demonstrates:
 --     - Implementing a crude text adventure game, which accepts input both through the engine console,
 --       and standard input.
---     - Disabling default execution of console commands as immediate mode AngelScript.
+--     - Disabling default execution of console commands as immediate mode Lua script.
 
 require "LuaScripts/Utilities/Sample"
 
