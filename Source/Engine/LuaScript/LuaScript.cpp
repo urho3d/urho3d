@@ -67,7 +67,8 @@ namespace Urho3D
 
 LuaScript::LuaScript(Context* context) :
     Object(context),
-    luaState_(0)
+    luaState_(0),
+    executeConsoleCommands_(true)
 {
     RegisterLuaScriptLibrary(context_);
 
@@ -260,6 +261,11 @@ void LuaScript::ScriptUnsubscribeFromEvents(void* sender)
     objectHandleFunctions_.Erase(it);
 }
 
+void LuaScript::SetExecuteConsoleCommands(bool enable)
+{
+    executeConsoleCommands_ = enable;
+}
+
 void LuaScript::RegisterLoader()
 {
     // Get package.loaders table
@@ -420,7 +426,9 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-    ExecuteString(eventData[P_COMMAND].GetString());
+    
+    if (executeConsoleCommands_)
+        ExecuteString(eventData[P_COMMAND].GetString());
 }
 
 bool LuaScript::PushScriptFunction(const String& functionName, bool silentIfNotFound)

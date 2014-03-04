@@ -1,5 +1,13 @@
 $#include "LuaScript.h"
 
+class LuaScript
+{
+    void SetExecuteConsoleCommands(bool enable);
+    bool GetExecuteConsoleCommands();
+    
+    tolua_property__get_set bool executeConsoleCommands;
+}
+
 void LuaScriptSendEvent @ SendEvent(const String eventName, VariantMap& eventData);
 void LuaScriptSubscribeToEvent @ SubscribeToEvent(const String eventName, const String functionName);
 void LuaScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(const String eventName, const String functionName = String::EMPTY);
@@ -8,7 +16,19 @@ void LuaScriptSubscribeToEvent @ SubscribeToEvent(void* sender, const String eve
 void LuaScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(void* sender, const String eventName, const String functionName = String::EMPTY);
 void LuaScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* sender);
 
+LuaScript* GetLuaScript();
+tolua_readonly tolua_property__get_set LuaScript* luaScript;
+
 ${
+#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_GetLuaScript00
+static int tolua_LuaScriptLuaAPI_GetLuaScript00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<LuaScript>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_luaScript_ptr
+#define tolua_get_luaScript_ptr tolua_LuaScriptLuaAPI_GetLuaScript00
+
 static LuaScript* GetLuaScript(lua_State* L)
 {
     return GetContext(L)->GetSubsystem<LuaScript>();
