@@ -66,7 +66,9 @@ void ConsoleInput::Start()
     
     // Subscribe to console commands and the frame update
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
+    #ifndef ENABLE_TESTING
     SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
+    #endif
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
