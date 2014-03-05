@@ -879,6 +879,7 @@ void InitResourcePicker()
     Array<String> soundFilters = {"*.wav","*.ogg"};
     Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> materialFilters = {"*.xml", "*.material"};
+    Array<String> plistFilters = {"*.plist"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani", ACTION_PICK | ACTION_TEST));
     resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
@@ -891,6 +892,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
     resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("ParticleModel2D", plistFilters, ACTION_PICK | ACTION_OPEN));
 }
 
 ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)

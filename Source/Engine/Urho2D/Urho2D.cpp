@@ -39,14 +39,15 @@ const char* URHO2D_CATEGORY = "Urho2D";
 
 void RegisterUrho2DLibrary(Context* context)
 {
+    // Must register objects from base to derived order
+    Drawable2D::RegisterObject(context);
+    StaticSprite2D::RegisterObject(context);
     AnimatedSprite2D::RegisterObject(context);
     Animation2D::RegisterObject(context);
-    Drawable2D::RegisterObject(context);
     ParticleEmitter2D::RegisterObject(context);
     ParticleModel2D::RegisterObject(context);
     Sprite2D::RegisterObject(context);
     SpriteSheet2D::RegisterObject(context);
-    StaticSprite2D::RegisterObject(context);
 }
 
 }

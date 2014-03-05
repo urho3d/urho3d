@@ -49,10 +49,11 @@ template<> CycleMode Variant::Get<CycleMode>() const
     return (CycleMode)GetInt();
 }
 
-AnimatedSprite2D::AnimatedSprite2D(Context* context) : StaticSprite2D(context),
-    speed_(1.0f), 
+AnimatedSprite2D::AnimatedSprite2D(Context* context) :
+    StaticSprite2D(context),
+    speed_(1.0f),
     cycleMode_(CM_LOOP),
-    animationTime_(0.0f), 
+    animationTime_(0.0f),
     animationTotalTime_(1.0f)
 {
 }
@@ -65,7 +66,7 @@ void AnimatedSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_FLOAT, "Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, "Cycle Mode", GetCycleMode, SetCycleMode, CycleMode, cycleModeNames, 0, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, "Cycle Mode", GetCycleMode, SetCycleMode, CycleMode, cycleModeNames, 0, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedSprite2D, StaticSprite2D);
 }
 

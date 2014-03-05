@@ -33,7 +33,8 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-StaticSprite2D::StaticSprite2D(Context* context) : Drawable2D(context),
+StaticSprite2D::StaticSprite2D(Context* context) :
+    Drawable2D(context),
     flipX_(false),
     flipY_(false),
     color_(Color::WHITE)

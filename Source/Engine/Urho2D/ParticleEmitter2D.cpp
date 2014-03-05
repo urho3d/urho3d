@@ -36,10 +36,11 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-ParticleEmitter2D::ParticleEmitter2D(Context* context) : Drawable2D(context), 
+ParticleEmitter2D::ParticleEmitter2D(Context* context) :
+    Drawable2D(context),
     lifeTime_(0.0f),
-    numParticles_(0),    
-    emitParticleTime_(0.0f), 
+    numParticles_(0),
+    emitParticleTime_(0.0f),
     timeBetweenParticles_(1.0f)
 {
 }
@@ -52,7 +53,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(ParticleEmitter2D, VAR_RESOURCEREF, "Particle Model", GetParticleModelAttr, SetParticleModelAttr, ResourceRef, ResourceRef(ParticleModel2D::GetTypeStatic()), AM_FILE);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter2D, VAR_RESOURCEREF, "Particle Model", GetParticleModelAttr, SetParticleModelAttr, ResourceRef, ResourceRef(ParticleModel2D::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(ParticleEmitter2D, Drawable2D);
 }
 

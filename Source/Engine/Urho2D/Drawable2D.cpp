@@ -42,7 +42,8 @@ namespace Urho3D
 
 extern const char* blendModeNames[];
 
-Drawable2D::Drawable2D(Context* context) : Drawable(context, DRAWABLE_GEOMETRY),
+Drawable2D::Drawable2D(Context* context) :
+    Drawable(context, DRAWABLE_GEOMETRY),
     unitPerPixel_(1.0f),
     blendMode_(BLEND_REPLACE),
     zValue_(0.0f),

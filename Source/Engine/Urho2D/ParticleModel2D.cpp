@@ -55,7 +55,8 @@ static const int destBlendFuncs[] =
     0x0304  // GL_DST_ALPHA
 };
 
-ParticleModel2D::ParticleModel2D(Context* context) : Resource(context), 
+ParticleModel2D::ParticleModel2D(Context* context) :
+    Resource(context),
     blendMode_(BLEND_ALPHA),
     duration_(-1.0f),
     emitterType_(EMITTER_TYPE_GRAVITY),
