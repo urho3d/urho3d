@@ -1878,18 +1878,6 @@ Properties:
 - bool timeStamp
 - bool quiet
 
-### LuaScript
-
-
-Methods:
-
-- void SetExecuteConsoleCommands(bool enable)
-- bool GetExecuteConsoleCommands()
-
-Properties:
-
-- bool executeConsoleCommands
-
 ### LuaScriptInstance : Component
 
 Methods:
@@ -5709,6 +5697,7 @@ Properties:
 - Engine* GetEngine()
 - EventHandler* GetEventHandler() const
 - Object* GetEventSender()
+- bool GetExecuteConsoleCommands()
 - String GetExtension(const String fullPath, bool lowercaseExtension = true)
 - String GetFileName(const String fullPath)
 - String GetFileNameAndExtension(const String fullPath, bool lowercaseExtension = false)
@@ -5717,7 +5706,6 @@ Properties:
 - Input* GetInput()
 - String GetInternalPath(const String pathName)
 - Log* GetLog()
-- LuaScript* GetLuaScript()
 - String GetNativePath(const String pathName)
 - Network* GetNetwork()
 - unsigned GetNumLogicalCPUs()
@@ -5739,15 +5727,16 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float range)
 - float Random()
 - float Random(float min, float max)
+- float Random(float range)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
 - void SendEvent(const String eventName, VariantMap& eventData)
+- void SetExecuteConsoleCommands(bool enable)
 - void SetRandomSeed(unsigned seed)
 - float Sign(float value)
 - float SmoothStep(float lhs, float rhs, float t)
@@ -5785,7 +5774,6 @@ Properties:
 - Graphics* graphics (readonly)
 - Input* input (readonly)
 - Log* log (readonly)
-- LuaScript* luaScript (readonly)
 - Network* network (readonly)
 - Renderer* renderer (readonly)
 - Time* time (readonly)
