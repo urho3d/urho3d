@@ -127,7 +127,7 @@ bool SpriteSheet2D::Load(Deserializer& source)
                 int frameWidth = subTextureElem.GetInt("frameWidth");
                 int frameHeight = subTextureElem.GetInt("frameHeight");
                 hotSpot.x_ = ((float)frameX + frameWidth / 2) / width;
-                hotSpot.y_ = ((float)frameY + frameHeight / 2) / height;
+                hotSpot.y_ = 1.0f - ((float)frameY + frameHeight / 2) / height;
             }
 
             DefineSprite(name, rectangle, hotSpot);
