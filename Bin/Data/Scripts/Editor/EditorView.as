@@ -1605,16 +1605,26 @@ Vector3 GetScreenCollision(IntVector2 pos)
 
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Hide gizmo from preview camera
-    if (eventData["Camera"].GetPtr() is previewCamera.Get() && gizmo !is null)
-        gizmo.viewMask = 0;
+    // Hide gizmo and grid from preview camera
+    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    {
+        if (gizmo !is null)
+            gizmo.viewMask = 0;
+        if (grid !is null)
+            grid.viewMask = 0;
+    }
 }
 
 void HandleEndViewUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Restore gizmo after preview view update
-    if (eventData["Camera"].GetPtr() is previewCamera.Get() && gizmo !is null)
-        gizmo.viewMask = 0x80000000;
+    // Restore gizmo and grid after preview view update
+    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    {
+        if (gizmo !is null)
+            gizmo.viewMask = 0x80000000;
+        if (grid !is null)
+            grid.viewMask = 0x80000000;
+    }
 }
 
 bool debugWasEnabled = true;
