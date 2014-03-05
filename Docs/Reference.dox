@@ -2059,6 +2059,31 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
+\page ContributionChecklist Contribution checklist
+
+When contributing code to the Urho3D project, there are a few things to check so that the process goes smoothly.
+
+First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be very sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
+
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2014 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+
+Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
+
+- For all code (classes, functions) for which it makes sense, both AngelScript and Lua bindings should exist. Refer to the existing bindings and the scripting documentation for specific conventions, for example the use of properties in AngelScript instead of setters / getters where possible, or Lua bindings providing both functions and properties.
+
+- %Script bindings do not need to be made for low-level functionality that only makes sense to be called from C++, such as thread handling or byte-level access to GPU resources, or for internal but public functions that are only accessed by subsystems and are not needed when using the classes.
+
+- Unless impossible due to missing bindings (see above) new examples should be implemented in all of C++, AngelScript and Lua.
+
+- For new Component or UIElement subclasses, \ref Serialization "attributes" should exist for serialization, network replication and editing. The classes should be possible to create from within the editor; check the component category and supply icons for them as necessary (see the files Bin/Data/Textures/EditorIcons.png and Bin/Data/UI/EditorIcons.xml.)
+
+- If the classes inherit attribute definitions from other classes, make sure that they are registered in the correct order on engine initialization.
+
+- \ref Network "Network replication" of a component's attributes must be triggered manually by calling MarkNetworkUpdate() in each setter function that modifies a network-replicated attribute. See the Camera class for a straightforward example.
+
+- Define \ref Events "events" where you anticipate that an external party might be interested in hooking to something happening. For example the editor implements showing and updating the scene hierarchy through events that the scene nodes send as they add/remove child nodes and components.
+
+- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs :)
 */
 
 }
