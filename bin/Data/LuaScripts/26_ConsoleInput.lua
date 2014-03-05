@@ -52,7 +52,7 @@ function Start()
     input.mouseVisible = true
 
     -- Disable default execution of Lua from the console
-    luaScript.executeConsoleCommands = false
+    SetExecuteConsoleCommands(false)
 
     -- Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow()
