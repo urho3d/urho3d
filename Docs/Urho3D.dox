@@ -147,7 +147,38 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 \page History History
 
-V1.3    
+V1.31
+
+- Extensive build system improvements, especially for using Urho3D as a library in an external project.
+- LuaJIT support.
+- Improved Lua bindings, Lua coroutine support, automatic loading of compiled Lua scripts (.luc) if they exist.
+- HDR rendering, 3D textures, height fog and several new post process shaders.
+- Shader refactoring. Need for XML shader descriptions & ShaderCompiler tool removed.
+- Reflection / refraction rendering support.
+- 2D drawable components: StaticSprite2D, AnimatedSprite2D, ParticleEmitter2D.
+- ToolTip & MessageBox UI elements. UI logic improvements.
+- Optimized text rendering + dynamic population of font textures for improved batching.
+- AngelScript DelayedExecute for free functions, and event handling for any script object, not just ScriptInstances
+- Editor: added grid, toolbar, camera view presets, camera orbit, mouse wheel zoom, multiple viewports and orthographic camera.
+- Borderless window mode, possibility to change application icon.
+- SDL GameController support, raw key codes support.
+- Optimized shadow rendering on mobile devices. Low quality mode avoids dependent texture reads.
+- HttpRequest class runs in a background thread to avoid blocking.
+- Compressed package file support using the LZ4 library.
+- Cone parameters in SoundSource3D for directional attenuation.
+- Variant GetPtr() safety refactoring. Uses WeakPtr's to RefCounted objects. Use GetVoidPtr() to store unsafe arbitrary pointers.
+- Improved work queue completion events. Work items are now RefCounted to allow persisting them as necessary.
+- Allow to disable automatic execution of AngelScript & Lua from the engine console.
+- Added shader variations, for example ambient occlusion texture and better emissive color support.
+- Added examples.
+- Update SDL to 2.0.1
+- Update AngelScript to 2.28.1.
+- Update FreeType to 2.5.0.
+- Fix long-standing audio click bug.
+- Fix kinematic rigidbodies to apply impulses correctly to dynamic bodies.
+- Plus many more improvements and bugfixes.
+
+V1.3
 
 - Lua scripting support.
 - Optional build as a single external library, static or dynamic.
