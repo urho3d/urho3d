@@ -499,8 +499,8 @@ V1.31   - Extensive build system improvements, especially for using Urho3D as
         - HttpRequest class runs in a background thread to avoid blocking.
         - Compressed package file support using the LZ4 library.
         - Cone parameters in SoundSource3D for directional attenuation.
-        - Variant GetPtr() safety refactoring. Uses WeakPtr's to RefCounted
-          objects. Use GetVoidPtr() to store unsafe arbitrary pointers.
+        - Variant GetPtr() safety refactoring. Uses WeakPtr to store RefCounted
+          subclasses. Use GetVoidPtr() to store unsafe arbitrary pointers.
         - Improved work queue completion events. Work items are now RefCounted
           to allow persisting them as necessary.
         - Allow to disable automatic execution of AngelScript & Lua from the 
@@ -511,6 +511,7 @@ V1.31   - Extensive build system improvements, especially for using Urho3D as
         - Update SDL to 2.0.1
         - Update AngelScript to 2.28.1.
         - Update FreeType to 2.5.0.
+        - Fix partial texture updates, both Direct3D9 & OpenGL.
         - Fix long-standing audio click bug.
         - Fix kinematic rigidbodies to apply impulses correctly to dynamic
           bodies.
