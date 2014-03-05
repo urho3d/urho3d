@@ -48,7 +48,9 @@ Drawable2D::Drawable2D(Context* context) :
     blendMode_(BLEND_REPLACE),
     zValue_(0.0f),
     vertexBuffer_(new VertexBuffer(context_)),
-    geometryDirty_(true)
+    verticesDirty_(true),
+    geometryDirty_(true),
+    materialUpdatePending_(false)
 {
     geometry_ = new Geometry(context);
     batches_.Resize(1);
@@ -65,14 +67,17 @@ void Drawable2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Unit Per Pixel", GetUnitPerPixel, SetUnitPerPixel, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, 0, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
 }
 
 void Drawable2D::ApplyAttributes()
 {
-    UpdateVertices();
-    UpdateMaterial();
+    if (materialUpdatePending_)
+    {
+        materialUpdatePending_ = false;
+        UpdateMaterial();
+    }
 }
 
 void Drawable2D::UpdateBatches(const FrameInfo& frame)
@@ -142,8 +147,8 @@ UpdateGeometryType Drawable2D::GetUpdateGeometryType()
 void Drawable2D::SetUnitPerPixel(float unitPerPixel)
 {
     unitPerPixel_ = Max(1.0f, unitPerPixel);
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetSprite(Sprite2D* sprite)
@@ -152,42 +157,45 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
         return;
 
     sprite_ = sprite;
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    OnMarkedDirty(node_);
     UpdateMaterial();
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetMaterial(Material* material)
 {
-    if (material != material_)
-    {
-        material_ = material;
-        // If a null material was specified, create one with defaults, otherwise clone the material so that
-        // the diffuse texture can be changed according to the sprite being used
-        if (!material_)
-            CreateDefaultMaterial();
-        else
-            batches_[0].material_ = material_->Clone();
-        
-        UpdateMaterial();
-    }
+    if (material == material_)
+        return;
+
+    material_ = material;
+    // If a null material was specified, create one with defaults, otherwise clone the material so that
+    // the diffuse texture can be changed according to the sprite being used
+    if (!material_)
+        CreateDefaultMaterial();
+    else
+        batches_[0].material_ = material_->Clone();
+    UpdateMaterial();
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetBlendMode(BlendMode mode)
 {
-    if (blendMode_ != mode)
-    {
-        blendMode_ = mode;
-        UpdateMaterial();
-    }
+    if (mode == blendMode_)
+        return;
+
+    blendMode_ = mode;
+    UpdateMaterial();
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetZValue(float zValue)
 {
-    zValue_ = zValue;
+    if (zValue == zValue_)
+        return;
 
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    zValue_ = zValue;
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 Material* Drawable2D::GetMaterial() const
@@ -197,6 +205,9 @@ Material* Drawable2D::GetMaterial() const
 
 void Drawable2D::SetSpriteAttr(ResourceRef value)
 {
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     if (value.type_ == Sprite2D::GetTypeStatic())
@@ -238,6 +249,9 @@ ResourceRef Drawable2D::GetSpriteAttr() const
 
 void Drawable2D::SetMaterialAttr(ResourceRef value)
 {
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
@@ -245,6 +259,22 @@ void Drawable2D::SetMaterialAttr(ResourceRef value)
 ResourceRef Drawable2D::GetMaterialAttr() const
 {
     return GetResourceRef(material_, Material::GetTypeStatic());
+}
+
+void Drawable2D::SetBlendModeAttr(BlendMode mode)
+{
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
+    SetBlendMode(mode);
+}
+
+void Drawable2D::OnMarkedDirty(Node* node)
+{
+    Drawable::OnMarkedDirty(node);
+
+    verticesDirty_ = true;
+    geometryDirty_ = true;
 }
 
 void Drawable2D::OnWorldBoundingBoxUpdate()
@@ -283,6 +313,10 @@ void Drawable2D::CreateDefaultMaterial()
 
 void Drawable2D::UpdateMaterial()
 {
+    // Delay the material update
+    if (materialUpdatePending_)
+        return;
+
     Material* material = batches_[0].material_;
     assert(material);
     

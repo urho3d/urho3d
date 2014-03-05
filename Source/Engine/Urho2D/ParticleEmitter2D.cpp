@@ -121,13 +121,17 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
             lifeTime_ = Max(0.0f, lifeTime_ - timeStep);
     }
 
-    MarkVerticesDirty();
-    OnMarkedDirty(node_);    
+    OnMarkedDirty(node_);
 }
 
 void ParticleEmitter2D::SetModel(ParticleModel2D* model)
 {
+    if (model == model_)
+        return;
+
     model_ = model;
+    MarkNetworkUpdate();
+
     if (!model_)
         return;
 
@@ -223,10 +227,10 @@ void ParticleEmitter2D::UpdateVertices()
         float add = (c + s) * p.size_ * 0.5f;
         float sub = (c - s) * p.size_ * 0.5f;
 
-        vertex0.position_ = Vector3(p.position_.x_ - sub, p.position_.y_ - add, 0.0f) * unitPerPixel_;
-        vertex1.position_ = Vector3(p.position_.x_ - add, p.position_.y_ + sub, 0.0f) * unitPerPixel_;
-        vertex2.position_ = Vector3(p.position_.x_ + sub, p.position_.y_ + add, 0.0f) * unitPerPixel_;
-        vertex3.position_ = Vector3(p.position_.x_ + add, p.position_.y_ - sub, 0.0f) * unitPerPixel_;
+        vertex0.position_ = Vector3(p.position_.x_ - sub, p.position_.y_ - add, zValue_) * unitPerPixel_;
+        vertex1.position_ = Vector3(p.position_.x_ - add, p.position_.y_ + sub, zValue_) * unitPerPixel_;
+        vertex2.position_ = Vector3(p.position_.x_ + sub, p.position_.y_ + add, zValue_) * unitPerPixel_;
+        vertex3.position_ = Vector3(p.position_.x_ + add, p.position_.y_ - sub, zValue_) * unitPerPixel_;
 
         vertex0.color_ = vertex1.color_ = vertex2.color_  = vertex3.color_ = p.color_.ToUInt();
 
@@ -236,8 +240,7 @@ void ParticleEmitter2D::UpdateVertices()
         vertices_.Push(vertex3);
     }
 
-    MarkGeometryDirty();
-
+    geometryDirty_ = true;
     verticesDirty_ = false;
 }
 

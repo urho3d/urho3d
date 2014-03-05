@@ -85,16 +85,16 @@ public:
     void SetMaterialAttr(ResourceRef value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
+    /// Set blend mode attribute.
+    void SetBlendModeAttr(BlendMode mode);
 
 protected:
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices() = 0;
-    /// Mark vertices dirty.
-    void MarkVerticesDirty() { verticesDirty_ = true; }
-    /// Mark geometry dirty.
-    void MarkGeometryDirty() { geometryDirty_ = true; }
     /// Create a default material when a material is not specified.
     void CreateDefaultMaterial();
     /// Update the material's properties (blend mode and texture).
@@ -121,6 +121,8 @@ protected:
     bool verticesDirty_;
     /// Geometry dirty flag.
     bool geometryDirty_;
+    /// Material update pending flag.
+    bool materialUpdatePending_;
 };
 
 }

@@ -62,8 +62,8 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void StaticSprite2D::SetFlipX(bool flipX)
@@ -78,9 +78,12 @@ void StaticSprite2D::SetFlipY(bool flipY)
 
 void StaticSprite2D::SetColor(const Color& color)
 {
+    if (color == color_)
+        return;
+
     color_ = color;
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void StaticSprite2D::UpdateVertices()
@@ -163,8 +166,7 @@ void StaticSprite2D::UpdateVertices()
     vertices_.Push(vertex2);
     vertices_.Push(vertex3);
 
-    MarkGeometryDirty();
-
+    geometryDirty_ = true;
     verticesDirty_ = false;
 }
 
