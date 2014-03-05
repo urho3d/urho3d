@@ -717,7 +717,7 @@ In the default render paths, the rendering operations proceed in the following o
 
 \section Rendering_Drawable Rendering components
 
-The rendering-related components defined by the %Graphics and %UI libraries are:
+The rendering-related components defined by the %Graphics, %UI and Urho2D libraries are:
 
 - Octree: spatial partitioning of Drawables for accelerated visibility queries. Needs to be created to the Scene (root node.)
 - Camera: describes a viewpoint for rendering, including projection parameters (FOV, near/far distance, perspective/orthographic)
@@ -735,6 +735,9 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - DecalSet: renders decal geometry on top of objects.
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
+- StaticSprite2D: a sprite that displays a single image.
+- AnimatedSprite2D: a sprite that displays a sequence of images.
+- ParticleEmitter2D: a two-dimensional particle effect.
 
 \section Rendering_Optimizations Optimizations
 

@@ -406,9 +406,10 @@ under the Source/Engine directory:
 - %Input. Provides input device access in both polled and event-based mode.
 - %Network. Provides client-server networking functionality.
 - %Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
-- %UI. Provides a 2D graphical user interface.
+- %UI. Provides graphical user interface elements.
 - Physics. Provides physics simulation.
 - Navigation. Provides navigation mesh generation and pathfinding.
+- Urho2D. Provides 2D rendering components that integrate into the 3D scene.
 - %Script. Provides scripting support using the AngelScript language.
 - %Engine. Instantiates the subsystems from the modules above (except Script, which needs to be instantiated by the application) and manages the main loop iteration.
 
