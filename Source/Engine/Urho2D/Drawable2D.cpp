@@ -44,7 +44,7 @@ extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    unitPerPixel_(1.0f),
+    pixelsPerUnit_(1.0f),
     zValue_(0.0f),
     blendMode_(BLEND_ALPHA),
     vertexBuffer_(new VertexBuffer(context_)),
@@ -65,7 +65,7 @@ Drawable2D::~Drawable2D()
 
 void Drawable2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Unit Per Pixel", GetUnitPerPixel, SetUnitPerPixel, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Pixels Per Unit", GetPixelsPerUnit, SetPixelsPerUnit, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Z Value", GetZValue, SetZValue, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
@@ -138,9 +138,9 @@ UpdateGeometryType Drawable2D::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
-void Drawable2D::SetUnitPerPixel(float unitPerPixel)
+void Drawable2D::SetPixelsPerUnit(float pixelsPerUnit)
 {
-    unitPerPixel_ = Max(1.0f, unitPerPixel);
+    pixelsPerUnit_ = Max(1.0f, pixelsPerUnit);
     verticesDirty_ = true;
     geometryDirty_ = true;
     OnMarkedDirty(node_);

@@ -52,8 +52,8 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
 
-    /// Set Unit per pixel.
-    void SetUnitPerPixel(float unitPerPixel);
+    /// Set pixels per coordinate unit.
+    void SetPixelsPerUnit(float pixelsPerUnit);
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
     /// Set material.
@@ -63,8 +63,8 @@ public:
     /// Set Z value.
     void SetZValue(float zValue);
 
-    /// Return unit per pixel.
-    float GetUnitPerPixel() const { return unitPerPixel_; }
+    /// Return pixels per coordinate unit.
+    float GetPixelsPerUnit() const { return pixelsPerUnit_; }
     /// Return sprite.
     Sprite2D* GetSprite() const { return sprite_; }
     /// Return material.
@@ -98,8 +98,8 @@ protected:
     /// Update the material's properties (blend mode and texture).
     void UpdateMaterial();
 
-    /// Unit per pixel.
-    float unitPerPixel_;
+    /// Pixels per coordinate unit.
+    float pixelsPerUnit_;
     /// Z value.
     float zValue_;
     /// Sprite.
