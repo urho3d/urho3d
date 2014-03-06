@@ -21,12 +21,13 @@
 //
 
 #include "Precompiled.h"
-#include "Animation2D.h"
 #include "AnimatedSprite2D.h"
+#include "Animation2D.h"
 #include "Context.h"
+#include "ResourceCache.h"
+#include "Scene.h"
 #include "SceneEvents.h"
 #include "Sprite2D.h"
-#include "Scene.h"
 #include "Texture2D.h"
 
 #include "DebugNew.h"
@@ -67,6 +68,7 @@ void AnimatedSprite2D::RegisterObject(Context* context)
     context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_FLOAT, "Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, "Cycle Mode", GetCycleMode, SetCycleMode, CycleMode, cycleModeNames, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_RESOURCEREF, "Animation", GetAnimationAttr, SetAnimationAttr, ResourceRef, ResourceRef(Animation2D::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedSprite2D, StaticSprite2D);
 }
 
@@ -116,6 +118,17 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 Animation2D* AnimatedSprite2D::GetAnimation() const
 {
     return animation_;
+}
+
+void AnimatedSprite2D::SetAnimationAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetAnimation(cache->GetResource<Animation2D>(value.name_));
+}
+
+Urho3D::ResourceRef AnimatedSprite2D::GetAnimationAttr() const
+{
+    return GetResourceRef(animation_, Animation2D::GetTypeStatic());
 }
 
 void AnimatedSprite2D::OnNodeSet(Node* node)
