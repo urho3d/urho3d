@@ -62,12 +62,12 @@ void LogicComponent::OnNodeSet(Node* node)
     {
         // We have been attached to a node. Set initial update event subscription state
         UpdateEventSubscription();
-        // Then execute the start function
+        // Then execute the user-defined start function
         Start();
     }
     else
     {
-        // We are being detached from a node: execute stop function and prepare for destruction
+        // We are being detached from a node: execute user-defined stop function and prepare for destruction
         Stop();
     }
 }
@@ -89,6 +89,7 @@ void LogicComponent::UpdateEventSubscription()
     
     if (enabled)
     {
+        // Component is enabled: subscribe
         if (updateEventMask_ & USE_UPDATE)
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LogicComponent, HandleSceneUpdate));
         if (updateEventMask_ & USE_POSTUPDATE)
@@ -110,6 +111,7 @@ void LogicComponent::UpdateEventSubscription()
     }
     else
     {
+        // Component is disabled: unsubscribe. Always unsubscribe from all events in case the mask has changed in the meanwhile
         UnsubscribeFromEvent(scene, E_SCENEUPDATE);
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
         
@@ -126,13 +128,14 @@ void LogicComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
 {
     using namespace SceneUpdate;
     
-    // Execute delayed start before first update
+    // Execute user-defined delayed start function before first update
     if (!delayedStartCalled_)
     {
         DelayedStart();
         delayedStartCalled_ = true;
     }
     
+    // Then execute user-defined update function
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
@@ -140,6 +143,7 @@ void LogicComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 {
     using namespace ScenePostUpdate;
     
+    // Execute user-defined post-update function
     PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
@@ -147,13 +151,14 @@ void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 {
     using namespace PhysicsPreStep;
     
-    // Execute delayed start before first update
+    // Execute user-defined delayed start before first fixed update
     if (!delayedStartCalled_)
     {
         DelayedStart();
         delayedStartCalled_ = true;
     }
     
+    // Then execute user-defined fixed update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
@@ -161,6 +166,7 @@ void LogicComponent::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
 {
     using namespace PhysicsPostStep;
     
+    // Execute user-defined fixed post-update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
