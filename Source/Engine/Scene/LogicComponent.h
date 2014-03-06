@@ -31,7 +31,7 @@ static const unsigned USE_UPDATE = 0x1;
 static const unsigned USE_POSTUPDATE = 0x2;
 /// Bitmask for using the physics update event.
 static const unsigned USE_FIXEDUPDATE = 0x4;
-/// Bitmask for using the phyics post-update event.
+/// Bitmask for using the physics post-update event.
 static const unsigned USE_FIXEDPOSTUPDATE = 0x8;
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
@@ -48,7 +48,7 @@ class URHO3D_API LogicComponent : public Component
     virtual void OnSetEnabled();
     /// Called when the component is added to a scene node. Other components may not yet exist.
     virtual void Start() {}
-    /// Called before the first update or fixed update. At this point all other components of the node should exist.
+    /// Called before the first update or fixed update. At this point all other components of the node should exist. Note that if you disable both update and fixed update from the update event mask, this will never be called!
     virtual void DelayedStart() {}
     /// Called when the component is detached from a scene node, usually on destruction.
     virtual void Stop() {}
@@ -61,7 +61,7 @@ class URHO3D_API LogicComponent : public Component
     /// Called on physics post-update, fixed timestep.
     virtual void FixedPostUpdate(float timeStep) {}
     
-    /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should be always called eg. in the subclass constructor.
+    /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
     void SetUpdateEventMask(unsigned mask);
     
     /// Return what update events are subscribed to.
