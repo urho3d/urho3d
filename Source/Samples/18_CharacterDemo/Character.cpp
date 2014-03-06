@@ -31,11 +31,13 @@
 #include "SceneEvents.h"
 
 Character::Character(Context* context) :
-    Component(context),
+    LogicComponent(context),
     onGround_(false),
     okToJump_(true),
     inAirTimer_(0.0f)
 {
+    // Only the physics update event is needed: unsubscribe from the rest for optimization
+    SetUpdateEventMask(USE_FIXEDUPDATE);
 }
 
 void Character::RegisterObject(Context* context)
@@ -51,46 +53,14 @@ void Character::RegisterObject(Context* context)
     ATTRIBUTE(Character, VAR_FLOAT, "In Air Timer", inAirTimer_, 0.0f, AM_DEFAULT);
 }
 
-void Character::OnNodeSet(Node* node)
+void Character::Start()
 {
-    if (node)
-    {
-        // Component has been inserted into its scene node. Subscribe to events now
-        SubscribeToEvent(node, E_NODECOLLISION, HANDLER(Character, HandleNodeCollision));
-        SubscribeToEvent(GetScene()->GetComponent<PhysicsWorld>(), E_PHYSICSPRESTEP, HANDLER(Character, HandleFixedUpdate));
-    }
+    // Component has been inserted into its scene node. Subscribe to events now
+    SubscribeToEvent(GetNode(), E_NODECOLLISION, HANDLER(Character, HandleNodeCollision));
 }
 
-void Character::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
+void Character::FixedUpdate(float timeStep)
 {
-    // Check collision contacts and see if character is standing on ground (look for a contact that has near vertical normal)
-    using namespace NodeCollision;
-    
-    MemoryBuffer contacts(eventData[P_CONTACTS].GetBuffer());
-    
-    while (!contacts.IsEof())
-    {
-        Vector3 contactPosition = contacts.ReadVector3();
-        Vector3 contactNormal = contacts.ReadVector3();
-        float contactDistance = contacts.ReadFloat();
-        float contactImpulse = contacts.ReadFloat();
-        
-        // If contact is below node center and mostly vertical, assume it's a ground contact
-        if (contactPosition.y_ < (node_->GetPosition().y_ + 1.0f))
-        {
-            float level = Abs(contactNormal.y_);
-            if (level > 0.75)
-                onGround_ = true;
-        }
-    }
-}
-
-void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace PhysicsPreStep;
-    
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
     /// \todo Could cache the components for faster access instead of finding them each frame
     RigidBody* body = GetComponent<RigidBody>();
     AnimationController* animCtrl = GetComponent<AnimationController>();
@@ -155,4 +125,28 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
     
     // Reset grounded flag for next frame
     onGround_ = false;
+}
+
+void Character::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
+{
+    // Check collision contacts and see if character is standing on ground (look for a contact that has near vertical normal)
+    using namespace NodeCollision;
+    
+    MemoryBuffer contacts(eventData[P_CONTACTS].GetBuffer());
+    
+    while (!contacts.IsEof())
+    {
+        Vector3 contactPosition = contacts.ReadVector3();
+        Vector3 contactNormal = contacts.ReadVector3();
+        float contactDistance = contacts.ReadFloat();
+        float contactImpulse = contacts.ReadFloat();
+        
+        // If contact is below node center and mostly vertical, assume it's a ground contact
+        if (contactPosition.y_ < (node_->GetPosition().y_ + 1.0f))
+        {
+            float level = Abs(contactNormal.y_);
+            if (level > 0.75)
+                onGround_ = true;
+        }
+    }
 }

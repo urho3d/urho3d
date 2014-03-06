@@ -29,10 +29,12 @@
 #include "DebugNew.h"
 
 Mover::Mover(Context* context) :
-    Component(context),
+    LogicComponent(context),
     moveSpeed_(0.0f),
     rotationSpeed_(0.0f)
 {
+    // Only the scene update event is needed: unsubscribe from the rest for optimization
+    SetUpdateEventMask(USE_UPDATE);
 }
 
 void Mover::SetParameters(float moveSpeed, float rotationSpeed, const BoundingBox& bounds)
@@ -42,24 +44,8 @@ void Mover::SetParameters(float moveSpeed, float rotationSpeed, const BoundingBo
     bounds_ = bounds;
 }
 
-void Mover::OnNodeSet(Node* node)
+void Mover::Update(float timeStep)
 {
-    // If the node pointer is non-null, this component has been created into a scene node. Subscribe to the variable timestep
-    // scene update event now
-    if (node)
-    {
-        Scene* scene = node->GetScene();
-        if (scene)
-            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(Mover, HandleSceneUpdate));
-    }
-}
-
-void Mover::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
-{
-    // Get the timestep from the update event
-    using namespace SceneUpdate;
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
     node_->TranslateRelative(Vector3::FORWARD * moveSpeed_ * timeStep);
     
     // If in risk of going outside the plane, rotate the model right

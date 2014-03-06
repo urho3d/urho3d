@@ -27,9 +27,11 @@
 #include "DebugNew.h"
 
 Rotator::Rotator(Context* context) :
-    Component(context),
+    LogicComponent(context),
     rotationSpeed_(Vector3::ZERO)
 {
+    // Only the scene update event is needed: unsubscribe from the rest for optimization
+    SetUpdateEventMask(USE_UPDATE);
 }
 
 void Rotator::SetRotationSpeed(const Vector3& speed)
@@ -37,26 +39,8 @@ void Rotator::SetRotationSpeed(const Vector3& speed)
     rotationSpeed_ = speed;
 }
 
-void Rotator::OnNodeSet(Node* node)
+void Rotator::Update(float timeStep)
 {
-    // If the node pointer is non-null, this component has been created into a scene node. Subscribe to the variable timestep
-    // scene update event now. If the node pointer is null, the component is being removed from a scene node at destruction
-    // time. In that case we do nothing
-    if (node)
-    {
-        Scene* scene = node->GetScene();
-        // The scene pointer can be null if this scene node has been created free-standing and not part of a scene
-        if (scene)
-            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(Rotator, HandleSceneUpdate));
-    }
-}
-
-void Rotator::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
-{
-    // Get the timestep from the update event
-    using namespace SceneUpdate;
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
     // Components have their scene node as a member variable for convenient access. Rotate the scene node now: construct a
     // rotation quaternion from Euler angles, scale rotation speed with the scene update time step
     node_->Rotate(Quaternion(rotationSpeed_.x_ * timeStep, rotationSpeed_.y_ * timeStep, rotationSpeed_.z_ * timeStep));

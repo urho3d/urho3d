@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "Component.h"
+#include "LogicComponent.h"
 
 using namespace Urho3D;
 
-/// Custom component for moving the animated model and rotating at area edges.
-class Mover : public Component
+/// Custom logic component for moving the animated model and rotating at area edges.
+class Mover : public LogicComponent
 {
     OBJECT(Mover);
     
@@ -37,6 +37,8 @@ public:
     
     /// Set motion parameters: forward movement speed, rotation speed, and movement boundaries.
     void SetParameters(float moveSpeed, float rotateSpeed, const BoundingBox& bounds);
+    /// Handle scene update. Called by LogicComponent base class.
+    virtual void Update(float timeStep);
     
     /// Return forward movement speed.
     float GetMoveSpeed() const { return moveSpeed_; }
@@ -45,14 +47,7 @@ public:
     /// Return movement boundaries.
     const BoundingBox& GetBounds() const { return bounds_; }
     
-protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
-    
 private:
-    /// Handle scene update event.
-    void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
-    
     /// Forward movement speed.
     float moveSpeed_;
     /// Rotation speed.
