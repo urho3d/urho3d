@@ -34,6 +34,7 @@ namespace Urho3D
 LogicComponent::LogicComponent(Context* context) :
     Component(context),
     updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
+    currentEventMask_(0),
     delayedStartCalled_(false)
 {
 }
@@ -87,40 +88,56 @@ void LogicComponent::UpdateEventSubscription()
     
     bool enabled = IsEnabledEffective();
     
-    if (enabled)
+    bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
+    if (needUpdate && !(currentEventMask_ & USE_UPDATE))
     {
-        // Component is enabled: subscribe
-        if (updateEventMask_ & USE_UPDATE)
-            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LogicComponent, HandleSceneUpdate));
-        if (updateEventMask_ & USE_POSTUPDATE)
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LogicComponent, HandleScenePostUpdate));
-        
-        if (updateEventMask_ & (USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE))
-        {
-            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
-            if (world)
-            {
-                if (updateEventMask_ & USE_FIXEDUPDATE)
-                    SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(LogicComponent, HandlePhysicsPreStep));
-                if (updateEventMask_ & USE_FIXEDPOSTUPDATE)
-                    SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(LogicComponent, HandlePhysicsPostStep));
-            }
-            else
-                LOGERROR("No physics world, can not subscribe to fixed update events");
-        }
+        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LogicComponent, HandleSceneUpdate));
+        currentEventMask_ |= USE_UPDATE;
     }
-    else
+    else if (!needUpdate && (currentEventMask_ & USE_UPDATE))
     {
-        // Component is disabled: unsubscribe. Always unsubscribe from all events in case the mask has changed in the meanwhile
         UnsubscribeFromEvent(scene, E_SCENEUPDATE);
+        currentEventMask_ &= ~USE_UPDATE;
+    }
+    
+    bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
+    if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
+    {
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LogicComponent, HandleScenePostUpdate));
+        currentEventMask_ |= USE_POSTUPDATE;
+    }
+    else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    {
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-        
-        PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
-        if (world)
-        {
-            UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
-            UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
-        }
+        currentEventMask_ &= ~USE_POSTUPDATE;
+    }
+    
+    PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+    if (!world)
+        return;
+
+    bool needFixedUpdate = enabled && (updateEventMask_ & USE_FIXEDUPDATE);
+    if (needFixedUpdate && !(currentEventMask_ & USE_FIXEDUPDATE))
+    {
+        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(LogicComponent, HandlePhysicsPreStep));
+        currentEventMask_ |= USE_FIXEDUPDATE;
+    }
+    else if (!needFixedUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    {
+        UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
+        currentEventMask_ &= ~USE_FIXEDUPDATE;
+    }
+    
+    bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
+    if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
+    {
+        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(LogicComponent, HandlePhysicsPostStep));
+        currentEventMask_ |= USE_FIXEDPOSTUPDATE;
+    }
+    else if (!needFixedPostUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    {
+        UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
+        currentEventMask_ &= ~USE_FIXEDPOSTUPDATE;
     }
 }
 
@@ -133,6 +150,14 @@ void LogicComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     {
         DelayedStart();
         delayedStartCalled_ = true;
+        
+        // If did not need actual update events, unsubscribe now
+        if (!(updateEventMask_ & USE_UPDATE))
+        {
+            UnsubscribeFromEvent(GetScene(), E_SCENEUPDATE);
+            currentEventMask_ &= ~USE_UPDATE;
+            return;
+        }
     }
     
     // Then execute user-defined update function
@@ -151,14 +176,7 @@ void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 {
     using namespace PhysicsPreStep;
     
-    // Execute user-defined delayed start before first fixed update
-    if (!delayedStartCalled_)
-    {
-        DelayedStart();
-        delayedStartCalled_ = true;
-    }
-    
-    // Then execute user-defined fixed update function
+    // Execute user-defined fixed update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 

@@ -48,7 +48,7 @@ class URHO3D_API LogicComponent : public Component
     virtual void OnSetEnabled();
     /// Called when the component is added to a scene node. Other components may not yet exist.
     virtual void Start() {}
-    /// Called before the first update or fixed update. At this point all other components of the node should exist. Note that if you disable both update and fixed update from the update event mask, this will never be called!
+    /// Called before the first update. At this point all other components of the node should exist. Will also be called if update events are not wanted; in that case the event is immediately unsubscribed afterward.
     virtual void DelayedStart() {}
     /// Called when the component is detached from a scene node, usually on destruction.
     virtual void Stop() {}
@@ -85,8 +85,10 @@ private:
     /// Handle physics post-step event.
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
     
-    /// Event subscription mask.
+    /// Requested event subscription mask.
     unsigned updateEventMask_;
+    /// Current event subscription mask.
+    unsigned currentEventMask_;
     /// Flag for delayed start.
     bool delayedStartCalled_;
 };
