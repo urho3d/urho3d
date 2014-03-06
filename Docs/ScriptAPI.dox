@@ -4517,7 +4517,6 @@ Properties:
 - String className
 - bool enabled
 - bool enabledEffective // readonly
-- int fixedUpdateFps
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly

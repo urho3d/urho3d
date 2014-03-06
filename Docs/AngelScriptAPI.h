@@ -5378,7 +5378,6 @@ String className;
 bool enabled;
 /* readonly */
 bool enabledEffective;
-int fixedUpdateFps;
 /* readonly */
 uint id;
 /* readonly */
