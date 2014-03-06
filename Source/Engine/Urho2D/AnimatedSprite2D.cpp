@@ -89,11 +89,13 @@ void AnimatedSprite2D::OnSetEnabled()
 void AnimatedSprite2D::SetSpeed(float speed)
 {
     speed_ = speed;
+    MarkNetworkUpdate();
 }
 
 void AnimatedSprite2D::SetCycleMode(CycleMode cycleMode)
 {
     cycleMode_ = cycleMode;
+    MarkNetworkUpdate();
 }
 
 void AnimatedSprite2D::SetAnimation(Animation2D* animation)
@@ -113,6 +115,8 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
         SetSprite(animation_->GetFrameSprite(0));
         animationTotalTime_ = animation_->GetTotalTime();
     }
+
+    MarkNetworkUpdate();
 }
 
 Animation2D* AnimatedSprite2D::GetAnimation() const
