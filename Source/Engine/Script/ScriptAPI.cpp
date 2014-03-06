@@ -309,6 +309,8 @@ static void RegisterScript(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Script", "ScriptFile@+ get_defaultScriptFile() const", asMETHOD(Script, GetDefaultScriptFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "void set_defaultScene(Scene@+)", asMETHOD(Script, SetDefaultScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "Scene@+ get_defaultScene() const", asMETHOD(Script, GetDefaultScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "void set_executeConsoleCommands(bool)", asMETHOD(Script, SetExecuteConsoleCommands), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "bool get_executeConsoleCommands() const", asMETHOD(Script, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Script@+ get_script()", asFUNCTION(GetScript), asCALL_CDECL);
 }
 

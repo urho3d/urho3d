@@ -33,7 +33,8 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-StaticSprite2D::StaticSprite2D(Context* context) : Drawable2D(context),
+StaticSprite2D::StaticSprite2D(Context* context) :
+    Drawable2D(context),
     flipX_(false),
     flipY_(false),
     color_(Color::WHITE)
@@ -61,8 +62,10 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    // Assume flipping does not invalidate bounding rectangle
+    verticesDirty_ = true;
+    geometryDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void StaticSprite2D::SetFlipX(bool flipX)
@@ -77,9 +80,13 @@ void StaticSprite2D::SetFlipY(bool flipY)
 
 void StaticSprite2D::SetColor(const Color& color)
 {
+    if (color == color_)
+        return;
+
     color_ = color;
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    verticesDirty_ = true;
+    geometryDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void StaticSprite2D::UpdateVertices()
@@ -114,9 +121,9 @@ void StaticSprite2D::UpdateVertices()
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    float pixelPerUnit = 1.0f / unitPerPixel_;
-    float width = (float)rectangle_.Width() * pixelPerUnit;
-    float height = (float)rectangle_.Height() * pixelPerUnit;
+    float unitsPerPixel = 1.0f / pixelsPerUnit_;
+    float width = (float)rectangle_.Width() * unitsPerPixel;
+    float height = (float)rectangle_.Height() * unitsPerPixel;
 
     const Vector2& hotSpot = sprite_->GetHotSpot();
     float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
@@ -162,8 +169,7 @@ void StaticSprite2D::UpdateVertices()
     vertices_.Push(vertex2);
     vertices_.Push(vertex3);
 
-    MarkGeometryDirty();
-
+    geometryDirty_ = true;
     verticesDirty_ = false;
 }
 

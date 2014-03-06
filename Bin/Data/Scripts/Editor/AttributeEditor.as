@@ -250,25 +250,28 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
     attrEdit.vars[TYPE_VAR] = resourceType.value;
     SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
 
-    if ((picker.actions & ACTION_PICK) != 0)
+    if (picker !is null)
     {
-        Button@ pickButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Pick");
-        SubscribeToEvent(pickButton, "Released", "PickResource");
-    }
-    if ((picker.actions & ACTION_OPEN) != 0)
-    {
-        Button@ openButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Open");
-        SubscribeToEvent(openButton, "Released", "OpenResource");
-    }
-    if ((picker.actions & ACTION_EDIT) != 0)
-    {
-        Button@ editButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Edit");
-        SubscribeToEvent(editButton, "Released", "EditResource");
-    }
-    if ((picker.actions & ACTION_TEST) != 0)
-    {
-        Button@ testButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Test");
-        SubscribeToEvent(testButton, "Released", "TestResource");
+        if ((picker.actions & ACTION_PICK) != 0)
+        {
+            Button@ pickButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Pick");
+            SubscribeToEvent(pickButton, "Released", "PickResource");
+        }
+        if ((picker.actions & ACTION_OPEN) != 0)
+        {
+            Button@ openButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Open");
+            SubscribeToEvent(openButton, "Released", "OpenResource");
+        }
+        if ((picker.actions & ACTION_EDIT) != 0)
+        {
+            Button@ editButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Edit");
+            SubscribeToEvent(editButton, "Released", "EditResource");
+        }
+        if ((picker.actions & ACTION_TEST) != 0)
+        {
+            Button@ testButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Test");
+            SubscribeToEvent(testButton, "Released", "TestResource");
+        }
     }
 
     return parent;
@@ -876,6 +879,8 @@ void InitResourcePicker()
     Array<String> soundFilters = {"*.wav","*.ogg"};
     Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> materialFilters = {"*.xml", "*.material"};
+    Array<String> plistFilters = {"*.plist"};
+    Array<String> anmFilters = {"*.anm"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani", ACTION_PICK | ACTION_TEST));
     resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
@@ -887,6 +892,9 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
+    resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("Animation2D", anmFilters, ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("ParticleModel2D", plistFilters, ACTION_PICK | ACTION_OPEN));
 }
 
 ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)

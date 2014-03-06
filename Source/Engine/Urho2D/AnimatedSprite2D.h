@@ -70,6 +70,11 @@ public:
     /// Return Animation.
     Animation2D* GetAnimation() const;
 
+    /// Set animation attr.
+    void SetAnimationAttr(ResourceRef value);
+    /// Return animation attr.
+    ResourceRef GetAnimationAttr() const;
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);

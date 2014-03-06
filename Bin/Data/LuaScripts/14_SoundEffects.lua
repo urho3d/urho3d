@@ -42,8 +42,7 @@ function CreateUI()
     for i, v in ipairs(soundNames) do
         local button = CreateButton((i - 1) * 140 + 20, 20, 120, 40, v)
         -- Store the sound effect resource name as a custom variable into the button
-        --button:SetVar("SoundResource", soundResourceNames[i])
-        button["SoundResource"] = soundResourceNames[i]
+        button:SetVar(ShortStringHash("SoundResource"), Variant(soundResourceNames[i]))
         SubscribeToEvent(button, "Pressed", "HandlePlaySound")
     end
     
@@ -102,9 +101,8 @@ end
 
 function HandlePlaySound(sender, eventType, eventData)
     local button = tolua.cast(GetEventSender(), "Button")
-    --local soundResourceName = button:GetVar("SoundResource"):GetString()
-    local soundResourceName = button["SoundResource"]
-    
+    local soundResourceName = button:GetVar(ShortStringHash("SoundResource")):GetString()
+
     -- Get the sound resource
     local sound = cache:GetResource("Sound", soundResourceName)
 

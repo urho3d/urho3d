@@ -267,7 +267,11 @@ const Vector<String>& GetArguments()
 String GetConsoleInput()
 {
     String ret;
-
+    #ifdef ENABLE_TESTING
+    // When we are running automated tests, reading the console may block. Just return empty in that case
+    return ret;
+    #endif
+    
     #ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);

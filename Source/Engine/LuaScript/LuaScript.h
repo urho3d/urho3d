@@ -66,12 +66,16 @@ public:
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName = String::EMPTY);
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
+    /// Set whether to execute engine console commands as script code. Default true.
+    void SetExecuteConsoleCommands(bool enable);
 
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function.
     WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
-
+    /// Return whether is executing engine console commands as script code.
+    bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
+    
 private:
     /// Register loader.
     void RegisterLoader();
@@ -107,6 +111,8 @@ private:
     HashMap<StringHash, LuaFunctionVector> eventHandleFunctions_;
     /// Object event handle funcitons.
     HashMap<Object*, HashMap<StringHash, LuaFunctionVector> > objectHandleFunctions_;
+    /// Flag for executing engine console commands as script code.
+    bool executeConsoleCommands_;
 };
 
 /// Register Lua script library objects.

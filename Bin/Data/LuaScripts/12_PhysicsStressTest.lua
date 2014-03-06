@@ -3,6 +3,7 @@
 --     - Physics and rendering performance with a high (1000) moving object count
 --     - Using triangle meshes for collision
 --     - Optimizing physics simulation by leaving out collision event signaling
+--     - Usage of Lua Coroutine to yield/resume based on time step
 
 require "LuaScripts/Utilities/Sample"
 
@@ -58,7 +59,6 @@ function CreateScene()
     light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
-
     
     if true then
         -- Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y

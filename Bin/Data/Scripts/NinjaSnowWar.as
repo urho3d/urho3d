@@ -167,7 +167,7 @@ void InitScene()
     }
     
     // Precache shaders if possible
-    if (cache.Exists("NinjaSnowWarShaders.xml"))
+    if (!engine.headless && cache.Exists("NinjaSnowWarShaders.xml"))
         graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.xml"));
 }
 

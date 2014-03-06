@@ -127,7 +127,6 @@ Engine::Engine(Context* context) :
     RegisterSceneLibrary(context_);
     RegisterPhysicsLibrary(context_);
     RegisterNavigationLibrary(context_);
-    RegisterUrho2DLibrary(context_);
 
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
 }
@@ -157,6 +156,8 @@ bool Engine::Initialize(const VariantMap& parameters)
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
     }
+    // 2D graphics library is dependent on 3D graphics library
+    RegisterUrho2DLibrary(context_);
 
     // Start logging
     Log* log = GetSubsystem<Log>();

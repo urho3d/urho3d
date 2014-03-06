@@ -5296,6 +5296,7 @@ ShortStringHash baseType;
 String category;
 Scene defaultScene;
 ScriptFile defaultScriptFile;
+bool executeConsoleCommands;
 /* readonly */
 int refs;
 /* readonly */

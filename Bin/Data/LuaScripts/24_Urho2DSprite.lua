@@ -3,7 +3,7 @@
 --     - Creating a 2D scene with sprite
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling keyboard to move and zoom 2D camera
---     - Using Lua Closure to update scene
+--     - Usage of Lua Closure to update scene
 
 require "LuaScripts/Utilities/Sample"
 

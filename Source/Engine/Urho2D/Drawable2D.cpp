@@ -42,14 +42,18 @@ namespace Urho3D
 
 extern const char* blendModeNames[];
 
-Drawable2D::Drawable2D(Context* context) : Drawable(context, DRAWABLE_GEOMETRY),
-    unitPerPixel_(1.0f),
-    blendMode_(BLEND_REPLACE),
+Drawable2D::Drawable2D(Context* context) :
+    Drawable(context, DRAWABLE_GEOMETRY),
+    pixelsPerUnit_(1.0f),
     zValue_(0.0f),
+    blendMode_(BLEND_ALPHA),
     vertexBuffer_(new VertexBuffer(context_)),
-    geometryDirty_(true)
+    verticesDirty_(true),
+    geometryDirty_(true),
+    materialUpdatePending_(false)
 {
     geometry_ = new Geometry(context);
+    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
     CreateDefaultMaterial();
@@ -61,17 +65,21 @@ Drawable2D::~Drawable2D()
 
 void Drawable2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Unit Per Pixel", GetUnitPerPixel, SetUnitPerPixel, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_FILE);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Pixels Per Unit", GetPixelsPerUnit, SetPixelsPerUnit, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Z Value", GetZValue, SetZValue, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
 }
 
 void Drawable2D::ApplyAttributes()
 {
-    UpdateVertices();
-    UpdateMaterial();
+    if (materialUpdatePending_)
+    {
+        materialUpdatePending_ = false;
+        UpdateMaterial();
+    }
 }
 
 void Drawable2D::UpdateBatches(const FrameInfo& frame)
@@ -85,49 +93,41 @@ void Drawable2D::UpdateBatches(const FrameInfo& frame)
 
 void Drawable2D::UpdateGeometry(const FrameInfo& frame)
 {
-    if (!geometryDirty_)
-        return;
-
     if (verticesDirty_)
         UpdateVertices();
 
-    if (vertices_.Size() > 0)
+    if (geometryDirty_ || vertexBuffer_->IsDataLost())
     {
         unsigned vertexCount = vertices_.Size() / 4 * 6;
-        
-        vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
-        Vertex2D* dest = (Vertex2D*)vertexBuffer_->Lock(0, vertexCount, true);
-        if (dest)
+        if (vertexCount)
         {
-            for (unsigned i = 0; i < vertices_.Size(); i += 4)
+            vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
+            Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
+            if (dest)
             {
-                *(dest++) = vertices_[i + 0];
-                *(dest++) = vertices_[i + 1];
-                *(dest++) = vertices_[i + 2];
+                for (unsigned i = 0; i < vertices_.Size(); i += 4)
+                {
+                    dest[0] = vertices_[i + 0];
+                    dest[1] = vertices_[i + 1];
+                    dest[2] = vertices_[i + 2];
 
-                *(dest++) = vertices_[i + 0];
-                *(dest++) = vertices_[i + 2];
-                *(dest++) = vertices_[i + 3];
+                    dest[3] = vertices_[i + 0];
+                    dest[4] = vertices_[i + 2];
+                    dest[5] = vertices_[i + 3];
+
+                    dest += 6;
+                }
+
+                vertexBuffer_->Unlock();
             }
-
-            vertexBuffer_->Unlock();
+            else
+                LOGERROR("Failed to lock vertex buffer");
         }
-        else
-            LOGERROR("Failed to lock vertex buffer");
-        
-        if (geometry_->GetVertexBuffer(0) != vertexBuffer_)
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
         geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, vertexCount);
-    }
-    else
-    {
-        if (geometry_->GetVertexBuffer(0) != vertexBuffer_)
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
-        geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, 0);
-    }
 
-    vertexBuffer_->ClearDataLost();
-    geometryDirty_ = false;
+        vertexBuffer_->ClearDataLost();
+        geometryDirty_ = false;
+    }
 }
 
 UpdateGeometryType Drawable2D::GetUpdateGeometryType()
@@ -138,11 +138,13 @@ UpdateGeometryType Drawable2D::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
-void Drawable2D::SetUnitPerPixel(float unitPerPixel)
+void Drawable2D::SetPixelsPerUnit(float pixelsPerUnit)
 {
-    unitPerPixel_ = Max(1.0f, unitPerPixel);
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    pixelsPerUnit_ = Max(1.0f, pixelsPerUnit);
+    verticesDirty_ = true;
+    geometryDirty_ = true;
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetSprite(Sprite2D* sprite)
@@ -151,42 +153,49 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
         return;
 
     sprite_ = sprite;
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    verticesDirty_ = true;
+    geometryDirty_ = true;
     UpdateMaterial();
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetMaterial(Material* material)
 {
-    if (material != material_)
-    {
-        material_ = material;
-        // If a null material was specified, create one with defaults, otherwise clone the material so that
-        // the diffuse texture can be changed according to the sprite being used
-        if (!material_)
-            CreateDefaultMaterial();
-        else
-            batches_[0].material_ = material_->Clone();
-        
-        UpdateMaterial();
-    }
+    if (material == material_)
+        return;
+
+    material_ = material;
+    // If a null material was specified, create one with defaults, otherwise clone the material so that
+    // the diffuse texture can be changed according to the sprite being used
+    if (!material_)
+        CreateDefaultMaterial();
+    else
+        batches_[0].material_ = material_->Clone();
+    UpdateMaterial();
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetBlendMode(BlendMode mode)
 {
-    if (blendMode_ != mode)
-    {
-        blendMode_ = mode;
-        UpdateMaterial();
-    }
+    if (mode == blendMode_)
+        return;
+
+    blendMode_ = mode;
+    UpdateMaterial();
+    MarkNetworkUpdate();
 }
 
 void Drawable2D::SetZValue(float zValue)
 {
-    zValue_ = zValue;
+    if (zValue == zValue_)
+        return;
 
-    MarkVerticesDirty();
-    MarkGeometryDirty();
+    zValue_ = zValue;
+    verticesDirty_ = true;
+    geometryDirty_ = true;
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 Material* Drawable2D::GetMaterial() const
@@ -196,6 +205,9 @@ Material* Drawable2D::GetMaterial() const
 
 void Drawable2D::SetSpriteAttr(ResourceRef value)
 {
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     if (value.type_ == Sprite2D::GetTypeStatic())
@@ -237,6 +249,9 @@ ResourceRef Drawable2D::GetSpriteAttr() const
 
 void Drawable2D::SetMaterialAttr(ResourceRef value)
 {
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
@@ -244,6 +259,14 @@ void Drawable2D::SetMaterialAttr(ResourceRef value)
 ResourceRef Drawable2D::GetMaterialAttr() const
 {
     return GetResourceRef(material_, Material::GetTypeStatic());
+}
+
+void Drawable2D::SetBlendModeAttr(BlendMode mode)
+{
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
+    SetBlendMode(mode);
 }
 
 void Drawable2D::OnWorldBoundingBoxUpdate()
@@ -282,6 +305,10 @@ void Drawable2D::CreateDefaultMaterial()
 
 void Drawable2D::UpdateMaterial()
 {
+    // Delay the material update
+    if (materialUpdatePending_)
+        return;
+
     Material* material = batches_[0].material_;
     assert(material);
     

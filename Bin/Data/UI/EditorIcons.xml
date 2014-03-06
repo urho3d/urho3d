@@ -207,6 +207,18 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="64 32 78 46" />
     </element>
+    <element type="StaticSprite2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="48 16 62 30" />
+    </element>
+    <element type="AnimatedSprite2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="48 16 62 30" />
+    </element>
+    <element type="ParticleEmitter2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="0 16 14 30" />
+    </element>
     <element type="Unknown">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="240 64 254 78" />

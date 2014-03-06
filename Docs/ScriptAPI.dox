@@ -4449,6 +4449,7 @@ Properties:
 - String category // readonly
 - Scene@ defaultScene
 - ScriptFile@ defaultScriptFile
+- bool executeConsoleCommands
 - int refs // readonly
 - ShortStringHash type // readonly
 - String typeName // readonly

@@ -104,7 +104,7 @@ private:
     /// Emit particle.
     void EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale);
     /// Update particle.
-    void UpdateParticle(Particle2D& particle, float timeStep, float worldScale);
+    void UpdateParticle(Particle2D& particle, float timeStep, const Vector3& worldPosition, float worldScale);
 
     /// Particle model.
     SharedPtr<ParticleModel2D> model_;

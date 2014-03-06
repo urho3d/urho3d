@@ -98,6 +98,8 @@ public:
     Color operator * (float rhs) const { return Color(r_ * rhs, g_ * rhs, b_ * rhs, a_ * rhs); }
     /// Add a color.
     Color operator + (const Color& rhs) const { return Color(r_ + rhs.r_, g_ + rhs.g_, b_ + rhs.b_, a_ + rhs.a_); }
+    /// Substract a color.
+    Color operator - (const Color& rhs) const { return Color(r_ - rhs.r_, g_ - rhs.g_, b_ - rhs.b_, a_ - rhs.a_); }
     
     /// Add-assign a color.
     Color& operator += (const Color& rhs)
