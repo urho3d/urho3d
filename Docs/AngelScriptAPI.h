@@ -166,6 +166,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -177,7 +178,6 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
-float unitPerPixel;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -2112,6 +2112,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -2122,7 +2123,6 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
-float unitPerPixel;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -4471,6 +4471,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -4481,7 +4482,6 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
-float unitPerPixel;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -6827,6 +6827,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -6837,7 +6838,6 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
-float unitPerPixel;
 uint viewMask;
 /* readonly */
 int weakRefs;
