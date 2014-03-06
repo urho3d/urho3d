@@ -44,7 +44,7 @@ extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    pixelsPerUnit_(1.0f),
+    pixelsPerUnit_(100.0f),
     zValue_(0.0f),
     blendMode_(BLEND_ALPHA),
     vertexBuffer_(new VertexBuffer(context_)),
