@@ -121,6 +121,7 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
             lifeTime_ = Max(0.0f, lifeTime_ - timeStep);
     }
 
+    verticesDirty_ = true;
     OnMarkedDirty(node_);
 }
 

@@ -45,14 +45,15 @@ extern const char* blendModeNames[];
 Drawable2D::Drawable2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     unitPerPixel_(1.0f),
-    blendMode_(BLEND_REPLACE),
     zValue_(0.0f),
+    blendMode_(BLEND_ALPHA),
     vertexBuffer_(new VertexBuffer(context_)),
     verticesDirty_(true),
     geometryDirty_(true),
     materialUpdatePending_(false)
 {
     geometry_ = new Geometry(context);
+    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
     CreateDefaultMaterial();
@@ -65,9 +66,10 @@ Drawable2D::~Drawable2D()
 void Drawable2D::RegisterObject(Context* context)
 {
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Unit Per Pixel", GetUnitPerPixel, SetUnitPerPixel, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Z Value", GetZValue, SetZValue, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, 0, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
 }
 
@@ -91,49 +93,41 @@ void Drawable2D::UpdateBatches(const FrameInfo& frame)
 
 void Drawable2D::UpdateGeometry(const FrameInfo& frame)
 {
-    if (!geometryDirty_)
-        return;
-
     if (verticesDirty_)
         UpdateVertices();
 
-    if (vertices_.Size() > 0)
+    if (geometryDirty_ || vertexBuffer_->IsDataLost())
     {
         unsigned vertexCount = vertices_.Size() / 4 * 6;
-        
-        vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
-        Vertex2D* dest = (Vertex2D*)vertexBuffer_->Lock(0, vertexCount, true);
-        if (dest)
+        if (vertexCount)
         {
-            for (unsigned i = 0; i < vertices_.Size(); i += 4)
+            vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
+            Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
+            if (dest)
             {
-                *(dest++) = vertices_[i + 0];
-                *(dest++) = vertices_[i + 1];
-                *(dest++) = vertices_[i + 2];
+                for (unsigned i = 0; i < vertices_.Size(); i += 4)
+                {
+                    dest[0] = vertices_[i + 0];
+                    dest[1] = vertices_[i + 1];
+                    dest[2] = vertices_[i + 2];
 
-                *(dest++) = vertices_[i + 0];
-                *(dest++) = vertices_[i + 2];
-                *(dest++) = vertices_[i + 3];
+                    dest[3] = vertices_[i + 0];
+                    dest[4] = vertices_[i + 2];
+                    dest[5] = vertices_[i + 3];
+
+                    dest += 6;
+                }
+
+                vertexBuffer_->Unlock();
             }
-
-            vertexBuffer_->Unlock();
+            else
+                LOGERROR("Failed to lock vertex buffer");
         }
-        else
-            LOGERROR("Failed to lock vertex buffer");
-        
-        if (geometry_->GetVertexBuffer(0) != vertexBuffer_)
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
         geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, vertexCount);
-    }
-    else
-    {
-        if (geometry_->GetVertexBuffer(0) != vertexBuffer_)
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
-        geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, 0);
-    }
 
-    vertexBuffer_->ClearDataLost();
-    geometryDirty_ = false;
+        vertexBuffer_->ClearDataLost();
+        geometryDirty_ = false;
+    }
 }
 
 UpdateGeometryType Drawable2D::GetUpdateGeometryType()
@@ -147,6 +141,8 @@ UpdateGeometryType Drawable2D::GetUpdateGeometryType()
 void Drawable2D::SetUnitPerPixel(float unitPerPixel)
 {
     unitPerPixel_ = Max(1.0f, unitPerPixel);
+    verticesDirty_ = true;
+    geometryDirty_ = true;
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
@@ -157,8 +153,10 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
         return;
 
     sprite_ = sprite;
-    OnMarkedDirty(node_);
+    verticesDirty_ = true;
+    geometryDirty_ = true;
     UpdateMaterial();
+    OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
 
@@ -194,6 +192,8 @@ void Drawable2D::SetZValue(float zValue)
         return;
 
     zValue_ = zValue;
+    verticesDirty_ = true;
+    geometryDirty_ = true;
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
@@ -267,14 +267,6 @@ void Drawable2D::SetBlendModeAttr(BlendMode mode)
     materialUpdatePending_ = true;
 
     SetBlendMode(mode);
-}
-
-void Drawable2D::OnMarkedDirty(Node* node)
-{
-    Drawable::OnMarkedDirty(node);
-
-    verticesDirty_ = true;
-    geometryDirty_ = true;
 }
 
 void Drawable2D::OnWorldBoundingBoxUpdate()

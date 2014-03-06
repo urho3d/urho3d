@@ -89,8 +89,6 @@ public:
     void SetBlendModeAttr(BlendMode mode);
 
 protected:
-    /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
@@ -102,14 +100,14 @@ protected:
 
     /// Unit per pixel.
     float unitPerPixel_;
+    /// Z value.
+    float zValue_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Material. If null, use a default material. If non-null, use a clone of this for updating the diffuse texture.
     SharedPtr<Material> material_;
     /// Blend mode.
     BlendMode blendMode_;
-    /// Z value.
-    float zValue_;
 
     /// Vertices.
     Vector<Vertex2D> vertices_;

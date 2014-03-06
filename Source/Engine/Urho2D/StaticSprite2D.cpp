@@ -62,7 +62,9 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-    OnMarkedDirty(node_);
+    // Assume flipping does not invalidate bounding rectangle
+    verticesDirty_ = true;
+    geometryDirty_ = true;
     MarkNetworkUpdate();
 }
 
@@ -82,7 +84,8 @@ void StaticSprite2D::SetColor(const Color& color)
         return;
 
     color_ = color;
-    OnMarkedDirty(node_);
+    verticesDirty_ = true;
+    geometryDirty_ = true;
     MarkNetworkUpdate();
 }
 
