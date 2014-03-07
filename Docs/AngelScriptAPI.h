@@ -1802,6 +1802,7 @@ void AddNode(Node, float = 1.0, bool = true);
 void AddPolyhedron(const Polyhedron&, const Color&, bool = true);
 void AddSkeleton(Skeleton, const Color&, bool = true);
 void AddSphere(const Sphere&, const Color&, bool = true);
+void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true);
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
