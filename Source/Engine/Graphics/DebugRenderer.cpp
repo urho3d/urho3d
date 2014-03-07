@@ -336,7 +336,7 @@ void DebugRenderer::Render()
     ShaderVariation* vs = graphics->GetShader(VS, "Basic", "VERTEXCOLOR");
     ShaderVariation* ps = graphics->GetShader(PS, "Basic", "VERTEXCOLOR");
     
-    unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
+    unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2 + (triangles_.Size() + noDepthTriangles_.Size()) * 3;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);

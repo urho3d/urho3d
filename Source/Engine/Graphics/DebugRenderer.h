@@ -70,8 +70,8 @@ struct DebugTriangle
     /// Construct undefined.
     DebugTriangle()
     {
-
     }
+
     /// Construct with start and end positions and color.
     DebugTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color) :
         v1_(v1),
