@@ -44,6 +44,8 @@ extern const char* SUBSYSTEM_CATEGORY;
 
 // Cap the amount of lines to prevent crash when eg. debug rendering large heightfields
 static const unsigned MAX_LINES = 1000000;
+// Cap the amount of triangles to prevent crash.
+static const unsigned MAX_TRIANGLES = 100000;
 
 DebugRenderer::DebugRenderer(Context* context) :
     Component(context)
@@ -86,6 +88,22 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned c
         lines_.Push(DebugLine(start, end, color));
     else
         noDepthLines_.Push(DebugLine(start, end, color));
+}
+
+void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3,  const Color& color, bool depthTest)
+{
+    AddTriangle(v1, v2, v3, color.ToUInt(), depthTest);
+}
+
+void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest)
+{
+    if (triangles_.Size() + noDepthTriangles_.Size() >= MAX_TRIANGLES)
+        return;
+
+    if (depthTest)
+        triangles_.Push(DebugTriangle(v1, v2, v3, color));
+    else
+        noDepthTriangles_.Push(DebugTriangle(v1, v2, v3, color));
 }
 
 void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
@@ -305,7 +323,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
 
 void DebugRenderer::Render()
 {
-    if (lines_.Empty() && noDepthLines_.Empty())
+    if (lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty())
         return;
 
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -351,6 +369,38 @@ void DebugRenderer::Render()
         dest += 8;
     }
 
+    for (unsigned i = 0; i < triangles_.Size(); ++i)
+    {
+        const DebugTriangle& triangle = triangles_[i];
+
+        dest[0] = triangle.v1_.x_; dest[1] = triangle.v1_.y_; dest[2] = triangle.v1_.z_;
+        ((unsigned&)dest[3]) = triangle.color_;
+
+        dest[4] = triangle.v2_.x_; dest[5] = triangle.v2_.y_; dest[6] = triangle.v2_.z_;
+        ((unsigned&)dest[7]) = triangle.color_;
+        
+        dest[8] = triangle.v3_.x_; dest[9] = triangle.v3_.y_; dest[10] = triangle.v3_.z_;
+        ((unsigned&)dest[11]) = triangle.color_;
+
+        dest += 12;
+    }
+
+    for (unsigned i = 0; i < noDepthTriangles_.Size(); ++i)
+    {
+        const DebugTriangle& triangle = noDepthTriangles_[i];
+
+        dest[0] = triangle.v1_.x_; dest[1] = triangle.v1_.y_; dest[2] = triangle.v1_.z_;
+        ((unsigned&)dest[3]) = triangle.color_;
+
+        dest[4] = triangle.v2_.x_; dest[5] = triangle.v2_.y_; dest[6] = triangle.v2_.z_;
+        ((unsigned&)dest[7]) = triangle.color_;
+
+        dest[8] = triangle.v3_.x_; dest[9] = triangle.v3_.y_; dest[10] = triangle.v3_.z_;
+        ((unsigned&)dest[11]) = triangle.color_;
+
+        dest += 12;
+    }
+
     vertexBuffer_->Unlock();
 
     graphics->SetBlendMode(BLEND_REPLACE);
@@ -365,15 +415,37 @@ void DebugRenderer::Render()
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     graphics->SetVertexBuffer(vertexBuffer_);
 
+    unsigned start = 0;
+    unsigned count = 0;
     if (lines_.Size())
     {
+        count = lines_.Size() * 2;
         graphics->SetDepthTest(CMP_LESSEQUAL);
-        graphics->Draw(LINE_LIST, 0, lines_.Size() * 2);
+        graphics->Draw(LINE_LIST, start, count);
+        start += count;
     }
     if (noDepthLines_.Size())
     {
+        count = noDepthLines_.Size() * 2;
         graphics->SetDepthTest(CMP_ALWAYS);
-        graphics->Draw(LINE_LIST, lines_.Size() * 2, noDepthLines_.Size() * 2);
+        graphics->Draw(LINE_LIST, start, count);
+        start += count;
+    }
+    
+    graphics->SetBlendMode(BLEND_ALPHA);
+    
+    if (triangles_.Size())
+    {
+        count = triangles_.Size() * 3;
+        graphics->SetDepthTest(CMP_LESSEQUAL);
+        graphics->Draw(TRIANGLE_LIST, start, count);
+        start += count;
+    }
+    if (noDepthTriangles_.Size())
+    {
+        count = noDepthTriangles_.Size() * 3;
+        graphics->SetDepthTest(CMP_ALWAYS);
+        graphics->Draw(TRIANGLE_LIST, start, count);
     }
 }
 
@@ -387,14 +459,22 @@ void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)
     // When the amount of debug geometry is reduced, release memory
     unsigned linesSize = lines_.Size();
     unsigned noDepthLinesSize = noDepthLines_.Size();
+    unsigned trianglesSize = triangles_.Size();
+    unsigned noDepthTrianglesSize = noDepthTriangles_.Size();
 
     lines_.Clear();
     noDepthLines_.Clear();
+    triangles_.Clear();
+    noDepthTriangles_.Clear();
 
     if (lines_.Capacity() > linesSize * 2)
         lines_.Reserve(linesSize);
     if (noDepthLines_.Capacity() > noDepthLinesSize * 2)
         noDepthLines_.Reserve(noDepthLinesSize);
+    if (triangles_.Capacity() > trianglesSize * 2)
+        triangles_.Reserve(trianglesSize);
+    if (noDepthTriangles_.Capacity() > noDepthTrianglesSize * 2)
+        noDepthTriangles_.Reserve(noDepthTrianglesSize);
 }
 
 }
