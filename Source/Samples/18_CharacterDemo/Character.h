@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Component.h"
 #include "Controls.h"
+#include "LogicComponent.h"
 
 using namespace Urho3D;
 
@@ -41,7 +41,7 @@ const float YAW_SENSITIVITY = 0.1f;
 const float INAIR_THRESHOLD_TIME = 0.1f;
 
 /// Character component, responsible for physical movement according to controls, as well as animation.
-class Character : public Component
+class Character : public LogicComponent
 {
     OBJECT(Character)
 
@@ -52,8 +52,10 @@ public:
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
     
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle startup. Called by LogicComponent base class.
+    virtual void Start();
+    /// Handle physics world update. Called by LogicComponent base class.
+    virtual void FixedUpdate(float timeStep);
     
     /// Movement controls. Assigned by the main program each frame.
     Controls controls_;
@@ -61,8 +63,6 @@ public:
 private:
     /// Handle physics collision event.
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
-    /// Handle physics world update event.
-    void HandleFixedUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Grounded flag for movement.
     bool onGround_;

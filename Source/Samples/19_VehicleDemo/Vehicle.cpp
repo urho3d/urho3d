@@ -34,9 +34,11 @@
 #include "Vehicle.h"
 
 Vehicle::Vehicle(Context* context) :
-    Component(context),
+    LogicComponent(context),
     steering_(0.0f)
 {
+    // Only the physics update event is needed: unsubscribe from the rest for optimization
+    SetUpdateEventMask(USE_FIXEDUPDATE);
 }
 
 void Vehicle::RegisterObject(Context* context)
@@ -54,12 +56,6 @@ void Vehicle::RegisterObject(Context* context)
     ATTRIBUTE(Vehicle, VAR_INT, "Rear Right Node", rearRightID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
-void Vehicle::OnNodeSet(Node* node)
-{
-    if (node)
-        SubscribeToEvent(GetScene()->GetComponent<PhysicsWorld>(), E_PHYSICSPRESTEP, HANDLER(Vehicle, HandleFixedUpdate));
-}
-
 void Vehicle::ApplyAttributes()
 {
     // This function is called on each Serializable after the whole scene has been loaded. Reacquire wheel nodes from ID's
@@ -73,6 +69,53 @@ void Vehicle::ApplyAttributes()
     hullBody_ = node_->GetComponent<RigidBody>();
     
     GetWheelComponents();
+}
+
+void Vehicle::FixedUpdate(float timeStep)
+{
+    float newSteering = 0.0f;
+    float accelerator = 0.0f;
+
+    // Read controls
+    if (controls_.buttons_ & CTRL_LEFT)
+        newSteering = -1.0f;
+    if (controls_.buttons_ & CTRL_RIGHT)
+        newSteering = 1.0f;
+    if (controls_.buttons_ & CTRL_FORWARD)
+        accelerator = 1.0f;
+    if (controls_.buttons_ & CTRL_BACK)
+        accelerator = -0.5f;
+
+    // When steering, wake up the wheel rigidbodies so that their orientation is updated
+    if (newSteering != 0.0f)
+    {
+        frontLeftBody_->Activate();
+        frontRightBody_->Activate();
+        steering_ = steering_ * 0.95f + newSteering * 0.05f;
+    }
+    else
+        steering_ = steering_ * 0.8f + newSteering * 0.2f;
+
+    // Set front wheel angles
+    Quaternion steeringRot(0, steering_ * MAX_WHEEL_ANGLE, 0);
+    frontLeftAxis_->SetOtherAxis(steeringRot * Vector3::LEFT);
+    frontRightAxis_->SetOtherAxis(steeringRot * Vector3::RIGHT);
+
+    Quaternion hullRot = hullBody_->GetRotation();
+    if (accelerator != 0.0f)
+    {
+        // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
+        Vector3 torqueVec = Vector3(ENGINE_POWER * accelerator, 0.0f, 0.0f);
+        
+        frontLeftBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
+        frontRightBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
+        rearLeftBody_->ApplyTorque(hullRot * torqueVec);
+        rearRightBody_->ApplyTorque(hullRot * torqueVec);
+    }
+
+    // Apply downforce proportional to velocity
+    Vector3 localVelocity = hullRot.Inverse() * hullBody_->GetLinearVelocity();
+    hullBody_->ApplyForce(hullRot * Vector3::DOWN * Abs(localVelocity.z_) * DOWN_FORCE);
 }
 
 void Vehicle::Init()
@@ -148,51 +191,4 @@ void Vehicle::GetWheelComponents()
     frontRightBody_ = frontRight_->GetComponent<RigidBody>();
     rearLeftBody_ = rearLeft_->GetComponent<RigidBody>();
     rearRightBody_ = rearRight_->GetComponent<RigidBody>();
-}
-
-void Vehicle::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
-{
-    float newSteering = 0.0f;
-    float accelerator = 0.0f;
-
-    // Read controls
-    if (controls_.buttons_ & CTRL_LEFT)
-        newSteering = -1.0f;
-    if (controls_.buttons_ & CTRL_RIGHT)
-        newSteering = 1.0f;
-    if (controls_.buttons_ & CTRL_FORWARD)
-        accelerator = 1.0f;
-    if (controls_.buttons_ & CTRL_BACK)
-        accelerator = -0.5f;
-
-    // When steering, wake up the wheel rigidbodies so that their orientation is updated
-    if (newSteering != 0.0f)
-    {
-        frontLeftBody_->Activate();
-        frontRightBody_->Activate();
-        steering_ = steering_ * 0.95f + newSteering * 0.05f;
-    }
-    else
-        steering_ = steering_ * 0.8f + newSteering * 0.2f;
-
-    // Set front wheel angles
-    Quaternion steeringRot(0, steering_ * MAX_WHEEL_ANGLE, 0);
-    frontLeftAxis_->SetOtherAxis(steeringRot * Vector3::LEFT);
-    frontRightAxis_->SetOtherAxis(steeringRot * Vector3::RIGHT);
-
-    Quaternion hullRot = hullBody_->GetRotation();
-    if (accelerator != 0.0f)
-    {
-        // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
-        Vector3 torqueVec = Vector3(ENGINE_POWER * accelerator, 0.0f, 0.0f);
-        
-        frontLeftBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
-        frontRightBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
-        rearLeftBody_->ApplyTorque(hullRot * torqueVec);
-        rearRightBody_->ApplyTorque(hullRot * torqueVec);
-    }
-
-    // Apply downforce proportional to velocity
-    Vector3 localVelocity = hullRot.Inverse() * hullBody_->GetLinearVelocity();
-    hullBody_->ApplyForce(hullRot * Vector3::DOWN * Abs(localVelocity.z_) * DOWN_FORCE);
 }

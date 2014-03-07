@@ -62,10 +62,6 @@ ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
     script_(GetSubsystem<Script>()),
     scriptObject_(0),
-    fixedUpdateFps_(0),
-    fixedUpdateInterval_(0.0f),
-    fixedUpdateAcc_(0.0f),
-    fixedPostUpdateAcc_(0.0f),
     subscribed_(false),
     subscribedPostFixed_(false)
 {
@@ -86,8 +82,6 @@ void ScriptInstance::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
@@ -231,15 +225,6 @@ void ScriptInstance::SetClassName(const String& className)
     
     className_ = className;
     CreateObject();
-    MarkNetworkUpdate();
-}
-
-void ScriptInstance::SetFixedUpdateFps(int fps)
-{
-    fixedUpdateFps_ = Max(fps, 0);
-    fixedUpdateInterval_ = fixedUpdateFps_ ? (1.0f / fixedUpdateFps_) : 0.0f;
-    fixedUpdateAcc_ = 0.0f;
-    fixedPostUpdateAcc_ = 0.0f;
     MarkNetworkUpdate();
 }
 
@@ -389,12 +374,6 @@ void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)
         UpdateEventSubscription();
 }
 
-void ScriptInstance::SetFixedUpdateAccAttr(float value)
-{
-    fixedUpdateAcc_ = value;
-    fixedPostUpdateAcc_ = value;
-}
-
 void ScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
 {
     if (scriptObject_ && methods_[METHOD_LOAD])
@@ -435,11 +414,6 @@ PODVector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
         buf.WriteVariantVector(i->parameters_);
     }
     return buf.GetBuffer();
-}
-
-float ScriptInstance::GetFixedUpdateAccAttr() const
-{
-    return fixedUpdateAcc_;
 }
 
 PODVector<unsigned char> ScriptInstance::GetScriptDataAttr() const
@@ -774,24 +748,9 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
     
     using namespace PhysicsPreStep;
     
-    if (!fixedUpdateFps_)
-    {
-        VariantVector parameters;
-        parameters.Push(eventData[P_TIMESTEP]);
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
-    }
-    else
-    {
-        float timeStep = eventData[P_TIMESTEP].GetFloat();
-        fixedUpdateAcc_ += timeStep;
-        if (fixedUpdateAcc_ >= fixedUpdateInterval_)
-        {
-            fixedUpdateAcc_ = fmodf(fixedUpdateAcc_, fixedUpdateInterval_);
-            VariantVector parameters;
-            parameters.Push(fixedUpdateInterval_);
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
-        }
-    }
+    VariantVector parameters;
+    parameters.Push(eventData[P_TIMESTEP]);
+    scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
 }
 
 void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
@@ -801,24 +760,9 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
     
     using namespace PhysicsPostStep;
     
-    if (!fixedUpdateFps_)
-    {
-        VariantVector parameters;
-        parameters.Push(eventData[P_TIMESTEP]);
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
-    }
-    else
-    {
-        float timeStep = eventData[P_TIMESTEP].GetFloat();
-        fixedPostUpdateAcc_ += timeStep;
-        if (fixedPostUpdateAcc_ >= fixedUpdateInterval_)
-        {
-            fixedPostUpdateAcc_ = fmodf(fixedPostUpdateAcc_, fixedUpdateInterval_);
-            VariantVector parameters;
-            parameters.Push(fixedUpdateInterval_);
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
-        }
-    }
+    VariantVector parameters;
+    parameters.Push(eventData[P_TIMESTEP]);
+    scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
 }
 
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)

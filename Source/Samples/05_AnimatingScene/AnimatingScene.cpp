@@ -106,7 +106,10 @@ void AnimatingScene::CreateScene()
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         
         // Add our custom Rotator component which will rotate the scene node each frame, when the scene sends its update event.
-        // Simply set same rotation speed for all objects
+        // The Rotator component derives from the base class LogicComponent, which has convenience functionality to subscribe
+        // to the various update events, and forward them to virtual functions that can be implemented by subclasses. This way
+        // writing logic/update components in C++ becomes similar to scripting.
+        // Now we simply set same rotation speed for all objects
         Rotator* rotator = boxNode->CreateComponent<Rotator>();
         rotator->SetRotationSpeed(Vector3(10.0f, 20.0f, 30.0f));
     }

@@ -8,8 +8,6 @@
         <attribute name="Delayed Method Calls" value="0" />
         <attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
         <attribute name="Class Name" value="LightFlash" />
-        <attribute name="Fixed Update FPS" value="0" />
-        <attribute name="Time Accumulator" value="0" />
         <attribute name="Script Data" value="" />
     </component>
     <component type="Light" id="12">

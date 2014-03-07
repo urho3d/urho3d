@@ -98,8 +98,6 @@ public:
     void SetScriptFile(ScriptFile* scriptFile);
     /// Set class name only. Recreate object if necessary.
     void SetClassName(const String& className);
-    /// Set fixed updates per second. 0 (default) uses the physics frame rate.
-    void SetFixedUpdateFps(int fps);
     /// Query for a method by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Execute a method.
@@ -115,8 +113,6 @@ public:
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
     /// Return class name.
     const String& GetClassName() const { return className_; }
-    /// Return fixed updates per second.
-    int GetFixedUpdateFps() const { return fixedUpdateFps_; }
     
     /// Set script file attribute.
     void SetScriptFileAttr(ResourceRef value);
@@ -183,14 +179,6 @@ private:
     String className_;
     /// Pointers to supported inbuilt methods.
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
-    /// Fixed update FPS.
-    int fixedUpdateFps_;
-    /// Fixed update time interval.
-    float fixedUpdateInterval_;
-    /// Fixed update time accumulator.
-    float fixedUpdateAcc_;
-    /// Fixed post update time accumulator.
-    float fixedPostUpdateAcc_;
     /// Delayed method calls.
     Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.

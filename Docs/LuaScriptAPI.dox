@@ -1099,12 +1099,12 @@ Properties:
 
 Methods:
 
-- void SetUnitPerPixel(float unitPerPixel)
+- void SetPixelsPerUnit(float pixelsPerUnit)
 - void SetSprite(Sprite2D* sprite)
 - void SetMaterial(Material* material)
 - void SetBlendMode(BlendMode mode)
 - void SetZValue(float zValue)
-- float GetUnitPerPixel() const
+- float GetPixelsPerUnit() const
 - Sprite2D* GetSprite() const
 - Material* GetMaterial() const
 - BlendMode GetBlendMode() const
@@ -1112,7 +1112,7 @@ Methods:
 
 Properties:
 
-- float unitPerPixel
+- float pixelsPerUnit
 - Sprite2D* sprite
 - Material* material
 - BlendMode blendMode

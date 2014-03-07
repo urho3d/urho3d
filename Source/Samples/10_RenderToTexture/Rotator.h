@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "Component.h"
+#include "LogicComponent.h"
 
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Custom component for rotating a scene node.
-class Rotator : public Component
+/// Custom logic component for rotating a scene node.
+class Rotator : public LogicComponent
 {
     OBJECT(Rotator);
     
@@ -38,18 +38,13 @@ public:
     
     /// Set rotation speed about the Euler axes. Will be scaled with scene update time step.
     void SetRotationSpeed(const Vector3& speed);
+    /// Handle scene update. Called by LogicComponent base class.
+    virtual void Update(float timeStep);
     
     /// Return rotation speed.
     const Vector3& GetRotationSpeed() const { return rotationSpeed_; }
     
-protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
-    
 private:
-    /// Handle scene update event.
-    void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
-    
     /// Rotation speed.
     Vector3 rotationSpeed_;
 };

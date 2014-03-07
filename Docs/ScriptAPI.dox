@@ -133,6 +133,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -141,7 +142,6 @@ Properties:
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
-- float unitPerPixel
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -1778,6 +1778,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -1785,7 +1786,6 @@ Properties:
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
-- float unitPerPixel
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -3727,6 +3727,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -3734,7 +3735,6 @@ Properties:
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
-- float unitPerPixel
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -4517,7 +4517,6 @@ Properties:
 - String className
 - bool enabled
 - bool enabledEffective // readonly
-- int fixedUpdateFps
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -5719,6 +5718,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -5726,7 +5726,6 @@ Properties:
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
-- float unitPerPixel
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
