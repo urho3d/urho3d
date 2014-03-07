@@ -26,13 +26,13 @@ namespace Urho3D
 {
 
 /// Bitmask for using the scene update event.
-static const unsigned USE_UPDATE = 0x1;
+static const unsigned char USE_UPDATE = 0x1;
 /// Bitmask for using the scene post-update event.
-static const unsigned USE_POSTUPDATE = 0x2;
+static const unsigned char USE_POSTUPDATE = 0x2;
 /// Bitmask for using the physics update event.
-static const unsigned USE_FIXEDUPDATE = 0x4;
+static const unsigned char USE_FIXEDUPDATE = 0x4;
 /// Bitmask for using the physics post-update event.
-static const unsigned USE_FIXEDPOSTUPDATE = 0x8;
+static const unsigned char USE_FIXEDPOSTUPDATE = 0x8;
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class URHO3D_API LogicComponent : public Component
@@ -62,10 +62,10 @@ class URHO3D_API LogicComponent : public Component
     virtual void FixedPostUpdate(float timeStep) {}
     
     /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
-    void SetUpdateEventMask(unsigned mask);
+    void SetUpdateEventMask(unsigned char mask);
     
     /// Return what update events are subscribed to.
-    unsigned GetUpdateEventMask() const { return updateEventMask_; }
+    unsigned char GetUpdateEventMask() const { return updateEventMask_; }
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
     
@@ -86,9 +86,9 @@ private:
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
     
     /// Requested event subscription mask.
-    unsigned updateEventMask_;
+    unsigned char updateEventMask_;
     /// Current event subscription mask.
-    unsigned currentEventMask_;
+    unsigned char currentEventMask_;
     /// Flag for delayed start.
     bool delayedStartCalled_;
 };

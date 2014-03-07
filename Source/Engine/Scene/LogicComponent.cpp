@@ -48,7 +48,7 @@ void LogicComponent::OnSetEnabled()
     UpdateEventSubscription();
 }
 
-void LogicComponent::SetUpdateEventMask(unsigned mask)
+void LogicComponent::SetUpdateEventMask(unsigned char mask)
 {
     if (updateEventMask_ != mask)
     {
@@ -122,7 +122,7 @@ void LogicComponent::UpdateEventSubscription()
         SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(LogicComponent, HandlePhysicsPreStep));
         currentEventMask_ |= USE_FIXEDUPDATE;
     }
-    else if (!needFixedUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    else if (!needFixedUpdate && (currentEventMask_ & USE_FIXEDUPDATE))
     {
         UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
         currentEventMask_ &= ~USE_FIXEDUPDATE;
@@ -134,7 +134,7 @@ void LogicComponent::UpdateEventSubscription()
         SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(LogicComponent, HandlePhysicsPostStep));
         currentEventMask_ |= USE_FIXEDPOSTUPDATE;
     }
-    else if (!needFixedPostUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    else if (!needFixedPostUpdate && (currentEventMask_ & USE_FIXEDPOSTUPDATE))
     {
         UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
         currentEventMask_ &= ~USE_FIXEDPOSTUPDATE;
