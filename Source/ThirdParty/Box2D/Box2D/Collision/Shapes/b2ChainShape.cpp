@@ -16,10 +16,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <Box2D/Collision/Shapes/b2ChainShape.h>
 #include <Box2D/Collision/Shapes/b2EdgeShape.h>
 #include <new>
-#include <memory.h>
+// Urho3D: replaced with cstring include for memcpy to work on Android
+// #include <memory.h>
+#include <cstring>
 
 b2ChainShape::~b2ChainShape()
 {

@@ -16,8 +16,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <Box2D/Collision/b2DynamicTree.h>
-#include <memory.h>
+// Urho3D: replaced with cstring include for memcpy to work on Android
+// #include <memory.h>
+#include <cstring>
 
 b2DynamicTree::b2DynamicTree()
 {
