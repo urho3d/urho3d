@@ -114,7 +114,7 @@ set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE}-snapshot)
 include (CPack)
 
 # Add targets
-foreach (TARGET Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
+foreach (TARGET Box2D Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 if (ENABLE_ANGELSCRIPT)
