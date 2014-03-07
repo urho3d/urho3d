@@ -440,6 +440,9 @@ cmake_xxxx batch files or shell scripts.
 |-DENABLE_ANGELSCRIPT=0|to disable AngelScript scripting support               |
 |-DENABLE_SSE=0        |to disable SSE instruction set                         |
 |-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)                |
+|-DENABLE_FILEWATCHER=0|to disable filewatcher support                         |
+|-DENABLE_PROFILING=0  |to disable profiling support                           |
+|-DENABLE_LOGGING=0    |to disable logging support                             |
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |
 |                      | on Windows platform because this option is enabled by |
 |                      | default for other platforms)                          | 

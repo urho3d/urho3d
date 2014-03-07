@@ -71,14 +71,20 @@ if (MSVC)
     endif ()
 endif ()
 
-# Enable file watcher support for automatic resource reloads.
-add_definitions (-DENABLE_FILEWATCHER)
+# Enable file watcher support for automatic resource reloads by default.
+if (ENABLE_FILEWATCHER OR NOT DEFINED ENABLE_FILEWATCHER)
+    add_definitions (-DENABLE_FILEWATCHER)
+endif ()
 
-# Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
-add_definitions (-DENABLE_PROFILING)
+# Enable profiling by default. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
+if (ENABLE_PROFILING OR NOT DEFINED ENABLE_PROFILING)
+    add_definitions (-DENABLE_PROFILING)
+endif ()
 
-# Enable logging. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
-add_definitions (-DENABLE_LOGGING)
+# Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
+if (ENABLE_LOGGING OR NOT DEFINED ENABLE_LOGGING)
+    add_definitions (-DENABLE_LOGGING)
+endif ()
 
 # If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
 # with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
