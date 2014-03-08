@@ -1,0 +1,4 @@
+$pfile "Scene/SplinePath.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

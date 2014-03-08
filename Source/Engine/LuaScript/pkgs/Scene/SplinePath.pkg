@@ -1,11 +1,11 @@
-$#include "Spline.h"
+$#include "SplinePath.h"
 
 enum InterpolationMode
 {
     BEZIER_CURVE
 };
 
-class Spline : public Component
+class SplinePath : public Component
 {
     void SetInterpolationMode(InterpolationMode interpolationMode);
     void SetSpeed(float speed);
@@ -15,8 +15,6 @@ class Spline : public Component
     float GetSpeed() const;
     Vector3 GetPosition() const;
     
-    void Push(const Vector3& controlPoint);
-    void Pop();
     Vector3 GetPoint(float factor) const;    
     
     void Move(float timeStep);

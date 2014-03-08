@@ -23,49 +23,45 @@
 #pragma once
 
 #include "Component.h"
+#include "DebugRenderer.h"
 #include "Vector3.h"
+#include "Spline.h"
 
 namespace Urho3D
 {
-/// Interpolation Mode for a Spline.
-enum InterpolationMode
-{
-    BEZIER_CURVE = 0
-};
 
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.
-class URHO3D_API Spline : public Component
+class URHO3D_API SplinePath : public Component
 {
-    OBJECT(Spline)
+    OBJECT(SplinePath)
 
 public:
     /// Construct an Empty Spline.
-    Spline(Context* context);
+    SplinePath(Context* context);
+    /// Destructor.
+    virtual ~SplinePath();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set the Control Points from an already defined set.
-    void SetControlPoints(const PODVector<Vector3>& controlPoints);
+    /// Apply Attributes to the Node.
+    virtual void ApplyAttributes();
+    /// Draw the Debug Geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
     /// Set the Interpolation Mode.
-    void SetInterpolationMode(InterpolationMode interpolationMode) { interpolationMode_ = interpolationMode; }
+    void SetInterpolationMode(InterpolationMode interpolationMode);
     /// Set the movement Speed.
     void SetSpeed(float speed) { speed_ = speed; }
     /// Set the parent node's position on the Spline.
     void SetPosition(float factor);
 
-    /// Get the Control Points.
-    const PODVector<Vector3>& GetControlPoints() const { return controlPoints_; }
     /// Get the Interpolation Mode.
-    InterpolationMode GetInterpolationMode() const { return interpolationMode_; }
+    InterpolationMode GetInterpolationMode() const { return spline_.GetInterpolationMode(); }
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
     /// Get the parent node's last position on the spline.
     Vector3 GetPosition() const;
 
-    /// Add a Control Point to the end.
-    void Push(const Vector3& controlPoint);
-    /// Remove a Control Point from the end.
-    void Pop();
     /// Get a point on the spline from 0.f to 1.f where 0 is the start and 1 is the end.
     Vector3 GetPoint(float factor) const;
 
@@ -76,19 +72,24 @@ public:
     /// Returns whether the movement along the Spline complete.
     bool IsFinished() const { return traveled_ >= 1.0f; }
 
-    VariantVector GetControlPointsAttr() const;
-    void SetControlPointsAttr(VariantVector value);
+protected:
+    virtual void OnMarkedDirty(Node* node);
+    virtual void OnNodeSetEnabled(Node* node);
 
 private:
     /// Calculate the length of the Spline. Used for movement calculations.
     void CalculateLength();
-    /// Move the parent node along the Spline in Bezier Mode.
-    Vector3 BezierMove(const PODVector<Vector3>& controlPoints, float t) const;
+    /// Handle Points Changed.
+    void PointAdded(StringHash eventType, VariantMap& eventData);
+    /// Handle Points Changed.
+    void PointRemoved(StringHash eventType, VariantMap& eventData);
+    /// Handle Points Changed.
+    void PointsUpdated(StringHash eventType, VariantMap& eventData);
+    /// Update the Point Set
+    void UpdatePoints();
 
     /// The Control Points of the Spline.
-    PODVector<Vector3> controlPoints_;
-    /// The Interpolation Mode of the Spline.
-    InterpolationMode interpolationMode_;
+    Spline<Vector3> spline_;
     /// The Speed of movement along the Spline.
     float speed_;
 
@@ -98,7 +99,7 @@ private:
     float traveled_;
     /// The length of the Spline.
     float length_;
-    /// Whether the length needs to be recalculated. Will only be true after a push or pop.
+    /// Whether the Spline has changed.
     bool dirty_;
 };
 }

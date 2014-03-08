@@ -26,6 +26,7 @@
 #include "Frustum.h"
 #include "Polyhedron.h"
 #include "Ray.h"
+#include "Spline.h"
 
 #include <angelscript.h>
 
@@ -1149,6 +1150,12 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Color", "float a", offsetof(Color, a_));
 }
 
+static void RegisterSpline(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("InterpolationMode");
+    engine->RegisterEnumValue("InterpolationMode", "BEZIER_CURVE", BEZIER_CURVE);
+}
+
 void RegisterMathAPI(asIScriptEngine* engine)
 {
     RegisterMathFunctions(engine);
@@ -1166,6 +1173,7 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterPlane(engine);
     RegisterRay(engine);
     RegisterColor(engine);
+    RegisterSpline(engine);
 }
 
 }
