@@ -1057,14 +1057,17 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
     PODVector<Triangle> oldTriangles;
     PODVector<Triangle> newTriangles;
     
+    if (subGeom->indexCount_ % 3)
+    {
+        PrintLine("Index count is not divisible by 3, skipping index optimization");
+        return;
+    }
+    
     for (unsigned i = 0; i < vb->vertices_.Size(); ++i)
     {
         vb->vertices_[i].useCount_ = 0;
         vb->vertices_[i].cachePosition_ = -1;
     }
-    
-    if (subGeom->indexCount_ % 3)
-        ErrorExit("Index count is not divisible by 3");
     
     for (unsigned i = subGeom->indexStart_; i < subGeom->indexStart_ + subGeom->indexCount_; i += 3)
     {
@@ -1105,7 +1108,10 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
         }
         
         if (bestTriangle == M_MAX_UNSIGNED)
-            ErrorExit("Could not find next triangle");
+        {
+            PrintLine("Could not find next triangle, aborting index optimization");
+            return;
+        }
         
         // Add the best triangle
         Triangle triangleCopy = oldTriangles[bestTriangle];
