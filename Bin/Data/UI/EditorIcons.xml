@@ -127,7 +127,7 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="96 16 110 30" />
     </element>
-    <element type="Spline">
+    <element type="SplinePath">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="96 16 110 30" />
     </element>

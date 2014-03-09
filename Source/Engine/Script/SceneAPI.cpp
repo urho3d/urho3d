@@ -26,7 +26,6 @@
 #include "Scene.h"
 #include "SmoothedTransform.h"
 #include "Sort.h"
-#include "Spline.h"
 
 namespace Urho3D
 {
@@ -225,35 +224,12 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
 }
 
-static void RegisterSpline(asIScriptEngine* engine)
-{
-    engine->RegisterEnum("InterpolationMode");
-    engine->RegisterEnumValue("InterpolationMode", "BEZIER_CURVE", BEZIER_CURVE);
-
-    RegisterComponent<Spline>(engine, "Spline", true, false);
-    engine->RegisterObjectMethod("Spline", "void set_controlPoints(Array<Vector3>@+)", asMETHOD(Spline, SetControlPoints), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "Array<Vector3>@ get_controlPoints() const", asMETHOD(Spline, GetControlPoints), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void set_interpolationMode(InterpolationMode)", asMETHOD(Spline, SetInterpolationMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "InterpolationMode get_interpolationMode() const", asMETHOD(Spline, GetInterpolationMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void set_speed(float)", asMETHOD(Spline, SetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "float get_speed() const", asMETHOD(Spline, GetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void set_position(float)", asMETHOD(Spline, SetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "Vector3 get_position() const", asMETHOD(Spline, GetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void Push(const Vector3&in)", asMETHOD(Spline, Push), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void Pop()", asMETHOD(Spline, Pop), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "Vector3 GetPoint(float) const", asMETHOD(Spline, GetPoint), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void Move(float)", asMETHOD(Spline, Move), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "void Reset()", asMETHOD(Spline, Reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Spline", "bool get_finished() const", asMETHOD(Spline, IsFinished), asCALL_THISCALL);
-}
-
 void RegisterSceneAPI(asIScriptEngine* engine)
 {
     RegisterSerializable(engine);
     RegisterNode(engine);
     RegisterSmoothedTransform(engine);
     RegisterScene(engine);
-    RegisterSpline(engine);
 }
 
 }

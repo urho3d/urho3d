@@ -142,6 +142,8 @@ public:
     Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Add a child scene node.
     void AddChild(Node* node);
+    /// Add a child scene node at a specific index.
+    void AddChild(Node* node, unsigned index);
     /// Remove a child scene node.
     void RemoveChild(Node* node);
     /// Remove all child scene nodes.
