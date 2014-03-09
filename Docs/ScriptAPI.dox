@@ -1521,6 +1521,7 @@ Methods:
 - void AddPolyhedron(const Polyhedron&, const Color&, bool = true)
 - void AddSkeleton(Skeleton@, const Color&, bool = true)
 - void AddSphere(const Sphere&, const Color&, bool = true)
+- void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true)
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
@@ -3904,6 +3905,7 @@ Methods:
 - void FromLookRotation(const Vector3&, const Vector3&)
 - void FromRotationTo(const Vector3&, const Vector3&)
 - Quaternion Inverse() const
+- bool IsNaN() const
 - Quaternion Nlerp(Quaternion, float, bool) const
 - void Normalize()
 - Quaternion Normalized() const
@@ -6758,6 +6760,7 @@ Methods:
 - float AbsDotProduct(const Vector2&) const
 - float DotProduct(const Vector2&) const
 - bool Equals(const Vector2&) const
+- bool IsNaN() const
 - Vector2 Lerp(const Vector2&, float) const
 - void Normalize()
 - Vector2 Normalized() const
@@ -6781,6 +6784,7 @@ Methods:
 - Vector3 CrossProduct(const Vector3&) const
 - float DotProduct(const Vector3&) const
 - bool Equals(const Vector3&) const
+- bool IsNaN() const
 - Vector3 Lerp(const Vector3&, float) const
 - void Normalize()
 - Vector3 Normalized() const
@@ -6803,6 +6807,7 @@ Methods:
 - float AbsDotProduct(const Vector4&) const
 - float DotProduct(const Vector4&) const
 - bool Equals(const Vector4&) const
+- bool IsNaN() const
 - Vector4 Lerp(const Vector4&, float) const
 - String ToString() const
 
@@ -7798,6 +7803,7 @@ Properties:
 - bool IsAbsolutePath(const String&)
 - bool IsAlpha(uint)
 - bool IsDigit(uint)
+- bool IsNaN(float)
 - String Join(String[]&, const String&)
 - float Lerp(float, float, float)
 - void MarkNetworkUpdate()

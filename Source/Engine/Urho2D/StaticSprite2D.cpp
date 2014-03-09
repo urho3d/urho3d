@@ -108,13 +108,13 @@ void StaticSprite2D::UpdateVertices()
         return;
 
     /*
-    V1 --------V2
+    V1---------V2
     |         / |
     |       /   |
     |     /     |
     |   /       |
     | /         |
-    V0 --------V3
+    V0---------V3
     */
     Vertex2D vertex0;
     Vertex2D vertex1;

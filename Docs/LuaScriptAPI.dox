@@ -943,6 +943,8 @@ Methods:
 - void SetView(Camera* camera)
 - void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true)
 - void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true)
+- void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest = true)
+- void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest = true)
 - void AddNode(Node* node, float scale = 1.0f, bool depthTest = true)
 - void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true)
 - void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true)
@@ -2879,6 +2881,7 @@ Methods:
 - float LengthSquared() const
 - float DotProduct(const Quaternion& rhs) const
 - bool Equals(const Quaternion& rhs) const
+- bool IsNaN() const
 - Quaternion Conjugate() const
 - Vector3 EulerAngles() const
 - float YawAngle() const
@@ -4780,6 +4783,7 @@ Methods:
 - Vector2 Abs() const
 - Vector2 Lerp(const Vector2& rhs, float t) const
 - bool Equals(const Vector2& rhs) const
+- bool IsNaN() const
 - Vector2 Normalized() const
 - String ToString() const
 
@@ -4825,6 +4829,7 @@ Methods:
 - Vector3 Abs() const
 - Vector3 Lerp(const Vector3& rhs, float t) const
 - bool Equals(const Vector3& rhs) const
+- bool IsNaN() const
 - float Angle(const Vector3& rhs) const
 - Vector3 Normalized() const
 - String ToString() const
@@ -4871,6 +4876,7 @@ Methods:
 - Vector4 Abs() const
 - Vector4 Lerp(const Vector4& rhs, float t) const
 - bool Equals(const Vector4& rhs) const
+- bool IsNaN() const
 - String ToString() const
 
 Properties:
@@ -5720,6 +5726,7 @@ Properties:
 - bool IsAbsolutePath(const String pathName)
 - bool IsAlpha(unsigned ch)
 - bool IsDigit(unsigned ch)
+- bool IsNaN(float value)
 - float Lerp(float lhs, float rhs, float t)
 - float Max(float lhs, float rhs)
 - float Min(float lhs, float rhs)
@@ -5727,9 +5734,9 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
+- float Random(float range)
 - float Random()
 - float Random(float min, float max)
-- float Random(float range)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
@@ -5759,8 +5766,8 @@ Properties:
 - Vector3 ToVector3(const String source)
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
-- void UnsubscribeFromEvent(const String eventName, const String functionName = String::EMPTY)
 - void UnsubscribeFromEvent(void* sender, const String eventName, const String functionName = String::EMPTY)
+- void UnsubscribeFromEvent(const String eventName, const String functionName = String::EMPTY)
 - void UnsubscribeFromEvents(void* sender)
 
 

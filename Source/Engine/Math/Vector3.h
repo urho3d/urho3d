@@ -191,7 +191,9 @@ public:
     bool Equals(const Vector3& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
     /// Returns the angle between this vector and another vector in degrees.
     float Angle(const Vector3& rhs) const { return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length() ) ); }
-
+    /// Return whether is NaN.
+    bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_); }
+    
     /// Return normalized to unit length.
     Vector3 Normalized() const
     {

@@ -2081,9 +2081,11 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - \ref Network "Network replication" of a component's attributes must be triggered manually by calling MarkNetworkUpdate() in each setter function that modifies a network-replicated attribute. See the Camera class for a straightforward example.
 
+- Define \ref Events "events" where you anticipate that an external party might be interested in hooking to something happening. For example the editor implements showing and updating the scene hierarchy through events that the scene nodes send as they add/remove child nodes and components.
+
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
-- Define \ref Events "events" where you anticipate that an external party might be interested in hooking to something happening. For example the editor implements showing and updating the scene hierarchy through events that the scene nodes send as they add/remove child nodes and components.
+- When you add a new third-party library, insert its license statement to the License.txt in the root directory.
 
 - Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs :)
 */

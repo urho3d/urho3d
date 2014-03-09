@@ -86,7 +86,7 @@ Urho3D uses the following third-party libraries:
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
-- Recast/Detour (http://code.google.com/p/recastnavigation/)
+- Recast/Detour (https://github.com/memononen/recastnavigation/)
 - SDL 2.0.1 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)
@@ -440,6 +440,9 @@ cmake_xxxx batch files or shell scripts.
 |-DENABLE_ANGELSCRIPT=0|to disable AngelScript scripting support               |
 |-DENABLE_SSE=0        |to disable SSE instruction set                         |
 |-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)                |
+|-DENABLE_FILEWATCHER=0|to disable filewatcher support                         |
+|-DENABLE_PROFILING=0  |to disable profiling support                           |
+|-DENABLE_LOGGING=0    |to disable logging support                             |
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |
 |                      | on Windows platform because this option is enabled by |
 |                      | default for other platforms)                          | 

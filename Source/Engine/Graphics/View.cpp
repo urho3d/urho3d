@@ -853,8 +853,6 @@ void View::GetBatches()
                         Drawable* drawable = *k;
                         if (!drawable->IsInView(frame_, true))
                         {
-                            // May be called from multiple threads, so don't manipulate the Drawable's viewCameras set,
-                            // just update the frame number
                             drawable->MarkInView(frame_.frameNumber_, 0);
                             shadowGeometries_.Push(drawable);
                         }

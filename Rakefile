@@ -96,6 +96,10 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
 desc 'Make binary package and upload it to a designated central hosting server'
 task :travis_ci_package_upload do
+  if ENV['XCODE']
+    $configuration = 'Release'
+    $testing = 0
+  end
   if ENV['ANDROID']
     platform_prefix = 'android-'
   elsif ENV['WINDOWS']
@@ -126,9 +130,20 @@ task :travis_ci_package_upload do
   else
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
+  # Determine the upload location
+  if ENV['RELEASE_TAG'].empty?
+    upload_dir = '/home/frs/project/urho3d/Urho3D/Snapshots'
+  else
+    upload_dir = "/home/frs/project/urho3d/Urho3D/#{ENV['RELEASE_TAG']}"
+    # Make sure the release directory exists remotely
+    system "sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
+mkdir #{upload_dir}
+bye
+EOF" or abort 'Failed to create release directory remotely'
+  end
   # Upload the package
   setup_digital_keys
-  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:/home/frs/project/urho3d/Urho3D/Snapshots" or abort 'Failed to upload binary package'
+  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
   # Sync readme and license files, just in case they are updated in the repo
   if ENV['SITE_UPDATE']
     system 'for f in Readme.txt License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'

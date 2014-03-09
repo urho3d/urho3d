@@ -5,6 +5,8 @@ class DebugRenderer : public Component
     void SetView(Camera* camera);
     void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
     void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true);
+    void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest = true);
+    void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest = true);
     void AddNode(Node* node, float scale = 1.0f, bool depthTest = true);
     void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
     void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
