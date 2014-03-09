@@ -49,7 +49,7 @@
 namespace Urho3D
 {
 
-extern const char* NAVIGATION_CATEGORY;
+const char* NAVIGATION_CATEGORY = "Navigation";
 
 static const int DEFAULT_TILE_SIZE = 128;
 static const float DEFAULT_CELL_SIZE = 0.3f;
@@ -536,12 +536,12 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
         MAX_POLYS);
     if (!numPolys)
         return;
-    
+
     Vector3 actualLocalEnd = localEnd;
     
     // If full path was not found, clamp end point to the end polygon
     if (pathData_->polys_[numPolys - 1] != endRef)
-        navMeshQuery_->closestPointOnPoly(pathData_->polys_[numPolys - 1], &localEnd.x_, &actualLocalEnd.x_);
+        navMeshQuery_->closestPointOnPoly(pathData_->polys_[numPolys - 1], &localEnd.x_, &actualLocalEnd.x_, 0);
     
     navMeshQuery_->findStraightPath(&localStart.x_, &actualLocalEnd.x_, pathData_->polys_, numPolys,
         &pathData_->pathPoints_[0].x_, pathData_->pathFlags_, pathData_->pathPolys_, &numPathPoints, MAX_POLYS);
@@ -1269,6 +1269,13 @@ void NavigationMesh::ReleaseNavigationMesh()
     numTilesZ_ = 0;
     boundingBox_.min_ = boundingBox_.max_ = Vector3::ZERO;
     boundingBox_.defined_ = false;
+}
+
+void RegisterNavigationLibrary(Context* context)
+{
+    Navigable::RegisterObject(context);
+    NavigationMesh::RegisterObject(context);
+    OffMeshConnection::RegisterObject(context);
 }
 
 }

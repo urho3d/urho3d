@@ -32,7 +32,7 @@
 #include "Input.h"
 #include "InputEvents.h"
 #include "Log.h"
-#include "Navigation.h"
+#include "NavigationMesh.h"
 #include "Network.h"
 #include "PackageFile.h"
 #include "PhysicsWorld.h"

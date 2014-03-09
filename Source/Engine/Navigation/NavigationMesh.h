@@ -220,4 +220,7 @@ private:
     BoundingBox boundingBox_;
 };
 
+/// Register Navigation library objects.
+void URHO3D_API RegisterNavigationLibrary(Context* context);
+
 }
