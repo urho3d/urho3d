@@ -96,6 +96,10 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
 desc 'Make binary package and upload it to a designated central hosting server'
 task :travis_ci_package_upload do
+  if ENV['XCODE']
+    $configuration = 'Release'
+    $testing = 0
+  end
   if ENV['ANDROID']
     platform_prefix = 'android-'
   elsif ENV['WINDOWS']
