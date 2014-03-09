@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 ///btBox2dBox2dCollisionAlgorithm, with modified b2CollidePolygons routines from the Box2D library.
 ///The modifications include: switching from b2Vec to btVector3, redefinition of b2Dot, b2Cross
 
@@ -25,6 +27,9 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 
 #define USE_PERSISTENT_CONTACTS 1
+
+// Urho3D - use define instead of integer variable
+#define b2_maxManifoldPoints    2
 
 btBox2dBox2dCollisionAlgorithm::btBox2dBox2dCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObjectWrapper* obj0Wrap,const btCollisionObjectWrapper* obj1Wrap)
 : btActivatingCollisionAlgorithm(ci,obj0Wrap,obj1Wrap),
@@ -95,7 +100,8 @@ struct ClipVertex
 #define b2Cross(a,b) (a).cross(b)
 #define btCrossS(a,s) btVector3(s * a.getY(), -s * a.getX(),0.f)
 
-int b2_maxManifoldPoints =2;
+// Urho3D - commented out
+//int b2_maxManifoldPoints =2;
 
 static int ClipSegmentToLine(ClipVertex vOut[2], ClipVertex vIn[2],
 					  const btVector3& normal, btScalar offset)
