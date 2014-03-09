@@ -196,6 +196,10 @@ The engine can be configured using the following command line options.
 -p <paths>   Resource path(s) to use, separated by semicolons
 -log <level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'
 -ds <file>   Dump used shader variations to a file for precaching
+-mq <level>  Material quality level, default 2 (high)
+-tq <level>  Texture quality level, default 2 (high)
+-tf <level>  Texture filter mode, default 2 (trilinear)
+-af <level>  Texture anisotropy level, default 4. Also sets anisotropic filter mode
 -borderless  Borderless window mode
 -headless    Headless mode. No application window will be created
 -prepass     Use light pre-pass rendering
