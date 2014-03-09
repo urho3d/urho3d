@@ -66,8 +66,8 @@ void SplinePath::ApplyAttributes()
     SubscribeToEvent(node_->GetScene(), E_NODEADDED, HANDLER(SplinePath, PointAdded));
     SubscribeToEvent(node_->GetScene(), E_NODEREMOVED, HANDLER(SplinePath, PointRemoved));
 
-    foreach(SharedPtr<Node> child, node_->GetChildren())
-        child->AddListener(this);
+    for (Vector<SharedPtr<Node> >::ConstIterator i = node_->GetChildren().Begin(); i != node_->GetChildren().End(); ++i)
+        (*i)->AddListener(this);
 
     UpdatePoints();
     CalculateLength();
@@ -79,17 +79,17 @@ void SplinePath::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         if (spline_.GetKnots().Size() > 1)
         {
-            Vector3 a = spline_.GetPoint(0.f);
+            Vector3 a = spline_.GetPoint(0.f).GetVector3();
             for (float f = 0.01f; f <= 1.0f; f = f + 0.01f)
             {
-                Vector3 b = spline_.GetPoint(f);
+                Vector3 b = spline_.GetPoint(f).GetVector3();
                 debug->AddLine(a, b, Color::GREEN);
                 a = b;
             }
         }
 
-        foreach(SharedPtr<Node> node, node_->GetChildren())
-            debug->AddNode(node);
+        for (Vector<SharedPtr<Node> >::ConstIterator i = node_->GetChildren().Begin(); i != node_->GetChildren().End(); ++i)
+            debug->AddNode(*i);
     }
 }
 
@@ -118,7 +118,7 @@ Vector3 SplinePath::GetPosition() const
 
 Vector3 SplinePath::GetPoint(float factor) const
 {
-    return spline_.GetPoint(factor);
+    return spline_.GetPoint(factor).GetVector3();
 }
 
 void SplinePath::Move(float timeStep)
@@ -132,7 +132,7 @@ void SplinePath::Move(float timeStep)
     float distanceCovered = elapsedTime_ * speed_;
     traveled_ = distanceCovered / length_;
 
-    GetPoint(traveled_);
+    node_->SetPosition(GetPoint(traveled_));
 }
 
 void SplinePath::Reset()
@@ -160,10 +160,10 @@ void SplinePath::CalculateLength()
 
     length_ = 0.f;
 
-    Vector3 a = spline_.GetKnot(0);
+    Vector3 a = spline_.GetKnot(0).GetVector3();
     for (float f = 0.000f; f <= 1.000f; f += 0.001f)
     {
-        Vector3 b = spline_.GetPoint(f);
+        Vector3 b = spline_.GetPoint(f).GetVector3();
         length_ += Abs((a - b).Length());
         a = b;
     }
@@ -208,10 +208,10 @@ void SplinePath::UpdatePoints()
 {
     spline_.Clear();
 
-    foreach(SharedPtr<Node> node, node_->GetChildren())
+    for (Vector<SharedPtr<Node> >::ConstIterator i = node_->GetChildren().Begin(); i != node_->GetChildren().End(); ++i)
     {
-        if (node->IsEnabled())
-            spline_.AddKnot(node->GetWorldPosition());
+        if ((*i)->IsEnabled())
+            spline_.AddKnot((*i)->GetWorldPosition());
     }
 }
 

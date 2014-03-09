@@ -22,10 +22,73 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "Spline.h"
 #include "SplinePath.h"
 
 namespace Urho3D
 {
+
+static void ConstructSpline(Spline* ptr)
+{
+    new (ptr) Spline();
+}
+
+static void ConstructSpline(InterpolationMode mode, Spline* ptr)
+{
+    new (ptr) Spline(mode);
+}
+
+static void ConstructSpline(CScriptArray* arr, InterpolationMode mode, Spline* ptr)
+{
+    new (ptr) Spline(ArrayToVector<Variant>(arr), mode);
+}
+
+static void ConstructSpline(const Spline& rhs, Spline* ptr)
+{
+    new (ptr) Spline(rhs);
+}
+
+static CScriptArray* GetSplineKnots(Spline* ptr)
+{
+    return VectorToArray(ptr->GetKnots(), "Array<Variant>");
+}
+
+static void SetSplineKnots(CScriptArray* arr, Spline* ptr)
+{
+    ptr->SetKnots(ArrayToVector<Variant>(arr));
+}
+
+static void SetSplineKnot(unsigned index, const Variant& in, Spline* ptr)
+{
+    ptr->SetKnot(in, index);
+}
+
+static void RegisterSpline(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("InterpolationMode");
+    engine->RegisterEnumValue("InterpolationMode", "BEZIER_CURVE", BEZIER_CURVE);
+
+    engine->RegisterObjectType("Spline", sizeof(Spline), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f()", asFUNCTIONPR(ConstructSpline, (Spline*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(InterpolationMode)", asFUNCTIONPR(ConstructSpline, (InterpolationMode, Spline*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(Array<Variant>@+, InterpolationMode = BEZIER_CURVE)", asFUNCTIONPR(ConstructSpline, (CScriptArray*, InterpolationMode, Spline*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(const Spline&in)", asFUNCTIONPR(ConstructSpline, (const Spline&, Spline*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Spline", "Spline& opAssign(const Spline&in)", asMETHOD(Spline, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "bool opEquals(const Spline&in) const", asMETHOD(Spline, operator ==), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("Spline", "InterpolationMode get_interpolationMode() const", asMETHOD(Spline, GetInterpolationMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "void set_interpolationMode(InterpolationMode)", asMETHOD(Spline, SetInterpolationMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "Array<Variant>@ get_knots() const", asFUNCTION(GetSplineKnots), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Spline", "void set_knots(Array<Variant>@+)", asFUNCTION(SetSplineKnots), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Spline", "Variant get_knot(uint) const", asMETHOD(Spline, GetKnot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "void set_knot(uint, const Variant&in)", asFUNCTION(SetSplineKnot), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Spline", "void AddKnot(const Variant&in)", asMETHODPR(Spline, AddKnot, (const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "void AddKnot(const Variant&in, uint)", asMETHODPR(Spline, AddKnot, (const Variant&, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "void RemoveKnot()", asMETHODPR(Spline, RemoveKnot, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "void RemoveKnot(uint)", asMETHODPR(Spline, RemoveKnot, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "void Clear()", asMETHOD(Spline, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Spline", "Variant GetPoint(float)", asMETHOD(Spline, GetPoint), asCALL_THISCALL);
+}
 
 static void RegisterSplinePath(asIScriptEngine* engine)
 {
@@ -39,12 +102,14 @@ static void RegisterSplinePath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SplinePath", "Vector3 GetPoint(float) const", asMETHOD(SplinePath, GetPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "void Move(float)", asMETHOD(SplinePath, Move), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "void Reset()", asMETHOD(SplinePath, Reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SplinePath", "bool get_finished() const", asMETHOD(SplinePath, IsFinished), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "bool get_isFinished() const", asMETHOD(SplinePath, IsFinished), asCALL_THISCALL);
 }
 
 
 void RegisterLogicAPI(asIScriptEngine* engine)
 {
+    // Register this here instead of MathAPI as it requires variant which requires math, even though technically its a math class.
+    RegisterSpline(engine);
     RegisterSplinePath(engine);
 }
 }

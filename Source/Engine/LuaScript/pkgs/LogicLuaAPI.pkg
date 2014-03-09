@@ -1,3 +1,4 @@
+$pfile "Math/Spline.pkg"
 $pfile "Scene/SplinePath.pkg"
 
 $using namespace Urho3D;

@@ -89,7 +89,7 @@ private:
     void UpdatePoints();
 
     /// The Control Points of the Spline.
-    Spline<Vector3> spline_;
+    Spline spline_;
     /// The Speed of movement along the Spline.
     float speed_;
 

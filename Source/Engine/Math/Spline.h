@@ -21,11 +21,11 @@
 
 #pragma once
 
+#include "Color.h"
 #include "Variant.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "Color.h"
 
 namespace Urho3D
 {
@@ -36,180 +36,70 @@ enum InterpolationMode
 };
 
 /// Spline class to get a point on it based off the interpolation mode.
-template<typename T>
 class URHO3D_API Spline
 {
 public:
-    /// Ctor.
-    Spline() :
-    interpolationMode_(BEZIER_CURVE)
-    {
-    }
+    /// Default Ctor.
+    Spline();
+    /// Ctor setting InterpolationMode.
+    Spline(InterpolationMode mode);
+    /// Ctor setting Knots and InterpolationMode.
+    Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE);
+    /// Copy Ctor.
+    Spline(const Spline& rhs);
 
-    /// Ctor.
-    Spline(InterpolationMode mode) :
-    interpolationMode_(mode)
+    /// Copy Operator.
+    void operator= (const Spline& rhs)
     {
+        knots_ = rhs.knots_;
+        interpolationMode_ = rhs.interpolationMode_;
     }
-
-    /// Ctor.
-    Spline(const PODVector<T>& knots, InterpolationMode mode = BEZIER_CURVE) :
-    interpolationMode_(mode),
-    knots_(knots)
+    /// Equality Operator.
+    bool operator== (const Spline& rhs) const
     {
+        return (knots_ == rhs.knots_ && interpolationMode_ == rhs.interpolationMode_);
     }
-
-    /// Ctor.
-    Spline(const Spline& rhs) :
-    interpolationMode_(rhs.interpolationMode_),
-    knots_(rhs.knots_)
+    /// Non Equality Operator.
+    bool operator!= (const Spline& rhs) const
     {
-    }
-
-    /// Dtor.
-    ~Spline()
-    {
-        Clear();
+        return !(*this == rhs);
     }
 
     /// Return the ImplementationMode.
-    InterpolationMode GetInterpolationMode() const
-    { 
-        return interpolationMode_; 
-    }
-
+    InterpolationMode GetInterpolationMode() const { return interpolationMode_; }
     /// Return the Knots of the Spline.
-    const PODVector<T>& GetKnots() const
-    { 
-        return knots_; 
-    }
-
+    const VariantVector& GetKnots() const { return knots_; }
     /// Return the Knot at the specific index.
-    const T GetKnot(unsigned index) const
-    {
-        return knots_[index];
-    }
-
+    Variant GetKnot(unsigned index) const { return knots_[index]; }
     /// Return the T of the point of the Spline at f from 0.f - 1.f.
-    T GetPoint(float f) const
-    {
-        if (knots_.Size() < 2)
-            return knots_.Size() == 1 ? knots_[0] : T();
-
-        if (f > 1.f)
-            f = 1.f;
-        else if (f < 0.f)
-            f = 0.f;
-
-        switch (interpolationMode_)
-        {
-        case BEZIER_CURVE:
-        default:
-            return BezierInterpolation(knots_, f);
-        }
-    }
-
+    Variant GetPoint(float f) const;
     /// Set the InterpolationMode of the Spline.
-    void SetInterpolationMode(InterpolationMode interpolationMode) 
-    { 
-        interpolationMode_ = interpolationMode; 
-    }
-
+    void SetInterpolationMode(InterpolationMode interpolationMode) { interpolationMode_ = interpolationMode; }
     /// Set the Knots of the Spline.
-    void SetKnots(const PODVector<T>& knots) 
-    { 
-        knots_ = knots_; 
-    }
-
+    void SetKnots(const Vector<Variant>& knots) { knots_ = knots_; }
+    /// Set the Knot value of an existing Knot.
+    void SetKnot(const Variant& knot, unsigned index);
     /// Add a Knot to the end of the Spline.
-    void AddKnot(const T& knot)
-    {
-        knots_.Push(knot);
-    }
-
+    void AddKnot(const Variant& knot);
     /// Add a Knot to the Spline at a specific index.
-    void AddKnot(const T& knot, unsigned index)
-    {
-        knots_.Insert(index, knot);
-    }
-
+    void AddKnot(const Variant& knot, unsigned index);
     /// Remove the last Knot on the Spline.
-    void RemoveKnot() 
-    { 
-        knots_.Pop(); 
-    }
-
+    void RemoveKnot() { knots_.Pop(); }
     /// Remove the Knot at the specific index.
-    void RemoveKnot(unsigned index)
-    {
-        knots_.Erase(index);
-    }
-
+    void RemoveKnot(unsigned index) { knots_.Erase(index); }
     /// Clear the Spline.
-    void Clear()
-    {
-        knots_.Clear();
-    }
+    void Clear() { knots_.Clear(); }
 
 private:
     /// Perform Bezier Interpolation on the Spline.
-    T BezierInterpolation(const PODVector<T>& knots, float t) const
-    {
-        if (knots.Size() == 2)
-        {
-            return LinearInterpolation(knots[0], knots[1], t);
-        }
-        else
-        {
-            PODVector<T> interpolatedKnots;
-            for (unsigned i = 1; i < knots.Size(); i++)
-            {
-                interpolatedKnots.Push(LinearInterpolation(knots[i - 1], knots[i], t));
-            }
-            return BezierInterpolation(interpolatedKnots, t);
-        }
-    }
-
-    /// Empty LinearInterpolation for Android or IOS implementations that don't support C++11 and the static_assert.
-    T LinearInterpolation(const T& lhs, const T& rhs, float t) const
-    {
-        return T();
-    }
+    Variant BezierInterpolation(const Vector<Variant>& knots, float t) const;
+    /// LinearInterpolation between two Variants based on underlying type.
+    Variant LinearInterpolation(const Variant& lhs, const Variant& rhs, float t) const;
 
     /// InterpolationMode.
     InterpolationMode interpolationMode_;
     /// Knots on the Spline.
-    PODVector<T> knots_;
+    VariantVector knots_;
 };
-
-/// Specialized LinearInterpolation for float.
-template<> float Urho3D::Spline<float>::LinearInterpolation(const float& lhs, const float& rhs, float t) const
-{
-    return Lerp(lhs, rhs, t);
-}
-
-/// Specialized LinearInterpolation for Vector2.
-template<> Vector2 Urho3D::Spline<Vector2>::LinearInterpolation(const Vector2& lhs, const Vector2& rhs, float t) const
-{
-    return lhs.Lerp(rhs, t);
-}
-
-/// Specialized LinearInterpolation for Vector3.
-template<> Vector3 Urho3D::Spline<Vector3>::LinearInterpolation(const Vector3& lhs, const Vector3& rhs, float t) const
-{
-    return lhs.Lerp(rhs, t);
-}
-
-/// Specialized LinearInterpolation for Vector4.
-template<> Vector4 Urho3D::Spline<Vector4>::LinearInterpolation(const Vector4& lhs, const Vector4& rhs, float t) const
-{
-    return lhs.Lerp(rhs, t);
-}
-
-/// Specialized LinearInterpolation for Color.
-template<> Color Urho3D::Spline<Color>::LinearInterpolation(const Color& lhs, const Color& rhs, float t) const
-{
-    return lhs.Lerp(rhs, t);
-}
 
 }
