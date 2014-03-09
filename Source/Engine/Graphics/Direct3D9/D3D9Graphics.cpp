@@ -387,7 +387,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     AdjustWindow(width, height, fullscreen, borderless);
 
     if (maximize)
+    {
         Maximize();
+        SDL_GetWindowSize(impl_->window_, &width, &height);
+    }
     
     if (fullscreen)
     {
