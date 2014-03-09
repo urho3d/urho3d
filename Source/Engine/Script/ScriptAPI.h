@@ -53,6 +53,8 @@ void RegisterNetworkAPI(asIScriptEngine* engine);
 void RegisterPhysicsAPI(asIScriptEngine* engine);
 /// Register the Navigation library to script.
 void RegisterNavigationAPI(asIScriptEngine* engine);
+/// Register the Logic library to script.
+void RegisterLogicAPI(asIScriptEngine* engine);
 /// Register the Urho2D library to script.
 void RegisterUrho2DAPI(asIScriptEngine* engine);
 /// Register the Script library to script.

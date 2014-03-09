@@ -535,6 +535,11 @@ Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id)
 
 void Node::AddChild(Node* node)
 {
+    AddChild(node, children_.Size());
+}
+
+void Node::AddChild(Node* node, unsigned index)
+{
     // Check for illegal or redundant parent assignment
     if (!node || node == this || node->parent_ == this)
         return;
@@ -547,8 +552,13 @@ void Node::AddChild(Node* node)
         parent = parent->parent_;
     }
 
+    if (index < 0)
+        index = 0;
+    if (index > children_.Size())
+        index = children_.Size();
+
     // Add first, then remove from old parent, to ensure the node does not get deleted
-    children_.Push(SharedPtr<Node>(node));
+    children_.Insert(index, SharedPtr<Node>(node));
     node->Remove();
 
     // Add to the scene if not added yet
