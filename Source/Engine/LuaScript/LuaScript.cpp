@@ -54,7 +54,6 @@ extern int tolua_InputLuaAPI_open(lua_State*);
 extern int tolua_IOLuaAPI_open(lua_State*);
 extern int tolua_MathLuaAPI_open(lua_State*);
 extern int tolua_NavigationLuaAPI_open(lua_State*);
-extern int tolua_LogicLuaAPI_open(lua_State*);
 extern int tolua_NetworkLuaAPI_open(lua_State*);
 extern int tolua_PhysicsLuaAPI_open(lua_State*);
 extern int tolua_ResourceLuaAPI_open(lua_State*);
@@ -99,7 +98,6 @@ LuaScript::LuaScript(Context* context) :
     tolua_GraphicsLuaAPI_open(luaState_);
     tolua_InputLuaAPI_open(luaState_);
     tolua_NavigationLuaAPI_open(luaState_);
-    tolua_LogicLuaAPI_open(luaState_);
     tolua_NetworkLuaAPI_open(luaState_);
     tolua_PhysicsLuaAPI_open(luaState_);
     tolua_UILuaAPI_open(luaState_);

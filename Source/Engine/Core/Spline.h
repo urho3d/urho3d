@@ -39,27 +39,27 @@ enum InterpolationMode
 class URHO3D_API Spline
 {
 public:
-    /// Default Ctor.
+    /// Default constructor.
     Spline();
-    /// Ctor setting InterpolationMode.
+    /// Constructor setting InterpolationMode.
     Spline(InterpolationMode mode);
-    /// Ctor setting Knots and InterpolationMode.
+    /// Constructor setting Knots and InterpolationMode.
     Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE);
-    /// Copy Ctor.
+    /// Copy constructor.
     Spline(const Spline& rhs);
 
-    /// Copy Operator.
+    /// Copy operator.
     void operator= (const Spline& rhs)
     {
         knots_ = rhs.knots_;
         interpolationMode_ = rhs.interpolationMode_;
     }
-    /// Equality Operator.
+    /// Equality operator.
     bool operator== (const Spline& rhs) const
     {
         return (knots_ == rhs.knots_ && interpolationMode_ == rhs.interpolationMode_);
     }
-    /// Non Equality Operator.
+    /// Non Equality operator.
     bool operator!= (const Spline& rhs) const
     {
         return !(*this == rhs);

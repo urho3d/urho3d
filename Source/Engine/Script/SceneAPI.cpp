@@ -22,10 +22,12 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "DebugRenderer.h"
 #include "PackageFile.h"
 #include "Scene.h"
 #include "SmoothedTransform.h"
 #include "Sort.h"
+#include "SplinePath.h"
 
 namespace Urho3D
 {
@@ -61,6 +63,7 @@ static void RegisterNode(asIScriptEngine* engine)
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");
+    
     engine->RegisterObjectMethod("Node", "void SetEnabled(bool, bool)", asMETHODPR(Node, SetEnabled, (bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void set_enabled(bool)", asMETHODPR(Node, SetEnabled, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool get_enabled() const", asMETHOD(Node, IsEnabled), asCALL_THISCALL);
@@ -73,6 +76,11 @@ static void RegisterNode(asIScriptEngine* engine)
     // Now GetNode can be registered
     engine->RegisterObjectMethod("Component", "Node@+ get_node() const", asMETHOD(Component, GetNode), asCALL_THISCALL);
 
+    // Calling DebugRenderer is part of the Component API, so register it as early as possible
+    RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
+    engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Component, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(DebugRenderer, DrawDebugGeometry), asCALL_THISCALL);
+    
     // Register Variant GetPtr() for Serializable, Node & Component. These are deprecated, GetPtr() should be used instead.
     engine->RegisterObjectMethod("Variant", "Serializable@+ GetSerializable(const String&in binding = \"deprecated:GetSerializable\") const", asFUNCTION(GetVariantPtr<Serializable>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Node@+ GetNode(const String&in binding = \"deprecated:GetNode\") const", asFUNCTION(GetVariantPtr<Node>), asCALL_CDECL_OBJLAST);
@@ -157,7 +165,7 @@ static CScriptArray* GetObjectsByCategory(const String& category)
 
 static void RegisterSmoothedTransform(asIScriptEngine* engine)
 {
-    RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform", true, false);
+    RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform");
     engine->RegisterObjectMethod("SmoothedTransform", "void Update(float, float)", asMETHOD(SmoothedTransform, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "void set_targetPosition(const Vector3&in)", asMETHOD(SmoothedTransform, SetTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "const Vector3& get_targetPosition() const", asMETHOD(SmoothedTransform, GetTargetPosition), asCALL_THISCALL);
@@ -168,6 +176,26 @@ static void RegisterSmoothedTransform(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SmoothedTransform", "void set_targetWorldRotation(const Quaternion&in)", asMETHOD(SmoothedTransform, SetTargetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "Quaternion get_targetWorldRotation() const", asMETHOD(SmoothedTransform, GetTargetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "bool get_inProgress() const", asMETHOD(SmoothedTransform, IsInProgress), asCALL_THISCALL);
+}
+
+static void RegisterSplinePath(asIScriptEngine* engine)
+{
+    RegisterComponent<SplinePath>(engine, "SplinePath");
+    engine->RegisterObjectMethod("SplinePath", "void AddControlPoint(Node@+ point, uint index = M_MAX_UNSIGNED)", asMETHOD(SplinePath, AddControlPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void RemoveControlPoint(Node@+ point)", asMETHOD(SplinePath, RemoveControlPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void ClearControlPoints()", asMETHOD(SplinePath, ClearControlPoints), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "Vector3 GetPoint(float) const", asMETHOD(SplinePath, GetPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void set_interpolationMode(InterpolationMode)", asMETHOD(SplinePath, SetInterpolationMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void set_speed(float)", asMETHOD(SplinePath, SetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void set_position(float)", asMETHOD(SplinePath, SetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void set_controlledNode(Node@+)", asMETHOD(SplinePath, GetControlledNode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "InterpolationMode get_interpolationMode() const", asMETHOD(SplinePath, GetInterpolationMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "float get_speed() const", asMETHOD(SplinePath, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "Vector3 get_position() const", asMETHOD(SplinePath, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "Node@ get_controlledNode() const", asMETHOD(SplinePath, GetControlledNode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void Move(float)", asMETHOD(SplinePath, Move), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void Reset()", asMETHOD(SplinePath, Reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "bool get_isFinished() const", asMETHOD(SplinePath, IsFinished), asCALL_THISCALL);
 }
 
 static void RegisterScene(asIScriptEngine* engine)
@@ -229,6 +257,7 @@ void RegisterSceneAPI(asIScriptEngine* engine)
     RegisterSerializable(engine);
     RegisterNode(engine);
     RegisterSmoothedTransform(engine);
+    RegisterSplinePath(engine);
     RegisterScene(engine);
 }
 
