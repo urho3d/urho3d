@@ -110,7 +110,10 @@ endif ()
 if (ENABLE_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
 endif ()
-set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE}-snapshot)
+set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
+if ("$ENV{RELEASE_TAG}" STREQUAL "")
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
+endif ()
 include (CPack)
 
 # Add targets

@@ -45,6 +45,7 @@ compiler: gcc
 before_install:
     - bash -c "[ '$TRAVIS_BRANCH' == 'master' ] && [ '$TRAVIS_PULL_REQUEST' == 'false' ]" && export ON_MASTER_COMMIT=1 && bash -c "[ $SITE_UPDATE ]" && export SITE_UPDATE_ON_MASTER_COMMIT=1 || true
     - bash -c "[ $ON_MASTER_COMMIT ]" && export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT) && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]' && git fetch --depth=2000 --tags origin $TRAVIS_BRANCH && export PACKAGE_UPLOAD=1 || true
+    - bash -c "[ $ON_MASTER_COMMIT ]" && export RELEASE_TAG=$(git describe --tags --exact-match $TRAVIS_COMMIT 2>/dev/null) && bash -c "[ $RELEASE_TAG ]" && export PACKAGE_UPLOAD=1 || true
     - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9c-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
     - bash -c "( [ $SITE_UPDATE_ON_MASTER_COMMIT ] || [ $PACKAGE_UPLOAD ] )" && sudo add-apt-repository ppa:george-edison55/precise-backports -y || true
     - sudo apt-get update -q -y
