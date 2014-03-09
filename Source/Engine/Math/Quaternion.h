@@ -171,7 +171,7 @@ public:
     void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
-    /// Define from a direction to look in and an up direction
+    /// Define from a direction to look in and an up direction.
     void FromLookRotation(const Vector3& direction, const Vector3&up = Vector3::UP);
 
     /// Normalize to unit length.
@@ -219,6 +219,8 @@ public:
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
     /// Test for equality with another quaternion with epsilon.
     bool Equals(const Quaternion& rhs) const { return Urho3D::Equals(w_, rhs.w_) && Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
+    /// Return whether is NaN.
+    bool IsNaN() const { return Urho3D::IsNaN(w_) || Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_); }
     /// Return conjugate.
     Quaternion Conjugate() const { return Quaternion(w_, -x_, -y_, -z_); }
     

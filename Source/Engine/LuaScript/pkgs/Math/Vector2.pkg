@@ -25,6 +25,7 @@ class Vector2
     Vector2 Abs() const;
     Vector2 Lerp(const Vector2& rhs, float t) const;
     bool Equals(const Vector2& rhs) const;
+    bool IsNaN() const;
     
     Vector2 Normalized() const;
     

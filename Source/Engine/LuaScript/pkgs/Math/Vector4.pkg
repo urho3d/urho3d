@@ -23,6 +23,7 @@ class Vector4
     Vector4 Abs() const;
     Vector4 Lerp(const Vector4& rhs, float t) const;
     bool Equals(const Vector4& rhs) const;
+    bool IsNaN() const;
 
     String ToString() const;
     

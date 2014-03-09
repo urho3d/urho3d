@@ -54,6 +54,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
     
     engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Cos(float)", asFUNCTION(Cos), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Tan(float)", asFUNCTION(Tan), asCALL_CDECL);
@@ -237,6 +238,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHOD(Vector2, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "bool IsNaN() const", asMETHOD(Vector2, IsNaN), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Normalized() const", asMETHOD(Vector2, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "String ToString() const", asMETHOD(Vector2, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHOD(Vector2, Length), asCALL_THISCALL);
@@ -300,6 +302,7 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Lerp(const Vector3&in, float) const", asMETHOD(Vector3, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "bool Equals(const Vector3&in) const", asMETHOD(Vector3, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "bool IsNaN() const", asMETHOD(Vector3, IsNaN), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float Angle(const Vector3&in) const", asMETHOD(Vector3, Angle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Normalized() const", asMETHOD(Vector3, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "String ToString() const", asMETHOD(Vector3, ToString), asCALL_THISCALL);
@@ -369,6 +372,7 @@ static void RegisterVector4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHOD(Vector4, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHOD(Vector4, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "bool Equals(const Vector4&in) const", asMETHOD(Vector4, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector4", "bool IsNaN() const", asMETHOD(Vector4, IsNaN), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHOD(Vector4, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
     engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
@@ -448,6 +452,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(Quaternion, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(Quaternion, float, bool) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "bool Equals(const Quaternion&in) const", asMETHOD(Quaternion, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "bool IsNaN() const", asMETHOD(Quaternion, IsNaN), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, EulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, YawAngle), asCALL_THISCALL);

@@ -25,6 +25,7 @@ class Vector3
     Vector3 Abs() const;
     Vector3 Lerp(const Vector3& rhs, float t) const;
     bool Equals(const Vector3& rhs) const;
+    bool IsNaN() const;
     float Angle(const Vector3& rhs) const;
     Vector3 Normalized() const;
     

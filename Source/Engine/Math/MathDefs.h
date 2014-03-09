@@ -58,6 +58,8 @@ enum Intersection
 
 /// Check whether two floating point values are equal within accuracy.
 inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
+/// Check whether a floating point value is NaN.
+inline bool IsNaN(float value) { return value != value; }
 /// Linear interpolation between two float values.
 inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
 /// Return the smaller of two floats.

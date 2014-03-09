@@ -39,6 +39,7 @@ class Quaternion
     float LengthSquared() const;
     float DotProduct(const Quaternion& rhs) const;
     bool Equals(const Quaternion& rhs) const;
+    bool IsNaN() const;
     
     Quaternion Conjugate() const;
     Vector3 EulerAngles() const;
