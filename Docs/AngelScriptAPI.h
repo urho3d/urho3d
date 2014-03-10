@@ -4011,8 +4011,7 @@ int weakRefs;
 class Node
 {
 // Methods:
-void AddChild(Node);
-void AddChild(Node, uint);
+void AddChild(Node, uint = M_MAX_UNSIGNED);
 void ApplyAttributes();
 Node Clone(CreateMode = REPLICATED);
 Node CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0);
@@ -5127,8 +5126,7 @@ int weakRefs;
 class Scene
 {
 // Methods:
-void AddChild(Node);
-void AddChild(Node, uint);
+void AddChild(Node, uint = M_MAX_UNSIGNED);
 void AddRequiredPackageFile(PackageFile);
 void ApplyAttributes();
 void Clear(bool = true, bool = true);
