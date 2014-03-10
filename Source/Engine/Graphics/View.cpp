@@ -201,8 +201,8 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
             {
                 Zone* drawableZone = drawable->GetZone();
-                if (!cameraZoneOverride && (drawable->IsZoneDirty() || !drawableZone || drawableZone->GetPriority() <
-                    view->highestZonePriority_ || (drawableZone->GetViewMask() & cameraViewMask) == 0))
+                if (!cameraZoneOverride && (drawable->IsZoneDirty() || !drawableZone || (drawableZone->GetViewMask() &
+                    cameraViewMask) == 0))
                     view->FindZone(drawable);
                 
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();

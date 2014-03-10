@@ -325,10 +325,7 @@ void Zone::ClearDrawablesZone()
             Drawable* drawable = *i;
             unsigned drawableFlags = drawable->GetDrawableFlags();
             if (drawableFlags & DRAWABLE_GEOMETRY)
-            {
-                if (drawable->GetZone() == this)
-                    drawable->SetZone(0);
-            }
+                drawable->SetZone(0);
             else if (drawableFlags & DRAWABLE_ZONE)
             {
                 Zone* zone = static_cast<Zone*>(drawable);
