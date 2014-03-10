@@ -215,9 +215,7 @@ public:
     Octant* GetOctant() const { return octant_; }
     /// Return current zone.
     Zone* GetZone() const { return zone_; }
-    /// Return previous zone.
-    Zone* GetLastZone() const { return lastZone_; }
-    /// Return if zone assignment needs re-evaluation.
+    /// Return whether current zone is inconclusive or dirty due to the drawable moving.
     bool IsZoneDirty() const { return zoneDirty_; }
     /// Return distance from camera.
     float GetDistance() const { return distance_; }
@@ -270,6 +268,8 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate() = 0;
+    /// Handle removal from octree.
+    virtual void OnRemoveFromOctree() {}
     /// Add to octree.
     void AddToOctree();
     /// Remove from octree.
@@ -335,9 +335,7 @@ protected:
     PODVector<Light*> vertexLights_;
     /// Current zone.
     Zone* zone_;
-    /// Previous zone.
-    Zone* lastZone_;
-    /// Zone assignment dirty flag.
+    /// Zone inconclusive or dirtied flag.
     bool zoneDirty_;
     /// Set of cameras from which is seen on the current frame.
     HashSet<Camera*> viewCameras_;

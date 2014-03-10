@@ -201,7 +201,8 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
             {
                 Zone* drawableZone = drawable->GetZone();
-                if ((!drawableZone || (drawableZone->GetViewMask() & cameraViewMask) == 0) && !cameraZoneOverride)
+                if (!cameraZoneOverride && (drawable->IsZoneDirty() || !drawableZone || drawableZone->GetPriority() <
+                    view->highestZonePriority_ || (drawableZone->GetViewMask() & cameraViewMask) == 0))
                     view->FindZone(drawable);
                 
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
@@ -2454,8 +2455,8 @@ void View::FindZone(Drawable* drawable)
     // (possibly incorrect) and must be re-evaluated on the next frame
     bool temporary = !camera_->GetFrustum().IsInside(center);
     
-    // First check if the last zone remains a conclusive result
-    Zone* lastZone = drawable->GetLastZone();
+    // First check if the current zone remains a conclusive result
+    Zone* lastZone = drawable->GetZone();
     
     if (lastZone && (lastZone->GetViewMask() & camera_->GetViewMask()) && lastZone->GetPriority() >= highestZonePriority_ &&
         (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->IsInside(center))

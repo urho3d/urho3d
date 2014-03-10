@@ -80,7 +80,6 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     octant_(0),
     firstLight_(0),
     zone_(0),
-    lastZone_(0),
     zoneDirty_(false)
 {
 }
@@ -272,7 +271,6 @@ bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera) const
 void Drawable::SetZone(Zone* zone, bool temporary)
 {
     zone_ = zone;
-    lastZone_ = zone;
 
     // If the zone assignment was temporary (inconclusive) set the dirty flag so that it will be re-evaluated on the next frame
     zoneDirty_ = temporary;
@@ -358,7 +356,7 @@ void Drawable::OnMarkedDirty(Node* node)
     if (!updateQueued_ && octant_)
         octant_->GetRoot()->QueueUpdate(this);
 
-    // Mark zone assignment dirty
+    // Mark zone assignment dirty when transform changes
     if (node == node_)
         zoneDirty_ = true;
 }
@@ -392,6 +390,9 @@ void Drawable::RemoveFromOctree()
         Octree* octree = octant_->GetRoot();
         if (updateQueued_)
             octree->CancelUpdate(this);
+        
+        // Perform subclass specific deinitialization if necessary
+        OnRemoveFromOctree();
         
         octant_->RemoveDrawable(this);
     }
