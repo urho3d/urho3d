@@ -243,6 +243,18 @@ template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const ch
     return 1;
 }
 
+template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const char*)
+{
+    const PODVector<RigidBody*>& vector = *((const PODVector<RigidBody*>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], "RigidBody");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
 template<typename T> int tolua_pushurho3dpodvectorusertype(lua_State* L, const PODVector<T>& vector, const char* typeName)
 {
     lua_newtable(L);
