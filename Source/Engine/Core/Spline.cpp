@@ -39,24 +39,24 @@ template<> InterpolationMode Variant::Get<InterpolationMode>() const
 }
 
 Spline::Spline() :
-interpolationMode_(BEZIER_CURVE)
+    interpolationMode_(BEZIER_CURVE)
 {
 }
 
 Spline::Spline(InterpolationMode mode) :
-interpolationMode_(mode)
+    interpolationMode_(mode)
 {
 }
 
 Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode) :
-interpolationMode_(mode),
-knots_(knots)
+    interpolationMode_(mode),
+    knots_(knots)
 {
 }
 
 Spline::Spline(const Spline& rhs) :
-interpolationMode_(rhs.interpolationMode_),
-knots_(rhs.knots_)
+    interpolationMode_(rhs.interpolationMode_),
+    knots_(rhs.knots_)
 {
 }
 
@@ -73,8 +73,11 @@ Variant Spline::GetPoint(float f) const
     switch (interpolationMode_)
     {
     case BEZIER_CURVE:
-    default:
         return BezierInterpolation(knots_, f);
+
+    default:
+        LOGERROR("Unsupported interpolation mode");
+        return Variant::EMPTY;
     }
 }
 

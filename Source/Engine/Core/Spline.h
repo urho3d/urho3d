@@ -77,7 +77,7 @@ public:
     /// Set the InterpolationMode of the Spline.
     void SetInterpolationMode(InterpolationMode interpolationMode) { interpolationMode_ = interpolationMode; }
     /// Set the Knots of the Spline.
-    void SetKnots(const Vector<Variant>& knots) { knots_ = knots_; }
+    void SetKnots(const Vector<Variant>& knots) { knots_ = knots; }
     /// Set the Knot value of an existing Knot.
     void SetKnot(const Variant& knot, unsigned index);
     /// Add a Knot to the end of the Spline.

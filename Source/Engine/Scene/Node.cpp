@@ -533,11 +533,6 @@ Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id)
     return newNode;
 }
 
-void Node::AddChild(Node* node)
-{
-    AddChild(node, children_.Size());
-}
-
 void Node::AddChild(Node* node, unsigned index)
 {
     // Check for illegal or redundant parent assignment
@@ -551,11 +546,6 @@ void Node::AddChild(Node* node, unsigned index)
             return;
         parent = parent->parent_;
     }
-
-    if (index < 0)
-        index = 0;
-    if (index > children_.Size())
-        index = children_.Size();
 
     // Add first, then remove from old parent, to ensure the node does not get deleted
     children_.Insert(index, SharedPtr<Node>(node));

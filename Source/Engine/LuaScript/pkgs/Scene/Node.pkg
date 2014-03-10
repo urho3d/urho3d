@@ -77,7 +77,7 @@ class Node : public Serializable
     
     Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
     
-    void AddChild(Node* node);
+    void AddChild(Node* node, unsigned index = M_MAX_UNSIGNED);
     void RemoveChild(Node* node);
     void RemoveAllChildren();
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
