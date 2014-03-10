@@ -1076,7 +1076,7 @@ Methods:
 - bool IsOccluder() const
 - bool IsOccludee() const
 - bool IsInView() const
-- bool IsInView(Camera* tolua_var_1) const
+- bool IsInView(Camera* tolua_var_2) const
 - Zone* GetZone() const
 
 Properties:
@@ -3768,27 +3768,51 @@ Properties:
 - float radius
 - bool defined
 
-### Spline : Component
+### Spline
+
 
 Methods:
 
-- void SetInterpolationMode(InterpolationMode interpolationMode)
-- void SetSpeed(float speed)
-- void SetPosition(float factor)
-- InterpolationMode GetInterpolationMode() const
-- float GetSpeed() const
-- Vector3 GetPosition() const
-- void Push(const Vector3& controlPoint)
-- void Pop()
+- Spline() (GC)
+- Spline* new()
+- Spline(InterpolationMode mode) (GC)
+- Spline* new(InterpolationMode mode)
+- Spline(const Spline& rhs) (GC)
+- Spline* new(const Spline& rhs)
+- bool operator==(const Spline& rhs) const
+- Variant GetPoint(float f) const
+- Variant GetKnot(unsigned index) const
+- void SetKnot(const Variant& knot, unsigned tolua_var_1)
+- void AddKnot(const Variant& knot)
+- void AddKnot(const Variant& knot, unsigned index)
+- void RemoveKnot()
+- void RemoveKnot(unsigned index)
+- void Clear()
+
+Properties:
+
+- InterpolationMode interpolationMode
+
+### SplinePath : Component
+
+Methods:
+
+- void AddControlPoint(Node* point, unsigned index = M_MAX_UNSIGNED)
+- void RemoveControlPoint(Node* point)
+- void ClearControlPoints()
 - Vector3 GetPoint(float factor) const
+- InterpolationMode GetInterpolationMode() const
+- Vector3 GetPosition() const
+- void SetInterpolationMode(InterpolationMode mode)
+- void SetPosition(float factor)
 - void Move(float timeStep)
 - void Reset()
 - bool IsFinished() const
 
 Properties:
 
-- InterpolationMode interpolationMode
 - float speed
+- Node* controlledNode
 
 ### Sprite : UIElement
 

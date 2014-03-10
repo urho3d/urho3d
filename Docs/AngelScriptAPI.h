@@ -4012,6 +4012,7 @@ class Node
 {
 // Methods:
 void AddChild(Node);
+void AddChild(Node, uint);
 void ApplyAttributes();
 Node Clone(CreateMode = REPLICATED);
 Node CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0);
@@ -5127,6 +5128,7 @@ class Scene
 {
 // Methods:
 void AddChild(Node);
+void AddChild(Node, uint);
 void AddRequiredPackageFile(PackageFile);
 void ApplyAttributes();
 void Clear(bool = true, bool = true);
@@ -6381,7 +6383,26 @@ float radius;
 class Spline
 {
 // Methods:
+void AddKnot(const Variant&);
+void AddKnot(const Variant&, uint);
+void Clear();
+Variant GetPoint(float);
+void RemoveKnot();
+void RemoveKnot(uint);
+
+// Properties:
+InterpolationMode interpolationMode;
+Array<Variant> knot;
+Array<Variant> knots;
+};
+
+class SplinePath
+{
+// Methods:
+void AddControlPoint(Node, uint = M_MAX_UNSIGNED);
 void ApplyAttributes();
+void ClearControlPoints();
+void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 Vector3 GetPoint(float) const;
@@ -6389,9 +6410,8 @@ bool Load(File, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Move(float);
-void Pop();
-void Push(const Vector3&);
 void Remove();
+void RemoveControlPoint(Node);
 void RemoveInstanceDefault();
 void Reset();
 void ResetToDefault();
@@ -6410,15 +6430,15 @@ Array<Variant> attributes;
 ShortStringHash baseType;
 /* readonly */
 String category;
-Array<Vector3> controlPoints;
+Node controlledNode;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 /* readonly */
-bool finished;
-/* readonly */
 uint id;
 InterpolationMode interpolationMode;
+/* readonly */
+bool isFinished;
 /* readonly */
 Node node;
 /* readonly */

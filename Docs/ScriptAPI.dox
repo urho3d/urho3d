@@ -3355,6 +3355,7 @@ Properties:
 Methods:
 
 - void AddChild(Node@)
+- void AddChild(Node@, uint)
 - void ApplyAttributes()
 - Node@ Clone(CreateMode = REPLICATED)
 - Node@ CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0)
@@ -4310,6 +4311,7 @@ Properties:
 Methods:
 
 - void AddChild(Node@)
+- void AddChild(Node@, uint)
 - void AddRequiredPackageFile(PackageFile@)
 - void ApplyAttributes()
 - void Clear(bool = true, bool = true)
@@ -5354,7 +5356,28 @@ Properties:
 
 Methods:
 
+- void AddKnot(const Variant&)
+- void AddKnot(const Variant&, uint)
+- void Clear()
+- Variant GetPoint(float)
+- void RemoveKnot()
+- void RemoveKnot(uint)
+
+Properties:
+
+- InterpolationMode interpolationMode
+- Variant[] knot
+- Variant[]@ knots
+
+
+### SplinePath
+
+Methods:
+
+- void AddControlPoint(Node@, uint = M_MAX_UNSIGNED)
 - void ApplyAttributes()
+- void ClearControlPoints()
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetPoint(float) const
@@ -5362,9 +5385,8 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Move(float)
-- void Pop()
-- void Push(const Vector3&)
 - void Remove()
+- void RemoveControlPoint(Node@)
 - void RemoveInstanceDefault()
 - void Reset()
 - void ResetToDefault()
@@ -5380,12 +5402,12 @@ Properties:
 - Variant[] attributes
 - ShortStringHash baseType // readonly
 - String category // readonly
-- Vector3[]@ controlPoints
+- Node@ controlledNode
 - bool enabled
 - bool enabledEffective // readonly
-- bool finished // readonly
 - uint id // readonly
 - InterpolationMode interpolationMode
+- bool isFinished // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
 - Vector3 position
