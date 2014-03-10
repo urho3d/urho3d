@@ -147,6 +147,10 @@ The full list of supported parameters, their datatypes and default values:
 - %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
 - LowQualityShadows (bool) Low-quality (1 sample) shadow mode. Default false.
+- MaterialQuality (int) %Material quality level. Default 2 (high)
+- TextureQuality (int) %Texture quality level. Default 2 (high)
+- TextureFilterMode (int) %Texture default filter mode. Default 2 (trilinear)
+- TextureAnisotropy (int) %Texture anisotropy level. Default 4. This has only effect for anisotropically filtered textures.
 - %Sound (bool) %Sound enable. Default true.
 - SoundBuffer (int) %Sound buffer length in milliseconds. Default 100.
 - SoundMixRate (int) %Sound output frequency in Hz. Default 44100.

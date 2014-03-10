@@ -140,8 +140,8 @@ public:
     void MarkDirty();
     /// Create a child scene node (with specified ID if provided).
     Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
-    /// Add a child scene node.
-    void AddChild(Node* node);
+    /// Add a child scene node at a specific index. If index is not explicitly specified or is greater than current children size, append the new child at the end.
+    void AddChild(Node* node, unsigned index = M_MAX_UNSIGNED);
     /// Remove a child scene node.
     void RemoveChild(Node* node);
     /// Remove all child scene nodes.

@@ -212,6 +212,18 @@ template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
     return dest;
 }
 
+/// Template function for array to PODVector conversion.
+template <class T> PODVector<T> ArraytoPODVector(CScriptArray* arr)
+{
+    PODVector<T> dest(arr ? arr->GetSize() : 0);
+    if (arr)
+    {
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            dest[i] = *static_cast<T*>(arr->At(i));
+    }
+    return dest;
+}
+
 /// Template function for registering implicit casts between base and subclass.
 template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const char* classNameT, const char* classNameU)
 {
@@ -590,7 +602,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = String(), CreateMode mode = REPLICATED, uint id = 0)", asMETHODPR(T, CreateChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void AddChild(Node@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void AddChild(Node@+, uint index = M_MAX_UNSIGNED)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(Node@+)", asMETHODPR(T, RemoveChild, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChildren(bool, bool, bool)", asMETHOD(T, RemoveChildren), asCALL_THISCALL);

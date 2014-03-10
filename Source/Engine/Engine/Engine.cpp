@@ -286,7 +286,11 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
-
+        renderer->SetMaterialQuality(GetParameter(parameters, "MaterialQuality", QUALITY_HIGH).GetInt());
+        renderer->SetTextureQuality(GetParameter(parameters, "TextureQuality", QUALITY_HIGH).GetInt());
+        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, "TextureFilterMode", FILTER_TRILINEAR).GetInt());
+        renderer->SetTextureAnisotropy(GetParameter(parameters, "TextureAnisotropy", 4).GetInt());
+        
         if (GetParameter(parameters, "Sound", true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
@@ -710,6 +714,27 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument == "ds" && !value.Empty())
             {
                 ret["DumpShaders"] = value;
+                ++i;
+            }
+            else if (argument == "mq" && !value.Empty())
+            {
+                ret["MaterialQuality"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "tq" && !value.Empty())
+            {
+                ret["TextureQuality"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "tf" && !value.Empty())
+            {
+                ret["TextureFilterMode"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "af" && !value.Empty())
+            {
+                ret["TextureFilterMode"] = FILTER_ANISOTROPIC;
+                ret["TextureAnisotropy"] = ToInt(value);
                 ++i;
             }
             #ifdef ENABLE_TESTING

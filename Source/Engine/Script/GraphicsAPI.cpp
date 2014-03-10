@@ -1366,7 +1366,6 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 
 static void RegisterDebugRenderer(asIScriptEngine* engine)
 {
-    RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
     engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddLine, (const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddTriangle(const Vector3&in, const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddTriangle, (const Vector3&, const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddNode(Node@+, float scale = 1.0, bool depthTest = true)", asMETHOD(DebugRenderer, AddNode), asCALL_THISCALL);
@@ -1377,12 +1376,6 @@ static void RegisterDebugRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "DebugRenderer@+ get_debugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
-    
-    // Component::DrawDebugGeometry() can be registered now
-    engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Component, DrawDebugGeometry), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SmoothedTransform", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(SmoothedTransform, DrawDebugGeometry), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(DebugRenderer, DrawDebugGeometry), asCALL_THISCALL);
-
 }
 
 static void ConstructRayQueryResult(RayQueryResult* ptr)

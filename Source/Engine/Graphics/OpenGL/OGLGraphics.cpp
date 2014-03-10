@@ -395,7 +395,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         CreateWindowIcon();
 
         if (maximize)
+        {
             Maximize();
+            SDL_GetWindowSize(impl_->window_, &width, &height);
+        }
         
         // Create/restore context and GPU objects and set initial renderstate
         Restore();
