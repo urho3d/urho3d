@@ -269,9 +269,7 @@ void Light::SetPerVertex(bool enable)
 
 void Light::SetColor(const Color& color)
 {
-    // Clamp RGB values to positive, as negative values behave erratically depending on whether the pass uses
-    // replace or additive blend mode
-    color_ = Color(Max(color.r_, 0.0f), Max(color.g_, 0.0f), Max(color.b_, 0.0f), 1.0f);
+    color_ = Color(color.r_, color.g_, color.b_, 1.0f);
     MarkNetworkUpdate();
 }
 
@@ -475,13 +473,9 @@ void Light::SetIntensitySortValue(float distance)
 {
     // When sorting lights globally, give priority to directional lights so that they will be combined into the ambient pass
     if (lightType_ != LIGHT_DIRECTIONAL)
-        sortValue_ = Max(distance, M_MIN_NEARCLIP) / (color_.SumRGB() + M_EPSILON);
+        sortValue_ = Max(distance, M_MIN_NEARCLIP) / (Max(color_.SumRGB(), 0.0f) + M_EPSILON);
     else
-        sortValue_ = M_EPSILON / (color_.SumRGB() + M_EPSILON);
-
-    // Additionally, give priority to vertex lights so that vertex light base passes can be determined before per pixel lights
-    if (perVertex_)
-        sortValue_ -= M_LARGE_VALUE;
+        sortValue_ = M_EPSILON / (Max(color_.SumRGB(), 0.0f) + M_EPSILON);
 }
 
 void Light::SetIntensitySortValue(const BoundingBox& box)
@@ -490,7 +484,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
-        sortValue_ = 1.0f / (color_.SumRGB() + M_EPSILON);
+        sortValue_ = 1.0f / (Max(color_.SumRGB(), 0.0f) + M_EPSILON);
         break;
 
     case LIGHT_SPOT:
@@ -517,7 +511,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float spotFactor = Min(spotAngle / maxAngle, 1.0f);
             // We do not know the actual range attenuation ramp, so take only spot attenuation into account
             float att = Max(1.0f - spotFactor * spotFactor, M_EPSILON);
-            sortValue_ = 1.0f / (color_.SumRGB() * att + M_EPSILON);
+            sortValue_ = 1.0f / (Max(color_.SumRGB(), 0.0f) * att + M_EPSILON);
         }
         break;
 
@@ -530,7 +524,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float distance = lightRay.HitDistance(box);
             float normDistance = distance / range_;
             float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
-            sortValue_ = 1.0f / (color_.SumRGB() * att + M_EPSILON);
+            sortValue_ = 1.0f / (Max(color_.SumRGB(), 0.0f) * att + M_EPSILON);
         }
         break;
     }
