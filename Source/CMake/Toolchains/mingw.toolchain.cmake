@@ -34,14 +34,15 @@ set (CMAKE_SYSTEM_PROCESSOR x86)
 file (TO_CMAKE_PATH "$ENV{MINGW_PREFIX}" MINGW_PREFIX)
 
 # C/C++ compilers
-set (CMAKE_C_COMPILER ${MINGW_PREFIX}-mingw32-gcc      CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${MINGW_PREFIX}-mingw32-g++    CACHE PATH "C++ compiler")
-set (CMAKE_RC_COMPILER ${MINGW_PREFIX}-mingw32-windres CACHE PATH "RC compiler")
+set (CMAKE_C_COMPILER ${MINGW_PREFIX}-gcc      CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${MINGW_PREFIX}-g++    CACHE PATH "C++ compiler")
+set (CMAKE_RC_COMPILER ${MINGW_PREFIX}-windres CACHE PATH "RC compiler")
 
 # specify the system root
 file (TO_CMAKE_PATH "$ENV{MINGW_ROOT}" MINGW_ROOT)
 if (NOT MINGW_ROOT)
-    set (MINGW_ROOT /usr/${MINGW_PREFIX}-mingw32)
+    get_filename_component (MINGW_PREFIX ${MINGW_PREFIX} NAME)
+    set (MINGW_ROOT /usr/${MINGW_PREFIX}/sys-root/mingw)
 endif ()
 set (MINGW_SYSROOT ${MINGW_ROOT} CACHE PATH "Path to MinGW SYSROOT")
 set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})

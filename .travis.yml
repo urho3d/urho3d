@@ -53,7 +53,7 @@ install:
     - sudo apt-get install -q -y --no-install-recommends libasound2-dev
     - bash -c "[ x$ENABLE_64BIT == 'x' ]" && sudo apt-get remove -q -y gvfs-daemons && sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true
     - bash -c "( [ $SITE_UPDATE_ON_MASTER_COMMIT ] || [ $PACKAGE_UPLOAD ] )" && sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true
-    - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64 MINGW_ROOT=/usr/${ARCH}-w64-mingw32 || true
+    - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32 || true
     - bash -c "[ $LINUX ] && [ $PACKAGE_UPLOAD ]" && sudo apt-get install -q -y rpm || true
     - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
