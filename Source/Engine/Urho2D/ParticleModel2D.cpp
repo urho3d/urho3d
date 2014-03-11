@@ -155,37 +155,40 @@ bool ParticleModel2D::Load(Deserializer& source)
         }
     }
 
+    // Apply model scale
+    const float modelScale = 0.01f;
+
     duration_ = keyValueMapping["duration"].GetFloat();
     emitterType_ = (EmitterType2D)(int)keyValueMapping["emitterType"].GetFloat();
 
-    sourcePositionVariance_.x_ = keyValueMapping["sourcePositionVariancex"].GetFloat();
-    sourcePositionVariance_.y_ = keyValueMapping["sourcePositionVariancey"].GetFloat();    
+    sourcePositionVariance_.x_ = keyValueMapping["sourcePositionVariancex"].GetFloat() * modelScale;
+    sourcePositionVariance_.y_ = keyValueMapping["sourcePositionVariancey"].GetFloat() * modelScale;
 
     maxParticles_ = (unsigned)keyValueMapping["maxParticles"].GetFloat();
     particleLifeSpan_ = keyValueMapping["particleLifespan"].GetFloat();
 
     particleLifeSpanVariance_ = keyValueMapping["particleLifespanVariance"].GetFloat();
-    startParticleSize_ = keyValueMapping["startParticleSize"].GetFloat();
-    startParticleSizeVariance_ = keyValueMapping["startParticleSizeVariance"].GetFloat();
-    endParticleSize_ = keyValueMapping["finishParticleSize"].GetFloat();
-    endParticleSizeVariance_ = keyValueMapping["finishParticleSizeVariance"].GetFloat();
+    startParticleSize_ = keyValueMapping["startParticleSize"].GetFloat() * modelScale;
+    startParticleSizeVariance_ = keyValueMapping["startParticleSizeVariance"].GetFloat() * modelScale;
+    endParticleSize_ = keyValueMapping["finishParticleSize"].GetFloat() * modelScale;
+    endParticleSizeVariance_ = keyValueMapping["finishParticleSizeVariance"].GetFloat() * modelScale;
     emitAngle_ = keyValueMapping["angle"].GetFloat();
     emitAngleVariance_ = keyValueMapping["angleVariance"].GetFloat();
 
-    speed_ = keyValueMapping["speed"].GetFloat();
-    speedVariance_ = keyValueMapping["speedVariance"].GetFloat();
+    speed_ = keyValueMapping["speed"].GetFloat() * modelScale;
+    speedVariance_ = keyValueMapping["speedVariance"].GetFloat() * modelScale;
 
-    gravity_.x_ = keyValueMapping["gravityx"].GetFloat();
-    gravity_.y_ = keyValueMapping["gravityy"].GetFloat();
+    gravity_.x_ = keyValueMapping["gravityx"].GetFloat() * modelScale;
+    gravity_.y_ = keyValueMapping["gravityy"].GetFloat() * modelScale;
 
-    radialAcceleration_ = keyValueMapping["radialAcceleration"].GetFloat();
-    radialAccelerationVariance_ = keyValueMapping["radialAccelVariance"].GetFloat();
-    tangentialAcceleration_ = keyValueMapping["tangentialAcceleration"].GetFloat();
-    tangentialAccelerationVariance_ = keyValueMapping["tangentialAccelVariance"].GetFloat();
+    radialAcceleration_ = keyValueMapping["radialAcceleration"].GetFloat() * modelScale;
+    radialAccelerationVariance_ = keyValueMapping["radialAccelVariance"].GetFloat() * modelScale;
+    tangentialAcceleration_ = keyValueMapping["tangentialAcceleration"].GetFloat() * modelScale;
+    tangentialAccelerationVariance_ = keyValueMapping["tangentialAccelVariance"].GetFloat() * modelScale;
 
-    maxRadius_ = keyValueMapping["maxRadius"].GetFloat();
-    maxRadiusVariance_ = keyValueMapping["maxRadiusVariance"].GetFloat();
-    minRadius_ = keyValueMapping["minRadius"].GetFloat();
+    maxRadius_ = keyValueMapping["maxRadius"].GetFloat() * modelScale;
+    maxRadiusVariance_ = keyValueMapping["maxRadiusVariance"].GetFloat() * modelScale;
+    minRadius_ = keyValueMapping["minRadius"].GetFloat() * modelScale;
     rotatePerSecond_ = keyValueMapping["rotatePerSecond"].GetFloat();
     rotatePerSecondVariance_ = keyValueMapping["rotatePerSecondVariance"].GetFloat();
 

@@ -47,8 +47,8 @@ void CreateScene()
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
 
-    uint width = graphics.width;
-    uint height = graphics.height;
+    uint width = graphics.width / scene_.unitSize2D;
+    uint height = graphics.height / scene_.unitSize2D;
     camera.SetOrthoSize(Vector2(width, height));
 
     Sprite2D@ sprite = cache.GetResource("Sprite2D", "Urho2D/Aster.png");
@@ -77,7 +77,7 @@ void CreateScene()
         // Set sprite
         staticSprite.sprite = sprite;
         
-        spriteNode.vars["MoveSpeed"] = Vector3(Random(-200.0f, 200.0f), Random(-200.0f, 200.0f), 0.0f);
+        spriteNode.vars["MoveSpeed"] = Vector3(Random(-2.0f, 2.0f), Random(-2.0f, 2.0f), 0.0f);
         spriteNode.vars["RotateSpeed"] = Random(-90.0f, 90.0f);
 
         spriteNodes.Push(spriteNode);
@@ -125,7 +125,7 @@ void MoveCamera(float timeStep)
         return;
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 400.0f;
+    const float MOVE_SPEED = 4.0f;
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could
@@ -166,8 +166,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 
-    float halfWidth = graphics.width * 0.5f;
-    float halfHeight = graphics.height * 0.5f;
+    float halfWidth = graphics.width * 0.5f / scene_.unitSize2D;
+    float halfHeight = graphics.height * 0.5f / scene_.unitSize2D;
 
     // Go through all sprites
     for (uint i = 0; i < spriteNodes.length; ++i)

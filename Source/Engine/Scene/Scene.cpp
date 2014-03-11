@@ -61,7 +61,7 @@ Scene::Scene(Context* context) :
     checksum_(0),
     timeScale_(1.0f),
     elapsedTime_(0),
-    unitSize2D_(1.0f),
+    unitSize2D_(100.0f),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     updateEnabled_(true),

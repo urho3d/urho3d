@@ -49,7 +49,7 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-    camera.SetOrthoSize(Vector2(graphics.width, graphics.height));
+    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) / scene_.unitSize2D);
 
     ParticleModel2D@ particleModel = cache.GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist");
     if (particleModel is null)
@@ -91,9 +91,10 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     if (particleNode !is null)
     {
-        int x = eventData["x"].GetInt();
-        int y = eventData["y"].GetInt();
-        particleNode.position = Vector3(x - graphics.width * 0.5f, -y + graphics.height * 0.5f, 0.0);
+        float x = eventData["x"].GetInt();
+        float y = eventData["y"].GetInt();
+        Camera@ camera = cameraNode.GetComponent("Camera");
+        particleNode.position = camera.ScreenToWorldPoint(Vector3(x / graphics.width, y / graphics.height, 10.0f));
     }
 }
 

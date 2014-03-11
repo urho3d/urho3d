@@ -45,7 +45,7 @@ function CreateScene()
     cameraNode.position = Vector3(0.0, 0.0, -10.0)
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
-    camera:SetOrthoSize(Vector2(graphics.width, graphics.height))
+    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) / scene_.unitSize2D)
 
     local particleModel = cache:GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist")
     if particleModel == nil then
@@ -85,6 +85,7 @@ function HandleMouseMove(eventType, eventData)
     if particleNode ~= nil then
         local x = eventData:GetInt("x")
         local y = eventData:GetInt("y")
-        particleNode.position = Vector3(x - graphics.width * 0.5, -y + graphics.height * 0.5, 0.0)
+        local camera = cameraNode:GetComponent("Camera")
+        particleNode.position = camera:ScreenToWorldPoint(Vector3(x / graphics.width, y / graphics.height, 10.0))
     end
 end

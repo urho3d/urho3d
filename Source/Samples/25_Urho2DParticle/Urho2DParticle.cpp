@@ -82,7 +82,7 @@ void Urho2DParticle::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()));
+    camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) / scene_->GetUnitSize2D());
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/LavaFlow.plist");
@@ -132,6 +132,7 @@ void Urho2DParticle::HandleMouseMove(StringHash eventType, VariantMap& eventData
         float x = (float)eventData[P_X].GetInt();
         float y = (float)eventData[P_Y].GetInt();
         Graphics* graphics = GetSubsystem<Graphics>();
-        particleNode_->SetPosition(Vector3(x - graphics->GetWidth() * 0.5f, -y + graphics->GetHeight() * 0.5f, 0.0));
+        Camera* camera = cameraNode_->GetComponent<Camera>();
+        particleNode_->SetPosition(camera->ScreenToWorldPoint(Vector3(x / graphics->GetWidth(), y / graphics->GetHeight(), 10.0f)));
     }
 }

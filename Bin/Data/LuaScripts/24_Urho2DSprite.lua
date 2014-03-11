@@ -44,8 +44,8 @@ function CreateScene()
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
 
-    local width = graphics.width
-    local height = graphics.height
+    local width = graphics.width / scene_.unitSize2D
+    local height = graphics.height / scene_.unitSize2D
     camera:SetOrthoSize(Vector2(width, height))
 
     local sprite = cache:GetResource("Sprite2D", "Urho2D/Aster.png")
@@ -70,7 +70,7 @@ function CreateScene()
         staticSprite.sprite = sprite
 
         -- Set move speed
-        spriteNode.moveSpeed = Vector3(Random(-200.0, 200.0), Random(-200.0, 200.0), 0.0)
+        spriteNode.moveSpeed = Vector3(Random(-2.0, 2.0), Random(-2.0, 2.0), 0.0)
         -- Set rotate speed
         spriteNode.rotateSpeed = Random(-90.0, 90.0)
 
@@ -140,7 +140,7 @@ function MoveCamera(timeStep)
     end
 
     -- Movement speed as world units per second
-    local MOVE_SPEED = 400.0
+    local MOVE_SPEED = 4.0
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     -- Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could

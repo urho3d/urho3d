@@ -84,8 +84,8 @@ void Urho2DSprite::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth();
-    float height = (float)graphics->GetHeight();
+    float width = (float)graphics->GetWidth() / scene_->GetUnitSize2D();
+    float height = (float)graphics->GetHeight() / scene_->GetUnitSize2D();
     camera->SetOrthoSize(Vector2(width, height));
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -168,7 +168,7 @@ void Urho2DSprite::MoveCamera(float timeStep)
     Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 400.0f;
+    const float MOVE_SPEED = 4.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could
