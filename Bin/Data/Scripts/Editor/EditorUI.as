@@ -363,7 +363,6 @@ void CreateMenuBar()
         for (uint i = 0; i < objects.length; ++i)
             childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objects[i]));
 		CreateChildDivider(childPopup);
-		childPopup.AddChild(CreateIconizedMenuItem("Monkey", @PickBuiltinObject, 0, 0, "Node", true, "Create " + "Monkey"));
 		childPopup.AddChild(CreateIconizedMenuItem("TeaPot", @PickBuiltinObject, 0, 0, "Node", true, "Create " + "TeaPot"));
         popup.AddChild(childMenu);
         CreateChildDivider(popup);
