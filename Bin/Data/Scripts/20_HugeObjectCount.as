@@ -74,7 +74,7 @@ void CreateScene()
                 boxNode.position = Vector3(x * 0.3f, 0.0f, y * 0.3f);
                 boxNode.SetScale(0.25f);
                 StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-                boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+                boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
                 boxNodes.Push(boxNode);
             }
         }
@@ -98,7 +98,7 @@ void CreateScene()
                 {
                     Node@ boxGroupNode = scene_.CreateChild("BoxGroup");
                     lastGroup = boxGroupNode.CreateComponent("StaticModelGroup");
-                    lastGroup.model = cache.GetResource("Model", "Models/Box.mdl");
+                    lastGroup.model = cache.GetResource("Model", "Models/Cube.mdl");
                 }
 
                 Node@ boxNode = scene_.CreateChild("Box");

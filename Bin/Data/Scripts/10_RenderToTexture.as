@@ -58,7 +58,7 @@ void CreateScene()
             // Orient using random pitch, yaw and roll Euler angles
             boxNode.rotation = Quaternion(Random(360.0f), Random(360.0f), Random(360.0f));
             StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-            boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+            boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
             boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
 
             // Add our custom Rotator component which will rotate the scene node each frame, when the scene sends its update event.
@@ -110,7 +110,7 @@ void CreateScene()
                 floorNode.position = Vector3(x * 20.5f, -0.5f, y * 20.5f);
                 floorNode.scale = Vector3(20.0f, 1.0f, 20.f);
                 StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
-                floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
+                floorObject.model = cache.GetResource("Model", "Models/Cube.mdl");
                 floorObject.material = cache.GetResource("Material", "Materials/Stone.xml");
             }
         }
@@ -122,7 +122,7 @@ void CreateScene()
             boxNode.position = Vector3(0.0f, 10.0f, 0.0f);
             boxNode.scale = Vector3(21.0f, 16.0f, 0.5f);
             StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-            boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+            boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
             boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
 
             Node@ screenNode = scene_.CreateChild("Screen");

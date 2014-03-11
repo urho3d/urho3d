@@ -67,7 +67,7 @@ void CreateScene()
     Node@ skyNode = scene_.CreateChild("Sky");
     skyNode.SetScale(500.0); // The scale actually does not matter
     Skybox@ skybox = skyNode.CreateComponent("Skybox");
-    skybox.model = cache.GetResource("Model", "Models/Box.mdl");
+    skybox.model = cache.GetResource("Model", "Models/Cube.mdl");
     skybox.material = cache.GetResource("Material", "Materials/Skybox.xml");
 
     // Create heightmap terrain
@@ -95,7 +95,7 @@ void CreateScene()
         objectNode.rotation = Quaternion(Vector3(0.0f, 1.0f, 0.0f), terrain.GetNormal(position));
         objectNode.SetScale(5.0f);
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
-        object.model = cache.GetResource("Model", "Models/Box.mdl");
+        object.model = cache.GetResource("Model", "Models/Cube.mdl");
         object.material = cache.GetResource("Material", "Materials/Stone.xml");
         object.castShadows = true;
     }

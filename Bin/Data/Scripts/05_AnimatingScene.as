@@ -58,7 +58,7 @@ void CreateScene()
         // Orient using random pitch, yaw and roll Euler angles
         boxNode.rotation = Quaternion(Random(360.0f), Random(360.0f), Random(360.0f));
         StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-        boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
         boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
 
         // Add the Rotator script object which will rotate the scene node each frame, when the scene sends its update event.

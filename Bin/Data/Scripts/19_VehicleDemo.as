@@ -265,7 +265,7 @@ class Vehicle : ScriptObject
         CollisionShape@ hullShape = node.CreateComponent("CollisionShape");
 
         node.scale = Vector3(1.5f, 1.0f, 3.0f);
-        hullObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        hullObject.model = cache.GetResource("Model", "Models/Cube.mdl");
         hullObject.material = cache.GetResource("Material", "Materials/Stone.xml");
         hullObject.castShadows = true;
         hullShape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
