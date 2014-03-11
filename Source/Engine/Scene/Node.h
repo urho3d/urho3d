@@ -361,6 +361,8 @@ public:
     void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
+    /// Mark all Drawable2D components attached to this node and its child nodes dirty.
+    void MarkAllDrawable2DDirty(bool markWorldBoundingBoxDirty = true);
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
     /// Add a pre-created component.

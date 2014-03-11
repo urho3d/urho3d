@@ -42,8 +42,8 @@
 DEFINE_APPLICATION_MAIN(Urho2DParticle)
 
 Urho2DParticle::Urho2DParticle(Context* context) :
-Sample(context)
-{    
+    Sample(context)
+{
 }
 
 void Urho2DParticle::Start()

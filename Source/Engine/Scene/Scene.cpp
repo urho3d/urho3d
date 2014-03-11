@@ -24,7 +24,6 @@
 #include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
-#include "Drawable2D.h"
 #include "File.h"
 #include "Log.h"
 #include "PackageFile.h"
@@ -49,6 +48,7 @@ const char* SUBSYSTEM_CATEGORY = "Subsystem";
 
 static const int ASYNC_LOAD_MIN_FPS = 30;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
+static const float DEFAULT_PIXELS_PER_UNIT_2D = 100.0f;
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
 
@@ -61,7 +61,7 @@ Scene::Scene(Context* context) :
     checksum_(0),
     timeScale_(1.0f),
     elapsedTime_(0),
-    pixelsPerUnit_(100.0f),
+    pixelsPerUnit_(DEFAULT_PIXELS_PER_UNIT_2D),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     updateEnabled_(true),
@@ -98,7 +98,7 @@ void Scene::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Pixel per Unit", GetPixelsPerUnit, SetPixelsPerUnit, float, 100.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Pixels per Unit (2D)", GetPixelsPerUnit, SetPixelsPerUnit, float, DEFAULT_PIXELS_PER_UNIT_2D, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
@@ -437,12 +437,12 @@ void Scene::SetElapsedTime(float time)
 
 void Scene::SetPixelsPerUnit(float pixelsPerUnit)
 {
-    if (pixelsPerUnit_ == pixelsPerUnit)
+    if (pixelsPerUnit == pixelsPerUnit_)
         return;
 
     pixelsPerUnit_ = Max(pixelsPerUnit, 1.0f);
 
-    MarkAllDrawable2DDirty(this);
+    MarkAllDrawable2DDirty();
     Node::MarkNetworkUpdate();
 }
 
@@ -970,18 +970,6 @@ void Scene::FinishSaving(Serializer* dest) const
         fileName_ = ptr->GetName();
         checksum_ = ptr->GetChecksum();
     }
-}
-
-void Scene::MarkAllDrawable2DDirty(Node* node)
-{
-    PODVector<Drawable2D*> drawables;
-    node->GetDerivedComponents<Drawable2D>(drawables);
-    for (PODVector<Drawable2D*>::Iterator i = drawables.Begin(); i != drawables.End(); ++i)
-        (*i)->MarkDirty();
-
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (unsigned i = 0; i < children.Size(); ++i)
-        MarkAllDrawable2DDirty(children[i]);
 }
 
 void RegisterSceneLibrary(Context* context)

@@ -48,8 +48,8 @@ static const ShortStringHash VAR_ROTATESPEED("RotateSpeed");
 DEFINE_APPLICATION_MAIN(Urho2DSprite)
 
 Urho2DSprite::Urho2DSprite(Context* context) :
-Sample(context)
-{    
+    Sample(context)
+{
 }
 
 void Urho2DSprite::Start()

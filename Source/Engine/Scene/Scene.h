@@ -197,8 +197,6 @@ private:
     void FinishLoading(Deserializer* source);
     /// Finish saving. Sets the scene filename and checksum.
     void FinishSaving(Serializer* dest) const;
-    /// Mark all Drawable2D components attached to this node and its child nodes dirty.
-    void MarkAllDrawable2DDirty(Node* node);
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;
@@ -242,7 +240,7 @@ private:
     float timeScale_;
     /// Elapsed time accumulator.
     float elapsedTime_;
-    /// 2D unit size representing the number of pixels per coordinate unit.
+    /// 2D pixels per unit.
     float pixelsPerUnit_;
     /// Motion smoothing constant.
     float smoothingConstant_;
