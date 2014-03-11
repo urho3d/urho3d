@@ -228,9 +228,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
             {
                 Light* light = static_cast<Light*>(drawable);
-                // Currently per pixel lights can not be reliably negative (darkening), so skip them
-                if (light->GetColor().SumRGB() > 0.0f || light->GetPerVertex())
-                    result.lights_.Push(light);
+                result.lights_.Push(light);
             }
         }
     }
@@ -1152,7 +1150,8 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
-    bool allowLitBase = useLitBase_ && light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
+    bool allowLitBase = useLitBase_ && !light->IsNegative() && light == drawable->GetFirstLight() &&
+        drawable->GetVertexLights().Empty() && !hasAmbientGradient;
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {
@@ -2640,7 +2639,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     Vector3 cameraPos = cameraNode_->GetWorldPosition();
     float lightDist;
     
-    graphics_->SetBlendMode(BLEND_ADD);
+    graphics_->SetBlendMode(light->IsNegative() ? BLEND_SUBTRACT : BLEND_ADD);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);

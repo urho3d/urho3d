@@ -110,7 +110,9 @@ static const unsigned glSrcBlend[] =
     GL_SRC_ALPHA,
     GL_SRC_ALPHA,
     GL_ONE,
-    GL_ONE_MINUS_DST_ALPHA
+    GL_ONE_MINUS_DST_ALPHA,
+    GL_ONE,
+    GL_SRC_ALPHA
 };
 
 static const unsigned glDestBlend[] =
@@ -121,7 +123,22 @@ static const unsigned glDestBlend[] =
     GL_ONE_MINUS_SRC_ALPHA,
     GL_ONE,
     GL_ONE_MINUS_SRC_ALPHA,
-    GL_DST_ALPHA
+    GL_DST_ALPHA,
+    GL_ONE,
+    GL_ONE
+};
+
+static const unsigned glBlendOp[] =
+{
+    GL_FUNC_ADD,
+    GL_FUNC_ADD,
+    GL_FUNC_ADD,
+    GL_FUNC_ADD,
+    GL_FUNC_ADD,
+    GL_FUNC_ADD,
+    GL_FUNC_ADD,
+    GL_FUNC_REVERSE_SUBTRACT,
+    GL_FUNC_REVERSE_SUBTRACT
 };
 
 #ifndef GL_ES_VERSION_2_0
@@ -1628,6 +1645,7 @@ void Graphics::SetBlendMode(BlendMode mode)
         {
             glEnable(GL_BLEND);
             glBlendFunc(glSrcBlend[mode], glDestBlend[mode]);
+            glBlendEquation(glBlendOp[mode]);
         }
         
         blendMode_ = mode;

@@ -99,6 +99,8 @@ private:
     D3DBLEND srcBlend_;
     /// Destination blend mode.
     D3DBLEND destBlend_;
+    /// Blend operation.
+    D3DBLENDOP blendOp_;
 };
 
 }

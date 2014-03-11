@@ -66,6 +66,7 @@ class Light : public Drawable
     Texture* GetRampTexture() const;
     Texture* GetShapeTexture() const;
     Frustum GetFrustum() const;
+    bool IsNegative() const;
     
     tolua_property__get_set LightType lightType;
     tolua_property__get_set bool perVertex;
@@ -85,4 +86,5 @@ class Light : public Drawable
     tolua_property__get_set Texture* rampTexture;
     tolua_property__get_set Texture* shapeTexture;
     tolua_readonly tolua_property__get_set Frustum frustum;
+    tolua_readonly tolua_property__is_set bool negative;
 };

@@ -166,7 +166,9 @@ public:
     void Invert(bool invertAlpha = false);
     /// Return linear interpolation of this color with another color.
     Color Lerp(const Color& rhs, float t) const;
-
+    /// Return color with absolute components.
+    Color Abs() const { return Color(Urho3D::Abs(r_), Urho3D::Abs(g_), Urho3D::Abs(b_), Urho3D::Abs(a_)); }
+    
     /// Return as string.
     String ToString() const;
     

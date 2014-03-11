@@ -184,7 +184,18 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     {
         bool isShadowPass = pass_->GetType() == PASS_SHADOW;
         
-        graphics->SetBlendMode(pass_->GetBlendMode());
+        BlendMode blend = pass_->GetBlendMode();
+        // Turn additive blending into subtract if the light is negative
+        bool hasNegativeLight = lightQueue_ && lightQueue_->light_ && lightQueue_->light_->IsNegative();
+        if (hasNegativeLight)
+        {
+            if (blend == BLEND_ADD)
+                blend = BLEND_SUBTRACT;
+            else if (blend == BLEND_ADDALPHA)
+                blend = BLEND_SUBTRACTALPHA;
+        }
+        
+        graphics->SetBlendMode(blend);
         renderer->SetCullMode(isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode(), camera_);
         if (!isShadowPass)
         {
@@ -482,7 +493,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         if (light->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
             fade = Min(1.0f - (light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
         
-        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor(), light->GetSpecularIntensity()) * fade);
+        // Negative lights will use subtract blending, so write absolute RGB values to the shader parameter
+        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor().Abs(), light->GetSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
         graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4((isLightVolume ? (lightNode->GetWorldPosition() -
             cameraEffectivePos) : lightNode->GetWorldPosition()), atten));

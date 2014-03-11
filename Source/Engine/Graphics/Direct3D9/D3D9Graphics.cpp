@@ -121,6 +121,7 @@ static const DWORD d3dBlendEnable[] =
     TRUE,
     TRUE,
     TRUE,
+    TRUE,
     TRUE
 };
 
@@ -133,6 +134,8 @@ static const D3DBLEND d3dSrcBlend[] =
     D3DBLEND_SRCALPHA,
     D3DBLEND_ONE,
     D3DBLEND_INVDESTALPHA,
+    D3DBLEND_ONE,
+    D3DBLEND_SRCALPHA,
 };
 
 static const D3DBLEND d3dDestBlend[] =
@@ -143,7 +146,22 @@ static const D3DBLEND d3dDestBlend[] =
     D3DBLEND_INVSRCALPHA,
     D3DBLEND_ONE,
     D3DBLEND_INVSRCALPHA,
-    D3DBLEND_DESTALPHA
+    D3DBLEND_DESTALPHA,
+    D3DBLEND_ONE,
+    D3DBLEND_ONE
+};
+
+static const D3DBLENDOP d3dBlendOp[] =
+{
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_ADD,
+    D3DBLENDOP_REVSUBTRACT,
+    D3DBLENDOP_REVSUBTRACT
 };
 
 static const D3DCULL d3dCullMode[] =
@@ -1640,6 +1658,11 @@ void Graphics::SetBlendMode(BlendMode mode)
                 impl_->device_->SetRenderState(D3DRS_DESTBLEND, d3dDestBlend[mode]);
                 impl_->destBlend_ = d3dDestBlend[mode];
             }
+            if (d3dBlendOp[mode] != impl_->blendOp_)
+            {
+                impl_->device_->SetRenderState(D3DRS_BLENDOP, d3dBlendOp[mode]);
+                impl_->blendOp_ = d3dBlendOp[mode];
+            }
         }
         
         blendMode_ = mode;
@@ -2659,6 +2682,7 @@ void Graphics::ResetCachedState()
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;
+    impl_->blendOp_ = D3DBLENDOP_ADD;
     
     queryIssued_ = false;
 }
