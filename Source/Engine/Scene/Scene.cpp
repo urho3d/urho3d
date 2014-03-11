@@ -24,6 +24,7 @@
 #include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "Drawable2D.h"
 #include "File.h"
 #include "Log.h"
 #include "PackageFile.h"
@@ -437,7 +438,7 @@ void Scene::SetElapsedTime(float time)
 void Scene::SetUnitSize2D(float pixels)
 {
     unitSize2D_ = pixels;
-    MarkAllDrawable2DDirty();
+    MarkAllDrawable2DDirty(this);
     Node::MarkNetworkUpdate();
 }
 
@@ -965,6 +966,18 @@ void Scene::FinishSaving(Serializer* dest) const
         fileName_ = ptr->GetName();
         checksum_ = ptr->GetChecksum();
     }
+}
+
+void Scene::MarkAllDrawable2DDirty(Node* node)
+{
+    PODVector<Drawable2D*> drawables;
+    node->GetDerivedComponents<Drawable2D>(drawables);
+    for (PODVector<Drawable2D*>::Iterator i = drawables.Begin(); i != drawables.End(); ++i)
+        (*i)->MarkDirty();
+
+    const Vector<SharedPtr<Node> >& children = node->GetChildren();
+    for (unsigned i = 0; i < children.Size(); ++i)
+        MarkAllDrawable2DDirty(children[i]);
 }
 
 void RegisterSceneLibrary(Context* context)

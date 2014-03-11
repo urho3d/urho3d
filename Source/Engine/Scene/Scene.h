@@ -197,6 +197,8 @@ private:
     void FinishLoading(Deserializer* source);
     /// Finish saving. Sets the scene filename and checksum.
     void FinishSaving(Serializer* dest) const;
+    /// Mark all Drawable2D components attached to this node and its child nodes dirty.
+    void MarkAllDrawable2DDirty(Node* node);
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;
