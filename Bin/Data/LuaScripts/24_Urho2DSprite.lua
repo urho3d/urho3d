@@ -44,8 +44,8 @@ function CreateScene()
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
 
-    local width = graphics.width / scene_.unitSize2D
-    local height = graphics.height / scene_.unitSize2D
+    local width = graphics.width / scene_.pixelsPerUnit
+    local height = graphics.height / scene_.pixelsPerUnit
     camera:SetOrthoSize(Vector2(width, height))
 
     local sprite = cache:GetResource("Sprite2D", "Urho2D/Aster.png")

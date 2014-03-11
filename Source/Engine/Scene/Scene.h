@@ -103,8 +103,8 @@ public:
     void SetTimeScale(float scale);
     /// Set elapsed time in seconds. This can be used to prevent inaccuracy in the timer if the scene runs for a long time.
     void SetElapsedTime(float time);
-    /// Set 2D unit size in pixels. This represents the number of pixels would be used by Drawable2D class per coordinate unit.
-    void SetUnitSize2D(float pixels);
+    /// Set 2D pixels per unit. This represents the number of pixels would be used by Drawable2D class per coordinate unit.
+    void SetPixelsPerUnit(float pixelsPerUnit);
     /// Set network client motion smoothing constant.
     void SetSmoothingConstant(float constant);
     /// Set network client motion smoothing snap threshold.
@@ -138,8 +138,8 @@ public:
     float GetTimeScale() const { return timeScale_; }
     /// Return elapsed time in seconds.
     float GetElapsedTime() const { return elapsedTime_; }
-    /// Return 2D unit size in pixels.
-    float GetUnitSize2D() const { return unitSize2D_; }
+    /// Return 2D pixels per unit. This represents the number of pixels would be used by Drawable2D class per coordinate unit.
+    float GetPixelsPerUnit() const { return pixelsPerUnit_; }
     /// Return motion smoothing constant.
     float GetSmoothingConstant() const { return smoothingConstant_; }
     /// Return motion smoothing snap threshold.
@@ -243,7 +243,7 @@ private:
     /// Elapsed time accumulator.
     float elapsedTime_;
     /// 2D unit size representing the number of pixels per coordinate unit.
-    float unitSize2D_;
+    float pixelsPerUnit_;
     /// Motion smoothing constant.
     float smoothingConstant_;
     /// Motion smoothing snap threshold.

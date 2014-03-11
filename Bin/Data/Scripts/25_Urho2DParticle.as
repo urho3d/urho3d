@@ -49,7 +49,7 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) / scene_.unitSize2D);
+    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) / scene_.pixelsPerUnit);
 
     ParticleModel2D@ particleModel = cache.GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist");
     if (particleModel is null)

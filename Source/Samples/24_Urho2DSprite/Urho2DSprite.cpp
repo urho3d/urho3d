@@ -84,8 +84,8 @@ void Urho2DSprite::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth() / scene_->GetUnitSize2D();
-    float height = (float)graphics->GetHeight() / scene_->GetUnitSize2D();
+    float width = (float)graphics->GetWidth() / scene_->GetPixelsPerUnit();
+    float height = (float)graphics->GetHeight() / scene_->GetPixelsPerUnit();
     camera->SetOrthoSize(Vector2(width, height));
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -111,7 +111,7 @@ void Urho2DSprite::CreateScene()
         staticSprite->SetSprite(sprite);
 
         // Set move speed
-        spriteNode->SetVar(VAR_MOVESPEED, Vector3(Random(-200.0f, 200.0f), Random(-200.0f, 200.0f), 0.0f));
+        spriteNode->SetVar(VAR_MOVESPEED, Vector3(Random(-2.0f, 2.0f), Random(-2.0f, 2.0f), 0.0f));
         // Set rotate speed
         spriteNode->SetVar(VAR_ROTATESPEED, Random(-90.0f, 90.0f));
 
@@ -212,8 +212,8 @@ void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float halfWidth = (float)graphics->GetWidth() * 0.5f;
-    float halfHeight = (float)graphics->GetHeight() * 0.5f;
+    float halfWidth = (float)graphics->GetWidth() * 0.5f / scene_->GetPixelsPerUnit();
+    float halfHeight = (float)graphics->GetHeight() * 0.5f / scene_->GetPixelsPerUnit();
 
     for (unsigned i = 0; i < spriteNodes_.Size(); ++i)
     {

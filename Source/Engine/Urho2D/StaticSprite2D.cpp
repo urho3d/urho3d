@@ -124,9 +124,9 @@ void StaticSprite2D::UpdateVertices()
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    float unitSize = scene->GetUnitSize2D();
-    float width = (float)rectangle_.Width() / unitSize;     // Compute width and height in pixels
-    float height = (float)rectangle_.Height() / unitSize;
+    float pixelsPerUnit = scene->GetPixelsPerUnit();
+    float width = (float)rectangle_.Width() / pixelsPerUnit;     // Compute width and height in pixels
+    float height = (float)rectangle_.Height() / pixelsPerUnit;
 
     const Vector2& hotSpot = sprite_->GetHotSpot();
     float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
