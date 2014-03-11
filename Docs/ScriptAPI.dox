@@ -4407,6 +4407,7 @@ Properties:
 - Octree@ octree // readonly
 - Node@ parent
 - PhysicsWorld@ physicsWorld // readonly
+- float pixelsPerUnit
 - Vector3 position
 - int refs // readonly
 - PackageFile@[]@ requiredPackageFiles // readonly
@@ -4421,7 +4422,6 @@ Properties:
 - Matrix3x4 transform // readonly
 - ShortStringHash type // readonly
 - String typeName // readonly
-- float unitSize2D
 - Vector3 up // readonly
 - bool updateEnabled
 - VariantMap vars // readonly

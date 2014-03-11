@@ -5241,6 +5241,7 @@ Octree octree;
 Node parent;
 /* readonly */
 PhysicsWorld physicsWorld;
+float pixelsPerUnit;
 Vector3 position;
 /* readonly */
 int refs;
@@ -5262,7 +5263,6 @@ Matrix3x4 transform;
 ShortStringHash type;
 /* readonly */
 String typeName;
-float unitSize2D;
 /* readonly */
 Vector3 up;
 bool updateEnabled;

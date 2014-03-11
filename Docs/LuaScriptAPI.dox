@@ -3379,7 +3379,7 @@ Methods:
 - void SetUpdateEnabled(bool enable)
 - void SetTimeScale(float scale)
 - void SetElapsedTime(float time)
-- void SetUnitSize2D(float pixels)
+- void SetPixelsPerUnit(float pixelsPerUnit)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
 - Node* GetNode(unsigned id) const
@@ -3390,7 +3390,7 @@ Methods:
 - unsigned GetChecksum() const
 - float GetTimeScale() const
 - float GetElapsedTime() const
-- float GetUnitSize2D() const
+- float GetPixelsPerUnit() const
 - float GetSmoothingConstant() const
 - float GetSnapThreshold() const
 - const String GetVarName(ShortStringHash hash) const
@@ -3422,7 +3422,7 @@ Properties:
 - unsigned checksum (readonly)
 - float timeScale
 - float elapsedTime
-- float unitSize2D
+- float pixelsPerUnit
 - float smoothingConstant
 - float snapThreshold
 - bool threadedUpdate (readonly)
