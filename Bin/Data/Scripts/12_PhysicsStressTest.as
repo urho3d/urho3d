@@ -67,7 +67,7 @@ void CreateScene()
         floorNode.position = Vector3(0.0f, -0.5f, 0.0f);
         floorNode.scale = Vector3(500.0f, 1.0f, 500.0f);
         StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
-        floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        floorObject.model = cache.GetResource("Model", "Models/Cube.mdl");
         floorObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
 
         // Make the floor physical by adding RigidBody and CollisionShape components
@@ -107,7 +107,7 @@ void CreateScene()
             Node@ boxNode = scene_.CreateChild("Box");
             boxNode.position = Vector3(0.0f, i * 2.0f + 100.0f, 0.0f);
             StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-            boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+            boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
             boxObject.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
             boxObject.castShadows = true;
 
@@ -227,7 +227,7 @@ void SpawnObject()
     boxNode.rotation = cameraNode.rotation;
     boxNode.SetScale(0.25f);
     StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-    boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+    boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
     boxObject.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
     boxObject.castShadows = true;
 

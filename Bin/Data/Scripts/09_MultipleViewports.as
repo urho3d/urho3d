@@ -89,7 +89,7 @@ void CreateScene()
         boxNode.position = Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f);
         boxNode.SetScale(size);
         StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-        boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
         boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
         boxObject.castShadows = true;
         if (size >= 3.0f)

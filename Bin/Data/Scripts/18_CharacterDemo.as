@@ -89,7 +89,7 @@ void CreateScene()
     floorNode.position = Vector3(0.0f, -0.5f, 0.0f);
     floorNode.scale = Vector3(200.0f, 1.0f, 200.0f);
     StaticModel@ object = floorNode.CreateComponent("StaticModel");
-    object.model = cache.GetResource("Model", "Models/Box.mdl");
+    object.model = cache.GetResource("Model", "Models/Cube.mdl");
     object.material = cache.GetResource("Material", "Materials/Stone.xml");
 
     RigidBody@ body = floorNode.CreateComponent("RigidBody");
@@ -129,7 +129,7 @@ void CreateScene()
         objectNode.rotation = Quaternion(Random(360.0f), Random(360.0f), Random(360.0f));
         objectNode.SetScale(scale);
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
-        object.model = cache.GetResource("Model", "Models/Box.mdl");
+        object.model = cache.GetResource("Model", "Models/Cube.mdl");
         object.material = cache.GetResource("Material", "Materials/Stone.xml");
         object.castShadows = true;
 

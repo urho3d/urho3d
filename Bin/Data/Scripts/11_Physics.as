@@ -68,7 +68,7 @@ void CreateScene()
     Node@ skyNode = scene_.CreateChild("Sky");
     skyNode.SetScale(500.0f); // The scale actually does not matter
     Skybox@ skybox = skyNode.CreateComponent("Skybox");
-    skybox.model = cache.GetResource("Model", "Models/Box.mdl");
+    skybox.model = cache.GetResource("Model", "Models/Cube.mdl");
     skybox.material = cache.GetResource("Material", "Materials/Skybox.xml");
 
     {
@@ -77,7 +77,7 @@ void CreateScene()
         floorNode.position = Vector3(0.0f, -0.5f, 0.0f);
         floorNode.scale = Vector3(1000.0f, 1.0f, 1000.0f);
         StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
-        floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        floorObject.model = cache.GetResource("Model", "Models/Cube.mdl");
         floorObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
 
         // Make the floor physical by adding RigidBody and CollisionShape components. The RigidBody's default
@@ -99,7 +99,7 @@ void CreateScene()
                 Node@ boxNode = scene_.CreateChild("Box");
                 boxNode.position = Vector3(x, -y + 8.0f, 0.0f);
                 StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-                boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+                boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
                 boxObject.material = cache.GetResource("Material", "Materials/StoneEnvMapSmall.xml");
                 boxObject.castShadows = true;
                 
@@ -221,7 +221,7 @@ void SpawnObject()
     boxNode.rotation = cameraNode.rotation;
     boxNode.SetScale(0.25f);
     StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-    boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+    boxObject.model = cache.GetResource("Model", "Models/Cube.mdl");
     boxObject.material = cache.GetResource("Material", "Materials/StoneEnvMapSmall.xml");
     boxObject.castShadows = true;
 

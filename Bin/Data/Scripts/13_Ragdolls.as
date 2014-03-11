@@ -67,7 +67,7 @@ void CreateScene()
         floorNode.position = Vector3(0.0f, -0.5f, 0.0f);
         floorNode.scale = Vector3(500.0f, 1.0f, 500.0f);
         StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
-        floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        floorObject.model = cache.GetResource("Model", "Models/Cube.mdl");
         floorObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
 
         // Make the floor physical by adding RigidBody and CollisionShape components

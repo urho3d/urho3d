@@ -64,7 +64,7 @@ void CreateScene()
             floorNode.position = Vector3(x * 20.5f, -0.5f, y * 20.5f);
             floorNode.scale = Vector3(20.0f, 1.0f, 20.f);
             StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
-            floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
+            floorObject.model = cache.GetResource("Model", "Models/Cube.mdl");
             floorObject.material = cache.GetResource("Material", "Materials/Stone.xml");
         }
     }
