@@ -44,7 +44,6 @@ extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    pixelsPerUnit_(1.0f),
     zValue_(0.0f),
     blendMode_(BLEND_ALPHA),
     vertexBuffer_(new VertexBuffer(context_)),
@@ -65,7 +64,6 @@ Drawable2D::~Drawable2D()
 
 void Drawable2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Pixels Per Unit", GetPixelsPerUnit, SetPixelsPerUnit, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Z Value", GetZValue, SetZValue, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
@@ -138,25 +136,14 @@ UpdateGeometryType Drawable2D::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
-void Drawable2D::SetPixelsPerUnit(float pixelsPerUnit)
-{
-    pixelsPerUnit_ = Max(1.0f, pixelsPerUnit);
-    verticesDirty_ = true;
-    geometryDirty_ = true;
-    OnMarkedDirty(node_);
-    MarkNetworkUpdate();
-}
-
 void Drawable2D::SetSprite(Sprite2D* sprite)
 {
     if (sprite == sprite_)
         return;
 
     sprite_ = sprite;
-    verticesDirty_ = true;
-    geometryDirty_ = true;
+    MarkDirty();
     UpdateMaterial();
-    OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
 
@@ -192,15 +179,22 @@ void Drawable2D::SetZValue(float zValue)
         return;
 
     zValue_ = zValue;
-    verticesDirty_ = true;
-    geometryDirty_ = true;
-    OnMarkedDirty(node_);
+    MarkDirty();
     MarkNetworkUpdate();
 }
 
 Material* Drawable2D::GetMaterial() const
 {
     return material_;
+}
+
+void Drawable2D::MarkDirty(bool markWorldBoundingBoxDirty)
+{
+    verticesDirty_ = true;
+    geometryDirty_ = true;
+
+    if (markWorldBoundingBoxDirty)
+        OnMarkedDirty(node_);
 }
 
 void Drawable2D::SetSpriteAttr(ResourceRef value)

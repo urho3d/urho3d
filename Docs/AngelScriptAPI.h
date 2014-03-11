@@ -166,7 +166,6 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
-float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -2113,7 +2112,6 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
-float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -4472,7 +4470,6 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
-float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -5265,6 +5262,7 @@ Matrix3x4 transform;
 ShortStringHash type;
 /* readonly */
 String typeName;
+float unitSize2D;
 /* readonly */
 Vector3 up;
 bool updateEnabled;
@@ -6846,7 +6844,6 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
-float pixelsPerUnit;
 /* readonly */
 int refs;
 float shadowDistance;

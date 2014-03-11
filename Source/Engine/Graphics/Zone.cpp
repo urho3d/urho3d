@@ -63,7 +63,6 @@ Zone::Zone(Context* context) :
 
 Zone::~Zone()
 {
-    /// \todo When zone is destroyed, there is now possibility of dangling zone pointers
 }
 
 void Zone::RegisterObject(Context* context)
@@ -96,15 +95,6 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
         attr.offset_ == offsetof(Zone, priority_))
         OnMarkedDirty(node_);
-}
-
-void Zone::OnSetEnabled()
-{
-    // When a Zone is disabled, clear the cached zone from all drawables inside bounding box before removing from octree
-    if (!IsEnabledEffective())
-        OnMarkedDirty(node_);
-
-    Drawable::OnSetEnabled();
 }
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -237,36 +227,10 @@ void Zone::OnMarkedDirty(Node* node)
     }
 
     Drawable::OnMarkedDirty(node);
-
-    // When marked dirty, clear the cached zone from all drawables inside the zone bounding box,
-    // and mark gradient dirty in all neighbor zones
-    if (octant_ && lastWorldBoundingBox_.defined_)
-    {
-        PODVector<Drawable*> result;
-        BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
-        octant_->GetRoot()->GetDrawables(query);
-
-        for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
-        {
-            Drawable* drawable = *i;
-            unsigned drawableFlags = drawable->GetDrawableFlags();
-            if (drawableFlags & DRAWABLE_GEOMETRY)
-            {
-                if (drawable->GetZone() == this)
-                    drawable->SetZone(0);
-            }
-            else if (drawableFlags & DRAWABLE_ZONE)
-            {
-                Zone* zone = static_cast<Zone*>(drawable);
-                zone->lastAmbientStartZone_.Reset();
-                zone->lastAmbientEndZone_.Reset();
-            }
-        }
-    }
-
-    lastWorldBoundingBox_ = GetWorldBoundingBox();
-    lastAmbientStartZone_.Reset();
-    lastAmbientEndZone_.Reset();
+    
+    // Clear zone reference from all drawables inside the bounding box, and mark gradient dirty in neighbor zones
+    ClearDrawablesZone();
+    
     inverseWorldDirty_ = true;
 }
 
@@ -341,6 +305,39 @@ void Zone::UpdateAmbientGradient()
             lastAmbientEndZone_ = bestZone;
         }
     }
+}
+
+void Zone::OnRemoveFromOctree()
+{
+    ClearDrawablesZone();
+}
+
+void Zone::ClearDrawablesZone()
+{
+    if (octant_ && lastWorldBoundingBox_.defined_)
+    {
+        PODVector<Drawable*> result;
+        BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
+        octant_->GetRoot()->GetDrawables(query);
+
+        for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            unsigned drawableFlags = drawable->GetDrawableFlags();
+            if (drawableFlags & DRAWABLE_GEOMETRY)
+                drawable->SetZone(0);
+            else if (drawableFlags & DRAWABLE_ZONE)
+            {
+                Zone* zone = static_cast<Zone*>(drawable);
+                zone->lastAmbientStartZone_.Reset();
+                zone->lastAmbientEndZone_.Reset();
+            }
+        }
+    }
+
+    lastWorldBoundingBox_ = GetWorldBoundingBox();
+    lastAmbientStartZone_.Reset();
+    lastAmbientEndZone_.Reset();
 }
 
 }

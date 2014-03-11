@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Scene.h"
 #include "Sprite2D.h"
 #include "StaticSprite2D.h"
 #include "Texture2D.h"
@@ -62,9 +63,8 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-    // Assume flipping does not invalidate bounding rectangle
-    verticesDirty_ = true;
-    geometryDirty_ = true;
+    // Assume flipping does not invalidate bounding box
+    MarkDirty(false);
     MarkNetworkUpdate();
 }
 
@@ -84,14 +84,17 @@ void StaticSprite2D::SetColor(const Color& color)
         return;
 
     color_ = color;
-    verticesDirty_ = true;
-    geometryDirty_ = true;
+    MarkDirty(false);
     MarkNetworkUpdate();
 }
 
 void StaticSprite2D::UpdateVertices()
 {
     if (!verticesDirty_)
+        return;
+
+    Scene* scene = GetScene();
+    if (!scene)
         return;
 
     vertices_.Clear();
@@ -121,9 +124,9 @@ void StaticSprite2D::UpdateVertices()
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    float unitsPerPixel = 1.0f / pixelsPerUnit_;
-    float width = (float)rectangle_.Width() * unitsPerPixel;
-    float height = (float)rectangle_.Height() * unitsPerPixel;
+    float unitSize = scene->GetUnitSize2D();
+    float width = (float)rectangle_.Width() / unitSize;     // Compute width and height in pixels
+    float height = (float)rectangle_.Height() / unitSize;
 
     const Vector2& hotSpot = sprite_->GetHotSpot();
     float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;

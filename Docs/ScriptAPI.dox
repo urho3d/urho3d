@@ -133,7 +133,6 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
-- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -1779,7 +1778,6 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
-- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -3728,7 +3726,6 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
-- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -4424,6 +4421,7 @@ Properties:
 - Matrix3x4 transform // readonly
 - ShortStringHash type // readonly
 - String typeName // readonly
+- float unitSize2D
 - Vector3 up // readonly
 - bool updateEnabled
 - VariantMap vars // readonly
@@ -5740,7 +5738,6 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
-- float pixelsPerUnit
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask

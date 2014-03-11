@@ -61,8 +61,6 @@ static const Vector3* directions[] =
     &Vector3::BACK
 };
 
-static const float LIGHT_INTENSITY_THRESHOLD = 0.003f;
-
 /// %Frustum octree query for shadowcasters.
 class ShadowCasterOctreeQuery : public FrustumOctreeQuery
 {
@@ -203,7 +201,8 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
             {
                 Zone* drawableZone = drawable->GetZone();
-                if ((!drawableZone || (drawableZone->GetViewMask() & cameraViewMask) == 0) && !cameraZoneOverride)
+                if (!cameraZoneOverride && (drawable->IsZoneDirty() || !drawableZone || (drawableZone->GetViewMask() &
+                    cameraViewMask) == 0))
                     view->FindZone(drawable);
                 
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
@@ -229,8 +228,8 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
             {
                 Light* light = static_cast<Light*>(drawable);
-                // Skip lights which are so dim that they can not contribute to a rendertarget
-                if (light->GetColor().SumRGB() > LIGHT_INTENSITY_THRESHOLD)
+                // Currently per pixel lights can not be reliably negative (darkening), so skip them
+                if (light->GetColor().SumRGB() > 0.0f || light->GetPerVertex())
                     result.lights_.Push(light);
             }
         }
@@ -740,7 +739,7 @@ void View::GetDrawables()
     if (minZ_ == M_INFINITY)
         minZ_ = 0.0f;
     
-    // Sort the lights to brightest/closest first
+    // Sort the lights to brightest/closest first, and per-vertex lights first so that per-vertex base pass can be evaluated first
     for (unsigned i = 0; i < lights_.Size(); ++i)
     {
         Light* light = lights_[i];
@@ -748,7 +747,7 @@ void View::GetDrawables()
         light->SetLightQueue(0);
     }
     
-    Sort(lights_.Begin(), lights_.End(), CompareDrawables);
+    Sort(lights_.Begin(), lights_.End(), CompareLights);
 }
 
 void View::GetBatches()
@@ -2456,8 +2455,8 @@ void View::FindZone(Drawable* drawable)
     // (possibly incorrect) and must be re-evaluated on the next frame
     bool temporary = !camera_->GetFrustum().IsInside(center);
     
-    // First check if the last zone remains a conclusive result
-    Zone* lastZone = drawable->GetLastZone();
+    // First check if the current zone remains a conclusive result
+    Zone* lastZone = drawable->GetZone();
     
     if (lastZone && (lastZone->GetViewMask() & camera_->GetViewMask()) && lastZone->GetPriority() >= highestZonePriority_ &&
         (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->IsInside(center))

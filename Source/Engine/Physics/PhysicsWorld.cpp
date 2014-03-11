@@ -87,7 +87,8 @@ static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisio
 struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
 {
     /// Construct.
-    PhysicsQueryCallback(PODVector<RigidBody*>& result) : result_(result)
+    PhysicsQueryCallback(PODVector<RigidBody*>& result, unsigned collisionMask) : result_(result),
+        collisionMask_(collisionMask)
     {
     }
 
@@ -95,16 +96,18 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     virtual btScalar addSingleResult(btManifoldPoint &, const btCollisionObjectWrapper *colObj0Wrap, int, int, const btCollisionObjectWrapper *colObj1Wrap, int, int)
     {
         RigidBody* body = reinterpret_cast<RigidBody*>(colObj0Wrap->getCollisionObject()->getUserPointer());
-        if (body && !result_.Contains(body))
+        if (body && !result_.Contains(body) && (body->GetCollisionLayer() & collisionMask_))
             result_.Push(body);
         body = reinterpret_cast<RigidBody*>(colObj1Wrap->getCollisionObject()->getUserPointer());
-        if (body && !result_.Contains(body))
+        if (body && !result_.Contains(body) && (body->GetCollisionLayer() & collisionMask_))
             result_.Push(body);
         return 0.0f;
     }
 
     /// Found rigid bodies.
     PODVector<RigidBody*>& result_;
+    /// Collision mask for the query.
+    unsigned collisionMask_;
 };
 
 PhysicsWorld::PhysicsWorld(Context* context) :
@@ -418,9 +421,9 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& s
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(sphere.center_)));
     // Need to activate the temporary rigid body to get reliable results from static, sleeping objects
     tempRigidBody->activate();
-    world_->addRigidBody(tempRigidBody, (short)0xffff, (short)collisionMask);
+    world_->addRigidBody(tempRigidBody);
 
-    PhysicsQueryCallback callback(result);
+    PhysicsQueryCallback callback(result, collisionMask);
     world_->contactTest(tempRigidBody, callback);
 
     world_->removeRigidBody(tempRigidBody);
@@ -437,9 +440,9 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
     btRigidBody* tempRigidBody = new btRigidBody(1.0f, 0, &boxShape);
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(box.Center())));
     tempRigidBody->activate();
-    world_->addRigidBody(tempRigidBody, (short)0xffff, (short)collisionMask);
+    world_->addRigidBody(tempRigidBody);
 
-    PhysicsQueryCallback callback(result);
+    PhysicsQueryCallback callback(result, collisionMask);
     world_->contactTest(tempRigidBody, callback);
 
     world_->removeRigidBody(tempRigidBody);

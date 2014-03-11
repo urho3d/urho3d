@@ -43,8 +43,6 @@ public:
     
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
-    /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
@@ -102,12 +100,16 @@ public:
     bool IsInside(const Vector3& point) const;
     
 protected:
-    /// Transform has changed. Clear cached zone of any contained drawables.
+    /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Handle removal from octree.
+    virtual void OnRemoveFromOctree();
     /// Recalculate the ambient gradient colors from neighbor zones. Not safe to call from worker threads due to octree query.
     void UpdateAmbientGradient();
+    /// Clear zone reference from drawables inside the bounding box.
+    void ClearDrawablesZone();
     
     /// Cached inverse world transform matrix.
     mutable Matrix3x4 inverseWorld_;

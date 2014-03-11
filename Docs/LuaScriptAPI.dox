@@ -1101,12 +1101,10 @@ Properties:
 
 Methods:
 
-- void SetPixelsPerUnit(float pixelsPerUnit)
 - void SetSprite(Sprite2D* sprite)
 - void SetMaterial(Material* material)
 - void SetBlendMode(BlendMode mode)
 - void SetZValue(float zValue)
-- float GetPixelsPerUnit() const
 - Sprite2D* GetSprite() const
 - Material* GetMaterial() const
 - BlendMode GetBlendMode() const
@@ -1114,7 +1112,6 @@ Methods:
 
 Properties:
 
-- float pixelsPerUnit
 - Sprite2D* sprite
 - Material* material
 - BlendMode blendMode
@@ -2747,6 +2744,9 @@ Methods:
 - const PODVector<PhysicsRaycastResult>& Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- const PODVector<RigidBody*>& GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
+- const PODVector<RigidBody*>& GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
+- const PODVector<RigidBody*>& GetRigidBodies(const RigidBody* body)
 - void DrawDebugGeometry(bool depthTest)
 - void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const
@@ -3379,6 +3379,7 @@ Methods:
 - void SetUpdateEnabled(bool enable)
 - void SetTimeScale(float scale)
 - void SetElapsedTime(float time)
+- void SetUnitSize2D(float pixels)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
 - Node* GetNode(unsigned id) const
@@ -3389,6 +3390,7 @@ Methods:
 - unsigned GetChecksum() const
 - float GetTimeScale() const
 - float GetElapsedTime() const
+- float GetUnitSize2D() const
 - float GetSmoothingConstant() const
 - float GetSnapThreshold() const
 - const String GetVarName(ShortStringHash hash) const
@@ -3420,6 +3422,7 @@ Properties:
 - unsigned checksum (readonly)
 - float timeScale
 - float elapsedTime
+- float unitSize2D
 - float smoothingConstant
 - float snapThreshold
 - bool threadedUpdate (readonly)

@@ -1286,11 +1286,11 @@ A Zone controls ambient lighting and fogging. Each geometry object determines th
 
 The viewport will be initially cleared to the fog color of the zone found at the camera's far clip distance. If no zone is found either for the far clip or an object, a default zone with black ambient and fog color will be used.
 
-Zones have three special flags: height fog mode, override mode and ambient gradient. 
+Zones have three special flags: height fog mode, override mode and ambient gradient.
 
 - When height fog mode is enabled, objects inside the zone receive height fog in addition of distance fog. The fog's \ref Zone::SetFogHeight "height level" is specified relative to the zone's world position. The width of the fog band on the Y-axis is specified by the \ref Zone::SetFogHeightScale "fog height scale" parameter.
 - If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect.
-- When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
+- When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors. To ensure objects use the gradient zone when inside it, the gradient zone should have higher priority than the neighbor zones. The gradient is always oriented along the gradient zone's local Z axis.
 
 Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 

@@ -112,6 +112,8 @@ template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char
 template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<UIElement*> to Lua as a table.
 template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char* type);
+/// Push PODVector<RigidBody*> to Lua as a table.
+template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<Vector3> to Lua as a table.
 template<> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char* type);
 /// Push PODVector<IntVector2> to Lua as a table.
