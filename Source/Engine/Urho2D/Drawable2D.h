@@ -73,7 +73,7 @@ public:
     /// Return all vertices.
     const Vector<Vertex2D>& GetVertices() const { return vertices_; }
     /// Mark vertices and geometry dirty.
-    void MarkDirty();
+    void MarkDirty(bool markWorldBoundingBoxDirty = true);
 
     /// Set sprite attribute.
     void SetSpriteAttr(ResourceRef value);

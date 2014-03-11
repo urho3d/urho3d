@@ -144,7 +144,6 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
     sprite_ = sprite;
     MarkDirty();
     UpdateMaterial();
-    OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
 
@@ -181,7 +180,6 @@ void Drawable2D::SetZValue(float zValue)
 
     zValue_ = zValue;
     MarkDirty();
-    OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
 
@@ -190,10 +188,13 @@ Material* Drawable2D::GetMaterial() const
     return material_;
 }
 
-void Drawable2D::MarkDirty()
+void Drawable2D::MarkDirty(bool markWorldBoundingBoxDirty)
 {
     verticesDirty_ = true;
     geometryDirty_ = true;
+
+    if (markWorldBoundingBoxDirty)
+        OnMarkedDirty(node_);
 }
 
 void Drawable2D::SetSpriteAttr(ResourceRef value)
