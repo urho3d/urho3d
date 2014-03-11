@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Component.h"
 #include "Context.h"
+#include "Drawable2D.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"
@@ -400,7 +401,7 @@ void Node::Roll(float angle, bool fixedAxis)
 
 void Node::LookAt(const Vector3& target, const Vector3& upAxis)
 {
-    Vector3 lookDir = (target - GetWorldPosition());
+    Vector3 lookDir = target - GetWorldPosition();
     // Check if target is very close, in that case can not reliably calculate lookat direction
     if (lookDir.Equals(Vector3::ZERO))
         return;
@@ -1272,6 +1273,17 @@ void Node::MarkReplicationDirty()
             }
         }
     }
+}
+
+void Node::MarkAllDrawable2DDirty()
+{
+    PODVector<Drawable2D*> drawables;
+    GetDerivedComponents<Drawable2D>(drawables);
+    for (PODVector<Drawable2D*>::Iterator i = drawables.Begin(); i != drawables.End(); ++i)
+        (*i)->MarkDirty();
+
+    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->MarkAllDrawable2DDirty();
 }
 
 Node* Node::CreateChild(unsigned id, CreateMode mode)

@@ -63,8 +63,6 @@ template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* 
 {
     RegisterDrawable<T>(engine, className);
     RegisterSubclass<Drawable2D, T>(engine, "Drawable2D", className);
-    engine->RegisterObjectMethod(className, "void set_pixelsPerUnit(float)", asMETHOD(T, SetPixelsPerUnit), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_pixelsPerUnit() const", asMETHOD(T, GetPixelsPerUnit), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_sprite(Sprite2D@+)", asMETHODPR(T, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Sprite2D@+ get_sprite() const", asMETHOD(T, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHODPR(T, SetMaterial, (Material*), void), asCALL_THISCALL);

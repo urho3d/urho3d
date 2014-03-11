@@ -233,6 +233,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "float get_timeScale() const", asMETHOD(Scene, GetTimeScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_elapsedTime(float)", asMETHOD(Scene, SetElapsedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float get_elapsedTime() const", asMETHOD(Scene, GetElapsedTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_unitSize2D(float)", asMETHOD(Scene, SetUnitSize2D), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_unitSize2D() const", asMETHOD(Scene, GetUnitSize2D), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_smoothingConstant(float)", asMETHOD(Scene, SetSmoothingConstant), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float get_smoothingConstant() const", asMETHOD(Scene, GetSmoothingConstant), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_snapThreshold(float)", asMETHOD(Scene, SetSnapThreshold), asCALL_THISCALL);
