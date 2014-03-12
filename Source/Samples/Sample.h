@@ -28,6 +28,7 @@
 namespace Urho3D
 {
 
+class BorderImage;
 class Sprite;
 
 }
@@ -42,8 +43,9 @@ using namespace Urho3D;
 ///    - Set custom window title and icon;
 ///    - Create Console and Debug HUD, and use F1 and F2 key to toggle them;
 ///    - Toggle rendering options from the keys 1-8;
-///    - Take screenshot with key 9
+///    - Take screenshot with key 9;
 ///    - Handle Esc key down to hide Console or exit application;
+///    - Display a splash screen during loading time (activated by default for mobiles);
 class Sample : public Application
 {
     // Enable type information.
@@ -66,14 +68,18 @@ protected:
     SharedPtr<Sprite> logoSprite_;
 
 private:
+    /// Display splash screen.
+    void SplashScreen();
     /// Create logo.
     void CreateLogo();
-    /// Set custom window Title & Icon
+    /// Set custom window Title & Icon.
     void SetWindowTitleAndIcon();
     /// Create console and debug HUD.
     void CreateConsoleAndDebugHud();
     /// Handle key down event to process key controls common to all samples.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+    /// Handle begin rendering to remove splash screen when scene has been rendered.
+    void HandleSplash(StringHash eventType, VariantMap& eventData);
 };
 
 #include "Sample.inl"

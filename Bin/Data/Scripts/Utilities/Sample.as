@@ -5,11 +5,16 @@
 //    - Toggle rendering options from the keys 1-8;
 //    - Take screenshots with key 9;
 //    - Handle Esc key down to hide Console or exit application;
+//    - Display a splash screen during loading time (activated by default for mobiles);
 
 Sprite@ logoSprite;
 
 void SampleStart()
 {
+    // Display splash screen
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+        SplashScreen();
+
     // Create logo
     CreateLogo();
 
@@ -21,6 +26,24 @@ void SampleStart()
 
     // Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleKeyDown");
+}
+
+void SplashScreen()
+{
+    BorderImage@ splashUI = ui.root.CreateChild("BorderImage", "Splash");
+    Texture2D@ texture = cache.GetResource("Texture2D", "Textures/LogoLarge.png"); // Get texture
+    splashUI.texture = texture; // Set texture
+    splashUI.SetSize(texture.width, texture.height);
+    splashUI.SetAlignment(HA_CENTER, VA_CENTER);
+    engine.RunFrame(); // Render Splash immediately
+    SubscribeToEvent("EndRendering", "HandleSplash"); // Keep visible until rendering of the scene
+}
+
+void HandleSplash(StringHash eventType, VariantMap& eventData)
+{
+    // Remove splash screen when the scene gets rendered
+    if (ui.root.GetChild("Splash") !is null)
+        ui.root.GetChild("Splash").Remove();
 }
 
 void SetLogoVisible(bool enable)
