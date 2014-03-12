@@ -13,7 +13,6 @@ class Spline
     
     void operator = (const Spline& rhs);
     bool operator == (const Spline& rhs) const;
-    bool operator != (const Spline& rhs) const;
     
     Variant GetPoint(float f) const;
     

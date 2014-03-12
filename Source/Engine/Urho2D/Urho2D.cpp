@@ -23,9 +23,12 @@
 #include "Precompiled.h"
 #include "AnimatedSprite2D.h"
 #include "Animation2D.h"
+#include "CollisionShape2D.h"
 #include "Drawable2D.h"
 #include "ParticleEmitter2D.h"
 #include "ParticleModel2D.h"
+#include "PhysicsWorld2D.h"
+#include "RigidBody2D.h"
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
@@ -48,6 +51,10 @@ void RegisterUrho2DLibrary(Context* context)
     ParticleModel2D::RegisterObject(context);
     Sprite2D::RegisterObject(context);
     SpriteSheet2D::RegisterObject(context);
+
+    PhysicsWorld2D::RegisterObject(context);
+    RigidBody2D::RegisterObject(context);
+    CollisionShape2D::RegisterObject(context);
 }
 
 }

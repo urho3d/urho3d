@@ -169,7 +169,7 @@ template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def)
     if (!lua_istable(L, narg))
         return 0;
 
-    static Vector<unsigned> result;
+    static PODVector<unsigned> result;
     result.Clear();
 
     int length = lua_objlen(L, narg);
@@ -186,6 +186,35 @@ template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def)
 
         unsigned value = (unsigned)tolua_tonumber(L, -1, 0);
         result.Push(value);
+
+        lua_pop(L, 1);
+    }
+
+    return &result;
+}
+
+template<> void* ToluaToPODVector<Vector2>(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+
+    static PODVector<Vector2> result;
+    result.Clear();
+
+    int length = lua_objlen(L, narg);
+    for (int i = 1; i <= length; ++i)
+    {
+        lua_pushinteger(L, i);
+        lua_gettable(L, narg);
+
+        if (!lua_isnumber(L, -1))
+        {
+            lua_pop(L, 1);
+            return 0;
+        }
+
+        Vector2* value = (Vector2*)tolua_touserdata(L, -1, 0);
+        result.Push(*value);
 
         lua_pop(L, 1);
     }

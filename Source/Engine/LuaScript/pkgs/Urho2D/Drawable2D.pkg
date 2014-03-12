@@ -2,6 +2,8 @@ $#include "Drawable2D.h"
 
 enum BlendMode {};
 
+const float PIXEL_SIZE;
+
 class Drawable2D : public Drawable
 {
 public:

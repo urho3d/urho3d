@@ -48,8 +48,8 @@ static const ShortStringHash VAR_ROTATESPEED("RotateSpeed");
 DEFINE_APPLICATION_MAIN(Urho2DSprite)
 
 Urho2DSprite::Urho2DSprite(Context* context) :
-Sample(context)
-{    
+    Sample(context)
+{
 }
 
 void Urho2DSprite::Start()
@@ -84,8 +84,8 @@ void Urho2DSprite::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth();
-    float height = (float)graphics->GetHeight();
+    float width = (float)graphics->GetWidth() * PIXEL_SIZE;
+    float height = (float)graphics->GetHeight() * PIXEL_SIZE;
     camera->SetOrthoSize(Vector2(width, height));
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -111,7 +111,7 @@ void Urho2DSprite::CreateScene()
         staticSprite->SetSprite(sprite);
 
         // Set move speed
-        spriteNode->SetVar(VAR_MOVESPEED, Vector3(Random(-200.0f, 200.0f), Random(-200.0f, 200.0f), 0.0f));
+        spriteNode->SetVar(VAR_MOVESPEED, Vector3(Random(-2.0f, 2.0f), Random(-2.0f, 2.0f), 0.0f));
         // Set rotate speed
         spriteNode->SetVar(VAR_ROTATESPEED, Random(-90.0f, 90.0f));
 
@@ -168,7 +168,7 @@ void Urho2DSprite::MoveCamera(float timeStep)
     Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 400.0f;
+    const float MOVE_SPEED = 4.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could
@@ -212,8 +212,8 @@ void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float halfWidth = (float)graphics->GetWidth() * 0.5f;
-    float halfHeight = (float)graphics->GetHeight() * 0.5f;
+    float halfWidth = (float)graphics->GetWidth() * 0.5f * PIXEL_SIZE;
+    float halfHeight = (float)graphics->GetHeight() * 0.5f * PIXEL_SIZE;
 
     for (unsigned i = 0; i < spriteNodes_.Size(); ++i)
     {

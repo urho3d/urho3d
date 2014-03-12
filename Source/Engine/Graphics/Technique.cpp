@@ -43,6 +43,8 @@ const char* blendModeNames[] =
     "addalpha",
     "premulalpha",
     "invdestalpha",
+    "subtract",
+    "subtractalpha",
     0
 };
 

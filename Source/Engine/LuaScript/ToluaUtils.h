@@ -101,6 +101,8 @@ template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type
 template<typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def);
 /// Convert PODVector<unsigned>.
 template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def);
+/// Convert PODVector<Vector2>.
+template<> void* ToluaToPODVector<Vector2>(lua_State* L, int narg, void* def);
 
 /// Push PODVector<T> to Lua as a table.
 template<typename T> int ToluaPushPODVector(lua_State* L, void* data, const char* type);

@@ -40,7 +40,8 @@ class Color
     void Clip(bool clipAlpha = false);
     void Invert(bool invertAlpha = false);
     Color Lerp(const Color& rhs, float t) const;
-
+    Color Abs() const;
+    
     String ToString() const;
     
     float r_ @ r;

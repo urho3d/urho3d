@@ -65,7 +65,7 @@ set (AMALG_SINGLE_TARGET 1)
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
 set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI  ../Urho2D
-    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
+    ../../ThirdParty/Box2D ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
 
 # Setup target
 setup_library ()

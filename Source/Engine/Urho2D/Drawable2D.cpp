@@ -40,6 +40,7 @@
 namespace Urho3D
 {
 
+const float PIXEL_SIZE = 0.01f;
 extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :

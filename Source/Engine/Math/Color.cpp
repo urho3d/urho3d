@@ -282,7 +282,7 @@ void Color::FromHCM(float h, float c, float m)
         h -= floorf(h);
 
     float hs = h * 6.0f;
-    float x  = c * (1.0f - Abs(fmodf(hs, 2.0f) - 1.0f));
+    float x  = c * (1.0f - Urho3D::Abs(fmodf(hs, 2.0f) - 1.0f));
 
     // Reconstruct r', g', b' from hue
     if (hs < 2.0f)

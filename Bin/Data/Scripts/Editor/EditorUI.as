@@ -359,7 +359,7 @@ void CreateMenuBar()
 
         childMenu = CreateMenuItem("Builtin object", null, SHOW_POPUP_INDICATOR);
         childPopup = CreatePopup(childMenu);
-        String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere" };
+        String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere", "TeaPot", "Torus" };
         for (uint i = 0; i < objects.length; ++i)
             childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objects[i]));
         popup.AddChild(childMenu);
