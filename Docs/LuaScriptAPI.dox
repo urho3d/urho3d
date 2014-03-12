@@ -662,6 +662,7 @@ Methods:
 - void Clip(bool clipAlpha = false)
 - void Invert(bool invertAlpha = false)
 - Color Lerp(const Color& rhs, float t) const
+- Color Abs() const
 - String ToString() const
 
 Properties:
@@ -1741,6 +1742,7 @@ Methods:
 - Texture* GetRampTexture() const
 - Texture* GetShapeTexture() const
 - Frustum GetFrustum() const
+- bool IsNegative() const
 
 Properties:
 
@@ -1762,6 +1764,7 @@ Properties:
 - Texture* rampTexture
 - Texture* shapeTexture
 - Frustum frustum (readonly)
+- bool negative (readonly)
 
 ### LineEdit : BorderImage
 
@@ -5247,6 +5250,8 @@ Properties:
 - int BLEND_ADDALPHA
 - int BLEND_PREMULALPHA
 - int BLEND_INVDESTALPHA
+- int BLEND_SUBTRACT
+- int BLEND_SUBTRACTALPHA
 - int MAX_BLENDMODES
 
 ### CollisionEventMode

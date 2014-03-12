@@ -1065,6 +1065,7 @@ Properties:
 
 Methods:
 
+- Color Abs() const
 - float Average() const
 - float Chroma() const
 - void Clip(bool)
@@ -2468,6 +2469,7 @@ Properties:
 - LightType lightType
 - float lodBias
 - uint maxLights
+- bool negative // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
 - bool occludee
@@ -7430,6 +7432,8 @@ Properties:
 - BLEND_ADDALPHA
 - BLEND_PREMULALPHA
 - BLEND_INVDESTALPHA
+- BLEND_SUBTRACT
+- BLEND_SUBTRACTALPHA
 
 
 ### CollisionEventMode

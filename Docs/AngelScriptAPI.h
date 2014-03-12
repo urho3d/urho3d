@@ -1258,6 +1258,7 @@ BoundingBox worldBoundingBox;
 class Color
 {
 // Methods:
+Color Abs() const;
 float Average() const;
 float Chroma() const;
 void Clip(bool);
@@ -2970,6 +2971,8 @@ uint lightMask;
 LightType lightType;
 float lodBias;
 uint maxLights;
+/* readonly */
+bool negative;
 /* readonly */
 Node node;
 /* readonly */
@@ -8858,6 +8861,8 @@ BLEND_ALPHA,
 BLEND_ADDALPHA,
 BLEND_PREMULALPHA,
 BLEND_INVDESTALPHA,
+BLEND_SUBTRACT,
+BLEND_SUBTRACTALPHA,
 };
 
 enum CollisionEventMode
