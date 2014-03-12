@@ -134,9 +134,10 @@ task :travis_ci_package_upload do
   setup_digital_keys
   if ENV['RELEASE_TAG'].empty?
     upload_dir = '/home/frs/project/urho3d/Urho3D/Snapshots'
-    # Only keep the snapshots from the last 30 revisions
+    # Only keep the snapshots from the last +/- 30 revisions
     if ENV['SITE_UPDATE']
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31
+      # The package revisions and their creation time may not always be in perfect chronological order due to Travis-CI build latency, so sort the final result one more time in order to get a unique revision removal list
+      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31 |sort |uniq
 cd #{upload_dir}
 ls -1t
 bye
