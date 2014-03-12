@@ -87,7 +87,7 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
 
     float timeStep = frame.timeStep_;
     Vector3 worldPosition = GetNode()->GetWorldPosition();
-    float worldScale = GetNode()->GetWorldScale().x_ / GetScene()->GetPixelsPerUnit();
+    float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
 
     unsigned particleIndex = 0;
     while (particleIndex < numParticles_)

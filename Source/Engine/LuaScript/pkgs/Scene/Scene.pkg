@@ -32,7 +32,6 @@ class Scene : public Node
     void SetUpdateEnabled(bool enable);
     void SetTimeScale(float scale);
     void SetElapsedTime(float time);
-    void SetPixelsPerUnit(float pixelsPerUnit);
     void SetSmoothingConstant(float constant);
     void SetSnapThreshold(float threshold);
     
@@ -46,7 +45,6 @@ class Scene : public Node
     unsigned GetChecksum() const;
     float GetTimeScale() const;
     float GetElapsedTime() const;
-    float GetPixelsPerUnit() const;
     float GetSmoothingConstant() const;
     float GetSnapThreshold() const;
     const String GetVarName(ShortStringHash hash) const;
@@ -77,7 +75,6 @@ class Scene : public Node
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_property__get_set float timeScale;
     tolua_property__get_set float elapsedTime;
-    tolua_property__get_set float pixelsPerUnit;
     tolua_property__get_set float smoothingConstant;
     tolua_property__get_set float snapThreshold;
     tolua_readonly tolua_property__is_set bool threadedUpdate;

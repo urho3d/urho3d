@@ -23,7 +23,6 @@
 #include "Precompiled.h"
 #include "Component.h"
 #include "Context.h"
-#include "Drawable2D.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"
@@ -1273,17 +1272,6 @@ void Node::MarkReplicationDirty()
             }
         }
     }
-}
-
-void Node::MarkAllDrawable2DDirty(bool markWorldBoundingBoxDirty)
-{
-    PODVector<Drawable2D*> drawables;
-    GetDerivedComponents<Drawable2D>(drawables);
-    for (PODVector<Drawable2D*>::Iterator i = drawables.Begin(); i != drawables.End(); ++i)
-        (*i)->MarkDirty(markWorldBoundingBoxDirty);
-
-    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->MarkAllDrawable2DDirty(markWorldBoundingBoxDirty);
 }
 
 Node* Node::CreateChild(unsigned id, CreateMode mode)

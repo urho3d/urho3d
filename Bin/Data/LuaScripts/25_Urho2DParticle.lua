@@ -45,7 +45,7 @@ function CreateScene()
     cameraNode.position = Vector3(0.0, 0.0, -10.0)
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
-    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) / scene_.pixelsPerUnit)
+    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
 
     local particleModel = cache:GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist")
     if particleModel == nil then

@@ -82,7 +82,7 @@ void Urho2DParticle::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) / scene_->GetPixelsPerUnit());
+    camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/LavaFlow.plist");

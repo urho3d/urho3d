@@ -47,8 +47,8 @@ void CreateScene()
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
 
-    uint width = graphics.width / scene_.pixelsPerUnit;
-    uint height = graphics.height / scene_.pixelsPerUnit;
+    uint width = graphics.width * PIXEL_SIZE;
+    uint height = graphics.height * PIXEL_SIZE;
     camera.SetOrthoSize(Vector2(width, height));
 
     Sprite2D@ sprite = cache.GetResource("Sprite2D", "Urho2D/Aster.png");
@@ -166,8 +166,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 
-    float halfWidth = graphics.width * 0.5f / scene_.pixelsPerUnit;
-    float halfHeight = graphics.height * 0.5f / scene_.pixelsPerUnit;
+    float halfWidth = graphics.width * 0.5f * PIXEL_SIZE;
+    float halfHeight = graphics.height * 0.5f * PIXEL_SIZE;
 
     // Go through all sprites
     for (uint i = 0; i < spriteNodes.length; ++i)

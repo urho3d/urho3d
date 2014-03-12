@@ -48,7 +48,6 @@ const char* SUBSYSTEM_CATEGORY = "Subsystem";
 
 static const int ASYNC_LOAD_MIN_FPS = 30;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
-static const float DEFAULT_PIXELS_PER_UNIT_2D = 100.0f;
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
 
@@ -61,7 +60,6 @@ Scene::Scene(Context* context) :
     checksum_(0),
     timeScale_(1.0f),
     elapsedTime_(0),
-    pixelsPerUnit_(DEFAULT_PIXELS_PER_UNIT_2D),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     updateEnabled_(true),
@@ -98,7 +96,6 @@ void Scene::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Pixels per Unit (2D)", GetPixelsPerUnit, SetPixelsPerUnit, float, DEFAULT_PIXELS_PER_UNIT_2D, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
@@ -433,17 +430,6 @@ void Scene::SetSnapThreshold(float threshold)
 void Scene::SetElapsedTime(float time)
 {
     elapsedTime_ = time;
-}
-
-void Scene::SetPixelsPerUnit(float pixelsPerUnit)
-{
-    if (pixelsPerUnit == pixelsPerUnit_)
-        return;
-
-    pixelsPerUnit_ = Max(pixelsPerUnit, 1.0f);
-
-    MarkAllDrawable2DDirty();
-    Node::MarkNetworkUpdate();
 }
 
 void Scene::AddRequiredPackageFile(PackageFile* package)

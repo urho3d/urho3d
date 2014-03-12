@@ -75,6 +75,8 @@ template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* 
 
 static void RegisterDrawable2D(asIScriptEngine* engine)
 {
+    engine->RegisterGlobalProperty("const float PIXEL_SIZE", (void*)&PIXEL_SIZE);
+    
     RegisterDrawable2D<Drawable2D>(engine, "Drawable2D");
 }
 
