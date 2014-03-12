@@ -49,11 +49,11 @@ public:
     /// Set sensor (trigger).
     void SetSensor(bool sensor);
     /// Set filter category bits.
-    void SetCategoryBits(unsigned short categoryBits);
+    void SetCategoryBits(int categoryBits);
     /// Set filter mask bits.
-    void SetMaskBits(unsigned short maskBits);
+    void SetMaskBits(int maskBits);
     /// Set filter group index.
-    void SetGroupIndex(short groupIndex);
+    void SetGroupIndex(int groupIndex);
     /// Set density.
     void SetDensity(float density);
     /// Set friction.
@@ -84,11 +84,11 @@ public:
     /// Return sensor (trigger).
     bool IsSensor() const { return fixtureDef_.isSensor; }
     /// Return filter category bits.
-    unsigned short GetCategoryBits() const { return fixtureDef_.filter.categoryBits; }
+    int GetCategoryBits() const { return fixtureDef_.filter.categoryBits; }
     /// Return filter mask bits.
-    unsigned short GetMaskBits() const { return fixtureDef_.filter.maskBits; }
+    int GetMaskBits() const { return fixtureDef_.filter.maskBits; }
     /// Return filter group index.
-    short GetGroupIndex() const { return fixtureDef_.filter.groupIndex; }
+    int GetGroupIndex() const { return fixtureDef_.filter.groupIndex; }
     /// Return density.
     float GetDensity() const { return fixtureDef_.density; }
     /// Return friction.

@@ -54,6 +54,16 @@ CollisionShape2D::~CollisionShape2D()
 void CollisionShape2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionShape2D>(URHO2D_CATEGORY);
+
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_BOOL, "Sensor", IsSensor, SetSensor, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Category Bits", GetCategoryBits, SetCategoryBits, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Mask Bits", GetMaskBits, SetMaskBits, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Group Index", GetGroupIndex, SetGroupIndex, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_FLOAT, "Density", GetDensity, SetDensity, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, 0.2f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, 0.0f, AM_DEFAULT);
+
+    COPY_BASE_ATTRIBUTES(CollisionShape2D, Component);
 }
 
 void CollisionShape2D::OnSetEnabled()
@@ -87,7 +97,7 @@ void CollisionShape2D::SetSensor(bool sensor)
     MarkNetworkUpdate();
 }
 
-void CollisionShape2D::SetCategoryBits(unsigned short categoryBits)
+void CollisionShape2D::SetCategoryBits(int categoryBits)
 {
     if (fixtureDef_.filter.categoryBits == categoryBits)
         return;
@@ -102,7 +112,7 @@ void CollisionShape2D::SetCategoryBits(unsigned short categoryBits)
     MarkNetworkUpdate();
 }
 
-void CollisionShape2D::SetMaskBits(unsigned short maskBits)
+void CollisionShape2D::SetMaskBits(int maskBits)
 {
     if (fixtureDef_.filter.maskBits == maskBits)
         return;
@@ -117,7 +127,7 @@ void CollisionShape2D::SetMaskBits(unsigned short maskBits)
     MarkNetworkUpdate();
 }
 
-void CollisionShape2D::SetGroupIndex(short groupIndex)
+void CollisionShape2D::SetGroupIndex(int groupIndex)
 {
     if (fixtureDef_.filter.groupIndex == groupIndex)
         return;

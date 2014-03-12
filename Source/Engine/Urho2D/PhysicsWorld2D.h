@@ -86,13 +86,13 @@ public:
     /// Set sub stepping.
     void SetSubStepping(bool enable);
     /// Set gravity.
-    void SetGravity(const Vector2& gravity);
+    void SetGravity(Vector2 gravity);
     /// Set auto clear forces.
     void SetAutoClearForces(bool enable);
     /// Set velocity iterations.
-    void SetVelocityIterations(unsigned velocityIterations);
+    void SetVelocityIterations(int velocityIterations);
     /// Set position iterations.
-    void SetPositionIterations(unsigned positionIterations);
+    void SetPositionIterations(int positionIterations);
     /// Add rigid body.
     void AddRigidBody(RigidBody2D* rigidBody);
     /// Remove rigid body.
@@ -128,11 +128,11 @@ public:
     /// Return auto clear forces.
     bool GetAutoClearForces() const;
     /// Return gravity.
-    const Vector2& GetGravity() const { return gravity_; }
+    Vector2 GetGravity() const { return gravity_; }
     /// Return velocity iterations.
-    unsigned GetVelocityIterations() const { return velocityIterations_; }
+    int GetVelocityIterations() const { return velocityIterations_; }
     /// Return position iterations.
-    unsigned GetPositionIterations() const { return positionIterations_; }
+    int GetPositionIterations() const { return positionIterations_; }
 
     /// Return the Box2D physics world.
     b2World* GetWorld() { return world_; }
@@ -154,9 +154,9 @@ private:
     /// Gravity.
     Vector2 gravity_;
     /// Velocity iterations.
-    unsigned velocityIterations_;
+    int velocityIterations_;
     /// Position iterations.
-    unsigned positionIterations_;
+    int positionIterations_;
 
     /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
     WeakPtr<Scene> scene_;

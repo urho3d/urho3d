@@ -58,7 +58,19 @@ RigidBody2D::~RigidBody2D()
 void RigidBody2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody2D>(URHO2D_CATEGORY);
+
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_VECTOR2, "Mass Center", GetMassCenter, SetMassCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Fixed Rotation", IsFixedRotation, SetFixedRotation, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Gravity Scale", GetGravityScale, SetGravityScale, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_VECTOR2, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
+
+    COPY_BASE_ATTRIBUTES(RigidBody2D, Component);
 }
+
 
 void RigidBody2D::OnSetEnabled()
 {
@@ -128,7 +140,7 @@ void RigidBody2D::SetInertia(float inertia)
     MarkNetworkUpdate();
 }
 
-void RigidBody2D::SetMassCenter(const Vector2& center)
+void RigidBody2D::SetMassCenter(Vector2 center)
 {
     b2Vec2 b2Center = ToB2Vec2(center);
     if (massData_.center == b2Center)
@@ -270,7 +282,7 @@ void RigidBody2D::SetAwake(bool awake)
     MarkNetworkUpdate();
 }
 
-void RigidBody2D::SetLinearVelocity(const Vector2& linearVelocity)
+void RigidBody2D::SetLinearVelocity(Vector2 linearVelocity)
 {
     b2Vec2 b2linearVelocity = ToB2Vec2(linearVelocity);
     if (bodyDef_.linearVelocity == b2linearVelocity)

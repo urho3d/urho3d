@@ -62,7 +62,7 @@ public:
     /// Set inertia.
     void SetInertia(float inertia);
     /// Set mass center.
-    void SetMassCenter(const Vector2& center);
+    void SetMassCenter(Vector2 center);
     /// Use fixture mass (default is true).
     void SetUseFixtureMass(bool useFixtureMass);
     /// Set linear damping.
@@ -80,7 +80,7 @@ public:
     /// Set awake.
     void SetAwake(bool awake);
     /// Set linear velocity.
-    void SetLinearVelocity(const Vector2& linearVelocity);
+    void SetLinearVelocity(Vector2 linearVelocity);
     /// Set angular velocity.
     void SetAngularVelocity(float angularVelocity);
     /// Apply force.

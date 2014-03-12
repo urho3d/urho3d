@@ -37,10 +37,11 @@ namespace Urho3D
 {
 
 extern const char* SUBSYSTEM_CATEGORY;
+static const Vector2 DEFAULT_GRAVITY(0.0f, -9.81f);
 
 PhysicsWorld2D::PhysicsWorld2D(Context* context) : Component(context),
     world_(0),
-    gravity_(0.0f, -9.81f),
+    gravity_(DEFAULT_GRAVITY),
     velocityIterations_(8),
     positionIterations_(3),
     debugRenderer_(0),
@@ -74,6 +75,22 @@ PhysicsWorld2D::~PhysicsWorld2D()
 void PhysicsWorld2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld2D>(SUBSYSTEM_CATEGORY);
+
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Shape", GetDrawShape, SetDrawShape, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Joint", GetDrawJoint, SetDrawJoint, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Aabb", GetDrawAabb, SetDrawAabb, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Pair", GetDrawPair, SetDrawPair, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw CenterOfMass", GetDrawCenterOfMass, SetDrawCenterOfMass, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Allow Sleeping", GetAllowSleeping, SetAllowSleeping, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, false, AM_DEFAULT);
+
+    COPY_BASE_ATTRIBUTES(PhysicsWorld2D, Component);
 }
 
 void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -275,7 +292,7 @@ void PhysicsWorld2D::SetSubStepping(bool enable)
     world_->SetSubStepping(enable);
 }
 
-void PhysicsWorld2D::SetGravity(const Vector2& gravity)
+void PhysicsWorld2D::SetGravity(Vector2 gravity)
 {
     gravity_ = gravity;
 
@@ -287,12 +304,12 @@ void PhysicsWorld2D::SetAutoClearForces(bool enable)
     world_->SetAutoClearForces(enable);
 }
 
-void PhysicsWorld2D::SetVelocityIterations(unsigned velocityIterations)
+void PhysicsWorld2D::SetVelocityIterations(int velocityIterations)
 {
     velocityIterations_ = velocityIterations;
 }
 
-void PhysicsWorld2D::SetPositionIterations(unsigned positionIterations)
+void PhysicsWorld2D::SetPositionIterations(int positionIterations)
 {
     positionIterations_ = positionIterations;
 }
