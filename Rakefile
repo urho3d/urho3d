@@ -133,6 +133,15 @@ task :travis_ci_package_upload do
   # Determine the upload location
   if ENV['RELEASE_TAG'].empty?
     upload_dir = '/home/frs/project/urho3d/Urho3D/Snapshots'
+    # Only keep the snapshots from the last 30 revisions
+    if ENV['SITE_UPDATE']
+      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31
+cd #{upload_dir}
+ls -1t
+bye
+EOF
+); do echo rm #{upload_dir}/${v}*; done |sftp -b - urho-travis-ci@frs.sourceforge.net" or abort 'Failed to housekeep snapshots'
+    end
   else
     upload_dir = "/home/frs/project/urho3d/Urho3D/#{ENV['RELEASE_TAG']}"
     # Make sure the release directory exists remotely
