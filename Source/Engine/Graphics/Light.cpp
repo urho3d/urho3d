@@ -228,6 +228,8 @@ void Light::UpdateBatches(const FrameInfo& frame)
 
 void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
+    Color color = GetEffectiveColor();
+    
     if (debug && IsEnabledEffective())
     {
         switch (lightType_)
@@ -240,18 +242,18 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                     for (short j = -1; j < 2; ++j)
                     {
                         Vector3 offset = Vector3::UP * (5.f * i) + Vector3::RIGHT * (5.f * j);
-                        debug->AddSphere(Sphere(start + offset, 0.1f), color_, depthTest);
-                        debug->AddLine(start + offset, end + offset, color_, depthTest);
+                        debug->AddSphere(Sphere(start + offset, 0.1f), color, depthTest);
+                        debug->AddLine(start + offset, end + offset, color, depthTest);
                     }
             }
             break;
 
         case LIGHT_SPOT:
-            debug->AddFrustum(GetFrustum(), color_, depthTest);
+            debug->AddFrustum(GetFrustum(), color, depthTest);
             break;
 
         case LIGHT_POINT:
-            debug->AddSphere(Sphere(node_->GetWorldPosition(), range_), color_, depthTest);
+            debug->AddSphere(Sphere(node_->GetWorldPosition(), range_), color, depthTest);
             break;
         }
     }
