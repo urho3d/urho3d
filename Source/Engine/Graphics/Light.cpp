@@ -472,10 +472,22 @@ void Light::OnWorldBoundingBoxUpdate()
 void Light::SetIntensitySortValue(float distance)
 {
     // When sorting lights globally, give priority to directional lights so that they will be combined into the ambient pass
-    if (lightType_ != LIGHT_DIRECTIONAL)
-        sortValue_ = Max(distance, M_MIN_NEARCLIP) / GetIntensityDivisor();
+    if (!IsNegative())
+    {
+        if (lightType_ != LIGHT_DIRECTIONAL)
+            sortValue_ = Max(distance, M_MIN_NEARCLIP) / GetIntensityDivisor();
+        else
+            sortValue_ = M_EPSILON / GetIntensityDivisor();
+    }
     else
-        sortValue_ = M_EPSILON / GetIntensityDivisor();
+    {
+        // Give extra priority to negative lights in the global sorting order so that they're handled first, right after ambient.
+        // Positive lights are added after them
+        if (lightType_ != LIGHT_DIRECTIONAL)
+            sortValue_ = -Max(distance, M_MIN_NEARCLIP) * GetIntensityDivisor();
+        else
+            sortValue_ = -M_LARGE_VALUE * GetIntensityDivisor();
+    }
 }
 
 void Light::SetIntensitySortValue(const BoundingBox& box)
