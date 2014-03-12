@@ -41,7 +41,8 @@ class Color
     void Invert(bool invertAlpha = false);
     Color Lerp(const Color& rhs, float t) const;
     Color Abs() const;
-    
+    bool Equals(const Color& rhs) const;
+
     String ToString() const;
     
     float r_ @ r;

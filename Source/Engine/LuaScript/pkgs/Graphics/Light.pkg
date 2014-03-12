@@ -34,6 +34,7 @@ class Light : public Drawable
     void SetPerVertex(bool enable);
     void SetColor(const Color& color);
     void SetSpecularIntensity(float intensity);
+    void SetBrightness(float brightness);
     void SetRange(float range);
     void SetFov(float fov);
     void SetAspectRatio(float aspectRatio);
@@ -52,6 +53,9 @@ class Light : public Drawable
     bool GetPerVertex() const;
     const Color& GetColor() const;
     float GetSpecularIntensity() const;
+    float GetBrightness() const;
+    Color GetEffectiveColor() const;
+    float GetEffectiveSpecularIntensity() const;
     float GetRange() const;
     float GetFov() const;
     float GetAspectRatio() const;
@@ -72,6 +76,7 @@ class Light : public Drawable
     tolua_property__get_set bool perVertex;
     tolua_property__get_set Color& color;
     tolua_property__get_set float specularIntensity;
+    tolua_property__get_set float brightness;
     tolua_property__get_set float range;
     tolua_property__get_set float fov;
     tolua_property__get_set float aspectRatio;
@@ -87,4 +92,6 @@ class Light : public Drawable
     tolua_property__get_set Texture* shapeTexture;
     tolua_readonly tolua_property__get_set Frustum frustum;
     tolua_readonly tolua_property__is_set bool negative;
+    tolua_readonly tolua_property__get_set Color effectiveColor;
+    tolua_readonly tolua_property__get_set float effectiveSpecularIntensity;
 };

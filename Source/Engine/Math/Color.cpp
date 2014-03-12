@@ -235,14 +235,10 @@ float Color::Hue(float min, float max) const
         return 0.0f;
 
     // Calculate and return hue
-    if (Equals(g_, max))
-    {
+    if (Urho3D::Equals(g_, max))
         return (b_ + 2.0f*chroma - r_) / (6.0f * chroma);
-    }
-    else if (Equals(b_, max))
-    {
+    else if (Urho3D::Equals(b_, max))
         return (4.0f * chroma - g_ + r_) / (6.0f * chroma);
-    }
     else
     {
         float r = (g_ - b_) / (6.0f * chroma);

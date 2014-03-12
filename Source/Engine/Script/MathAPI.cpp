@@ -1145,6 +1145,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Color", "void Invert(bool)", asMETHOD(Color, Invert), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color Lerp(const Color&in, float) const", asMETHOD(Color, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color Abs() const", asMETHOD(Color, Abs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "bool Equals() const", asMETHOD(Color, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "String ToString() const", asMETHOD(Color, ToString), asCALL_THISCALL);
 
     engine->RegisterObjectProperty("Color", "float r", offsetof(Color, r_));

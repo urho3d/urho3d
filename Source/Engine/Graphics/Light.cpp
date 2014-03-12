@@ -43,6 +43,7 @@ static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
 static const float DEFAULT_RANGE = 10.0f;
 static const float DEFAULT_FOV = 30.0f;
 static const float DEFAULT_SPECULARINTENSITY = 1.0f;
+static const float DEFAULT_BRIGHTNESS = 1.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
 static const float DEFAULT_BIASAUTOADJUST = 1.0f;
@@ -92,6 +93,7 @@ Light::Light(Context* context) :
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
+    brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
     fov_(DEFAULT_FOV),
     aspectRatio_(1.0f),
@@ -116,6 +118,7 @@ void Light::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Light, VAR_COLOR, "Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
@@ -273,6 +276,18 @@ void Light::SetColor(const Color& color)
     MarkNetworkUpdate();
 }
 
+void Light::SetSpecularIntensity(float intensity)
+{
+    specularIntensity_ = Max(intensity, 0.0f);
+    MarkNetworkUpdate();
+}
+
+void Light::SetBrightness(float brightness)
+{
+    brightness_ = brightness;
+    MarkNetworkUpdate();
+}
+
 void Light::SetRange(float range)
 {
     range_ = Max(range, 0.0f);
@@ -297,12 +312,6 @@ void Light::SetAspectRatio(float aspectRatio)
 void Light::SetShadowNearFarRatio(float nearFarRatio)
 {
     shadowNearFarRatio_ = Clamp(nearFarRatio, 0.0f, 0.5f);
-    MarkNetworkUpdate();
-}
-
-void Light::SetSpecularIntensity(float intensity)
-{
-    specularIntensity_ = Max(intensity, 0.0f);
     MarkNetworkUpdate();
 }
 
