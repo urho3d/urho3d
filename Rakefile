@@ -131,6 +131,7 @@ task :travis_ci_package_upload do
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
+  setup_digital_keys
   if ENV['RELEASE_TAG'].empty?
     upload_dir = '/home/frs/project/urho3d/Urho3D/Snapshots'
     # Only keep the snapshots from the last 30 revisions
@@ -151,7 +152,6 @@ bye
 EOF" or abort 'Failed to create release directory remotely'
   end
   # Upload the package
-  setup_digital_keys
   system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
   # Sync readme and license files, just in case they are updated in the repo
   if ENV['SITE_UPDATE']
