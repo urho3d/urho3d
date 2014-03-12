@@ -109,8 +109,10 @@ private:
     typedef Vector<WeakPtr<LuaFunction> > LuaFunctionVector;
     /// Event handle functions.
     HashMap<StringHash, LuaFunctionVector> eventHandleFunctions_;
-    /// Object event handle funcitons.
+    /// Object event handle functions.
     HashMap<Object*, HashMap<StringHash, LuaFunctionVector> > objectHandleFunctions_;
+    /// Internally used events, which should not be unsubscribed from.
+    PODVector<StringHash> internalEvents_;
     /// Flag for executing engine console commands as script code.
     bool executeConsoleCommands_;
 };

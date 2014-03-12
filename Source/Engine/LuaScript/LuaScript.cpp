@@ -111,6 +111,10 @@ LuaScript::LuaScript(Context* context) :
 
     // Subscribe to console commands
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+    
+    // Record the internally handled script functions so that UnsubscribeFromAllEvents doesn't destroy them
+    internalEvents_.Push(E_POSTUPDATE);
+    internalEvents_.Push(E_CONSOLECOMMAND);
 }
 
 LuaScript::~LuaScript()
@@ -196,7 +200,7 @@ void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName, const String
         {
             UnsubscribeFromEvent(eventType);
             eventHandleFunctions_.Erase(i);
-        }   
+        }
     }
 }
 
@@ -204,8 +208,8 @@ void LuaScript::ScriptUnsubscribeFromAllEvents()
 {
     if (eventHandleFunctions_.Empty())
         return;
-
-    UnsubscribeFromAllEvents();
+    
+    UnsubscribeFromAllEventsExcept(internalEvents_, false);
 
     eventHandleFunctions_.Clear();
 }
