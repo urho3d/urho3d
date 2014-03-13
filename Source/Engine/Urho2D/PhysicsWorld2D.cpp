@@ -28,7 +28,7 @@
 #include "PhysicsWorld2D.h"
 #include "Profiler.h"
 #include "RigidBody2D.h"
-#include "scene.h"
+#include "Scene.h"
 #include "SceneEvents.h"
 
 #include "DebugNew.h"
