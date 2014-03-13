@@ -37,11 +37,11 @@ namespace Urho3D
 {
 
 extern const char* SUBSYSTEM_CATEGORY;
-static const Vector2 DEFAULT_GRAVITY(0.0f, -9.81f);
+static const Vector2 DEFAULT_GRAVITY_2D(0.0f, -9.81f);
 
 PhysicsWorld2D::PhysicsWorld2D(Context* context) : Component(context),
     world_(0),
-    gravity_(DEFAULT_GRAVITY),
+    gravity_(DEFAULT_GRAVITY_2D),
     velocityIterations_(8),
     positionIterations_(3),
     debugRenderer_(0),
@@ -85,7 +85,7 @@ void PhysicsWorld2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, false, AM_DEFAULT);
