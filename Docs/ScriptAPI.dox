@@ -1061,6 +1061,54 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 
 
+### CollisionShape2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint16 categoryBits
+- float density
+- bool enabled
+- bool enabledEffective // readonly
+- float friction
+- int16 groupIndex
+- uint id // readonly
+- float inertia // readonly
+- uint16 maskBits
+- float mass // readonly
+- Vector2 massCenter // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
+- float restitution
+- bool sensor
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
 ### Color
 
 Methods:
@@ -1069,6 +1117,7 @@ Methods:
 - float Average() const
 - float Chroma() const
 - void Clip(bool)
+- bool Equals() const
 - void FromHSL(float, float, float, float)
 - void FromHSV(float, float, float, float)
 - float Hue() const
@@ -2454,10 +2503,13 @@ Properties:
 - Variant[] attributes
 - ShortStringHash baseType // readonly
 - BoundingBox boundingBox // readonly
+- float brightness
 - bool castShadows
 - String category // readonly
 - Color color
 - float drawDistance
+- Color effectiveColor // readonly
+- float effectiveSpecularIntensity // readonly
 - bool enabled
 - bool enabledEffective // readonly
 - float fadeDistance
@@ -3844,6 +3896,57 @@ Properties:
 - int weakRefs // readonly
 
 
+### PhysicsWorld2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- bool allowSleeping
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- bool autoClearForces
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool continuousPhysics
+- bool drawAabb
+- bool drawCenterOfMass
+- bool drawJoint
+- bool drawPair
+- bool drawShape
+- bool enabled
+- bool enabledEffective // readonly
+- Vector2 gravity
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint positionIterations
+- int refs // readonly
+- bool subStepping
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint velocityIterations
+- bool warmStarting
+- int weakRefs // readonly
+
+
 ### Plane
 
 Methods:
@@ -4304,6 +4407,62 @@ Properties:
 - int weakRefs // readonly
 
 
+### RigidBody2D
+
+Methods:
+
+- void ApplyAngularImpulse(float, bool)
+- void ApplyAttributes()
+- void ApplyForce(const Vector2&, const Vector2&, bool)
+- void ApplyForceToCenter(const Vector2&, bool)
+- void ApplyLinearImpulse(const Vector2&, const Vector2&, bool)
+- void ApplyTorque(float, bool)
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- bool allowSleep
+- float angularDamping
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- bool awake
+- ShortStringHash baseType // readonly
+- BodyType2D bodyType
+- bool bullet
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- bool fixedRotation
+- float gravityScale
+- uint id // readonly
+- float inertia
+- float linearDamping
+- Vector2 linearVelocity
+- float mass
+- Vector2 massCenter
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- bool useFixtureMass
+- int weakRefs // readonly
+
+
 ### Scene
 
 Methods:
@@ -4409,7 +4568,6 @@ Properties:
 - Octree@ octree // readonly
 - Node@ parent
 - PhysicsWorld@ physicsWorld // readonly
-- float pixelsPerUnit
 - Vector3 position
 - int refs // readonly
 - PackageFile@[]@ requiredPackageFiles // readonly
@@ -7436,6 +7594,13 @@ Properties:
 - BLEND_SUBTRACTALPHA
 
 
+### BodyType2D
+
+- BT_STATIC
+- BT_DYNAMIC
+- BT_KINEMATIC
+
+
 ### CollisionEventMode
 
 - COLLISION_NEVER
@@ -7825,6 +7990,7 @@ Properties:
 - bool IsAlpha(uint)
 - bool IsDigit(uint)
 - bool IsNaN(float)
+- bool IsPowerOfTwo(uint)
 - String Join(String[]&, const String&)
 - float Lerp(float, float, float)
 - void MarkNetworkUpdate()
@@ -7833,6 +7999,7 @@ Properties:
 - float Min(float, float)
 - int Min(int, int)
 - float Mod(float, float)
+- uint NextPowerOfTwo(uint)
 - void OpenConsoleWindow()
 - float Pow(float, float)
 - void Print(bool, bool = false)
@@ -7852,6 +8019,7 @@ Properties:
 - void Remove()
 - String RemoveTrailingSlash(const String&)
 - String ReplaceExtension(const String&, const String&)
+- uint SDBMHash(uint, uint8)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRandomSeed(uint)
 - float Sign(float)
@@ -8037,6 +8205,7 @@ Properties:
 - uint M_MIN_UNSIGNED
 - float M_PI
 - float M_RADTODEG
+- float PIXEL_SIZE
 - int QUALITY_HIGH
 - int QUALITY_LOW
 - int QUALITY_MAX

@@ -621,6 +621,41 @@ Properties:
 - BoundingBox worldBoundingBox (readonly)
 - ResourceRef modelAttr
 
+### CollisionShape2D : Component
+
+Methods:
+
+- void SetSensor(bool sensor)
+- void SetCategoryBits(short categoryBits)
+- void SetMaskBits(short maskBits)
+- void SetGroupIndex(short groupIndex)
+- void SetDensity(float density)
+- void SetFriction(float friction)
+- void SetRestitution(float restitution)
+- bool IsSensor() const
+- short GetCategoryBits() const
+- short GetMaskBits() const
+- short GetGroupIndex() const
+- float GetDensity() const
+- float GetFriction() const
+- float GetRestitution() const
+- float GetMass() const
+- float GetInertia() const
+- Vector2 GetMassCenter() const
+
+Properties:
+
+- bool sensor
+- short categoryBits
+- short maskBits
+- short groupIndex
+- float density
+- float friction
+- float restitution
+- float mass (readonly)
+- float inertia (readonly)
+- Vector2 massCenter (readonly)
+
 ### Color
 
 
@@ -663,6 +698,7 @@ Methods:
 - void Invert(bool invertAlpha = false)
 - Color Lerp(const Color& rhs, float t) const
 - Color Abs() const
+- bool Equals(const Color& rhs) const
 - String ToString() const
 
 Properties:
@@ -1711,6 +1747,7 @@ Methods:
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
 - void SetSpecularIntensity(float intensity)
+- void SetBrightness(float brightness)
 - void SetRange(float range)
 - void SetFov(float fov)
 - void SetAspectRatio(float aspectRatio)
@@ -1728,6 +1765,9 @@ Methods:
 - bool GetPerVertex() const
 - const Color& GetColor() const
 - float GetSpecularIntensity() const
+- float GetBrightness() const
+- Color GetEffectiveColor() const
+- float GetEffectiveSpecularIntensity() const
 - float GetRange() const
 - float GetFov() const
 - float GetAspectRatio() const
@@ -1750,6 +1790,7 @@ Properties:
 - bool perVertex
 - Color& color
 - float specularIntensity
+- float brightness
 - float range
 - float fov
 - float aspectRatio
@@ -1765,6 +1806,8 @@ Properties:
 - Texture* shapeTexture
 - Frustum frustum (readonly)
 - bool negative (readonly)
+- Color effectiveColor (readonly)
+- float effectiveSpecularIntensity (readonly)
 
 ### LineEdit : BorderImage
 
@@ -2771,6 +2814,54 @@ Properties:
 - float maxNetworkAngularVelocity
 - bool applyingTransforms
 
+### PhysicsWorld2D : Component
+
+Methods:
+
+- void SetDrawShape(bool drawShape)
+- void SetDrawJoint(bool drawJoint)
+- void SetDrawAabb(bool drawAabb)
+- void SetDrawPair(bool drawPair)
+- void SetDrawCenterOfMass(bool drawCenterOfMass)
+- void SetAllowSleeping(bool enable)
+- void SetWarmStarting(bool enable)
+- void SetContinuousPhysics(bool enable)
+- void SetSubStepping(bool enable)
+- void SetGravity(Vector2 gravity)
+- void SetAutoClearForces(bool enable)
+- void SetVelocityIterations(unsigned velocityIterations)
+- void SetPositionIterations(unsigned positionIterations)
+- void DrawDebugGeometry()
+- bool GetDrawShape() const
+- bool GetDrawJoint() const
+- bool GetDrawAabb() const
+- bool GetDrawPair() const
+- bool GetDrawCenterOfMass() const
+- bool GetAllowSleeping() const
+- bool GetWarmStarting() const
+- bool GetContinuousPhysics() const
+- bool GetSubStepping() const
+- bool GetAutoClearForces() const
+- Vector2 GetGravity() const
+- unsigned GetVelocityIterations() const
+- unsigned GetPositionIterations() const
+
+Properties:
+
+- bool drawShape
+- bool drawJoint
+- bool drawAabb
+- bool drawPair
+- bool drawCenterOfMass
+- bool allowSleeping
+- bool warmStarting
+- bool continuousPhysics
+- bool subStepping
+- bool autoClearForces
+- Vector2 gravity
+- unsigned velocityIterations
+- unsigned positionIterations
+
 ### Plane
 
 
@@ -3354,6 +3445,59 @@ Properties:
 - unsigned collisionMask
 - CollisionEventMode collisionEventMode
 
+### RigidBody2D : Component
+
+Methods:
+
+- void SetBodyType(BodyType2D bodyType)
+- void SetMass(float mass)
+- void SetInertia(float inertia)
+- void SetMassCenter(const Vector2& center)
+- void SetUseFixtureMass(bool useFixtureMass)
+- void SetLinearDamping(float linearDamping)
+- void SetAngularDamping(float angularDamping)
+- void SetAllowSleep(bool allowSleep)
+- void SetFixedRotation(bool fixedRotation)
+- void SetBullet(bool bullet)
+- void SetGravityScale(float gravityScale)
+- void SetAwake(bool awake)
+- void SetLinearVelocity(const Vector2& linearVelocity)
+- void SetAngularVelocity(float angularVelocity)
+- void ApplyForce(const Vector2& force, const Vector2& point, bool wake)
+- void ApplyForceToCenter(const Vector2& force, bool wake)
+- void ApplyTorque(float torque, bool wake)
+- void ApplyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake)
+- void ApplyAngularImpulse(float impulse, bool wake)
+- BodyType2D GetBodyType() const
+- float GetMass() const
+- float GetInertia() const
+- Vector2 GetMassCenter() const
+- bool GetUseFixtureMass() const
+- float GetLinearDamping() const
+- float GetAngularDamping() const
+- bool IsAllowSleep() const
+- bool IsFixedRotation() const
+- bool IsBullet() const
+- float GetGravityScale() const
+- bool IsAwake() const
+- Vector2 GetLinearVelocity() const
+
+Properties:
+
+- BodyType2D bodyType
+- float mass
+- float inertia
+- Vector2 massCenter
+- bool useFixtureMass
+- float linearDamping
+- float angularDamping
+- bool allowSleep
+- bool fixedRotation
+- bool bullet
+- float gravityScale
+- bool awake
+- Vector2 linearVelocity
+
 ### Scene : Node
 
 Methods:
@@ -3382,7 +3526,6 @@ Methods:
 - void SetUpdateEnabled(bool enable)
 - void SetTimeScale(float scale)
 - void SetElapsedTime(float time)
-- void SetPixelsPerUnit(float pixelsPerUnit)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
 - Node* GetNode(unsigned id) const
@@ -3393,7 +3536,6 @@ Methods:
 - unsigned GetChecksum() const
 - float GetTimeScale() const
 - float GetElapsedTime() const
-- float GetPixelsPerUnit() const
 - float GetSmoothingConstant() const
 - float GetSnapThreshold() const
 - const String GetVarName(ShortStringHash hash) const
@@ -3425,7 +3567,6 @@ Properties:
 - unsigned checksum (readonly)
 - float timeScale
 - float elapsedTime
-- float pixelsPerUnit
 - float smoothingConstant
 - float snapThreshold
 - bool threadedUpdate (readonly)
@@ -5254,6 +5395,12 @@ Properties:
 - int BLEND_SUBTRACTALPHA
 - int MAX_BLENDMODES
 
+### BodyType2D
+
+- int BT_STATIC
+- int BT_DYNAMIC
+- int BT_KINEMATIC
+
 ### CollisionEventMode
 
 - int COLLISION_NEVER
@@ -5759,9 +5906,11 @@ Properties:
 - bool IsAlpha(unsigned ch)
 - bool IsDigit(unsigned ch)
 - bool IsNaN(float value)
+- bool IsPowerOfTwo(unsigned value)
 - float Lerp(float lhs, float rhs, float t)
 - float Max(float lhs, float rhs)
 - float Min(float lhs, float rhs)
+- unsigned NextPowerOfTwo(unsigned value)
 - void OpenConsoleWindow()
 - void PrintLine(const String str, bool error = false)
 - int Rand()
@@ -5769,18 +5918,19 @@ Properties:
 - float Random(float range)
 - float Random()
 - float Random(float min, float max)
-- int RandomInt(int range)
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
+- unsigned SDBMHash(unsigned hash, char c)
 - void SendEvent(const String eventName, VariantMap& eventData)
 - void SetExecuteConsoleCommands(bool enable)
 - void SetRandomSeed(unsigned seed)
 - float Sign(float value)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
 - void SubscribeToEvent(const String eventName, const String functionName)
+- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)
@@ -6009,6 +6159,7 @@ Properties:
 - float M_RADTODEG
 - unsigned NUM_FRUSTUM_PLANES
 - unsigned NUM_FRUSTUM_VERTICES
+- float PIXEL_SIZE
 - int QUALITY_HIGH
 - int QUALITY_LOW
 - int QUALITY_MAX
