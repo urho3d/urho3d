@@ -932,7 +932,7 @@ A technique definition looks like this:
     <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow"
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
-        blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha" 
+        blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal"
         depthwrite="true|false" 
         alphamask="true|false" />
@@ -1121,7 +1121,7 @@ In OpenGL post-processing shaders it is important to distinguish between samplin
 
 \page Lights Lights and shadows
 
-Lights in Urho3D can be directional, point, or spot lights. Shadow mapping is supported for all light types.
+Lights in Urho3D can be directional, point, or spot lights, either per-pixel or per-vertex. Shadow mapping is supported for all per-pixel lights.
 
 A directional light's position has no effect, as it's assumed to be infinitely far away, only its rotation matters. It casts orthographically projected shadows. For increasing the shadow quality, cascaded shadow mapping (splitting the view into several shadow maps along the Z-axis) can be used.
 
@@ -1129,7 +1129,19 @@ Point lights are spherical in shape. When a point light casts shadows, it will b
 
 Spot lights have FOV & aspect ratio values like cameras to define the shape of the light cone.
 
-Both point and spot lights use an attenuation ramp texture to determine how the intensity varies with distance. In addition they have a shape texture, 2D for spot lights, and an optional cube texture for point lights. It is important that the spot light's shape texture has black at the borders, and has mipmapping disabled, otherwise there will be "bleeding" artifacts at the edges of the light cone.
+Both point and spot lights in per-pixel mode use an attenuation ramp texture to determine how the intensity varies with distance. In addition they have a shape texture, 2D for spot lights, and an optional cube texture for point lights. It is important that the spot light's shape texture has black at the borders, and has mipmapping disabled, otherwise there will be "bleeding" artifacts at the edges of the light cone.
+
+Per-vertex mode is enabled on a light by calling \ref Light::SetPerVertex "SetPerVertex()". Per-vertex lights are evaluated during each object's ambient light and fog calculations and can be substantially faster than per-pixel lights. There is currently a maximum of 4 per-vertex lights for each object; if this number is exceeded, only the brightest per-vertex lights affecting the object will be rendered.
+
+\section Lights_LightColor Light color
+
+A light's color and strength are controlled by three values: \ref Light::SetColor "color", \ref Light::SetSpecularIntensity "specular intensity", and \ref Light::SetBrightness "brightness multiplier".
+
+The brightness multiplier is applied to both the color and specular intensity to yield final values used in rendering. This can be used to implement fades or flickering without affecting the original color.
+
+A specular intensity of 0 disables specular calculations from a per-pixel light, resulting in faster GPU calculations. Per-vertex lights never use specular calculations.
+
+Negative (subtractive) lights can be achieved by setting either the color components or the brightness multiplier to a negative value. These can be used to locally reduce the ambient light level, for example to create a dark cave. Negative per-pixel lights will not work in light pre-pass rendering mode, as it uses a light accumulation buffer with a black initial value, so there is nothing to subtract from.
 
 \section Lights_LightCulling Light culling
 

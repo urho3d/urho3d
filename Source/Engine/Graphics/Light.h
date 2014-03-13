@@ -177,9 +177,9 @@ public:
     void SetPerVertex(bool enable);
     /// Set color.
     void SetColor(const Color& color);
-    /// Set specular intensity.
+    /// Set specular intensity. Zero disables specular calculations.
     void SetSpecularIntensity(float intensity);
-    /// Set light brightness multiplier.
+    /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this to get final values for rendering.
     void SetBrightness(float brightness);
     /// Set range.
     void SetRange(float range);
