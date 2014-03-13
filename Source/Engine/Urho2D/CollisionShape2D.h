@@ -93,6 +93,10 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
+    /// Apply Node world scale.
+    virtual void ApplyNodeWorldScale() = 0;
     
     /// Rigid body.
     WeakPtr<RigidBody2D> rigidBody_;
@@ -100,6 +104,8 @@ protected:
     b2FixtureDef fixtureDef_;
     /// Box2D fixture.
     b2Fixture* fixture_;
+    /// Cached world scale.
+    Vector3 cachedWorldScale_;
 };
 
 }

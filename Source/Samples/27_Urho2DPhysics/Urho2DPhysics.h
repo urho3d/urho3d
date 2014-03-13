@@ -31,6 +31,9 @@ namespace Urho3D
 }
 
 /// Urho2D physics sample.
+/// This sample demonstrates:
+///     - Creating both static and moving 2D physics objects to a scene
+///     - Displaying physics debug geometry
 class Urho2DPhysics : public Sample
 {
     OBJECT(Urho2DPhysics);
@@ -55,6 +58,8 @@ private:
     void SubscribeToEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle scene post update event.
+    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Scene.
     SharedPtr<Scene> scene_;

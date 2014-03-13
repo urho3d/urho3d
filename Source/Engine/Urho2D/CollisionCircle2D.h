@@ -20,45 +20,50 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "AnimatedSprite2D.h"
-#include "Animation2D.h"
-#include "CollisionBox2D.h"
-#include "CollisionCircle2D.h"
-#include "CollisionShape2D.h"
-#include "Drawable2D.h"
-#include "ParticleEmitter2D.h"
-#include "ParticleModel2D.h"
-#include "PhysicsWorld2D.h"
-#include "RigidBody2D.h"
-#include "Sprite2D.h"
-#include "SpriteSheet2D.h"
-#include "StaticSprite2D.h"
+#pragma once
 
-#include "DebugNew.h"
+#include "CollisionShape2D.h"
 
 namespace Urho3D
 {
 
-const char* URHO2D_CATEGORY = "Urho2D";
-
-void RegisterUrho2DLibrary(Context* context)
+/// 2D circle collision component.
+class URHO3D_API CollisionCircle2D : public CollisionShape2D
 {
-    // Must register objects from base to derived order
-    Drawable2D::RegisterObject(context);
-    StaticSprite2D::RegisterObject(context);
-    AnimatedSprite2D::RegisterObject(context);
-    Animation2D::RegisterObject(context);
-    ParticleEmitter2D::RegisterObject(context);
-    ParticleModel2D::RegisterObject(context);
-    Sprite2D::RegisterObject(context);
-    SpriteSheet2D::RegisterObject(context);
+    OBJECT(CollisionCircle2D);
 
-    PhysicsWorld2D::RegisterObject(context);
-    RigidBody2D::RegisterObject(context);
-    CollisionShape2D::RegisterObject(context);
-    CollisionBox2D::RegisterObject(context);
-    CollisionCircle2D::RegisterObject(context);
-}
+public:
+    /// Construct.
+    CollisionCircle2D(Context* scontext);
+    /// Destruct.
+    virtual ~CollisionCircle2D();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
+
+    /// Set radius.
+    void SetRadius(float radius);
+    /// Set center.
+    void SetCenter(const Vector2& center);
+    /// Set center.
+    void SetCenter(float x, float y);
+
+    /// Return radius.
+    float GetRadius() const { return radius_; }
+    /// Return center.
+    const Vector2& GetCenter() const { return center_; }
+
+private:
+    /// Apply node world scale.
+    virtual void ApplyNodeWorldScale();
+    /// Recreate fixture.
+    void RecreateFixture();
+
+    /// Circle shape.
+    b2CircleShape circleShape_;
+    /// Radius.
+    float radius_;
+    /// Center.
+    Vector2 center_;
+};
 
 }

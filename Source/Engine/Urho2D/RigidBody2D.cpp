@@ -447,11 +447,13 @@ void RigidBody2D::OnMarkedDirty(Node* node)
 
     // Check if transform has changed from the last one set in ApplyWorldTransform()
     b2Vec2 newPosition = ToB2Vec2(node_->GetWorldPosition());
-    if (bodyDef_.position != newPosition)
+    float newAngle = node->GetWorldRotation().RollAngle() * M_DEGTORAD;
+    if (newPosition != bodyDef_.position || newAngle != bodyDef_.angle)
     {
         bodyDef_.position = newPosition;
+        bodyDef_.angle = newAngle;
         if (body_)
-            body_->SetTransform(newPosition, 0.0f);
+            body_->SetTransform(newPosition, newAngle);
     }
 }
 
