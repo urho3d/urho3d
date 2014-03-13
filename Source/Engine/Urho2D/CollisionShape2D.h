@@ -63,8 +63,6 @@ public:
 
     /// Create fixture.
     void CreateFixture();
-    /// Update fixture.
-    void UpdateFixture();
     /// Release fixture.
     void ReleaseFixture();
 
@@ -91,8 +89,6 @@ public:
 
     /// Return fixture.
     b2Fixture* GetFixture() const { return fixture_;}
-    /// Return is fixture dirty.
-    bool IsFixtureDirty() const { return fixtureDirty_; }
 
 protected:
     /// Handle node being assigned.
@@ -104,8 +100,6 @@ protected:
     b2FixtureDef fixtureDef_;
     /// Box2D fixture.
     b2Fixture* fixture_;
-    /// Shape dirty.
-    bool fixtureDirty_;
 };
 
 }

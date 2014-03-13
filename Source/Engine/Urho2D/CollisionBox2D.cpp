@@ -52,7 +52,7 @@ void CollisionBox2D::RegisterObject(Context* context)
 
     REF_ACCESSOR_ATTRIBUTE(CollisionBox2D, VAR_VECTOR2, "Size", GetSize, SetSize, Vector2, DEFAULT_BOX_SIZE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionBox2D, VAR_VECTOR2, "Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    
+
     COPY_BASE_ATTRIBUTES(CollisionBox2D, CollisionShape2D);
 }
 
@@ -91,7 +91,7 @@ void CollisionBox2D::SetCenter(float x, float y)
 void CollisionBox2D::RecreateFixture()
 {
     ReleaseFixture();
-    
+
     if (center_ == Vector2::ZERO)
         boxShape_.SetAsBox(size_.x_ * 0.5f, size_.y_ * 0.5f);
     else

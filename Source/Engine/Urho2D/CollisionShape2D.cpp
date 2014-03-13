@@ -36,8 +36,7 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 
 CollisionShape2D::CollisionShape2D(Context* context) : Component(context), 
-    fixture_(0),
-    fixtureDirty_(true)
+    fixture_(0)
 {
 
 }
@@ -86,11 +85,9 @@ void CollisionShape2D::SetSensor(bool sensor)
 
     fixtureDef_.isSensor = sensor;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetSensor(sensor);
-    else
-        fixtureDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -101,11 +98,9 @@ void CollisionShape2D::SetCategoryBits(int categoryBits)
 
     fixtureDef_.filter.categoryBits = categoryBits;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    else
-        fixtureDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -116,10 +111,8 @@ void CollisionShape2D::SetMaskBits(int maskBits)
 
     fixtureDef_.filter.maskBits = maskBits;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    else
-        fixtureDirty_ = true;
 
     MarkNetworkUpdate();
 }
@@ -131,10 +124,8 @@ void CollisionShape2D::SetGroupIndex(int groupIndex)
 
     fixtureDef_.filter.groupIndex = groupIndex;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    else
-        fixtureDirty_ = true;
 
     MarkNetworkUpdate();
 }
@@ -146,10 +137,14 @@ void CollisionShape2D::SetDensity(float density)
 
     fixtureDef_.density = density;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
+    {
+        // This will not automatically adjust the mass of the body
         fixture_->SetDensity(density);
-    else
-        fixtureDirty_ = true;
+
+        if (rigidBody_->GetUseFixtureMass())
+            rigidBody_->GetBody()->ResetMassData();
+    }
 
     MarkNetworkUpdate();
 }
@@ -161,10 +156,21 @@ void CollisionShape2D::SetFriction(float friction)
 
     fixtureDef_.friction = friction;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
+    {
+        // This will not change the friction of existing contacts
         fixture_->SetFriction(friction);
-    else
-        fixtureDirty_ = true;
+
+        b2ContactEdge* contractEdge = rigidBody_->GetBody()->GetContactList();
+        while (contractEdge)
+        {
+            b2Contact* contact = contractEdge->contact;
+            if (contact->GetFixtureA() == fixture_ || contact->GetFixtureB() == fixture_)
+                contractEdge->contact->ResetFriction();
+
+            contractEdge = contractEdge->next;
+        }
+    }
 
     MarkNetworkUpdate();
 }
@@ -176,10 +182,21 @@ void CollisionShape2D::SetRestitution(float restitution)
 
     fixtureDef_.restitution = restitution;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
+    {
+        // This will not change the restitution of existing contacts
         fixture_->SetRestitution(restitution);
-    else
-        fixtureDirty_ = true;
+
+        b2ContactEdge* contractEdge = rigidBody_->GetBody()->GetContactList();
+        while (contractEdge)
+        {
+            b2Contact* contact = contractEdge->contact;
+            if (contact->GetFixtureA() == fixture_ || contact->GetFixtureB() == fixture_)
+                contractEdge->contact->ResetRestitution();
+
+            contractEdge = contractEdge->next;
+        }
+    }
 
     MarkNetworkUpdate();
 }
@@ -201,17 +218,6 @@ void CollisionShape2D::CreateFixture()
 
     fixture_ = body->CreateFixture(&fixtureDef_);
     fixture_->SetUserData(this);
-}
-
-void CollisionShape2D::UpdateFixture()
-{
-    if (!fixtureDirty_)
-        return;
-
-    ReleaseFixture();
-    CreateFixture();
-
-    fixtureDirty_ = false;
 }
 
 void CollisionShape2D::ReleaseFixture()
@@ -271,7 +277,10 @@ void CollisionShape2D::OnNodeSet(Node* node)
     {
         rigidBody_ = node->GetComponent<RigidBody2D>();
         if (rigidBody_)
+        {
+            CreateFixture();
             rigidBody_->AddCollisionShape2D(this);
+        }
         else
             LOGERROR("No right body component in node, can not create collision shape");
     }

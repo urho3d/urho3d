@@ -96,8 +96,6 @@ public:
 
     /// Create body.
     void CreateBody();
-    /// Update body.
-    void UpdateBody();
     /// Release body.
     void ReleaseBody();
     
@@ -156,8 +154,6 @@ private:
     bool useFixtureMass_; 
     /// Box2D body.
     b2Body* body_;
-    /// Body dirty.
-    bool bodyDirty_;
     /// Collision shapes.
     Vector<WeakPtr<CollisionShape2D> > collisionShapes_;
 };
