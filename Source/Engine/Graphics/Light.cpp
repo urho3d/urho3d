@@ -238,13 +238,15 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             {
                 Vector3 start = node_->GetWorldPosition();
                 Vector3 end = start + node_->GetWorldDirection() * 10.f;
-                for (short i = -1; i < 2; ++i)
-                    for (short j = -1; j < 2; ++j)
+                for (int i = -1; i < 2; ++i)
+                {
+                    for (int j = -1; j < 2; ++j)
                     {
                         Vector3 offset = Vector3::UP * (5.f * i) + Vector3::RIGHT * (5.f * j);
                         debug->AddSphere(Sphere(start + offset, 0.1f), color, depthTest);
                         debug->AddLine(start + offset, end + offset, color, depthTest);
                     }
+                }
             }
             break;
 
