@@ -21,7 +21,7 @@
 //
 
 #include "Camera.h"
-#include "CollisionShape2D.h"
+#include "CollisionBox2D.h"
 #include "CoreEvents.h"
 #include "DebugRenderer.h"
 #include "Engine.h"
@@ -101,8 +101,8 @@ void Urho2DPhysics::CreateScene()
     groundNode->SetPosition(Vector3(0.0f, -3.0f, 0.0f));
     RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
 
-    CollisionShape2D* groundShape = groundNode->CreateComponent<CollisionShape2D>();
-    groundShape->SetBox(Vector2(10.0f, 0.05f));
+    CollisionBox2D* groundShape = groundNode->CreateComponent<CollisionBox2D>();
+    groundShape->SetSize(Vector2(20.0f, 0.1f));
     groundShape->SetFriction(0.5f);
 
     for (unsigned i = 0; i < 100; ++i)
@@ -114,8 +114,8 @@ void Urho2DPhysics::CreateScene()
         RigidBody2D* boxBody = boxNode->CreateComponent<RigidBody2D>();
         boxBody->SetBodyType(BT_DYNAMIC);
 
-        CollisionShape2D* boxShape = boxNode->CreateComponent<CollisionShape2D>();
-        boxShape->SetBox(Vector2(0.16f, 0.16f));
+        CollisionBox2D* boxShape = boxNode->CreateComponent<CollisionBox2D>();
+        boxShape->SetSize(Vector2(0.32f, 0.32f));
         // Set the box density to be non-zero, so it will be dynamic.
         boxShape->SetDensity(1.0f);
         // Override the default friction.

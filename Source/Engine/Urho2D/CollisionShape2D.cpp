@@ -48,13 +48,10 @@ CollisionShape2D::~CollisionShape2D()
         rigidBody_->RemoveCollisionShape2D(this);
 
     ReleaseFixture();
-    ReleaseFixtureShape();
 }
 
 void CollisionShape2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionShape2D>(URHO2D_CATEGORY);
-
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_BOOL, "Sensor", IsSensor, SetSensor, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Category Bits", GetCategoryBits, SetCategoryBits, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Mask Bits", GetMaskBits, SetMaskBits, int, 0, AM_DEFAULT);
@@ -187,98 +184,12 @@ void CollisionShape2D::SetRestitution(float restitution)
     MarkNetworkUpdate();
 }
 
-void CollisionShape2D::SetCircle(float radius, const Vector2& center)
-{
-    ReleaseFixtureShape();
-
-    b2CircleShape* shape = new b2CircleShape;
-    shape->m_radius = radius;
-    shape->m_p = ToB2Vec2(center);
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetBox(const Vector2& halfSize, const Vector2& center)
-{
-    ReleaseFixtureShape();
-
-    b2PolygonShape* shape = new b2PolygonShape;
-    if (center == Vector2::ZERO)
-        shape->SetAsBox(halfSize.x_, halfSize.y_);
-    else
-        shape->SetAsBox(halfSize.x_, halfSize.y_, ToB2Vec2(center), 0.0f);
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetBox(float halfWidth, float halfHeight, const Vector2& center)
-{
-    SetBox(Vector2(halfWidth, halfHeight), center);
-}
-
-void CollisionShape2D::SetChain(const PODVector<Vector2>& vertices)
-{
-    ReleaseFixtureShape();
-
-    unsigned count = vertices.Size();
-    if (!count)
-        return;
-    
-    b2ChainShape* shape = new b2ChainShape;
-    b2Vec2* points = new b2Vec2[count];
-    for (unsigned i = 0; i < count; ++i)
-        points[i] = ToB2Vec2(vertices[i]);
-    shape->CreateChain(points, count);
-    delete [] points;
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetPolygon(const PODVector<Vector2>& vertices)
-{
-    ReleaseFixtureShape();
-
-    unsigned count = Min(b2_maxPolygonVertices, vertices.Size());
-    if (!count)
-        return;
-
-    b2PolygonShape* shape = new b2PolygonShape;
-    b2Vec2* points = new b2Vec2[count];
-    for (unsigned i = 0; i < count; ++i)
-        points[i] = ToB2Vec2(vertices[i]);
-    shape->Set(points, count);
-    delete [] points;
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetEdge(const Vector2& vertex1, const Vector2& vertex2)
-{
-    ReleaseFixtureShape();
-
-    b2EdgeShape* shape = new b2EdgeShape;
-    shape->Set(ToB2Vec2(vertex1), ToB2Vec2(vertex2));
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
 void CollisionShape2D::CreateFixture()
 {
     if (fixture_)
+        return;
+
+    if (!fixtureDef_.shape)
         return;
 
     if (!rigidBody_)
@@ -317,14 +228,6 @@ void CollisionShape2D::ReleaseFixture()
 
     body->DestroyFixture(fixture_);
     fixture_ = 0;
-}
-
-void CollisionShape2D::ReleaseFixtureShape()
-{
-    if (!fixtureDef_.shape)
-        return;
-    delete fixtureDef_.shape;
-    fixtureDef_.shape = 0;
 }
 
 float CollisionShape2D::GetMass() const
