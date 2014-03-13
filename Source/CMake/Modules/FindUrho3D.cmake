@@ -130,7 +130,7 @@ else ()
 
     if (URHO3D_INCLUDE_DIRS)
         set (BASE_DIR ${URHO3D_INCLUDE_DIRS})
-        set (DIRS Box2D Bullet kNet SDL)
+        set (DIRS Bullet kNet SDL)
         if (ENABLE_ANGELSCRIPT)
             list (APPEND DIRS AngelScript)
         endif ()

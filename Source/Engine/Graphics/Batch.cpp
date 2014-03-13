@@ -178,7 +178,9 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     Graphics* graphics = view->GetGraphics();
     Renderer* renderer = view->GetRenderer();
     Node* cameraNode = camera_ ? camera_->GetNode() : 0;
-    
+    Light* light = lightQueue_ ? lightQueue_->light_ : 0;
+    Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : 0;
+
     // Set pass / material-specific renderstates
     if (pass_ && material_)
     {
@@ -186,8 +188,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         
         BlendMode blend = pass_->GetBlendMode();
         // Turn additive blending into subtract if the light is negative
-        bool hasNegativeLight = lightQueue_ && lightQueue_->light_ && lightQueue_->light_->IsNegative();
-        if (hasNegativeLight)
+        if (light && light->IsNegative())
         {
             if (blend == BLEND_ADD)
                 blend = BLEND_SUBTRACT;
@@ -367,13 +368,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     }
     
     // Set light-related shader parameters
-    Light* light = 0;
-    Texture2D* shadowMap = 0;
     if (lightQueue_)
     {
-        light = lightQueue_->light_;
-        shadowMap = lightQueue_->shadowMap_;
-        
         if (graphics->NeedParameterUpdate(SP_VERTEXLIGHTS, lightQueue_) && graphics->HasShaderParameter(VS, VSP_VERTEXLIGHTS))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
@@ -411,7 +407,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                 if (vertexLight->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
                     fade = Min(1.0f - (vertexLight->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
                 
-                Color color = vertexLight->GetColor() * fade;
+                Color color = vertexLight->GetEffectiveColor() * fade;
                 vertexLights[i * 3] = Vector4(color.r_, color.g_, color.b_, invRange);
                 
                 // Direction
@@ -494,7 +490,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             fade = Min(1.0f - (light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
         
         // Negative lights will use subtract blending, so write absolute RGB values to the shader parameter
-        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor().Abs(), light->GetSpecularIntensity()) * fade);
+        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetEffectiveColor().Abs(),
+            light->GetEffectiveSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
         graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4((isLightVolume ? (lightNode->GetWorldPosition() -
             cameraEffectivePos) : lightNode->GetWorldPosition()), atten));

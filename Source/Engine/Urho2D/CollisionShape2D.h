@@ -61,23 +61,8 @@ public:
     /// Set restitution .
     void SetRestitution(float restitution);
 
-    /// Set circle.
-    void SetCircle(float radius, const Vector2& center = Vector2::ZERO);
-    /// Set box.
-    void SetBox(const Vector2& halfSize, const Vector2& center = Vector2::ZERO);
-    /// Set box.
-    void SetBox(float halfWidth, float halfHeight, const Vector2& center = Vector2::ZERO);
-    /// Set chain.
-    void SetChain(const PODVector<Vector2>& vertices);
-    /// Set polygon.
-    void SetPolygon(const PODVector<Vector2>& vertices);
-    /// Set edge.
-    void SetEdge(const Vector2& vertex1, const Vector2& vertex2);
-    
     /// Create fixture.
     void CreateFixture();
-    /// Update fixture.
-    void UpdateFixture();
     /// Release fixture.
     void ReleaseFixture();
 
@@ -104,23 +89,17 @@ public:
 
     /// Return fixture.
     b2Fixture* GetFixture() const { return fixture_;}
-    /// Return is fixture dirty.
-    bool IsFixtureDirty() const { return fixtureDirty_; }
 
-private:
+protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Release fixture shape.
-    void ReleaseFixtureShape();
-
+    
     /// Rigid body.
     WeakPtr<RigidBody2D> rigidBody_;
     /// Fixture def.
     b2FixtureDef fixtureDef_;
     /// Box2D fixture.
     b2Fixture* fixture_;
-    /// Shape dirty.
-    bool fixtureDirty_;
 };
 
 }

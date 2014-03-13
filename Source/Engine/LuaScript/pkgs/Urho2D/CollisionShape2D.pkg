@@ -10,13 +10,6 @@ class CollisionShape2D : Component
     void SetFriction(float friction);
     void SetRestitution(float restitution);
 
-    void SetCircle(float radius, const Vector2& center = Vector2::ZERO);
-    void SetBox(const Vector2& halfSize, const Vector2& center = Vector2::ZERO);
-    void SetBox(float halfWidth, float halfHeight, const Vector2& center = Vector2::ZERO);
-    void SetChain(const PODVector<Vector2>& vertices);
-    void SetPolygon(const PODVector<Vector2>& vertices);
-    void SetEdge(const Vector2& vertex1, const Vector2& vertex2);
-
     bool IsSensor() const;
     unsigned short GetCategoryBits() const;
     unsigned short GetMaskBits() const;

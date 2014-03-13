@@ -36,8 +36,7 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 
 CollisionShape2D::CollisionShape2D(Context* context) : Component(context), 
-    fixture_(0),
-    fixtureDirty_(true)
+    fixture_(0)
 {
 
 }
@@ -48,13 +47,10 @@ CollisionShape2D::~CollisionShape2D()
         rigidBody_->RemoveCollisionShape2D(this);
 
     ReleaseFixture();
-    ReleaseFixtureShape();
 }
 
 void CollisionShape2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionShape2D>(URHO2D_CATEGORY);
-
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_BOOL, "Sensor", IsSensor, SetSensor, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Category Bits", GetCategoryBits, SetCategoryBits, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Mask Bits", GetMaskBits, SetMaskBits, int, 0, AM_DEFAULT);
@@ -89,11 +85,9 @@ void CollisionShape2D::SetSensor(bool sensor)
 
     fixtureDef_.isSensor = sensor;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetSensor(sensor);
-    else
-        fixtureDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -104,11 +98,9 @@ void CollisionShape2D::SetCategoryBits(int categoryBits)
 
     fixtureDef_.filter.categoryBits = categoryBits;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    else
-        fixtureDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -119,10 +111,8 @@ void CollisionShape2D::SetMaskBits(int maskBits)
 
     fixtureDef_.filter.maskBits = maskBits;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    else
-        fixtureDirty_ = true;
 
     MarkNetworkUpdate();
 }
@@ -134,10 +124,8 @@ void CollisionShape2D::SetGroupIndex(int groupIndex)
 
     fixtureDef_.filter.groupIndex = groupIndex;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    else
-        fixtureDirty_ = true;
 
     MarkNetworkUpdate();
 }
@@ -149,10 +137,14 @@ void CollisionShape2D::SetDensity(float density)
 
     fixtureDef_.density = density;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
+    {
+        // This will not automatically adjust the mass of the body
         fixture_->SetDensity(density);
-    else
-        fixtureDirty_ = true;
+
+        if (rigidBody_->GetUseFixtureMass())
+            rigidBody_->GetBody()->ResetMassData();
+    }
 
     MarkNetworkUpdate();
 }
@@ -164,10 +156,21 @@ void CollisionShape2D::SetFriction(float friction)
 
     fixtureDef_.friction = friction;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
+    {
+        // This will not change the friction of existing contacts
         fixture_->SetFriction(friction);
-    else
-        fixtureDirty_ = true;
+
+        b2ContactEdge* contractEdge = rigidBody_->GetBody()->GetContactList();
+        while (contractEdge)
+        {
+            b2Contact* contact = contractEdge->contact;
+            if (contact->GetFixtureA() == fixture_ || contact->GetFixtureB() == fixture_)
+                contractEdge->contact->ResetFriction();
+
+            contractEdge = contractEdge->next;
+        }
+    }
 
     MarkNetworkUpdate();
 }
@@ -179,106 +182,31 @@ void CollisionShape2D::SetRestitution(float restitution)
 
     fixtureDef_.restitution = restitution;
 
-    if (fixture_ && !fixtureDirty_)
+    if (fixture_)
+    {
+        // This will not change the restitution of existing contacts
         fixture_->SetRestitution(restitution);
-    else
-        fixtureDirty_ = true;
 
-    MarkNetworkUpdate();
-}
+        b2ContactEdge* contractEdge = rigidBody_->GetBody()->GetContactList();
+        while (contractEdge)
+        {
+            b2Contact* contact = contractEdge->contact;
+            if (contact->GetFixtureA() == fixture_ || contact->GetFixtureB() == fixture_)
+                contractEdge->contact->ResetRestitution();
 
-void CollisionShape2D::SetCircle(float radius, const Vector2& center)
-{
-    ReleaseFixtureShape();
+            contractEdge = contractEdge->next;
+        }
+    }
 
-    b2CircleShape* shape = new b2CircleShape;
-    shape->m_radius = radius;
-    shape->m_p = ToB2Vec2(center);
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetBox(const Vector2& halfSize, const Vector2& center)
-{
-    ReleaseFixtureShape();
-
-    b2PolygonShape* shape = new b2PolygonShape;
-    if (center == Vector2::ZERO)
-        shape->SetAsBox(halfSize.x_, halfSize.y_);
-    else
-        shape->SetAsBox(halfSize.x_, halfSize.y_, ToB2Vec2(center), 0.0f);
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetBox(float halfWidth, float halfHeight, const Vector2& center)
-{
-    SetBox(Vector2(halfWidth, halfHeight), center);
-}
-
-void CollisionShape2D::SetChain(const PODVector<Vector2>& vertices)
-{
-    ReleaseFixtureShape();
-
-    unsigned count = vertices.Size();
-    if (!count)
-        return;
-    
-    b2ChainShape* shape = new b2ChainShape;
-    b2Vec2* points = new b2Vec2[count];
-    for (unsigned i = 0; i < count; ++i)
-        points[i] = ToB2Vec2(vertices[i]);
-    shape->CreateChain(points, count);
-    delete [] points;
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetPolygon(const PODVector<Vector2>& vertices)
-{
-    ReleaseFixtureShape();
-
-    unsigned count = Min(b2_maxPolygonVertices, vertices.Size());
-    if (!count)
-        return;
-
-    b2PolygonShape* shape = new b2PolygonShape;
-    b2Vec2* points = new b2Vec2[count];
-    for (unsigned i = 0; i < count; ++i)
-        points[i] = ToB2Vec2(vertices[i]);
-    shape->Set(points, count);
-    delete [] points;
-
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void CollisionShape2D::SetEdge(const Vector2& vertex1, const Vector2& vertex2)
-{
-    ReleaseFixtureShape();
-
-    b2EdgeShape* shape = new b2EdgeShape;
-    shape->Set(ToB2Vec2(vertex1), ToB2Vec2(vertex2));
-    fixtureDef_.shape = shape;
-
-    fixtureDirty_ = true;
     MarkNetworkUpdate();
 }
 
 void CollisionShape2D::CreateFixture()
 {
     if (fixture_)
+        return;
+
+    if (!fixtureDef_.shape)
         return;
 
     if (!rigidBody_)
@@ -290,17 +218,6 @@ void CollisionShape2D::CreateFixture()
 
     fixture_ = body->CreateFixture(&fixtureDef_);
     fixture_->SetUserData(this);
-}
-
-void CollisionShape2D::UpdateFixture()
-{
-    if (!fixtureDirty_)
-        return;
-
-    ReleaseFixture();
-    CreateFixture();
-
-    fixtureDirty_ = false;
 }
 
 void CollisionShape2D::ReleaseFixture()
@@ -317,14 +234,6 @@ void CollisionShape2D::ReleaseFixture()
 
     body->DestroyFixture(fixture_);
     fixture_ = 0;
-}
-
-void CollisionShape2D::ReleaseFixtureShape()
-{
-    if (!fixtureDef_.shape)
-        return;
-    delete fixtureDef_.shape;
-    fixtureDef_.shape = 0;
 }
 
 float CollisionShape2D::GetMass() const
@@ -368,7 +277,10 @@ void CollisionShape2D::OnNodeSet(Node* node)
     {
         rigidBody_ = node->GetComponent<RigidBody2D>();
         if (rigidBody_)
+        {
+            CreateFixture();
             rigidBody_->AddCollisionShape2D(this);
+        }
         else
             LOGERROR("No right body component in node, can not create collision shape");
     }

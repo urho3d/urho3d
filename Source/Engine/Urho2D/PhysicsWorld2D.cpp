@@ -28,7 +28,7 @@
 #include "PhysicsWorld2D.h"
 #include "Profiler.h"
 #include "RigidBody2D.h"
-#include "scene.h"
+#include "Scene.h"
 #include "SceneEvents.h"
 
 #include "DebugNew.h"
@@ -408,11 +408,6 @@ void PhysicsWorld2D::OnNodeSet(Node* node)
 void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace SceneSubsystemUpdate;
-
-    for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
-        if (rigidBodies_[i])
-            rigidBodies_[i]->UpdateBody();
-
     Update(eventData[P_TIMESTEP].GetFloat());
 
     DrawDebugGeometry();

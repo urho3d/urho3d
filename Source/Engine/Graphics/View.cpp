@@ -228,7 +228,9 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
             {
                 Light* light = static_cast<Light*>(drawable);
-                result.lights_.Push(light);
+                // Skip lights with zero brightness or black color
+                if (!light->GetEffectiveColor().Equals(Color::BLACK))
+                    result.lights_.Push(light);
             }
         }
     }

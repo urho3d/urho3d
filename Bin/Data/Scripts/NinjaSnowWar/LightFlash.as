@@ -10,7 +10,7 @@ class LightFlash : GameObject
     void FixedUpdate(float timeStep)
     {
         Light@ light = node.GetComponent("Light");
-        light.color = light.color * Max(1.0 - timeStep * 10.0, 0.0);
+        light.brightness = light.brightness * Max(1.0 - timeStep * 10.0, 0.0);
 
         // Call superclass to handle lifetime
         GameObject::FixedUpdate(timeStep);

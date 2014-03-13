@@ -179,6 +179,8 @@ public:
     void SetColor(const Color& color);
     /// Set specular intensity.
     void SetSpecularIntensity(float intensity);
+    /// Set light brightness multiplier.
+    void SetBrightness(float brightness);
     /// Set range.
     void SetRange(float range);
     /// Set spotlight field of view.
@@ -214,6 +216,12 @@ public:
     const Color& GetColor() const { return color_; }
     /// Return specular intensity.
     float GetSpecularIntensity() const { return specularIntensity_; }
+    /// Return brightness multiplier.
+    float GetBrightness() const { return brightness_; }
+    /// Return effective color, multiplied by brightness. Do not multiply the alpha so that can compare against the default black color to detect a light with no effect.
+    Color GetEffectiveColor() const { return Color(color_ * brightness_, 1.0f); }
+    /// Return effective specular intensity, multiplied by absolute value of brightness.
+    float GetEffectiveSpecularIntensity() const { return specularIntensity_ * Abs(brightness_); }
     /// Return range.
     float GetRange() const { return range_; }
     /// Return spotlight field of view.
@@ -243,7 +251,7 @@ public:
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
     /// Return whether light has negative (darkening) color.
-    bool IsNegative() const { return color_.SumRGB() < 0.0f; }
+    bool IsNegative() const { return GetEffectiveColor().SumRGB() < 0.0f; }
     
     /// Set sort value based on intensity and view distance.
     void SetIntensitySortValue(float distance);
@@ -258,7 +266,7 @@ public:
     /// Return light queue. Called by View.
     LightBatchQueue* GetLightQueue() const { return lightQueue_; }
     /// Return a divisor value based on intensity for calculating the sort value.
-    float GetIntensityDivisor(float attenuation = 1.0f) const { return Max(color_.SumRGB(), 0.0f) * attenuation + M_EPSILON; }
+    float GetIntensityDivisor(float attenuation = 1.0f) const { return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + M_EPSILON; }
     
     /// Set ramp texture attribute.
     void SetRampTextureAttr(ResourceRef value);
@@ -294,6 +302,8 @@ private:
     LightBatchQueue* lightQueue_;
     /// Specular intensity.
     float specularIntensity_;
+    /// Brightness multiplier.
+    float brightness_;
     /// Range.
     float range_;
     /// Spotlight field of view.

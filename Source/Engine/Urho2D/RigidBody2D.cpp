@@ -37,8 +37,7 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 
 RigidBody2D::RigidBody2D(Context* context) : Component(context),
-    body_(0), 
-    bodyDirty_(true),
+    body_(0),
     useFixtureMass_(true)
 {
     massData_.mass = 0.0f;
@@ -80,9 +79,7 @@ void RigidBody2D::OnSetEnabled()
 
     if (body_)
         body_->SetActive(enabled);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -96,9 +93,7 @@ void RigidBody2D::SetBodyType(BodyType2D type)
 
     if (body_)
         body_->SetType(bodyType);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -110,13 +105,8 @@ void RigidBody2D::SetMass(float mass)
 
     massData_.mass = mass;
 
-    if (useFixtureMass_)
-    {
-        if (body_)
-            body_->SetMassData(&massData_);
-        else
-            bodyDirty_ = true;
-    }
+    if (useFixtureMass_ && body_)
+        body_->SetMassData(&massData_);
 
     MarkNetworkUpdate();
 }
@@ -129,13 +119,8 @@ void RigidBody2D::SetInertia(float inertia)
 
     massData_.I = inertia;
 
-    if (useFixtureMass_)
-    {
-        if (body_)
-            body_->SetMassData(&massData_);
-        else
-            bodyDirty_ = true;
-    }
+    if (useFixtureMass_ && body_)
+        body_->SetMassData(&massData_);
 
     MarkNetworkUpdate();
 }
@@ -148,13 +133,8 @@ void RigidBody2D::SetMassCenter(Vector2 center)
 
     massData_.center = b2Center;
 
-    if (useFixtureMass_)
-    {
-        if (body_)
-            body_->SetMassData(&massData_);
-        else
-            bodyDirty_ = true;
-    }
+    if (useFixtureMass_ && body_)
+        body_->SetMassData(&massData_);
 
     MarkNetworkUpdate();
 }
@@ -186,9 +166,7 @@ void RigidBody2D::SetLinearDamping(float linearDamping)
 
     if (body_)
         body_->SetLinearDamping(linearDamping);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -201,9 +179,7 @@ void RigidBody2D::SetAngularDamping(float angularDamping)
 
     if (body_)
         body_->SetAngularDamping(angularDamping);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -216,9 +192,7 @@ void RigidBody2D::SetAllowSleep(bool allowSleep)
 
     if (body_)
         body_->SetSleepingAllowed(allowSleep);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -231,9 +205,7 @@ void RigidBody2D::SetFixedRotation(bool fixedRotation)
 
     if (body_)
         body_->SetFixedRotation(fixedRotation);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -246,9 +218,7 @@ void RigidBody2D::SetBullet(bool bullet)
 
     if (body_)
         body_->SetBullet(bullet);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -261,9 +231,7 @@ void RigidBody2D::SetGravityScale(float gravityScale)
 
     if (body_)
         body_->SetGravityScale(gravityScale);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -276,9 +244,7 @@ void RigidBody2D::SetAwake(bool awake)
 
     if (body_)
         body_->SetAwake(awake);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -292,9 +258,7 @@ void RigidBody2D::SetLinearVelocity(Vector2 linearVelocity)
 
     if (body_)
         body_->SetLinearVelocity(b2linearVelocity);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -307,9 +271,7 @@ void RigidBody2D::SetAngularVelocity(float angularVelocity)
 
     if (body_)
         body_->SetAngularVelocity(angularVelocity);
-    else
-        bodyDirty_ = true;
-
+    
     MarkNetworkUpdate();
 }
 
@@ -356,43 +318,10 @@ void RigidBody2D::CreateBody()
 
     for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
         if (collisionShapes_[i])
-            collisionShapes_[i]->ReleaseFixture();
+            collisionShapes_[i]->CreateFixture();
 
     if (!useFixtureMass_)
         body_->SetMassData(&massData_);
-}
-
-void RigidBody2D::UpdateBody()
-{
-    bool shapeDirty = false;
-    for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
-    {
-        if (collisionShapes_[i]->IsFixtureDirty())
-        {
-            shapeDirty = true;
-            break;
-        }
-    }
-
-    if (!bodyDirty_ || !shapeDirty)
-        return;
-
-    if (bodyDirty_)
-    {
-        for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
-            collisionShapes_[i]->ReleaseFixture();
-        ReleaseBody();
-
-        CreateBody();
-        for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
-            collisionShapes_[i]->CreateFixture();
-        bodyDirty_ = false;
-    }
-    else
-    {
-        for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
-            collisionShapes_[i]->UpdateFixture();
-    }
 }
 
 void RigidBody2D::ReleaseBody()
@@ -494,7 +423,10 @@ void RigidBody2D::OnNodeSet(Node* node)
         Scene* scene = GetScene();
         physicsWorld_ = scene->GetComponent<PhysicsWorld2D>();
         if (physicsWorld_)
+        {
+            CreateBody();
             physicsWorld_->AddRigidBody(this);
+        }
         else
             LOGERROR("No physic world component in scene, can not create rigid body");
     }
@@ -520,8 +452,6 @@ void RigidBody2D::OnMarkedDirty(Node* node)
         bodyDef_.position = newPosition;
         if (body_)
             body_->SetTransform(newPosition, 0.0f);
-        else
-            bodyDirty_ = true;
     }
 }
 

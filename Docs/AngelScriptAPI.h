@@ -1255,6 +1255,67 @@ int weakRefs;
 BoundingBox worldBoundingBox;
 };
 
+class CollisionShape2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+uint16 categoryBits;
+float density;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float friction;
+int16 groupIndex;
+/* readonly */
+uint id;
+/* readonly */
+float inertia;
+uint16 maskBits;
+/* readonly */
+float mass;
+/* readonly */
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int refs;
+float restitution;
+bool sensor;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class Color
 {
 // Methods:
@@ -1262,6 +1323,7 @@ Color Abs() const;
 float Average() const;
 float Chroma() const;
 void Clip(bool);
+bool Equals() const;
 void FromHSL(float, float, float, float);
 void FromHSV(float, float, float, float);
 float Hue() const;
@@ -2951,11 +3013,16 @@ Array<Variant> attributes;
 ShortStringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
+float brightness;
 bool castShadows;
 /* readonly */
 String category;
 Color color;
 float drawDistance;
+/* readonly */
+Color effectiveColor;
+/* readonly */
+float effectiveSpecularIntensity;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -4613,6 +4680,67 @@ String typeName;
 int weakRefs;
 };
 
+class PhysicsWorld2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+bool allowSleeping;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+bool autoClearForces;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool continuousPhysics;
+bool drawAabb;
+bool drawCenterOfMass;
+bool drawJoint;
+bool drawPair;
+bool drawShape;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+Vector2 gravity;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+uint positionIterations;
+/* readonly */
+int refs;
+bool subStepping;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+uint velocityIterations;
+bool warmStarting;
+/* readonly */
+int weakRefs;
+};
+
 class Plane
 {
 // Methods:
@@ -5123,6 +5251,72 @@ bool useGravity;
 int weakRefs;
 };
 
+class RigidBody2D
+{
+// Methods:
+void ApplyAngularImpulse(float, bool);
+void ApplyAttributes();
+void ApplyForce(const Vector2&, const Vector2&, bool);
+void ApplyForceToCenter(const Vector2&, bool);
+void ApplyLinearImpulse(const Vector2&, const Vector2&, bool);
+void ApplyTorque(float, bool);
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+bool allowSleep;
+float angularDamping;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+bool awake;
+/* readonly */
+ShortStringHash baseType;
+BodyType2D bodyType;
+bool bullet;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+bool fixedRotation;
+float gravityScale;
+/* readonly */
+uint id;
+float inertia;
+float linearDamping;
+Vector2 linearVelocity;
+float mass;
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+bool useFixtureMass;
+/* readonly */
+int weakRefs;
+};
+
 class Scene
 {
 // Methods:
@@ -5244,7 +5438,6 @@ Octree octree;
 Node parent;
 /* readonly */
 PhysicsWorld physicsWorld;
-float pixelsPerUnit;
 Vector3 position;
 /* readonly */
 int refs;
@@ -8865,6 +9058,13 @@ BLEND_SUBTRACT,
 BLEND_SUBTRACTALPHA,
 };
 
+enum BodyType2D
+{
+BT_STATIC,
+BT_DYNAMIC,
+BT_KINEMATIC,
+};
+
 enum CollisionEventMode
 {
 COLLISION_NEVER,
@@ -9255,6 +9455,7 @@ bool IsAbsolutePath(const String&);
 bool IsAlpha(uint);
 bool IsDigit(uint);
 bool IsNaN(float);
+bool IsPowerOfTwo(uint);
 String Join(Array<String>&, const String&);
 float Lerp(float, float, float);
 void MarkNetworkUpdate();
@@ -9263,6 +9464,7 @@ int Max(int, int);
 float Min(float, float);
 int Min(int, int);
 float Mod(float, float);
+uint NextPowerOfTwo(uint);
 void OpenConsoleWindow();
 float Pow(float, float);
 void Print(bool, bool = false);
@@ -9282,6 +9484,7 @@ float RandomNormal(float, float);
 void Remove();
 String RemoveTrailingSlash(const String&);
 String ReplaceExtension(const String&, const String&);
+uint SDBMHash(uint, uint8);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetRandomSeed(uint);
 float Sign(float);
@@ -9469,6 +9672,7 @@ int M_MIN_INT;
 uint M_MIN_UNSIGNED;
 float M_PI;
 float M_RADTODEG;
+float PIXEL_SIZE;
 int QUALITY_HIGH;
 int QUALITY_LOW;
 int QUALITY_MAX;

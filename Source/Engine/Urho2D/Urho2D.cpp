@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "AnimatedSprite2D.h"
 #include "Animation2D.h"
+#include "CollisionBox2D.h"
 #include "CollisionShape2D.h"
 #include "Drawable2D.h"
 #include "ParticleEmitter2D.h"
@@ -55,6 +56,7 @@ void RegisterUrho2DLibrary(Context* context)
     PhysicsWorld2D::RegisterObject(context);
     RigidBody2D::RegisterObject(context);
     CollisionShape2D::RegisterObject(context);
+    CollisionBox2D::RegisterObject(context);
 }
 
 }
