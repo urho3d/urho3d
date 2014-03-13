@@ -37,7 +37,7 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 
 RigidBody2D::RigidBody2D(Context* context) : Component(context),
-    body_(0), 
+    body_(0),
     bodyDirty_(true),
     useFixtureMass_(true)
 {
@@ -356,7 +356,7 @@ void RigidBody2D::CreateBody()
 
     for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
         if (collisionShapes_[i])
-            collisionShapes_[i]->ReleaseFixture();
+            collisionShapes_[i]->CreateFixture();
 
     if (!useFixtureMass_)
         body_->SetMassData(&massData_);
@@ -374,18 +374,13 @@ void RigidBody2D::UpdateBody()
         }
     }
 
-    if (!bodyDirty_ || !shapeDirty)
+    if (!bodyDirty_ && !shapeDirty)
         return;
 
     if (bodyDirty_)
     {
-        for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
-            collisionShapes_[i]->ReleaseFixture();
         ReleaseBody();
-
         CreateBody();
-        for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
-            collisionShapes_[i]->CreateFixture();
         bodyDirty_ = false;
     }
     else
