@@ -177,7 +177,7 @@ The update of each Scene causes further events to be sent:
 - E_SMOOTHINGUPDATE: update SmoothedTransform components in network client scenes.
 - E_SCENEPOSTUPDATE: variable timestep scene post-update. ParticleEmitter and AnimationController update themselves as a response to this event.
 
-Variable timestep logic updates are preferable to fixed timestep, because they are only executed once per frame. In contrast, if the rendering framerate is low, several physics simulation steps will be performed on each frame to keep up the apparent passage if time, and if this also causes a lot of logic code to be executed for each step, the program may bog down further if the CPU can not handle the load. Note that the Engine's \ref Engine::SetMinFps "minimum FPS", by default 10, sets a hard cap for the timestep to prevent spiraling down to a complete halt; if exceeded, animation and physics will instead appear to slow down.
+Variable timestep logic updates are preferable to fixed timestep, because they are only executed once per frame. In contrast, if the rendering framerate is low, several physics simulation steps will be performed on each frame to keep up the apparent passage of time, and if this also causes a lot of logic code to be executed for each step, the program may bog down further if the CPU can not handle the load. Note that the Engine's \ref Engine::SetMinFps "minimum FPS", by default 10, sets a hard cap for the timestep to prevent spiraling down to a complete halt; if exceeded, animation and physics will instead appear to slow down.
 
 \section MainLoop_ApplicationState Main loop and the application activation state
 
