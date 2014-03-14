@@ -43,7 +43,7 @@
 
 DEFINE_APPLICATION_MAIN(Urho2DPhysics)
 
-static const unsigned NUM_OBJECT = 100;
+static const unsigned NUM_OBJECTS = 100;
 
 Urho2DPhysics::Urho2DPhysics(Context* context) : Sample(context)
 {    
@@ -87,9 +87,7 @@ void Urho2DPhysics::CreateScene()
 
     // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
-    // Define the gravity vector.
-    physicsWorld->SetGravity(Vector2(0.0f, -10.0f));
-
+    
     // Create ground.
     Node* groundNode = scene_->CreateChild("Ground");
     groundNode->SetPosition(Vector3(0.0f, -3.0f, 0.0f));
@@ -105,7 +103,7 @@ void Urho2DPhysics::CreateScene()
     // Set friction
     groundShape->SetFriction(0.5f);
 
-    for (unsigned i = 0; i < NUM_OBJECT; ++i)
+    for (unsigned i = 0; i < NUM_OBJECTS; ++i)
     {
         Node* node  = scene_->CreateChild("RigidBody");
         node->SetPosition(Vector3(Random(-0.1f, 0.1f), 5.0f + i * 0.4f, 0.0f));

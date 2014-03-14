@@ -121,7 +121,7 @@ void CollisionBox2D::RecreateFixture()
     if (scaledCenter == Vector2::ZERO && angle_ == 0.0f)
         boxShape_.SetAsBox(halfWidth, halfHeight);
     else
-        boxShape_.SetAsBox(halfWidth, halfHeight, ToB2Vec2(scaledCenter), angle_);
+        boxShape_.SetAsBox(halfWidth, halfHeight, ToB2Vec2(scaledCenter), angle_ * M_DEGTORAD);
 
     CreateFixture();
 }

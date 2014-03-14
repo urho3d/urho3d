@@ -84,7 +84,7 @@ void PhysicsWorld2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, false, AM_DEFAULT);
@@ -291,7 +291,7 @@ void PhysicsWorld2D::SetSubStepping(bool enable)
     world_->SetSubStepping(enable);
 }
 
-void PhysicsWorld2D::SetGravity(Vector2 gravity)
+void PhysicsWorld2D::SetGravity(const Vector2& gravity)
 {
     gravity_ = gravity;
 
