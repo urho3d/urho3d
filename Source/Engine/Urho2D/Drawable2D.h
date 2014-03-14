@@ -66,6 +66,8 @@ public:
 
     /// Return sprite.
     Sprite2D* GetSprite() const { return sprite_; }
+    /// Return texture.
+    Texture2D* GetTexture() const { return sprite_ ? sprite_->GetTexture() : 0; }
     /// Return material.
     Material* GetMaterial() const;
     /// Return blend mode.
