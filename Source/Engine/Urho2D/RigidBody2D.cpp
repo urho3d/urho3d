@@ -50,12 +50,12 @@ template<> BodyType2D Variant::Get<BodyType2D>() const
     return (BodyType2D)GetInt();
 }
 
-RigidBody2D::RigidBody2D(Context* context) : Component(context),
-    body_(0),
-    useFixtureMass_(true)
+RigidBody2D::RigidBody2D(Context* context) :
+    Component(context),
+    massData_(),    // b2MassData structure does not have a constructor so need to zero-initialize all its members
+    useFixtureMass_(true),
+    body_(0)
 {
-    massData_.mass = 0.0f;
-    massData_.I = 0.0f;
 }
 
 RigidBody2D::~RigidBody2D()
