@@ -1187,6 +1187,136 @@ int weakRefs;
 int width;
 };
 
+class CollisionBox2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetCenter(float, float);
+void SetSize(float, float);
+
+// Properties:
+float angle;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+int categoryBits;
+Vector2 center;
+float density;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float friction;
+int groupIndex;
+/* readonly */
+uint id;
+/* readonly */
+float inertia;
+int maskBits;
+/* readonly */
+float mass;
+/* readonly */
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int refs;
+float restitution;
+bool sensor;
+Vector2 size;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class CollisionCircle2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetCenter(float, float);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+int categoryBits;
+Vector2 center;
+float density;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float friction;
+int groupIndex;
+/* readonly */
+uint id;
+/* readonly */
+float inertia;
+int maskBits;
+/* readonly */
+float mass;
+/* readonly */
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+float radius;
+/* readonly */
+int refs;
+float restitution;
+bool sensor;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class CollisionShape
 {
 // Methods:
@@ -1283,18 +1413,18 @@ Array<Variant> attributes;
 ShortStringHash baseType;
 /* readonly */
 String category;
-uint16 categoryBits;
+int categoryBits;
 float density;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 float friction;
-int16 groupIndex;
+int groupIndex;
 /* readonly */
 uint id;
 /* readonly */
 float inertia;
-uint16 maskBits;
+int maskBits;
 /* readonly */
 float mass;
 /* readonly */
@@ -4684,6 +4814,7 @@ class PhysicsWorld2D
 {
 // Methods:
 void ApplyAttributes();
+void DrawDebugGeometry() const;
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
@@ -5438,6 +5569,8 @@ Octree octree;
 Node parent;
 /* readonly */
 PhysicsWorld physicsWorld;
+/* readonly */
+PhysicsWorld2D physicsWorld2D;
 Vector3 position;
 /* readonly */
 int refs;
@@ -9519,6 +9652,7 @@ Network network;
 Node node;
 Octree octree;
 PhysicsWorld physicsWorld;
+PhysicsWorld2D physicsWorld2D;
 Renderer renderer;
 ResourceCache resourceCache;
 Scene scene;
