@@ -93,10 +93,6 @@ void StaticSprite2D::UpdateVertices()
     if (!verticesDirty_)
         return;
 
-    Scene* scene = GetScene();
-    if (!scene)
-        return;
-
     vertices_.Clear();
 
     Texture2D* texture = GetTexture();
