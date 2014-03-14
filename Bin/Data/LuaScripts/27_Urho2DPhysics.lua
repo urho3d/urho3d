@@ -50,6 +50,9 @@ function CreateScene()
     -- Create 2D physics world component
     scene_:CreateComponent("PhysicsWorld2D")
     
+    local boxSprite = cache:GetResource("Sprite2D", "Urho2D/Box.png")
+    local ballSprite = cache:GetResource("Sprite2D", "Urho2D/Ball.png")
+
     -- Create ground.
     local groundNode = scene_:CreateChild("Ground")
     groundNode.position = Vector3(0.0, -3.0, 0.0)
@@ -57,11 +60,14 @@ function CreateScene()
     
     -- Create 2D rigid body for gound
     local groundBody = groundNode:CreateComponent("RigidBody2D")
-    
+
+    local groundSprite = groundNode:CreateComponent("StaticSprite2D")
+    groundSprite.sprite = boxSprite
+
     -- Create box collider for ground
     local groundShape = groundNode:CreateComponent("CollisionBox2D")
     -- Set box size
-    groundShape.size = Vector2(0.1, 0.1)
+    groundShape.size = Vector2(0.32, 0.32)
     -- Set friction
     groundShape.friction = 0.5
     
@@ -74,13 +80,16 @@ function CreateScene()
         local body = node:CreateComponent("RigidBody2D")
         body.bodyType = BT_DYNAMIC
 
+        local staticSprite = node:CreateComponent("StaticSprite2D")
         local shape = nil
         if i % 2 == 0 then
+            staticSprite.sprite = boxSprite
             -- Create box
             shape = node:CreateComponent("CollisionBox2D")
             -- Set size
             shape.size = Vector2(0.32, 0.32)
         else
+            staticSprite.sprite = ballSprite
             -- Create circle
             shape = node:CreateComponent("CollisionCircle2D")
             -- Set radius
@@ -154,7 +163,6 @@ end
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
-    SubscribeToEvent("ScenePostUpdate", "HandleScenePostUpdate")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -166,8 +174,4 @@ function HandleUpdate(eventType, eventData)
 
     -- Update scene
     scene_:Update(timeStep)
-end
-
-function HandleScenePostUpdate(eventType, eventData)
-    scene_:GetComponent("PhysicsWorld2D"):DrawDebugGeometry()
 end

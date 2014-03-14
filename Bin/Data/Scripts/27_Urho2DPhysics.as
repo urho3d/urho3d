@@ -53,6 +53,9 @@ void CreateScene()
     // Create 2D physics world component
     scene_.CreateComponent("PhysicsWorld2D");
     
+    Sprite2D@ boxSprite = cache.GetResource("Sprite2D", "Urho2D/Box.png");
+    Sprite2D@ ballSprite = cache.GetResource("Sprite2D", "Urho2D/Ball.png");
+
     // Create ground.
     Node@ groundNode = scene_.CreateChild("Ground");
     groundNode.position = Vector3(0.0f, -3.0f, 0.0f);
@@ -61,10 +64,13 @@ void CreateScene()
     // Create 2D rigid body for gound
     RigidBody2D@ groundBody = groundNode.CreateComponent("RigidBody2D");
     
+    StaticSprite2D@ groundSprite = groundNode.CreateComponent("StaticSprite2D");
+    groundSprite.sprite = boxSprite;
+
     // Create box collider for ground
     CollisionBox2D@ groundShape = groundNode.CreateComponent("CollisionBox2D");
     // Set box size
-    groundShape.size = Vector2(0.1f, 0.1f);
+    groundShape.size = Vector2(0.32f, 0.32f);
     // Set friction
     groundShape.friction = 0.5f;
 
@@ -78,8 +84,12 @@ void CreateScene()
         RigidBody2D@ body = node.CreateComponent("RigidBody2D");
         body.bodyType = BT_DYNAMIC;
 
+        StaticSprite2D@ staticSprite = node.CreateComponent("StaticSprite2D");
+
         if (i % 2 == 0)
         {
+            staticSprite.sprite = boxSprite;
+
             // Create box
             CollisionBox2D@ box = node.CreateComponent("CollisionBox2D");
             // Set size
@@ -93,6 +103,8 @@ void CreateScene()
         }
         else
         {
+            staticSprite.sprite = ballSprite;
+
             // Create circle
             CollisionCircle2D@ circle = node.CreateComponent("CollisionCircle2D");
             // Set radius
@@ -167,7 +179,6 @@ void SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
-    SubscribeToEvent("ScenePostUpdate", "HandleScenePostUpdate");
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -179,8 +190,3 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 }
 
-
-void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
-{
-    scene_.physicsWorld2D.DrawDebugGeometry();
-}

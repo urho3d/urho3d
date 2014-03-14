@@ -33,9 +33,12 @@
 #include "Octree.h"
 #include "PhysicsWorld2D.h"
 #include "Renderer.h"
+#include "ResourceCache.h"
 #include "RigidBody2D.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "Sprite2D.h"
+#include "StaticSprite2D.h"
 #include "Text.h"
 #include "Urho2DPhysics.h"
 
@@ -88,6 +91,10 @@ void Urho2DPhysics::CreateScene()
     // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
     
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Sprite2D* boxSprite = cache->GetResource<Sprite2D>("Urho2D/Box.png");
+    Sprite2D* ballSprite = cache->GetResource<Sprite2D>("Urho2D/Ball.png");
+
     // Create ground.
     Node* groundNode = scene_->CreateChild("Ground");
     groundNode->SetPosition(Vector3(0.0f, -3.0f, 0.0f));
@@ -96,10 +103,13 @@ void Urho2DPhysics::CreateScene()
     // Create 2D rigid body for gound
     RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
     
+    StaticSprite2D* groundSprite = groundNode->CreateComponent<StaticSprite2D>();
+    groundSprite->SetSprite(boxSprite);
+
     // Create box collider for ground
     CollisionBox2D* groundShape = groundNode->CreateComponent<CollisionBox2D>();
     // Set box size
-    groundShape->SetSize(Vector2(0.1f, 0.1f));
+    groundShape->SetSize(Vector2(0.32f, 0.32f));
     // Set friction
     groundShape->SetFriction(0.5f);
 
@@ -112,8 +122,12 @@ void Urho2DPhysics::CreateScene()
         RigidBody2D* body = node->CreateComponent<RigidBody2D>();
         body->SetBodyType(BT_DYNAMIC);
 
+        StaticSprite2D* staticSprite = node->CreateComponent<StaticSprite2D>();
+
         if (i % 2 == 0)
         {
+            staticSprite->SetSprite(boxSprite);
+
             // Create box
             CollisionBox2D* box = node->CreateComponent<CollisionBox2D>();
             // Set size
@@ -127,6 +141,8 @@ void Urho2DPhysics::CreateScene()
         }
         else
         {
+            staticSprite->SetSprite(ballSprite);
+
             // Create circle
             CollisionCircle2D* circle = node->CreateComponent<CollisionCircle2D>();
             // Set radius
@@ -206,8 +222,6 @@ void Urho2DPhysics::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Urho2DPhysics, HandleUpdate));
-
-    SubscribeToEvent(E_SCENEPOSTUPDATE, HANDLER(Urho2DPhysics, HandleScenePostUpdate));
 }
 
 void Urho2DPhysics::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -220,10 +234,3 @@ void Urho2DPhysics::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }
-
-void Urho2DPhysics::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
-{
-    PhysicsWorld2D* physicWorld = scene_->GetComponent<PhysicsWorld2D>();
-    physicWorld->DrawDebugGeometry();
-}
-

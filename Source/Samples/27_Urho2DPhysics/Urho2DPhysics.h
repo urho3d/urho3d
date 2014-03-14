@@ -58,8 +58,6 @@ private:
     void SubscribeToEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle scene post update event.
-    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Scene.
     SharedPtr<Scene> scene_;
