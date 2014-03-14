@@ -33,8 +33,10 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 static const float DEFAULT_CLRCLE_RADIUS(0.01f);
 
-CollisionCircle2D::CollisionCircle2D(Context* context) : CollisionShape2D(context),
-    center_(0.0f, 0.0f)
+CollisionCircle2D::CollisionCircle2D(Context* context) :
+    CollisionShape2D(context),
+    radius_(DEFAULT_CLRCLE_RADIUS),
+    center_(Vector2::ZERO)
 {
     circleShape_.m_radius = DEFAULT_CLRCLE_RADIUS * cachedWorldScale_.x_;
     fixtureDef_.shape = &circleShape_;
@@ -42,7 +44,6 @@ CollisionCircle2D::CollisionCircle2D(Context* context) : CollisionShape2D(contex
 
 CollisionCircle2D::~CollisionCircle2D()
 {
-
 }
 
 void CollisionCircle2D::RegisterObject(Context* context)
@@ -92,7 +93,7 @@ void CollisionCircle2D::RecreateFixture()
     
     // Only use scale in x axis for circle
     float worldScale = cachedWorldScale_.x_;
-    circleShape_.m_radius = radius_* worldScale;
+    circleShape_.m_radius = radius_ * worldScale;
     circleShape_.m_p = ToB2Vec2(center_ * worldScale);
 
     CreateFixture();
