@@ -25,6 +25,7 @@
 #include "Vector.h"
 
 // Note: ForEach is not supported on all compilers, such as VS2008.
+#ifdef ENABLE_MODERN_CPP
 
 namespace Urho3D {
 
@@ -132,3 +133,11 @@ Urho3D::RandomAccessConstIterator<T> End(const Urho3D::PODVector<T> *v) {
     for (auto it = _foreach_begin.value; it != _foreach_end.value; ++it) \
     if (bool _foreach_flag = false) { } else \
     for (VAL = *it; !_foreach_flag; ITER++, _foreach_flag = true)
+
+#else
+
+#include <cassert>
+#define foreach(VAL, VALS) assert (false);
+#define foreachv(ITER, VAL, VALS) assert (false);
+
+#endif
