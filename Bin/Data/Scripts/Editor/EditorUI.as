@@ -923,6 +923,7 @@ void CreateConsole()
     Console@ console = engine.CreateConsole();
     console.defaultStyle = uiStyle;
     console.numRows = 16;
+    console.autoVisibleOnError = true;
 }
 
 void CreateDebugHud()
@@ -1384,11 +1385,4 @@ bool LoadMostRecentScene()
         return false;
 
     return LoadScene(text.text);
-}
-
-void HandleErrorEvent(StringHash eventType, VariantMap& eventData)
-{
-    // Open console if it not yet open
-    if (!console.visible)
-        console.visible = true;
 }

@@ -86,7 +86,7 @@ public:
     /// Set sub stepping.
     void SetSubStepping(bool enable);
     /// Set gravity.
-    void SetGravity(Vector2 gravity);
+    void SetGravity(const Vector2& gravity);
     /// Set auto clear forces.
     void SetAutoClearForces(bool enable);
     /// Set velocity iterations.
@@ -128,7 +128,7 @@ public:
     /// Return auto clear forces.
     bool GetAutoClearForces() const;
     /// Return gravity.
-    Vector2 GetGravity() const { return gravity_; }
+    const Vector2& GetGravity() const { return gravity_; }
     /// Return velocity iterations.
     int GetVelocityIterations() const { return velocityIterations_; }
     /// Return position iterations.

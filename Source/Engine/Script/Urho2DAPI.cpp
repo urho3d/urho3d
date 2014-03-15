@@ -21,15 +21,19 @@
 //
 
 #include "Precompiled.h"
+#include "APITemplates.h"
 #include "AnimatedSprite2D.h"
 #include "Animation2D.h"
 #include "APITemplates.h"
+#include "CollisionBox2D.h"
+#include "CollisionCircle2D.h"
 #include "CollisionShape2D.h"
 #include "Drawable2D.h"
 #include "ParticleEmitter2D.h"
 #include "ParticleModel2D.h"
 #include "PhysicsWorld2D.h"
 #include "RigidBody2D.h"
+#include "Scene.h"
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
@@ -143,6 +147,16 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleModel2D@+ get_model() const", asMETHOD(ParticleEmitter2D, GetModel), asCALL_THISCALL);
 }
 
+static PhysicsWorld2D* SceneGetPhysicsWorld2D(Scene* ptr)
+{
+    return ptr->GetComponent<PhysicsWorld2D>();
+}
+
+static PhysicsWorld2D* GetPhysicsWorld2D()
+{
+    Scene* scene = GetScriptContextScene();
+    return scene ? scene->GetComponent<PhysicsWorld2D>() : 0;
+}
 
 static void RegisterPhysicsWorld2D(asIScriptEngine* engine)
 {
@@ -174,6 +188,10 @@ static void RegisterPhysicsWorld2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld2D", "uint get_velocityIterations() const", asMETHOD(PhysicsWorld2D, GetVelocityIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "void set_positionIterations(uint)", asMETHOD(PhysicsWorld2D, SetPositionIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "uint get_positionIterations() const", asMETHOD(PhysicsWorld2D, GetPositionIterations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld2D", "void DrawDebugGeometry() const", asMETHOD(PhysicsWorld2D, DrawDebugGeometry), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("Scene", "PhysicsWorld2D@+ get_physicsWorld2D() const", asFUNCTION(SceneGetPhysicsWorld2D), asCALL_CDECL_OBJLAST);
+    engine->RegisterGlobalFunction("PhysicsWorld2D@+ get_physicsWorld2D()", asFUNCTION(GetPhysicsWorld2D), asCALL_CDECL);
 }
 
 static void RegisterRigidBody2D(asIScriptEngine* engine)
@@ -219,28 +237,57 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyAngularImpulse(float, bool)", asMETHOD(RigidBody2D, ApplyAngularImpulse), asCALL_THISCALL);
 }
 
+/// Template function for registering a class derived from CollisionShape2D.
+template <class T> void RegisterCollisionShape2D(asIScriptEngine* engine, const char* className)
+{
+    RegisterComponent<T>(engine, className);
+    RegisterSubclass<CollisionShape2D, T>(engine, "CollisionShape2D", className);
+
+    engine->RegisterObjectMethod(className, "void set_sensor(bool)", asMETHOD(T, SetSensor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_sensor() const", asMETHOD(T, IsSensor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_categoryBits(int)", asMETHOD(T, SetCategoryBits), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_categoryBits() const", asMETHOD(T, GetCategoryBits), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maskBits(int)", asMETHOD(T, SetMaskBits), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maskBits() const", asMETHOD(T, GetMaskBits), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_groupIndex(int)", asMETHOD(T, SetGroupIndex), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_groupIndex() const", asMETHOD(T, GetGroupIndex), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_density(float)", asMETHOD(T, SetDensity), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_density() const", asMETHOD(T, GetDensity), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_friction(float)", asMETHOD(T, SetFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_friction() const", asMETHOD(T, GetFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_restitution(float)", asMETHOD(T, SetRestitution), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_restitution() const", asMETHOD(T, GetRestitution), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_mass() const", asMETHOD(T, GetMass), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_inertia() const", asMETHOD(T, GetInertia), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector2 get_massCenter() const", asMETHOD(T, GetMassCenter), asCALL_THISCALL);
+}
+
 static void RegisterCollisionShape2D(asIScriptEngine* engine)
 {
-    RegisterComponent<CollisionShape2D>(engine, "CollisionShape2D");
+    RegisterCollisionShape2D<CollisionShape2D>(engine, "CollisionShape2D");
+}
 
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_sensor(bool)", asMETHOD(CollisionShape2D, SetSensor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "bool get_sensor() const", asMETHOD(CollisionShape2D, IsSensor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_categoryBits(uint16)", asMETHOD(CollisionShape2D, SetCategoryBits), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "uint16 get_categoryBits() const", asMETHOD(CollisionShape2D, GetCategoryBits), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_maskBits(uint16)", asMETHOD(CollisionShape2D, SetMaskBits), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "uint16 get_maskBits() const", asMETHOD(CollisionShape2D, GetMaskBits), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_groupIndex(int16)", asMETHOD(CollisionShape2D, SetGroupIndex), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "int16 get_groupIndex() const", asMETHOD(CollisionShape2D, GetGroupIndex), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_density(float)", asMETHOD(CollisionShape2D, SetDensity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "float get_density() const", asMETHOD(CollisionShape2D, GetDensity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_friction(float)", asMETHOD(CollisionShape2D, SetFriction), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "float get_friction() const", asMETHOD(CollisionShape2D, GetFriction), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "void set_restitution(float)", asMETHOD(CollisionShape2D, SetRestitution), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "float get_restitution() const", asMETHOD(CollisionShape2D, GetRestitution), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "float get_mass() const", asMETHOD(CollisionShape2D, GetMass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "float get_inertia() const", asMETHOD(CollisionShape2D, GetInertia), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape2D", "Vector2 get_massCenter() const", asMETHOD(CollisionShape2D, GetMassCenter), asCALL_THISCALL);
+static void RegisterCollisionBox2D(asIScriptEngine* engine)
+{
+    RegisterCollisionShape2D<CollisionBox2D>(engine, "CollisionBox2D");
+    engine->RegisterObjectMethod("CollisionBox2D", "void set_size(const Vector2&in)", asMETHODPR(CollisionBox2D, SetSize, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "void SetSize(float, float)", asMETHODPR(CollisionBox2D, SetSize, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "const Vector2& get_size() const", asMETHOD(CollisionBox2D, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "void set_center(const Vector2&in)", asMETHODPR(CollisionBox2D, SetCenter, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "void SetCenter(float, float)", asMETHODPR(CollisionBox2D, SetCenter, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "const Vector2& get_center() const", asMETHOD(CollisionBox2D, GetCenter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "void set_angle(float)", asMETHOD(CollisionBox2D, SetAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionBox2D", "float get_angle() const", asMETHOD(CollisionBox2D, GetAngle), asCALL_THISCALL);
+}
 
+static void RegisterCollisionCircle2D(asIScriptEngine* engine)
+{
+    RegisterCollisionShape2D<CollisionCircle2D>(engine, "CollisionCircle2D");
+    engine->RegisterObjectMethod("CollisionCircle2D", "void set_radius(float)", asMETHOD(CollisionCircle2D, SetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionCircle2D", "float get_radius() const", asMETHOD(CollisionCircle2D, GetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionCircle2D", "void set_center(const Vector2&in)", asMETHODPR(CollisionCircle2D, SetCenter, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionCircle2D", "void SetCenter(float, float)", asMETHODPR(CollisionCircle2D, SetCenter, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionCircle2D", "const Vector2& get_center() const", asMETHOD(CollisionCircle2D, GetCenter), asCALL_THISCALL);
 }
 
 void RegisterUrho2DAPI(asIScriptEngine* engine)
@@ -256,6 +303,8 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterPhysicsWorld2D(engine);
     RegisterRigidBody2D(engine);
     RegisterCollisionShape2D(engine);
+    RegisterCollisionBox2D(engine);
+    RegisterCollisionCircle2D(engine);
 }
 
 }

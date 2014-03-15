@@ -5,6 +5,7 @@ class Console : public Object
     void SetDefaultStyle(XMLFile* style);
     void SetVisible(bool enable);
     void Toggle();
+    void SetAutoVisibleOnError(bool enable);
     void SetNumRows(unsigned rows);
     void SetNumHistoryRows(unsigned rows);
     void UpdateElements();
@@ -13,6 +14,7 @@ class Console : public Object
     BorderImage* GetBackground() const;
     LineEdit* GetLineEdit() const;
     bool IsVisible() const;
+    bool IsAutoVisibleOnError() const;
     unsigned GetNumRows() const;
     unsigned GetNumHistoryRows() const;
     unsigned GetHistoryPosition() const;
@@ -22,6 +24,7 @@ class Console : public Object
     tolua_readonly tolua_property__get_set BorderImage* background;
     tolua_readonly tolua_property__get_set LineEdit* lineEdit;
     tolua_property__is_set bool visible;
+    tolua_property__is_set bool autoVisibleOnError;
     tolua_property__get_set unsigned numRows;
     tolua_property__get_set unsigned numHistoryRows;
     tolua_readonly tolua_property__get_set unsigned historyPosition;

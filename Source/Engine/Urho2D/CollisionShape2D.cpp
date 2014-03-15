@@ -27,6 +27,7 @@
 #include "Node.h"
 #include "PhysicsUtils2D.h"
 #include "RigidBody2D.h"
+#include "Scene.h"
 
 #include "DebugNew.h"
 
@@ -36,7 +37,8 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 
 CollisionShape2D::CollisionShape2D(Context* context) : Component(context), 
-    fixture_(0)
+    fixture_(0),
+    cachedWorldScale_(Vector3::ONE)
 {
 
 }
@@ -284,6 +286,28 @@ void CollisionShape2D::OnNodeSet(Node* node)
         else
             LOGERROR("No right body component in node, can not create collision shape");
     }
+}
+
+void CollisionShape2D::OnMarkedDirty(Node* node)
+{
+    Vector3 newWorldScale = node_->GetWorldScale();
+
+    Vector3 delta = newWorldScale - cachedWorldScale_;
+    if (delta.DotProduct(delta) < 0.01f)
+        return;
+
+    // Physics operations are not safe from worker threads
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
+    cachedWorldScale_ = newWorldScale;
+
+    if (fixture_)
+        ApplyNodeWorldScale();
 }
 
 }

@@ -22,8 +22,10 @@
 
 #include "Camera.h"
 #include "CollisionBox2D.h"
+#include "CollisionCircle2D.h"
 #include "CoreEvents.h"
 #include "DebugRenderer.h"
+#include "Drawable2D.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -34,18 +36,19 @@
 #include "ResourceCache.h"
 #include "RigidBody2D.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "Sprite2D.h"
 #include "StaticSprite2D.h"
 #include "Text.h"
 #include "Urho2DPhysics.h"
-#include "Zone.h"
 
 #include "DebugNew.h"
 
 DEFINE_APPLICATION_MAIN(Urho2DPhysics)
 
-Urho2DPhysics::Urho2DPhysics(Context* context) :
-Sample(context)
+static const unsigned NUM_OBJECTS = 100;
+
+Urho2DPhysics::Urho2DPhysics(Context* context) : Sample(context)
 {    
 }
 
@@ -76,7 +79,7 @@ void Urho2DPhysics::CreateScene()
     cameraNode_ = scene_->CreateChild("Camera");
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
+    
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
@@ -85,47 +88,72 @@ void Urho2DPhysics::CreateScene()
     float height = (float)graphics->GetHeight();
     camera->SetOrthoSize(Vector2(width, height) * PIXEL_SIZE);
 
+    // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
-    // Define the gravity vector.
-    physicsWorld->SetGravity(Vector2(0.0f, -10.0f));
     
-
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    // Get sprite
-    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Box.png");
-    if (!sprite)
-        return;
+    Sprite2D* boxSprite = cache->GetResource<Sprite2D>("Urho2D/Box.png");
+    Sprite2D* ballSprite = cache->GetResource<Sprite2D>("Urho2D/Ball.png");
 
     // Create ground.
     Node* groundNode = scene_->CreateChild("Ground");
     groundNode->SetPosition(Vector3(0.0f, -3.0f, 0.0f));
+    groundNode->SetScale(Vector3(200.0f, 1.0f, 0.0f));
+    
+    // Create 2D rigid body for gound
     RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
+    
+    StaticSprite2D* groundSprite = groundNode->CreateComponent<StaticSprite2D>();
+    groundSprite->SetSprite(boxSprite);
 
+    // Create box collider for ground
     CollisionBox2D* groundShape = groundNode->CreateComponent<CollisionBox2D>();
-    groundShape->SetSize(Vector2(20.0f, 0.1f));
+    // Set box size
+    groundShape->SetSize(Vector2(0.32f, 0.32f));
+    // Set friction
     groundShape->SetFriction(0.5f);
 
-    for (unsigned i = 0; i < 100; ++i)
+    for (unsigned i = 0; i < NUM_OBJECTS; ++i)
     {
-        // Create a box.
-        Node* boxNode  = scene_->CreateChild("Box");
-        boxNode->SetPosition(Vector3(Random(-0.1f, 0.1f), 5.0f + i * 0.4f, 0.0f));
+        Node* node  = scene_->CreateChild("RigidBody");
+        node->SetPosition(Vector3(Random(-0.1f, 0.1f), 5.0f + i * 0.4f, 0.0f));
 
-        RigidBody2D* boxBody = boxNode->CreateComponent<RigidBody2D>();
-        boxBody->SetBodyType(BT_DYNAMIC);
+        // Create rigid body
+        RigidBody2D* body = node->CreateComponent<RigidBody2D>();
+        body->SetBodyType(BT_DYNAMIC);
 
-        CollisionBox2D* boxShape = boxNode->CreateComponent<CollisionBox2D>();
-        boxShape->SetSize(Vector2(0.32f, 0.32f));
-        // Set the box density to be non-zero, so it will be dynamic.
-        boxShape->SetDensity(1.0f);
-        // Override the default friction.
-        boxShape->SetFriction(0.5f);
-        boxShape->SetRestitution(0.1f);
+        StaticSprite2D* staticSprite = node->CreateComponent<StaticSprite2D>();
 
-        // Create static sprite.
-        StaticSprite2D* staticSprite = boxNode->CreateComponent<StaticSprite2D>();
-        // Set sprite
-        staticSprite->SetSprite(sprite);
+        if (i % 2 == 0)
+        {
+            staticSprite->SetSprite(boxSprite);
+
+            // Create box
+            CollisionBox2D* box = node->CreateComponent<CollisionBox2D>();
+            // Set size
+            box->SetSize(Vector2(0.32f, 0.32f));
+            // Set density
+            box->SetDensity(1.0f);
+            // Set friction
+            box->SetFriction(0.5f);
+            // Set restitution
+            box->SetRestitution(0.1f);
+        }
+        else
+        {
+            staticSprite->SetSprite(ballSprite);
+
+            // Create circle
+            CollisionCircle2D* circle = node->CreateComponent<CollisionCircle2D>();
+            // Set radius
+            circle->SetRadius(0.16f);
+            // Set density
+            circle->SetDensity(1.0f);
+            // Set friction.
+            circle->SetFriction(0.5f);
+            // Set restitution
+            circle->SetRestitution(0.1f);
+        }
     }
 }
 

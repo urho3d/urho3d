@@ -316,12 +316,10 @@ void Drawable2D::UpdateMaterial()
             pass->SetBlendMode(blendMode_);
     }
     
-    // Update diffuse texture from sprite
-    if (sprite_)
-    {
-        Texture2D* texture = sprite_->GetTexture();
+    // Update diffuse texture
+    Texture2D* texture = GetTexture();
+    if (texture)
         material->SetTexture(TU_DIFFUSE, texture);
-    }
 }
 
 }

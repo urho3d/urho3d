@@ -48,7 +48,6 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) : Component(context),
     applyingTransforms_(false)
 {
     // Set default debug draw flags
-    // m_drawFlags = e_shapeBit | e_jointBit | e_centerOfMassBit;
     m_drawFlags = e_shapeBit;
 
     // Create Box2D world
@@ -85,7 +84,7 @@ void PhysicsWorld2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, false, AM_DEFAULT);
@@ -178,9 +177,9 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
 
     Vector3 p = ToVector3(center);
     Color c = ToColor(color);
-    for (unsigned i = 0; i < 360; i += 45)
+    for (unsigned i = 0; i < 360; i += 30)
     {
-        unsigned j = i + 45;
+        unsigned j = i + 30;
         float x1 = radius * Cos((float)i);
         float y1 = radius * Sin((float)i);
         float x2 = radius * Cos((float)j);
@@ -198,9 +197,9 @@ void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const
     Vector3 p = ToVector3(center);
     Color c(color.r, color.g, color.b, 0.5f);
 
-    for (unsigned i = 0; i < 360; i += 45)
+    for (unsigned i = 0; i < 360; i += 30)
     {
-        unsigned j = i + 45;
+        unsigned j = i + 30;
         float x1 = radius * Cos((float)i);
         float y1 = radius * Sin((float)i);
         float x2 = radius * Cos((float)j);
@@ -292,7 +291,7 @@ void PhysicsWorld2D::SetSubStepping(bool enable)
     world_->SetSubStepping(enable);
 }
 
-void PhysicsWorld2D::SetGravity(Vector2 gravity)
+void PhysicsWorld2D::SetGravity(const Vector2& gravity)
 {
     gravity_ = gravity;
 
@@ -409,8 +408,6 @@ void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap
 {
     using namespace SceneSubsystemUpdate;
     Update(eventData[P_TIMESTEP].GetFloat());
-
-    DrawDebugGeometry();
 }
 
 }

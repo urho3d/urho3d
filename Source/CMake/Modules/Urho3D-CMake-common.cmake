@@ -228,10 +228,11 @@ if (MSVC)
     endif ()
 else ()
     # GCC/Clang-specific setup
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
     if (ANDROID)
         # Most of the flags are already setup in android.toolchain.cmake module
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -fstack-protector")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector")
         if (ENABLE_64BIT)
             # TODO: Revisit this again when ARM also support 64bit
             # For now just reference it to suppress "unused variable" warning
@@ -243,7 +244,6 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
         endif ()
     else ()
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
         if (RASPI)
             add_definitions (-DRASPI)
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wno-psabi")
@@ -270,6 +270,7 @@ else ()
                 endif ()
             endif ()
         endif ()
+        # MinGW-specific setup
         if (WIN32)
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc")

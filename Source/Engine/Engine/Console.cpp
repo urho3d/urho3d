@@ -47,6 +47,7 @@ static const int DEFAULT_HISTORY_SIZE = 16;
 
 Console::Console(Context* context) :
     Object(context),
+    autoVisibleOnError_(false),
     historyRows_(DEFAULT_HISTORY_SIZE),
     historyPosition_(0),
     printing_(false)
@@ -187,7 +188,7 @@ XMLFile* Console::GetDefaultStyle() const
 
 bool Console::IsVisible() const
 {
-    return background_ ? background_->IsVisible() : false;
+    return background_ && background_->IsVisible();
 }
 
 unsigned Console::GetNumRows() const
@@ -283,6 +284,9 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     
     for (unsigned i = 0; i < rows.Size(); ++i)
         pendingRows_.Push(MakePair(level, rows[i]));
+
+    if (autoVisibleOnError_ && level == LOG_ERROR && !IsVisible())
+        SetVisible(true);
 }
 
 void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)

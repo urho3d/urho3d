@@ -43,6 +43,8 @@ static void RegisterConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "XMLFile@+ get_defaultStyle() const", asMETHOD(Console, GetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_visible(bool)", asMETHOD(Console, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "bool get_visible() const", asMETHOD(Console, IsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void set_autoVisibleOnError(bool)", asMETHOD(Console, SetAutoVisibleOnError), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "bool get_autoVisibleOnError() const", asMETHOD(Console, IsAutoVisibleOnError), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_numRows(uint)", asMETHOD(Console, SetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint get_numRows() const", asMETHOD(Console, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_numHistoryRows(uint)", asMETHOD(Console, SetNumHistoryRows), asCALL_THISCALL);

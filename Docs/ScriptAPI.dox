@@ -1004,6 +1004,110 @@ Properties:
 - int width
 
 
+### CollisionBox2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetCenter(float, float)
+- void SetSize(float, float)
+
+Properties:
+
+- float angle
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- int categoryBits
+- Vector2 center
+- float density
+- bool enabled
+- bool enabledEffective // readonly
+- float friction
+- int groupIndex
+- uint id // readonly
+- float inertia // readonly
+- int maskBits
+- float mass // readonly
+- Vector2 massCenter // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int refs // readonly
+- float restitution
+- bool sensor
+- Vector2 size
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### CollisionCircle2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetCenter(float, float)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- int categoryBits
+- Vector2 center
+- float density
+- bool enabled
+- bool enabledEffective // readonly
+- float friction
+- int groupIndex
+- uint id // readonly
+- float inertia // readonly
+- int maskBits
+- float mass // readonly
+- Vector2 massCenter // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- float radius
+- int refs // readonly
+- float restitution
+- bool sensor
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
 ### CollisionShape
 
 Methods:
@@ -1087,15 +1191,15 @@ Properties:
 - Variant[] attributes
 - ShortStringHash baseType // readonly
 - String category // readonly
-- uint16 categoryBits
+- int categoryBits
 - float density
 - bool enabled
 - bool enabledEffective // readonly
 - float friction
-- int16 groupIndex
+- int groupIndex
 - uint id // readonly
 - float inertia // readonly
-- uint16 maskBits
+- int maskBits
 - float mass // readonly
 - Vector2 massCenter // readonly
 - Node@ node // readonly
@@ -1239,6 +1343,7 @@ Methods:
 
 Properties:
 
+- bool autoVisibleOnError
 - BorderImage@ background // readonly
 - ShortStringHash baseType // readonly
 - String category // readonly
@@ -3901,6 +4006,7 @@ Properties:
 Methods:
 
 - void ApplyAttributes()
+- void DrawDebugGeometry() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
@@ -4568,6 +4674,7 @@ Properties:
 - Octree@ octree // readonly
 - Node@ parent
 - PhysicsWorld@ physicsWorld // readonly
+- PhysicsWorld2D@ physicsWorld2D // readonly
 - Vector3 position
 - int refs // readonly
 - PackageFile@[]@ requiredPackageFiles // readonly
@@ -8053,6 +8160,7 @@ Properties:
 - Node@ node
 - Octree@ octree
 - PhysicsWorld@ physicsWorld
+- PhysicsWorld2D@ physicsWorld2D
 - Renderer@ renderer
 - ResourceCache@ resourceCache
 - Scene@ scene

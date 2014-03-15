@@ -10,6 +10,8 @@ $pfile "Urho2D/ParticleEmitter2D.pkg"
 $pfile "Urho2D/PhysicsWorld2D.pkg"
 $pfile "Urho2D/RigidBody2D.pkg"
 $pfile "Urho2D/CollisionShape2D.pkg"
+$pfile "Urho2D/CollisionBox2D.pkg"
+$pfile "Urho2D/CollisionCircle2D.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)

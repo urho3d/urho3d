@@ -198,10 +198,7 @@ void ParticleEmitter2D::UpdateVertices()
 
     vertices_.Clear();
 
-    if (!sprite_)
-        return;
-
-    Texture2D* texture = sprite_->GetTexture();
+    Texture2D* texture = GetTexture();
     if (!texture)
         return;
 

@@ -35,13 +35,27 @@ namespace Urho3D
 {
 
 extern const char* URHO2D_CATEGORY;
+static const BodyType2D DEFAULT_BODYTYPE = BT_STATIC;
 
-RigidBody2D::RigidBody2D(Context* context) : Component(context),
-    body_(0),
-    useFixtureMass_(true)
+static const char* bodyTypeNames[] =
 {
-    massData_.mass = 0.0f;
-    massData_.I = 0.0f;
+    "Static",
+    "Dynamic",
+    "Kinematic",
+    0
+};
+
+template<> BodyType2D Variant::Get<BodyType2D>() const
+{
+    return (BodyType2D)GetInt();
+}
+
+RigidBody2D::RigidBody2D(Context* context) :
+    Component(context),
+    massData_(),    // b2MassData structure does not have a constructor so need to zero-initialize all its members
+    useFixtureMass_(true),
+    body_(0)
+{
 }
 
 RigidBody2D::~RigidBody2D()
@@ -58,12 +72,18 @@ void RigidBody2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody2D>(URHO2D_CATEGORY);
 
+    ENUM_ACCESSOR_ATTRIBUTE(RigidBody2D, "Body Type", GetBodyType, SetBodyType, BodyType2D, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Mass", GetMass, SetMass, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Inertia", GetInertia, SetInertia, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_VECTOR2, "Mass Center", GetMassCenter, SetMassCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Allow Sleep", IsAllowSleep, SetAllowSleep, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Fixed Rotation", IsFixedRotation, SetFixedRotation, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Bullet", IsBullet, SetBullet, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Gravity Scale", GetGravityScale, SetGravityScale, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_VECTOR2, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
 
@@ -447,11 +467,13 @@ void RigidBody2D::OnMarkedDirty(Node* node)
 
     // Check if transform has changed from the last one set in ApplyWorldTransform()
     b2Vec2 newPosition = ToB2Vec2(node_->GetWorldPosition());
-    if (bodyDef_.position != newPosition)
+    float newAngle = node->GetWorldRotation().RollAngle() * M_DEGTORAD;
+    if (newPosition != bodyDef_.position || newAngle != bodyDef_.angle)
     {
         bodyDef_.position = newPosition;
+        bodyDef_.angle = newAngle;
         if (body_)
-            body_->SetTransform(newPosition, 0.0f);
+            body_->SetTransform(newPosition, newAngle);
     }
 }
 

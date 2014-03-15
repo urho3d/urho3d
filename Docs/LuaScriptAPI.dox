@@ -559,6 +559,40 @@ Properties:
 - bool checked
 - IntVector2& checkedOffset
 
+### CollisionBox2D : CollisionShape2D
+
+Methods:
+
+- void SetSize(const Vector2& size)
+- void SetSize(float width, float height)
+- void SetCenter(const Vector2& center)
+- void SetCenter(float x, float y)
+- void SetAngle(float angle)
+- const Vector2& GetSize() const
+- const Vector2& GetCenter() const
+- float GetAngle() const
+
+Properties:
+
+- Vector2& size
+- Vector2& center
+- float angle
+
+### CollisionCircle2D : CollisionShape2D
+
+Methods:
+
+- void SetRadius(float radius)
+- void SetCenter(const Vector2& center)
+- void SetCenter(float x, float y)
+- float GetRadius() const
+- const Vector2& GetCenter() const
+
+Properties:
+
+- float radius
+- Vector2& center
+
 ### CollisionShape : Component
 
 Methods:
@@ -626,16 +660,16 @@ Properties:
 Methods:
 
 - void SetSensor(bool sensor)
-- void SetCategoryBits(short categoryBits)
-- void SetMaskBits(short maskBits)
-- void SetGroupIndex(short groupIndex)
+- void SetCategoryBits(int categoryBits)
+- void SetMaskBits(int maskBits)
+- void SetGroupIndex(int groupIndex)
 - void SetDensity(float density)
 - void SetFriction(float friction)
 - void SetRestitution(float restitution)
 - bool IsSensor() const
-- short GetCategoryBits() const
-- short GetMaskBits() const
-- short GetGroupIndex() const
+- int GetCategoryBits() const
+- int GetMaskBits() const
+- int GetGroupIndex() const
 - float GetDensity() const
 - float GetFriction() const
 - float GetRestitution() const
@@ -646,9 +680,9 @@ Methods:
 Properties:
 
 - bool sensor
-- short categoryBits
-- short maskBits
-- short groupIndex
+- int categoryBits
+- int maskBits
+- int groupIndex
 - float density
 - float friction
 - float restitution
@@ -817,6 +851,7 @@ Methods:
 - void SetDefaultStyle(XMLFile* style)
 - void SetVisible(bool enable)
 - void Toggle()
+- void SetAutoVisibleOnError(bool enable)
 - void SetNumRows(unsigned rows)
 - void SetNumHistoryRows(unsigned rows)
 - void UpdateElements()
@@ -824,6 +859,7 @@ Methods:
 - BorderImage* GetBackground() const
 - LineEdit* GetLineEdit() const
 - bool IsVisible() const
+- bool IsAutoVisibleOnError() const
 - unsigned GetNumRows() const
 - unsigned GetNumHistoryRows() const
 - unsigned GetHistoryPosition() const
@@ -835,6 +871,7 @@ Properties:
 - BorderImage* background (readonly)
 - LineEdit* lineEdit (readonly)
 - bool visible
+- bool autoVisibleOnError
 - unsigned numRows
 - unsigned numHistoryRows
 - unsigned historyPosition (readonly)
@@ -2827,10 +2864,10 @@ Methods:
 - void SetWarmStarting(bool enable)
 - void SetContinuousPhysics(bool enable)
 - void SetSubStepping(bool enable)
-- void SetGravity(Vector2 gravity)
+- void SetGravity(const Vector2& gravity)
 - void SetAutoClearForces(bool enable)
-- void SetVelocityIterations(unsigned velocityIterations)
-- void SetPositionIterations(unsigned positionIterations)
+- void SetVelocityIterations(int velocityIterations)
+- void SetPositionIterations(int positionIterations)
 - void DrawDebugGeometry()
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
@@ -2842,9 +2879,9 @@ Methods:
 - bool GetContinuousPhysics() const
 - bool GetSubStepping() const
 - bool GetAutoClearForces() const
-- Vector2 GetGravity() const
-- unsigned GetVelocityIterations() const
-- unsigned GetPositionIterations() const
+- const Vector2& GetGravity() const
+- int GetVelocityIterations() const
+- int GetPositionIterations() const
 
 Properties:
 
@@ -2858,9 +2895,9 @@ Properties:
 - bool continuousPhysics
 - bool subStepping
 - bool autoClearForces
-- Vector2 gravity
-- unsigned velocityIterations
-- unsigned positionIterations
+- Vector2& gravity
+- int velocityIterations
+- int positionIterations
 
 ### Plane
 
@@ -3452,7 +3489,7 @@ Methods:
 - void SetBodyType(BodyType2D bodyType)
 - void SetMass(float mass)
 - void SetInertia(float inertia)
-- void SetMassCenter(const Vector2& center)
+- void SetMassCenter(Vector2 center)
 - void SetUseFixtureMass(bool useFixtureMass)
 - void SetLinearDamping(float linearDamping)
 - void SetAngularDamping(float angularDamping)
@@ -3461,7 +3498,7 @@ Methods:
 - void SetBullet(bool bullet)
 - void SetGravityScale(float gravityScale)
 - void SetAwake(bool awake)
-- void SetLinearVelocity(const Vector2& linearVelocity)
+- void SetLinearVelocity(Vector2 linearVelocity)
 - void SetAngularVelocity(float angularVelocity)
 - void ApplyForce(const Vector2& force, const Vector2& point, bool wake)
 - void ApplyForceToCenter(const Vector2& force, bool wake)
@@ -3481,6 +3518,7 @@ Methods:
 - float GetGravityScale() const
 - bool IsAwake() const
 - Vector2 GetLinearVelocity() const
+- float GetAngularVelocity() const
 
 Properties:
 
@@ -3497,6 +3535,7 @@ Properties:
 - float gravityScale
 - bool awake
 - Vector2 linearVelocity
+- float angularVelocity
 
 ### Scene : Node
 

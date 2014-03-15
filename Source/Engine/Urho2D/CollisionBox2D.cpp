@@ -33,17 +33,20 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 static const Vector2 DEFAULT_BOX_SIZE(0.01f, 0.01f);
 
-CollisionBox2D::CollisionBox2D(Context* context) : CollisionShape2D(context),
+CollisionBox2D::CollisionBox2D(Context* context) :
+    CollisionShape2D(context),
     size_(DEFAULT_BOX_SIZE),
-    center_(Vector2::ZERO)
+    center_(Vector2::ZERO),
+    angle_(0.0f)
 {
-    boxShape_.SetAsBox(size_.x_ * 0.5f, size_.y_ * 0.5f);
+    float halfWidth = size_.x_ * 0.5f * cachedWorldScale_.x_;
+    float halfHeight = size_.y_ * 0.5f * cachedWorldScale_.y_;
+    boxShape_.SetAsBox(halfWidth, halfHeight);
     fixtureDef_.shape = &boxShape_;
 }
 
 CollisionBox2D::~CollisionBox2D()
 {
-
 }
 
 void CollisionBox2D::RegisterObject(Context* context)
@@ -52,7 +55,7 @@ void CollisionBox2D::RegisterObject(Context* context)
 
     REF_ACCESSOR_ATTRIBUTE(CollisionBox2D, VAR_VECTOR2, "Size", GetSize, SetSize, Vector2, DEFAULT_BOX_SIZE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionBox2D, VAR_VECTOR2, "Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-
+    ACCESSOR_ATTRIBUTE(CollisionBox2D, VAR_FLOAT, "Angle", GetAngle, SetAngle, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(CollisionBox2D, CollisionShape2D);
 }
 
@@ -88,14 +91,36 @@ void CollisionBox2D::SetCenter(float x, float y)
     SetCenter(Vector2(x, y));
 }
 
+void CollisionBox2D::SetAngle(float angle)
+{
+    if (angle == angle_)
+        return;
+
+    angle_ = angle;
+
+    MarkNetworkUpdate();
+    RecreateFixture();
+}
+
+void CollisionBox2D::ApplyNodeWorldScale()
+{
+    RecreateFixture();
+}
+
 void CollisionBox2D::RecreateFixture()
 {
     ReleaseFixture();
 
-    if (center_ == Vector2::ZERO)
-        boxShape_.SetAsBox(size_.x_ * 0.5f, size_.y_ * 0.5f);
+    float worlsScaleX = cachedWorldScale_.x_;
+    float worldScaleY = cachedWorldScale_.y_;
+    float halfWidth = size_.x_ * 0.5f * worlsScaleX;
+    float halfHeight = size_.y_ * 0.5f * worldScaleY;
+    Vector2 scaledCenter = center_ * Vector2(worlsScaleX, worldScaleY);
+
+    if (scaledCenter == Vector2::ZERO && angle_ == 0.0f)
+        boxShape_.SetAsBox(halfWidth, halfHeight);
     else
-        boxShape_.SetAsBox(size_.x_ * 0.5f, size_.y_ * 0.5f, ToB2Vec2(center_), 0.0f);
+        boxShape_.SetAsBox(halfWidth, halfHeight, ToB2Vec2(scaledCenter), angle_ * M_DEGTORAD);
 
     CreateFixture();
 }

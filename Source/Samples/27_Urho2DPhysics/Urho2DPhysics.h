@@ -31,6 +31,9 @@ namespace Urho3D
 }
 
 /// Urho2D physics sample.
+/// This sample demonstrates:
+///     - Creating both static and moving 2D physics objects to a scene
+///     - Displaying physics debug geometry
 class Urho2DPhysics : public Sample
 {
     OBJECT(Urho2DPhysics);

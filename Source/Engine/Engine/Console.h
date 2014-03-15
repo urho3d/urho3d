@@ -35,7 +35,7 @@ class Text;
 class UIElement;
 class XMLFile;
 
-/// %Console window with log history and AngelScript prompt.
+/// %Console window with log history and command line prompt.
 class URHO3D_API Console : public Object
 {
     OBJECT(Console);
@@ -52,6 +52,8 @@ public:
     void SetVisible(bool enable);
     /// Toggle visibility.
     void Toggle();
+    /// Automatically set console to visible when receiving an error log message.
+    void SetAutoVisibleOnError(bool enable) { autoVisibleOnError_ = enable; }
     /// Set number of displayed rows.
     void SetNumRows(unsigned rows);
     /// Set command history maximum size, 0 disables history.
@@ -67,6 +69,8 @@ public:
     LineEdit* GetLineEdit() const { return lineEdit_; }
     /// Return whether is visible.
     bool IsVisible() const;
+    /// Return true when console is set to automatically visible when receiving an error log message.
+    bool IsAutoVisibleOnError() const { return autoVisibleOnError_; }
     /// Return number of displayed rows.
     unsigned GetNumRows() const;
     /// Return history maximum size.
@@ -88,6 +92,8 @@ private:
     /// Handle the application post-update.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
 
+    /// Auto visible on error flag.
+    bool autoVisibleOnError_;
     /// Background.
     SharedPtr<BorderImage> background_;
     /// Container for text rows.

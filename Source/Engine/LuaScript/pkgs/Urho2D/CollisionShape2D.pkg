@@ -3,17 +3,17 @@ $#include "CollisionShape2D.h"
 class CollisionShape2D : Component
 {
     void SetSensor(bool sensor);
-    void SetCategoryBits(unsigned short categoryBits);
-    void SetMaskBits(unsigned short maskBits);
-    void SetGroupIndex(short groupIndex);
+    void SetCategoryBits(int categoryBits);
+    void SetMaskBits(int maskBits);
+    void SetGroupIndex(int groupIndex);
     void SetDensity(float density);
     void SetFriction(float friction);
     void SetRestitution(float restitution);
 
     bool IsSensor() const;
-    unsigned short GetCategoryBits() const;
-    unsigned short GetMaskBits() const;
-    short GetGroupIndex() const;
+    int GetCategoryBits() const;
+    int GetMaskBits() const;
+    int GetGroupIndex() const;
     float GetDensity() const;
     float GetFriction() const;
     float GetRestitution() const;
@@ -22,9 +22,9 @@ class CollisionShape2D : Component
     Vector2 GetMassCenter() const;
 
     tolua_property__is_set bool sensor;
-    tolua_property__get_set unsigned short categoryBits;
-    tolua_property__get_set unsigned short maskBits;
-    tolua_property__get_set short groupIndex;
+    tolua_property__get_set int categoryBits;
+    tolua_property__get_set int maskBits;
+    tolua_property__get_set int groupIndex;
     tolua_property__get_set float density;
     tolua_property__get_set float friction;
     tolua_property__get_set float restitution;

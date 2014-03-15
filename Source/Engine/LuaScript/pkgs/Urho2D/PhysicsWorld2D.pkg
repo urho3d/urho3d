@@ -1,6 +1,6 @@
 $#include "PhysicsWorld2D.h"
 
-class PhysicsWorld2D : public Component
+class PhysicsWorld2D : Component
 {
     void SetDrawShape(bool drawShape);
     void SetDrawJoint(bool drawJoint);
@@ -11,10 +11,10 @@ class PhysicsWorld2D : public Component
     void SetWarmStarting(bool enable);
     void SetContinuousPhysics(bool enable);
     void SetSubStepping(bool enable);
-    void SetGravity(Vector2 gravity);
+    void SetGravity(const Vector2& gravity);
     void SetAutoClearForces(bool enable);
-    void SetVelocityIterations(unsigned velocityIterations);
-    void SetPositionIterations(unsigned positionIterations);
+    void SetVelocityIterations(int velocityIterations);
+    void SetPositionIterations(int positionIterations);
 
     void DrawDebugGeometry();
 
@@ -28,9 +28,9 @@ class PhysicsWorld2D : public Component
     bool GetContinuousPhysics() const;
     bool GetSubStepping() const;
     bool GetAutoClearForces() const;
-    Vector2 GetGravity() const;
-    unsigned GetVelocityIterations() const;
-    unsigned GetPositionIterations() const;
+    const Vector2& GetGravity() const;
+    int GetVelocityIterations() const;
+    int GetPositionIterations() const;
 
     tolua_property__get_set bool drawShape;
     tolua_property__get_set bool drawJoint;
@@ -42,7 +42,7 @@ class PhysicsWorld2D : public Component
     tolua_property__get_set bool continuousPhysics;
     tolua_property__get_set bool subStepping;
     tolua_property__get_set bool autoClearForces;
-    tolua_property__get_set Vector2 gravity;
-    tolua_property__get_set unsigned velocityIterations;
-    tolua_property__get_set unsigned positionIterations;
+    tolua_property__get_set Vector2& gravity;
+    tolua_property__get_set int velocityIterations;
+    tolua_property__get_set int positionIterations;
 };
