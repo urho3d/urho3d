@@ -41,6 +41,7 @@ CollisionEdge2D::CollisionEdge2D(Context* context) : CollisionShape2D(context),
 {
     Vector2 worldScale(cachedWorldScale_.x_, cachedWorldScale_.y_);
     edgeShape_.Set(ToB2Vec2(vertex1_ * worldScale), ToB2Vec2(vertex2_ * worldScale));
+
     fixtureDef_.shape = &edgeShape_;
 }
 
