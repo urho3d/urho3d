@@ -1598,6 +1598,7 @@ void Toggle();
 void UpdateElements();
 
 // Properties:
+bool autoVisibleOnError;
 /* readonly */
 BorderImage background;
 /* readonly */

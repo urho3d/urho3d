@@ -851,6 +851,7 @@ Methods:
 - void SetDefaultStyle(XMLFile* style)
 - void SetVisible(bool enable)
 - void Toggle()
+- void SetAutoVisibleOnError(bool enable)
 - void SetNumRows(unsigned rows)
 - void SetNumHistoryRows(unsigned rows)
 - void UpdateElements()
@@ -858,6 +859,7 @@ Methods:
 - BorderImage* GetBackground() const
 - LineEdit* GetLineEdit() const
 - bool IsVisible() const
+- bool IsAutoVisibleOnError() const
 - unsigned GetNumRows() const
 - unsigned GetNumHistoryRows() const
 - unsigned GetHistoryPosition() const
@@ -869,6 +871,7 @@ Properties:
 - BorderImage* background (readonly)
 - LineEdit* lineEdit (readonly)
 - bool visible
+- bool autoVisibleOnError
 - unsigned numRows
 - unsigned numHistoryRows
 - unsigned historyPosition (readonly)

@@ -1343,6 +1343,7 @@ Methods:
 
 Properties:
 
+- bool autoVisibleOnError
 - BorderImage@ background // readonly
 - ShortStringHash baseType // readonly
 - String category // readonly
