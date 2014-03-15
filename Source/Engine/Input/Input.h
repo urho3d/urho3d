@@ -141,10 +141,26 @@ public:
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
     
+    /// Return keycode from key name.
+    int GetKeyFromName(const String& name) const;
+    /// Return keycode from scancode.
+    int GetKeyFromScancode(int scancode) const;
+    /// Return name of key from keycode.
+    String GetKeyName(int key) const;
+    /// Return scancode from keycode.
+    int GetScancodeFromKey(int key) const;
+    /// Return scancode from key name.
+    int GetScancodeFromName(const String& name) const;
+    /// Return name of key from scancode.
+    String GetScancodeName(int scancode) const;
     /// Check if a key is held down.
     bool GetKeyDown(int key) const;
     /// Check if a key has been pressed on this frame.
     bool GetKeyPress(int key) const;
+    /// Check if a key is held down by scancode.
+    bool GetScancodeDown(int scancode) const;
+    /// Check if a key has been pressed on this frame by scancode.
+    bool GetScancodePress(int scanode) const;
     /// Check if a mouse button is held down.
     bool GetMouseButtonDown(int button) const;
     /// Check if a mouse button has been pressed on this frame.
@@ -204,7 +220,7 @@ private:
     /// Handle a mouse button change.
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
-    void SetKey(int key, bool newState, unsigned raw);
+    void SetKey(int key, int scancode, unsigned raw, bool newState);
     /// Handle mousewheel change.
     void SetMouseWheel(int delta);
     /// Internal function to set the mouse cursor position.
@@ -222,6 +238,10 @@ private:
     HashSet<int> keyDown_;
     /// Key pressed state.
     HashSet<int> keyPress_;
+    /// Key down state by scancode.
+    HashSet<int> scancodeDown_;
+    /// Key pressed state by scancode.
+    HashSet<int> scancodePress_;
     /// Active finger touches.
     HashMap<int, TouchState> touches_;
     /// String for text input.

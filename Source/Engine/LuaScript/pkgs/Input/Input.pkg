@@ -34,8 +34,16 @@ class Input : public Object
     bool DetectJoysticks();
     void SetScreenKeyboardVisible(bool enable);
 
+    int GetKeyFromName(const String name) const;
+    int GetKeyFromScancode(int scancode) const;
+    String GetKeyName(int key) const;
+    int GetScancodeFromKey(int key) const;
+    int GetScancodeFromName(const String name) const;
+    String GetScancodeName(int scancode) const;
     bool GetKeyDown(int key) const;
     bool GetKeyPress(int key) const;
+    bool GetScancodeDown(int scancode) const;
+    bool GetScancodePress(int scancode) const;
     bool GetMouseButtonDown(int button) const;
     bool GetMouseButtonPress(int button) const;
     bool GetQualifierDown(int qualifier) const;

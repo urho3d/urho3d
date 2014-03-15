@@ -1187,9 +1187,9 @@ void UpdateView(float timeStep)
             adjust.y = -1;
         if (editMode == EDIT_SCALE)
         {
-            if (input.keyDown[KEY_ADD])
+            if (input.keyDown[KEY_KP_PLUS])
                 adjust = Vector3(1, 1, 1);
-            if (input.keyDown[KEY_SUBTRACT])
+            if (input.keyDown[KEY_KP_MINUS])
                 adjust = Vector3(-1, -1, -1);
         }
 
@@ -1262,9 +1262,9 @@ void SteppedObjectManipulation(int key)
         adjust.y = -1;
     if (editMode == EDIT_SCALE)
     {
-        if (key == KEY_ADD)
+        if (key == KEY_KP_PLUS)
             adjust = Vector3(1, 1, 1);
-        if (key == KEY_SUBTRACT)
+        if (key == KEY_KP_MINUS)
             adjust = Vector3(-1, -1, -1);
     }
 

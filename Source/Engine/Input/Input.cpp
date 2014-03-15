@@ -52,7 +52,7 @@ namespace Urho3D
 /// Convert SDL keycode if necessary
 int ConvertSDLKeyCode(int keySym, int scanCode)
 {
-    if (scanCode == SDL_SCANCODE_AC_BACK)
+    if (scanCode == SCANCODE_AC_BACK)
         return KEY_ESC;
     else
         return SDL_toupper(keySym);
@@ -90,6 +90,7 @@ void Input::Update()
 
     // Reset input accumulation for this frame
     keyPress_.Clear();
+    scancodePress_.Clear();
     mouseButtonPress_ = 0;
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
@@ -296,6 +297,36 @@ void Input::CloseJoystick(unsigned index)
     }
 }
 
+int Input::GetKeyFromName(const String& name) const
+{
+    return SDL_GetKeyFromName(name.CString());
+}
+
+int Input::GetKeyFromScancode(int scancode) const
+{
+    return SDL_GetKeyFromScancode((SDL_Scancode)scancode);
+}
+
+String Input::GetKeyName(int key) const
+{
+    return String(SDL_GetKeyName(key));
+}
+
+int Input::GetScancodeFromKey(int key) const
+{
+    return SDL_GetScancodeFromKey(key);
+}
+
+int Input::GetScancodeFromName(const String& name) const
+{
+    return SDL_GetScancodeFromName(name.CString());
+}
+
+String Input::GetScancodeName(int scancode) const
+{
+    return SDL_GetScancodeName((SDL_Scancode)scancode);
+}
+
 bool Input::GetKeyDown(int key) const
 {
     return keyDown_.Contains(key);
@@ -304,6 +335,16 @@ bool Input::GetKeyDown(int key) const
 bool Input::GetKeyPress(int key) const
 {
     return keyPress_.Contains(key);
+}
+
+bool Input::GetScancodeDown(int scancode) const
+{
+    return scancodeDown_.Contains(scancode);
+}
+
+bool Input::GetScancodePress(int scancode) const
+{
+    return scancodePress_.Contains(scancode);
 }
 
 bool Input::GetMouseButtonDown(int button) const
@@ -492,6 +533,8 @@ void Input::ResetState()
 {
     keyDown_.Clear();
     keyPress_.Clear();
+    scancodeDown_.Clear();
+    scancodePress_.Clear();
 
     /// \todo Check if this is necessary
     for (Vector<JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
@@ -574,7 +617,7 @@ void Input::SetMouseButton(int button, bool newState)
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
-void Input::SetKey(int key, bool newState, unsigned raw)
+void Input::SetKey(int key, int scancode, unsigned raw, bool newState)
 {
     // If we do not have focus yet, do not react to the key down
     if (!graphics_->GetExternalWindow() && newState && !inputFocus_)
@@ -584,6 +627,9 @@ void Input::SetKey(int key, bool newState, unsigned raw)
 
     if (newState)
     {
+        scancodeDown_.Insert(scancode);
+        scancodePress_.Insert(scancode);
+
         if (!keyDown_.Contains(key))
         {
             keyDown_.Insert(key);
@@ -594,6 +640,8 @@ void Input::SetKey(int key, bool newState, unsigned raw)
     }
     else
     {
+        scancodeDown_.Erase(scancode);
+        
         if (!keyDown_.Erase(key))
             return;
     }
@@ -602,14 +650,16 @@ void Input::SetKey(int key, bool newState, unsigned raw)
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_KEY] = key;
+    eventData[P_SCANCODE] = scancode;
+    eventData[P_RAW] = raw;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
-    eventData[P_RAW] = raw;
     if (newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
 
-    if ((key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER) && newState && !repeat && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
+    if ((key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER) && newState && !repeat && toggleFullscreen_ &&
+        (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
         graphics_->ToggleFullscreen();
 }
 
@@ -649,11 +699,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
     {
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), true, evt.key.keysym.raw);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, true);
         break;
 
     case SDL_KEYUP:
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), false, evt.key.keysym.raw);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, false);
         break;
 
     case SDL_TEXTINPUT:
