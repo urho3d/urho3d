@@ -28,6 +28,7 @@
 namespace Urho3D
 {
 
+class DrawableProxy2D;
 class VertexBuffer;
 
 /// Pixel size (equal 0.01f).
@@ -92,12 +93,12 @@ public:
     void SetBlendModeAttr(BlendMode mode);
 
 protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices() = 0;
-    /// Create a default material when a material is not specified.
-    void CreateDefaultMaterial();
     /// Update the material's properties (blend mode and texture).
     void UpdateMaterial();
 
@@ -122,6 +123,8 @@ protected:
     bool geometryDirty_;
     /// Material update pending flag.
     bool materialUpdatePending_;
+    /// Drawable proxy.
+    WeakPtr<DrawableProxy2D> drawableProxy_;
 };
 
 }

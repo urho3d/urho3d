@@ -24,10 +24,13 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable2D.h"
+#include "DrawableProxy2D.h"
 #include "Geometry.h"
+#include "Log.h"
 #include "Material.h"
 #include "Node.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "Technique.h"
@@ -35,7 +38,6 @@
 #include "VertexBuffer.h"
 
 #include "DebugNew.h"
-#include "Log.h"
 
 namespace Urho3D
 {
@@ -56,11 +58,12 @@ Drawable2D::Drawable2D(Context* context) :
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
-    CreateDefaultMaterial();
 }
 
 Drawable2D::~Drawable2D()
 {
+    if (drawableProxy_)
+        drawableProxy_->RemoveDrawable(this);
 }
 
 void Drawable2D::RegisterObject(Context* context)
@@ -154,12 +157,7 @@ void Drawable2D::SetMaterial(Material* material)
         return;
 
     material_ = material;
-    // If a null material was specified, create one with defaults, otherwise clone the material so that
-    // the diffuse texture can be changed according to the sprite being used
-    if (!material_)
-        CreateDefaultMaterial();
-    else
-        batches_[0].material_ = material_->Clone();
+
     UpdateMaterial();
     MarkNetworkUpdate();
 }
@@ -264,6 +262,17 @@ void Drawable2D::SetBlendModeAttr(BlendMode mode)
     SetBlendMode(mode);
 }
 
+void Drawable2D::OnNodeSet(Node* node)
+{
+    Drawable::OnNodeSet(node);
+
+    if (node)
+    {
+        drawableProxy_ = GetScene()->GetOrCreateComponent<DrawableProxy2D>();
+        drawableProxy_->AddDrawable(this);
+    }
+}
+
 void Drawable2D::OnWorldBoundingBoxUpdate()
 {
     if (verticesDirty_)
@@ -278,48 +287,16 @@ void Drawable2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
-void Drawable2D::CreateDefaultMaterial()
-{
-    SharedPtr<Material> material(new Material(context_));
-    
-    Technique* tech = new Technique(context_);
-    Pass* pass = tech->CreatePass(PASS_ALPHA);
-    pass->SetVertexShader("Basic");
-    pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
-
-    pass->SetPixelShader("Basic");
-    pass->SetPixelShaderDefines("DIFFMAP VERTEXCOLOR");
-    
-    pass->SetDepthWrite(false);
-
-    material->SetTechnique(0, tech);
-    material->SetCullMode(CULL_NONE);
-
-    batches_[0].material_ = material;
-}
-
 void Drawable2D::UpdateMaterial()
 {
     // Delay the material update
     if (materialUpdatePending_)
         return;
 
-    Material* material = batches_[0].material_;
-    assert(material);
-    
-    // If we are using the default created material, we can update blend mode. Otherwise must respect what is set in the material
-    if (!material_)
-    {
-        Technique* technique = material->GetTechnique(0);
-        Pass* pass = technique->GetPass(PASS_ALPHA);
-        if (pass)
-            pass->SetBlendMode(blendMode_);
-    }
-    
-    // Update diffuse texture
-    Texture2D* texture = GetTexture();
-    if (texture)
-        material->SetTexture(TU_DIFFUSE, texture);
+    if (material_)
+        batches_[0].material_ = material_;
+    else
+        batches_[0].material_ = drawableProxy_->GetMaterial(this);
 }
 
 }
