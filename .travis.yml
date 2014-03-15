@@ -26,16 +26,16 @@ env:
     - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
     - DISPLAY=:99.0
   matrix:
-    - WINDOWS=1 ARCH=x86_64 ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC
     - WINDOWS=1 ARCH=x86_64 ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
-    - LINUX=1               ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC SITE_UPDATE=1
-    - LINUX=1               ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
-    - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=STATIC
-    - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=SHARED
-    - LINUX=1                              URHO3D_LIB_TYPE=STATIC
+    - WINDOWS=1 ARCH=x86_64 ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC
     - LINUX=1                              URHO3D_LIB_TYPE=SHARED
-    - ANDROID=1                            URHO3D_LIB_TYPE=STATIC
+    - LINUX=1                              URHO3D_LIB_TYPE=STATIC
     - ANDROID=1                            URHO3D_LIB_TYPE=SHARED
+    - ANDROID=1                            URHO3D_LIB_TYPE=STATIC
+    - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=SHARED
+    - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=STATIC
+    - LINUX=1               ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
+    - LINUX=1               ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC SITE_UPDATE=1
 #matrix:
 #  fast_finish: true
 #  allow_failures:
