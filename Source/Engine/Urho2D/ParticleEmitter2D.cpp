@@ -156,6 +156,8 @@ ParticleModel2D* ParticleEmitter2D::GetModel() const
 
 void ParticleEmitter2D::SetParticleModelAttr(ResourceRef value)
 {
+    materialUpdatePending_ = true;
+    
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetModel(cache->GetResource<ParticleModel2D>(value.name_));
 }

@@ -126,6 +126,8 @@ Animation2D* AnimatedSprite2D::GetAnimation() const
 
 void AnimatedSprite2D::SetAnimationAttr(ResourceRef value)
 {
+    materialUpdatePending_ = true;
+    
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetAnimation(cache->GetResource<Animation2D>(value.name_));
 }
