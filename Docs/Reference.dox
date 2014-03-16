@@ -1351,7 +1351,7 @@ The input polling API differentiates between the initiation of a key/mouse butto
 
 To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
 
-In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePerss[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
+In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
 
 To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
 
