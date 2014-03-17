@@ -739,9 +739,6 @@ The rendering-related components defined by the %Graphics, %UI and Urho2D librar
 - DecalSet: renders decal geometry on top of objects.
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
-- StaticSprite2D: a sprite that displays a single image.
-- AnimatedSprite2D: a sprite that displays a sequence of images.
-- ParticleEmitter2D: a two-dimensional particle effect.
 
 \section Rendering_Optimizations Optimizations
 
@@ -1597,6 +1594,76 @@ Left, top, right & bottom border widths and spacing between elements can also be
 Sprites are a special kind of %UI element that allow subpixel (float) positioning and scaling, as well as rotation, while the other elements use integer positioning for pixel-perfect display. Sprites can be used to implement rotating HUD elements such as minimaps or speedometer needles.
 
 Due to the free transformability, sprites can not be reliably queried with \ref UI::GetElementAt "GetElementAt()". Also, only other sprites should be parented to sprites, as the other elements do not support scaling and rotation.
+
+
+\page Urho2D Urho2D
+In order to make 2D Game in Urho3D, Urho2D is provided. Urho2D include 2D graphics and 2D physics. The classes provide are:
+
+- Sprite2D: a sprite is defined with texture and texture rectangle and hot spot.
+- SpriteSheet2D: a sprite sheet(texture atlas) include some sprites in it.
+- StaticSprite2D: a drawable component to display a sprite.
+- Animation2D: two-demensional animation with some frames, a frame include duration and a sprite.
+- AnimatedSprite2D : a drawable component to display an animation.
+- ParticleModel2D: two-demensional particle model file.
+- ParticleEmitter2D: a two-dimensional particle effect.
+- PhysicsWorld2D: implements two-dimensional physics simulation. Two-demensional physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
+- RigidBody2D: a two-demensional physics object instance.
+- CollisionShape2D: defines two-dimensional physics collision geometry. 
+- CollisionBox2D: defines two-dimensional physics collision box.
+- CollisionCircle2D: defines two-dimensional physics collision circle.
+- CollisionEdge2D: defines two-dimensional physics collision edge.
+- CollisionChain2D: defines two-dimensional physics collision chain.
+- CollisionPolygon2D: defines two-dimensional physics collision polygon.
+
+In order to use Urho2D, it is need set camera to 2D mode first, it can be done with following code:
+
+C++:
+\code
+    // Create camera node
+    Node* cameraNode = scene_->CreateChild("Camera");
+    // Set camera node's position
+    cameraNode->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
+
+    // Create camera
+    Camera* camera = cameraNode->CreateComponent<Camera>();
+    // Set camera orthographic
+    camera->SetOrthographic(true);
+
+    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera->SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+\endcode 
+
+AngelScript:
+\code
+    // Create camera node
+    Node@ cameraNode = scene_.CreateChild("Camera");
+    // Set camera node's position
+    cameraNode.SetPosition(Vector3(0.0f, 0.0f, -10.0f));
+
+    // Create camera
+    Camera@ camera = cameraNode.CreateComponent("Camera");
+    // Set camera orthographic
+    camera.orthographic = true;
+
+    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+\endcode 
+
+Lua:
+\code
+    -- Create camera node
+    cameraNode = scene_:CreateChild("Camera")
+    -- Set camera node's position
+    cameraNode.position = Vector3(0.0, 0.0, -10.0)
+
+    -- Create camera
+    local camera = cameraNode:CreateComponent("Camera")
+    -- Set camera orthographic
+    camera.orthographic = true
+
+    -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
+\endcode 
 
 
 \page Serialization Serialization

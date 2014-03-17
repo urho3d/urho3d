@@ -322,7 +322,7 @@ function writeGlobalFunctions(file)
   end
 end
  
-function writeGLobalProperties(file)
+function writeGlobalProperties(file)
   file:write("\n")
   for i, property in ipairs(globalProperties) do
     writeProperty(file, property)
@@ -371,7 +371,7 @@ function classPackage:print()
   writeClasses(file)
   writeEnumerates(file)
   writeGlobalFunctions(file)
-  writeGLobalProperties(file)
+  writeGlobalProperties(file)
   writeGlobalConstants(file)
  
   file:write("\n}\nreturn api\n")
