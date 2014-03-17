@@ -204,7 +204,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         {
             String idStr;
             if (editNode.id >= FIRST_LOCAL_ID)
-                idStr = " (Local ID " + String(editNode.id - FIRST_LOCAL_ID) + ")";
+                idStr = " (Local ID " + String(editNode.id) + ")";
             else
                 idStr = " (ID " + String(editNode.id) + ")";
             nodeType = editNode.typeName;

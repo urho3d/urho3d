@@ -452,7 +452,7 @@ String GetNodeTitle(Node@ node)
         ret = node.name;
 
     if (node.id >= FIRST_LOCAL_ID)
-        ret += " (Local " + String(node.id - FIRST_LOCAL_ID) + ")";
+        ret += " (Local " + String(node.id) + ")";
     else
         ret += " (" + String(node.id) + ")";
 
