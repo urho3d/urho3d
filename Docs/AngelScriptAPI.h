@@ -4954,6 +4954,17 @@ Vector3 normal;
 Vector3 position;
 };
 
+class PhysicsRaycastResult2D
+{
+
+// Properties:
+/* readonly */
+RigidBody2D body;
+float distance;
+Vector2 normal;
+Vector2 position;
+};
+
 class PhysicsWorld
 {
 // Methods:
@@ -5026,9 +5037,12 @@ void DrawDebugGeometry() const;
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+Array<RigidBody2D> GetRigidBodies(const Rect&, uint = 0xffff);
 bool Load(File, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
+Array<PhysicsRaycastResult2D> Raycast(const Vector2&, const Vector2&, uint = 0xffff);
+PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff);
 void Remove();
 void RemoveInstanceDefault();
 void ResetToDefault();

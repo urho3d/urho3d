@@ -2865,6 +2865,22 @@ Properties:
 - float distance
 - RigidBody* body
 
+### PhysicsRaycastResult2D
+
+
+Methods:
+
+- PhysicsRaycastResult2D() (GC)
+- PhysicsRaycastResult2D* new()
+- void delete()
+
+Properties:
+
+- Vector2 position
+- Vector2 normal
+- float distance
+- RigidBody2D* body
+
 ### PhysicsWorld : Component
 
 Methods:
@@ -2909,6 +2925,7 @@ Properties:
 
 Methods:
 
+- void DrawDebugGeometry()
 - void SetDrawShape(bool drawShape)
 - void SetDrawJoint(bool drawJoint)
 - void SetDrawAabb(bool drawAabb)
@@ -2922,7 +2939,9 @@ Methods:
 - void SetAutoClearForces(bool enable)
 - void SetVelocityIterations(int velocityIterations)
 - void SetPositionIterations(int positionIterations)
-- void DrawDebugGeometry()
+- const PODVector<PhysicsRaycastResult2D>& Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult2D RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
+- const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
 - bool GetDrawAabb() const
