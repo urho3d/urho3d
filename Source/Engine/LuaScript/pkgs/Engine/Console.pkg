@@ -8,6 +8,7 @@ class Console : public Object
     void SetAutoVisibleOnError(bool enable);
     void SetNumRows(unsigned rows);
     void SetNumHistoryRows(unsigned rows);
+    void SetFocusOnShow(bool enable);
     void UpdateElements();
     
     XMLFile* GetDefaultStyle() const;
@@ -19,6 +20,7 @@ class Console : public Object
     unsigned GetNumHistoryRows() const;
     unsigned GetHistoryPosition() const;
     const String GetHistoryRow(unsigned index) const;
+    bool GetFocusOnShow() const;
     
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_readonly tolua_property__get_set BorderImage* background;
@@ -28,6 +30,7 @@ class Console : public Object
     tolua_property__get_set unsigned numRows;
     tolua_property__get_set unsigned numHistoryRows;
     tolua_readonly tolua_property__get_set unsigned historyPosition;
+    tolua_property__get_set bool focusOnShow;
 };
 
 Console* GetConsole();

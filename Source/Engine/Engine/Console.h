@@ -48,7 +48,7 @@ public:
 
     /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);
-    /// Show or hide. Showing automatically focuses the line edit.
+    /// Show or hide.
     void SetVisible(bool enable);
     /// Toggle visibility.
     void Toggle();
@@ -58,6 +58,8 @@ public:
     void SetNumRows(unsigned rows);
     /// Set command history maximum size, 0 disables history.
     void SetNumHistoryRows(unsigned rows);
+    /// Set whether to automatically focus the line edit when showing. Default true on desktops and false on mobile devices, as on mobiles it would pop up the screen keyboard.
+    void SetFocusOnShow(bool enable);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
 
@@ -79,6 +81,8 @@ public:
     unsigned GetHistoryPosition() const { return historyPosition_; }
     /// Return history row at index.
     const String& GetHistoryRow(unsigned index) const;
+    /// Return whether automatically focuses the line edit when showing.
+    bool GetFocusOnShow() const { return focusOnShow_; }
 
 private:
     /// Handle enter pressed on the line edit.
@@ -112,6 +116,8 @@ private:
     unsigned historyPosition_;
     /// Flag when printing messages to prevent endless loop.
     bool printing_;
+    /// Flag for automatically focusing the line edit on showing the console.
+    bool focusOnShow_;
 };
 
 }
