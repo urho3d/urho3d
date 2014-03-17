@@ -2941,6 +2941,7 @@ Methods:
 - void SetPositionIterations(int positionIterations)
 - const PODVector<PhysicsRaycastResult2D>& Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
+- RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
