@@ -311,7 +311,7 @@ function writeGlobalFunctions(file)
   file:write("\n")
 end
 
-function writeGLobalProperties(file)
+function writeGlobalProperties(file)
   sortByName(globalProperties)
   file:write("\n\\section LuaScriptAPI_GlobalProperties Global properties\n")
 
@@ -354,7 +354,7 @@ function classPackage:print()
   writeClasses(file)
   writeEnumerates(file)
   writeGlobalFunctions(file)
-  writeGLobalProperties(file)
+  writeGlobalProperties(file)
   writeGlobalConstants(file)
   
   file:write("*/\n")
