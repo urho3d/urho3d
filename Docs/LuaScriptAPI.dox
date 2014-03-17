@@ -900,6 +900,7 @@ Methods:
 - void SetAutoVisibleOnError(bool enable)
 - void SetNumRows(unsigned rows)
 - void SetNumHistoryRows(unsigned rows)
+- void SetFocusOnShow(bool enable)
 - void UpdateElements()
 - XMLFile* GetDefaultStyle() const
 - BorderImage* GetBackground() const
@@ -910,6 +911,7 @@ Methods:
 - unsigned GetNumHistoryRows() const
 - unsigned GetHistoryPosition() const
 - const String GetHistoryRow(unsigned index) const
+- bool GetFocusOnShow() const
 
 Properties:
 
@@ -921,6 +923,7 @@ Properties:
 - unsigned numRows
 - unsigned numHistoryRows
 - unsigned historyPosition (readonly)
+- bool focusOnShow
 
 ### Constraint : Component
 

@@ -1803,6 +1803,7 @@ ShortStringHash baseType;
 /* readonly */
 String category;
 XMLFile defaultStyle;
+bool focusOnShow;
 /* readonly */
 uint historyPosition;
 /* readonly */
