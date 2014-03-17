@@ -38,12 +38,14 @@ namespace Urho3D
 
 extern const char* SUBSYSTEM_CATEGORY;
 static const Vector2 DEFAULT_GRAVITY(0.0f, -9.81f);
+static const int DEFAULT_VELOCITY_ITERATIONS = 8;
+static const int DEFAULT_POSITION_ITERATIONS = 3;
 
 PhysicsWorld2D::PhysicsWorld2D(Context* context) : Component(context),
     world_(0),
     gravity_(DEFAULT_GRAVITY),
-    velocityIterations_(8),
-    positionIterations_(3),
+    velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
+    positionIterations_(DEFAULT_POSITION_ITERATIONS),
     debugRenderer_(0),
     applyingTransforms_(false)
 {
@@ -56,7 +58,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) : Component(context),
     world_->SetContactListener(this);
     // Set debug draw
     world_->SetDebugDraw(this);
-
+    
     world_->SetContinuousPhysics(true);
     world_->SetSubStepping(true);
 }
@@ -86,9 +88,8 @@ void PhysicsWorld2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, false, AM_DEFAULT);
-
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, DEFAULT_VELOCITY_ITERATIONS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, DEFAULT_POSITION_ITERATIONS, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(PhysicsWorld2D, Component);
 }
 
@@ -223,7 +224,7 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
     const float32 axisScale = 0.4f;
 
     b2Vec2 p1 = xf.p, p2;
-    p2 = p1 + axisScale * xf.q.GetXAxis();    
+    p2 = p1 + axisScale * xf.q.GetXAxis();
     debugRenderer_->AddLine(Vector3(p1.x, p1.y, 0.0f), Vector3(p2.x, p2.y, 0.0f), Color::RED, debugDepthTest_);
 
     p2 = p1 + axisScale * xf.q.GetYAxis();
@@ -374,6 +375,10 @@ public:
     // Called for each fixture found in the query.
     virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
     {
+        // Ignore sensor
+        if (fixture->IsSensor())
+            return true;
+        
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -384,7 +389,6 @@ public:
         result.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
         
         results_.Push(result);
-
         return true;
     }
 
@@ -421,6 +425,10 @@ public:
     // Called for each fixture found in the query.
     virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
     {
+        // Ignore sensor
+        if (fixture->IsSensor())
+            return true;
+        
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -457,12 +465,68 @@ void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2
     world_->RayCast(&callback, ToB2Vec2(startPoint), ToB2Vec2(endPoint));
 }
 
-// Query callback class.
-class QueryCallback : public b2QueryCallback
+// Point query callback class.
+class PointQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    QueryCallback(PODVector<RigidBody2D*>& results, unsigned collisionMask) :
+    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :
+        point_(point),
+        collisionMask_(collisionMask),
+        rigidBody_(0)
+    {
+    }
+
+    // Called for each fixture found in the query AABB.
+    virtual bool ReportFixture(b2Fixture* fixture)
+    {
+        // Ignore sensor
+        if (fixture->IsSensor())
+            return true;
+        
+        if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
+            return true;
+
+        if (fixture->TestPoint(point_))
+        {
+            rigidBody_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
+            return false;
+        }
+
+        return true;
+    }
+
+    // Return rigid body.
+    RigidBody2D* GetRigidBody() const { return rigidBody_; }
+    
+private:
+    // Point.
+    b2Vec2 point_;
+    // Collision mask.
+    unsigned collisionMask_;
+    // Rigid body.
+    RigidBody2D* rigidBody_;
+};
+
+RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisionMask)
+{
+    PointQueryCallback callback(ToB2Vec2(point), collisionMask);
+
+    b2AABB b2Aabb;
+    Vector2 delta(M_EPSILON, M_EPSILON);
+    b2Aabb.lowerBound = ToB2Vec2(point - delta);
+    b2Aabb.upperBound = ToB2Vec2(point + delta);
+
+    world_->QueryAABB(&callback, b2Aabb);
+    return callback.GetRigidBody();
+}
+
+// Aabb query callback class.
+class AabbQueryCallback : public b2QueryCallback
+{
+public:
+    // Construct.
+    AabbQueryCallback(PODVector<RigidBody2D*>& results, unsigned collisionMask) :
         results_(results),
         collisionMask_(collisionMask)
     {
@@ -471,11 +535,14 @@ public:
     // Called for each fixture found in the query AABB.
     virtual bool ReportFixture(b2Fixture* fixture)
     {
+        // Ignore sensor
+        if (fixture->IsSensor())
+            return true;
+        
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
         results_.Push((RigidBody2D*)(fixture->GetBody()->GetUserData()));
-
         return true;
     }
 
@@ -484,26 +551,11 @@ private:
     PODVector<RigidBody2D*>& results_;
     // Collision mask.
     unsigned collisionMask_;
-    
 };
-
-RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisionMask)
-{
-    PODVector<RigidBody2D*> results;
-    QueryCallback callback(results, collisionMask);
-
-    b2AABB b2Aabb;
-    Vector2 delta(M_EPSILON, M_EPSILON);
-    b2Aabb.lowerBound = ToB2Vec2(point - delta);
-    b2Aabb.upperBound = ToB2Vec2(point + delta);
-
-    world_->QueryAABB(&callback, b2Aabb);
-    return results.Empty() ? 0 : results[0];
-}
 
 void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask)
 {
-    QueryCallback callback(results, collisionMask);
+    AabbQueryCallback callback(results, collisionMask);
 
     b2AABB b2Aabb;
     b2Aabb.lowerBound = ToB2Vec2(aabb.min_);
@@ -545,16 +597,6 @@ void PhysicsWorld2D::OnNodeSet(Node* node)
         scene_ = GetScene();
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld2D, HandleSceneSubsystemUpdate));
     }
-}
-
-void PhysicsWorld2D::SetDebugRenderer(DebugRenderer* debug)
-{
-    debugRenderer_ = debug;
-}
-
-void PhysicsWorld2D::SetDebugDepthTest(bool enable)
-{
-    debugDepthTest_ = enable;
 }
 
 void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)

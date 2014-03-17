@@ -170,10 +170,6 @@ protected:
     virtual void OnNodeSet(Node* node);
 
 private:
-    /// Set debug renderer to use. 
-    void SetDebugRenderer(DebugRenderer* debug);
-    /// Set debug geometry depth test mode. 
-    void SetDebugDepthTest(bool enable);
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
 
