@@ -22,10 +22,8 @@
 
 #include "Precompiled.h"
 #include "Context.h"
-#include "Drawable2D.h"
-#include "DrawableProxy2D.h"
 #include "Material.h"
-#include "Scene.h"
+#include "MaterialCache2D.h"
 #include "Technique.h"
 #include "Texture2D.h"
 
@@ -34,51 +32,34 @@
 namespace Urho3D
 {
 
-DrawableProxy2D::DrawableProxy2D(Context* context) :
-    Component(context)
+MaterialCache2D::MaterialCache2D(Context* context) : 
+    Object(context)
 {
 }
 
-DrawableProxy2D::~DrawableProxy2D()
+MaterialCache2D::~MaterialCache2D()
 {
 }
 
-void DrawableProxy2D::RegisterObject(Context* context)
+void MaterialCache2D::ReleaseAllMaterials()
 {
-    context->RegisterFactory<DrawableProxy2D>();
+    materials_.Clear();
 }
 
-void DrawableProxy2D::AddDrawable(Drawable2D* drawable)
+void MaterialCache2D::ReleaseMaterial(Texture2D* texture)
 {
-    if (!drawable)
-        return;
-
-    WeakPtr<Drawable2D> drawablePtr(drawable);
-    if (drawables_.Contains(drawablePtr))
-        return;
-
-    drawables_.Push(drawablePtr);
+    materials_.Erase(texture);
 }
 
-void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
+void MaterialCache2D::ReleaseMaterial(Texture2D* texture, BlendMode blendMode)
 {
-    if (!drawable)
-        return;
-
-    WeakPtr<Drawable2D> drawablePtr(drawable);
-    drawables_.Remove(drawablePtr);
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator i = materials_.Find(texture);
+    if (i != materials_.End())
+        i->second_.Erase(blendMode);
 }
 
-Material* DrawableProxy2D::GetMaterial(Drawable2D* drawable)
+Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 {
-    if (!drawable)
-        return 0;
-
-    Texture2D* texture = drawable->GetTexture();
-    if (!texture)
-        return 0;
-
-    BlendMode blendMode = drawable->GetBlendMode();
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = materials_.Find(texture);
     if (t == materials_.End())
     {
@@ -98,7 +79,7 @@ Material* DrawableProxy2D::GetMaterial(Drawable2D* drawable)
     return material;
 }
 
-Material* DrawableProxy2D::CreateMaterial(Texture2D* texture, BlendMode blendMode) const
+Material* MaterialCache2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
 {
     Material* material = new Material(context_);
     

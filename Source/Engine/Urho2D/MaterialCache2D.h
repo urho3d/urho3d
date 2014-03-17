@@ -22,40 +22,40 @@
 
 #pragma once
 
-#include "Drawable.h"
+#include "Object.h"
+#include "GraphicsDefs.h"
 
 namespace Urho3D
 {
 
 class Texture2D;
-class Drawable2D;
+class Material;
 
-/// 2D drawable proxy components.
-class URHO3D_API DrawableProxy2D : public Component
+/// Material cache for 2D.
+class URHO3D_API MaterialCache2D : public Object
 {
-    OBJECT(DrawableProxy2D);
+    OBJECT(MaterialCache2D);
 
 public:
     /// Construct.
-    DrawableProxy2D(Context* context);
+    MaterialCache2D(Context* context);
     /// Destruct.
-    ~DrawableProxy2D();
-    /// Register object factory. Drawable must be registered first.
-    static void RegisterObject(Context* context);
+    virtual ~MaterialCache2D();
+    
+    /// Release all materials.
+    void ReleaseAllMaterials();
+    /// Release material by texture.
+    void ReleaseMaterial(Texture2D* texture);
+    /// Release material by texture and blend mode.
+    void ReleaseMaterial(Texture2D* texture, BlendMode blendMode);
 
-    /// Add drawable.
-    void AddDrawable(Drawable2D* drawable);
-    /// Remove drawable.
-    void RemoveDrawable(Drawable2D* drawable);
-    /// Return material.
-    Material* GetMaterial(Drawable2D* drawable);
+    /// Return material by texture and blend mode.
+    Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
 
 protected:
     /// Create material by texture and blend mode.
-    Material* CreateMaterial(Texture2D* Texture, BlendMode blendMode) const;
+    Material* CreateMaterial(Texture2D* Texture, BlendMode blendMode);
 
-    /// Drawables.
-    Vector<WeakPtr<Drawable2D> > drawables_;
     /// Materials.
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > materials_;
 };

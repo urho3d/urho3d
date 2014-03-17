@@ -29,8 +29,8 @@
 #include "CollisionEdge2D.h"
 #include "CollisionPolygon2D.h"
 #include "CollisionShape2D.h"
+#include "Context.h"
 #include "Drawable2D.h"
-#include "DrawableProxy2D.h"
 #include "ParticleEmitter2D.h"
 #include "ParticleModel2D.h"
 #include "PhysicsWorld2D.h"
@@ -50,7 +50,6 @@ void RegisterUrho2DLibrary(Context* context)
 {
     // Must register objects from base to derived order
     Drawable2D::RegisterObject(context);
-    DrawableProxy2D::RegisterObject(context);
     StaticSprite2D::RegisterObject(context);
     AnimatedSprite2D::RegisterObject(context);
     Animation2D::RegisterObject(context);

@@ -24,10 +24,10 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable2D.h"
-#include "DrawableProxy2D.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Material.h"
+#include "MaterialCache2D.h"
 #include "Node.h"
 #include "ResourceCache.h"
 #include "Scene.h"
@@ -62,8 +62,6 @@ Drawable2D::Drawable2D(Context* context) :
 
 Drawable2D::~Drawable2D()
 {
-    if (drawableProxy_)
-        drawableProxy_->RemoveDrawable(this);
 }
 
 void Drawable2D::RegisterObject(Context* context)
@@ -262,17 +260,6 @@ void Drawable2D::SetBlendModeAttr(BlendMode mode)
     SetBlendMode(mode);
 }
 
-void Drawable2D::OnNodeSet(Node* node)
-{
-    Drawable::OnNodeSet(node);
-
-    if (node)
-    {
-        drawableProxy_ = GetScene()->GetOrCreateComponent<DrawableProxy2D>();
-        drawableProxy_->AddDrawable(this);
-    }
-}
-
 void Drawable2D::OnWorldBoundingBoxUpdate()
 {
     if (verticesDirty_)
@@ -296,7 +283,10 @@ void Drawable2D::UpdateMaterial()
     if (material_)
         batches_[0].material_ = material_;
     else
-        batches_[0].material_ = drawableProxy_->GetMaterial(this);
+    {
+        MaterialCache2D* materialCache = GetSubsystem<MaterialCache2D>();
+        batches_[0].material_ = materialCache->GetMaterial(GetTexture(), blendMode_);
+    }
 }
 
 }
