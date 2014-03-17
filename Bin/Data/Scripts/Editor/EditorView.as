@@ -1305,7 +1305,7 @@ void HandlePostRenderUpdate()
     if (debug is null || orbiting)
         return;
 
-    // Visualize the currently selected nodes as their local axes + the first drawable component
+    // Visualize the currently selected nodes
     for (uint i = 0; i < selectedNodes.length; ++i)
         DrawNodeDebug(selectedNodes[i], debug);
 
@@ -1337,11 +1337,17 @@ void HandlePostRenderUpdate()
 void DrawNodeDebug(Node@ node, DebugRenderer@ debug)
 {
     debug.AddNode(node, 1.0, false);
-    for (uint j = 0; j < node.numComponents; ++j)
-        node.components[j].DrawDebugGeometry(debug, false);
-    
-    for (uint k = 0; k < node.numChildren; ++k)
-        DrawNodeDebug(node.children[k], debug);
+
+    // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
+    // components can have a large performance hit
+    if (node !is editorScene)
+    {
+        for (uint j = 0; j < node.numComponents; ++j)
+            node.components[j].DrawDebugGeometry(debug, false);
+
+        for (uint k = 0; k < node.numChildren; ++k)
+            DrawNodeDebug(node.children[k], debug);
+    }
 }
 
 void ViewMouseMove()
