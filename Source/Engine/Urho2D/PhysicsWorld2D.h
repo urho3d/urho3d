@@ -30,6 +30,27 @@ namespace Urho3D
 
 class RigidBody2D;
 
+/// 2D Physics raycast hit.
+struct URHO3D_API PhysicsRaycastResult2D
+{
+    /// Construct with defaults.
+    PhysicsRaycastResult2D() : body_(0)
+    {
+    }
+
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const PhysicsRaycastResult2D& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_; }
+
+    /// Hit worldspace position.
+    Vector2 position_;
+    /// Hit worldspace normal.
+    Vector2 normal_;
+    /// Hit distance from ray origin.
+    float distance_;
+    /// Rigid body that was hit.
+    RigidBody2D* body_;
+};
+
 /// 2D physics simulation world component. Should be added only to the root scene node.
 class URHO3D_API PhysicsWorld2D : public Component, public b2ContactListener, public b2Draw
 {
@@ -66,7 +87,10 @@ public:
     /// Draw a transform. Choose your own length scale.
     virtual void DrawTransform(const b2Transform& xf);
 
-
+    /// Step the simulation forward.
+    void Update(float timeStep);
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry();
     /// Set draw shape.
     void SetDrawShape(bool drawShape);
     /// Set draw joint.
@@ -98,14 +122,12 @@ public:
     /// Remove rigid body.
     void RemoveRigidBody(RigidBody2D* rigidBody);
 
-    /// Step the simulation forward.
-    void Update(float timeStep);
-    /// Add debug geometry to the debug renderer.
-    void DrawDebugGeometry();
-    /// Set debug renderer to use. Called both by PhysicsWorld2D itself and physics components.
-    void SetDebugRenderer(DebugRenderer* debug);
-    /// Set debug geometry depth test mode. Called both by PhysicsWorld2D itself and physics components.
-    void SetDebugDepthTest(bool enable);
+    /// Perform a physics world raycast and return all hits.
+    void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Perform a physics world raycast and return the closest hit.
+    void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Return rigid bodies by a box query.
+    void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 
     /// Return draw shape.
     bool GetDrawShape() const { return (m_drawFlags & e_shapeBit) != 0; }
@@ -146,6 +168,10 @@ protected:
     virtual void OnNodeSet(Node* node);
 
 private:
+    /// Set debug renderer to use. 
+    void SetDebugRenderer(DebugRenderer* debug);
+    /// Set debug geometry depth test mode. 
+    void SetDebugDepthTest(bool enable);
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
 

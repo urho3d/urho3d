@@ -230,6 +230,31 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
     debugRenderer_->AddLine(Vector3(p1.x, p1.y, 0.0f), Vector3(p2.x, p2.y, 0.0f), Color::GREEN, debugDepthTest_);
 }
 
+void PhysicsWorld2D::Update(float timeStep)
+{
+    using namespace Physics2DPreStep2D;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WORLD] = this;
+    eventData[P_TIMESTEP] = timeStep;
+    SendEvent(E_PHYSICSPRESTEP2D, eventData);
+
+    world_->Step(timeStep, velocityIterations_, positionIterations_);
+
+    for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
+        rigidBodies_[i]->ApplyWorldTransform();
+
+    using namespace PhysicsPostStep2D;
+    SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
+}
+
+void PhysicsWorld2D::DrawDebugGeometry()
+{
+    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    if (debug)
+        DrawDebugGeometry(debug, false);
+}
+
 void PhysicsWorld2D::SetDrawShape(bool drawShape)
 {
     if (drawShape)
@@ -334,39 +359,143 @@ void PhysicsWorld2D::RemoveRigidBody(RigidBody2D* rigidBody)
     rigidBodies_.Remove(rigidBodyPtr);
 }
 
-void PhysicsWorld2D::Update(float timeStep)
+// Ray cast call back class.
+class RayCastCallback : public b2RayCastCallback
 {
-    using namespace Physics2DPreStep2D;
+public:
+    // Construct.
+    RayCastCallback(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, unsigned collisionMask) :
+        results_(results),
+        startPoint_(startPoint), 
+        collisionMask_(collisionMask)
+    {
+    }
+    
+    // Called for each fixture found in the query.
+    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    {
+        if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
+            return true;
 
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = this;
-    eventData[P_TIMESTEP] = timeStep;
-    SendEvent(E_PHYSICSPRESTEP2D, eventData);
+        PhysicsRaycastResult2D result;
+        result.position_ = ToVector2(point);
+        result.normal_ = ToVector2(normal);
+        result.distance_ = (result.position_ - startPoint_).Length();
+        result.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
+        
+        results_.Push(result);
 
-    world_->Step(timeStep, velocityIterations_, positionIterations_);
+        return true;
+    }
 
-    for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
-        rigidBodies_[i]->ApplyWorldTransform();
+protected:
+    // Physics raycast results.
+    PODVector<PhysicsRaycastResult2D>& results_;
+    // Start point.
+    Vector2 startPoint_;
+    // Collision mask.
+    unsigned collisionMask_;
+};
 
-    using namespace PhysicsPostStep2D;
-    SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
+void PhysicsWorld2D::Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask)
+{
+    results.Clear();
+
+    RayCastCallback callback(results, startPoint, collisionMask);
+    world_->RayCast(&callback, ToB2Vec2(startPoint), ToB2Vec2(endPoint));
 }
 
-void PhysicsWorld2D::DrawDebugGeometry()
+// Single ray cast call back class.
+class SingleRayCastCallback : public b2RayCastCallback
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
-    if (debug)
-        DrawDebugGeometry(debug, false);
+public:
+    // Construct.
+    SingleRayCastCallback(PhysicsRaycastResult2D& result, const Vector2& startPoint, unsigned collisionMask) :
+        result_(result),
+        startPoint_(startPoint),
+        collisionMask_(collisionMask),
+        minDistance_(M_INFINITY)
+    {
+    }
+
+    // Called for each fixture found in the query.
+    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    {
+        if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
+            return true;
+
+        float distance = (ToVector2(point)- startPoint_).Length();
+        if (distance < minDistance_)
+        {
+            minDistance_ = distance;
+
+            result_.position_ = ToVector2(point);
+            result_.normal_ = ToVector2(normal);
+            result_.distance_ = distance;
+            result_.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
+        }
+
+        return true;
+    }
+
+private:
+    // Physics raycast result.
+    PhysicsRaycastResult2D& result_;
+    // Start point.
+    Vector2 startPoint_;
+    // Collision mask.
+    unsigned collisionMask_;
+    // Minimum distance.
+    float minDistance_;
+};
+
+void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask)
+{
+    result.body_ = 0;
+
+    SingleRayCastCallback callback(result, startPoint, collisionMask);
+    world_->RayCast(&callback, ToB2Vec2(startPoint), ToB2Vec2(endPoint));
 }
 
-void PhysicsWorld2D::SetDebugRenderer(DebugRenderer* debug)
+// Query callback class.
+class QueryCallback : public b2QueryCallback
 {
-    debugRenderer_ = debug;
-}
+public:
+    // Construct.
+    QueryCallback(PODVector<RigidBody2D*>& results, unsigned collisionMask) :
+        results_(results),
+        collisionMask_(collisionMask)
+    {
+    }
 
-void PhysicsWorld2D::SetDebugDepthTest(bool enable)
+    // Called for each fixture found in the query AABB.
+    virtual bool ReportFixture(b2Fixture* fixture)
+    {
+        if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
+            return true;
+
+        results_.Push((RigidBody2D*)(fixture->GetBody()->GetUserData()));
+
+        return true;
+    }
+
+private:
+    // Results.
+    PODVector<RigidBody2D*>& results_;
+    // Collision mask.
+    unsigned collisionMask_;
+    
+};
+
+void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask)
 {
-    debugDepthTest_ = enable;
+    QueryCallback callback(result, collisionMask);
+
+    b2AABB b2Aabb;
+    b2Aabb.lowerBound = ToB2Vec2(aabb.min_);
+    b2Aabb.upperBound = ToB2Vec2(aabb.max_);
+
+    world_->QueryAABB(&callback, b2Aabb);
 }
 
 bool PhysicsWorld2D::GetAllowSleeping() const
@@ -402,6 +531,16 @@ void PhysicsWorld2D::OnNodeSet(Node* node)
         scene_ = GetScene();
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld2D, HandleSceneSubsystemUpdate));
     }
+}
+
+void PhysicsWorld2D::SetDebugRenderer(DebugRenderer* debug)
+{
+    debugRenderer_ = debug;
+}
+
+void PhysicsWorld2D::SetDebugDepthTest(bool enable)
+{
+    debugDepthTest_ = enable;
 }
 
 void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)

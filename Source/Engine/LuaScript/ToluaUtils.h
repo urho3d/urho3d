@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "OctreeQuery.h"
 #include "PhysicsWorld.h"
+#include "PhysicsWorld2D.h"
 #include "Vector2.h"
 #include "Vector3.h"
 
@@ -116,6 +117,8 @@ template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const 
 template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RigidBody*> to Lua as a table.
 template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const char* type);
+/// Push PODVector<RigidBody2D*> to Lua as a table.
+template<> int ToluaPushPODVector<RigidBody2D*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<Vector3> to Lua as a table.
 template<> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char* type);
 /// Push PODVector<IntVector2> to Lua as a table.
@@ -124,5 +127,7 @@ template<> int ToluaPushPODVector<IntVector2>(lua_State* L, void* data, const ch
 template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, const char* type);
 /// Push PODVector<PhysicsRaycastResult> to Lua as a table.
 template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char* type);
+/// Push PODVector<PhysicsRaycastResult2D> to Lua as a table.
+template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* type);

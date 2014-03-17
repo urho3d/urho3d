@@ -284,6 +284,18 @@ template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const ch
     return 1;
 }
 
+template<> int ToluaPushPODVector<RigidBody2D*>(lua_State* L, void* data, const char*)
+{
+    const PODVector<RigidBody2D*>& vector = *((const PODVector<RigidBody2D*>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], "RigidBody2D");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
 template<typename T> int tolua_pushurho3dpodvectorusertype(lua_State* L, const PODVector<T>& vector, const char* typeName)
 {
     lua_newtable(L);
@@ -317,6 +329,11 @@ template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, c
 template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<PhysicsRaycastResult>*)data), "PhysicsRaycastResult");
+}
+
+template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char*)
+{
+    return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<PhysicsRaycastResult2D>*)data), "PhysicsRaycastResult2D");
 }
 
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char*)
