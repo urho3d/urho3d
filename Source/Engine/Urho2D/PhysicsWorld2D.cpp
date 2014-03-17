@@ -487,9 +487,23 @@ private:
     
 };
 
-void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask)
+RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisionMask)
 {
-    QueryCallback callback(result, collisionMask);
+    PODVector<RigidBody2D*> results;
+    QueryCallback callback(results, collisionMask);
+
+    b2AABB b2Aabb;
+    Vector2 delta(M_EPSILON, M_EPSILON);
+    b2Aabb.lowerBound = ToB2Vec2(point - delta);
+    b2Aabb.upperBound = ToB2Vec2(point + delta);
+
+    world_->QueryAABB(&callback, b2Aabb);
+    return results.Empty() ? 0 : results[0];
+}
+
+void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask)
+{
+    QueryCallback callback(results, collisionMask);
 
     b2AABB b2Aabb;
     b2Aabb.lowerBound = ToB2Vec2(aabb.min_);

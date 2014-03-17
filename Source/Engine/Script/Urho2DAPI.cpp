@@ -24,7 +24,6 @@
 #include "APITemplates.h"
 #include "AnimatedSprite2D.h"
 #include "Animation2D.h"
-#include "APITemplates.h"
 #include "CollisionBox2D.h"
 #include "CollisionChain2D.h"
 #include "CollisionCircle2D.h"
@@ -68,7 +67,7 @@ static void RegisterSpriteSheet2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SpriteSheet2D", "void UpdateSprite(const String&, const IntRect&, const Vector2&)", asMETHOD(SpriteSheet2D, UpdateSprite), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from Drawable2D.
+// Template function for registering a class derived from Drawable2D.
 template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* className)
 {
     RegisterDrawable<T>(engine, className);
@@ -90,7 +89,7 @@ static void RegisterDrawable2D(asIScriptEngine* engine)
     RegisterDrawable2D<Drawable2D>(engine, "Drawable2D");
 }
 
-/// Template function for registering a class derived from StaticSprite2D.
+// Template function for registering a class derived from StaticSprite2D.
 template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const char* className)
 {
     RegisterDrawable2D<T>(engine, className);
@@ -158,7 +157,6 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
     engine->RegisterEnumValue("BodyType2D", "BT_KINEMATIC", BT_KINEMATIC);
 
     RegisterComponent<RigidBody2D>(engine, "RigidBody2D");
-
     engine->RegisterObjectMethod("RigidBody2D", "void set_bodyType(BodyType2D)", asMETHOD(RigidBody2D, SetBodyType), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "BodyType2D get_bodyType() const", asMETHOD(RigidBody2D, GetBodyType), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void set_mass(float)", asMETHOD(RigidBody2D, SetMass), asCALL_THISCALL);
@@ -185,23 +183,11 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody2D", "bool get_awake() const", asMETHOD(RigidBody2D, IsAwake), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void set_linearVelocity(Vector2)", asMETHOD(RigidBody2D, SetLinearVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "Vector2 get_linearVelocity() const", asMETHOD(RigidBody2D, GetLinearVelocity), asCALL_THISCALL);
-
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyForce(const Vector2&in, const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyForce), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyForceToCenter(const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyForceToCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyTorque(float torque, bool)", asMETHOD(RigidBody2D, ApplyTorque), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyLinearImpulse(const Vector2&in, const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyLinearImpulse), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyAngularImpulse(float, bool)", asMETHOD(RigidBody2D, ApplyAngularImpulse), asCALL_THISCALL);
-}
-
-static PhysicsWorld2D* SceneGetPhysicsWorld2D(Scene* ptr)
-{
-    return ptr->GetComponent<PhysicsWorld2D>();
-}
-
-static PhysicsWorld2D* GetPhysicsWorld2D()
-{
-    Scene* scene = GetScriptContextScene();
-    return scene ? scene->GetComponent<PhysicsWorld2D>() : 0;
 }
 
 static void ConstructPhysicsRaycastResult2D(PhysicsRaycastResult2D* ptr)
@@ -243,6 +229,17 @@ static CScriptArray* PhysicsWorld2DGetRigidBodies(const Rect& aabb, unsigned col
     return VectorToHandleArray<RigidBody2D>(results, "Array<RigidBody2D@>");
 }
 
+static PhysicsWorld2D* SceneGetPhysicsWorld2D(Scene* ptr)
+{
+    return ptr->GetComponent<PhysicsWorld2D>();
+}
+
+static PhysicsWorld2D* GetPhysicsWorld2D()
+{
+    Scene* scene = GetScriptContextScene();
+    return scene ? scene->GetComponent<PhysicsWorld2D>() : 0;
+}
+
 static void RegisterPhysicsWorld2D(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("PhysicsRaycastResult2D", sizeof(PhysicsRaycastResult2D), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -257,6 +254,7 @@ static void RegisterPhysicsWorld2D(asIScriptEngine* engine)
     RegisterComponent<PhysicsWorld2D>(engine, "PhysicsWorld2D");
     engine->RegisterObjectMethod("PhysicsWorld2D", "Array<PhysicsRaycastResult2D>@ Raycast(const Vector2&, const Vector2&, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorld2DRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld2D", "PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorld2DRaycastSingle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld2D", "RigidBody2D@+ GetRigidBody(const Vector2&, uint collisionMask = 0xffff)", asMETHOD(PhysicsWorld2D, GetRigidBody), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "Array<RigidBody2D@>@ GetRigidBodies(const Rect&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorld2DGetRigidBodies), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld2D", "void set_drawShape(bool)", asMETHOD(PhysicsWorld2D, SetDrawShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "bool get_drawShape() const", asMETHOD(PhysicsWorld2D, GetDrawShape), asCALL_THISCALL);
@@ -290,12 +288,11 @@ static void RegisterPhysicsWorld2D(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("PhysicsWorld2D@+ get_physicsWorld2D()", asFUNCTION(GetPhysicsWorld2D), asCALL_CDECL);
 }
 
-/// Template function for registering a class derived from CollisionShape2D.
+// Template function for registering a class derived from CollisionShape2D.
 template <class T> void RegisterCollisionShape2D(asIScriptEngine* engine, const char* className)
 {
     RegisterComponent<T>(engine, className);
     RegisterSubclass<CollisionShape2D, T>(engine, "CollisionShape2D", className);
-
     engine->RegisterObjectMethod(className, "void set_sensor(bool)", asMETHOD(T, SetSensor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_sensor() const", asMETHOD(T, IsSensor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_categoryBits(int)", asMETHOD(T, SetCategoryBits), asCALL_THISCALL);
@@ -407,6 +404,7 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterAnimatedSprite2D(engine);
     RegisterParticleModel2D(engine);
     RegisterParticleEmitter2D(engine);
+
     RegisterRigidBody2D(engine);
     RegisterPhysicsWorld2D(engine);
     RegisterCollisionShape2D(engine);
