@@ -977,6 +977,68 @@ Properties:
 - float CFM
 - bool disableCollision
 
+### Constraint2D : Component
+
+Methods:
+
+- void SetOtherBody(RigidBody2D* body)
+- void SetCollideConnected(bool collideConnected)
+- RigidBody2D* GetOwnerBody() const
+- RigidBody2D* GetOtherBody() const
+- bool GetCollideConnected() const
+
+Properties:
+
+- RigidBody2D* ownerBody (readonly)
+- RigidBody2D* otherBody
+- bool collideConnected
+
+### ConstraintRevolute2D : Constraint2D
+
+Methods:
+
+- void SetAnchorPoint(const Vector2& anchor)
+- void SetEnableLimit(bool enableLimit)
+- void SetLowerAngle(float lowerAngle)
+- void SetUpperAngle(float upperAngle)
+- void SetEnableMotor(bool enableMotor)
+- void SetMotorSpeed(float motorSpeed)
+- void SetMaxMotorTorque(float maxMotorTorque)
+- const Vector2& GetAnchorPoint() const
+- bool GetEnableLimit() const
+- float GetLowerAngle() const
+- float GetUpperAngle() const
+- bool GetEnableMotor() const
+- float GetMotorSpeed() const
+- float GetMaxMotorTorque() const
+
+Properties:
+
+- Vector2& anchorPoint
+- bool enableLimit
+- float lowerAngle
+- float upperAngle
+- bool enableMotor
+- float motorSpeed
+- float maxMotorTorque
+
+### ConstraintRope2D : Constraint2D
+
+Methods:
+
+- void SetOwnerBodyAnchor(const Vector2& anchor)
+- void SetOtherBodyAnchor(const Vector2& anchor)
+- void SetMaxLength(float maxLength)
+- const Vector2& GetOwnerBodyAnchor() const
+- const Vector2& GetOtherBodyAnchor() const
+- float GetMaxLength() const
+
+Properties:
+
+- Vector2& ownerBodyAnchor
+- Vector2& otherBodyAnchor
+- float maxLength
+
 ### Context
 
 
