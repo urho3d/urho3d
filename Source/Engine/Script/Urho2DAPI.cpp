@@ -30,6 +30,9 @@
 #include "CollisionEdge2D.h"
 #include "CollisionPolygon2D.h"
 #include "CollisionShape2D.h"
+#include "Constraint2D.h"
+#include "ConstraintRevolute2D.h"
+#include "ConstraintRope2D.h"
 #include "Drawable2D.h"
 #include "ParticleEmitter2D.h"
 #include "ParticleModel2D.h"
@@ -394,6 +397,54 @@ static void RegisterCollisionPolygon2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionPolygon2D", "Array<Vector2>@ GetVertices() const", asFUNCTION(CollisionPolygon2DGetVertices), asCALL_CDECL_OBJLAST);
 }
 
+// Template function for registering a class derived from Constraint2D.
+template <class T> void RegisterConstraint2D(asIScriptEngine* engine, const char* className)
+{
+    RegisterComponent<T>(engine, className);
+    RegisterSubclass<Constraint2D, T>(engine, "Constraint2D", className);
+    engine->RegisterObjectMethod(className, "void set_otherBody(RigidBody2D@+)", asMETHOD(T, SetOtherBody), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "RigidBody2D@+ get_ownerBody() const", asMETHOD(T, GetOwnerBody), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "RigidBody2D@+ get_otherBody() const", asMETHOD(T, GetOtherBody), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_collideConnected(bool)", asMETHOD(T, SetCollideConnected), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_collideConnected() const", asMETHOD(T, GetCollideConnected), asCALL_THISCALL);
+}
+
+
+static void RegisterConstraint2D(asIScriptEngine* engine)
+{
+    RegisterConstraint2D<Constraint2D>(engine, "Constraint2D");
+}
+
+static void RegisterConstraintRevolute2D(asIScriptEngine* engine)
+{
+    RegisterConstraint2D<ConstraintRevolute2D>(engine, "ConstraintRevolute2D");
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_anchorPoint(const Vector2&)", asMETHOD(ConstraintRevolute2D, SetAnchorPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Vector2& get_anchorPoint() const", asMETHOD(ConstraintRevolute2D, GetAnchorPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enableLimit(bool)", asMETHOD(ConstraintRevolute2D, SetEnableLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enableLimit() const", asMETHOD(ConstraintRevolute2D, GetEnableLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_lowerAngle(float)", asMETHOD(ConstraintRevolute2D, SetLowerAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_lowerAngle() const", asMETHOD(ConstraintRevolute2D, GetLowerAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_upperAngle(float)", asMETHOD(ConstraintRevolute2D, SetUpperAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_upperAngle() const", asMETHOD(ConstraintRevolute2D, GetUpperAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enableMotor(bool)", asMETHOD(ConstraintRevolute2D, SetEnableMotor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enableMotor() const", asMETHOD(ConstraintRevolute2D, GetEnableMotor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_motorSpeed(float)", asMETHOD(ConstraintRevolute2D, SetMotorSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_motorSpeed() const", asMETHOD(ConstraintRevolute2D, GetMotorSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_maxMotorTorque(float)", asMETHOD(ConstraintRevolute2D, SetMaxMotorTorque), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_maxMotorTorque() const", asMETHOD(ConstraintRevolute2D, GetMaxMotorTorque), asCALL_THISCALL);
+}
+
+static void RegisterConstraintRope2D(asIScriptEngine* engine)
+{
+    RegisterConstraint2D<ConstraintRope2D>(engine, "ConstraintRope2D");
+    engine->RegisterObjectMethod("ConstraintRope2D", "void set_ownerBodyAnchor(const Vector2&)", asMETHOD(ConstraintRope2D, SetOwnerBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRope2D", "const Vector2& get_ownerBodyAnchor() const", asMETHOD(ConstraintRope2D, GetOwnerBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRope2D", "void set_otherBodyAnchor(const Vector2&)", asMETHOD(ConstraintRope2D, SetOtherBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRope2D", "const Vector2& get_otherBodyAnchor() const", asMETHOD(ConstraintRope2D, GetOtherBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRope2D", "void set_maxLength(float)", asMETHOD(ConstraintRope2D, SetMaxLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRope2D", "float get_maxLength() const", asMETHOD(ConstraintRope2D, GetMaxLength), asCALL_THISCALL);
+}
+
 void RegisterUrho2DAPI(asIScriptEngine* engine)
 {
     RegisterSprite2D(engine);
@@ -413,6 +464,9 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterCollisionChain2D(engine);
     RegisterCollisionEdge2D(engine);
     RegisterCollisionPolygon2D(engine);
+    RegisterConstraint2D(engine);
+    RegisterConstraintRevolute2D(engine);
+    RegisterConstraintRope2D(engine);
 }
 
 }
