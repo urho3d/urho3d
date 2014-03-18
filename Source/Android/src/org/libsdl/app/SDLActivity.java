@@ -3,6 +3,7 @@
 package org.libsdl.app;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -45,8 +46,15 @@ public class SDLActivity extends Activity {
     protected static AudioTrack mAudioTrack;
 
 
-    // Urho3D: flag to load the .so
+    // Urho3D: flag to load the .so and a new method load them
     private static boolean mIsSharedLibraryLoaded = false;
+
+    protected boolean onLoadLibrary(ArrayList<String> libraryNames) {
+        for (final String name : libraryNames) {
+            System.loadLibrary(name);
+        }
+        return true;
+    }
 
     // Setup
     @Override
@@ -68,12 +76,14 @@ public class SDLActivity extends Activity {
                     return Long.valueOf(lhs.lastModified()).compareTo(rhs.lastModified());
                 }
             });
+            ArrayList<String> libraryNames = new ArrayList<String>(files.length);
             for (final File libraryFilename : files) {
                 String name = libraryFilename.getName().replaceAll("^lib(.*)\\.so$", "$1");
                 //Log.v(TAG, "library name: " + name);
-                System.loadLibrary(name);
-            }            
-            mIsSharedLibraryLoaded = true;
+                libraryNames.add(name);
+            }
+            if (onLoadLibrary(libraryNames))
+                mIsSharedLibraryLoaded = true;
         }
 
         // Set up the surface
@@ -123,8 +133,9 @@ public class SDLActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.v("SDL", "onDestroy()");
-        // Send a quit message to the application
-        SDLActivity.nativeQuit();
+        // Urho3D - Send a quit message to the application only when native library has been loaded
+        if (mIsSharedLibraryLoaded)
+            SDLActivity.nativeQuit();
 
         // Now wait for the SDL thread to quit
         if (mSDLThread != null) {
