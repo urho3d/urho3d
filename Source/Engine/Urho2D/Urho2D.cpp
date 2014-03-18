@@ -29,6 +29,9 @@
 #include "CollisionEdge2D.h"
 #include "CollisionPolygon2D.h"
 #include "CollisionShape2D.h"
+#include "Constraint2D.h"
+#include "ConstraintRevolute2D.h"
+#include "ConstraintRope2D.h"
 #include "Context.h"
 #include "Drawable2D.h"
 #include "ParticleEmitter2D.h"
@@ -66,6 +69,10 @@ void RegisterUrho2DLibrary(Context* context)
     CollisionCircle2D::RegisterObject(context);
     CollisionEdge2D::RegisterObject(context);
     CollisionPolygon2D::RegisterObject(context);
+    Constraint2D::RegisterObject(context);
+    ConstraintRevolute2D::RegisterObject(context);
+    ConstraintRope2D::RegisterObject(context);
+
 }
 
 }
