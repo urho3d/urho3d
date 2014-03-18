@@ -51,6 +51,14 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="112 0 126 14" />
     </element>
+    <element type="ConstraintRevolute2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintRope2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
     <element type="CustomGeometry">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="32 0 46 14" />
