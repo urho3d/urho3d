@@ -420,26 +420,32 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
                 decodePosition_ %= decodeBuffer_->GetDataSize();
                 totalBytes -= outBytes;
             }
+            
+            // Correct interpolation of the looping buffer
+            decodeBuffer_->FixInterpolation();
         }
         else
         {
             // Setup the decoder and decode initial buffer
             decoder_ = sound_->AllocateDecoder();
             unsigned sampleSize = sound_->GetSampleSize();
-            unsigned DecodeBufferSize = sampleSize * sound_->GetIntFrequency() * DECODE_BUFFER_LENGTH / 1000;
+            unsigned decodeBufferSize = sampleSize * sound_->GetIntFrequency() * DECODE_BUFFER_LENGTH / 1000;
             decodeBuffer_ = new Sound(context_);
-            decodeBuffer_->SetSize(DecodeBufferSize);
+            decodeBuffer_->SetSize(decodeBufferSize);
             decodeBuffer_->SetFormat(sound_->GetIntFrequency(), true, sound_->IsStereo());
 
             // Clear the decode buffer, then fill with initial audio data and set it to loop
-            memset(decodeBuffer_->GetStart(), 0, DecodeBufferSize);
-            sound_->Decode(decoder_, decodeBuffer_->GetStart(), DecodeBufferSize);
+            memset(decodeBuffer_->GetStart(), 0, decodeBufferSize);
+            sound_->Decode(decoder_, decodeBuffer_->GetStart(), decodeBufferSize);
             decodeBuffer_->SetLooped(true);
             decodePosition_ = 0;
 
             // Start playing the decode buffer
             position_ = decodeBuffer_->GetStart();
             fractPosition_ = 0;
+            
+            // Correct initial interpolation of the looping buffer
+            decodeBuffer_->FixInterpolation();
         }
     }
 
