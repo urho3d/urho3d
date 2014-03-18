@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class SoundStream;
+
 /// %Sound resource.
 class URHO3D_API Sound : public Resource
 {
@@ -63,15 +65,10 @@ public:
     /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
     void FixInterpolation();
     
-    /// Create and return a compressed audio decoder instance. Return null if fails.
-    void* AllocateDecoder();
-    /// Decode compressed audio data. Return number of actually decoded bytes.
-    unsigned Decode(void* decoder, signed char* dest, unsigned bytes);
-    /// Rewind the decoder to beginning of audio data.
-    void RewindDecoder(void* decoder);
-    /// Free the decoder instance.
-    void FreeDecoder(void* decoder);
-    
+    /// Return a new instance of a decoder sound stream. Used by compressed sounds.
+    SharedPtr<SoundStream> GetDecoderStream() const;
+    /// Return shared sound data.
+    SharedArrayPtr<signed char> GetData() const { return data_; }
     /// Return sound data start.
     signed char* GetStart() const { return data_.Get(); }
     /// Return loop start.
@@ -85,16 +82,16 @@ public:
     /// Return sample size.
     unsigned GetSampleSize() const;
     /// Return default frequency as a float.
-    float GetFrequency() { return (float)frequency_; }
+    float GetFrequency() const { return (float)frequency_; }
     /// Return default frequency as an integer.
-    unsigned GetIntFrequency() { return frequency_; }
+    unsigned GetIntFrequency() const { return frequency_; }
     /// Return whether is looped.
     bool IsLooped() const { return looped_; }
     /// Return whether data is sixteen bit.
     bool IsSixteenBit() const { return sixteenBit_; }
     /// Return whether data is stereo.
     bool IsStereo() const { return stereo_; }
-    /// Return whether is compressed in Ogg Vorbis format.
+    /// Return whether is compressed.
     bool IsCompressed() const { return compressed_; }
     
 private:

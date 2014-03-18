@@ -30,9 +30,10 @@ namespace Urho3D
 
 class Audio;
 class Sound;
+class SoundStream;
 
 // Compressed audio decode buffer length in milliseconds
-static const int DECODE_BUFFER_LENGTH = 100;
+static const int STREAM_BUFFER_LENGTH = 100;
 
 /// %Sound source component with stereo position.
 class URHO3D_API SoundSource : public Component
@@ -55,6 +56,8 @@ public:
     void Play(Sound* sound, float frequency, float gain);
     /// Play a sound with specified frequency, gain and panning.
     void Play(Sound* sound, float frequency, float gain, float panning);
+    /// Start playing a sound stream.
+    void Play(SoundStream* stream);
     /// Stop playback.
     void Stop();
     /// Set sound type, determines the master gain group.
@@ -93,12 +96,6 @@ public:
     /// Return whether is playing.
     bool IsPlaying() const;
     
-    /// Play a sound without locking the audio mutex. Called internally.
-    void PlayLockless(Sound* sound);
-    /// Stop sound without locking the audio mutex. Called internally.
-    void StopLockless();
-    /// Set new playback position without locking the audio mutex. Called internally.
-    void SetPlayPositionLockless(signed char* position);
     /// Update the sound source. Perform subclass specific operations. Called by Audio.
     virtual void Update(float timeStep);
     /// Mix sound source output to a 32-bit clipping buffer. Called by Audio.
@@ -134,6 +131,14 @@ protected:
     bool autoRemove_;
     
 private:
+    /// Play a sound without locking the audio mutex. Called internally.
+    void PlayLockless(Sound* sound);
+    /// Play a sound stream without locking the audio mutex. Called internally.
+    void PlayLockless(SharedPtr<SoundStream> stream);
+    /// Stop sound without locking the audio mutex. Called internally.
+    void StopLockless();
+    /// Set new playback position without locking the audio mutex. Called internally.
+    void SetPlayPositionLockless(signed char* position);
     /// Mix mono sample to mono buffer.
     void MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate);
     /// Mix mono sample to stereo buffer.
@@ -154,23 +159,23 @@ private:
     void MixZeroVolume(Sound* sound, unsigned samples, int mixRate);
     /// Advance playback pointer to simulate audio playback in headless mode.
     void MixNull(float timeStep);
-    /// Free the decoder if any.
-    void FreeDecoder();
     
-    /// Sound.
+    /// Sound that is being played.
     SharedPtr<Sound> sound_;
+    /// Sound stream that is being played.
+    SharedPtr<SoundStream> soundStream_;
     /// Playback position.
     volatile signed char *position_;
     /// Playback fractional position.
     volatile int fractPosition_;
     /// Playback time position.
     volatile float timePosition_;
-    /// Ogg Vorbis decoder.
-    void* decoder_;
     /// Decode buffer.
-    SharedPtr<Sound> decodeBuffer_;
-    /// Previous decode buffer position.
-    unsigned decodePosition_;
+    SharedPtr<Sound> streamBuffer_;
+    /// Position in stream buffer the next audio data from the stream will be written to.
+    unsigned streamWritePosition_;
+    /// Stream underrun flag.
+    bool streamStopped_;
 };
 
 }

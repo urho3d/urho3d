@@ -26,6 +26,7 @@
 #include "ResourceCache.h"
 #include "Sound.h"
 #include "SoundSource.h"
+#include "SoundStream.h"
 
 #include <cstring>
 
@@ -115,8 +116,8 @@ SoundSource::SoundSource(Context* context) :
     position_(0),
     fractPosition_(0),
     timePosition_(0.0f),
-    decoder_(0),
-    decodePosition_(0)
+    streamWritePosition_(0),
+    streamStopped_(false)
 {
     audio_ = GetSubsystem<Audio>();
 
@@ -128,8 +129,6 @@ SoundSource::~SoundSource()
 {
     if (audio_)
         audio_->RemoveSoundSource(this);
-
-    FreeDecoder();
 }
 
 void SoundSource::RegisterObject(Context* context)
@@ -152,7 +151,7 @@ void SoundSource::Play(Sound* sound)
 {
     if (!audio_)
         return;
-
+    
     // If no frequency set yet, set from the sound's default
     if (frequency_ == 0.0f && sound)
         SetFrequency(sound->GetFrequency());
@@ -190,6 +189,34 @@ void SoundSource::Play(Sound* sound, float frequency, float gain, float panning)
     Play(sound);
 }
 
+void SoundSource::Play(SoundStream* stream)
+{
+    if (!audio_)
+        return;
+
+    // If no frequency set yet, set from the stream's default
+    if (frequency_ == 0.0f && stream)
+        SetFrequency(stream->GetFrequency());
+
+    SharedPtr<SoundStream> streamPtr(stream);
+    
+    // If sound source is currently playing, have to lock the audio mutex. When stream playback is explicitly
+    // requested, clear the existing sound if any
+    if (position_)
+    {
+        MutexLock lock(audio_->GetMutex());
+        sound_.Reset();
+        PlayLockless(streamPtr);
+    }
+    else
+    {
+        sound_.Reset();
+        PlayLockless(streamPtr);
+    }
+    
+    // Stream playback is not supported for network replication, no need to mark network dirty
+}
+
 void SoundSource::Stop()
 {
     if (!audio_)
@@ -201,10 +228,9 @@ void SoundSource::Stop()
         MutexLock lock(audio_->GetMutex());
         StopLockless();
     }
-
-    // Free the compressed sound decoder now if any
-    FreeDecoder();
-
+    else
+        StopLockless();
+    
     MarkNetworkUpdate();
 }
 
@@ -248,88 +274,17 @@ void SoundSource::SetAutoRemove(bool enable)
 
 bool SoundSource::IsPlaying() const
 {
-    return sound_ != 0 && position_ != 0;
+    return (sound_ || soundStream_) && position_ != 0;
 }
 
 void SoundSource::SetPlayPosition(signed char* pos)
 {
-    if (!audio_ || !sound_)
+    // Setting play position on a stream is not supported
+    if (!audio_ || !sound_ || soundStream_)
         return;
 
     MutexLock lock(audio_->GetMutex());
     SetPlayPositionLockless(pos);
-}
-
-void SoundSource::PlayLockless(Sound* sound)
-{
-    // Reset the time position in any case
-    timePosition_ = 0.0f;
-
-    if (sound)
-    {
-        if (!sound->IsCompressed())
-        {
-            // Uncompressed sound start
-            signed char* start = sound->GetStart();
-            if (start)
-            {
-                // Free decoder in case previous sound was compressed
-                FreeDecoder();
-                sound_ = sound;
-                position_ = start;
-                fractPosition_ = 0;
-                return;
-            }
-        }
-        else
-        {
-            // Compressed sound start
-            if (sound == sound_ && decoder_)
-            {
-                // If same compressed sound is already playing, rewind the decoder
-                sound_->RewindDecoder(decoder_);
-                return;
-            }
-            else
-            {
-                // Else just set the new sound with a dummy start position. The mixing routine will allocate the new decoder
-                FreeDecoder();
-                sound_ = sound;
-                position_ = sound->GetStart();
-                return;
-            }
-        }
-    }
-
-    // If sound pointer is null or if sound has no data, stop playback
-    FreeDecoder();
-    sound_.Reset();
-    position_ = 0;
-}
-
-void SoundSource::StopLockless()
-{
-    position_ = 0;
-    timePosition_ = 0.0f;
-}
-
-void SoundSource::SetPlayPositionLockless(signed char* pos)
-{
-    // Setting position on a compressed sound is not supported
-    if (!sound_ || sound_->IsCompressed())
-        return;
-
-    signed char* start = sound_->GetStart();
-    signed char* end = sound_->GetEnd();
-    if (pos < start)
-        pos = start;
-    if (sound_->IsSixteenBit() && (pos - start) & 1)
-        ++pos;
-    if (pos > end)
-        pos = end;
-
-    position_ = pos;
-    timePosition_ = ((float)(int)(size_t)(pos - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
 void SoundSource::Update(float timeStep)
@@ -341,9 +296,9 @@ void SoundSource::Update(float timeStep)
     if (!audio_->IsInitialized())
         MixNull(timeStep);
 
-    // Free the decoder if playback has stopped
-    if (!position_ && decoder_)
-        FreeDecoder();
+    // Free the stream if playback has stopped
+    if (soundStream_ && !position_)
+        StopLockless();
 
     // Check for autoremove
     if (autoRemove_)
@@ -365,92 +320,73 @@ void SoundSource::Update(float timeStep)
 
 void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
 {
-    if (!position_ || !sound_ || !IsEnabledEffective())
+    if (!position_ || (!sound_ && !soundStream_) || !IsEnabledEffective())
         return;
-
-    if (sound_->IsCompressed())
+    
+    if (soundStream_ && streamBuffer_)
     {
-        if (decoder_)
+        unsigned streamBufferSize = streamBuffer_->GetDataSize();
+        
+        // Decode new audio in stream mode. If stream experienced an underrun, try restarting
+        if (streamStopped_)
         {
-            // If decoder already exists, decode new compressed audio
-            bool eof = false;
-            unsigned currentPos = position_ - decodeBuffer_->GetStart();
-            unsigned totalBytes;
-            
-            // Handle possible wraparound
-            if (currentPos >= decodePosition_)
-                totalBytes = currentPos - decodePosition_;
+            // If stream should stop at end, do not loop after current buffer is played
+            if (soundStream_->GetStopAtEnd())
+                streamBuffer_->SetLooped(false);
             else
-                totalBytes = decodeBuffer_->GetDataSize() - decodePosition_ + currentPos;
-            
-            while (totalBytes)
             {
-                // Calculate size of current decode work unit (may need to do in two parts if wrapping)
-                unsigned bytes = decodeBuffer_->GetDataSize() - decodePosition_;
-                if (bytes > totalBytes)
-                    bytes = totalBytes;
-                
-                unsigned outBytes = 0;
-                
-                if (!eof)
+                unsigned outBytes = soundStream_->GetData(streamBuffer_->GetStart(), streamBufferSize);
+                if (outBytes)
                 {
-                    outBytes = sound_->Decode(decoder_, decodeBuffer_->GetStart() + decodePosition_, bytes);
-                    // If decoded less than the requested amount, has reached end. Rewind (looped) or fill rest with zero (oneshot)
-                    if (outBytes < bytes)
-                    {
-                        if (sound_->IsLooped())
-                        {
-                            sound_->RewindDecoder(decoder_);
-                            timePosition_ = 0.0f;
-                        }
-                        else
-                        {
-                            decodeBuffer_->SetLooped(false); // Stop after the current decode buffer has been played
-                            eof = true;
-                        }
-                    }
+                    // If did not get a full buffer, fill the rest with zero
+                    if (outBytes < streamBufferSize)
+                        memset(streamBuffer_->GetStart() + outBytes, 0, streamBufferSize - outBytes);
+                    streamStopped_ = false;
+                    // Start playback from beginning of stream buffer again so that there is minimal latency
+                    position_ = streamBuffer_->GetStart();
+                    fractPosition_ = 0;
+                    streamWritePosition_ = 0;
                 }
-                else
-                {
-                    memset(decodeBuffer_->GetStart() + decodePosition_, 0, bytes);
-                    outBytes = bytes;
-                }
-                
-                decodePosition_ += outBytes;
-                decodePosition_ %= decodeBuffer_->GetDataSize();
-                totalBytes -= outBytes;
             }
-            
-            // Correct interpolation of the looping buffer
-            decodeBuffer_->FixInterpolation();
         }
         else
         {
-            // Setup the decoder and decode initial buffer
-            decoder_ = sound_->AllocateDecoder();
-            unsigned sampleSize = sound_->GetSampleSize();
-            unsigned decodeBufferSize = sampleSize * sound_->GetIntFrequency() * DECODE_BUFFER_LENGTH / 1000;
-            decodeBuffer_ = new Sound(context_);
-            decodeBuffer_->SetSize(decodeBufferSize);
-            decodeBuffer_->SetFormat(sound_->GetIntFrequency(), true, sound_->IsStereo());
-
-            // Clear the decode buffer, then fill with initial audio data and set it to loop
-            memset(decodeBuffer_->GetStart(), 0, decodeBufferSize);
-            sound_->Decode(decoder_, decodeBuffer_->GetStart(), decodeBufferSize);
-            decodeBuffer_->SetLooped(true);
-            decodePosition_ = 0;
-
-            // Start playing the decode buffer
-            position_ = decodeBuffer_->GetStart();
-            fractPosition_ = 0;
+            unsigned currentPos = position_ - streamBuffer_->GetStart();
+            unsigned totalBytes;
             
-            // Correct initial interpolation of the looping buffer
-            decodeBuffer_->FixInterpolation();
+            // Handle possible wraparound
+            if (currentPos >= streamWritePosition_)
+                totalBytes = currentPos - streamWritePosition_;
+            else
+                totalBytes = streamBuffer_->GetDataSize() - streamWritePosition_ + currentPos;
+            
+            while (totalBytes)
+            {
+                // Calculate size of current stream data request (may need to do in two parts if wrapping)
+                unsigned bytes = streamBuffer_->GetDataSize() - streamWritePosition_;
+                if (bytes > totalBytes)
+                    bytes = totalBytes;
+                
+                unsigned outBytes = soundStream_->GetData(streamBuffer_->GetStart() + streamWritePosition_, bytes);
+                // If got less than the requested amount, stream reached end or experienced underrun. Fill rest with zero
+                if (outBytes < bytes)
+                {
+                    streamStopped_ = true;
+                    memset(streamBuffer_->GetStart() + streamWritePosition_ + outBytes, 0, bytes - outBytes);
+                }
+                
+                streamWritePosition_ += bytes;
+                streamWritePosition_ %= streamBuffer_->GetDataSize();
+                totalBytes -= bytes;
+            }
         }
+        
+        // Correct interpolation of the stream buffer
+        streamBuffer_->FixInterpolation();
     }
 
-    // If compressed, play the decode buffer. Otherwise play the original sound
-    Sound* sound = sound_->IsCompressed() ? decodeBuffer_ : sound_;
+    // If streaming, play the stream buffer. Otherwise play the original sound
+    Sound* sound = soundStream_ ? streamBuffer_ : sound_;
     if (!sound)
         return;
 
@@ -491,10 +427,10 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     }
 
     // Update the time position
-    if (!sound_->IsCompressed())
+    if (soundStream_)
+        timePosition_ += ((float)samples / (float)mixRate) * frequency_ / soundStream_->GetFrequency();
+    else if (sound_)
         timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
-    else
-        timePosition_ += ((float)samples / (float)mixRate) * frequency_ / sound_->GetFrequency();
 }
 
 void SoundSource::SetSoundAttr(ResourceRef value)
@@ -505,8 +441,9 @@ void SoundSource::SetSoundAttr(ResourceRef value)
         Play(newSound);
     else
     {
-        // When changing the sound and not playing, make sure the old decoder (if any) is freed
-        FreeDecoder();
+        // When changing the sound and not playing, free previous sound stream and stream buffer (if any)
+        soundStream_.Reset();
+        streamBuffer_.Reset();
         sound_ = newSound;
     }
 }
@@ -539,6 +476,104 @@ int SoundSource::GetPositionAttr() const
         return (int)(GetPlayPosition() - sound_->GetStart());
     else
         return 0;
+}
+
+void SoundSource::PlayLockless(Sound* sound)
+{
+    // Reset the time position in any case
+    timePosition_ = 0.0f;
+
+    if (sound)
+    {
+        if (!sound->IsCompressed())
+        {
+            // Uncompressed sound start
+            signed char* start = sound->GetStart();
+            if (start)
+            {
+                // Free existing stream & stream buffer if any
+                soundStream_.Reset();
+                streamBuffer_.Reset();
+                sound_ = sound;
+                position_ = start;
+                fractPosition_ = 0;
+                return;
+            }
+        }
+        else
+        {
+            // Compressed sound start
+            PlayLockless(sound->GetDecoderStream());
+            return;
+        }
+    }
+    
+    // If sound pointer is null or if sound has no data, stop playback
+    StopLockless();
+    sound_.Reset();
+}
+
+void SoundSource::PlayLockless(SharedPtr<SoundStream> stream)
+{
+    // Reset the time position in any case
+    timePosition_ = 0.0f;
+
+    if (stream)
+    {
+        // Setup the stream buffer
+        unsigned sampleSize = stream->GetSampleSize();
+        unsigned streamBufferSize = sampleSize * stream->GetIntFrequency() * STREAM_BUFFER_LENGTH / 1000;
+        
+        streamBuffer_ = new Sound(context_);
+        streamBuffer_->SetSize(streamBufferSize);
+        streamBuffer_->SetFormat(stream->GetIntFrequency(), stream->IsSixteenBit(), stream->IsStereo());
+        streamBuffer_->SetLooped(true);
+        
+        // Fill stream buffer with initial data
+        unsigned outBytes = stream->GetData(streamBuffer_->GetStart(), streamBufferSize);
+        if (outBytes < streamBufferSize)
+            memset(streamBuffer_->GetStart() + outBytes, 0, streamBufferSize - outBytes);
+        
+        soundStream_ = stream;
+        streamWritePosition_ = 0;
+        streamStopped_ = false;
+        position_ = streamBuffer_->GetStart();
+        fractPosition_ = 0;
+        return;
+    }
+    
+    // If stream pointer is null, stop playback
+    StopLockless();
+}
+
+void SoundSource::StopLockless()
+{
+    position_ = 0;
+    timePosition_ = 0.0f;
+    streamStopped_ = true;
+    
+    // Free the sound stream and decode buffer if a stream was playing
+    soundStream_.Reset();
+    streamBuffer_.Reset();
+}
+
+void SoundSource::SetPlayPositionLockless(signed char* pos)
+{
+    // Setting position on a stream is not supported
+    if (!sound_ || soundStream_)
+        return;
+
+    signed char* start = sound_->GetStart();
+    signed char* end = sound_->GetEnd();
+    if (pos < start)
+        pos = start;
+    if (sound_->IsSixteenBit() && (pos - start) & 1)
+        ++pos;
+    if (pos > end)
+        pos = end;
+
+    position_ = pos;
+    timePosition_ = ((float)(int)(size_t)(pos - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
 void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
@@ -1222,17 +1257,6 @@ void SoundSource::MixNull(float timeStep)
             timePosition_ = 0.0f;
         }
     }
-}
-
-void SoundSource::FreeDecoder()
-{
-    if (sound_ && decoder_)
-    {
-        sound_->FreeDecoder(decoder_);
-        decoder_ = 0;
-    }
-
-    decodeBuffer_.Reset();
 }
 
 }

@@ -22,8 +22,8 @@ class Sound : public Resource
     float GetLength() const;
     unsigned GetDataSize() const;
     unsigned GetSampleSize() const;
-    float GetFrequency();
-    unsigned GetIntFrequency();
+    float GetFrequency() const;
+    unsigned GetIntFrequency() const;
     bool IsLooped() const;
     bool IsSixteenBit() const;
     bool IsStereo() const;
