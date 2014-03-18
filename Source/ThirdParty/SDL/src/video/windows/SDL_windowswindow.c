@@ -59,12 +59,6 @@ static ATOM SDL_HelperWindowClass = 0;
 #define STYLE_RESIZABLE     (WS_THICKFRAME | WS_MAXIMIZEBOX)
 #define STYLE_MASK          (STYLE_FULLSCREEN | STYLE_BORDERLESS | STYLE_NORMAL | STYLE_RESIZABLE)
 
-// Urho3D: added function for Direct3D9 initialization
-HWND WIN_GetWindowHandle(SDL_Window* window)
-{
-    return ((SDL_WindowData *)window->driverdata)->hwnd;
-}
-
 static DWORD
 GetWindowStyle(SDL_Window * window)
 {
