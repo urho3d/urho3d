@@ -902,6 +902,8 @@ Normal maps encode the tangent-space surface normal for normal mapping. There ar
 
 Make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
 
+Models using a normal-mapped material need to have tangent vectors in their vertex data; the easiest way to ensure this is to use the switch -t (generate tangents) when using either AssetImporter or OgreImporter to import models to Urho3D format. If there are no tangents, the light attenuation on the normal-mapped material will behave in a completely erratic fashion.
+
 Specular maps encode the specular surface color as RGB. Note that deferred rendering is only able to use monochromatic specular intensity from the G channel, while forward and light pre-pass rendering use fully colored specular. DXT1 format should suit these textures well.
 
 Textures can have an accompanying XML file which specifies load-time parameters, such as addressing, mipmapping, and number of mip levels to skip on each quality level:

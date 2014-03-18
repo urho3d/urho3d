@@ -372,59 +372,58 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     {
         if (decoder_)
         {
-            // If Decoder already exists, decode new compressed audio
+            // If decoder already exists, decode new compressed audio
             bool eof = false;
             unsigned currentPos = position_ - decodeBuffer_->GetStart();
-            if (currentPos != decodePosition_)
+            unsigned totalBytes;
+            
+            // Handle possible wraparound
+            if (currentPos >= decodePosition_)
+                totalBytes = currentPos - decodePosition_;
+            else
+                totalBytes = decodeBuffer_->GetDataSize() - decodePosition_ + currentPos;
+            
+            while (totalBytes)
             {
-                // If buffer has wrapped, decode first to the end
-                if (currentPos < decodePosition_)
+                // Calculate size of current decode work unit (may need to do in two parts if wrapping)
+                unsigned bytes = decodeBuffer_->GetDataSize() - decodePosition_;
+                if (bytes > totalBytes)
+                    bytes = totalBytes;
+                
+                unsigned outBytes = 0;
+                
+                if (!eof)
                 {
-                    unsigned bytes = decodeBuffer_->GetDataSize() - decodePosition_;
-                    unsigned outBytes = sound_->Decode(decoder_, decodeBuffer_->GetStart() + decodePosition_, bytes);
-                    // If produced less output, end of sound encountered. Fill rest with zero
+                    outBytes = sound_->Decode(decoder_, decodeBuffer_->GetStart() + decodePosition_, bytes);
+                    // If decoded less than the requested amount, has reached end. Rewind (looped) or fill rest with zero (oneshot)
                     if (outBytes < bytes)
                     {
-                        memset(decodeBuffer_->GetStart() + decodePosition_ + outBytes, 0, bytes - outBytes);
-                        eof = true;
-                    }
-                    decodePosition_ = 0;
-                }
-                if (currentPos > decodePosition_)
-                {
-                    unsigned bytes = currentPos - decodePosition_;
-                    unsigned outBytes = sound_->Decode(decoder_, decodeBuffer_->GetStart() + decodePosition_, bytes);
-                    // If produced less output, end of sound encountered. Fill rest with zero
-                    if (outBytes < bytes)
-                    {
-                        memset(decodeBuffer_->GetStart() + decodePosition_ + outBytes, 0, bytes - outBytes);
                         if (sound_->IsLooped())
+                        {
+                            sound_->RewindDecoder(decoder_);
+                            timePosition_ = 0.0f;
+                        }
+                        else
+                        {
+                            decodeBuffer_->SetLooped(false); // Stop after the current decode buffer has been played
                             eof = true;
+                        }
                     }
-
-                    // If wrote to buffer start, correct interpolation wraparound
-                    if (!decodePosition_)
-                        decodeBuffer_->FixInterpolation();
-                }
-            }
-
-            // If end of stream encountered, check whether we should rewind or stop
-            if (eof)
-            {
-                if (sound_->IsLooped())
-                {
-                    sound_->RewindDecoder(decoder_);
-                    timePosition_ = 0.0f;
                 }
                 else
-                    decodeBuffer_->SetLooped(false); // Stop after the current decode buffer has been played
+                {
+                    memset(decodeBuffer_->GetStart() + decodePosition_, 0, bytes);
+                    outBytes = bytes;
+                }
+                
+                decodePosition_ += outBytes;
+                decodePosition_ %= decodeBuffer_->GetDataSize();
+                totalBytes -= outBytes;
             }
-
-            decodePosition_ = currentPos;
         }
         else
         {
-            // Setup the decoder and decode buffer
+            // Setup the decoder and decode initial buffer
             decoder_ = sound_->AllocateDecoder();
             unsigned sampleSize = sound_->GetSampleSize();
             unsigned DecodeBufferSize = sampleSize * sound_->GetIntFrequency() * DECODE_BUFFER_LENGTH / 1000;
