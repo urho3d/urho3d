@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "FileSystem.h"
 #include "ParticleModel2D.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
@@ -57,35 +58,40 @@ static const int destBlendFuncs[] =
 
 ParticleModel2D::ParticleModel2D(Context* context) :
     Resource(context),
-    blendMode_(BLEND_ALPHA),
+    sourcePosition_(157.97f, 228.41f),// Values from sun.pex
+    sourcePositionVariance_(7.0f, 7.0f),
+    speed_(260.0f),
+    speedVariance_(10.0f),
+    particleLifeSpan_(1.000f),
+    particleLifespanVariance_(0.700f),
+    angle_(0.0f),
+    angleVariance_(360.0f),
+    gravity_(0.0f, 0.0f),
+    radialAcceleration_(-380.0f),
+    tangentialAcceleration_(-140.0f),
+    radialAccelVariance_(0.0f),
+    tangentialAccelVariance_(0.0f),
+    startColor_(1.0f, 0.0f, 0.0f, 1.0f),
+    startColorVariance_(0.0f, 0.0f, 0.0f, 0.0f),
+    finishColor_(1.0f, 1.0f, 0.0f, 1.0f),
+    finishColorVariance_(0.0f, 0.0f, 0.0f, 0.0f),
+    maxParticles_(600),
+    startParticleSize_(60.0f),
+    startParticleSizeVariance_(40.0f),
+    finishParticleSize_(5.0f),
+    FinishParticleSizeVariance_(5.0f),
     duration_(-1.0f),
     emitterType_(EMITTER_TYPE_GRAVITY),
-    sourcePositionVariance_(Vector2::ZERO),
-    maxParticles_(32),
-    particleLifeSpan_(1.0f),
-    particleLifeSpanVariance_(0.0f),
-    startParticleSize_(1.0f),
-    startParticleSizeVariance_(0.0f),
-    endParticleSize_(0.0f),
-    endParticleSizeVariance_(0.0f),
-    emitAngle_(0.0f),
-    emitAngleVariance_(0.0f),
-    speed_(100.0f),
-    speedVariance_(0.0f),
-    gravity_(Vector2::ZERO),
-    radialAcceleration_(0.0f),
-    radialAccelerationVariance_(0.0f),
-    tangentialAcceleration_(0.0f),
-    tangentialAccelerationVariance_(0.0f),
     maxRadius_(100.0f),
     maxRadiusVariance_(0.0f),
     minRadius_(0.0f),
     rotatePerSecond_(0.0f),
     rotatePerSecondVariance_(0.0f),
-    startColor_(Color::WHITE),
-    startColorVariance_(Color::TRANSPARENT),
-    endColor_(Color::WHITE),
-    endColorVariance_(Color::TRANSPARENT)
+    blendMode_(BLEND_ALPHA),
+    rotationStart_(0.0f),
+    rotationStartVariance_(0.0f),
+    rotationEnd_(0.0f),
+    rotationEndVariance_(0.0f)
 {
 }
 
@@ -104,47 +110,62 @@ bool ParticleModel2D::Load(Deserializer& source)
     if (!xmlFile.Load(source))
         return false;
 
-    XMLElement plistElem = xmlFile.GetRoot("plist");
-    if (!plistElem)
+    XMLElement rootElem = xmlFile.GetRoot("particleEmitterConfig");
+    if (!rootElem)
         return false;
 
-    XMLElement dictElem = plistElem.GetChild();
-    if (!dictElem || dictElem.GetName() != "dict")
-        return false;
-
-    VariantMap keyValueMapping;
-    XMLElement keyElem = dictElem.GetChild();
-    while (keyElem)
-    {
-        if (keyElem.GetName() != "key")
-            return false;
-
-        XMLElement valueElem = keyElem.GetNext();
-        if (!valueElem)
-            return false;
-
-        String key = keyElem.GetValue();
-        String type = valueElem.GetName();
-        String value = valueElem.GetValue();
-
-        if (type == "integer")
-            keyValueMapping[key] = ToInt(value);
-        else if (type == "real")
-            keyValueMapping[key] = ToFloat(value);
-        else
-            keyValueMapping[key] = value;
-
-        keyElem = valueElem.GetNext();
-    }
-
-    const String& textureFileName = keyValueMapping["textureFileName"].GetString();
+    String texture = rootElem.GetChild("texture").GetAttribute("name");
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    sprite_= cache->GetResource<Sprite2D>(textureFileName);
+    sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
     if (!sprite_)
         return false;
 
-    int blendFuncSource = keyValueMapping["blendFuncSource"].GetInt();
-    int blendFuncDestination = keyValueMapping["blendFuncDestination"].GetInt();
+    sourcePosition_ = ReadVector2(rootElem.GetChild("sourcePosition"));
+    sourcePositionVariance_ = ReadVector2(rootElem.GetChild("sourcePositionVariance"));
+
+    speed_ = rootElem.GetChild("speed").GetFloat("value");
+    speedVariance_ = rootElem.GetChild("speedVariance").GetFloat("value");
+    
+    particleLifeSpan_ = rootElem.GetChild("particleLifeSpan").GetFloat("value");
+    particleLifespanVariance_ = rootElem.GetChild("particleLifespanVariance").GetFloat("value");
+    
+    angle_ = 360.0f - rootElem.GetChild("angle").GetFloat("value");
+    angleVariance_ = rootElem.GetChild("angleVariance").GetFloat("value");
+    
+    gravity_ = ReadVector2(rootElem.GetChild("gravity"));
+
+    radialAcceleration_ = rootElem.GetChild("radialAcceleration").GetFloat("value");
+    tangentialAcceleration_ = -rootElem.GetChild("tangentialAcceleration").GetFloat("value");
+    
+    radialAccelVariance_ = rootElem.GetChild("radialAccelVariance").GetFloat("value");
+    tangentialAccelVariance_ = rootElem.GetChild("tangentialAccelVariance").GetFloat("value");
+
+    startColor_ = ReadColor(rootElem.GetChild("startColor"));
+    startColorVariance_ = ReadColor(rootElem.GetChild("startColorVariance"));
+    
+    finishColor_ = ReadColor(rootElem.GetChild("finishColor"));
+    finishColorVariance_ = ReadColor(rootElem.GetChild("finishColorVariance"));
+
+    maxParticles_ = rootElem.GetChild("maxParticles").GetInt("value");
+    
+    startParticleSize_ = rootElem.GetChild("startParticleSize").GetFloat("value");
+    startParticleSizeVariance_ = rootElem.GetChild("startParticleSizeVariance").GetFloat("value");
+    
+    finishParticleSize_ = rootElem.GetChild("finishParticleSize").GetFloat("value");
+    FinishParticleSizeVariance_ = rootElem.GetChild("FinishParticleSizeVariance").GetFloat("value");
+    
+    duration_ = rootElem.GetChild("duration").GetFloat("value");
+    emitterType_ = (EmitterType2D)rootElem.GetChild("emitterType").GetInt("value");
+    
+    maxRadius_ = rootElem.GetChild("maxRadius").GetFloat("value");
+    maxRadiusVariance_ = rootElem.GetChild("maxRadiusVariance").GetFloat("value");
+    minRadius_ = rootElem.GetChild("minRadius").GetFloat("value");
+
+    rotatePerSecond_ = -rootElem.GetChild("rotatePerSecond").GetFloat("value");
+    rotatePerSecondVariance_ = rootElem.GetChild("rotatePerSecondVariance").GetFloat("value");
+    
+    int blendFuncSource = rootElem.GetChild("blendFuncSource").GetInt("value");
+    int blendFuncDestination = rootElem.GetChild("blendFuncDestination").GetInt("value");
     blendMode_ = BLEND_ALPHA;
     for (int i = 0; i < MAX_BLENDMODES; ++i)
     {
@@ -155,59 +176,11 @@ bool ParticleModel2D::Load(Deserializer& source)
         }
     }
 
-    duration_ = keyValueMapping["duration"].GetFloat();
-    emitterType_ = (EmitterType2D)(int)keyValueMapping["emitterType"].GetFloat();
-
-    sourcePositionVariance_.x_ = keyValueMapping["sourcePositionVariancex"].GetFloat();
-    sourcePositionVariance_.y_ = keyValueMapping["sourcePositionVariancey"].GetFloat();    
-
-    maxParticles_ = (unsigned)keyValueMapping["maxParticles"].GetFloat();
-    particleLifeSpan_ = keyValueMapping["particleLifespan"].GetFloat();
-
-    particleLifeSpanVariance_ = keyValueMapping["particleLifespanVariance"].GetFloat();
-    startParticleSize_ = keyValueMapping["startParticleSize"].GetFloat();
-    startParticleSizeVariance_ = keyValueMapping["startParticleSizeVariance"].GetFloat();
-    endParticleSize_ = keyValueMapping["finishParticleSize"].GetFloat();
-    endParticleSizeVariance_ = keyValueMapping["finishParticleSizeVariance"].GetFloat();
-    emitAngle_ = keyValueMapping["angle"].GetFloat();
-    emitAngleVariance_ = keyValueMapping["angleVariance"].GetFloat();
-
-    speed_ = keyValueMapping["speed"].GetFloat();
-    speedVariance_ = keyValueMapping["speedVariance"].GetFloat();
-
-    gravity_.x_ = keyValueMapping["gravityx"].GetFloat();
-    gravity_.y_ = keyValueMapping["gravityy"].GetFloat();
-
-    radialAcceleration_ = keyValueMapping["radialAcceleration"].GetFloat();
-    radialAccelerationVariance_ = keyValueMapping["radialAccelVariance"].GetFloat();
-    tangentialAcceleration_ = keyValueMapping["tangentialAcceleration"].GetFloat();
-    tangentialAccelerationVariance_ = keyValueMapping["tangentialAccelVariance"].GetFloat();
-
-    maxRadius_ = keyValueMapping["maxRadius"].GetFloat();
-    maxRadiusVariance_ = keyValueMapping["maxRadiusVariance"].GetFloat();
-    minRadius_ = keyValueMapping["minRadius"].GetFloat();
-    rotatePerSecond_ = keyValueMapping["rotatePerSecond"].GetFloat();
-    rotatePerSecondVariance_ = keyValueMapping["rotatePerSecondVariance"].GetFloat();
-
-    startColor_.r_ = keyValueMapping["startColorRed"].GetFloat();
-    startColor_.g_ = keyValueMapping["startColorGreen"].GetFloat();
-    startColor_.b_ = keyValueMapping["startColorBlue"].GetFloat();
-    startColor_.a_ = keyValueMapping["startColorAlpha"].GetFloat();
-
-    startColorVariance_.r_ = keyValueMapping["startColorVarianceRed"].GetFloat();
-    startColorVariance_.g_ = keyValueMapping["startColorVarianceGreen"].GetFloat();
-    startColorVariance_.b_ = keyValueMapping["startColorVarianceBlue"].GetFloat();
-    startColorVariance_.a_ = keyValueMapping["startColorVarianceAlpha"].GetFloat();
-
-    endColor_.r_ = keyValueMapping["finishColorRed"].GetFloat();
-    endColor_.g_ = keyValueMapping["finishColorGreen"].GetFloat();
-    endColor_.b_ = keyValueMapping["finishColorBlue"].GetFloat();
-    endColor_.a_ = keyValueMapping["finishColorAlpha"].GetFloat();
-
-    endColorVariance_.r_ = keyValueMapping["finishColorVarianceRed"].GetFloat();
-    endColorVariance_.g_ = keyValueMapping["finishColorVarianceGreen"].GetFloat();
-    endColorVariance_.b_ = keyValueMapping["finishColorVarianceBlue"].GetFloat();
-    endColorVariance_.a_ = keyValueMapping["finishColorVarianceAlpha"].GetFloat();
+    rotationStart_ = -rootElem.GetChild("rotationStart").GetFloat("value");
+    rotationStartVariance_ = rootElem.GetChild("rotationStartVariance").GetFloat("value");
+    
+    rotationEnd_ = -rootElem.GetChild("rotationEnd").GetFloat("value");
+    rotationEndVariance_ = rootElem.GetChild("rotationEndVariance").GetFloat("value");
 
     return true;
 }
@@ -217,9 +190,190 @@ bool ParticleModel2D::Save(Serializer& dest) const
     return false;
 }
 
-Sprite2D* ParticleModel2D::GetSprite() const
+void ParticleModel2D::SetSourcePosition(const Vector2& sourcePosition)
 {
-    return sprite_;
+    sourcePosition_ = sourcePosition;
+}
+
+void ParticleModel2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance)
+{
+    sourcePositionVariance_ = sourcePositionVariance;
+}
+
+void ParticleModel2D::SetSpeed(float speed)
+{
+    speed_ = speed;
+}
+
+void ParticleModel2D::SetSpeedVariance(float speedVariance)
+{
+    speedVariance_ = speedVariance;
+}
+
+void ParticleModel2D::SetParticleLifeSpan(float particleLifeSpan)
+{
+    particleLifeSpan_ = particleLifeSpan;
+}
+
+void ParticleModel2D::SetParticleLifespanVariance(float particleLifespanVariance)
+{
+    particleLifespanVariance_ = particleLifespanVariance;
+}
+
+void ParticleModel2D::SetAngle(float angle)
+{
+    angle_ = angle;
+}
+
+void ParticleModel2D::SetAngleVariance(float angleVariance)
+{
+    angleVariance_ = angleVariance;
+}
+
+void ParticleModel2D::SetGravity(const Vector2& gravity)
+{
+    gravity_ = gravity;
+}
+
+void ParticleModel2D::SetRadialAcceleration(float radialAcceleration)
+{
+    radialAcceleration_ = radialAcceleration;
+}
+
+void ParticleModel2D::SetTangentialAcceleration(float tangentialAcceleration)
+{
+    tangentialAcceleration_ = tangentialAcceleration;
+}
+
+void ParticleModel2D::SetRadialAccelVariance(float radialAccelVariance)
+{
+    radialAccelVariance_ = radialAccelVariance;
+}
+
+void ParticleModel2D::SetTangentialAccelVariance(float tangentialAccelVariance)
+{
+    tangentialAccelVariance_ = tangentialAccelVariance;
+}
+
+void ParticleModel2D::SetStartColor(const Color& startColor)
+{
+    startColor_ = startColor;
+}
+
+void ParticleModel2D::SetStartColorVariance(const Color& startColorVariance)
+{
+    startColorVariance_ = startColorVariance;
+}
+
+void ParticleModel2D::SetFinishColor(const Color& finishColor)
+{
+    finishColor_ = finishColor;
+}
+
+void ParticleModel2D::SetFinishColorVariance(const Color& finishColorVariance)
+{
+    finishColorVariance_ = finishColorVariance;
+}
+
+void ParticleModel2D::SetMaxParticles(int maxParticles)
+{
+    maxParticles_ = maxParticles;
+}
+
+void ParticleModel2D::SetStartParticleSize(float startParticleSize)
+{
+    startParticleSize_ = startParticleSize;
+}
+
+void ParticleModel2D::SetStartParticleSizeVariance(float startParticleSizeVariance)
+{
+    startParticleSizeVariance_ = startParticleSizeVariance;
+}
+
+void ParticleModel2D::SetFinishParticleSize(float finishParticleSize)
+{
+    finishParticleSize_ = finishParticleSize;
+}
+
+void ParticleModel2D::SetFinishParticleSizeVariance(float FinishParticleSizeVariance)
+{
+    FinishParticleSizeVariance_ = FinishParticleSizeVariance;
+}
+
+void ParticleModel2D::SetDuration(float duration)
+{
+    duration_ = duration;
+}
+
+void ParticleModel2D::SetEmitterType(EmitterType2D emitterType)
+{
+    emitterType_ = emitterType;
+}
+
+void ParticleModel2D::SetMaxRadius(float maxRadius)
+{
+    maxRadius_ = maxRadius;
+}
+
+void ParticleModel2D::SetMaxRadiusVariance(float maxRadiusVariance)
+{
+    maxRadiusVariance_ = maxRadiusVariance;
+}
+
+void ParticleModel2D::SetMinRadius(float minRadius)
+{
+    minRadius_ = minRadius;
+}
+
+void ParticleModel2D::SetRotatePerSecond(float rotatePerSecond)
+{
+    rotatePerSecond_ = rotatePerSecond;
+}
+
+void ParticleModel2D::SetRotatePerSecondVariance(float rotatePerSecondVariance)
+{
+    rotatePerSecondVariance_ = rotatePerSecondVariance;
+}
+
+void ParticleModel2D::SetBlendMode(BlendMode blendMode)
+{
+    blendMode_ = blendMode;
+}
+
+void ParticleModel2D::SetRotationStart(float rotationStart)
+{
+    rotationStart_ = rotationStart;
+}
+
+void ParticleModel2D::SetRotationStartVariance(float rotationStartVariance)
+{
+    rotationStartVariance_ = rotationStartVariance;
+}
+
+void ParticleModel2D::SetRotationEnd(float rotationEnd)
+{
+    rotationEnd_ = rotationEnd;
+}
+
+void ParticleModel2D::SetRotationEndVariance(float rotationEndVariance)
+{
+    rotationEndVariance_ = rotationEndVariance;
+}
+
+Color ParticleModel2D::ReadColor(const XMLElement& element) const
+{
+    Color color;
+    color.r_ = element.GetFloat("red");
+    color.g_ = element.GetFloat("green");
+    color.b_ = element.GetFloat("blue");
+    color.a_ = element.GetFloat("alpha");
+    return color;
+}
+
+Vector2 ParticleModel2D::ReadVector2(const XMLElement& element) const
+{
+    // Flip y.
+    return Vector2(element.GetFloat("x"), -element.GetFloat("y"));
 }
 
 }

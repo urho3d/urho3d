@@ -85,7 +85,7 @@ void Urho2DParticle::CreateScene()
     camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/LavaFlow.plist");
+    ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/sun.pex");
     if (!particleModel)
         return;
 

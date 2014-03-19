@@ -111,7 +111,7 @@ private:
     /// Life time;
     float lifeTime_;
     /// Num particles.
-    unsigned numParticles_;
+    int numParticles_;
     /// Particles.
     Vector<Particle2D> particles_;
     /// Time to emit particle.

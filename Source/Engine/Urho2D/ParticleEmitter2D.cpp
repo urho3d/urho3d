@@ -89,7 +89,7 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
     Vector3 worldPosition = GetNode()->GetWorldPosition();
     float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
 
-    unsigned particleIndex = 0;
+    int particleIndex = 0;
     while (particleIndex < numParticles_)
     {
         Particle2D& currentParticle = particles_[particleIndex];
@@ -218,7 +218,7 @@ void ParticleEmitter2D::UpdateVertices()
     vertex2.uv_ = Vector2(1.0f, 0.0f);
     vertex3.uv_ = Vector2(1.0f, 1.0f);
 
-    for (unsigned i = 0; i < numParticles_; ++i)
+    for (int i = 0; i < numParticles_; ++i)
     {
         Particle2D& p = particles_[i];
 
@@ -254,7 +254,7 @@ void ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAn
     if (numParticles_ >= model_->GetMaxParticles())
         return;
 
-    float lifespan = model_->GetParticleLifeSpan() + model_->GetParticleLifeSpanVariance() * Random(-1.0f, 1.0f);
+    float lifespan = model_->GetParticleLifeSpan() + model_->GetParticleLifespanVariance() * Random(-1.0f, 1.0f);
     if (lifespan <= 0.0f) 
         return;
     
@@ -266,7 +266,7 @@ void ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAn
     particle.startPos_ = Vector2(worldPosition.x_, worldPosition.y_);
     particle.position_ = particle.startPos_ + model_->GetSourcePositionVariance() * Vector2(Random(-1.0f, 1.0f), Random(-1.0f, 1.0f)) * worldScale;
 
-    float emitAngle = worldAngle + model_->GetEmitAngle() + model_->GetEmitAngleVariance() * Random(-1.0f, 1.0f);
+    float emitAngle = worldAngle + model_->GetAngle() + model_->GetAngleVariance() * Random(-1.0f, 1.0f);
     float speed = worldScale * (model_->GetSpeed() + model_->GetSpeedVariance() * Random(-1.0f, 1.0f));
     particle.velocity_ = Vector2(Cos(emitAngle), Sin(emitAngle)) * speed;
 
@@ -276,15 +276,15 @@ void ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAn
     particle.rotation_ = emitAngle;
     particle.rotationDelta_ = model_->GetRotatePerSecond() + model_->GetRotatePerSecondVariance() * Random(-1.0f, 1.0f);
 
-    particle.radialAccel_ = worldScale * (model_->GetRadialAcceleration() + model_->GetRadialAccelerationVariance() * Random(-1.0f, 1.0f));
-    particle.tangentialAccel_ = worldScale * (model_->GetTangentialAcceleration() + model_->GetTangentialAccelerationVariance() * Random(-1.0f, 1.0f));
+    particle.radialAccel_ = worldScale * (model_->GetRadialAcceleration() + model_->GetRadialAccelVariance() * Random(-1.0f, 1.0f));
+    particle.tangentialAccel_ = worldScale * (model_->GetTangentialAcceleration() + model_->GetTangentialAccelVariance() * Random(-1.0f, 1.0f));
 
     particle.size_  = worldScale * Max(0.1f, model_->GetStartParticleSize() + model_->GetStartParticleSizeVariance() * Random(-1.0f, 1.0f));
-    float endParticleSize = worldScale * Max(0.1f, model_->GetEndParticleSize() + model_->GetEndParticleSizeVariance() * Random(-1.0f, 1.0f));
+    float endParticleSize = worldScale * Max(0.1f, model_->GetFinishParticleSize() + model_->GetFinishParticleSizeVariance() * Random(-1.0f, 1.0f));
     particle.sizeDelta_ = (endParticleSize - particle.size_) * invLifespan;
 
     particle.color_ = model_->GetStartColor() + model_->GetStartColorVariance() * Random(-1.0f, 1.0f);
-    Color endColor = model_->GetEndColor() + model_->GetEndColorVariance() * Random(-1.0f, 1.0f);
+    Color endColor = model_->GetFinishColor() + model_->GetFinishColorVariance() * Random(-1.0f, 1.0f);
     particle.colorDelta_ = (endColor - particle.color_) * invLifespan;
 }
 

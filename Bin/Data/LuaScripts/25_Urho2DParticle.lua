@@ -47,7 +47,7 @@ function CreateScene()
     camera.orthographic = true
     camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
 
-    local particleModel = cache:GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist")
+    local particleModel = cache:GetResource("ParticleModel2D", "Urho2D/sun.pex")
     if particleModel == nil then
         return
     end

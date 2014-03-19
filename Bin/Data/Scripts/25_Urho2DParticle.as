@@ -51,7 +51,7 @@ void CreateScene()
     camera.orthographic = true;
     camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
 
-    ParticleModel2D@ particleModel = cache.GetResource("ParticleModel2D", "Urho2D/LavaFlow.plist");
+    ParticleModel2D@ particleModel = cache.GetResource("ParticleModel2D", "Urho2D/sun.pex");
     if (particleModel is null)
         return;
 
