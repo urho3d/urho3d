@@ -69,7 +69,7 @@ void SoundSynthesis::CreateSound()
     SoundSource* source = node_->CreateComponent<SoundSource>();
     
     soundStream_ = new BufferedSoundStream();
-    // Set format: 44100 kHz, sixteen bit, mono
+    // Set format: 44100 Hz, sixteen bit, mono
     soundStream_->SetFormat(44100, true, false);
     
     // Start playback. We don't have data in the stream yet, but the SoundSource will wait until there is data,
@@ -89,6 +89,8 @@ void SoundSynthesis::UpdateSound()
     if (!numSamples)
         return;
     
+    // Allocate a new buffer and fill it with a simple two-oscillator algorithm. The sound is over-amplified
+    // (distorted), clamped to the 16-bit range, and finally lowpass-filtered according to the coefficient
     SharedArrayPtr<signed short> newData(new signed short[numSamples]);
     for (unsigned i = 0; i < numSamples; ++i)
     {
@@ -100,6 +102,7 @@ void SoundSynthesis::UpdateSound()
         newData[i] = (int)accumulator_;
     }
     
+    // Queue buffer to the stream for playback
     soundStream_->AddData(newData, numSamples * sizeof(signed short));
 }
 
