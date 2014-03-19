@@ -122,19 +122,13 @@ public:
         AddRef();
     }
     
-    /// Perform a dynamic cast from a shared array pointer of another type.
-    template <class U> void DynamicCast(const SharedArrayPtr<U>& rhs)
+   /// Perform a reinterpret cast from a shared array pointer of another type.
+    template <class U> void ReinterpretCast(const SharedArrayPtr<U>& rhs)
     {
         ReleaseRef();
-        ptr_ = dynamic_cast<T*>(rhs.Get());
-        
-        if (ptr_)
-        {
-            refCount_ = rhs.RefCountPtr();
-            AddRef();
-        }
-        else
-            refCount_ = 0;
+        ptr_ = reinterpret_cast<T*>(rhs.Get());
+        refCount_ = rhs.RefCountPtr();
+        AddRef();
     }
     
     /// Check if the pointer is null.
@@ -201,11 +195,11 @@ template <class T, class U> SharedArrayPtr<T> StaticCast(const SharedArrayPtr<U>
     return ret;
 }
 
-/// Perform a dynamic cast from one shared array pointer type to another.
-template <class T, class U> SharedArrayPtr<T> DynamicCast(const SharedArrayPtr<U>& ptr)
+/// Perform a reinterpret cast from one shared array pointer type to another.
+template <class T, class U> SharedArrayPtr<T> ReinterpretCast(const SharedArrayPtr<U>& ptr)
 {
     SharedArrayPtr<T> ret;
-    ret.DynamicCast(ptr);
+    ret.ReinterpretCast(ptr);
     return ret;
 }
 
@@ -409,11 +403,11 @@ template <class T, class U> WeakArrayPtr<T> StaticCast(const WeakArrayPtr<U>& pt
     return ret;
 }
 
-/// Perform a dynamic cast from one weak pointer type to another.
-template <class T, class U> WeakArrayPtr<T> DynamicCast(const WeakArrayPtr<U>& ptr)
+/// Perform a reinterpret cast from one weak pointer type to another.
+template <class T, class U> WeakArrayPtr<T> ReinterpretCast(const WeakArrayPtr<U>& ptr)
 {
     WeakArrayPtr<T> ret;
-    ret.DynamicCast(ptr);
+    ret.ReinterpretCast(ptr);
     return ret;
 }
 

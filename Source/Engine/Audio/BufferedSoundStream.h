@@ -22,50 +22,48 @@
 
 #pragma once
 
-#include "RefCounted.h"
+#include "ArrayPtr.h"
+#include "List.h"
+#include "Mutex.h"
+#include "Pair.h"
+#include "SoundStream.h"
 
 namespace Urho3D
 {
 
-/// Base class for sound streams.
-class URHO3D_API SoundStream : public RefCounted
+/// %Sound stream that supports manual buffering of data from the main thread.
+class BufferedSoundStream : public SoundStream
 {
 public:
     /// Construct.
-    SoundStream();
+    BufferedSoundStream();
     /// Destruct.
-    ~SoundStream();
+    ~BufferedSoundStream();
     
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
-    virtual unsigned GetData(signed char* dest, unsigned numBytes) = 0;
+    virtual unsigned GetData(signed char* dest, unsigned numBytes);
     
-    /// Set sound data format.
-    void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
-    /// Set whether playback should stop when no more data. Default false.
-    void SetStopAtEnd(bool enable);
+    /// Buffer sound data. Makes a copy of it.
+    void AddData(void* data, unsigned numBytes);
+    /// Buffer sound data by taking ownership of it.
+    void AddData(SharedArrayPtr<signed char> data, unsigned numBytes);
+    /// Buffer sound data by taking ownership of it.
+    void AddData(SharedArrayPtr<signed short> data, unsigned numBytes);
+    /// Remove all buffered audio data.
+    void Clear();
     
-    /// Return sample size.
-    unsigned GetSampleSize() const;
-    /// Return default frequency as a float.
-    float GetFrequency() const { return (float)frequency_; }
-    /// Return default frequency as an integer.
-    unsigned GetIntFrequency() const { return frequency_; }
-    /// Return whether playback should stop when no more data.
-    bool GetStopAtEnd() const { return stopAtEnd_; }
-    /// Return whether data is sixteen bit.
-    bool IsSixteenBit() const { return sixteenBit_; }
-    /// Return whether data is stereo.
-    bool IsStereo() const { return stereo_; }
-
-protected:
-    /// Default frequency.
-    unsigned frequency_;
-    /// Stop when no more data flag.
-    bool stopAtEnd_;
-    /// Sixteen bit flag.
-    bool sixteenBit_;
-    /// Stereo flag.
-    bool stereo_;
+    /// Return amount of buffered (unplayed) sound data in bytes.
+    unsigned GetBufferNumBytes() const;
+    /// Return length of buffered (unplayed) sound data in seconds.
+    float GetBufferLength() const;
+    
+private:
+    /// Buffers and their sizes.
+    List<Pair<SharedArrayPtr<signed char>, unsigned> > buffers_;
+    /// Byte position in the frontmost buffer.
+    unsigned position_;
+    /// Mutex for buffer data.
+    mutable Mutex bufferMutex_;
 };
 
 }

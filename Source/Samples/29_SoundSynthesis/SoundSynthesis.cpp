@@ -1,0 +1,144 @@
+//
+// Copyright (c) 2008-2014 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#include "BufferedSoundStream.h"
+#include "CoreEvents.h"
+#include "Engine.h"
+#include "Font.h"
+#include "Input.h"
+#include "Log.h"
+#include "Node.h"
+#include "SoundSource.h"
+#include "Text.h"
+#include "UI.h"
+
+#include "SoundSynthesis.h"
+
+#include "DebugNew.h"
+
+// Expands to this example's entry-point
+DEFINE_APPLICATION_MAIN(SoundSynthesis)
+
+SoundSynthesis::SoundSynthesis(Context* context) :
+    Sample(context),
+    filter_(0.5f),
+    accumulator_(0.0f),
+    osc1_(0.0f),
+    osc2_(0.0f)
+{
+}
+
+void SoundSynthesis::Start()
+{
+    // Execute base class startup
+    Sample::Start();
+
+    // Create the sound stream & start playback
+    CreateSound();
+    
+    // Create the UI content
+    CreateInstructions();
+    
+    // Hook up to the frame update events
+    SubscribeToEvents();
+}
+
+void SoundSynthesis::CreateSound()
+{
+    // Sound source needs a node so that it is considered enabled
+    node_ = new Node(context_);
+    SoundSource* source = node_->CreateComponent<SoundSource>();
+    
+    soundStream_ = new BufferedSoundStream();
+    // Set format: 44100 kHz, sixteen bit, mono
+    soundStream_->SetFormat(44100, true, false);
+    
+    // Start playback. We don't have data in the stream yet, but the SoundSource will wait until there is data,
+    // as the stream is by default in the "don't stop at end" mode
+    source->Play(soundStream_);
+}
+
+void SoundSynthesis::UpdateSound()
+{
+    // Try to keep 1/10 seconds of sound in the buffer, to avoid both dropouts and unnecessary latency
+    float targetLength = 1.0f / 10.0f;
+    float requiredLength = targetLength - soundStream_->GetBufferLength();
+    if (requiredLength < 0.0f)
+        return;
+    
+    unsigned numSamples = (unsigned)(soundStream_->GetFrequency() * requiredLength);
+    if (!numSamples)
+        return;
+    
+    SharedArrayPtr<signed short> newData(new signed short[numSamples]);
+    for (unsigned i = 0; i < numSamples; ++i)
+    {
+        osc1_ = fmodf(osc1_ + 1.0f, 360.0f);
+        osc2_ = fmodf(osc2_ + 1.002f, 360.0f);
+        
+        float newValue = Clamp((Sin(osc1_) + Sin(osc2_)) * 200000.0f, -32767.0f, 32767.0f);
+        accumulator_ = Lerp(accumulator_, newValue, filter_);
+        newData[i] = (int)accumulator_;
+    }
+    
+    soundStream_->AddData(newData, numSamples * sizeof(signed short));
+}
+
+void SoundSynthesis::CreateInstructions()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    UI* ui = GetSubsystem<UI>();
+    
+    // Construct new Text object, set string to display and font to use
+    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    instructionText->SetText("Use cursor up and down to control sound filtering");
+    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    
+    // Position the text relative to the screen center
+    instructionText->SetHorizontalAlignment(HA_CENTER);
+    instructionText->SetVerticalAlignment(VA_CENTER);
+    instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+}
+
+void SoundSynthesis::SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(SoundSynthesis, HandleUpdate));
+}
+
+void SoundSynthesis::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace Update;
+
+    // Take the frame time step, which is stored as a float
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+    
+    // Use keys to control the filter constant
+    Input* input = GetSubsystem<Input>();
+    if (input->GetKeyDown(KEY_UP))
+        filter_ += timeStep * 0.5f;
+    if (input->GetKeyDown(KEY_DOWN))
+        filter_ -= timeStep * 0.5f;
+    filter_ = Clamp(filter_, 0.01f, 1.0f);
+    
+    UpdateSound();
+}
