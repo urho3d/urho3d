@@ -55,6 +55,15 @@ function CreateScene()
     particleNode = scene_:CreateChild("ParticleEmitter2D")
     local particleEmitter = particleNode:CreateComponent("ParticleEmitter2D")
     particleEmitter.model = particleModel
+
+    local greenSpiralModel = cache:GetResource("ParticleModel2D", "Urho2D/greenspiral.pex")
+    if greenSpiralModel == nil then
+        return
+    end
+
+    greenSpiralNode = scene_:CreateChild("GreenSpiral")
+    local greenSpiralEmitter = greenSpiralNode:CreateComponent("ParticleEmitter2D")
+    greenSpiralEmitter.model = greenSpiralModel
 end
 
 function CreateInstructions()

@@ -58,7 +58,6 @@ static const int destBlendFuncs[] =
 
 ParticleModel2D::ParticleModel2D(Context* context) :
     Resource(context),
-    sourcePosition_(157.97f, 228.41f),// Values from sun.pex
     sourcePositionVariance_(7.0f, 7.0f),
     speed_(260.0f),
     speedVariance_(10.0f),
@@ -120,13 +119,12 @@ bool ParticleModel2D::Load(Deserializer& source)
     if (!sprite_)
         return false;
 
-    sourcePosition_ = ReadVector2(rootElem.GetChild("sourcePosition"));
     sourcePositionVariance_ = ReadVector2(rootElem.GetChild("sourcePositionVariance"));
 
     speed_ = rootElem.GetChild("speed").GetFloat("value");
     speedVariance_ = rootElem.GetChild("speedVariance").GetFloat("value");
     
-    particleLifeSpan_ = rootElem.GetChild("particleLifeSpan").GetFloat("value");
+    particleLifeSpan_ = Max(0.01f, rootElem.GetChild("particleLifeSpan").GetFloat("value"));
     particleLifespanVariance_ = rootElem.GetChild("particleLifespanVariance").GetFloat("value");
     
     angle_ = 360.0f - rootElem.GetChild("angle").GetFloat("value");
@@ -154,7 +152,15 @@ bool ParticleModel2D::Load(Deserializer& source)
     finishParticleSize_ = rootElem.GetChild("finishParticleSize").GetFloat("value");
     FinishParticleSizeVariance_ = rootElem.GetChild("FinishParticleSizeVariance").GetFloat("value");
     
-    duration_ = rootElem.GetChild("duration").GetFloat("value");
+    duration_ = M_INFINITY;
+    if (rootElem.HasChild("duration"))
+    {
+        float duration = rootElem.GetChild("duration").GetFloat("value");
+        if (duration > 0.0f)
+            duration_ = duration;
+    }
+
+
     emitterType_ = (EmitterType2D)rootElem.GetChild("emitterType").GetInt("value");
     
     maxRadius_ = rootElem.GetChild("maxRadius").GetFloat("value");
@@ -188,11 +194,6 @@ bool ParticleModel2D::Load(Deserializer& source)
 bool ParticleModel2D::Save(Serializer& dest) const
 {
     return false;
-}
-
-void ParticleModel2D::SetSourcePosition(const Vector2& sourcePosition)
-{
-    sourcePosition_ = sourcePosition;
 }
 
 void ParticleModel2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance)

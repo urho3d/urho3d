@@ -58,6 +58,14 @@ void CreateScene()
     particleNode = scene_.CreateChild("ParticleEmitter2D");
     ParticleEmitter2D@ particleEmitter = particleNode.CreateComponent("ParticleEmitter2D");
     particleEmitter.model = particleModel;
+
+    ParticleModel2D@ greenSpiralModel = cache.GetResource("ParticleModel2D", "Urho2D/greenspiral.pex");
+    if (greenSpiralModel is null)
+        return;
+
+    Node@ greenSpiralNode = scene_.CreateChild("GreenSpiral");
+    ParticleEmitter2D@ greenSpiralEmitter = greenSpiralNode.CreateComponent("ParticleEmitter2D");
+    greenSpiralEmitter.model = greenSpiralModel;
 }
 
 void CreateInstructions()

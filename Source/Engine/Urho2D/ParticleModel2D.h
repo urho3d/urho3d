@@ -58,8 +58,6 @@ public:
 
     /// Set sprite.
     void SetSprite(const String& sprite);
-    /// Set source position.
-    void SetSourcePosition(const Vector2& sourcePosition);
     /// Set source position variance.
     void SetSourcePositionVariance(const Vector2& sourcePositionVariance);
     /// Set speed.
@@ -129,8 +127,6 @@ public:
 
     /// Return sprite.
     Sprite2D* GetSprite() const { return sprite_; }
-    /// Return source position.
-    const Vector2& GetSourcePosition() const { return sourcePosition_; }
     /// Return source position variance.
     const Vector2& GetSourcePositionVariance() const { return sourcePositionVariance_; }
     /// Return speed.
@@ -206,8 +202,6 @@ private:
     
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
-    /// Source position.
-    Vector2 sourcePosition_;
     /// Source position variance.
     Vector2 sourcePositionVariance_;
     /// Speed.

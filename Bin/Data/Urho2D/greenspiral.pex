@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
   <particleEmitterConfig>
-  <texture name="particle.png"/>
+  <texture name="greenspiral.png"/>
   <sourcePositionVariance x="37" y="0"/>
   <gravity x="0" y="36"/>
   <emitterType value="1"/>

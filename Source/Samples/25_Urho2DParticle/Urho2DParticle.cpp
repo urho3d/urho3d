@@ -92,6 +92,14 @@ void Urho2DParticle::CreateScene()
     particleNode_ = scene_->CreateChild("ParticleEmitter2D");
     ParticleEmitter2D* particleEmitter = particleNode_->CreateComponent<ParticleEmitter2D>();
     particleEmitter->SetModel(particleModel);
+
+    ParticleModel2D* greenSpiralModel = cache->GetResource<ParticleModel2D>("Urho2D/greenspiral.pex");
+    if (!greenSpiralModel)
+        return;
+
+    Node* greenSpiralNode = scene_->CreateChild("GreenSpiral");
+    ParticleEmitter2D* greenSpiralEmitter = greenSpiralNode->CreateComponent<ParticleEmitter2D>();
+    greenSpiralEmitter->SetModel(greenSpiralModel);
 }
 
 void Urho2DParticle::CreateInstructions()

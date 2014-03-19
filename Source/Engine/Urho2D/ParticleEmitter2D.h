@@ -34,32 +34,41 @@ class ParticleModel2D;
 {
     /// Time to live.
     float timeToLive_;
-    /// Start position.
-    Vector2 startPos_;
+    
     /// Position.
     Vector2 position_;
-    /// Velocity.
-    Vector2 velocity_;
-    /// Radius.
-    float radius_;
-    /// Radius delta.
-    float radiusDelta_;
-    /// Rotation.
-    float rotation_;
-    /// Rotation delta.
-    float rotationDelta_;
-    /// Radial acceleration.
-    float radialAccel_;
-    /// Tangential acceleration.
-    float tangentialAccel_;
     /// Size.
     float size_;
     /// Size delta.
     float sizeDelta_;
+    /// Rotation.
+    float rotation_;
+    /// Rotation delta.
+    float rotationDelta_;
     /// Color.
     Color color_;
     /// Color delta.
     Color colorDelta_;
+
+    // EMITTER_TYPE_GRAVITY parameters
+    /// Start position.
+    Vector2 startPos_;
+    /// Velocity.
+    Vector2 velocity_;
+    /// Radial acceleration.
+    float radialAcceleration_;
+    /// Tangential acceleration.
+    float tangentialAcceleration_;
+
+    // EMITTER_TYPE_RADIAL parameters
+    /// Emit radius.
+    float emitRadius_;
+    /// Emit radius delta.
+    float emitRadiusDelta_;
+    /// Emit rotation.
+    float emitRotation_;
+    /// Emit rotation delta.
+    float emitRotationDelta_;
 };
 
 /// 2D particle emitter component.
@@ -102,22 +111,22 @@ private:
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Emit particle.
-    void EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale);
+    bool EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale);
     /// Update particle.
     void UpdateParticle(Particle2D& particle, float timeStep, const Vector3& worldPosition, float worldScale);
 
     /// Particle model.
     SharedPtr<ParticleModel2D> model_;
-    /// Life time;
-    float lifeTime_;
     /// Num particles.
     int numParticles_;
+    /// Emission time.
+    float emissionTime_;
+    /// Emmision rate
+    float emissionRate_;
+    /// Emit particle time
+    float emitParticleTime_;
     /// Particles.
     Vector<Particle2D> particles_;
-    /// Time to emit particle.
-    float emitParticleTime_;
-    /// Time between particles.
-    float timeBetweenParticles_;
 };
 
 }
