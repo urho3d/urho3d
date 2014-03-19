@@ -171,7 +171,4 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
-
-    -- Update scene
-    scene_:Update(timeStep)
 end

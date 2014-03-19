@@ -739,9 +739,6 @@ The rendering-related components defined by the %Graphics, %UI and Urho2D librar
 - DecalSet: renders decal geometry on top of objects.
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
-- StaticSprite2D: a sprite that displays a single image.
-- AnimatedSprite2D: a sprite that displays a sequence of images.
-- ParticleEmitter2D: a two-dimensional particle effect.
 
 \section Rendering_Optimizations Optimizations
 
@@ -904,6 +901,8 @@ Normal maps encode the tangent-space surface normal for normal mapping. There ar
 - Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx
 
 Make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
+
+Models using a normal-mapped material need to have tangent vectors in their vertex data; the easiest way to ensure this is to use the switch -t (generate tangents) when using either AssetImporter or OgreImporter to import models to Urho3D format. If there are no tangents, the light attenuation on the normal-mapped material will behave in a completely erratic fashion.
 
 Specular maps encode the specular surface color as RGB. Note that deferred rendering is only able to use monochromatic specular intensity from the G channel, while forward and light pre-pass rendering use fully colored specular. DXT1 format should suit these textures well.
 
@@ -1348,9 +1347,13 @@ The input events include:
 - E_CONTROLLERBUTTONUP: a joystick button on an SDL controller was released.
 - E_CONTROLLERAXISMOVE: a joystick axis on an SDL controller was moved.
 
+Key events include both the symbolic keycode ("Key") that depends on the keyboard layout, the layout- and operating system-independent SDL scancode ("Scancode"), and the true operating system-specific raw keycode ("Raw").
+
 The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
 
-In script, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
+To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
+
+In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
 
 To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
 
@@ -1396,6 +1399,12 @@ A standard WAV file can not tell whether it should loop, and raw audio does not 
 The frequency is in Hz, and loop start and end are bytes from the start of audio data. If a loop is enabled without specifying the start and end, it is assumed to be the whole sound. Ogg Vorbis compressed sounds do not support specifying the loop range, only whether whole sound looping is enabled or disabled.
 
 The Audio subsystem is always instantiated, but in headless mode it is not active. In headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
+
+\section Audio_Stream Sound streaming
+
+In addition to playing existing sound resources, sound can be generated during runtime using the SoundStream class and its subclasses. To start playback of a stream on a SoundSource, call \ref SoundSource::Play(SoundStream* stream) "Play(SoundStream* stream)".
+
+%Sound streaming is used internally to implement on-the-fly Ogg Vorbis decoding. It is only available in C++ code and not scripting due to its low-level nature. See the SoundSynthesis C++ sample for an example of using the BufferedSoundStream subclass, which allows the sound data to be queued for playback from the main thread.
 
 
 \page Physics Physics
@@ -1593,6 +1602,76 @@ Left, top, right & bottom border widths and spacing between elements can also be
 Sprites are a special kind of %UI element that allow subpixel (float) positioning and scaling, as well as rotation, while the other elements use integer positioning for pixel-perfect display. Sprites can be used to implement rotating HUD elements such as minimaps or speedometer needles.
 
 Due to the free transformability, sprites can not be reliably queried with \ref UI::GetElementAt "GetElementAt()". Also, only other sprites should be parented to sprites, as the other elements do not support scaling and rotation.
+
+
+\page Urho2D Urho2D
+In order to make 2D Game in Urho3D, Urho2D is provided. Urho2D include 2D graphics and 2D physics. The classes provide are:
+
+- Sprite2D: a sprite is defined with texture and texture rectangle and hot spot.
+- SpriteSheet2D: a sprite sheet(texture atlas) include some sprites in it.
+- StaticSprite2D: a drawable component to display a sprite.
+- Animation2D: two-demensional animation with some frames, a frame include duration and a sprite.
+- AnimatedSprite2D : a drawable component to display an animation.
+- ParticleModel2D: two-demensional particle model file.
+- ParticleEmitter2D: a two-dimensional particle effect.
+- PhysicsWorld2D: implements two-dimensional physics simulation. Two-demensional physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
+- RigidBody2D: a two-demensional physics object instance.
+- CollisionShape2D: defines two-dimensional physics collision geometry. 
+- CollisionBox2D: defines two-dimensional physics collision box.
+- CollisionCircle2D: defines two-dimensional physics collision circle.
+- CollisionEdge2D: defines two-dimensional physics collision edge.
+- CollisionChain2D: defines two-dimensional physics collision chain.
+- CollisionPolygon2D: defines two-dimensional physics collision polygon.
+
+In order to use Urho2D, it is need set camera to 2D mode first, it can be done with following code:
+
+C++:
+\code
+    // Create camera node
+    Node* cameraNode = scene_->CreateChild("Camera");
+    // Set camera node's position
+    cameraNode->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
+
+    // Create camera
+    Camera* camera = cameraNode->CreateComponent<Camera>();
+    // Set camera orthographic
+    camera->SetOrthographic(true);
+
+    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera->SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+\endcode 
+
+AngelScript:
+\code
+    // Create camera node
+    Node@ cameraNode = scene_.CreateChild("Camera");
+    // Set camera node's position
+    cameraNode.SetPosition(Vector3(0.0f, 0.0f, -10.0f));
+
+    // Create camera
+    Camera@ camera = cameraNode.CreateComponent("Camera");
+    // Set camera orthographic
+    camera.orthographic = true;
+
+    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+\endcode 
+
+Lua:
+\code
+    -- Create camera node
+    cameraNode = scene_:CreateChild("Camera")
+    -- Set camera node's position
+    cameraNode.position = Vector3(0.0, 0.0, -10.0)
+
+    -- Create camera
+    local camera = cameraNode:CreateComponent("Camera")
+    -- Set camera orthographic
+    camera.orthographic = true
+
+    -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
+\endcode 
 
 
 \page Serialization Serialization

@@ -85,13 +85,21 @@ void Urho2DParticle::CreateScene()
     camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/LavaFlow.plist");
+    ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/sun.pex");
     if (!particleModel)
         return;
 
     particleNode_ = scene_->CreateChild("ParticleEmitter2D");
     ParticleEmitter2D* particleEmitter = particleNode_->CreateComponent<ParticleEmitter2D>();
     particleEmitter->SetModel(particleModel);
+
+    ParticleModel2D* greenSpiralModel = cache->GetResource<ParticleModel2D>("Urho2D/greenspiral.pex");
+    if (!greenSpiralModel)
+        return;
+
+    Node* greenSpiralNode = scene_->CreateChild("GreenSpiral");
+    ParticleEmitter2D* greenSpiralEmitter = greenSpiralNode->CreateComponent<ParticleEmitter2D>();
+    greenSpiralEmitter->SetModel(greenSpiralModel);
 }
 
 void Urho2DParticle::CreateInstructions()

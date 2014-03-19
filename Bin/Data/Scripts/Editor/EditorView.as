@@ -1187,9 +1187,9 @@ void UpdateView(float timeStep)
             adjust.y = -1;
         if (editMode == EDIT_SCALE)
         {
-            if (input.keyDown[KEY_ADD])
+            if (input.keyDown[KEY_KP_PLUS])
                 adjust = Vector3(1, 1, 1);
-            if (input.keyDown[KEY_SUBTRACT])
+            if (input.keyDown[KEY_KP_MINUS])
                 adjust = Vector3(-1, -1, -1);
         }
 
@@ -1262,9 +1262,9 @@ void SteppedObjectManipulation(int key)
         adjust.y = -1;
     if (editMode == EDIT_SCALE)
     {
-        if (key == KEY_ADD)
+        if (key == KEY_KP_PLUS)
             adjust = Vector3(1, 1, 1);
-        if (key == KEY_SUBTRACT)
+        if (key == KEY_KP_MINUS)
             adjust = Vector3(-1, -1, -1);
     }
 
@@ -1305,21 +1305,9 @@ void HandlePostRenderUpdate()
     if (debug is null || orbiting)
         return;
 
-    // Visualize the currently selected nodes as their local axes + the first drawable component
+    // Visualize the currently selected nodes
     for (uint i = 0; i < selectedNodes.length; ++i)
-    {
-        Node@ node = selectedNodes[i];
-        debug.AddNode(node, 1.0, false);
-        for (uint j = 0; j < node.numComponents; ++j)
-        {
-            Drawable@ drawable = cast<Drawable>(node.components[j]);
-            if (drawable !is null)
-            {
-                drawable.DrawDebugGeometry(debug, false);
-                break;
-            }
-        }
-    }
+        DrawNodeDebug(selectedNodes[i], debug);
 
     // Visualize the currently selected components
     for (uint i = 0; i < selectedComponents.length; ++i)
@@ -1344,6 +1332,22 @@ void HandlePostRenderUpdate()
     }
 
     ViewRaycast(false);
+}
+
+void DrawNodeDebug(Node@ node, DebugRenderer@ debug)
+{
+    debug.AddNode(node, 1.0, false);
+
+    // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
+    // components can have a large performance hit
+    if (node !is editorScene)
+    {
+        for (uint j = 0; j < node.numComponents; ++j)
+            node.components[j].DrawDebugGeometry(debug, false);
+
+        for (uint k = 0; k < node.numChildren; ++k)
+            DrawNodeDebug(node.children[k], debug);
+    }
 }
 
 void ViewMouseMove()

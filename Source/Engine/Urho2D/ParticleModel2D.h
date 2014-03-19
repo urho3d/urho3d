@@ -28,6 +28,7 @@
 namespace Urho3D
 {
 
+class XMLElement;
 class Sprite2D;
 
 /// 2D particle emitter types.
@@ -37,7 +38,7 @@ enum EmitterType2D
     EMITTER_TYPE_RADIAL
 };
 
-/// 2D particle emitter component.
+/// 2D particle effect resource.
 class URHO3D_API ParticleModel2D : public Resource
 {
     OBJECT(ParticleModel2D);
@@ -55,48 +56,123 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
+    /// Set sprite.
+    void SetSprite(const String& sprite);
+    /// Set source position variance.
+    void SetSourcePositionVariance(const Vector2& sourcePositionVariance);
+    /// Set speed.
+    void SetSpeed(float speed);
+    /// Set speed variance.
+    void SetSpeedVariance(float speedVariance);
+    /// Set particle lifespan.
+    void SetParticleLifeSpan(float particleLifeSpan);
+    /// Set particle lifespan variance.
+    void SetParticleLifespanVariance(float particleLifespanVariance);
+    /// Set angle.
+    void SetAngle(float angle);
+    /// Set angle variance.
+    void SetAngleVariance(float angleVariance);
+    /// Set gravity.
+    void SetGravity(const Vector2& gravity);
+    /// Set radial acceleration.
+    void SetRadialAcceleration(float radialAcceleration);
+    /// Set tangential acceleration.
+    void SetTangentialAcceleration(float tangentialAcceleration);
+    /// Set radial acceleration variance.
+    void SetRadialAccelVariance(float radialAccelVariance);
+    /// Set tangential acceleration variance.
+    void SetTangentialAccelVariance(float tangentialAccelVariance);
+    /// Set start color.
+    void SetStartColor(const Color& startColor);
+    /// Set start color variance.
+    void SetStartColorVariance(const Color& startColorVariance);
+    /// Set finish color.
+    void SetFinishColor(const Color& finishColor);
+    /// Set finish color variance.
+    void SetFinishColorVariance(const Color& finishColorVariance);
+    /// Set max particles.
+    void SetMaxParticles(int maxParticles);
+    /// Set start particle size.
+    void SetStartParticleSize(float startParticleSize);
+    /// Set start particle size variance.
+    void SetStartParticleSizeVariance(float startParticleSizeVariance);
+    /// Set finish particle size.
+    void SetFinishParticleSize(float finishParticleSize);
+    /// Set finish particle size variance.
+    void SetFinishParticleSizeVariance(float FinishParticleSizeVariance);
+    /// Set duration.
+    void SetDuration(float duration);
+    /// Set emitter type.
+    void SetEmitterType(EmitterType2D emitterType);
+    /// Set max radius.
+    void SetMaxRadius(float maxRadius);
+    /// Set max radius variance.
+    void SetMaxRadiusVariance(float maxRadiusVariance);
+    /// Set min radius.
+    void SetMinRadius(float minRadius);
+    /// Set rotate per second.
+    void SetRotatePerSecond(float rotatePerSecond);
+    /// Set rotate per second variance.
+    void SetRotatePerSecondVariance(float rotatePerSecondVariance);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode blendMode);
+    /// Set rotation start.
+    void SetRotationStart(float rotationStart);
+    /// Set rotation start variance.
+    void SetRotationStartVariance(float rotationStartVariance);
+    /// Set rotation end.
+    void SetRotationEnd(float rotationEnd);
+    /// Set rotation end variance.
+    void SetRotationEndVariance(float rotationEndVariance);
+
     /// Return sprite.
-    Sprite2D* GetSprite() const;
-    /// Return blend mode.
-    BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return duration.
-    float GetDuration() const { return duration_; }
-    /// Return emitter type.
-    EmitterType2D GetEmitterType() const { return emitterType_; }
+    Sprite2D* GetSprite() const { return sprite_; }
     /// Return source position variance.
     const Vector2& GetSourcePositionVariance() const { return sourcePositionVariance_; }
-    /// Return max particles.
-    unsigned GetMaxParticles() const { return maxParticles_; }
-    /// Return particle lifespan
-    float GetParticleLifeSpan() const { return particleLifeSpan_; }
-    /// Return particle lifespan variance.
-    float GetParticleLifeSpanVariance() const { return particleLifeSpanVariance_; }
-    /// Return start particle size.
-    float GetStartParticleSize() const { return startParticleSize_; }
-    /// Return start particle size variance.
-    float GetStartParticleSizeVariance() const { return startParticleSizeVariance_; }
-    /// Return end particle size.
-    float GetEndParticleSize() const { return endParticleSize_; }
-    /// Return end particle size variance.
-    float GetEndParticleSizeVariance() const { return endParticleSizeVariance_; }
-    /// Return angle.
-    float GetEmitAngle() const { return emitAngle_; }
-    /// Return angle variance.
-    float GetEmitAngleVariance() const { return emitAngleVariance_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
     /// Return speed variance.
     float GetSpeedVariance() const { return speedVariance_; }
+    /// Return particle lifespan.
+    float GetParticleLifeSpan() const { return particleLifeSpan_; }
+    /// Return particle lifespan variance.
+    float GetParticleLifespanVariance() const { return particleLifespanVariance_; }
+    /// Return angle.
+    float GetAngle() const { return angle_; }
+    /// Return angle variance.
+    float GetAngleVariance() const { return angleVariance_; }
     /// Return gravity.
     const Vector2& GetGravity() const { return gravity_; }
     /// Return radial acceleration.
     float GetRadialAcceleration() const { return radialAcceleration_; }
-    /// Return radial acceleration variance.
-    float GetRadialAccelerationVariance() const { return radialAccelerationVariance_; }
     /// Return tangential acceleration.
     float GetTangentialAcceleration() const { return tangentialAcceleration_; }
+    /// Return radial acceleration variance.
+    float GetRadialAccelVariance() const { return radialAccelVariance_; }
     /// Return tangential acceleration variance.
-    float GetTangentialAccelerationVariance() const { return tangentialAccelerationVariance_; }
+    float GetTangentialAccelVariance() const { return tangentialAccelVariance_; }
+    /// Return start color.
+    const Color& GetStartColor() const { return startColor_; }
+    /// Return start color variance.
+    const Color& GetStartColorVariance() const { return startColorVariance_; }
+    /// Return finish color.
+    const Color& GetFinishColor() const { return finishColor_; }
+    /// Return finish color variance.
+    const Color& GetFinishColorVariance() const { return finishColorVariance_; }
+    /// Return max particles.
+    int GetMaxParticles() const { return maxParticles_; }
+    /// Return start particle size.
+    float GetStartParticleSize() const { return startParticleSize_; }
+    /// Return start particle size variance.
+    float GetStartParticleSizeVariance() const { return startParticleSizeVariance_; }
+    /// Return finish particle size.
+    float GetFinishParticleSize() const { return finishParticleSize_; }
+    /// Return finish particle size variance.
+    float GetFinishParticleSizeVariance() const { return FinishParticleSizeVariance_; }
+    /// Return duration.
+    float GetDuration() const { return duration_; }
+    /// Return emitter type.
+    EmitterType2D GetEmitterType() const { return emitterType_; }
     /// Return max radius.
     float GetMaxRadius() const { return maxRadius_; }
     /// Return max radius variance.
@@ -107,58 +183,71 @@ public:
     float GetRotatePerSecond() const { return rotatePerSecond_; }
     /// Return rotate per second variance.
     float GetRotatePerSecondVariance() const { return rotatePerSecondVariance_; }
-    /// Return start color.
-    const Color& GetStartColor() const { return startColor_; }
-    /// Return start color variance.
-    const Color& GetStartColorVariance() const { return startColorVariance_; }
-    /// Return end color.
-    const Color& GetEndColor() const { return endColor_; }
-    /// Return end color variance.
-    const Color& GetEndColorVariance() const { return endColorVariance_; }
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
+    /// Return rotation start.
+    float GetRotationStart() const { return rotationStart_; }
+    /// Return rotation start variance.
+    float GetRotationStartVariance() const { return rotationStartVariance_; }
+    /// Return rotation end.
+    float GetRotationEnd() const { return rotationEnd_; }
+    /// Return rotation end variance.
+    float GetRotationEndVariance() const { return rotationEndVariance_; }
 
 private:
-    /// Texture.
+    /// Read Color.
+    Color ReadColor(const XMLElement& element) const;
+    /// Read Vector2.
+    Vector2 ReadVector2(const XMLElement& element) const;
+    
+    /// Sprite.
     SharedPtr<Sprite2D> sprite_;
-    /// Blend mode.
-    BlendMode blendMode_;
-    /// Duration.
-    float duration_;
-    /// Emitter type.
-    EmitterType2D emitterType_;
     /// Source position variance.
     Vector2 sourcePositionVariance_;
-    /// Max particles.
-    unsigned maxParticles_;
-    /// Particle lifespan
-    float particleLifeSpan_;
-    /// Particle lifespan variance.
-    float particleLifeSpanVariance_;
-    /// Start particle size.
-    float startParticleSize_;
-    /// Start particle size variance.
-    float startParticleSizeVariance_;
-    /// End particle size.
-    float endParticleSize_;
-    /// End particle size variance.
-    float endParticleSizeVariance_;
-    /// Angle.
-    float emitAngle_;
-    /// Angle variance.
-    float emitAngleVariance_;
     /// Speed.
     float speed_;
     /// Speed variance.
     float speedVariance_;
+    /// Particle lifespan.
+    float particleLifeSpan_;
+    /// Particle lifespan variance.
+    float particleLifespanVariance_;
+    /// Angle.
+    float angle_;
+    /// Angle variance.
+    float angleVariance_;
     /// Gravity.
     Vector2 gravity_;
     /// Radial acceleration.
     float radialAcceleration_;
-    /// Radial acceleration variance.
-    float radialAccelerationVariance_;
     /// Tangential acceleration.
     float tangentialAcceleration_;
+    /// Radial acceleration variance.
+    float radialAccelVariance_;
     /// Tangential acceleration variance.
-    float tangentialAccelerationVariance_;
+    float tangentialAccelVariance_;
+    /// Start color.
+    Color startColor_;
+    /// Start color variance.
+    Color startColorVariance_;
+    /// Finish color.
+    Color finishColor_;
+    /// Finish color variance.
+    Color finishColorVariance_;
+    /// Max particles.
+    int maxParticles_;
+    /// Start particle size.
+    float startParticleSize_;
+    /// Start particle size variance.
+    float startParticleSizeVariance_;
+    /// Finish particle size.
+    float finishParticleSize_;
+    /// Finish particle size variance.
+    float FinishParticleSizeVariance_;
+    /// Duration.
+    float duration_;
+    /// Emitter type.
+    EmitterType2D emitterType_;
     /// Max radius.
     float maxRadius_;
     /// Max radius variance.
@@ -169,14 +258,18 @@ private:
     float rotatePerSecond_;
     /// Rotate per second variance.
     float rotatePerSecondVariance_;
-    /// Start color.
-    Color startColor_;
-    /// Start color variance.
-    Color startColorVariance_;
-    /// End color.
-    Color endColor_;
-    /// End color variance.
-    Color endColorVariance_;
+    /// Blend mode.
+    BlendMode blendMode_;
+    /// Rotation start.
+    float rotationStart_;
+    /// Rotation start variance.
+    float rotationStartVariance_;
+    /// Rotation end.
+    float rotationEnd_;
+    /// Rotation end variance.
+    float rotationEndVariance_;
+
+
 };
 
 }

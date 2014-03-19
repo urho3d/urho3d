@@ -57,6 +57,8 @@
 #include "VertexDeclaration.h"
 #include "Zone.h"
 
+#include <SDL_syswm.h>
+
 #include "DebugNew.h"
 
 #ifdef _MSC_VER
@@ -75,8 +77,6 @@ extern "C" {
 
 namespace Urho3D
 {
-
-extern "C" HWND WIN_GetWindowHandle(SDL_Window* window);
 
 static const D3DCMPFUNC d3dCmpFunc[] =
 {
@@ -194,6 +194,15 @@ static unsigned GetD3DColor(const Color& color)
     unsigned b = (unsigned)(Clamp(color.b_ * 255.0f, 0.0f, 255.0f));
     unsigned a = (unsigned)(Clamp(color.a_ * 255.0f, 0.0f, 255.0f));
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
+}
+
+static HWND GetWindowHandle(SDL_Window* window)
+{
+    SDL_SysWMinfo sysInfo;
+    
+    SDL_VERSION(&sysInfo.version);
+    SDL_GetWindowWMInfo(window, &sysInfo);
+    return sysInfo.info.win.window;
 }
 
 static unsigned depthStencilFormat = D3DFMT_D24S8;
@@ -427,7 +436,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     impl_->presentParams_.MultiSampleType            = multiSample > 1 ? (D3DMULTISAMPLE_TYPE)multiSample : D3DMULTISAMPLE_NONE;
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
-    impl_->presentParams_.hDeviceWindow              = WIN_GetWindowHandle(impl_->window_);
+    impl_->presentParams_.hDeviceWindow              = GetWindowHandle(impl_->window_);
     impl_->presentParams_.EnableAutoDepthStencil     = TRUE;
     impl_->presentParams_.AutoDepthStencilFormat     = D3DFMT_D24S8;
     impl_->presentParams_.Flags                      = D3DPRESENT_LINEAR_CONTENT;
@@ -585,7 +594,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     }
     else
     {
-        HWND hwnd = WIN_GetWindowHandle(impl_->window_);
+        HWND hwnd = GetWindowHandle(impl_->window_);
         GetClientRect(hwnd, &sourceRect);
         ClientToScreen(hwnd, (LPPOINT)&sourceRect);
     }
@@ -2464,7 +2473,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
     if (FAILED(impl_->interface_->CreateDevice(
         adapter,
         (D3DDEVTYPE)deviceType,
-        WIN_GetWindowHandle(impl_->window_),
+        GetWindowHandle(impl_->window_),
         behaviorFlags,
         &impl_->presentParams_,
         &impl_->device_)))

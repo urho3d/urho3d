@@ -26,9 +26,6 @@ class SoundSource : public Component
     bool GetAutoRemove() const;
     bool IsPlaying() const;
     
-    void PlayLockless(Sound* sound);
-    void StopLockless();
-        
     tolua_readonly tolua_property__get_set Sound* sound;
     tolua_property__get_set SoundType soundType;
     tolua_readonly tolua_property__get_set float timePosition;

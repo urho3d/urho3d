@@ -277,6 +277,7 @@ void CollisionShape2D::OnNodeSet(Node* node)
 
     if (node)
     {
+        node->AddListener(this);
         rigidBody_ = node->GetComponent<RigidBody2D>();
         if (rigidBody_)
         {

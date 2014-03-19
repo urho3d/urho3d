@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "CollisionShape2D.h"
+#include "Constraint2D.h"
 #include "Context.h"
 #include "Log.h"
 #include "PhysicsUtils2D.h"
@@ -333,15 +334,26 @@ void RigidBody2D::CreateBody()
     if (!physicsWorld_ || !physicsWorld_->GetWorld())
         return;
 
+    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());;
+    bodyDef_.angle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
+
     body_ = physicsWorld_->GetWorld()->CreateBody(&bodyDef_);
     body_->SetUserData(this);
 
     for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
+    {
         if (collisionShapes_[i])
             collisionShapes_[i]->CreateFixture();
+    }
 
     if (!useFixtureMass_)
         body_->SetMassData(&massData_);
+    
+    for (unsigned i = 0; i < constraints_.Size(); ++i)
+    {
+            if (constraints_[i])
+            constraints_[i]->CreateJoint();
+    }
 }
 
 void RigidBody2D::ReleaseBody()
@@ -352,9 +364,17 @@ void RigidBody2D::ReleaseBody()
     if (!physicsWorld_ || !physicsWorld_->GetWorld())
         return;
 
+    for (unsigned i = 0; i < constraints_.Size(); ++i)
+    {
+        if (constraints_[i])
+            constraints_[i]->ReleaseJoint();
+    }
+
     for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
+    {
         if (collisionShapes_[i])
             collisionShapes_[i]->ReleaseFixture();
+    }
 
     physicsWorld_->GetWorld()->DestroyBody(body_);
     body_ = 0;
@@ -383,6 +403,7 @@ void RigidBody2D::AddCollisionShape2D(CollisionShape2D* collisionShape)
     WeakPtr<CollisionShape2D> collisionShapePtr(collisionShape);
     if (collisionShapes_.Contains(collisionShapePtr))
         return;
+
     collisionShapes_.Push(collisionShapePtr);
 }
 
@@ -393,6 +414,26 @@ void RigidBody2D::RemoveCollisionShape2D(CollisionShape2D* collisionShape)
 
     WeakPtr<CollisionShape2D> collisionShapePtr(collisionShape);
     collisionShapes_.Remove(collisionShapePtr);
+}
+
+void RigidBody2D::AddConstraint2D(Constraint2D* constraint)
+{
+    if (!constraint)
+        return;
+
+    WeakPtr<Constraint2D> constraintPtr(constraint);
+    if (constraints_.Contains(constraintPtr))
+        return;
+    constraints_.Push(constraintPtr);
+}
+
+void RigidBody2D::RemoveConstraint2D(Constraint2D* constraint)
+{
+    if (!constraint)
+        return;
+
+    WeakPtr<Constraint2D> constraintPtr(constraint);
+    constraints_.Remove(constraintPtr);
 }
 
 float RigidBody2D::GetMass() const
@@ -440,6 +481,7 @@ void RigidBody2D::OnNodeSet(Node* node)
 
     if (node)
     {
+        node->AddListener(this);
         Scene* scene = GetScene();
         physicsWorld_ = scene->GetComponent<PhysicsWorld2D>();
         if (physicsWorld_)
@@ -467,7 +509,7 @@ void RigidBody2D::OnMarkedDirty(Node* node)
 
     // Check if transform has changed from the last one set in ApplyWorldTransform()
     b2Vec2 newPosition = ToB2Vec2(node_->GetWorldPosition());
-    float newAngle = node->GetWorldRotation().RollAngle() * M_DEGTORAD;
+    float newAngle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
     if (newPosition != bodyDef_.position || newAngle != bodyDef_.angle)
     {
         bodyDef_.position = newPosition;

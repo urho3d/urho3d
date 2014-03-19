@@ -43,7 +43,7 @@ language: cpp
 compiler: gcc
 before_install:
     - bash -c "[ '$TRAVIS_BRANCH' == 'master' ] && [ '$TRAVIS_PULL_REQUEST' == 'false' ]" && export ON_MASTER_COMMIT=1 && bash -c "[ $SITE_UPDATE ]" && export SITE_UPDATE_ON_MASTER_COMMIT=1 || true
-    - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9c-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
+    - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9d-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
     - sudo apt-get update -q -y
 install:
     - sudo apt-get install -q -y --no-install-recommends libasound2-dev

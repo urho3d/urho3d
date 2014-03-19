@@ -27,7 +27,35 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="96 0 110 14" />
     </element>
+    <element type="CollisionBox2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="96 0 110 14" />
+    </element>
+    <element type="CollisionChain2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="96 0 110 14" />
+    </element>
+    <element type="CollisionCircle2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="96 0 110 14" />
+    </element>
+    <element type="CollisionEdge2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="96 0 110 14" />
+    </element>
+    <element type="CollisionPolygon2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="96 0 110 14" />
+    </element>
     <element type="Constraint">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintRevolute2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintRope2D">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="112 0 126 14" />
     </element>
@@ -63,7 +91,15 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="160 0 174 14" />
     </element>
+    <element type="PhysicsWorld2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 0 174 14" />
+    </element>
     <element type="RigidBody">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="80 0 94 14" />
+    </element>
+    <element type="RigidBody2D">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="80 0 94 14" />
     </element>

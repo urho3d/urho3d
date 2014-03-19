@@ -5,6 +5,7 @@
 ** See Copyright Notice at the end of this file
 */
 
+// Modified by Aster Jian for Urho3D
 
 #ifndef lua_h
 #define lua_h
@@ -110,7 +111,7 @@ typedef LUA_INTEGER lua_Integer;
 LUA_API lua_State *(lua_newstate) (lua_Alloc f, void *ud);
 LUA_API void       (lua_close) (lua_State *L);
 LUA_API lua_State *(lua_newthread) (lua_State *L);
-/* Modified by Aster Jian for Urho3D */
+// Urho3D
 LUA_API lua_State *(lua_getmainthread) (lua_State *L);
 
 LUA_API lua_CFunction (lua_atpanic) (lua_State *L, lua_CFunction panicf);

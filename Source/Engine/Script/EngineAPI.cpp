@@ -49,6 +49,8 @@ static void RegisterConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "uint get_numRows() const", asMETHOD(Console, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_numHistoryRows(uint)", asMETHOD(Console, SetNumHistoryRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint get_numHistoryRows() const", asMETHOD(Console, GetNumHistoryRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void set_focusOnShow(bool)", asMETHOD(Console, SetFocusOnShow), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "bool get_focusOnShow() const", asMETHOD(Console, GetFocusOnShow), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint get_historyPosition() const", asMETHOD(Console, GetHistoryPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "const String& get_historyRow(uint) const", asMETHOD(Console, GetHistoryRow), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "BorderImage@+ get_background() const", asMETHOD(Console, GetBackground), asCALL_THISCALL);

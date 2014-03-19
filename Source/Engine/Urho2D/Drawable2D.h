@@ -96,8 +96,6 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices() = 0;
-    /// Create a default material when a material is not specified.
-    void CreateDefaultMaterial();
     /// Update the material's properties (blend mode and texture).
     void UpdateMaterial();
 

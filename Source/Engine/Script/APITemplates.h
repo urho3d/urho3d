@@ -213,7 +213,7 @@ template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
 }
 
 /// Template function for array to PODVector conversion.
-template <class T> PODVector<T> ArraytoPODVector(CScriptArray* arr)
+template <class T> PODVector<T> ArrayToPODVector(CScriptArray* arr)
 {
     PODVector<T> dest(arr ? arr->GetSize() : 0);
     if (arr)

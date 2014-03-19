@@ -144,9 +144,9 @@ add_subdirectory (Engine)
 add_subdirectory (Tools)
 
 # Urho3D samples
-# Samples are built on iOS platform too when enabled
-# Although samples should also work for Android platform, currently there is no available mechanism to package each sample apps into individual *.apk
-if (NOT ANDROID AND ENABLE_SAMPLES)
+# Samples are built on iOS platform too when enabled. Currently there is no available mechanism to package each sample apps into individual *.apk
+# for Android platform, so we deploy all samples into one apk and use a simple list view activity launcher to select the sample to run
+if (ENABLE_SAMPLES)
     add_subdirectory (Samples)
 endif ()
 

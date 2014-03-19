@@ -32,6 +32,7 @@
 #include "Input.h"
 #include "InputEvents.h"
 #include "Log.h"
+#include "MaterialCache2D.h"
 #include "NavigationMesh.h"
 #include "Network.h"
 #include "PackageFile.h"
@@ -156,7 +157,9 @@ bool Engine::Initialize(const VariantMap& parameters)
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
     }
+
     // 2D graphics library is dependent on 3D graphics library
+    context_->RegisterSubsystem(new MaterialCache2D(context_));
     RegisterUrho2DLibrary(context_);
 
     // Start logging
@@ -775,6 +778,10 @@ void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void Engine::DoExit()
 {
+    MaterialCache2D* materialCache = GetSubsystem<MaterialCache2D>();
+    if (materialCache)
+        materialCache->ReleaseAllMaterials();
+
     Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics)
         graphics->Close();

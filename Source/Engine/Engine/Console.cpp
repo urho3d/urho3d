@@ -55,6 +55,9 @@ Console::Console(Context* context) :
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
 
+    // By default prevent the automatic showing of the screen keyboard
+    focusOnShow_ = !ui->GetUseScreenKeyboard();
+
     background_ = new BorderImage(context_);
     background_->SetBringToBack(false);
     background_->SetClipChildren(true);
@@ -115,7 +118,7 @@ void Console::SetVisible(bool enable)
         bool hasConsoleCommandEventHandler = context_->GetEventReceivers(this, E_CONSOLECOMMAND) != 0 ||
             context_->GetEventReceivers(E_CONSOLECOMMAND) != 0;
         lineEdit_->SetVisible(hasConsoleCommandEventHandler);
-        if (hasConsoleCommandEventHandler)
+        if (hasConsoleCommandEventHandler && focusOnShow_)
             GetSubsystem<UI>()->SetFocusElement(lineEdit_);
 
         // Ensure the background has no empty space when shown without the lineedit
@@ -170,6 +173,11 @@ void Console::SetNumHistoryRows(unsigned rows)
         history_.Resize(rows);
     if (historyPosition_ > rows)
         historyPosition_ = rows;
+}
+
+void Console::SetFocusOnShow(bool enable)
+{
+    focusOnShow_ = enable;
 }
 
 void Console::UpdateElements()

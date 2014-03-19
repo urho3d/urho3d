@@ -238,8 +238,8 @@ else ()
             # For now just reference it to suppress "unused variable" warning
         endif ()
     elseif (IOS)
-        # Using the fact that ENABLE_TESTING option is provided when performing CI build, suppress all the warnings for iOS build because 3rd party libraries produce too many of them and yet we don't want to touch the 3rd party library's source codes unnecessarily
-        if (DEFINED ENABLE_TESTING)
+        # When performing CI build, suppress all the warnings for iOS build because 3rd party libraries produce too many of them and yet we don't want to touch the 3rd party library's source codes unnecessarily
+        if ($ENV{CI})
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
         endif ()
@@ -562,6 +562,11 @@ macro (setup_main_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
             COMMENT "Stripping lib${TARGET_NAME}.so in library output directory")
+        # When performing packaging, include the final apk file 
+        if (DEST_RUNTIME_DIR AND NOT APK_INCLUDED)
+            install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
+            set (APK_INCLUDED 1)
+        endif ()
     else ()
         # Setup target as executable
         if (WIN32)

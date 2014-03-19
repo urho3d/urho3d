@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "FileSystem.h"
 #include "Log.h"
+#include "OggVorbisSoundStream.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Sound.h"
@@ -309,43 +310,9 @@ void Sound::FixInterpolation()
     }
 }
 
-void* Sound::AllocateDecoder()
+SharedPtr<SoundStream> Sound::GetDecoderStream() const
 {
-    if (!compressed_)
-        return 0;
-    
-    int error;
-    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data_.Get(), dataSize_, &error, 0);
-    return vorbis;
-}
-
-unsigned Sound::Decode(void* decoder, signed char* dest, unsigned bytes)
-{
-    if (!decoder)
-        return 0;
-    
-    unsigned soundSources = stereo_ ? 2 : 1;
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder);
-    unsigned outSamples = stb_vorbis_get_samples_short_interleaved(vorbis, soundSources, (short*)dest, bytes >> 1);
-    return (outSamples * soundSources) << 1;
-}
-
-void Sound::RewindDecoder(void* decoder)
-{
-    if (!decoder)
-        return;
-    
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder);
-    stb_vorbis_seek_start(vorbis);
-}
-
-void Sound::FreeDecoder(void* decoder)
-{
-    if (!decoder)
-        return;
-    
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder);
-    stb_vorbis_close(vorbis);
+    return compressed_ ? SharedPtr<SoundStream>(new OggVorbisSoundStream(this)) : SharedPtr<SoundStream>();
 }
 
 float Sound::GetLength() const

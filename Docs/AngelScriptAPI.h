@@ -1253,6 +1253,73 @@ String typeName;
 int weakRefs;
 };
 
+class CollisionChain2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+Array<Vector2> GetVertices() const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetVertex(uint, const Vector2&);
+void SetVertices(Array<Vector2>);
+const Vector2& GetVertex(uint) const;
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+int categoryBits;
+float density;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float friction;
+int groupIndex;
+/* readonly */
+uint id;
+/* readonly */
+float inertia;
+bool loop;
+int maskBits;
+/* readonly */
+float mass;
+/* readonly */
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int refs;
+float restitution;
+bool sensor;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+uint vertexCount;
+/* readonly */
+int weakRefs;
+};
+
 class CollisionCircle2D
 {
 // Methods:
@@ -1313,6 +1380,136 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class CollisionEdge2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetVertices(const Vector2&, const Vector2&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+int categoryBits;
+float density;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float friction;
+int groupIndex;
+/* readonly */
+uint id;
+/* readonly */
+float inertia;
+int maskBits;
+/* readonly */
+float mass;
+/* readonly */
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int refs;
+float restitution;
+bool sensor;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+Vector2 vertex1;
+Vector2 vertex2;
+/* readonly */
+int weakRefs;
+};
+
+class CollisionPolygon2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+Array<Vector2> GetVertices() const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetVertex(uint, const Vector2&);
+void SetVertices(Array<Vector2>);
+const Vector2& GetVertex(uint) const;
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+int categoryBits;
+float density;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float friction;
+int groupIndex;
+/* readonly */
+uint id;
+/* readonly */
+float inertia;
+int maskBits;
+/* readonly */
+float mass;
+/* readonly */
+Vector2 massCenter;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int refs;
+float restitution;
+bool sensor;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+uint vertexCount;
 /* readonly */
 int weakRefs;
 };
@@ -1606,6 +1803,7 @@ ShortStringHash baseType;
 /* readonly */
 String category;
 XMLFile defaultStyle;
+bool focusOnShow;
 /* readonly */
 uint historyPosition;
 /* readonly */
@@ -1689,6 +1887,172 @@ String typeName;
 /* readonly */
 int weakRefs;
 Vector3 worldPosition;
+};
+
+class Constraint2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintRevolute2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+Vector2 anchorPoint;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enableLimit;
+bool enableMotor;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float lowerAngle;
+float maxMotorTorque;
+float motorSpeed;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float upperAngle;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintRope2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float maxLength;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+Vector2 otherBodyAnchor;
+/* readonly */
+RigidBody2D ownerBody;
+Vector2 ownerBodyAnchor;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
 };
 
 class Controls
@@ -3000,6 +3364,12 @@ class Input
 // Methods:
 void CloseJoystick(uint);
 bool DetectJoysticks();
+int GetKeyFromName(const String&) const;
+int GetKeyFromScancode(int) const;
+String GetKeyName(int) const;
+int GetScancodeFromKey(int) const;
+int GetScancodeFromName(const String&) const;
+String GetScancodeName(int) const;
 bool OpenJoystick(uint);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
@@ -3047,6 +3417,10 @@ Array<bool> qualifierPress;
 int qualifiers;
 /* readonly */
 int refs;
+/* readonly */
+Array<bool> scancodeDown;
+/* readonly */
+Array<bool> scancodePress;
 /* readonly */
 bool screenKeyboardSupport;
 bool screenKeyboardVisible;
@@ -4747,6 +5121,17 @@ Vector3 normal;
 Vector3 position;
 };
 
+class PhysicsRaycastResult2D
+{
+
+// Properties:
+/* readonly */
+RigidBody2D body;
+float distance;
+Vector2 normal;
+Vector2 position;
+};
+
 class PhysicsWorld
 {
 // Methods:
@@ -4819,9 +5204,13 @@ void DrawDebugGeometry() const;
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+Array<RigidBody2D> GetRigidBodies(const Rect&, uint = 0xffff);
+RigidBody2D GetRigidBody(const Vector2&, uint = 0xffff);
 bool Load(File, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
+Array<PhysicsRaycastResult2D> Raycast(const Vector2&, const Vector2&, uint = 0xffff);
+PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff);
 void Remove();
 void RemoveInstanceDefault();
 void ResetToDefault();
@@ -9715,16 +10104,31 @@ int HAT_DOWN;
 int HAT_LEFT;
 int HAT_RIGHT;
 int HAT_UP;
-int KEY_ADD;
-int KEY_APPS;
+int KEY_0;
+int KEY_1;
+int KEY_2;
+int KEY_3;
+int KEY_4;
+int KEY_5;
+int KEY_6;
+int KEY_7;
+int KEY_8;
+int KEY_9;
+int KEY_A;
+int KEY_ALT;
+int KEY_APPLICATION;
+int KEY_B;
 int KEY_BACKSPACE;
+int KEY_C;
 int KEY_CAPSLOCK;
-int KEY_DECIMAL;
+int KEY_CTRL;
+int KEY_D;
 int KEY_DELETE;
-int KEY_DIVIDE;
 int KEY_DOWN;
+int KEY_E;
 int KEY_END;
 int KEY_ESC;
+int KEY_F;
 int KEY_F1;
 int KEY_F10;
 int KEY_F11;
@@ -9749,41 +10153,68 @@ int KEY_F6;
 int KEY_F7;
 int KEY_F8;
 int KEY_F9;
+int KEY_G;
+int KEY_GUI;
+int KEY_H;
 int KEY_HOME;
+int KEY_I;
 int KEY_INSERT;
+int KEY_J;
+int KEY_K;
+int KEY_KP_0;
+int KEY_KP_1;
+int KEY_KP_2;
+int KEY_KP_3;
+int KEY_KP_4;
+int KEY_KP_5;
+int KEY_KP_6;
+int KEY_KP_7;
+int KEY_KP_8;
+int KEY_KP_9;
+int KEY_KP_DIVIDE;
 int KEY_KP_ENTER;
+int KEY_KP_MINUS;
+int KEY_KP_MULTIPLY;
+int KEY_KP_PERIOD;
+int KEY_KP_PLUS;
+int KEY_L;
 int KEY_LALT;
 int KEY_LCTRL;
 int KEY_LEFT;
+int KEY_LGUI;
 int KEY_LSHIFT;
-int KEY_LWIN;
-int KEY_MULTIPLY;
-int KEY_NUMLOCK;
-int KEY_NUMPAD0;
-int KEY_NUMPAD1;
-int KEY_NUMPAD2;
-int KEY_NUMPAD3;
-int KEY_NUMPAD4;
-int KEY_NUMPAD5;
-int KEY_NUMPAD6;
-int KEY_NUMPAD7;
-int KEY_NUMPAD8;
-int KEY_NUMPAD9;
+int KEY_M;
+int KEY_N;
+int KEY_NUMLOCKCLEAR;
+int KEY_O;
+int KEY_P;
 int KEY_PAGEDOWN;
 int KEY_PAGEUP;
 int KEY_PAUSE;
+int KEY_PRINTSCREEN;
+int KEY_Q;
+int KEY_R;
 int KEY_RALT;
 int KEY_RCTRL;
 int KEY_RETURN;
 int KEY_RETURN2;
+int KEY_RGUI;
 int KEY_RIGHT;
 int KEY_RSHIFT;
-int KEY_RWIN;
+int KEY_S;
 int KEY_SCROLLLOCK;
+int KEY_SELECT;
+int KEY_SHIFT;
 int KEY_SPACE;
-int KEY_SUBTRACT;
+int KEY_T;
 int KEY_TAB;
+int KEY_U;
 int KEY_UP;
+int KEY_V;
+int KEY_W;
+int KEY_X;
+int KEY_Y;
+int KEY_Z;
 uint LAST_LOCAL_ID;
 uint LAST_REPLICATED_ID;
 int LOG_DEBUG;
@@ -9816,6 +10247,251 @@ int QUAL_ALT;
 int QUAL_ANY;
 int QUAL_CTRL;
 int QUAL_SHIFT;
+int SCANCODE_0;
+int SCANCODE_1;
+int SCANCODE_2;
+int SCANCODE_3;
+int SCANCODE_4;
+int SCANCODE_5;
+int SCANCODE_6;
+int SCANCODE_7;
+int SCANCODE_8;
+int SCANCODE_9;
+int SCANCODE_A;
+int SCANCODE_AC_BACK;
+int SCANCODE_AC_BOOKMARKS;
+int SCANCODE_AC_FORWARD;
+int SCANCODE_AC_HOME;
+int SCANCODE_AC_REFRESH;
+int SCANCODE_AC_SEARCH;
+int SCANCODE_AC_STOP;
+int SCANCODE_AGAIN;
+int SCANCODE_ALT;
+int SCANCODE_ALTERASE;
+int SCANCODE_APOSTROPHE;
+int SCANCODE_APP1;
+int SCANCODE_APP2;
+int SCANCODE_APPLICATION;
+int SCANCODE_AUDIOMUTE;
+int SCANCODE_AUDIONEXT;
+int SCANCODE_AUDIOPLAY;
+int SCANCODE_AUDIOPREV;
+int SCANCODE_AUDIOSTOP;
+int SCANCODE_B;
+int SCANCODE_BACKSLASH;
+int SCANCODE_BACKSPACE;
+int SCANCODE_BRIGHTNESSDOWN;
+int SCANCODE_BRIGHTNESSUP;
+int SCANCODE_C;
+int SCANCODE_CALCULATOR;
+int SCANCODE_CANCEL;
+int SCANCODE_CAPSLOCK;
+int SCANCODE_CLEAR;
+int SCANCODE_CLEARAGAIN;
+int SCANCODE_COMMA;
+int SCANCODE_COMPUTER;
+int SCANCODE_COPY;
+int SCANCODE_CRSEL;
+int SCANCODE_CTRL;
+int SCANCODE_CURRENCYSUBUNIT;
+int SCANCODE_CURRENCYUNIT;
+int SCANCODE_CUT;
+int SCANCODE_D;
+int SCANCODE_DECIMALSEPARATOR;
+int SCANCODE_DELETE;
+int SCANCODE_DISPLAYSWITCH;
+int SCANCODE_DOWN;
+int SCANCODE_E;
+int SCANCODE_EJECT;
+int SCANCODE_END;
+int SCANCODE_EQUALS;
+int SCANCODE_ESCAPE;
+int SCANCODE_EXECUTE;
+int SCANCODE_EXSEL;
+int SCANCODE_F;
+int SCANCODE_F1;
+int SCANCODE_F10;
+int SCANCODE_F11;
+int SCANCODE_F12;
+int SCANCODE_F13;
+int SCANCODE_F14;
+int SCANCODE_F15;
+int SCANCODE_F16;
+int SCANCODE_F17;
+int SCANCODE_F18;
+int SCANCODE_F19;
+int SCANCODE_F2;
+int SCANCODE_F20;
+int SCANCODE_F21;
+int SCANCODE_F22;
+int SCANCODE_F23;
+int SCANCODE_F24;
+int SCANCODE_F3;
+int SCANCODE_F4;
+int SCANCODE_F5;
+int SCANCODE_F6;
+int SCANCODE_F7;
+int SCANCODE_F8;
+int SCANCODE_F9;
+int SCANCODE_FIND;
+int SCANCODE_G;
+int SCANCODE_GRAVE;
+int SCANCODE_GUI;
+int SCANCODE_H;
+int SCANCODE_HELP;
+int SCANCODE_HOME;
+int SCANCODE_I;
+int SCANCODE_INSERT;
+int SCANCODE_INTERNATIONAL1;
+int SCANCODE_INTERNATIONAL2;
+int SCANCODE_INTERNATIONAL3;
+int SCANCODE_INTERNATIONAL4;
+int SCANCODE_INTERNATIONAL5;
+int SCANCODE_INTERNATIONAL6;
+int SCANCODE_INTERNATIONAL7;
+int SCANCODE_INTERNATIONAL8;
+int SCANCODE_INTERNATIONAL9;
+int SCANCODE_J;
+int SCANCODE_K;
+int SCANCODE_KBDILLUMDOWN;
+int SCANCODE_KBDILLUMTOGGLE;
+int SCANCODE_KBDILLUMUP;
+int SCANCODE_KP_0;
+int SCANCODE_KP_00;
+int SCANCODE_KP_000;
+int SCANCODE_KP_1;
+int SCANCODE_KP_2;
+int SCANCODE_KP_3;
+int SCANCODE_KP_4;
+int SCANCODE_KP_5;
+int SCANCODE_KP_6;
+int SCANCODE_KP_7;
+int SCANCODE_KP_8;
+int SCANCODE_KP_9;
+int SCANCODE_KP_A;
+int SCANCODE_KP_AMPERSAND;
+int SCANCODE_KP_AT;
+int SCANCODE_KP_B;
+int SCANCODE_KP_BACKSPACE;
+int SCANCODE_KP_BINARY;
+int SCANCODE_KP_C;
+int SCANCODE_KP_CLEAR;
+int SCANCODE_KP_CLEARENTRY;
+int SCANCODE_KP_COLON;
+int SCANCODE_KP_COMMA;
+int SCANCODE_KP_D;
+int SCANCODE_KP_DBLAMPERSAND;
+int SCANCODE_KP_DBLVERTICALBAR;
+int SCANCODE_KP_DECIMAL;
+int SCANCODE_KP_DIVIDE;
+int SCANCODE_KP_E;
+int SCANCODE_KP_ENTER;
+int SCANCODE_KP_EQUALS;
+int SCANCODE_KP_EQUALSAS400;
+int SCANCODE_KP_EXCLAM;
+int SCANCODE_KP_F;
+int SCANCODE_KP_GREATER;
+int SCANCODE_KP_HASH;
+int SCANCODE_KP_HEXADECIMAL;
+int SCANCODE_KP_LEFTBRACE;
+int SCANCODE_KP_LEFTPAREN;
+int SCANCODE_KP_LESS;
+int SCANCODE_KP_MEMADD;
+int SCANCODE_KP_MEMCLEAR;
+int SCANCODE_KP_MEMDIVIDE;
+int SCANCODE_KP_MEMMULTIPLY;
+int SCANCODE_KP_MEMRECALL;
+int SCANCODE_KP_MEMSTORE;
+int SCANCODE_KP_MEMSUBTRACT;
+int SCANCODE_KP_MINUS;
+int SCANCODE_KP_MULTIPLY;
+int SCANCODE_KP_OCTAL;
+int SCANCODE_KP_PERCENT;
+int SCANCODE_KP_PERIOD;
+int SCANCODE_KP_PLUS;
+int SCANCODE_KP_PLUSMINUS;
+int SCANCODE_KP_POWER;
+int SCANCODE_KP_RIGHTBRACE;
+int SCANCODE_KP_RIGHTPAREN;
+int SCANCODE_KP_SPACE;
+int SCANCODE_KP_TAB;
+int SCANCODE_KP_VERTICALBAR;
+int SCANCODE_KP_XOR;
+int SCANCODE_L;
+int SCANCODE_LALT;
+int SCANCODE_LANG1;
+int SCANCODE_LANG2;
+int SCANCODE_LANG3;
+int SCANCODE_LANG4;
+int SCANCODE_LANG5;
+int SCANCODE_LANG6;
+int SCANCODE_LANG7;
+int SCANCODE_LANG8;
+int SCANCODE_LANG9;
+int SCANCODE_LCTRL;
+int SCANCODE_LEFT;
+int SCANCODE_LEFTBRACKET;
+int SCANCODE_LGUI;
+int SCANCODE_LSHIFT;
+int SCANCODE_M;
+int SCANCODE_MAIL;
+int SCANCODE_MEDIASELECT;
+int SCANCODE_MENU;
+int SCANCODE_MINUS;
+int SCANCODE_MODE;
+int SCANCODE_MUTE;
+int SCANCODE_N;
+int SCANCODE_NONUSBACKSLASH;
+int SCANCODE_NONUSHASH;
+int SCANCODE_NUMLOCKCLEAR;
+int SCANCODE_O;
+int SCANCODE_OPER;
+int SCANCODE_OUT;
+int SCANCODE_P;
+int SCANCODE_PAGEDOWN;
+int SCANCODE_PAGEUP;
+int SCANCODE_PASTE;
+int SCANCODE_PAUSE;
+int SCANCODE_PERIOD;
+int SCANCODE_POWER;
+int SCANCODE_PRINTSCREEN;
+int SCANCODE_PRIOR;
+int SCANCODE_Q;
+int SCANCODE_R;
+int SCANCODE_RALT;
+int SCANCODE_RCTRL;
+int SCANCODE_RETURN;
+int SCANCODE_RETURN2;
+int SCANCODE_RGUI;
+int SCANCODE_RIGHT;
+int SCANCODE_RIGHTBRACKET;
+int SCANCODE_RSHIFT;
+int SCANCODE_S;
+int SCANCODE_SCROLLLOCK;
+int SCANCODE_SELECT;
+int SCANCODE_SEMICOLON;
+int SCANCODE_SEPARATOR;
+int SCANCODE_SHIFT;
+int SCANCODE_SLASH;
+int SCANCODE_SLEEP;
+int SCANCODE_SPACE;
+int SCANCODE_STOP;
+int SCANCODE_SYSREQ;
+int SCANCODE_T;
+int SCANCODE_TAB;
+int SCANCODE_THOUSANDSSEPARATOR;
+int SCANCODE_U;
+int SCANCODE_UNDO;
+int SCANCODE_UNKNOWN;
+int SCANCODE_UP;
+int SCANCODE_V;
+int SCANCODE_VOLUMEDOWN;
+int SCANCODE_VOLUMEUP;
+int SCANCODE_W;
+int SCANCODE_WWW;
+int SCANCODE_X;
+int SCANCODE_Y;
+int SCANCODE_Z;
 uint SCAN_DIRS;
 uint SCAN_FILES;
 uint SCAN_HIDDEN;
