@@ -102,6 +102,8 @@ static const char* typeNames[] =
 
 static const float AUTOREMOVE_DELAY = 0.25f;
 
+static const int STREAM_SAFETY_SAMPLES = 4;
+
 extern const char* AUDIO_CATEGORY;
 
 SoundSource::SoundSource(Context* context) :
@@ -116,8 +118,7 @@ SoundSource::SoundSource(Context* context) :
     position_(0),
     fractPosition_(0),
     timePosition_(0.0f),
-    streamWritePosition_(0),
-    streamStopped_(false)
+    unusedStreamSize_(0)
 {
     audio_ = GetSubsystem<Audio>();
 
@@ -323,66 +324,32 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     if (!position_ || (!sound_ && !soundStream_) || !IsEnabledEffective())
         return;
     
+    int streamFilledSize, outBytes;
+    
     if (soundStream_ && streamBuffer_)
     {
-        unsigned streamBufferSize = streamBuffer_->GetDataSize();
+        int streamBufferSize = streamBuffer_->GetDataSize();
+        // Calculate how many bytes of stream sound data is needed
+        int neededSize = (int)((float)samples * frequency_ / (float)mixRate);
+        // Add a little safety buffer. Subtract previous unused data
+        neededSize += STREAM_SAFETY_SAMPLES;
+        neededSize *= soundStream_->GetSampleSize();
+        neededSize -= unusedStreamSize_;
+        neededSize = Clamp(neededSize, 0, streamBufferSize - unusedStreamSize_);
         
-        // Decode new audio in stream mode. If stream experienced an underrun, try restarting
-        if (streamStopped_)
-        {
-            // If stream should stop at end, do not loop after current buffer is played
-            if (soundStream_->GetStopAtEnd())
-                streamBuffer_->SetLooped(false);
-            else
-            {
-                unsigned outBytes = soundStream_->GetData(streamBuffer_->GetStart(), streamBufferSize);
-                if (outBytes)
-                {
-                    // If did not get a full buffer, fill the rest with zero
-                    if (outBytes < streamBufferSize)
-                        memset(streamBuffer_->GetStart() + outBytes, 0, streamBufferSize - outBytes);
-                    streamStopped_ = false;
-                    // Start playback from beginning of stream buffer again so that there is minimal latency
-                    position_ = streamBuffer_->GetStart();
-                    fractPosition_ = 0;
-                    streamWritePosition_ = 0;
-                }
-            }
-        }
-        else
-        {
-            unsigned currentPos = position_ - streamBuffer_->GetStart();
-            unsigned totalBytes;
-            
-            // Handle possible wraparound
-            if (currentPos >= streamWritePosition_)
-                totalBytes = currentPos - streamWritePosition_;
-            else
-                totalBytes = streamBuffer_->GetDataSize() - streamWritePosition_ + currentPos;
-            
-            while (totalBytes)
-            {
-                // Calculate size of current stream data request (may need to do in two parts if wrapping)
-                unsigned bytes = streamBuffer_->GetDataSize() - streamWritePosition_;
-                if (bytes > totalBytes)
-                    bytes = totalBytes;
-                
-                unsigned outBytes = soundStream_->GetData(streamBuffer_->GetStart() + streamWritePosition_, bytes);
-                // If got less than the requested amount, stream reached end or experienced underrun. Fill rest with zero
-                if (outBytes < bytes)
-                {
-                    streamStopped_ = true;
-                    memset(streamBuffer_->GetStart() + streamWritePosition_ + outBytes, 0, bytes - outBytes);
-                }
-                
-                streamWritePosition_ += bytes;
-                streamWritePosition_ %= streamBuffer_->GetDataSize();
-                totalBytes -= bytes;
-            }
-        }
+        // Always start play position at the beginning of the stream buffer
+        position_ = streamBuffer_->GetStart();
         
-        // Correct interpolation of the stream buffer
-        streamBuffer_->FixInterpolation();
+        // Request new data from the stream
+        signed char* dest = streamBuffer_->GetStart() + unusedStreamSize_;
+        outBytes = neededSize ? soundStream_->GetData(dest, neededSize) : 0;
+        dest += outBytes;
+        // Zero-fill rest if stream did not produce enough data
+        if (outBytes < neededSize)
+            memset(dest, 0, neededSize - outBytes);
+        
+        // Calculate amount of total bytes of data in stream buffer now, to know how much went unused after mixing
+        streamFilledSize = neededSize + unusedStreamSize_;
     }
 
     // If streaming, play the stream buffer. Otherwise play the original sound
@@ -426,9 +393,22 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         }
     }
 
-    // Update the time position
+    // Update the time position. In stream mode, copy unused data back to the beginning of the stream buffer
     if (soundStream_)
+    {
         timePosition_ += ((float)samples / (float)mixRate) * frequency_ / soundStream_->GetFrequency();
+        
+        unusedStreamSize_ = Max(streamFilledSize - (int)(size_t)(position_ - streamBuffer_->GetStart()), 0);
+        if (unusedStreamSize_)
+            memcpy(streamBuffer_->GetStart(), (const void*)position_, unusedStreamSize_);
+        
+        // If stream did not produce any data, stop if applicable
+        if (!outBytes && soundStream_->GetStopAtEnd())
+        {
+            position_ = 0;
+            return;
+        }
+    }
     else if (sound_)
         timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
@@ -529,14 +509,8 @@ void SoundSource::PlayLockless(SharedPtr<SoundStream> stream)
         streamBuffer_->SetFormat(stream->GetIntFrequency(), stream->IsSixteenBit(), stream->IsStereo());
         streamBuffer_->SetLooped(true);
         
-        // Fill stream buffer with initial data
-        unsigned outBytes = stream->GetData(streamBuffer_->GetStart(), streamBufferSize);
-        if (outBytes < streamBufferSize)
-            memset(streamBuffer_->GetStart() + outBytes, 0, streamBufferSize - outBytes);
-        
         soundStream_ = stream;
-        streamWritePosition_ = 0;
-        streamStopped_ = false;
+        unusedStreamSize_ = 0;
         position_ = streamBuffer_->GetStart();
         fractPosition_ = 0;
         return;
@@ -550,7 +524,6 @@ void SoundSource::StopLockless()
 {
     position_ = 0;
     timePosition_ = 0.0f;
-    streamStopped_ = true;
     
     // Free the sound stream and decode buffer if a stream was playing
     soundStream_.Reset();

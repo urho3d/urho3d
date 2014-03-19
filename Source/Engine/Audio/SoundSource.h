@@ -172,10 +172,8 @@ private:
     volatile float timePosition_;
     /// Decode buffer.
     SharedPtr<Sound> streamBuffer_;
-    /// Position in stream buffer the next audio data from the stream will be written to.
-    unsigned streamWritePosition_;
-    /// Stream underrun flag.
-    bool streamStopped_;
+    /// Unused stream bytes from previous frame.
+    int unusedStreamSize_;
 };
 
 }

@@ -62,6 +62,8 @@ private:
     SharedPtr<Node> node_;
     /// Sound stream that we update.
     SharedPtr<BufferedSoundStream> soundStream_;
+    /// Instruction text.
+    SharedPtr<Text> instructionText_;
     /// Filter coefficient for the sound.
     float filter_;
     /// Synthesis accumulator.

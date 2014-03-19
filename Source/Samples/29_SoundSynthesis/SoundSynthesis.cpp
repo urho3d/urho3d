@@ -43,7 +43,7 @@ SoundSynthesis::SoundSynthesis(Context* context) :
     filter_(0.5f),
     accumulator_(0.0f),
     osc1_(0.0f),
-    osc2_(0.0f)
+    osc2_(180.0f)
 {
 }
 
@@ -95,7 +95,7 @@ void SoundSynthesis::UpdateSound()
         osc1_ = fmodf(osc1_ + 1.0f, 360.0f);
         osc2_ = fmodf(osc2_ + 1.002f, 360.0f);
         
-        float newValue = Clamp((Sin(osc1_) + Sin(osc2_)) * 200000.0f, -32767.0f, 32767.0f);
+        float newValue = Clamp((Sin(osc1_) + Sin(osc2_)) * 100000.0f, -32767.0f, 32767.0f);
         accumulator_ = Lerp(accumulator_, newValue, filter_);
         newData[i] = (int)accumulator_;
     }
@@ -109,14 +109,15 @@ void SoundSynthesis::CreateInstructions()
     UI* ui = GetSubsystem<UI>();
     
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use cursor up and down to control sound filtering");
-    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    instructionText_ = ui->GetRoot()->CreateChild<Text>();
+    instructionText_->SetText("Use cursor up and down to control sound filtering");
+    instructionText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     
     // Position the text relative to the screen center
-    instructionText->SetHorizontalAlignment(HA_CENTER);
-    instructionText->SetVerticalAlignment(VA_CENTER);
-    instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+    instructionText_->SetTextAlignment(HA_CENTER);
+    instructionText_->SetHorizontalAlignment(HA_CENTER);
+    instructionText_->SetVerticalAlignment(VA_CENTER);
+    instructionText_->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
 void SoundSynthesis::SubscribeToEvents()
@@ -139,6 +140,9 @@ void SoundSynthesis::HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input->GetKeyDown(KEY_DOWN))
         filter_ -= timeStep * 0.5f;
     filter_ = Clamp(filter_, 0.01f, 1.0f);
+    
+    instructionText_->SetText("Use cursor up and down to control sound filtering\n"
+        "Coefficient: " + String(filter_));
     
     UpdateSound();
 }
