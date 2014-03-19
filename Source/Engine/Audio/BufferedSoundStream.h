@@ -32,7 +32,7 @@ namespace Urho3D
 {
 
 /// %Sound stream that supports manual buffering of data from the main thread.
-class BufferedSoundStream : public SoundStream
+class URHO3D_API BufferedSoundStream : public SoundStream
 {
 public:
     /// Construct.
