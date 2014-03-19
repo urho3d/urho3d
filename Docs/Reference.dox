@@ -1400,6 +1400,12 @@ The frequency is in Hz, and loop start and end are bytes from the start of audio
 
 The Audio subsystem is always instantiated, but in headless mode it is not active. In headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
 
+\section Audio_Stream Sound streaming
+
+In addition to playing existing sound resources, sound can be generated during runtime using the SoundStream class and its subclasses. To start playback of a stream on a SoundSource, call \ref SoundSource::Play(SoundStream* stream) "Play(SoundStream* stream)".
+
+%Sound streaming is used internally to implement on-the-fly Ogg Vorbis decoding. It is only available in C++ code and not scripting due to its low-level nature. See the SoundSynthesis C++ sample for an example of using the BufferedSoundStream subclass, which allows the sound data to be queued for playback from the main thread.
+
 
 \page Physics Physics
 

@@ -34,7 +34,7 @@ class BufferedSoundStream;
 
 /// Sound synthesis example.
 /// This sample demonstrates:
-///     - Playing back a sound stream produced in realtime in code
+///     - Playing back a sound stream produced on-the-fly by a simple CPU synthesis algorithm
 class SoundSynthesis : public Sample
 {
     OBJECT(SoundSynthesis);
