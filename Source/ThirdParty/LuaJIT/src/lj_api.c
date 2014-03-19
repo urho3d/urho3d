@@ -1,10 +1,12 @@
 /*
 ** Public Lua/C API.
-** Copyright (C) 2005-2013 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
 */
+
+// Modified by Aster Jian for Urho3D
 
 #define lj_api_c
 #define LUA_CORE
@@ -689,12 +691,12 @@ LUA_API lua_State *lua_newthread(lua_State *L)
   return L1;
 }
 
-/* Modified by Aster Jian for Urho3D */
+// Urho3D
 LUA_API lua_State *lua_getmainthread(lua_State *L)
 {
-    lua_State *L1;
-    L1 = mainthread(G(L));
-    return L1;
+  lua_State *L1;
+  L1 = mainthread(G(L));
+  return L1;
 }
 
 LUA_API void *lua_newuserdata(lua_State *L, size_t size)
@@ -1172,7 +1174,7 @@ LUA_API int lua_gc(lua_State *L, int what, int data)
     MSize a = (MSize)data << 10;
     g->gc.threshold = (a <= g->gc.total) ? (g->gc.total - a) : 0;
     while (g->gc.total >= g->gc.threshold)
-      if (lj_gc_step(L)) {
+      if (lj_gc_step(L) > 0) {
 	res = 1;
 	break;
       }
