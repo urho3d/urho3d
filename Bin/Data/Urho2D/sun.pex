@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <particleEmitterConfig>
-  <texture name="sun_particle.png"/>
+  <texture name="particle.png"/>
   <sourcePosition x="157.97" y="228.41"/>
   <sourcePositionVariance x="7.00" y="7.00"/>
   <speed value="260.00"/>
