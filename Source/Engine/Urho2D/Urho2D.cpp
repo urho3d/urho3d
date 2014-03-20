@@ -1,4 +1,4 @@
-//
+
 // Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +30,9 @@
 #include "CollisionPolygon2D.h"
 #include "CollisionShape2D.h"
 #include "Constraint2D.h"
+#include "ConstraintDistance2D.h"
+#include "ConstraintFriction2D.h"
+#include "ConstraintPulley2D.h"
 #include "ConstraintRevolute2D.h"
 #include "ConstraintRope2D.h"
 #include "Context.h"
@@ -63,16 +66,20 @@ void RegisterUrho2DLibrary(Context* context)
 
     PhysicsWorld2D::RegisterObject(context);
     RigidBody2D::RegisterObject(context);
+    
     CollisionShape2D::RegisterObject(context);
     CollisionBox2D::RegisterObject(context);
     CollisionChain2D::RegisterObject(context);
     CollisionCircle2D::RegisterObject(context);
     CollisionEdge2D::RegisterObject(context);
     CollisionPolygon2D::RegisterObject(context);
+
     Constraint2D::RegisterObject(context);
+    ConstraintDistance2D::RegisterObject(context);
+    ConstraintFriction2D::RegisterObject(context);
+    ConstraintPulley2D::RegisterObject(context);
     ConstraintRevolute2D::RegisterObject(context);
     ConstraintRope2D::RegisterObject(context);
-
 }
 
 }

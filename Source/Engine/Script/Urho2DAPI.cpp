@@ -31,6 +31,9 @@
 #include "CollisionPolygon2D.h"
 #include "CollisionShape2D.h"
 #include "Constraint2D.h"
+#include "ConstraintDistance2D.h"
+#include "ConstraintFriction2D.h"
+#include "ConstraintPulley2D.h"
 #include "ConstraintRevolute2D.h"
 #include "ConstraintRope2D.h"
 #include "Drawable2D.h"
@@ -415,6 +418,46 @@ static void RegisterConstraint2D(asIScriptEngine* engine)
     RegisterConstraint2D<Constraint2D>(engine, "Constraint2D");
 }
 
+static void RegisterConstraintDistance2D(asIScriptEngine* engine)
+{
+    RegisterConstraint2D<ConstraintDistance2D>(engine, "ConstraintDistance2D");
+    engine->RegisterObjectMethod("ConstraintDistance2D", "void set_ownerBodyAnchor(const Vector2&)", asMETHOD(ConstraintDistance2D, SetOwnerBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "const Vector2& get_ownerBodyAnchor() const", asMETHOD(ConstraintDistance2D, GetOwnerBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "void set_otherBodyAnchor(const Vector2&)", asMETHOD(ConstraintDistance2D, SetOtherBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "const Vector2& get_otherBodyAnchor() const", asMETHOD(ConstraintDistance2D, GetOtherBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "void set_frequencyHz(float)", asMETHOD(ConstraintDistance2D, SetFrequencyHz), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "float get_frequencyHz() const", asMETHOD(ConstraintDistance2D, GetFrequencyHz), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "void set_dampingRatio(float)", asMETHOD(ConstraintDistance2D, SetDampingRatio), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "float get_dampingRatio() const", asMETHOD(ConstraintDistance2D, GetDampingRatio), asCALL_THISCALL);
+}
+
+static void RegisterConstraintFriction2D(asIScriptEngine* engine)
+{
+    RegisterConstraint2D<ConstraintFriction2D>(engine, "ConstraintFriction2D");
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_anchorPoint(const Vector2&)", asMETHOD(ConstraintFriction2D, SetAnchorPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const Vector2& get_anchorPoint() const", asMETHOD(ConstraintFriction2D, GetAnchorPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_maxForce(float)", asMETHOD(ConstraintFriction2D, SetMaxForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float get_maxForce() const", asMETHOD(ConstraintFriction2D, GetMaxForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_maxTorque(float)", asMETHOD(ConstraintFriction2D, SetMaxTorque), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float get_maxTorque() const", asMETHOD(ConstraintFriction2D, GetMaxTorque), asCALL_THISCALL);
+}
+
+static void RegisterConstraintPulley2D(asIScriptEngine* engine)
+{
+    RegisterConstraint2D<ConstraintPulley2D>(engine, "ConstraintPulley2D");
+    engine->RegisterObjectMethod("ConstraintPulley2D", "void set_ownerBodyGroundAnchor(const Vector2&)", asMETHOD(ConstraintPulley2D, SetOwnerBodyGroundAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "const Vector2& get_ownerBodyGroundAnchor() const", asMETHOD(ConstraintPulley2D, GetOwnerBodyGroundAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "void set_otherBodyGroundAnchor(const Vector2&)", asMETHOD(ConstraintPulley2D, SetOtherBodyGroundAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "const Vector2& get_otherBodyGroundAnchor() const", asMETHOD(ConstraintPulley2D, GetOtherBodyGroundAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "void set_ownerBodyAnchor(const Vector2&)", asMETHOD(ConstraintPulley2D, SetOwnerBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "const Vector2& get_ownerBodyAnchor() const", asMETHOD(ConstraintPulley2D, GetOwnerBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "void set_otherBodyAnchor(const Vector2&)", asMETHOD(ConstraintPulley2D, SetOtherBodyAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "const Vector2& get_otherBodyAnchor() const", asMETHOD(ConstraintPulley2D, GetOtherBodyAnchor), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("ConstraintPulley2D", "void set_ratio(float)", asMETHOD(ConstraintPulley2D, SetRatio), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPulley2D", "float get_ratio() const", asMETHOD(ConstraintPulley2D, GetRatio), asCALL_THISCALL);
+}
+
 static void RegisterConstraintRevolute2D(asIScriptEngine* engine)
 {
     RegisterConstraint2D<ConstraintRevolute2D>(engine, "ConstraintRevolute2D");
@@ -458,13 +501,18 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
 
     RegisterRigidBody2D(engine);
     RegisterPhysicsWorld2D(engine);
+
     RegisterCollisionShape2D(engine);
     RegisterCollisionBox2D(engine);
     RegisterCollisionCircle2D(engine);
     RegisterCollisionChain2D(engine);
     RegisterCollisionEdge2D(engine);
     RegisterCollisionPolygon2D(engine);
+    
     RegisterConstraint2D(engine);
+    RegisterConstraintDistance2D(engine);
+    RegisterConstraintFriction2D(engine);
+    RegisterConstraintPulley2D(engine);
     RegisterConstraintRevolute2D(engine);
     RegisterConstraintRope2D(engine);
 }
