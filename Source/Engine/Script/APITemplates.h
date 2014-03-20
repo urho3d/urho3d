@@ -1078,6 +1078,8 @@ template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "const IntRect& get_imageRect() const", asMETHOD(T, GetImageRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_border(const IntRect&in)", asMETHODPR(T, SetBorder, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& get_border() const", asMETHOD(T, GetBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_imageBorder(const IntRect&in)", asMETHODPR(T, SetImageBorder, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntRect& get_imageBorder() const", asMETHOD(T, GetImageBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_hoverOffset(const IntVector2&in)", asMETHODPR(T, SetHoverOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_hoverOffset() const", asMETHOD(T, GetHoverOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(BlendMode)", asMETHOD(T, SetBlendMode), asCALL_THISCALL);
