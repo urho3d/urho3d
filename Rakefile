@@ -130,7 +130,8 @@ task :travis_ci_package_upload do
   else
     if ENV['ANDROID']
       # Build Android package consisting of both armeabi-v7a and armeabi ABIs
-      system "./cmake_gcc.sh -DANDROID_ABI=armeabi && cd #{platform_prefix}Build && make" or abort 'Failed to reconfigure and build for armeabi'
+      system 'echo Reconfigure and rebuild Urho3D project using armeabi ABI'
+      system "SKIP_NATIVE=1 ./cmake_gcc.sh -DANDROID_ABI=armeabi && cd #{platform_prefix}Build && make" or abort 'Failed to reconfigure and rebuild for armeabi'
       system "cd #{platform_prefix}Build && $ANDROID_SDK/tools/android update project -p . -t 1 && ant debug && bash -c 'mv bin/Urho3D{-debug,}.apk'" or abort 'Failed to make Android package (apk)'
     end
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
