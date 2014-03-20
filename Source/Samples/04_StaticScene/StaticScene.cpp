@@ -97,11 +97,12 @@ void StaticScene::CreateScene()
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
 
-    AttributeAnimation* lightColorAnimation = new AttributeAnimation(context_);
+    // Test code for attribute animation
+    SharedPtr<AttributeAnimation> lightColorAnimation(new AttributeAnimation(context_));
     lightColorAnimation->AddKeyFrame(0.0f, Color(1.0f, 1.0f, 1.0f, 1.0f));
     lightColorAnimation->AddKeyFrame(1.0f, Color(1.0f, 0.0f, 0.0f, 1.0f));
     lightColorAnimation->AddKeyFrame(2.0f, Color(0.0f, 0.0f, 1.0f, 1.0f));
-    lightColorAnimation->AddKeyFrame(3.0f, Color(1.0f, 1.0f, 1.0f, 1.0f));    
+    lightColorAnimation->AddKeyFrame(3.0f, Color(1.0f, 1.0f, 1.0f, 1.0f));
     light->SetAttributeAnimation("Color", lightColorAnimation);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
