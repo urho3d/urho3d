@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,11 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#ifdef TEST_MAIN
 #include "SDL_config.h"
+#else
+#include "../SDL_internal.h"
+#endif
 
 #if defined(__WIN32__)
 #include "../core/windows/SDL_windows.h"
@@ -55,6 +59,7 @@
 #define CPU_HAS_SSE3    0x00000040
 #define CPU_HAS_SSE41   0x00000100
 #define CPU_HAS_SSE42   0x00000200
+#define CPU_HAS_AVX     0x00000400
 
 #if SDL_ALTIVEC_BLITTERS && HAVE_SETJMP && !__MACOSX__ && !__OpenBSD__
 /* This is the brute force way of detecting instruction sets...
@@ -93,7 +98,7 @@ CPU_haveCPUID(void)
     );
 #elif defined(__GNUC__) && defined(__x86_64__)
 /* Technically, if this is being compiled under __x86_64__ then it has 
-CPUid by definition.  But it's nice to be able to prove it.  :)      */
+   CPUid by definition.  But it's nice to be able to prove it.  :)      */
     __asm__ (
 "        pushfq                      # Get original EFLAGS             \n"
 "        popq    %%rax                                                 \n"
@@ -126,6 +131,8 @@ CPUid by definition.  But it's nice to be able to prove it.  :)      */
         mov     has_CPUID,1         ; We have CPUID support
 done:
     }
+#elif defined(_MSC_VER) && defined(_M_X64)
+    has_CPUID = 1;
 #elif defined(__sun) && defined(__i386)
     __asm (
 "       pushfl                 \n"
@@ -186,7 +193,17 @@ done:
         __asm mov b, ebx \
         __asm mov c, ecx \
         __asm mov d, edx \
-    }
+}
+#elif defined(_MSC_VER) && defined(_M_X64)
+#define cpuid(func, a, b, c, d) \
+{ \
+    int CPUInfo[4]; \
+    __cpuid(CPUInfo, func); \
+    a = CPUInfo[0]; \
+    b = CPUInfo[1]; \
+    c = CPUInfo[2]; \
+    d = CPUInfo[3]; \
+}
 #else
 #define cpuid(func, a, b, c, d) \
     a = b = c = d = 0
@@ -324,6 +341,21 @@ CPU_haveSSE42(void)
         if (a >= 1) {
             cpuid(1, a, b, c, d);
             return (c & 0x00100000);
+        }
+    }
+    return 0;
+}
+
+static SDL_INLINE int
+CPU_haveAVX(void)
+{
+    if (CPU_haveCPUID()) {
+        int a, b, c, d;
+
+        cpuid(1, a, b, c, d);
+        if (a >= 1) {
+            cpuid(1, a, b, c, d);
+            return (c & 0x10000000);
         }
     }
     return 0;
@@ -523,6 +555,9 @@ SDL_GetCPUFeatures(void)
         if (CPU_haveSSE42()) {
             SDL_CPUFeatures |= CPU_HAS_SSE42;
         }
+        if (CPU_haveAVX()) {
+            SDL_CPUFeatures |= CPU_HAS_AVX;
+        }
     }
     return SDL_CPUFeatures;
 }
@@ -608,6 +643,15 @@ SDL_HasSSE42(void)
     return SDL_FALSE;
 }
 
+SDL_bool
+SDL_HasAVX(void)
+{
+    if (SDL_GetCPUFeatures() & CPU_HAS_AVX) {
+        return SDL_TRUE;
+    }
+    return SDL_FALSE;
+}
+
 static int SDL_SystemRAM = 0;
 
 int
@@ -621,7 +665,7 @@ SDL_GetSystemRAM(void)
 #endif
 #ifdef HAVE_SYSCTLBYNAME
         if (SDL_SystemRAM <= 0) {
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
 #ifdef HW_REALMEM
             int mib[2] = {CTL_HW, HW_REALMEM};
 #else
@@ -630,7 +674,7 @@ SDL_GetSystemRAM(void)
 #endif /* HW_REALMEM */
 #else
             int mib[2] = {CTL_HW, HW_MEMSIZE};
-#endif /* __FreeBSD__ */
+#endif /* __FreeBSD__ || __FreeBSD_kernel__ */
             Uint64 memsize = 0;
             size_t len = sizeof(memsize);
             
@@ -673,6 +717,7 @@ main()
     printf("SSE3: %d\n", SDL_HasSSE3());
     printf("SSE4.1: %d\n", SDL_HasSSE41());
     printf("SSE4.2: %d\n", SDL_HasSSE42());
+    printf("AVX: %d\n", SDL_HasAVX());
     printf("RAM: %d MB\n", SDL_GetSystemRAM());
     return 0;
 }

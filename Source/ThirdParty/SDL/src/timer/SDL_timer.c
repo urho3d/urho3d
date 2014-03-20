@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 #include "SDL_timer.h"
 #include "SDL_timer_c.h"
@@ -224,7 +224,11 @@ SDL_TimerInit(void)
         /* !!! FIXME: this is nasty. */
 #if defined(__WIN32__) && !defined(HAVE_LIBC)
 #undef SDL_CreateThread
+#if SDL_DYNAMIC_API
+        data->thread = SDL_CreateThread_REAL(SDL_TimerThread, name, data, NULL, NULL);
+#else
         data->thread = SDL_CreateThread(SDL_TimerThread, name, data, NULL, NULL);
+#endif
 #else
         data->thread = SDL_CreateThread(SDL_TimerThread, name, data);
 #endif

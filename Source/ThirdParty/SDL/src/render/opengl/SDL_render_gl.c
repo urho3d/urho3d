@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_RENDER_OGL && !SDL_RENDER_DISABLED
 
@@ -32,6 +32,12 @@
 #include <OpenGL/OpenGL.h>
 #endif
 
+/* To prevent unnecessary window recreation, 
+ * these should match the defaults selected in SDL_GL_ResetAttributes 
+ */
+
+#define RENDERER_CONTEXT_MAJOR 2
+#define RENDERER_CONTEXT_MINOR 1
 
 /* OpenGL renderer implementation */
 
@@ -381,11 +387,25 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
     const char *hint;
     GLint value;
     Uint32 window_flags;
+    int profile_mask, major, minor;
 
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile_mask);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
+    
     window_flags = SDL_GetWindowFlags(window);
-    if (!(window_flags & SDL_WINDOW_OPENGL)) {
+    if (!(window_flags & SDL_WINDOW_OPENGL) ||
+        profile_mask == SDL_GL_CONTEXT_PROFILE_ES || major != RENDERER_CONTEXT_MAJOR || minor != RENDERER_CONTEXT_MINOR) {
+        
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, RENDERER_CONTEXT_MAJOR);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, RENDERER_CONTEXT_MINOR);
+
         if (SDL_RecreateWindow(window, window_flags | SDL_WINDOW_OPENGL) < 0) {
             /* Uh oh, better try to put it back... */
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile_mask);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
             SDL_RecreateWindow(window, window_flags);
             return NULL;
         }
@@ -427,7 +447,7 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
     renderer->GL_BindTexture = GL_BindTexture;
     renderer->GL_UnbindTexture = GL_UnbindTexture;
     renderer->info = GL_RenderDriver.info;
-    renderer->info.flags = SDL_RENDERER_ACCELERATED;
+    renderer->info.flags = (SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     renderer->driverdata = data;
     renderer->window = window;
 
@@ -919,8 +939,16 @@ GL_UpdateViewport(SDL_Renderer * renderer)
         return 0;
     }
 
-    data->glViewport(renderer->viewport.x, renderer->viewport.y,
-                     renderer->viewport.w, renderer->viewport.h);
+    if (renderer->target) {
+        data->glViewport(renderer->viewport.x, renderer->viewport.y,
+                         renderer->viewport.w, renderer->viewport.h);
+    } else {
+        int w, h;
+
+        SDL_GetRendererOutputSize(renderer, &w, &h);
+        data->glViewport(renderer->viewport.x, (h - renderer->viewport.y - renderer->viewport.h),
+                         renderer->viewport.w, renderer->viewport.h);
+    }
 
     data->glMatrixMode(GL_PROJECTION);
     data->glLoadIdentity();
@@ -1048,17 +1076,15 @@ GL_RenderDrawPoints(SDL_Renderer * renderer, const SDL_FPoint * points,
                     int count)
 {
     GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
+    int i;
 
     GL_SetDrawingState(renderer);
 
-    data->glTranslatef(0.5f, 0.5f, 0.0f);
-    data->glVertexPointer(2, GL_FLOAT, 0, points);
-    data->glEnableClientState(GL_VERTEX_ARRAY);
-
-    data->glDrawArrays(GL_POINTS, 0, count);
-
-    data->glDisableClientState(GL_VERTEX_ARRAY);
-    data->glTranslatef(-0.5f, -0.5f, 0.0f);
+    data->glBegin(GL_POINTS);
+    for (i = 0; i < count; ++i) {
+        data->glVertex2f(0.5f + points[i].x, 0.5f + points[i].y);
+    }
+    data->glEnd();
 
     return 0;
 }
@@ -1068,28 +1094,62 @@ GL_RenderDrawLines(SDL_Renderer * renderer, const SDL_FPoint * points,
                    int count)
 {
     GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
+    int i;
 
     GL_SetDrawingState(renderer);
 
-    data->glTranslatef(0.5f, 0.5f, 0.0f);
-    data->glVertexPointer(2, GL_FLOAT, 0, points);
-    data->glEnableClientState(GL_VERTEX_ARRAY);
-
     if (count > 2 &&
         points[0].x == points[count-1].x && points[0].y == points[count-1].y) {
+        data->glBegin(GL_LINE_LOOP);
         /* GL_LINE_LOOP takes care of the final segment */
-        data->glDrawArrays(GL_LINE_LOOP, 0, count-1);
+        --count;
+        for (i = 0; i < count; ++i) {
+            data->glVertex2f(0.5f + points[i].x, 0.5f + points[i].y);
+        }
+        data->glEnd();
     } else {
-        data->glDrawArrays(GL_LINE_STRIP, 0, count);
-    }
-    /* Make sure all the line endpoints are closed.
-     * http://www.opengl.org/documentation/specs/version1.1/glspec1.1/node47.html
-     * Which points need to be drawn varies by driver, so just draw all of them.
-     */
-    data->glDrawArrays(GL_POINTS, 0, count);
-    data->glDisableClientState(GL_VERTEX_ARRAY);
-    data->glTranslatef(-0.5f, -0.5f, 0.0f);
+#if defined(__MACOSX__) || defined(__WIN32__)
+#else
+        int x1, y1, x2, y2;
+#endif
 
+        data->glBegin(GL_LINE_STRIP);
+        for (i = 0; i < count; ++i) {
+            data->glVertex2f(0.5f + points[i].x, 0.5f + points[i].y);
+        }
+        data->glEnd();
+
+        /* The line is half open, so we need one more point to complete it.
+         * http://www.opengl.org/documentation/specs/version1.1/glspec1.1/node47.html
+         * If we have to, we can use vertical line and horizontal line textures
+         * for vertical and horizontal lines, and then create custom textures
+         * for diagonal lines and software render those.  It's terrible, but at
+         * least it would be pixel perfect.
+         */
+        data->glBegin(GL_POINTS);
+#if defined(__MACOSX__) || defined(__WIN32__)
+        /* Mac OS X and Windows seem to always leave the last point open */
+        data->glVertex2f(0.5f + points[count-1].x, 0.5f + points[count-1].y);
+#else
+        /* Linux seems to leave the right-most or bottom-most point open */
+        x1 = points[0].x;
+        y1 = points[0].y;
+        x2 = points[count-1].x;
+        y2 = points[count-1].y;
+
+        if (x1 > x2) {
+            data->glVertex2f(0.5f + x1, 0.5f + y1);
+        } else if (x2 > x1) {
+            data->glVertex2f(0.5f + x2, 0.5f + y2);
+        }
+        if (y1 > y2) {
+            data->glVertex2f(0.5f + x1, 0.5f + y1);
+        } else if (y2 > y1) {
+            data->glVertex2f(0.5f + x2, 0.5f + y2);
+        }
+#endif
+        data->glEnd();
+    }
     return GL_CheckError("", renderer);
 }
 

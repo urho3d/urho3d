@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-#include "SDL_config.h"
+#include "./SDL_internal.h"
 
 #if defined(__WIN32__)
 #include "core/windows/SDL_windows.h"
@@ -41,7 +41,8 @@
 #if !SDL_TIMERS_DISABLED
 extern int SDL_TimerInit(void);
 extern void SDL_TimerQuit(void);
-extern void SDL_InitTicks(void);
+extern void SDL_TicksInit(void);
+extern void SDL_TicksQuit(void);
 #endif
 #if SDL_VIDEO_DRIVER_WINDOWS
 extern int SDL_HelperWindowCreate(void);
@@ -118,13 +119,15 @@ SDL_InitSubSystem(Uint32 flags)
     SDL_ClearError();
 
 #if SDL_VIDEO_DRIVER_WINDOWS
-    if (SDL_HelperWindowCreate() < 0) {
-        return -1;
-    }
+	if ((flags & (SDL_INIT_HAPTIC|SDL_INIT_JOYSTICK))) {
+		if (SDL_HelperWindowCreate() < 0) {
+			return -1;
+		}
+	}
 #endif
 
 #if !SDL_TIMERS_DISABLED
-    SDL_InitTicks();
+    SDL_TicksInit();
 #endif
 
     if ((flags & SDL_INIT_GAMECONTROLLER)) {
@@ -356,6 +359,10 @@ SDL_Quit(void)
 #endif
     SDL_QuitSubSystem(SDL_INIT_EVERYTHING);
 
+#if !SDL_TIMERS_DISABLED
+    SDL_TicksQuit();
+#endif
+
     SDL_ClearHints();
     SDL_AssertionsQuit();
     SDL_LogResetPriorities();
@@ -397,8 +404,6 @@ SDL_GetPlatform()
     return "AIX";
 #elif __ANDROID__
     return "Android";
-#elif __BEOS__
-    return "BeOS";
 #elif __BSDI__
     return "BSDI";
 #elif __DREAMCAST__

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -71,7 +71,17 @@
 # include <ctype.h>
 #endif
 #ifdef HAVE_MATH_H
+# if defined(__WINRT__)
+/* Defining _USE_MATH_DEFINES is required to get M_PI to be defined on
+   WinRT.  See http://msdn.microsoft.com/en-us/library/4hwaceh6.aspx
+   for more information.
+*/
+#  define _USE_MATH_DEFINES
+# endif
 # include <math.h>
+#endif
+#ifdef HAVE_FLOAT_H
+# include <float.h>
 #endif
 #if defined(HAVE_ICONV) && defined(HAVE_ICONV_H)
 # include <iconv.h>
@@ -255,7 +265,7 @@ extern DECLSPEC void *SDLCALL SDL_memset(void *dst, int c, size_t len);
 #define SDL_zerop(x) SDL_memset((x), 0, sizeof(*(x)))
 
 /* Note that memset() is a byte assignment and this is a 32-bit assignment, so they're not directly equivalent. */
-SDL_FORCE_INLINE void SDL_memset4(void *dst, int val, size_t dwords)
+SDL_FORCE_INLINE void SDL_memset4(void *dst, Uint32 val, size_t dwords)
 {
 #if defined(__GNUC__) && defined(i386)
     int u0, u1, u2;
@@ -331,6 +341,7 @@ extern DECLSPEC int SDLCALL SDL_strcasecmp(const char *str1, const char *str2);
 extern DECLSPEC int SDLCALL SDL_strncasecmp(const char *str1, const char *str2, size_t len);
 
 extern DECLSPEC int SDLCALL SDL_sscanf(const char *text, const char *fmt, ...);
+extern DECLSPEC int SDLCALL SDL_vsscanf(const char *text, const char *fmt, va_list ap);
 extern DECLSPEC int SDLCALL SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...);
 extern DECLSPEC int SDLCALL SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap);
 
@@ -340,6 +351,8 @@ extern DECLSPEC int SDLCALL SDL_vsnprintf(char *text, size_t maxlen, const char 
 #endif
 #endif
 
+extern DECLSPEC double SDLCALL SDL_acos(double x);
+extern DECLSPEC double SDLCALL SDL_asin(double x);
 extern DECLSPEC double SDLCALL SDL_atan(double x);
 extern DECLSPEC double SDLCALL SDL_atan2(double x, double y);
 extern DECLSPEC double SDLCALL SDL_ceil(double x);

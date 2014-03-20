@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* This is the game controller API for Simple DirectMedia Layer */
 
@@ -33,6 +33,7 @@
 #endif
 #define ABS(_x) ((_x) < 0 ? -(_x) : (_x))
 
+#define SDL_CONTROLLER_PLATFORM_FIELD "platform:"
 
 /* a list of currently opened game controllers */
 static SDL_GameController *SDL_gamecontrollers = NULL;
@@ -87,7 +88,7 @@ typedef struct _ControllerMapping_t
 } ControllerMapping_t;
 
 static ControllerMapping_t *s_pSupportedControllers = NULL;
-#ifdef SDL_JOYSTICK_DINPUT
+#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
 static ControllerMapping_t *s_pXInputMapping = NULL;
 #endif
 
@@ -278,7 +279,7 @@ ControllerMapping_t *SDL_PrivateGetControllerMappingForGUID(SDL_JoystickGUID *gu
  */
 ControllerMapping_t *SDL_PrivateGetControllerMapping(int device_index)
 {
-#ifdef SDL_JOYSTICK_DINPUT
+#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
     if ( SDL_SYS_IsXInputDeviceIndex(device_index) && s_pXInputMapping )
     {
         return s_pXInputMapping;
@@ -289,8 +290,6 @@ ControllerMapping_t *SDL_PrivateGetControllerMapping(int device_index)
         SDL_JoystickGUID jGUID = SDL_JoystickGetDeviceGUID( device_index );
         return SDL_PrivateGetControllerMappingForGUID(&jGUID);
     }
-
-    return NULL;
 }
 
 static const char* map_StringForControllerAxis[] = {
@@ -659,6 +658,78 @@ void SDL_PrivateGameControllerRefreshMapping( ControllerMapping_t *pControllerMa
  * Add or update an entry into the Mappings Database
  */
 int
+SDL_GameControllerAddMappingsFromRW( SDL_RWops * rw, int freerw )
+{
+    const char *platform = SDL_GetPlatform();
+    int controllers = 0;
+    char *buf, *line, *line_end, *tmp, *comma, line_platform[64];
+    size_t db_size, platform_len;
+    
+    if (rw == NULL) {
+        return SDL_SetError("Invalid RWops");
+    }
+    db_size = (size_t)SDL_RWsize(rw);
+    
+    buf = (char *)SDL_malloc(db_size + 1);
+    if (buf == NULL) {
+        if (freerw) {
+            SDL_RWclose(rw);
+        }
+        return SDL_SetError("Could allocate space to not read DB into memory");
+    }
+    
+    if (SDL_RWread(rw, buf, db_size, 1) != 1) {
+        if (freerw) {
+            SDL_RWclose(rw);
+        }
+        SDL_free(buf);
+        return SDL_SetError("Could not read DB");
+    }
+    
+    if (freerw) {
+        SDL_RWclose(rw);
+    }
+    
+    buf[db_size] = '\0';
+    line = buf;
+    
+    while (line < buf + db_size) {
+        line_end = SDL_strchr( line, '\n' );
+        if (line_end != NULL) {
+            *line_end = '\0';
+        }
+        else {
+            line_end = buf + db_size;
+        }
+        
+        /* Extract and verify the platform */
+        tmp = SDL_strstr(line, SDL_CONTROLLER_PLATFORM_FIELD);
+        if ( tmp != NULL ) {
+            tmp += SDL_strlen(SDL_CONTROLLER_PLATFORM_FIELD);
+            comma = SDL_strchr(tmp, ',');
+            if (comma != NULL) {
+                platform_len = comma - tmp + 1;
+                if (platform_len + 1 < SDL_arraysize(line_platform)) {
+                    SDL_strlcpy(line_platform, tmp, platform_len);
+                    if(SDL_strncasecmp(line_platform, platform, platform_len) == 0
+                        && SDL_GameControllerAddMapping(line) > 0) {
+                        controllers++;
+                    }
+                }
+            }
+        }
+        
+        line = line_end + 1;
+    }
+
+    SDL_free(buf);
+    return controllers;
+}
+
+/*
+ * Add or update an entry into the Mappings Database
+ */
+int
 SDL_GameControllerAddMapping( const char *mappingString )
 {
     char *pchGUID;
@@ -666,15 +737,15 @@ SDL_GameControllerAddMapping( const char *mappingString )
     char *pchMapping;
     SDL_JoystickGUID jGUID;
     ControllerMapping_t *pControllerMapping;
-#ifdef SDL_JOYSTICK_DINPUT
+#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
     SDL_bool is_xinput_mapping = SDL_FALSE;
 #endif
 
     pchGUID = SDL_PrivateGetControllerGUIDFromMappingString( mappingString );
     if (!pchGUID) {
-        return -1;
+        return SDL_SetError("Couldn't parse GUID from %s", mappingString);
     }
-#ifdef SDL_JOYSTICK_DINPUT
+#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
     if ( !SDL_strcasecmp( pchGUID, "xinput" ) ) {
         is_xinput_mapping = SDL_TRUE;
     }
@@ -682,16 +753,18 @@ SDL_GameControllerAddMapping( const char *mappingString )
     jGUID = SDL_JoystickGetGUIDFromString(pchGUID);
     SDL_free(pchGUID);
 
-    pControllerMapping = SDL_PrivateGetControllerMappingForGUID(&jGUID);
-
     pchName = SDL_PrivateGetControllerNameFromMappingString( mappingString );
-    if (!pchName) return -1;
+    if (!pchName) {
+        return SDL_SetError("Couldn't parse name from %s", mappingString);
+    }
 
     pchMapping = SDL_PrivateGetControllerMappingFromMappingString( mappingString );
     if (!pchMapping) {
         SDL_free( pchName );
-        return -1;
+        return SDL_SetError("Couldn't parse %s", mappingString);
     }
+
+    pControllerMapping = SDL_PrivateGetControllerMappingForGUID(&jGUID);
 
     if (pControllerMapping) {
         /* Update existing mapping */
@@ -709,7 +782,7 @@ SDL_GameControllerAddMapping( const char *mappingString )
             SDL_free( pchMapping );
             return SDL_OutOfMemory();
         }
-#ifdef SDL_JOYSTICK_DINPUT
+#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
         if ( is_xinput_mapping )
         {
             s_pXInputMapping = pControllerMapping;
@@ -762,6 +835,7 @@ SDL_GameControllerLoadHints()
         char *pUserMappings = SDL_malloc( nchHints + 1 );
         char *pTempMappings = pUserMappings;
         SDL_memcpy( pUserMappings, hint, nchHints );
+        pUserMappings[nchHints] = '\0';
         while ( pUserMappings ) {
             char *pchNewLine = NULL;
 
@@ -790,8 +864,7 @@ SDL_GameControllerInit(void)
     const char *pMappingString = NULL;
     s_pSupportedControllers = NULL;
     pMappingString = s_ControllerMappings[i];
-    while ( pMappingString )
-    {
+    while ( pMappingString ) {
         SDL_GameControllerAddMapping( pMappingString );
 
         i++;
@@ -803,6 +876,16 @@ SDL_GameControllerInit(void)
 
     /* watch for joy events and fire controller ones if needed */
     SDL_AddEventWatch( SDL_GameControllerEventWatcher, NULL );
+
+    /* Send added events for controllers currently attached */
+    for (i = 0; i < SDL_NumJoysticks(); ++i) {
+        if (SDL_IsGameController(i)) {
+            SDL_Event deviceevent;
+            deviceevent.type = SDL_CONTROLLERDEVICEADDED;
+            deviceevent.cdevice.which = i;
+            SDL_PushEvent(&deviceevent);
+        }
+    }
 
     return (0);
 }
@@ -1141,6 +1224,7 @@ SDL_GameControllerQuit(void)
         pControllerMap = s_pSupportedControllers;
         s_pSupportedControllers = s_pSupportedControllers->next;
         SDL_free( pControllerMap->name );
+        SDL_free( pControllerMap->mapping );
         SDL_free( pControllerMap );
     }
 

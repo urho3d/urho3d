@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by OvermindDL1 for Urho3D
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 
@@ -200,45 +200,6 @@
 }
 
 @end
-
-/* This is the original behavior, before support was added for
- * differentiating between left and right versions of the keys.
- */
-static void
-DoUnsidedModifiers(unsigned short scancode,
-                   unsigned int oldMods, unsigned int newMods)
-{
-    const int mapping[] = {
-        SDL_SCANCODE_CAPSLOCK,
-        SDL_SCANCODE_LSHIFT,
-        SDL_SCANCODE_LCTRL,
-        SDL_SCANCODE_LALT,
-        SDL_SCANCODE_LGUI
-    };
-    unsigned int i, bit;
-
-    /* Iterate through the bits, testing each against the current modifiers */
-    for (i = 0, bit = NSAlphaShiftKeyMask; bit <= NSCommandKeyMask; bit <<= 1, ++i) {
-        unsigned int oldMask, newMask;
-
-        oldMask = oldMods & bit;
-        newMask = newMods & bit;
-
-        if (oldMask && oldMask != newMask) {        /* modifier up event */
-            /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
-            if (bit == NSAlphaShiftKeyMask) {
-                SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(i), mapping[i]);
-            }
-            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(i), mapping[i]);
-        } else if (newMask && oldMask != newMask) { /* modifier down event */
-			SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(i), mapping[i]);
-            /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
-            if (bit == NSAlphaShiftKeyMask) {
-				SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(i), mapping[i]);
-            }
-        }
-    }
-}
 
 /* This is a helper function for HandleModifierSide. This
  * function reverts back to behavior before the distinction between
@@ -461,15 +422,7 @@ HandleModifiers(_THIS, unsigned short scancode, unsigned int modifierFlags)
         return;
     }
 
-    /*
-     * Starting with Panther (10.3.0), the ability to distinguish between
-     * left side and right side modifiers is available.
-     */
-    if (data->osversion >= 0x1030) {
-        DoSidedModifiers(scancode, data->modifierFlags, modifierFlags);
-    } else {
-        DoUnsidedModifiers(scancode, data->modifierFlags, modifierFlags);
-    }
+    DoSidedModifiers(scancode, data->modifierFlags, modifierFlags);
     data->modifierFlags = modifierFlags;
 }
 
@@ -556,7 +509,12 @@ Cocoa_StartTextInput(_THIS)
 {
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSView *parentView = [[NSApp keyWindow] contentView];
+    SDL_Window *window = SDL_GetKeyboardFocus();
+    NSWindow *nswindow = nil;
+    if (window)
+        nswindow = ((SDL_WindowData*)window->driverdata)->nswindow;
+
+    NSView *parentView = [nswindow contentView];
 
     /* We only keep one field editor per process, since only the front most
      * window can receive text input events, so it make no sense to keep more
@@ -573,7 +531,7 @@ Cocoa_StartTextInput(_THIS)
         /* DEBUG_IME(@"add fieldEdit to window contentView"); */
         [data->fieldEdit removeFromSuperview];
         [parentView addSubview: data->fieldEdit];
-        [[NSApp keyWindow] makeFirstResponder: data->fieldEdit];
+        [nswindow makeFirstResponder: data->fieldEdit];
     }
 
     [pool release];

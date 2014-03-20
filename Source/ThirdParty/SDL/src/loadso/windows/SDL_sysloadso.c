@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #ifdef SDL_LOADSO_WINDOWS
 
@@ -33,7 +33,15 @@ void *
 SDL_LoadObject(const char *sofile)
 {
     LPTSTR tstr = WIN_UTF8ToString(sofile);
+#ifdef __WINRT__
+    /* WinRT only publically supports LoadPackagedLibrary() for loading .dll
+       files.  LoadLibrary() is a private API, and not available for apps
+       (that can be published to MS' Windows Store.)
+    */
+    void *handle = (void *) LoadPackagedLibrary(tstr, 0);
+#else
     void *handle = (void *) LoadLibrary(tstr);
+#endif
     SDL_free(tstr);
 
     /* Generate an error message if all loads failed */
