@@ -22,10 +22,7 @@
 
 // Modified by OvermindDL1 for Urho3D
 
-#include "SDL_config.h"
-=======
 #include "../../SDL_internal.h"
->>>>>>> master:src/core/linux/SDL_evdev.c
 
 #ifdef SDL_INPUT_LINUXEV
 
