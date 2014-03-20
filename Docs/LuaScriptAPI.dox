@@ -337,6 +337,7 @@ Methods:
 - void SetImageRect(const IntRect& rect)
 - void SetFullImageRect()
 - void SetBorder(const IntRect& rect)
+- void SetImageBorder(const IntRect& rect)
 - void SetHoverOffset(const IntVector2& offset)
 - void SetHoverOffset(int x, int y)
 - void SetBlendMode(BlendMode mode)
@@ -344,6 +345,7 @@ Methods:
 - Texture* GetTexture() const
 - const IntRect& GetImageRect() const
 - const IntRect& GetBorder() const
+- const IntRect& GetImageBorder() const
 - const IntVector2& GetHoverOffset() const
 - BlendMode GetBlendMode() const
 - bool IsTiled() const
@@ -353,6 +355,7 @@ Properties:
 - Texture* texture
 - IntRect& imageRect
 - IntRect& border
+- IntRect& imageBorder
 - IntVector2& hoverOffset
 - BlendMode blendMode
 - bool tiled

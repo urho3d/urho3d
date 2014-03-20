@@ -560,6 +560,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -737,6 +738,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -961,6 +963,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -1951,6 +1954,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -2480,6 +2484,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -3188,6 +3193,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -3665,6 +3671,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -5769,6 +5776,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing

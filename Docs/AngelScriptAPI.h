@@ -668,6 +668,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -869,6 +870,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -1133,6 +1135,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -2344,6 +2347,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -2977,6 +2981,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -3859,6 +3864,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -4403,6 +4409,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -6897,6 +6904,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
