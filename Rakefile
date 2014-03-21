@@ -106,6 +106,8 @@ task :travis_ci_package_upload do
     platform_prefix = 'mingw-'
   elsif ENV['IOS']
     platform_prefix = 'ios-'
+  elsif ENV['RPI']
+    platform_prefix = 'raspi-'
   else
     platform_prefix = ''
   end
@@ -230,6 +232,14 @@ def makefile_travis_ci
     ENV['SKIP_NATIVE'] = '1'
     system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
     platform_prefix = 'android-'
+  elsif ENV['RPI']
+    # LuaJIT on Raspberry Pi build requires tolua++ and buildvm-raspi tools to be built natively first
+    system 'cd Build/ThirdParty/toluapp/src/bin && make' or abort 'Failed to build tolua++ tool'
+    system 'cd Build/ThirdParty/LuaJIT/generated/buildvm-raspi && make' or abort 'Failed to build buildvm-android tool'
+    # Reconfigure Raspberry Pi build one more time now that we have the tools built
+    ENV['SKIP_NATIVE'] = '1'
+    system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Raspberry Pi build'
+    platform_prefix = 'raspi-'
   elsif ENV['WINDOWS']
     platform_prefix = 'mingw-'
   else
