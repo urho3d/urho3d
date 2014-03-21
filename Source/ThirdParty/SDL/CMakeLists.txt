@@ -90,6 +90,13 @@ else ()
         file (GLOB VIDEO_DRIVER_C_FILES src/video/x11/*.c)
     endif ()
     find_package (ALSA REQUIRED)
+    # todo: remove this fix when the minimum CMake version has been raised to higher than 2.8.7
+    # There is a bug in older version of FindALSA.cmake module where it erroneously include 'alsa' directory component into the variable
+    # For cross-compiling build to work correctly, this extra directory component must be removed
+    if (ALSA_INCLUDE_DIRS MATCHES .*/alsa)
+        get_filename_component (ALSA_INCLUDE_DIRS ${ALSA_INCLUDE_DIRS} PATH)
+    endif ()
+    # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
     file (GLOB SYS_C_FILES
