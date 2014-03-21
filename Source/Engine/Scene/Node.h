@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Matrix3x4.h"
-#include "SceneObject.h"
+#include "Serializable.h"
 #include "VectorBuffer.h"
 
 namespace Urho3D
@@ -44,7 +44,7 @@ enum CreateMode
 };
 
 /// %Scene node that may contain components and child nodes.
-class URHO3D_API Node : public SceneObject
+class URHO3D_API Node : public Serializable
 {
     OBJECT(Node);
     BASEOBJECT(Node);
@@ -75,8 +75,6 @@ public:
     virtual bool SaveDefaultAttributes() const { return true; }
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
-    /// Return scene.
-    virtual Scene* GetScene() const { return scene_; }
 
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest) const;
@@ -189,6 +187,8 @@ public:
     StringHash GetNameHash() const { return nameHash_; }
     /// Return parent scene node.
     Node* GetParent() const { return parent_; }
+    /// Return scene.
+    Scene* GetScene() const { return scene_; }
     /// Return whether is enabled. Disables nodes effectively disable all their components.
     bool IsEnabled() const { return enabled_; }
     /// Return owner connection in networking.

@@ -33,7 +33,7 @@ namespace Urho3D
 {
 
 Component::Component(Context* context) :
-    SceneObject(context),
+    Serializable(context),
     node_(0),
     id_(0),
     networkUpdate_(false),
@@ -47,7 +47,7 @@ Component::~Component()
 
 void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    SceneObject::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
     MarkNetworkUpdate();
 }
 
@@ -60,7 +60,7 @@ bool Component::Save(Serializer& dest) const
         return false;
 
     // Write attributes
-    return SceneObject::Save(dest);
+    return Serializable::Save(dest);
 }
 
 bool Component::SaveXML(XMLElement& dest) const
@@ -72,7 +72,7 @@ bool Component::SaveXML(XMLElement& dest) const
         return false;
 
     // Write attributes
-    return SceneObject::SaveXML(dest);
+    return Serializable::SaveXML(dest);
 }
 
 void Component::SetEnabled(bool enable)

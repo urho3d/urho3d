@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "AttributeAnimation.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Engine.h"
@@ -96,15 +95,7 @@ void StaticScene::CreateScene()
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
-
-    // Test code for attribute animation
-    SharedPtr<AttributeAnimation> lightColorAnimation(new AttributeAnimation(context_));
-    lightColorAnimation->AddKeyFrame(0.0f, Color(1.0f, 1.0f, 1.0f, 1.0f));
-    lightColorAnimation->AddKeyFrame(1.0f, Color(1.0f, 0.0f, 0.0f, 1.0f));
-    lightColorAnimation->AddKeyFrame(2.0f, Color(0.0f, 0.0f, 1.0f, 1.0f));
-    lightColorAnimation->AddKeyFrame(3.0f, Color(1.0f, 1.0f, 1.0f, 1.0f));
-    light->SetAttributeAnimation("Color", lightColorAnimation);
-
+    
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
     // LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll
