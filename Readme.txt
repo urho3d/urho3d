@@ -144,7 +144,7 @@ successfully:
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
 
-- For Android, the Android SDK and Android NDK (minimum API level 9) need to be
+- For Android, the Android SDK and Android NDK (minimum API level 12) need to be
   installed. Optionally, also install Eclipse ADT plugin for building and 
   deployment via Eclipse.
 

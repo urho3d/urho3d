@@ -26,6 +26,9 @@
 #if SDL_VIDEO_OPENGL_EGL
 
 #include "SDL_sysvideo.h"
+#include "SDL_egl_c.h"
+#include "SDL_loadso.h"
+#include "SDL_hints.h"
 
 // Urho3D: No need to hardcode the full path, otherwise it won't work for Pidora
 #if SDL_VIDEO_DRIVER_RPI || SDL_VIDEO_DRIVER_ANDROID

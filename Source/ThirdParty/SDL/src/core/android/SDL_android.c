@@ -516,18 +516,6 @@ SDL_bool Android_JNI_GetAccelerometerValues(float values[3])
     return retval;
 }
 
-// Urho3D: added function
-void Android_JNI_FinishActivity()
-{
-    // Terminating the SDL main thread on our own may cause crashes with extra threads, so request
-    // the activity to finish instead
-    jmethodID mid;
-    JNIEnv *mEnv = Android_JNI_GetEnv();
-    mid = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass, "finishActivity","()V");
-    if (mid)
-        (*mEnv)->CallStaticVoidMethod(mEnv, mActivityClass, mid);
-}
-
 static void Android_JNI_ThreadDestroyed(void* value)
 {
     /* The thread is being destroyed, detach it from the Java VM and set the mThreadKey value to NULL as required */
