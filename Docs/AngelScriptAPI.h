@@ -2019,7 +2019,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-Vector2 anchorPoint;
+Vector2 anchor;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -2051,6 +2051,232 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintGear2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+Constraint2D otherConstraint;
+/* readonly */
+RigidBody2D ownerBody;
+Constraint2D ownerConstraint;
+float ratio;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintMotor2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float maxLength;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+Vector2 otherBodyAnchor;
+/* readonly */
+RigidBody2D ownerBody;
+Vector2 ownerBodyAnchor;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintMouse2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+float dampingRatio;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float frequencyHz;
+/* readonly */
+uint id;
+float maxForce;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
+/* readonly */
+int refs;
+Vector2 target;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintPrismatic2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+Vector2 anchor;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+Vector2 axis;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enableLimit;
+bool enableMotor;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float lowerTranslation;
+float maxMotorForce;
+float motorSpeed;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+float upperTranslation;
 /* readonly */
 int weakRefs;
 };
@@ -2131,7 +2357,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
-Vector2 anchorPoint;
+Vector2 anchor;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -2215,6 +2441,120 @@ Vector2 otherBodyAnchor;
 /* readonly */
 RigidBody2D ownerBody;
 Vector2 ownerBodyAnchor;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintWeld2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+Vector2 anchor;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+float dampingRatio;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float frequencyHz;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintWheel2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+Vector2 anchor;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+Vector2 axis;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+float dampingRatio;
+bool enableMotor;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float frequencyHz;
+/* readonly */
+uint id;
+float maxMotorTorque;
+float motorSpeed;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
 /* readonly */
 int refs;
 bool temporary;
