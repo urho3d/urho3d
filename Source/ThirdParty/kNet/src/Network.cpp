@@ -15,6 +15,8 @@
 /** @file Network.cpp
 	@brief */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #include <string>
 #include <sstream>
 
@@ -590,7 +592,8 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 	// Setup the listening socket - bind it to a local port.
 	// If we are setting up a TCP socket, the socket will be only for listening and accepting incoming connections.
 	// If we are setting up an UDP socket, all connection initialization and data transfers will be managed through this socket.
-	ret = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
+	// Urho3D: disambiguate global bind from std::bind
+	ret = ::bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
 	if (ret == KNET_SOCKET_ERROR)
 	{
 		LOG(LogError, "bind failed: %s when trying to bind to port %d with transport %s", 
