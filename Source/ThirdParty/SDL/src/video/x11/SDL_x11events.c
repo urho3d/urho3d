@@ -309,10 +309,11 @@ X11_DispatchEvent(_THIS)
         if (orig_keycode) {
             /* Make sure dead key press/release events are sent */
             SDL_Scancode scancode = videodata->key_layout[orig_keycode];
+            // Urho3D: also send the original keycode
             if (orig_event_type == KeyPress) {
-                SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+                SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(orig_keycode), scancode);
             } else {
-                SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+                SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(orig_keycode), scancode);
             }
         }
         return;
@@ -490,6 +491,7 @@ X11_DispatchEvent(_THIS)
 #ifdef DEBUG_XEVENTS
             printf("window %p: KeyPress (X11 keycode = 0x%X)\n", data, xevent.xkey.keycode);
 #endif
+            // Urho3D: send also the original keycode
             SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(keycode), videodata->key_layout[keycode]);
 #if 0
             if (videodata->key_layout[keycode] == SDL_SCANCODE_UNKNOWN && keycode) {
@@ -533,6 +535,7 @@ X11_DispatchEvent(_THIS)
                 /* We're about to get a repeated key down, ignore the key up */
                 break;
             }
+            // Urho3D: also send the original keycode
             SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(keycode), videodata->key_layout[keycode]);
         }
         break;
