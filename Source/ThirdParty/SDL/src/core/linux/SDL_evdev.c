@@ -18,7 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-<<<<<<< HEAD:src/input/evdev/SDL_evdev.c
 
 // Modified by OvermindDL1 for Urho3D
 
