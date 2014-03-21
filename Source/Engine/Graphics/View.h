@@ -135,6 +135,8 @@ public:
     Octree* GetOctree() const { return octree_; }
     /// Return camera.
     Camera* GetCamera() const { return camera_; }
+    /// Return information of the frame being rendered.
+    const FrameInfo& GetFrameInfo() const { return frame_; }
     /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
     /// Return geometry objects.

@@ -1582,6 +1582,13 @@ void View::RenderQuad(RenderPathCommand& command)
     graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
     graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
 
+    if (scene_)
+    {
+        float elapsedTime = scene_->GetElapsedTime();
+        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+    }
+
     float nearClip = camera_->GetNearClip();
     float farClip = camera_->GetFarClip();
     graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);

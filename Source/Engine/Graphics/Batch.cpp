@@ -213,6 +213,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     // Set global frame parameters
     if (graphics->NeedParameterUpdate(SP_FRAME, (void*)0))
     {
+        const FrameInfo& frame = view->GetFrameInfo();
+        graphics->SetShaderParameter(VSP_DELTATIME, frame.timeStep_);
+        graphics->SetShaderParameter(PSP_DELTATIME, frame.timeStep_);
+        
         Scene* scene = view->GetScene();
         if (scene)
         {
