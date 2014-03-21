@@ -2,7 +2,7 @@ $#include "ConstraintRevolute2D.h"
 
 class ConstraintRevolute2D : Constraint2D
 {
-    void SetAnchorPoint(const Vector2& anchor);
+    void SetAnchor(const Vector2& anchor);
     void SetEnableLimit(bool enableLimit);
     void SetLowerAngle(float lowerAngle);
     void SetUpperAngle(float upperAngle);
@@ -10,7 +10,7 @@ class ConstraintRevolute2D : Constraint2D
     void SetMotorSpeed(float motorSpeed);
     void SetMaxMotorTorque(float maxMotorTorque);
 
-    const Vector2& GetAnchorPoint() const;
+    const Vector2& GetAnchor() const;
     bool GetEnableLimit() const;
     float GetLowerAngle() const;
     float GetUpperAngle() const;
@@ -18,7 +18,7 @@ class ConstraintRevolute2D : Constraint2D
     float GetMotorSpeed() const;
     float GetMaxMotorTorque() const;
 
-    tolua_property__get_set Vector2& anchorPoint;
+    tolua_property__get_set Vector2& anchor;
     tolua_property__get_set bool enableLimit;
     tolua_property__get_set float lowerAngle;
     tolua_property__get_set float upperAngle;
