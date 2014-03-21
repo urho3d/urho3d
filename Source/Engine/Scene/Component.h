@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "SceneObject.h"
+#include "Serializable.h"
 
 namespace Urho3D
 {
@@ -34,7 +34,7 @@ class Scene;
 struct ComponentReplicationState;
 
 /// Base class for components. Components can be created to scene nodes.
-class URHO3D_API Component : public SceneObject
+class URHO3D_API Component : public Serializable
 {
     OBJECT(Component);
     BASEOBJECT(Component);
