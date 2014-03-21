@@ -127,13 +127,13 @@ bool ParticleModel2D::Load(Deserializer& source)
     particleLifeSpan_ = Max(0.01f, rootElem.GetChild("particleLifeSpan").GetFloat("value"));
     particleLifespanVariance_ = rootElem.GetChild("particleLifespanVariance").GetFloat("value");
     
-    angle_ = 360.0f - rootElem.GetChild("angle").GetFloat("value");
+    angle_ = rootElem.GetChild("angle").GetFloat("value");
     angleVariance_ = rootElem.GetChild("angleVariance").GetFloat("value");
     
     gravity_ = ReadVector2(rootElem.GetChild("gravity"));
 
     radialAcceleration_ = rootElem.GetChild("radialAcceleration").GetFloat("value");
-    tangentialAcceleration_ = -rootElem.GetChild("tangentialAcceleration").GetFloat("value");
+    tangentialAcceleration_ = rootElem.GetChild("tangentialAcceleration").GetFloat("value");
     
     radialAccelVariance_ = rootElem.GetChild("radialAccelVariance").GetFloat("value");
     tangentialAccelVariance_ = rootElem.GetChild("tangentialAccelVariance").GetFloat("value");
@@ -167,7 +167,7 @@ bool ParticleModel2D::Load(Deserializer& source)
     maxRadiusVariance_ = rootElem.GetChild("maxRadiusVariance").GetFloat("value");
     minRadius_ = rootElem.GetChild("minRadius").GetFloat("value");
 
-    rotatePerSecond_ = -rootElem.GetChild("rotatePerSecond").GetFloat("value");
+    rotatePerSecond_ = rootElem.GetChild("rotatePerSecond").GetFloat("value");
     rotatePerSecondVariance_ = rootElem.GetChild("rotatePerSecondVariance").GetFloat("value");
     
     int blendFuncSource = rootElem.GetChild("blendFuncSource").GetInt("value");
@@ -182,10 +182,10 @@ bool ParticleModel2D::Load(Deserializer& source)
         }
     }
 
-    rotationStart_ = -rootElem.GetChild("rotationStart").GetFloat("value");
+    rotationStart_ = rootElem.GetChild("rotationStart").GetFloat("value");
     rotationStartVariance_ = rootElem.GetChild("rotationStartVariance").GetFloat("value");
     
-    rotationEnd_ = -rootElem.GetChild("rotationEnd").GetFloat("value");
+    rotationEnd_ = rootElem.GetChild("rotationEnd").GetFloat("value");
     rotationEndVariance_ = rootElem.GetChild("rotationEndVariance").GetFloat("value");
 
     return true;
@@ -373,8 +373,7 @@ Color ParticleModel2D::ReadColor(const XMLElement& element) const
 
 Vector2 ParticleModel2D::ReadVector2(const XMLElement& element) const
 {
-    // Flip y.
-    return Vector2(element.GetFloat("x"), -element.GetFloat("y"));
+    return Vector2(element.GetFloat("x"), element.GetFloat("y"));
 }
 
 }

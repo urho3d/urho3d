@@ -560,6 +560,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -737,6 +738,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -961,6 +963,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -1613,6 +1616,141 @@ Properties:
 - int weakRefs // readonly
 
 
+### ConstraintDistance2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- float dampingRatio
+- bool enabled
+- bool enabledEffective // readonly
+- float frequencyHz
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- Vector2 otherBodyAnchor
+- RigidBody2D@ ownerBody // readonly
+- Vector2 ownerBodyAnchor
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintFriction2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Vector2 anchorPoint
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- float maxForce
+- float maxTorque
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- RigidBody2D@ ownerBody // readonly
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintPulley2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- Vector2 otherBodyAnchor
+- Vector2 otherBodyGroundAnchor
+- RigidBody2D@ ownerBody // readonly
+- Vector2 ownerBodyAnchor
+- Vector2 ownerBodyGroundAnchor
+- float ratio
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
 ### ConstraintRevolute2D
 
 Methods:
@@ -1816,6 +1954,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -2345,6 +2484,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -3053,6 +3193,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -3530,6 +3671,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing
@@ -5634,6 +5776,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
 - IntRect imageRect
 - int indent
 - int indentSpacing

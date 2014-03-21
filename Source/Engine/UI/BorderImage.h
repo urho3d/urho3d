@@ -53,8 +53,10 @@ public:
     void SetImageRect(const IntRect& rect);
     /// Use whole texture as the image.
     void SetFullImageRect();
-    /// Set image border dimensions.
+    /// Set border dimensions on the screen.
     void SetBorder(const IntRect& rect);
+    /// Set border dimensions on the image. If zero (default) uses the screen dimensions, resulting in pixel-perfect borders.
+    void SetImageBorder(const IntRect& rect);
     /// Set offset to image rectangle used on hover.
     void SetHoverOffset(const IntVector2& offset);
     /// Set offset to image rectangle used on hover.
@@ -68,8 +70,10 @@ public:
     Texture* GetTexture() const { return texture_; }
     /// Return image rectangle.
     const IntRect& GetImageRect() const { return imageRect_; }
-    /// Return image border dimensions.
+    /// Return border screen dimensions.
     const IntRect& GetBorder() const { return border_; }
+    /// Return border image dimensions. Zero rect uses border screen dimensions.
+    const IntRect& GetImageBorder() const { return imageBorder_; }
     /// Return offset to image rectangle used on hover.
     const IntVector2& GetHoverOffset() const { return hoverOffset_; }
     /// Return blend mode.
@@ -90,8 +94,10 @@ protected:
     SharedPtr<Texture> texture_;
     /// Image rectangle.
     IntRect imageRect_;
-    /// Image border dimensions.
+    /// Border dimensions on screen.
     IntRect border_;
+    /// Border dimensions on the image.
+    IntRect imageBorder_;
     /// Offset to image rectangle on hover.
     IntVector2 hoverOffset_;
     /// Blend mode flag.

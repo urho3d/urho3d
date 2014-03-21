@@ -225,9 +225,10 @@ void ParticleEmitter2D::UpdateVertices()
     for (int i = 0; i < numParticles_; ++i)
     {
         Particle2D& p = particles_[i];
-
-        float c = Cos(p.rotation_);
-        float s = Sin(p.rotation_);
+        
+        float rotation = -p.rotation_;
+        float c = Cos(rotation);
+        float s = Sin(rotation);
         float add = (c + s) * p.size_ * 0.5f;
         float sub = (c - s) * p.size_ * 0.5f;
 
@@ -235,7 +236,7 @@ void ParticleEmitter2D::UpdateVertices()
         vertex1.position_ = Vector3(p.position_.x_ - add, p.position_.y_ + sub, zValue_);
         vertex2.position_ = Vector3(p.position_.x_ + sub, p.position_.y_ + add, zValue_);
         vertex3.position_ = Vector3(p.position_.x_ + add, p.position_.y_ - sub, zValue_);
-
+        
         vertex0.color_ = vertex1.color_ = vertex2.color_  = vertex3.color_ = p.color_.ToUInt();
 
         vertices_.Push(vertex0);
@@ -340,8 +341,8 @@ void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep, con
         tangentialX = -tangentialY * particle.tangentialAcceleration_;
         tangentialY = newY * particle.tangentialAcceleration_;
 
-        particle.velocity_.x_ += (model_->GetGravity().x_ * worldScale + radialX + tangentialX) * timeStep;
-        particle.velocity_.y_ += (model_->GetGravity().y_ * worldScale + radialY + tangentialY) * timeStep;
+        particle.velocity_.x_ += (model_->GetGravity().x_ * worldScale + radialX - tangentialX) * timeStep;
+        particle.velocity_.y_ -= (model_->GetGravity().y_ * worldScale - radialY + tangentialY) * timeStep;
         particle.position_.x_ += particle.velocity_.x_ * timeStep;
         particle.position_.y_ += particle.velocity_.y_ * timeStep;
     }

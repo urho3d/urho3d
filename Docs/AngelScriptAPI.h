@@ -668,6 +668,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -869,6 +870,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -1133,6 +1135,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -1941,6 +1944,174 @@ String typeName;
 int weakRefs;
 };
 
+class ConstraintDistance2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+float dampingRatio;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float frequencyHz;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+Vector2 otherBodyAnchor;
+/* readonly */
+RigidBody2D ownerBody;
+Vector2 ownerBodyAnchor;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintFriction2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+Vector2 anchorPoint;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float maxForce;
+float maxTorque;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+/* readonly */
+RigidBody2D ownerBody;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class ConstraintPulley2D
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool Load(File, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+bool collideConnected;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+RigidBody2D otherBody;
+Vector2 otherBodyAnchor;
+Vector2 otherBodyGroundAnchor;
+/* readonly */
+RigidBody2D ownerBody;
+Vector2 ownerBodyAnchor;
+Vector2 ownerBodyGroundAnchor;
+float ratio;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class ConstraintRevolute2D
 {
 // Methods:
@@ -2176,6 +2347,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -2809,6 +2981,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -3691,6 +3864,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -4235,6 +4409,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;
@@ -6729,6 +6904,7 @@ HorizontalAlignment horizontalAlignment;
 IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
 IntRect imageRect;
 int indent;
 int indentSpacing;

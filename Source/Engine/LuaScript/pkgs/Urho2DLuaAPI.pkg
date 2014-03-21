@@ -6,15 +6,21 @@ $pfile "Urho2D/Animation2D.pkg"
 $pfile "Urho2D/AnimatedSprite2D.pkg"
 $pfile "Urho2D/ParticleModel2D.pkg"
 $pfile "Urho2D/ParticleEmitter2D.pkg"
+
 $pfile "Urho2D/RigidBody2D.pkg"
 $pfile "Urho2D/PhysicsWorld2D.pkg"
+
 $pfile "Urho2D/CollisionShape2D.pkg"
 $pfile "Urho2D/CollisionBox2D.pkg"
-$pfile "Urho2D/CollisionCircle2D.pkg"
 $pfile "Urho2D/CollisionChain2D.pkg"
+$pfile "Urho2D/CollisionCircle2D.pkg"
 $pfile "Urho2D/CollisionEdge2D.pkg"
 $pfile "Urho2D/CollisionPolygon2D.pkg"
+
 $pfile "Urho2D/Constraint2D.pkg"
+$pfile "Urho2D/ConstraintDistance2D.pkg"
+$pfile "Urho2D/ConstraintFriction2D.pkg"
+$pfile "Urho2D/ConstraintPulley2D.pkg"
 $pfile "Urho2D/ConstraintRevolute2D.pkg"
 $pfile "Urho2D/ConstraintRope2D.pkg"
 

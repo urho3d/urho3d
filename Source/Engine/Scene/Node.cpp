@@ -39,7 +39,7 @@ namespace Urho3D
 {
 
 Node::Node(Context* context) :
-    Serializable(context),
+    SceneObject(context),
     worldTransform_(Matrix3x4::IDENTITY),
     dirty_(false),
     networkUpdate_(false),
@@ -82,7 +82,7 @@ void Node::RegisterObject(Context* context)
 
 void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    SceneObject::OnSetAttribute(attr, src);
     MarkNetworkUpdate();
 }
 
@@ -112,7 +112,7 @@ bool Node::Save(Serializer& dest) const
         return false;
 
     // Write attributes
-    if (!Serializable::Save(dest))
+    if (!SceneObject::Save(dest))
         return false;
 
     // Write components
@@ -172,7 +172,7 @@ bool Node::SaveXML(XMLElement& dest) const
         return false;
 
     // Write attributes
-    if (!Serializable::SaveXML(dest))
+    if (!SceneObject::SaveXML(dest))
         return false;
 
     // Write components
@@ -1055,7 +1055,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
     RemoveAllComponents();
 
     // ID has been read at the parent level
-    if (!Serializable::Load(source))
+    if (!SceneObject::Load(source))
         return false;
 
     unsigned numComponents = source.ReadVLE();
@@ -1098,7 +1098,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     RemoveAllChildren();
     RemoveAllComponents();
 
-    if (!Serializable::LoadXML(source))
+    if (!SceneObject::LoadXML(source))
         return false;
 
     XMLElement compElem = source.GetChild("component");

@@ -512,7 +512,7 @@ endmacro ()
 macro (add_android_native_init)
     # This source file could not be added when building SDL static library because it needs SDL_Main() which is not yet available at library building time
     # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
-    if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
+    if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
         list (APPEND SOURCE_FILES ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
     elseif (EXISTS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         # Use Urho3D source installation
@@ -562,8 +562,8 @@ macro (setup_main_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
             COMMENT "Stripping lib${TARGET_NAME}.so in library output directory")
-        # When performing packaging, include the final apk file 
-        if (DEST_RUNTIME_DIR AND NOT APK_INCLUDED)
+        # When performing packaging, include the final apk file
+        if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
             install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
             set (APK_INCLUDED 1)
         endif ()

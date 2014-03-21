@@ -337,6 +337,7 @@ Methods:
 - void SetImageRect(const IntRect& rect)
 - void SetFullImageRect()
 - void SetBorder(const IntRect& rect)
+- void SetImageBorder(const IntRect& rect)
 - void SetHoverOffset(const IntVector2& offset)
 - void SetHoverOffset(int x, int y)
 - void SetBlendMode(BlendMode mode)
@@ -344,6 +345,7 @@ Methods:
 - Texture* GetTexture() const
 - const IntRect& GetImageRect() const
 - const IntRect& GetBorder() const
+- const IntRect& GetImageBorder() const
 - const IntVector2& GetHoverOffset() const
 - BlendMode GetBlendMode() const
 - bool IsTiled() const
@@ -353,6 +355,7 @@ Properties:
 - Texture* texture
 - IntRect& imageRect
 - IntRect& border
+- IntRect& imageBorder
 - IntVector2& hoverOffset
 - BlendMode blendMode
 - bool tiled
@@ -992,6 +995,66 @@ Properties:
 - RigidBody2D* ownerBody (readonly)
 - RigidBody2D* otherBody
 - bool collideConnected
+
+### ConstraintDistance2D : Constraint2D
+
+Methods:
+
+- void SetOwnerBodyAnchor(const Vector2& anchor)
+- void SetOtherBodyAnchor(const Vector2& anchor)
+- void SetFrequencyHz(float frequencyHz)
+- void SetDampingRatio(float dampingRatio)
+- const Vector2& GetOwnerBodyAnchor() const
+- const Vector2& GetOtherBodyAnchor() const
+- float GetFrequencyHz() const
+- float GetDampingRatio() const
+
+Properties:
+
+- Vector2& ownerBodyAnchor
+- Vector2& otherBodyAnchor
+- float frequencyHz
+- float dampingRatio
+
+### ConstraintFriction2D : Constraint2D
+
+Methods:
+
+- void SetAnchorPoint(const Vector2& anchor)
+- void SetMaxForce(float maxForce)
+- void SetMaxTorque(float maxTorque)
+- const Vector2& GetAnchorPoint() const
+- float GetMaxForce() const
+- float GetMaxTorque() const
+
+Properties:
+
+- Vector2& anchorPoint
+- float maxForce
+- float maxTorque
+
+### ConstraintPulley2D : Constraint2D
+
+Methods:
+
+- void SetOwnerBodyGroundAnchor(const Vector2& groundAnchor)
+- void SetOtherBodyGroundAnchor(const Vector2& groundAnchor)
+- void SetOwnerBodyAnchor(const Vector2& anchor)
+- void SetOtherBodyAnchor(const Vector2& anchor)
+- void SetRatio(float ratio)
+- const Vector2& GetOwnerBodyGroundAnchor() const
+- const Vector2& GetOtherBodyGroundAnchor() const
+- const Vector2& GetOwnerBodyAnchor() const
+- const Vector2& GetOtherBodyAnchor() const
+- float GetRatio() const
+
+Properties:
+
+- Vector2& ownerBodyGroundAnchor
+- Vector2& otherBodyGroundAnchor
+- Vector2& ownerBodyAnchor
+- Vector2& otherBodyAnchor
+- float ratio
 
 ### ConstraintRevolute2D : Constraint2D
 
