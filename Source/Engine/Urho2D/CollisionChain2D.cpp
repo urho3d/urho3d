@@ -30,9 +30,8 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
-CollisionChain2D::CollisionChain2D(Context* context) : CollisionShape2D(context),
+CollisionChain2D::CollisionChain2D(Context* context) :
+    CollisionShape2D(context),
     loop_(false)
 {
     fixtureDef_.shape = &chainShape_;
@@ -44,7 +43,7 @@ CollisionChain2D::~CollisionChain2D()
 
 void CollisionChain2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionChain2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<CollisionChain2D>();
     ACCESSOR_ATTRIBUTE(CollisionChain2D, VAR_BOOL, "Loop", GetLoop, SetLoop, bool, false, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(CollisionChain2D, CollisionShape2D);
 }

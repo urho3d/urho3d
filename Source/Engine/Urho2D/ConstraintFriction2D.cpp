@@ -31,11 +31,9 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
-ConstraintFriction2D::ConstraintFriction2D(Context* context) : 
+ConstraintFriction2D::ConstraintFriction2D(Context* context) :
     Constraint2D(context),
-    anchorPoint_(Vector2::ZERO),
+    anchor_(Vector2::ZERO),
     maxForce_(0.0f),
     maxTorque_(0.0f)
 {
@@ -48,20 +46,20 @@ ConstraintFriction2D::~ConstraintFriction2D()
 
 void ConstraintFriction2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintFriction2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintFriction2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_VECTOR2, "Anchor Point", GetAnchorPoint, SetAnchorPoint, Vector2, Vector2::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_VECTOR2, "Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_FLOAT, "Max Force", GetMaxForce, SetMaxForce, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_FLOAT, "Max Torque", GetMaxTorque, SetMaxTorque, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(ConstraintFriction2D, Constraint2D);
 }
 
-void ConstraintFriction2D::SetAnchorPoint(const Vector2& anchorPoint)
+void ConstraintFriction2D::SetAnchor(const Vector2& anchor)
 {
-    if (anchorPoint == anchorPoint_)
+    if (anchor == anchor_)
         return;
 
-    anchorPoint_ = anchorPoint;
+    anchor_ = anchor;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -101,7 +99,7 @@ b2JointDef* ConstraintFriction2D::CreateJointDef()
         return 0;
 
     b2FrictionJointDef* jointDef = new b2FrictionJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchorPoint_));
+    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
     jointDef->maxForce = maxForce_;
     jointDef->maxTorque = maxTorque_;
 

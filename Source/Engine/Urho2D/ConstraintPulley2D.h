@@ -51,13 +51,13 @@ public:
     /// Set ratio.
     void SetRatio(float ratio);
 
-    /// Return owner body ground anchor point.
+    /// Return owner body ground anchor.
     const Vector2& GetOwnerBodyGroundAnchor() const { return ownerBodyGroundAnchor_; }
-    /// return other body ground anchor point.
+    /// return other body ground anchor.
     const Vector2& GetOtherBodyGroundAnchor() const { return otherBodyGroundAnchor_; }
-    /// Return owner body anchor point.
+    /// Return owner body anchor.
     const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
-    /// Return other body anchor point.
+    /// Return other body anchor.
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
     /// Return ratio.
     float GetRatio() const { return ratio_; }

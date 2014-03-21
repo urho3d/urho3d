@@ -40,15 +40,15 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set anchor point.
-    void SetAnchorPoint(const Vector2& anchor);
+    /// Set anchor.
+    void SetAnchor(const Vector2& anchor);
     /// Set max force.
     void SetMaxForce(float maxForce);
     /// Set max torque.
     void SetMaxTorque(float maxTorque);
 
-    /// Return anchor point.
-    const Vector2& GetAnchorPoint() const { return anchorPoint_; }
+    /// Return anchor.
+    const Vector2& GetAnchor() const { return anchor_; }
     /// Set max force.
     float GetMaxForce() const { return maxForce_; }
     /// Set max torque.
@@ -58,8 +58,8 @@ private:
     /// Create Joint def.
     virtual b2JointDef* CreateJointDef();
 
-    /// Anchor point.
-    Vector2 anchorPoint_;
+    /// Anchor.
+    Vector2 anchor_;
     /// Max force.
     float maxForce_;
     /// Max torque.

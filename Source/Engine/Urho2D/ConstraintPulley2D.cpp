@@ -31,9 +31,7 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
-ConstraintPulley2D::ConstraintPulley2D(Context* context) : 
+ConstraintPulley2D::ConstraintPulley2D(Context* context) :
     Constraint2D(context),
     ownerBodyGroundAnchor_(-1.0f, 1.0f),
     otherBodyGroundAnchor_(1.0f, 1.0f),
@@ -50,7 +48,7 @@ ConstraintPulley2D::~ConstraintPulley2D()
 
 void ConstraintPulley2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintPulley2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintPulley2D>();
     
     REF_ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_VECTOR2, "Owner Body Ground Anchor", GetOwnerBodyGroundAnchor, SetOwnerBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_VECTOR2, "Other Body Ground Anchor", GetOtherBodyGroundAnchor, SetOtherBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

@@ -40,8 +40,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set anchor point.
-    void SetAnchorPoint(const Vector2& anchor);
+    /// Set anchor.
+    void SetAnchor(const Vector2& anchor);
     /// Set enable limit.
     void SetEnableLimit(bool enableLimit);
     /// Set lower angle.
@@ -55,8 +55,8 @@ public:
     /// Set max motor torque.
     void SetMaxMotorTorque(float maxMotorTorque);
 
-    /// Return anchor point.
-    const Vector2& GetAnchorPoint() const { return anchorPoint_; }
+    /// Return anchor.
+    const Vector2& GetAnchor() const { return anchor_; }
     /// Return enable limit.
     bool GetEnableLimit() const { return enableLimit_; }
     /// Return lower angle.
@@ -74,8 +74,8 @@ private:
     /// Create Joint def.
     virtual b2JointDef* CreateJointDef();
 
-    /// Owner body anchor.
-    Vector2 anchorPoint_;
+    /// Anchor.
+    Vector2 anchor_;
     /// Enable limit.
     bool enableLimit_;
     /// Lower angle.

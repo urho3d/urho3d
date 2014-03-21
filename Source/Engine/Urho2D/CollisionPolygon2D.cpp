@@ -32,7 +32,8 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-CollisionPolygon2D::CollisionPolygon2D(Context* context) : CollisionShape2D(context)
+CollisionPolygon2D::CollisionPolygon2D(Context* context) :
+    CollisionShape2D(context)
 {
     fixtureDef_.shape = &polygonShape_;
 }
