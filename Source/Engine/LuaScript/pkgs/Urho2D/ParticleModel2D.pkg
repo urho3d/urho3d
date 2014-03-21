@@ -8,5 +8,4 @@ enum EmitterType2D
 
 class ParticleModel2D : public Resource
 {
-    
 };

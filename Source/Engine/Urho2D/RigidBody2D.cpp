@@ -520,4 +520,3 @@ void RigidBody2D::OnMarkedDirty(Node* node)
 }
 
 }
-
