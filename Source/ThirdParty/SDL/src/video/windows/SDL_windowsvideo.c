@@ -253,6 +253,9 @@ SDL_Direct3D9GetAdapterIndex( int displayIndex )
 	}
 }
 
+// Urho3D: dxgi may not be available on MinGW
+#ifdef _MSC_VER
+
 #define CINTERFACE
 #define COBJMACROS
 #include <dxgi.h>
@@ -337,6 +340,7 @@ SDL_DXGIGetOutputInfo( int displayIndex, int *adapterIndex, int *outputIndex )
 		SDL_UnloadObject(pDXGIDLL);
 	}
 }
+#endif
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */
 
