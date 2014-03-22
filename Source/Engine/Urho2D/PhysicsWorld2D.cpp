@@ -41,7 +41,8 @@ static const Vector2 DEFAULT_GRAVITY_2D(0.0f, -9.81f);
 static const int DEFAULT_VELOCITY_ITERATIONS = 8;
 static const int DEFAULT_POSITION_ITERATIONS = 3;
 
-PhysicsWorld2D::PhysicsWorld2D(Context* context) : Component(context),
+PhysicsWorld2D::PhysicsWorld2D(Context* context) :
+    Component(context),
     world_(0),
     gravity_(DEFAULT_GRAVITY_2D),
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),

@@ -91,7 +91,7 @@ function CreateScene()
 
         local joint = node:CreateComponent("ConstraintRevolute2D")
         joint.otherBody = prevBody
-        joint.anchorPoint = Vector2(i, y)
+        joint.anchor = Vector2(i, y)
         joint.collideConnected = false
 
         prevBody = body

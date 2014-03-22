@@ -90,7 +90,7 @@ void CollisionCircle2D::ApplyNodeWorldScale()
 void CollisionCircle2D::RecreateFixture()
 {
     ReleaseFixture();
-    
+
     // Only use scale in x axis for circle
     float worldScale = cachedWorldScale_.x_;
     circleShape_.m_radius = radius_ * worldScale;

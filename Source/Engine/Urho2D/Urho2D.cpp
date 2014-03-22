@@ -32,9 +32,15 @@
 #include "Constraint2D.h"
 #include "ConstraintDistance2D.h"
 #include "ConstraintFriction2D.h"
+#include "ConstraintGear2D.h"
+#include "ConstraintMotor2D.h"
+#include "ConstraintMouse2D.h"
+#include "ConstraintPrismatic2D.h"
 #include "ConstraintPulley2D.h"
 #include "ConstraintRevolute2D.h"
 #include "ConstraintRope2D.h"
+#include "ConstraintWeld2D.h"
+#include "ConstraintWheel2D.h"
 #include "Context.h"
 #include "Drawable2D.h"
 #include "ParticleEmitter2D.h"
@@ -77,9 +83,15 @@ void RegisterUrho2DLibrary(Context* context)
     Constraint2D::RegisterObject(context);
     ConstraintDistance2D::RegisterObject(context);
     ConstraintFriction2D::RegisterObject(context);
+    ConstraintGear2D::RegisterObject(context);
+    ConstraintMotor2D::RegisterObject(context);
+    ConstraintMouse2D::RegisterObject(context);
+    ConstraintPrismatic2D::RegisterObject(context);
     ConstraintPulley2D::RegisterObject(context);
     ConstraintRevolute2D::RegisterObject(context);
     ConstraintRope2D::RegisterObject(context);
+    ConstraintWeld2D::RegisterObject(context);
+    ConstraintWheel2D::RegisterObject(context);
 }
 
 }

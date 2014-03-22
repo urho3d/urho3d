@@ -35,15 +35,19 @@ env:
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=SHARED
     - ANDROID=1                            URHO3D_LIB_TYPE=STATIC
     - ANDROID=1                            URHO3D_LIB_TYPE=SHARED
-#matrix:
-#  fast_finish: true
+    - RPI=1                                URHO3D_LIB_TYPE=STATIC
+    - RPI=1                                URHO3D_LIB_TYPE=SHARED
+matrix:
+  fast_finish: true
 #  allow_failures:
-#    - env:
+#    - env: RPI=1 URHO3D_LIB_TYPE=STATIC
+#    - env: RPI=1 URHO3D_LIB_TYPE=SHARED
 language: cpp
 compiler: gcc
 before_install:
     - bash -c "[ '$TRAVIS_BRANCH' == 'master' ] && [ '$TRAVIS_PULL_REQUEST' == 'false' ]" && export ON_MASTER_COMMIT=1 && bash -c "[ $SITE_UPDATE ]" && export SITE_UPDATE_ON_MASTER_COMMIT=1 || true
     - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9d-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
+    - bash -c "[ $RPI ]" && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && git clone --depth=1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot && export RASPI_ROOT=$(pwd)/rpi-sysroot || true
     - sudo apt-get update -q -y
 install:
     - sudo apt-get install -q -y --no-install-recommends libasound2-dev

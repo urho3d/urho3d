@@ -40,16 +40,16 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set owner body anchor point.
+    /// Set owner body anchor.
     void SetOwnerBodyAnchor(const Vector2& anchor);
-    /// Set other body anchor point.
+    /// Set other body anchor.
     void SetOtherBodyAnchor(const Vector2& anchor);
     /// Set max length.
     void SetMaxLength(float maxLength);
 
-    /// Return owner body anchor point.
+    /// Return owner body anchor.
     const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
-    /// Return other body anchor point.
+    /// Return other body anchor.
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
     /// Return max length.
     float GetMaxLength() const { return maxLength_; }

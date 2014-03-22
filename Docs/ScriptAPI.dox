@@ -1682,7 +1682,7 @@ Methods:
 
 Properties:
 
-- Vector2 anchorPoint
+- Vector2 anchor
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1702,6 +1702,188 @@ Properties:
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintGear2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- Constraint2D@ otherConstraint
+- RigidBody2D@ ownerBody // readonly
+- Constraint2D@ ownerConstraint
+- float ratio
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintMotor2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- float maxLength
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- Vector2 otherBodyAnchor
+- RigidBody2D@ ownerBody // readonly
+- Vector2 ownerBodyAnchor
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintMouse2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- float dampingRatio
+- bool enabled
+- bool enabledEffective // readonly
+- float frequencyHz
+- uint id // readonly
+- float maxForce
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- RigidBody2D@ ownerBody // readonly
+- int refs // readonly
+- Vector2 target
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintPrismatic2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Vector2 anchor
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- Vector2 axis
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- bool enableLimit
+- bool enableMotor
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- float lowerTranslation
+- float maxMotorForce
+- float motorSpeed
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- RigidBody2D@ ownerBody // readonly
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- float upperTranslation
 - int weakRefs // readonly
 
 
@@ -1772,7 +1954,7 @@ Methods:
 
 Properties:
 
-- Vector2 anchorPoint
+- Vector2 anchor
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1836,6 +2018,98 @@ Properties:
 - Vector2 otherBodyAnchor
 - RigidBody2D@ ownerBody // readonly
 - Vector2 ownerBodyAnchor
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintWeld2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Vector2 anchor
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- float dampingRatio
+- bool enabled
+- bool enabledEffective // readonly
+- float frequencyHz
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- RigidBody2D@ ownerBody // readonly
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+
+### ConstraintWheel2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+
+Properties:
+
+- Vector2 anchor
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- Vector2 axis
+- ShortStringHash baseType // readonly
+- String category // readonly
+- bool collideConnected
+- float dampingRatio
+- bool enableMotor
+- bool enabled
+- bool enabledEffective // readonly
+- float frequencyHz
+- uint id // readonly
+- float maxMotorTorque
+- float motorSpeed
+- Node@ node // readonly
+- uint numAttributes // readonly
+- RigidBody2D@ otherBody
+- RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly

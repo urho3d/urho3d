@@ -31,7 +31,8 @@
 namespace Urho3D
 {
 
-Sprite2D::Sprite2D(Context* context) : Resource(context), 
+Sprite2D::Sprite2D(Context* context) :
+    Resource(context), 
     hotSpot_(0.5f, 0.5f)
 {
 

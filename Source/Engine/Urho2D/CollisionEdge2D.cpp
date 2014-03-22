@@ -34,7 +34,8 @@ extern const char* URHO2D_CATEGORY;
 static const Vector2 DEFAULT_VERTEX1(-0.01f, 0.0f);
 static const Vector2 DEFAULT_VERTEX2(0.01f, 0.0f);
 
-CollisionEdge2D::CollisionEdge2D(Context* context) : CollisionShape2D(context),
+CollisionEdge2D::CollisionEdge2D(Context* context) :
+    CollisionShape2D(context),
     vertex1_(DEFAULT_VERTEX1),
     vertex2_(DEFAULT_VERTEX2)
 

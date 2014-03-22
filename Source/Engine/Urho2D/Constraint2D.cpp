@@ -37,7 +37,7 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-Constraint2D::Constraint2D(Context* context) : 
+Constraint2D::Constraint2D(Context* context) :
     Component(context),
     joint_(0),
     collideConnected_(false)
@@ -118,6 +118,11 @@ void Constraint2D::SetCollideConnected(bool collideConnected)
     MarkNetworkUpdate();
 }
 
+void Constraint2D::SetAttachedConstraint(Constraint2D* constraint)
+{
+    attachedConstraint_ = constraint;
+}
+
 void Constraint2D::OnNodeSet(Node* node)
 {
     Component::OnNodeSet(node);
@@ -150,8 +155,14 @@ void Constraint2D::InitializeJointDef(b2JointDef* jointDef)
 
 void Constraint2D::RecreateJoint()
 {
+    if (attachedConstraint_)
+        attachedConstraint_->ReleaseJoint();
+
     ReleaseJoint();
     CreateJoint();
+
+    if (attachedConstraint_)
+        attachedConstraint_->CreateJoint();
 }
 
 }

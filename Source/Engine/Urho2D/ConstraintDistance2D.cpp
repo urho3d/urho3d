@@ -31,9 +31,7 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
-ConstraintDistance2D::ConstraintDistance2D(Context* context) : 
+ConstraintDistance2D::ConstraintDistance2D(Context* context) :
     Constraint2D(context),
     ownerBodyAnchor_(Vector2::ZERO),
     otherBodyAnchor_(Vector2::ZERO),
@@ -49,7 +47,7 @@ ConstraintDistance2D::~ConstraintDistance2D()
 
 void ConstraintDistance2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintDistance2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintDistance2D>();
     
     REF_ACCESSOR_ATTRIBUTE(ConstraintDistance2D, VAR_VECTOR2, "Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(ConstraintDistance2D, VAR_VECTOR2, "Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

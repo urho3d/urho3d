@@ -258,14 +258,14 @@ class ViewportContext
 
     void UpdateSettingsUI()
     {
-        cameraPosX.text = Floor(cameraNode.position.x * 1000) / 1000;
-        cameraPosY.text = Floor(cameraNode.position.y * 1000) / 1000;
-        cameraPosZ.text = Floor(cameraNode.position.z * 1000) / 1000;
-        cameraRotX.text = Floor(cameraNode.rotation.pitch * 1000) / 1000;
-        cameraRotY.text = Floor(cameraNode.rotation.yaw * 1000) / 1000;
-        cameraRotZ.text = Floor(cameraNode.rotation.roll * 1000) / 1000;
-        cameraZoom.text = Floor(camera.zoom * 1000) / 1000;
-        cameraOrthoSize.text = Floor(camera.orthoSize * 1000) / 1000;
+        cameraPosX.text = String(Floor(cameraNode.position.x * 1000) / 1000);
+        cameraPosY.text = String(Floor(cameraNode.position.y * 1000) / 1000);
+        cameraPosZ.text = String(Floor(cameraNode.position.z * 1000) / 1000);
+        cameraRotX.text = String(Floor(cameraNode.rotation.pitch * 1000) / 1000);
+        cameraRotY.text = String(Floor(cameraNode.rotation.yaw * 1000) / 1000);
+        cameraRotZ.text = String(Floor(cameraNode.rotation.roll * 1000) / 1000);
+        cameraZoom.text = String(Floor(camera.zoom * 1000) / 1000);
+        cameraOrthoSize.text = String(Floor(camera.orthoSize * 1000) / 1000);
         cameraOrthographic.checked = camera.orthographic;
     }
 

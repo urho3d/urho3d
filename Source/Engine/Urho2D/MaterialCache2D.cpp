@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-MaterialCache2D::MaterialCache2D(Context* context) : 
+MaterialCache2D::MaterialCache2D(Context* context) :
     Object(context)
 {
 }

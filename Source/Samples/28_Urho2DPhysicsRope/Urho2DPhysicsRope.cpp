@@ -134,7 +134,7 @@ void Urho2DPhysicsRope::CreateScene()
 
         ConstraintRevolute2D* joint = node->CreateComponent<ConstraintRevolute2D>();
         joint->SetOtherBody(prevBody);
-        joint->SetAnchorPoint(Vector2(float(i), y));
+        joint->SetAnchor(Vector2(float(i), y));
         joint->SetCollideConnected(false);
 
         prevBody = body;

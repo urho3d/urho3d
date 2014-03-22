@@ -31,10 +31,9 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
-ConstraintRevolute2D::ConstraintRevolute2D(Context* context) : Constraint2D(context),
-    anchorPoint_(Vector2::ZERO),
+ConstraintRevolute2D::ConstraintRevolute2D(Context* context) :
+    Constraint2D(context),
+    anchor_(Vector2::ZERO),
     lowerAngle_(0.0f),
     upperAngle_(0.0f),
     maxMotorTorque_(0.0f),
@@ -50,9 +49,9 @@ ConstraintRevolute2D::~ConstraintRevolute2D()
 
 void ConstraintRevolute2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintRevolute2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintRevolute2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_VECTOR2, "Anchor Point", GetAnchorPoint, SetAnchorPoint, Vector2, Vector2::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_VECTOR2, "Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_BOOL, "Enable Limit", GetEnableLimit, SetEnableLimit, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_FLOAT, "Lower Angle", GetLowerAngle, SetLowerAngle, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_FLOAT, "Upper Angle", GetUpperAngle, SetUpperAngle, float, 0.0f, AM_DEFAULT);
@@ -62,12 +61,12 @@ void ConstraintRevolute2D::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(ConstraintRevolute2D, Constraint2D);
 }
 
-void ConstraintRevolute2D::SetAnchorPoint(const Vector2& anchor)
+void ConstraintRevolute2D::SetAnchor(const Vector2& anchor)
 {
-    if (anchor == anchorPoint_)
+    if (anchor == anchor_)
         return;
 
-    anchorPoint_ = anchor;
+    anchor_ = anchor;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -150,7 +149,7 @@ b2JointDef* ConstraintRevolute2D::CreateJointDef()
         return 0;
 
     b2RevoluteJointDef* jointDef = new b2RevoluteJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchorPoint_));
+    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
     jointDef->enableLimit = enableLimit_;
     jointDef->lowerAngle = lowerAngle_;
     jointDef->upperAngle = upperAngle_;

@@ -37,7 +37,8 @@
 namespace Urho3D
 {
 
-SpriteSheet2D::SpriteSheet2D(Context* context) : Resource(context)
+SpriteSheet2D::SpriteSheet2D(Context* context) :
+    Resource(context)
 {
 
 }

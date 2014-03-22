@@ -36,7 +36,8 @@
 namespace Urho3D
 {
 
-Animation2D::Animation2D(Context* context) : Resource(context)
+Animation2D::Animation2D(Context* context) :
+    Resource(context)
 {
 
 }

@@ -1,0 +1,126 @@
+//
+// Copyright (c) 2008-2014 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#include "Precompiled.h"
+#include "ConstraintGear2D.h"
+#include "Context.h"
+#include "PhysicsUtils2D.h"
+#include "RigidBody2D.h"
+
+#include "DebugNew.h"
+
+namespace Urho3D
+{
+
+ConstraintGear2D::ConstraintGear2D(Context* context) :
+    Constraint2D(context),
+    ratio_(1.0f)
+{
+}
+
+ConstraintGear2D::~ConstraintGear2D()
+{
+}
+
+void ConstraintGear2D::RegisterObject(Context* context)
+{
+    context->RegisterFactory<ConstraintGear2D>();
+
+    ACCESSOR_ATTRIBUTE(ConstraintGear2D, VAR_FLOAT, "Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(ConstraintGear2D, Constraint2D);
+}
+
+void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint)
+{
+    if (constraint == ownerConstraint_)
+        return;
+
+    if (ownerConstraint_)
+        ownerConstraint_->SetAttachedConstraint(0);
+
+    ownerConstraint_ = constraint;
+
+    if (ownerConstraint_)
+        ownerConstraint_->SetAttachedConstraint(this);
+
+    RecreateJoint();
+    MarkNetworkUpdate();
+}
+
+void ConstraintGear2D::SetOtherConstraint(Constraint2D* constraint)
+{
+    WeakPtr<Constraint2D> constraintPtr(constraint);
+    if (constraintPtr == otherConstraint_)
+        return;
+
+    if (otherConstraint_)
+        otherConstraint_->SetAttachedConstraint(0);
+
+    otherConstraint_ = constraintPtr;
+
+    if (otherConstraint_)
+        otherConstraint_->SetAttachedConstraint(this);
+
+    RecreateJoint();
+    MarkNetworkUpdate();
+}
+
+void ConstraintGear2D::SetRatio(float ratio)
+{
+    if (ratio == ratio_)
+        return;
+
+    ratio_ = ratio;
+
+    RecreateJoint();
+    MarkNetworkUpdate();
+}
+
+b2JointDef* ConstraintGear2D::CreateJointDef()
+{
+    if (!ownerBody_ || !otherBody_)
+        return 0;
+
+    b2Body* bodyA = ownerBody_->GetBody();
+    b2Body* bodyB = otherBody_->GetBody();
+    if (!bodyA || !bodyB)
+        return 0;
+
+    if (!ownerConstraint_ || !otherConstraint_)
+        return 0;
+
+    b2Joint* jointA = ownerConstraint_->GetJoint();
+    b2Joint* jointB = otherConstraint_->GetJoint();
+    if (!jointA || !jointB)
+        return 0;
+
+    b2GearJointDef* jointDef = new b2GearJointDef;
+    InitializeJointDef(jointDef);
+
+    jointDef->joint1 = jointA;
+    jointDef->joint2 = jointB;
+    jointDef->ratio = ratio_;
+
+    return jointDef;
+}
+
+}

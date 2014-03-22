@@ -1020,18 +1020,104 @@ Properties:
 
 Methods:
 
-- void SetAnchorPoint(const Vector2& anchor)
+- void SetAnchor(const Vector2& anchor)
 - void SetMaxForce(float maxForce)
 - void SetMaxTorque(float maxTorque)
-- const Vector2& GetAnchorPoint() const
+- const Vector2& GetAnchor() const
 - float GetMaxForce() const
 - float GetMaxTorque() const
 
 Properties:
 
-- Vector2& anchorPoint
+- Vector2& anchor
 - float maxForce
 - float maxTorque
+
+### ConstraintGear2D : Constraint2D
+
+Methods:
+
+- void SetOwnerConstraint(Constraint2D* constraint)
+- void SetOtherConstraint(Constraint2D* constraint)
+- void SetRatio(float ratio)
+- Constraint2D* GetOwnerConstraint() const
+- Constraint2D* GetOtherConstraint() const
+- float GetRatio() const
+
+Properties:
+
+- Constraint2D* ownerConstraint
+- Constraint2D* otherConstraint
+- float ratio
+
+### ConstraintMotor2D : Constraint2D
+
+Methods:
+
+- void SetOwnerBodyAnchor(const Vector2& anchor)
+- void SetOtherBodyAnchor(const Vector2& anchor)
+- void SetMaxLength(float maxLength)
+- const Vector2& GetOwnerBodyAnchor() const
+- const Vector2& GetOtherBodyAnchor() const
+- float GetMaxLength() const
+
+Properties:
+
+- Vector2& ownerBodyAnchor
+- Vector2& otherBodyAnchor
+- float maxLength
+
+### ConstraintMouse2D : Constraint2D
+
+Methods:
+
+- void SetTarget(const Vector2& target)
+- void SetMaxForce(float maxForce)
+- void SetFrequencyHz(float frequencyHz)
+- void SetDampingRatio(float dampingRatio)
+- const Vector2& GetTarget() const
+- float GetMaxForce() const
+- float GetFrequencyHz() const
+- float GetDampingRatio() const
+
+Properties:
+
+- Vector2& target
+- float maxForce
+- float frequencyHz
+- float dampingRatio
+
+### ConstraintPrismatic2D : Constraint2D
+
+Methods:
+
+- void SetAnchor(const Vector2& anchor)
+- void SetAxis(const Vector2& axis)
+- void SetEnableLimit(bool enableLimit)
+- void SetLowerTranslation(float lowerTranslation)
+- void SetUpperTranslation(float upperTranslation)
+- void SetEnableMotor(bool enableMotor)
+- void SetMaxMotorForce(float maxMotorForce)
+- void SetMotorSpeed(float motorSpeed)
+- const Vector2& GetAnchor() const
+- const Vector2& GetAxis() const
+- bool GetEnableLimit() const
+- float GetLowerTranslation() const
+- float GetUpperTranslation() const
+- bool GetEnableMotor() const
+- float GetMaxMotorForce() const
+- float GetMotorSpeed() const
+
+Properties:
+
+- Vector2& anchor
+- Vector2& axis
+- bool enableLimit
+- float lowerTranslation
+- float upperTranslation
+- bool enableMotor
+- float maxMotorForce
+- float motorSpeed
 
 ### ConstraintPulley2D : Constraint2D
 
@@ -1060,14 +1146,14 @@ Properties:
 
 Methods:
 
-- void SetAnchorPoint(const Vector2& anchor)
+- void SetAnchor(const Vector2& anchor)
 - void SetEnableLimit(bool enableLimit)
 - void SetLowerAngle(float lowerAngle)
 - void SetUpperAngle(float upperAngle)
 - void SetEnableMotor(bool enableMotor)
 - void SetMotorSpeed(float motorSpeed)
 - void SetMaxMotorTorque(float maxMotorTorque)
-- const Vector2& GetAnchorPoint() const
+- const Vector2& GetAnchor() const
 - bool GetEnableLimit() const
 - float GetLowerAngle() const
 - float GetUpperAngle() const
@@ -1077,7 +1163,7 @@ Methods:
 
 Properties:
 
-- Vector2& anchorPoint
+- Vector2& anchor
 - bool enableLimit
 - float lowerAngle
 - float upperAngle
@@ -1101,6 +1187,52 @@ Properties:
 - Vector2& ownerBodyAnchor
 - Vector2& otherBodyAnchor
 - float maxLength
+
+### ConstraintWeld2D : Constraint2D
+
+Methods:
+
+- void SetAnchor(const Vector2& anchor)
+- void SetFrequencyHz(float frequencyHz)
+- void SetDampingRatio(float dampingRatio)
+- const Vector2& GetAnchor() const
+- float GetFrequencyHz() const
+- float GetDampingRatio() const
+
+Properties:
+
+- Vector2& anchor
+- float frequencyHz
+- float dampingRatio
+
+### ConstraintWheel2D : Constraint2D
+
+Methods:
+
+- void SetAnchor(const Vector2& anchor)
+- void SetAxis(const Vector2& axis)
+- void SetEnableMotor(bool enableMotor)
+- void SetMaxMotorTorque(float maxMotorTorque)
+- void SetMotorSpeed(float motorSpeed)
+- void SetFrequencyHz(float frequencyHz)
+- void SetDampingRatio(float dampingRatio)
+- const Vector2& GetAnchor() const
+- const Vector2& GetAxis() const
+- bool GetEnableMotor() const
+- float GetMaxMotorTorque() const
+- float GetMotorSpeed() const
+- float GetFrequencyHz() const
+- float GetDampingRatio() const
+
+Properties:
+
+- Vector2& anchor
+- Vector2& axis
+- bool enableMotor
+- float maxMotorTorque
+- float motorSpeed
+- float frequencyHz
+- float dampingRatio
 
 ### Context
 
