@@ -40,9 +40,9 @@ env:
     - RPI=1                                URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
-  allow_failures:
-    - env: RPI=1 URHO3D_LIB_TYPE=STATIC
-    - env: RPI=1 URHO3D_LIB_TYPE=SHARED
+#  allow_failures:
+#    - env: RPI=1 URHO3D_LIB_TYPE=STATIC
+#    - env: RPI=1 URHO3D_LIB_TYPE=SHARED
 language: cpp
 compiler: gcc
 before_install:
