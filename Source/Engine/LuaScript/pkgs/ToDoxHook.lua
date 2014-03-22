@@ -27,6 +27,7 @@ globalFunctions = {}
 globalProperties = {}
 currentClass = nil
 currentFunction = nil
+curDir = nil
 
 function classClass:print(ident,close)
   local class = {}
@@ -204,6 +205,246 @@ function sortByName(t)
   table.sort(t, function(a, b) return a.name < b.name end)
 end
 
+function getCurrentDirectory()
+  local separator = (package.config):gsub("\n.*","")
+  local path = ""
+  local tmpFile = os.tmpname()
+  if separator == "\\" then
+    os.execute("cd > " .. tmpFile)
+  else
+    os.execute("pwd > " .. tmpFile)
+  end
+  local tmpHandler = io.open(tmpFile, "r")
+  path = tmpHandler:read("*a"):gsub("\n.*","")
+  tmpHandler:close()
+  os.remove(tmpFile)
+  return {path = path, separator = separator}
+end
+
+function isTypeEquivalent(headerType, packageType)
+  -- {["headerType"] = {"packageType1", "packageType2", ...}}
+  --local equivalenceTable = {["StringHash"] = {"const String"}}
+  if headerType == packageType then
+    return true
+  else
+    if equivalenceTable ~= nil then
+      for headerEqType, packageEqTypes in pairs(equivalenceTable) do
+        if headerEqType == headerType then
+          if packageEqTypes ~= nil then
+            for i, packageEqType in ipairs(packageEqTypes) do
+              if packageEqType == packageType then
+                return true
+              end
+            end
+          end
+          return false
+        end
+      end
+    end
+  end
+  return false
+end
+
+function isSameFilename(str1, str2, excludeExtensions)
+  str1 = str1:gsub("^.*" .. curDir.separator.. "(.*)$", "%1", 1)
+  str2 = str2:gsub("^.*" .. curDir.separator.. "(.*)$", "%1", 1)
+  if excludeExtensions == true then
+    str1 = str1:gsub("^(.*)%..*$", "%1", 1)
+    str2 = str2:gsub("^(.*)%..*$", "%1", 1)
+  end
+  if str1 == str2 then
+    return true
+  else
+    return false
+  end
+end
+
+function isSameFunction(headerFunc, packageFunc, strict)
+  if headerFunc.name == packageFunc.name then
+    if strict == true then
+      if headerFunc.declarations ~= nil and packageFunc.declarations ~= nil then
+        --for _, decl in ipairs(headerFunc.declarations) do print("FuncHeader  Param: \""..decl.type.."\", \""..decl.ptr.."\", \""..decl.name.."\", \""..decl.def.."\"") end
+        --for _, decl in ipairs(packageFunc.declarations) do print("FuncPackage Param: \""..decl.type.."\", \""..decl.ptr.."\", \""..decl.name.."\", \""..decl.def.."\"") end
+        for i, headerDecl in ipairs(headerFunc.declarations) do
+		  if packageFunc.declarations[i] ~= nil then
+		    if not isTypeEquivalent(headerDecl.type, packageFunc.declarations[i].type) then
+		      return false
+		    end
+		  else
+		    if headerDecl.def == "" then
+		      return false
+		    end
+		  end
+		end
+        return true
+      else
+        return true
+      end
+    else
+      return true
+    end
+  end
+  return false
+end
+
+function printDescriptionsFromPackageFile(filename, directory)
+  for line in io.lines(filename) do
+    if line:find("^%s*%$pfile%s+\"(.+)\"") ~= nil then
+      -- If it's another package file, load it (recursive)
+      local nextPath = curDir.path .. curDir.separator
+      nextPath = nextPath .. line:gsub("^%s*%$pfile%s+\"(.+)\"", "%1", 1):gsub("/", curDir.separator)
+      local nextDirectory = line:gsub("^%s*%$pfile%s+\"(.+)\"", "%1", 1):gsub("/.*$", ""):gsub("/", curDir.separator)
+      printDescriptionsFromPackageFile(nextPath, nextDirectory)
+    elseif line:find("^%s*%$#include%s+\"(.+)\"") ~= nil then
+      -- If it's an include, load it to fetch the descriptions
+      local nextFilename = line:gsub("^%s*%$#include%s+\"(.+)\"", "%1", 1):gsub("/", curDir.separator)
+      if isSameFilename(filename, nextFilename, true) then
+        -- Must be same as Package Name
+        printDescriptions(nextFilename, directory)
+      end
+    end
+  end
+end
+
+function printDescriptions(filename, directory)
+  -- Search Descriptions
+  local className = nil
+  local classScope = nil
+  local description = nil
+  local sourceEnginePath = curDir.path .. curDir.separator .. ".." .. curDir.separator .. ".." .. curDir.separator
+  if directory ~= nil then
+    sourceEnginePath = sourceEnginePath .. directory .. curDir.separator
+  end
+  for line in io.lines(sourceEnginePath .. filename) do
+    -- Entering Class
+    if line:find("^%s*[Cc]lass%s+(.+)") ~= nil then
+      local classDefine = line:gsub("^%s*[Cc]lass%s+([%w_][^:;]*)%s*:*.*", "%1")
+      className = classDefine:gsub("[%w_]+%s+([%w_]+).*", "%1")
+    -- Struct Defined (same as Class)
+    elseif line:find("^%s*[Ss]truct%s+(.+)") ~= nil then
+      local classDefine = line:gsub("^%s*[Ss]truct%s+([%w_][^:;]*)%s*:*.*", "%1")
+      className = classDefine:gsub("[%w_]+%s+([%w_]+).*", "%1")
+    elseif className ~= nil then
+      -- Detecting Scope
+      if line:find("^%s*(%w+)%s*:%s*$") ~= nil then
+        classScope = line:gsub("^%s*(%w)%s*:%s*$", "%1")
+      -- Leaving Class
+      elseif line:find("^%s*}%s*$") ~= nil then
+        className = nil
+        classScope = nil
+        description = nil
+      -- Gather Informations
+      elseif className ~= nil and classScope ~= nil then
+        -- Line stating with "///" (Description)
+        if line:find("^%s*///") ~= nil then
+          description = line:gsub("^%s*///%s*", "")
+        -- Not Empty Line (Function)
+        elseif line:find("^%s*$") == nil and description ~= nil then
+          printElementDescription(className, classScope, line, description)
+          description = nil
+        end
+      end
+    end
+  end
+end
+
+function getElementFromLine(line)
+  local element = {}
+  element.name = nil
+  element.params = nil
+  element.type = nil
+  -- Type Detect (Function)
+  if line:find("^.*%s*([%w_~]+)%s*%(.*%).*$") ~= nil then
+    element.name = line:gsub("^.*%s+([%w_~]+)%s*%(.*%).*$", "%1")
+    element.type = "functions"
+    if line:find("^.+%(.*%)") ~= nil then
+      element.params = {}
+      local params_str = line:gsub("^.+%((.*)%).*$", "%1", 1)
+      --print("Current Params: "..params_str)
+      if params_str ~= "" then
+        for param_str in params_str:gmatch("[^,;]+") do
+          local param = {}
+          param.type = ""
+          if param_str:find("^%s*(const%s+)") ~= nil then
+            param.type = "const "
+            param_str = param_str:gsub("^%s*((const%s+)", "")
+          end
+          param.type = param.type..param_str:gsub("^%s*([%w_]+).*$", "%1")
+          param.ptr = param_str:gsub("^%s*[%w_]+([%*&]?).*$", "%1")
+          param.name = param_str:gsub("^%s*[%w_]+[%*&]?%s+([%w_]+).*$", "%1")
+          param.def = ""
+          if param_str:find(".+=.+") then
+            param.def = param_str:gsub("^.*=%s*(.*)$", "%1")
+          end
+          table.insert(element.params, param)
+        end
+      else
+        local param = {}
+        param.type = "void"
+        param.ptr = ""
+        param.name = ""
+        param.def = ""
+        table.insert(element.params, param)
+      end
+    end
+  -- Type Detect (Property)
+  elseif line:find("^.*%s+([%w_]+)%s*.*;%s*$") ~= nil then
+    element.name = line:gsub("^.*%s+([%w_]+)%s*.*;%s*$", "%1")
+    element.type = "properties"
+  end
+  return element
+end
+
+function printElementDescription(className, classScope, line, description)
+  if description ~= "" then
+    local currentElement = getElementFromLine(line)
+    -- Search Class & Function/Property, Then Map
+    if currentElement.name ~= nil and currentElement.type ~= nil then
+      --print("Name: " .. currentElement.name)
+      --print("ok (name = \"" .. currentElement.name .. "\", type = \"" .. currentElement.type .. "\", className = \"" .. className .. "\")")
+      for i, class in ipairs(classes) do
+        if class.name == className then
+          --print("Class: "..class.name.." = "..className)
+          if class[currentElement.type] ~= nil then
+            for j, storedElement in ipairs(class[currentElement.type]) do
+              local isSameName = false
+              if storedElement.name == currentElement.name then
+                isSameName = true
+              -- Consider that the name is the same if it has an additionnal "_" at the end and if it's a property
+              elseif storedElement.name .. "_" == currentElement.name and currentElement.type == "properties" then
+                isSameName = true
+              end
+              if isSameName == true then
+                --print("Element: " .. storedElement.name .. " = " .. currentElement.name)
+                -- Confirm that the function is the same and not an overloading one
+                local isSameElement = true
+                if currentElement.type == "functions" then
+                  local candidateElement = {declarations = currentElement.params}
+                  candidateElement.name = currentElement.name
+                  isSameElement = isSameFunction(candidateElement, storedElement, true)
+                  --if isSameElement == true then print("Is same element? True") else print("Is same element? False") end
+                end
+                if isSameElement == true then
+                  --print("Element: " .. storedElement.name .. " = " .. currentElement.name)
+                  if storedElement.descriptions == nil then
+                    --print("[New description table]")
+                    classes[i][currentElement.type][j].descriptions = {}
+                  end
+                  --print("Description: "..description)
+                  --print("")
+                  table.insert(classes[i][currentElement.type][j].descriptions, description)
+                  return
+                end
+              end
+            end
+          end
+        end
+      end
+      --print("")
+    end
+  end
+end
+
 function writeClass(file, class)
   if class.base == "" then
     file:write("### " .. class.name .. "\n\n")
@@ -331,6 +572,8 @@ function writeProperty(file, property)
 end
 
 function classPackage:print()
+  curDir = getCurrentDirectory()
+  
   if flags.o == nil then
     print("Invalid output filename");
     return
@@ -350,6 +593,7 @@ function classPackage:print()
     self[i]:print("","")
     i = i + 1
   end
+  printDescriptionsFromPackageFile(flags.f)
 
   writeClasses(file)
   writeEnumerates(file)

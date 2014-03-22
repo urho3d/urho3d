@@ -219,16 +219,18 @@ function writeFunction(file, func, classname, isInheritance, asFunc)
       end
       file:write(")\",")
      
-      -- write description
+      -- write description preparation
+      local isFirstDescription = true
+      if func.overloads ~= nil or func.descriptions ~= nil then
+        file:write("\n        description = \"")
+      end
       -- write overloaded parameters in description, if any
       if func.overloads ~= nil then
-        file:write("\n        description = \"")
-        local firstOverload = true
         for i, overload in ipairs(func.overloads) do
-          if firstOverload == false then
+          if isFirstDescription == false then
             file:write(",\\n")
           else
-            firstOverload = false
+            isFirstDescription = false
           end
           file:write("(")
           writeFunctionReturn(file, overload)
@@ -236,9 +238,23 @@ function writeFunction(file, func, classname, isInheritance, asFunc)
           writeFunctionArgs(file, overload.declarations)
           file:write(")")
         end
+      end
+      -- write description
+      if func.descriptions ~= nil then
+        for i, description in ipairs(func.descriptions) do
+          if isFirstDescription == false then
+            file:write("\\n")
+          else
+            isFirstDescription = false
+          end
+          local fixedDescription = description:gsub([[(")]], [[\%1]])
+          file:write(fixedDescription)
+        end
+      end
+      -- write description (end)
+      if func.overloads ~= nil or func.descriptions ~= nil then
         file:write("\",")
       end
-      -- [TODO] Read package file with "flags.f" and link functions from headers' doxygen comments (///)
       
       -- write returns
       if func.type ~= "" or func.ptr ~= "" then
@@ -341,16 +357,27 @@ function writeProperty(file, property)
  
   -- write description (type)
   if property.mod:find("tolua_readonly") == nil then
-    file:write("\n        description = \"" .. property.type  .. property.ptr .. "\",")
+    file:write("\n        description = \"" .. property.type  .. property.ptr .. "")
   else
-    file:write("\n        description = \"(Readonly) " .. property.type .. property.ptr .. "\",")
+    file:write("\n        description = \"(Readonly) " .. property.type .. property.ptr .. "")
   end
+  -- write description
+  if property.descriptions ~= nil then
+    for i, description in ipairs(property.descriptions) do
+      local fixedDescription = description:gsub([[(")]], [[\%1]])
+      file:write("\\n" .. fixedDescription)
+    end
+  end
+  file:write("\",")
+  
   -- write property end
   file:write("\n        type = \"value\"")
   file:write("\n      },")
 end
  
 function classPackage:print()
+  curDir = getCurrentDirectory()
+  
   if flags.o == nil then
     print("Invalid output filename");
     return
@@ -367,6 +394,7 @@ function classPackage:print()
     self[i]:print("","")
     i = i + 1
   end
+  printDescriptionsFromPackageFile(flags.f)
  
   writeClasses(file)
   writeEnumerates(file)
