@@ -1,0 +1,5 @@
+$#include "Animatable.h"
+
+class Animatable : Serializable
+{
+};

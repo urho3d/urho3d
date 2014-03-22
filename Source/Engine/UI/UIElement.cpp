@@ -108,7 +108,7 @@ template<> LayoutMode Variant::Get<LayoutMode>() const
 XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
 
 UIElement::UIElement(Context* context) :
-    Serializable(context),
+    Animatable(context),
     parent_(0),
     clipBorder_(IntRect::ZERO),
     priority_(0),
@@ -245,7 +245,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     }
 
     // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source, setInstanceDefault))
+    if (!Animatable::LoadXML(source, setInstanceDefault))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -350,7 +350,7 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Write attributes
-    if (!Serializable::SaveXML(dest))
+    if (!Animatable::SaveXML(dest))
         return false;
 
     // Write child elements

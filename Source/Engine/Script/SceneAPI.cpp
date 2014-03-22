@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "Animatable.h"
 #include "DebugRenderer.h"
 #include "PackageFile.h"
 #include "Scene.h"
@@ -44,6 +45,11 @@ static void RegisterSerializable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint AM_NODEIDVECTOR", (void*)&AM_NODEIDVECTOR);
     
     RegisterSerializable<Serializable>(engine, "Serializable");
+}
+
+static void RegisterAnimatable(asIScriptEngine* engine)
+{
+    RegisterAnimatable<Animatable>(engine, "Animatable");
 }
 
 static bool NodeSaveXML(File* file, Node* ptr)
@@ -260,6 +266,7 @@ static void RegisterScene(asIScriptEngine* engine)
 void RegisterSceneAPI(asIScriptEngine* engine)
 {
     RegisterSerializable(engine);
+    RegisterAnimatable(engine);
     RegisterNode(engine);
     RegisterSmoothedTransform(engine);
     RegisterSplinePath(engine);

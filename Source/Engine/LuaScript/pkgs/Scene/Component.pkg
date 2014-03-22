@@ -1,6 +1,6 @@
 $#include "Component.h"
 
-class Component : public Serializable
+class Component : public Animatable
 {
     void SetEnabled(bool enable);
     void Remove();

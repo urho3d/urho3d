@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Serializable.h"
+#include "Animatable.h"
 #include "UIBatch.h"
 #include "Vector2.h"
 #include "XMLFile.h"
@@ -111,7 +111,7 @@ class Cursor;
 class ResourceCache;
 
 /// Base class for %UI elements.
-class URHO3D_API UIElement : public Serializable
+class URHO3D_API UIElement : public Animatable
 {
     OBJECT(UIElement);
     BASEOBJECT(UIElement);

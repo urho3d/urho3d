@@ -446,10 +446,17 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     RegisterSubclass<Object, T>(engine, "Serializable", className);
 }
 
+/// Template function for registering a class derived from Animatable.
+template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* className)
+{
+    RegisterSerializable<T>(engine, className);
+    RegisterSubclass<Object, T>(engine, "Animatable", className);
+}
+
 /// Template function for registering a class derived from Component.
 template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className, bool nodeRegistered = true, bool debugRendererRegistered = true)
 {
-    RegisterSerializable<T>(engine, className);
+    RegisterAnimatable<T>(engine, className);
     RegisterSubclass<Component, T>(engine, "Component", className);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHODPR(T, Remove, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
@@ -589,7 +596,7 @@ static VariantMap& NodeGetVars(Node* ptr)
 /// Template function for registering a class derived from Node.
 template <class T> void RegisterNode(asIScriptEngine* engine, const char* className)
 {
-    RegisterSerializable<T>(engine, className);
+    RegisterAnimatable<T>(engine, className);
     RegisterSubclass<Node, T>(engine, "Node", className);
     engine->RegisterObjectMethod(className, "void SetScale(float)", asMETHODPR(T, SetScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
@@ -895,7 +902,7 @@ static XMLFile* UIElementGetDefaultStyle(UIElement* ptr)
 /// Template function for registering a class derived from UIElement.
 template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className, bool isSprite = false)
 {
-    RegisterSerializable<T>(engine, className);
+    RegisterAnimatable<T>(engine, className);
     RegisterObjectConstructor<T>(engine, className);
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);

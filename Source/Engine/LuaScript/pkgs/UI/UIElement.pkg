@@ -56,7 +56,7 @@ static const unsigned DD_SOURCE;
 static const unsigned DD_TARGET;
 static const unsigned DD_SOURCE_AND_TARGET;
 
-class UIElement : public Serializable
+class UIElement : public Animatable
 {
     UIElement();
     virtual ~UIElement();

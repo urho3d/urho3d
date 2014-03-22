@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Matrix3x4.h"
-#include "Serializable.h"
+#include "Animatable.h"
 #include "VectorBuffer.h"
 
 namespace Urho3D
@@ -52,7 +52,7 @@ enum TransformSpace
 };
 
 /// %Scene node that may contain components and child nodes.
-class URHO3D_API Node : public Serializable
+class URHO3D_API Node : public Animatable
 {
     OBJECT(Node);
     BASEOBJECT(Node);
