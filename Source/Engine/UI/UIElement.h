@@ -468,6 +468,10 @@ public:
     UIElement* GetElementEventSender() const;
 
 protected:
+    /// Handle attribute animation added.
+    virtual void OnAttributeAnimationAdded();
+    /// Handle attribute animation removed.
+    virtual void OnAttributeAnimationRemoved();
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.
@@ -557,6 +561,8 @@ private:
     void Detach();
     /// Verify that child elements have proper alignment for layout mode.
     void VerifyChildAlignment();
+    /// Handle logic post-update event.
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Size.
     IntVector2 size_;

@@ -22,6 +22,8 @@
 
 #include "Precompiled.h"
 #include "Animatable.h"
+#include "AttributeAnimation.h"
+#include "Log.h"
 
 #include "DebugNew.h"
 
@@ -35,6 +37,95 @@ Animatable::Animatable(Context* context) :
 
 Animatable::~Animatable()
 {
+}
+
+void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* animation)
+{
+    unsigned index = M_MAX_UNSIGNED;
+    for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
+    {
+        AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
+        if (!attributeAnimationInfo.info_->name_.Compare(name, true))
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (animation)
+    {
+        if (index == M_MAX_UNSIGNED)
+        {
+            const Vector<AttributeInfo>* attributes = GetAttributes();
+            if (!attributes)
+            {
+                LOGERROR(GetTypeName() + " has no attributes");
+                return;
+            }
+
+            for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
+            {
+                const AttributeInfo* attributeInfo = &(*i);
+                if (!attributeInfo->name_.Compare(name, true))
+                {
+                    if (animation->GetValueType() == attributeInfo->type_)
+                    {
+                        AttributeAnimationInfo atrAnimInfo(attributeInfo, animation);
+                        attributeAnimationInfos_.Push(atrAnimInfo);
+
+                        OnAttributeAnimationAdded();
+                    }
+                    else
+                    {
+                        LOGERROR("Error value type");
+                        return;
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            // Replace old animation and reset time
+            attributeAnimationInfos_[index].animation_ = animation;
+            attributeAnimationInfos_[index].time_ = 0.0f;
+        }
+    }
+    else
+    {
+        if (index != M_MAX_UNSIGNED)
+        {
+            attributeAnimationInfos_.Erase(index);
+
+            OnAttributeAnimationRemoved();
+        }
+    }
+}
+
+AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
+{
+    for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
+    {
+        const AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
+        if (!attributeAnimationInfo.info_->name_.Compare(name, true))
+        {
+            return attributeAnimationInfo.animation_;
+        }
+    }
+
+    return 0;
+}
+
+void Animatable::UpdateAttributeAnimations(float timeStep)
+{
+    for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
+    {
+        AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
+
+        attributeAnimationInfo.time_ += timeStep;
+        attributeAnimationInfo.animation_->GetValue(attributeAnimationInfo.time_, attributeAnimationInfo.value_);
+        OnSetAttribute(*attributeAnimationInfo.info_, attributeAnimationInfo.value_);
+    }        
 }
 
 }

@@ -195,6 +195,18 @@ void Component::MarkNetworkUpdate()
     }
 }
 
+void Component::OnAttributeAnimationAdded()
+{
+    if (attributeAnimationInfos_.Size() == 1)
+        SubscribeToEvent(GetScene(), E_SCENEPOSTUPDATE, HANDLER(Component, HandleScenePostUpdate));        
+}
+
+void Component::OnAttributeAnimationRemoved()
+{
+    if (attributeAnimationInfos_.Empty())
+        UnsubscribeFromEvent(GetScene(), E_SCENEPOSTUPDATE);
+}
+
 void Component::SetID(unsigned id)
 {
     id_ = id;
@@ -224,4 +236,10 @@ void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type)
         dest.Clear();
 }
 
+void Component::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ScenePostUpdate;
+
+    UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+}
 }

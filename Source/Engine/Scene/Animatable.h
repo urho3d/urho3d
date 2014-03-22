@@ -22,12 +22,12 @@
 
 #pragma once
 
+#include "AttributeAnimation.h"
 #include "Serializable.h"
 
 namespace Urho3D
 {
 
-class AttributeAnimation;
 class Scene;
 
 /// Base class for animatable object
@@ -40,6 +40,50 @@ public:
     Animatable(Context* context);
     /// Destruct.
     virtual ~Animatable();
+
+    /// Set attribute animation.
+    void SetAttributeAnimation(const String& name, AttributeAnimation* animation);
+
+    /// Return attribute animation.
+    AttributeAnimation* GetAttributeAnimation(const String& name) const;
+
+protected:
+    /// Handle attribute animation added.
+    virtual void OnAttributeAnimationAdded() = 0;
+    /// Handle attribute animation removed.
+    virtual void OnAttributeAnimationRemoved() = 0;
+    /// Update attribute animations
+    void UpdateAttributeAnimations(float timeStep);
+
+    /// Attribute animation information.
+    struct AttributeAnimationInfo
+    { 
+        /// Construct.
+        AttributeAnimationInfo() : 
+            time_(0.0f)
+        {
+        }
+
+        /// Construct.
+        AttributeAnimationInfo(const AttributeInfo* info, AttributeAnimation* animation) :
+            info_(info),
+            animation_(animation),
+            time_(0.0f)
+        {
+        }
+
+        /// Time.
+        float time_;
+        /// Value.
+        Variant value_;
+        /// Attribute information.
+        const AttributeInfo* info_;
+        /// Attribute animation.
+        SharedPtr<AttributeAnimation> animation_;
+    };
+
+    /// All attribute animation infos.
+    Vector<AttributeAnimationInfo> attributeAnimationInfos_;
 };
 
 }

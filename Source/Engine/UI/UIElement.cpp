@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "Cursor.h"
 #include "HashSet.h"
 #include "Log.h"
@@ -1580,6 +1581,18 @@ UIElement* UIElement::GetElementEventSender() const
     return element;
 }
 
+void UIElement::OnAttributeAnimationAdded()
+{
+    if (attributeAnimationInfos_.Size() == 1)
+        SubscribeToEvent(E_POSTUPDATE, HANDLER(UIElement, HandlePostUpdate));
+}
+
+void UIElement::OnAttributeAnimationRemoved()
+{
+    if (attributeAnimationInfos_.Size() == 0)
+        UnsubscribeFromEvent(E_POSTUPDATE);
+}
+
 void UIElement::MarkDirty()
 {
     positionDirty_ = true;
@@ -1854,6 +1867,13 @@ void UIElement::VerifyChildAlignment()
         (*i)->SetHorizontalAlignment((*i)->GetHorizontalAlignment());
         (*i)->SetVerticalAlignment((*i)->GetVerticalAlignment());
     }
+}
+
+void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace PostUpdate;
+
+    UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

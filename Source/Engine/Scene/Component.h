@@ -95,6 +95,10 @@ public:
     void MarkNetworkUpdate();
     
 protected:
+    /// Handle attribute animation added.
+    virtual void OnAttributeAnimationAdded();
+    /// Handle attribute animation removed.
+    virtual void OnAttributeAnimationRemoved();
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node) {};
     /// Handle scene node transform dirtied.
@@ -105,6 +109,8 @@ protected:
     void SetID(unsigned id);
     /// Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
+    /// Handle scene post-update event.
+    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Scene node.
     Node* node_;

@@ -1439,6 +1439,18 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
+void Node::OnAttributeAnimationAdded()
+{
+    if (attributeAnimationInfos_.Size() == 1)
+        SubscribeToEvent(GetScene(), E_SCENEPOSTUPDATE, HANDLER(Node, HandleScenePostUpdate));        
+}
+
+void Node::OnAttributeAnimationRemoved()
+{
+    if (attributeAnimationInfos_.Empty())
+        UnsubscribeFromEvent(GetScene(), E_SCENEPOSTUPDATE);
+}
+
 Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
 {
     // First check if factory for type exists
@@ -1609,6 +1621,13 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     // If the component is still referenced elsewhere, reset its node pointer now
     if (componentWeak)
         componentWeak->SetNode(0);
+}
+
+void Node::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ScenePostUpdate;
+
+    UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

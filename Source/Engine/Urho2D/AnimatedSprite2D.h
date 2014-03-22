@@ -29,17 +29,6 @@ namespace Urho3D
 
 class Animation2D;
 
-/// Cycle mode.
-enum CycleMode
-{
-    /// Loop mode.
-    CM_LOOP = 0,
-    /// Clamp mode.
-    CM_CLAMP,
-    /// Pingpong Mode.
-    CM_PINGPONG,
-};
-
 /// Animated sprite component.
 class URHO3D_API AnimatedSprite2D : public StaticSprite2D
 {
