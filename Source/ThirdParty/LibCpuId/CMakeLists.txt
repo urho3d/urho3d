@@ -20,7 +20,7 @@ if (MSVC AND ENABLE_64BIT)
 endif ()
 
 set (SOURCE_FILES ${C_FILES} ${H_FILES} ${ASM_FILES})
-set (AMALG_EXCLUDES recog)
+set (AMALG_EXCLUDES asm-bits|recog)
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY src)
