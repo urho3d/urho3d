@@ -31,12 +31,18 @@ namespace Urho3D
 {
 
 Animatable::Animatable(Context* context) :
-    Serializable(context)
+    Serializable(context),
+    animationEnabled_(true)
 {
 }
 
 Animatable::~Animatable()
 {
+}
+
+void Animatable::SetAnimationEnabled(bool animationEnabled)
+{
+    animationEnabled_ = animationEnabled;
 }
 
 void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* animation)
@@ -118,12 +124,15 @@ AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
 
 void Animatable::UpdateAttributeAnimations(float timeStep)
 {
+    if (!animationEnabled_)
+        return;
+
     for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
     {
         AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
 
         attributeAnimationInfo.time_ += timeStep;
-        attributeAnimationInfo.animation_->GetValue(attributeAnimationInfo.time_, attributeAnimationInfo.value_);
+        attributeAnimationInfo.animation_->GetAnimationValue(attributeAnimationInfo.time_, attributeAnimationInfo.value_);
         OnSetAttribute(*attributeAnimationInfo.info_, attributeAnimationInfo.value_);
     }        
 }

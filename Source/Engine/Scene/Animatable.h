@@ -41,9 +41,13 @@ public:
     /// Destruct.
     virtual ~Animatable();
 
+    /// Set animation enabled.
+    void SetAnimationEnabled(bool enable);
     /// Set attribute animation.
     void SetAttributeAnimation(const String& name, AttributeAnimation* animation);
 
+    /// Return animation enabled.
+    bool IsAnimationEnabled() const { return animationEnabled_; }
     /// Return attribute animation.
     AttributeAnimation* GetAttributeAnimation(const String& name) const;
 
@@ -66,9 +70,9 @@ protected:
 
         /// Construct.
         AttributeAnimationInfo(const AttributeInfo* info, AttributeAnimation* animation) :
+            time_(0.0f),
             info_(info),
-            animation_(animation),
-            time_(0.0f)
+            animation_(animation)
         {
         }
 
@@ -82,6 +86,8 @@ protected:
         SharedPtr<AttributeAnimation> animation_;
     };
 
+    /// Animation enabled.
+    bool animationEnabled_;
     /// All attribute animation infos.
     Vector<AttributeAnimationInfo> attributeAnimationInfos_;
 };

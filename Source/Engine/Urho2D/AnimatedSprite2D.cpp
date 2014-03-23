@@ -37,7 +37,7 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-const char* cycleModeNames[] = 
+static const char* cycleModeNames[] = 
 {
     "Loop",
     "Clamp",

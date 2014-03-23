@@ -100,12 +100,11 @@ void StaticScene::CreateScene()
 
     /// Create light color animation
     SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
-    colorAnimation->SetValueType(VAR_COLOR);
-    colorAnimation->AddKeyFrame(0.0f, Color::WHITE);
-    colorAnimation->AddKeyFrame(1.0f, Color::RED);
-    colorAnimation->AddKeyFrame(2.0f, Color::YELLOW);
-    colorAnimation->AddKeyFrame(3.0f, Color::GREEN);
-    colorAnimation->AddKeyFrame(4.0f, Color::WHITE);
+    colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+    colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+    colorAnimation->SetKeyFrame(1.0f, Color::RED);
+    colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+    colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
     light->SetAttributeAnimation("Color", colorAnimation);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
@@ -127,13 +126,13 @@ void StaticScene::CreateScene()
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
 
-        /// Create mushroom position animation.
+        // Create mushroom position animation.
         SharedPtr<AttributeAnimation> positionAnimaiton(new AttributeAnimation(context_));
-        positionAnimaiton->SetValueType(VAR_VECTOR3);
-        positionAnimaiton->AddKeyFrame(0.0f, position);
-        positionAnimaiton->AddKeyFrame(1.0f, position + Vector3(Random(2.0f) - 1.0f, 0.0f, Random(2.0f) - 1.0f));
-        positionAnimaiton->AddKeyFrame(2.0f, position + Vector3(Random(2.0f) - 1.0f, 0.0f, Random(2.0f) - 1.0f));
-        positionAnimaiton->AddKeyFrame(3.0f, position);
+        // Set same value for begin and end key frames
+        positionAnimaiton->SetKeyFrame(0.0f, position);
+        positionAnimaiton->SetKeyFrame(3.0f, position);
+        positionAnimaiton->SetKeyFrame(1.0f, position + Vector3(Random(2.0f) - 1.0f, 0.0f, Random(2.0f) - 1.0f));
+        positionAnimaiton->SetKeyFrame(2.0f, position + Vector3(Random(2.0f) - 1.0f, 0.0f, Random(2.0f) - 1.0f));
         mushroomNode->SetAttributeAnimation("Position", positionAnimaiton);
     }
     

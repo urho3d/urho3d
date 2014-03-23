@@ -49,25 +49,26 @@ public:
     AttributeAnimation(Context* context);
     /// Destruct.
     virtual ~AttributeAnimation();
-
-    /// Set value type.
-    void SetValueType(VariantType valueType);
+    
     /// Set cycle mode.
     void SetCycleMode(CycleMode cycleMode);
-    /// Add key frame (please add in order).
-    void AddKeyFrame(float time, const Variant& value);
+    /// Set value type.
+    void SetValueType(VariantType valueType);
+    /// Set key frame.
+    bool SetKeyFrame(float time, const Variant& value);
 
+    /// Return cycle mode.
+    CycleMode GetCycleMode() const { return cycleMode_; }
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
-    /// Return cycle mode.
-    CycleMode GetTytpeMode() const { return cycleMode_; }
-    /// Get value by animation time.
-    void GetValue(float animationTime, Variant& animationValue) const;
+    /// Return begin time.
+    float GetBeginTime() const { return beginTime_; }
+    /// Return end time.
+    float GetEndTime() const { return endTime_; }
+    /// Get animation value.
+    void GetAnimationValue(float time, Variant& value) const;
 
 protected:
-    /// Calculate scaled time.
-    float CalculateScaledTime(float animationTime) const;
-    
     /// Key frame
     struct KeyFrame
     {
@@ -76,16 +77,20 @@ protected:
         /// Value.
         Variant value_;
     };
+
+    /// Calculate scaled time.
+    float CalculateScaledTime(float animationTime) const;
     /// Interpolation.
-    void Interpolation(const KeyFrame& loKeyFrame, const KeyFrame& hiKeyFrame, float scaledTime, Variant& animationValue) const;
-    /// Value type.
-    VariantType valueType_;
+    void Interpolation(const KeyFrame& loKeyFrame, const KeyFrame& hiKeyFrame, float scaledTime, Variant& value) const;
+
     /// Cycle mode.
     CycleMode cycleMode_;
-    /// Min time.
-    float minTime_;
-    /// Max time.
-    float maxTime_;
+    /// Value type.
+    VariantType valueType_;
+    /// Begin time.
+    float beginTime_;
+    /// End time.
+    float endTime_;
     /// Key frames.
     Vector<KeyFrame> keyframes_;
 };
