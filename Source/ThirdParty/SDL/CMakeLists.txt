@@ -119,7 +119,7 @@ install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_SHARE_DIR}
 if (MSVC)
     set (AMALG_EXCLUDES .)
 else ()
-    set (AMALG_EXCLUDES "(audio|blit_A|joystick|libm|rwops|SDL_evdev|SDL_sys|video)")
+    set (AMALG_EXCLUDES "(audio|blit_A|joystick|libm|rwops|SDL_evdev|SDL_sys|SDL_udev|video)")
 endif ()
 
 # Define dependency libs
