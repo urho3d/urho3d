@@ -357,11 +357,33 @@ void CreateMenuBar()
         FinalizedPopupMenu(childPopup);
         popup.AddChild(childMenu);
 
-        childMenu = CreateMenuItem("Builtin object", null, SHOW_POPUP_INDICATOR);
+        childMenu = CreateMenuItem("Geometric Objects", null, SHOW_POPUP_INDICATOR);
         childPopup = CreatePopup(childMenu);
-        String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere", "TeaPot", "Torus" };
-        for (uint i = 0; i < objects.length; ++i)
-            childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objects[i]));
+		String[] objectsMenu = { "Tiled UVMap", "True UVMap" };
+        for (uint i = 0; i < objectsMenu.length ; ++i)
+        {
+            Menu@ menu = CreateMenuItem(objectsMenu[i], null, SHOW_POPUP_INDICATOR);
+            Window@ popup = CreatePopup(menu);
+			if(objectsMenu[i] == "Tiled UVMap") {
+				String[] objectsA = { "Box", "Capsule", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere", "Tetrahedron", "Torus" };
+				for (uint i = 0; i < objectsA.length; ++i)
+					popup.AddChild(CreateIconizedMenuItem(objectsA[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objectsA[i]));
+				CreateChildDivider(popup);
+				String[] objectsB = { "TorusKnot", "TeaPot" };
+				for (uint i = 0; i < objectsB.length; ++i)
+					popup.AddChild(CreateIconizedMenuItem(objectsB[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objectsB[i]));
+			} else {
+				String[] objectsA = { "BoxB", "CapsuleB", "ConeB", "CylinderB", "PyramidB", "SphereB", "SphereC", "TetrahedronB", "TorusB" };
+				for (uint i = 0; i < objectsA.length; ++i)
+					popup.AddChild(CreateIconizedMenuItem(objectsA[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objectsA[i]));
+				CreateChildDivider(popup);
+				String[] objectsB = { "TorusKnot", "TeaPot" };
+				for (uint i = 0; i < objectsB.length; ++i)
+					popup.AddChild(CreateIconizedMenuItem(objectsB[i] + "B", @PickBuiltinObject, 0, 0, "Node", true, "Create " + objectsB[i] + " B"));
+			}
+            childPopup.AddChild(menu);
+        }
+		FinalizedPopupMenu(childPopup);
         popup.AddChild(childMenu);
         CreateChildDivider(popup);
 

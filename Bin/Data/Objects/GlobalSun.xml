@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<node id="16777221">
+	<attribute name="Is Enabled" value="true" />
+	<attribute name="Name" value="Light" />
+	<attribute name="Position" value="35.8115 73.6153 19.9802" />
+	<attribute name="Rotation" value="1 0 0 0" />
+	<attribute name="Scale" value="1 1 1" />
+	<attribute name="Variables" />
+	<component type="Zone" id="16777221">
+		<attribute name="Bounding Box Min" value="-1000 -1000 -1000" />
+		<attribute name="Bounding Box Max" value="1000 1000 1000" />
+		<attribute name="Ambient Color" value="0.5 0.5 0.62 1" />
+		<attribute name="Fog Color" value="0.5 0.5 0.62 1" />
+		<attribute name="Fog Start" value="300" />
+	</component>
+	<node id="16777224">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Sun Light" />
+		<attribute name="Position" value="0 46.6348 0" />
+		<attribute name="Rotation" value="0.703235 0.633378 -0.234271 -0.222282" />
+		<attribute name="Scale" value="0.02 0.02 0.02" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777218">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.9 0.95 1 1" />
+			<attribute name="Specular Intensity" value="1.3" />
+			<attribute name="Cast Shadows" value="true" />
+		</component>
+	</node>
+	<node id="16777222">
+		<attribute name="Is Enabled" value="false" />
+		<attribute name="Name" value="Light Secondary" />
+		<attribute name="Position" value="0 -8.46154 0" />
+		<attribute name="Rotation" value="-0.898794 -0.438372 2.73731e-008 -2.19451e-008" />
+		<attribute name="Scale" value="0.999998 1 0.999998" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777222">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.85 0.93 0.68 1" />
+			<attribute name="Per Vertex" value="true" />
+		</component>
+	</node>
+	<node id="16777225">
+		<attribute name="Is Enabled" value="false" />
+		<attribute name="Name" value="Light Primary" />
+		<attribute name="Position" value="0 19.9698 0" />
+		<attribute name="Rotation" value="1.09365e-008 5.3341e-009 0.898794 -0.438372" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777224">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.5 0.5 0.5 1" />
+			<attribute name="Specular Intensity" value="0" />
+			<attribute name="Per Vertex" value="true" />
+		</component>
+	</node>
+</node>

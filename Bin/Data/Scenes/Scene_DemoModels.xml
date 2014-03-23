@@ -1,0 +1,1314 @@
+<?xml version="1.0"?>
+<scene id="1">
+	<attribute name="Name" value="" />
+	<attribute name="Time Scale" value="1" />
+	<attribute name="Smoothing Constant" value="50" />
+	<attribute name="Snap Threshold" value="5" />
+	<attribute name="Elapsed Time" value="0" />
+	<attribute name="Next Replicated Node ID" value="7" />
+	<attribute name="Next Replicated Component ID" value="9" />
+	<attribute name="Next Local Node ID" value="16777334" />
+	<attribute name="Next Local Component ID" value="16777294" />
+	<attribute name="Variables" />
+	<attribute name="Variable Names" value="" />
+	<component type="Octree" id="1" />
+	<component type="PhysicsWorld" id="2" />
+	<component type="DebugRenderer" id="3" />
+	<node id="16777216">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="0 -3.94427 7.88854" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="16777217">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8865 -2.71744" />
+			<attribute name="Rotation" value="0.635543 0.309976 -0.635543 0.309975" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777216">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+		<node id="16777218">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+			<attribute name="Rotation" value="0.635543 0.309975 0.635544 -0.309976" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777217">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+		<node id="16777219">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+			<attribute name="Rotation" value="-1.98453e-007 -3.89799e-007 0.898794 -0.438372" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777218">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+		<node id="16777220">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+			<attribute name="Rotation" value="0.898794 0.438372 3.3768e-007 -6.92344e-007" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777219">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+	</node>
+	<node id="16777221">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Light" />
+		<attribute name="Position" value="0 -3.94427 7.88854" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Zone" id="16777220">
+			<attribute name="Bounding Box Min" value="-1000 -1000 -1000" />
+			<attribute name="Bounding Box Max" value="1000 1000 1000" />
+			<attribute name="Ambient Color" value="0.5 0.5 0.62 1" />
+			<attribute name="Fog Color" value="0.5 0.5 0.62 1" />
+			<attribute name="Fog Start" value="300" />
+		</component>
+		<node id="16777222">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sun Light" />
+			<attribute name="Position" value="0 46.6348 0" />
+			<attribute name="Rotation" value="0.703235 0.633378 -0.234271 -0.222282" />
+			<attribute name="Scale" value="0.02 0.02 0.02" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777221">
+				<attribute name="Is Enabled" value="false" />
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.9 0.95 1 1" />
+				<attribute name="Specular Intensity" value="1.3" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="16777223">
+			<attribute name="Is Enabled" value="false" />
+			<attribute name="Name" value="Light Secondary" />
+			<attribute name="Position" value="0 -8.46154 0" />
+			<attribute name="Rotation" value="-0.898794 -0.438372 2.73731e-008 -2.19451e-008" />
+			<attribute name="Scale" value="0.999998 1 0.999998" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777222">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.85 0.93 0.68 1" />
+				<attribute name="Per Vertex" value="true" />
+			</component>
+		</node>
+		<node id="16777224">
+			<attribute name="Is Enabled" value="false" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="0 19.9698 0" />
+			<attribute name="Rotation" value="1.09365e-008 5.3341e-009 0.898794 -0.438372" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777223">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.5 0.5 0.5 1" />
+				<attribute name="Specular Intensity" value="0" />
+				<attribute name="Per Vertex" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777228">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Exhibitors Side Right" />
+		<attribute name="Position" value="0 1 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="16777227">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777225">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777224">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777226">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777225">
+					<attribute name="Model" value="Model;Models/PyramidB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777229">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="8 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777230">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777226">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777231">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777227">
+					<attribute name="Model" value="Model;Models/CylinderB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777232">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="16 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777233">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777228">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777234">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777229">
+					<attribute name="Model" value="Model;Models/SphereB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777235">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="24 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777236">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777230">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777237">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777231">
+					<attribute name="Model" value="Model;Models/SphereC.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777238">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="32 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777239">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777232">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777240">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777233">
+					<attribute name="Model" value="Model;Models/CapsuleB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777241">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="40 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777242">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777234">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777243">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777235">
+					<attribute name="Model" value="Model;Models/ConeB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777244">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-8 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777245">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777236">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777246">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777237">
+					<attribute name="Model" value="Model;Models/TetrahedronB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777253">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-16 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777254">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777242">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777255">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777243">
+					<attribute name="Model" value="Model;Models/TeaPot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777247">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-24 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777248">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777238">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777249">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777239">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777250">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-32 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777251">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777240">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777252">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777241">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777256">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-40 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777257">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777244">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777258">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777245">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777259">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-48 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777260">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777246">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777261">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777247">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777262">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-56 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777263">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777248">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777264">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777249">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777265">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="56 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777266">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777250">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777267">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777251">
+					<attribute name="Model" value="Model;Models/TorusB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777268">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="64 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777269">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777252">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777270">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777253">
+					<attribute name="Model" value="Model;Models/TorusKnotB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777271">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-64 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777272">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777254">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777273">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777255">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777274">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="48 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777275">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777256">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777276">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777257">
+					<attribute name="Model" value="Model;Models/BoxB.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+	</node>
+	<node id="16777280">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Exhibitors Side Left" />
+		<attribute name="Position" value="0 1 -20" />
+		<attribute name="Rotation" value="1.2168e-008 0 1 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="16777281">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777282">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777260">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777283">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777261">
+					<attribute name="Model" value="Model;Models/Pyramid.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777284">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="8 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777285">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777262">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777286">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777263">
+					<attribute name="Model" value="Model;Models/Tetrahedron.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777287">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="16 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777288">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777264">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777289">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777265">
+					<attribute name="Model" value="Model;Models/TeaPot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777290">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="24 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777291">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777266">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777292">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777267">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777293">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="32 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777294">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777268">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777295">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777269">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777296">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="40 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777297">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777270">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777298">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777271">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777299">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-8 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777300">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777272">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777301">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777273">
+					<attribute name="Model" value="Model;Models/Cylinder.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777302">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-16 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777303">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777274">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777304">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777275">
+					<attribute name="Model" value="Model;Models/Sphere.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777305">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-24 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777306">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777276">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777307">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777277">
+					<attribute name="Model" value="Model;Models/Plane.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777308">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-32 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777309">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777278">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777310">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777279">
+					<attribute name="Model" value="Model;Models/Capsule.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777311">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-40 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777312">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777280">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777313">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777281">
+					<attribute name="Model" value="Model;Models/Cone.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777314">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-48 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777315">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777282">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777316">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777283">
+					<attribute name="Model" value="Model;Models/Box.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777317">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-56 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777318">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777284">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777319">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777285">
+					<attribute name="Model" value="Model;Models/Torus.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777320">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="56 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777321">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777286">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777322">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777287">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777323">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="64 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777324">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777288">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777325">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777289">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777326">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="-64 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777327">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777290">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777328">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777291">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+		<node id="16777329">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Exhibitor" />
+			<attribute name="Position" value="48 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777330">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Static" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777292">
+					<attribute name="Model" value="Model;Models/Exhibitor.mdl" />
+					<attribute name="Material" value="Material;Materials/3DExamples/Exhibitor.xml;Materials/3DExamples/Exhibitor.xml" />
+				</component>
+			</node>
+			<node id="16777331">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="Model" />
+				<attribute name="Position" value="0 0.5 0" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="2 2 2" />
+				<attribute name="Variables" />
+				<component type="StaticModel" id="16777293">
+					<attribute name="Model" value="Model;Models/TorusKnot.mdl" />
+					<attribute name="Material" value="Material;Materials/Base/Default_Detail_512_Sub_Orange.xml" />
+				</component>
+			</node>
+		</node>
+	</node>
+	<node id="16777332">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Deco" />
+		<attribute name="Position" value="73.1162 14.0981 -0.110663" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="16777333">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Ground" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+		</node>
+	</node>
+	<node id="2">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Ground" />
+		<attribute name="Position" value="0 0.8 -10" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="138 20 30" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="4">
+			<attribute name="Model" value="Model;Models/Plane.mdl" />
+			<attribute name="Material" value="Material;Materials/Base/Default_512_Sub_Dark.xml" />
+		</component>
+	</node>
+	<node id="3">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Side Right" />
+		<attribute name="Position" value="0 5.8 5" />
+		<attribute name="Rotation" value="0.707107 -0.707107 0 0" />
+		<attribute name="Scale" value="138 20 10" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="5">
+			<attribute name="Model" value="Model;Models/Plane.mdl" />
+			<attribute name="Material" value="Material;Materials/Base/Default_512_Dark.xml" />
+		</component>
+	</node>
+	<node id="4">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Side Left" />
+		<attribute name="Position" value="0 5.8 -25" />
+		<attribute name="Rotation" value="8.60405e-009 -8.60405e-009 0.707107 0.707107" />
+		<attribute name="Scale" value="138 20 10" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="6">
+			<attribute name="Model" value="Model;Models/Plane.mdl" />
+			<attribute name="Material" value="Material;Materials/Base/Default_512_Dark.xml" />
+		</component>
+	</node>
+	<node id="5">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Side" />
+		<attribute name="Position" value="-69 5.8 -10" />
+		<attribute name="Rotation" value="0.5 -0.5 -0.5 -0.5" />
+		<attribute name="Scale" value="30 20 10" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="7">
+			<attribute name="Model" value="Model;Models/Plane.mdl" />
+			<attribute name="Material" value="Material;Materials/Base/Default_512_Dark.xml" />
+		</component>
+	</node>
+	<node id="6">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Side" />
+		<attribute name="Position" value="69 5.8 -10" />
+		<attribute name="Rotation" value="0.5 -0.5 0.5 0.5" />
+		<attribute name="Scale" value="30 20 10" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="8">
+			<attribute name="Model" value="Model;Models/Plane.mdl" />
+			<attribute name="Material" value="Material;Materials/Base/Default_512_Dark.xml" />
+		</component>
+	</node>
+</scene>
