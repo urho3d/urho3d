@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by Yao Wei Tjong for Urho3D
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
 
@@ -48,7 +48,7 @@
 static int Android_VideoInit(_THIS);
 static void Android_VideoQuit(_THIS);
 
-#include "../SDL_egl.h"
+#include "../SDL_egl_c.h"
 /* GL functions (SDL_androidgl.c) */
 extern SDL_GLContext Android_GLES_CreateContext(_THIS, SDL_Window * window);
 extern int Android_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);

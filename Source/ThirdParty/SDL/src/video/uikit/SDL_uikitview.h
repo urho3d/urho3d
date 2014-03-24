@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,6 +45,8 @@
 #if SDL_IPHONE_KEYBOARD
     UITextField *textField;
     BOOL keyboardVisible;
+    SDL_Rect textInputRect;
+    int keyboardHeight;
 #endif
 
 @public
@@ -60,11 +62,14 @@
 - (void)hideKeyboard;
 - (void)initializeKeyboard;
 @property (readonly) BOOL keyboardVisible;
+@property (nonatomic,assign) SDL_Rect textInputRect;
+@property (nonatomic,assign) int keyboardHeight;
 
 SDL_bool UIKit_HasScreenKeyboardSupport(_THIS);
 void UIKit_ShowScreenKeyboard(_THIS, SDL_Window *window);
 void UIKit_HideScreenKeyboard(_THIS, SDL_Window *window);
 SDL_bool UIKit_IsScreenKeyboardShown(_THIS, SDL_Window *window);
+void UIKit_SetTextInputRect(_THIS, SDL_Rect *rect);
 
 #endif
 

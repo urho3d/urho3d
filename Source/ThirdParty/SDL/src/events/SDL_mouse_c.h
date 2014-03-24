@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 #ifndef _SDL_mouse_c_h
 #define _SDL_mouse_c_h
@@ -32,6 +32,13 @@ struct SDL_Cursor
     struct SDL_Cursor *next;
     void *driverdata;
 };
+
+typedef struct
+{
+    int last_x, last_y;
+    Uint32 last_timestamp;
+    Uint8 click_count;
+} SDL_MouseClickState;
 
 typedef struct
 {
@@ -66,8 +73,11 @@ typedef struct
     int last_x, last_y;         /* the last reported x and y coordinates */
     Uint32 buttonstate;
     SDL_bool relative_mode;
-    /* the x and y coordinates when relative mode was activated */
-    int original_x, original_y;
+    SDL_bool relative_mode_warp;
+
+    /* Data for double-click tracking */
+    int num_clickstates;
+    SDL_MouseClickState *clickstate;
 
     SDL_Cursor *cursors;
     SDL_Cursor *def_cursor;
@@ -84,6 +94,9 @@ extern int SDL_MouseInit(void);
 
 /* Get the mouse state structure */
 SDL_Mouse *SDL_GetMouse(void);
+
+/* Set the default double-click interval */
+extern void SDL_SetDoubleClickTime(Uint32 interval);
 
 /* Set the default mouse cursor */
 extern void SDL_SetDefaultCursor(SDL_Cursor * cursor);

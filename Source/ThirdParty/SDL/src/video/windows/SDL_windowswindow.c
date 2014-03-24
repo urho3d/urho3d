@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
 
@@ -31,9 +31,11 @@
 #include "../SDL_sysvideo.h"
 #include "../SDL_pixels_c.h"
 #include "../../events/SDL_keyboard_c.h"
+#include "../../events/SDL_mouse_c.h"
 
 #include "SDL_windowsvideo.h"
 #include "SDL_windowswindow.h"
+#include "SDL_hints.h"
 
 /* Dropfile support */
 #include <shellapi.h>
@@ -82,7 +84,8 @@ GetWindowStyle(SDL_Window * window)
 static void
 WIN_SetWindowPositionInternal(_THIS, SDL_Window * window, UINT flags)
 {
-    HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
+    SDL_WindowData *data = (SDL_WindowData *)window->driverdata;
+    HWND hwnd = data->hwnd;
     RECT rect;
     DWORD style;
     HWND top;
@@ -108,7 +111,9 @@ WIN_SetWindowPositionInternal(_THIS, SDL_Window * window, UINT flags)
     x = window->x + rect.left;
     y = window->y + rect.top;
 
+    data->expected_resize = TRUE;
     SetWindowPos(hwnd, top, x, y, w, h, flags);
+    data->expected_resize = FALSE;
 }
 
 static int
@@ -273,6 +278,32 @@ WIN_CreateWindow(_THIS, SDL_Window * window)
         DestroyWindow(hwnd);
         return -1;
     }
+
+#if SDL_VIDEO_OPENGL_WGL
+    /* We need to initialize the extensions before deciding how to create ES profiles */
+    if (window->flags & SDL_WINDOW_OPENGL) {
+        WIN_GL_InitExtensions(_this);
+    }
+#endif
+
+#if SDL_VIDEO_OPENGL_ES2
+    if ((window->flags & SDL_WINDOW_OPENGL) &&
+        _this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES
+#if SDL_VIDEO_OPENGL_WGL           
+        && (!_this->gl_data || !_this->gl_data->HAS_WGL_EXT_create_context_es2_profile)
+#endif  
+        ) {
+#if SDL_VIDEO_OPENGL_EGL  
+        if (WIN_GLES_SetupWindow(_this, window) < 0) {
+            WIN_DestroyWindow(_this, window);
+            return -1;
+        }
+#else
+        return SDL_SetError("Could not create GLES window surface (no EGL support available)");
+#endif /* SDL_VIDEO_OPENGL_EGL */
+    } else 
+#endif /* SDL_VIDEO_OPENGL_ES2 */
+
 #if SDL_VIDEO_OPENGL_WGL
     if (window->flags & SDL_WINDOW_OPENGL) {
         if (WIN_GL_SetupWindow(_this, window) < 0) {
@@ -281,6 +312,7 @@ WIN_CreateWindow(_THIS, SDL_Window * window)
         }
     }
 #endif
+
     return 0;
 }
 
@@ -309,14 +341,38 @@ WIN_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
     if (SetupWindowData(_this, window, hwnd, SDL_FALSE) < 0) {
         return -1;
     }
-    
+
     // Urho3D: if window will be used for OpenGL, choose pixel format
     if (window->flags & SDL_WINDOW_OPENGL) {
         if (WIN_GL_SetupWindow(_this, window) < 0) {
             return -1;
         }
     }
-    
+
+#if SDL_VIDEO_OPENGL_WGL
+    {
+        const char *hint = SDL_GetHint(SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT);
+        if (hint) {
+            // This hint is a pointer (in string form) of the address of
+            // the window to share a pixel format with
+            SDL_Window *otherWindow = NULL;
+            SDL_sscanf(hint, "%p", (void**)&otherWindow);
+
+            // Do some error checking on the pointer
+            if (otherWindow != NULL && otherWindow->magic == &_this->window_magic)
+            {
+                // If the otherWindow has SDL_WINDOW_OPENGL set, set it for the new window as well
+                if (otherWindow->flags & SDL_WINDOW_OPENGL)
+                {
+                    window->flags |= SDL_WINDOW_OPENGL;
+                    if(!WIN_GL_SetPixelFormatFrom(_this, otherWindow, window)) {
+                        return -1;
+                    }
+                }
+            }
+        }
+    }
+#endif
     return 0;
 }
 
@@ -416,16 +472,16 @@ void
 WIN_RaiseWindow(_THIS, SDL_Window * window)
 {
     WIN_SetWindowPositionInternal(_this, window, SWP_NOCOPYBITS | SWP_NOMOVE | SWP_NOSIZE);
-
-    /* Raising the window while alt-tabbed can cause it to be minimized for some reason? */
-    WIN_RestoreWindow(_this, window);
 }
 
 void
 WIN_MaximizeWindow(_THIS, SDL_Window * window)
 {
-    HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
+    SDL_WindowData *data = (SDL_WindowData *)window->driverdata;
+    HWND hwnd = data->hwnd;
+    data->expected_resize = TRUE;
     ShowWindow(hwnd, SW_MAXIMIZE);
+    data->expected_resize = FALSE;
 }
 
 void
@@ -456,9 +512,11 @@ WIN_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered)
 void
 WIN_RestoreWindow(_THIS, SDL_Window * window)
 {
-    HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
-
+    SDL_WindowData *data = (SDL_WindowData *)window->driverdata;
+    HWND hwnd = data->hwnd;
+    data->expected_resize = TRUE;
     ShowWindow(hwnd, SW_RESTORE);
+    data->expected_resize = FALSE;
 }
 
 void
@@ -504,7 +562,9 @@ WIN_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display, 
         y = window->windowed.y + rect.top;
     }
     SetWindowLong(hwnd, GWL_STYLE, style);
-    SetWindowPos(hwnd, top, x, y, w, h, SWP_NOCOPYBITS);
+    data->expected_resize = TRUE;
+    SetWindowPos(hwnd, top, x, y, w, h, SWP_NOCOPYBITS | SWP_NOACTIVATE);
+    data->expected_resize = FALSE;
 }
 
 int
@@ -548,17 +608,7 @@ WIN_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp)
 void
 WIN_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 {
-    HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
-
-    if (grabbed) {
-        RECT rect;
-        GetClientRect(hwnd, &rect);
-        ClientToScreen(hwnd, (LPPOINT) & rect);
-        ClientToScreen(hwnd, (LPPOINT) & rect + 1);
-        ClipCursor(&rect);
-    } else {
-        ClipCursor(NULL);
-    }
+    WIN_UpdateClipCursor(window);
 
     if (window->flags & SDL_WINDOW_FULLSCREEN) {
         UINT flags = SWP_NOCOPYBITS | SWP_NOMOVE | SWP_NOSIZE;
@@ -633,7 +683,7 @@ SDL_HelperWindowCreate(void)
 
     /* Register the class. */
     SDL_HelperWindowClass = RegisterClass(&wce);
-    if (SDL_HelperWindowClass == 0) {
+    if (SDL_HelperWindowClass == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
         return WIN_SetError("Unable to create Helper Window Class");
     }
 
@@ -697,6 +747,48 @@ void WIN_OnWindowEnter(_THIS, SDL_Window * window)
 
     TrackMouseEvent(&trackMouseEvent);
 #endif /* WM_MOUSELEAVE */
+}
+
+void
+WIN_UpdateClipCursor(SDL_Window *window)
+{
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    SDL_Mouse *mouse = SDL_GetMouse();
+
+    /* Don't clip the cursor while we're in the modal resize or move loop */
+    if (data->in_title_click || data->in_modal_loop) {
+        ClipCursor(NULL);
+        return;
+    }
+
+    if ((mouse->relative_mode || (window->flags & SDL_WINDOW_INPUT_GRABBED)) &&
+        (window->flags & SDL_WINDOW_INPUT_FOCUS)) {
+        if (mouse->relative_mode && !mouse->relative_mode_warp) {
+            LONG cx, cy;
+            RECT rect;
+            GetWindowRect(data->hwnd, &rect);
+
+            cx = (rect.left + rect.right) / 2;
+            cy = (rect.top + rect.bottom) / 2;
+
+            /* Make an absurdly small clip rect */
+            rect.left = cx - 1;
+            rect.right = cx + 1;
+            rect.top = cy - 1;
+            rect.bottom = cy + 1;
+
+            ClipCursor(&rect);
+        } else {
+            RECT rect;
+            if (GetClientRect(data->hwnd, &rect) && !IsRectEmpty(&rect)) {
+                ClientToScreen(data->hwnd, (LPPOINT) & rect);
+                ClientToScreen(data->hwnd, (LPPOINT) & rect + 1);
+                ClipCursor(&rect);
+            }
+        }
+    } else {
+        ClipCursor(NULL);
+    }
 }
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */

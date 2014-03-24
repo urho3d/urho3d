@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -47,7 +47,7 @@
 // Urho3D: Only export when it is being requested
 #ifdef SDL_EXPORTS
 #ifndef DECLSPEC
-# if defined(__WIN32__)
+# if defined(__WIN32__) || defined(__WINRT__)
 #  ifdef __BORLANDC__
 #   ifdef BUILD_SDL
 #    define DECLSPEC
@@ -73,7 +73,7 @@
 
 /* By default SDL uses the C calling convention */
 #ifndef SDLCALL
-#if defined(__WIN32__) && !defined(__GNUC__)
+#if (defined(__WIN32__) || defined(__WINRT__)) && !defined(__GNUC__)
 #define SDLCALL __cdecl
 #else
 #define SDLCALL

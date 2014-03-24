@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 #include "SDL_stdinc.h"
 #include "SDL_assert.h"
 #include "SDL_log.h"
@@ -38,6 +38,7 @@
 #include "../../video/android/SDL_androidtouch.h"
 #include "../../video/android/SDL_androidvideo.h"
 #include "../../video/android/SDL_androidwindow.h"
+#include "../../joystick/android/SDL_sysjoystick_c.h"
 
 #include <android/log.h>
 #include <pthread.h>
@@ -78,6 +79,7 @@ static jmethodID midAudioInit;
 static jmethodID midAudioWriteShortBuffer;
 static jmethodID midAudioWriteByteBuffer;
 static jmethodID midAudioQuit;
+static jmethodID midPollInputDevices;
 
 /* Accelerometer data storage */
 static float fLastAccelerometer[3];
@@ -104,12 +106,10 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
      * Create mThreadKey so we can keep track of the JNIEnv assigned to each thread
      * Refer to http://developer.android.com/guide/practices/design/jni.html for the rationale behind this
      */
-    if (pthread_key_create(&mThreadKey, Android_JNI_ThreadDestroyed)) {
+    if (pthread_key_create(&mThreadKey, Android_JNI_ThreadDestroyed) != 0) {
         __android_log_print(ANDROID_LOG_ERROR, "SDL", "Error initializing pthread key");
     }
-    else {
-        Android_JNI_SetupThread();
-    }
+    Android_JNI_SetupThread();
 
     return JNI_VERSION_1_4;
 }
@@ -156,11 +156,13 @@ void SDL_Android_Init(JNIEnv* mEnv, jclass cls, jstring filesDir)
                                 "audioWriteByteBuffer", "([B)V");
     midAudioQuit = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass,
                                 "audioQuit", "()V");
+    midPollInputDevices = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass,
+                                "pollInputDevices", "()V");
 
     bHasNewData = false;
 
     if(!midGetNativeSurface || !midFlipBuffers || !midAudioInit ||
-       !midAudioWriteShortBuffer || !midAudioWriteByteBuffer || !midAudioQuit) {
+       !midAudioWriteShortBuffer || !midAudioWriteByteBuffer || !midAudioQuit || !midPollInputDevices) {
         __android_log_print(ANDROID_LOG_WARN, "SDL", "SDL: Couldn't locate Java callbacks, check that they're named and typed correctly");
     }
     __android_log_print(ANDROID_LOG_INFO, "SDL", "SDL_Android_Init() finished!");
@@ -172,6 +174,60 @@ void Java_org_libsdl_app_SDLActivity_onNativeResize(
                                     jint width, jint height, jint format)
 {
     Android_SetScreenResolution(width, height, format);
+}
+
+// Paddown
+int Java_org_libsdl_app_SDLActivity_onNativePadDown(
+                                    JNIEnv* env, jclass jcls,
+                                    jint device_id, jint keycode)
+{
+    return Android_OnPadDown(device_id, keycode);
+}
+
+// Padup
+int Java_org_libsdl_app_SDLActivity_onNativePadUp(
+                                   JNIEnv* env, jclass jcls,
+                                   jint device_id, jint keycode)
+{
+    return Android_OnPadUp(device_id, keycode);
+}
+
+/* Joy */
+void Java_org_libsdl_app_SDLActivity_onNativeJoy(
+                                    JNIEnv* env, jclass jcls,
+                                    jint device_id, jint axis, jfloat value)
+{
+    Android_OnJoy(device_id, axis, value);
+}
+
+/* POV Hat */
+void Java_org_libsdl_app_SDLActivity_onNativeHat(
+                                    JNIEnv* env, jclass jcls,
+                                    jint device_id, jint hat_id, jint x, jint y)
+{
+    Android_OnHat(device_id, hat_id, x, y);
+}
+
+
+int Java_org_libsdl_app_SDLActivity_nativeAddJoystick(
+    JNIEnv* env, jclass jcls,
+    jint device_id, jstring device_name, jint is_accelerometer, 
+    jint nbuttons, jint naxes, jint nhats, jint nballs)
+{
+    int retval;
+    const char *name = (*env)->GetStringUTFChars(env, device_name, NULL);
+
+    retval = Android_AddJoystick(device_id, name, (SDL_bool) is_accelerometer, nbuttons, naxes, nhats, nballs);
+
+    (*env)->ReleaseStringUTFChars(env, device_name, name);
+    
+    return retval;
+}
+
+int Java_org_libsdl_app_SDLActivity_nativeRemoveJoystick(
+    JNIEnv* env, jclass jcls, jint device_id)
+{
+    return Android_RemoveJoystick(device_id);
 }
 
 
@@ -289,25 +345,34 @@ void Java_org_libsdl_app_SDLActivity_nativeQuit(
 {
     // Urho3D: added log print
     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeQuit()");
+
+    /* Discard previous events. The user should have handled state storage
+     * in SDL_APP_WILLENTERBACKGROUND. After nativeQuit() is called, no
+     * events other than SDL_QUIT and SDL_APP_TERMINATING should fire */
+    SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
     /* Inject a SDL_QUIT event */
     SDL_SendQuit();
     SDL_SendAppEvent(SDL_APP_TERMINATING);
+    /* Resume the event loop so that the app can catch SDL_QUIT which
+     * should now be the top event in the event queue. */
+    if (!SDL_SemValue(Android_ResumeSem)) SDL_SemPost(Android_ResumeSem);
 }
 
 /* Pause */
 void Java_org_libsdl_app_SDLActivity_nativePause(
                                     JNIEnv* env, jclass cls)
 {
+    __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativePause()");
     if (Android_Window) {
-        /* Signal the pause semaphore so the event loop knows to pause and (optionally) block itself */
-        if (!SDL_SemValue(Android_PauseSem)) SDL_SemPost(Android_PauseSem);
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_FOCUS_LOST, 0, 0);
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
+        SDL_SendAppEvent(SDL_APP_WILLENTERBACKGROUND);
+        SDL_SendAppEvent(SDL_APP_DIDENTERBACKGROUND);
+    
+        /* *After* sending the relevant events, signal the pause semaphore 
+         * so the event loop knows to pause and (optionally) block itself */
+        if (!SDL_SemValue(Android_PauseSem)) SDL_SemPost(Android_PauseSem);
     }
-
-    __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativePause()");
-    SDL_SendAppEvent(SDL_APP_WILLENTERBACKGROUND);
-    SDL_SendAppEvent(SDL_APP_DIDENTERBACKGROUND);
 }
 
 /* Resume */
@@ -315,17 +380,17 @@ void Java_org_libsdl_app_SDLActivity_nativeResume(
                                     JNIEnv* env, jclass cls)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeResume()");
-    SDL_SendAppEvent(SDL_APP_WILLENTERFOREGROUND);
-    SDL_SendAppEvent(SDL_APP_DIDENTERFOREGROUND);
 
     if (Android_Window) {
+        SDL_SendAppEvent(SDL_APP_WILLENTERFOREGROUND);
+        SDL_SendAppEvent(SDL_APP_DIDENTERFOREGROUND);
+        SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
+        SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_RESTORED, 0, 0);
         /* Signal the resume semaphore so the event loop knows to resume and restore the GL Context
          * We can't restore the GL Context here because it needs to be done on the SDL main thread
          * and this function will be called from the Java thread instead.
          */
         if (!SDL_SemValue(Android_ResumeSem)) SDL_SemPost(Android_ResumeSem);
-        SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
-        SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_RESTORED, 0, 0);
     }
 }
 
@@ -451,19 +516,8 @@ SDL_bool Android_JNI_GetAccelerometerValues(float values[3])
     return retval;
 }
 
-// Urho3D: added function
-void Android_JNI_FinishActivity()
+static void Android_JNI_ThreadDestroyed(void* value)
 {
-    // Terminating the SDL main thread on our own may cause crashes with extra threads, so request
-    // the activity to finish instead
-    jmethodID mid;
-    JNIEnv *mEnv = Android_JNI_GetEnv();
-    mid = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass, "finishActivity","()V");
-    if (mid)
-        (*mEnv)->CallStaticVoidMethod(mEnv, mActivityClass, mid);
-}
-
-static void Android_JNI_ThreadDestroyed(void* value) {
     /* The thread is being destroyed, detach it from the Java VM and set the mThreadKey value to NULL as required */
     JNIEnv *env = (JNIEnv*) value;
     if (env != NULL) {
@@ -472,7 +526,8 @@ static void Android_JNI_ThreadDestroyed(void* value) {
     }
 }
 
-JNIEnv* Android_JNI_GetEnv(void) {
+JNIEnv* Android_JNI_GetEnv(void)
+{
     /* From http://developer.android.com/guide/practices/jni.html
      * All threads are Linux threads, scheduled by the kernel.
      * They're usually started from managed code (using Thread.start), but they can also be created elsewhere and then
@@ -492,10 +547,6 @@ JNIEnv* Android_JNI_GetEnv(void) {
         return 0;
     }
 
-    return env;
-}
-
-int Android_JNI_SetupThread(void) {
     /* From http://developer.android.com/guide/practices/jni.html
      * Threads attached through JNI must call DetachCurrentThread before they exit. If coding this directly is awkward,
      * in Android 2.0 (Eclair) and higher you can use pthread_key_create to define a destructor function that will be
@@ -505,8 +556,14 @@ int Android_JNI_SetupThread(void) {
      * Note: You can call this function any number of times for the same thread, there's no harm in it
      *       (except for some lost CPU cycles)
      */
-    JNIEnv *env = Android_JNI_GetEnv();
     pthread_setspecific(mThreadKey, (void*) env);
+
+    return env;
+}
+
+int Android_JNI_SetupThread(void)
+{
+    Android_JNI_GetEnv();
     return 1;
 }
 
@@ -1051,7 +1108,7 @@ static jobject Android_JNI_GetSystemServiceObject(const char* name)
     mid = (*env)->GetStaticMethodID(env, mActivityClass, "getContext", "()Landroid/content/Context;");
     jobject context = (*env)->CallStaticObjectMethod(env, mActivityClass, mid);
 
-    mid = (*env)->GetMethodID(env, mActivityClass, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+    mid = (*env)->GetMethodID(env, mActivityClass, "getSystemServiceFromUiThread", "(Ljava/lang/String;)Ljava/lang/Object;");
     jobject manager = (*env)->CallObjectMethod(env, context, mid, service);
 
     (*env)->DeleteLocalRef(env, service);
@@ -1252,6 +1309,12 @@ int Android_JNI_GetTouchDeviceIds(int **ids) {
         (*env)->DeleteLocalRef(env, array);
     }
     return number;
+}
+
+void Android_JNI_PollInputDevices()
+{
+    JNIEnv *env = Android_JNI_GetEnv();
+    (*env)->CallStaticVoidMethod(env, mActivityClass, midPollInputDevices);    
 }
 
 /* sends message to be handled on the UI event dispatch thread */

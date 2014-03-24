@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #ifndef _SDL_windowsopengl_h
 #define _SDL_windowsopengl_h
@@ -29,6 +29,7 @@ struct SDL_GLDriverData
 {
     SDL_bool HAS_WGL_ARB_pixel_format;
     SDL_bool HAS_WGL_EXT_swap_control_tear;
+    SDL_bool HAS_WGL_EXT_create_context_es2_profile;
 
     void *(WINAPI * wglGetProcAddress) (const char *proc);
       HGLRC(WINAPI * wglCreateContext) (HDC hdc);
@@ -62,6 +63,8 @@ extern int WIN_GL_SetSwapInterval(_THIS, int interval);
 extern int WIN_GL_GetSwapInterval(_THIS);
 extern void WIN_GL_SwapWindow(_THIS, SDL_Window * window);
 extern void WIN_GL_DeleteContext(_THIS, SDL_GLContext context);
+extern void WIN_GL_InitExtensions(_THIS);
+extern SDL_bool WIN_GL_SetPixelFormatFrom(_THIS, SDL_Window * fromWindow, SDL_Window * toWindow);
 
 #ifndef WGL_ARB_pixel_format
 #define WGL_NUMBER_PIXEL_FORMATS_ARB   0x2000
