@@ -420,7 +420,18 @@ void LineEdit::OnChar(unsigned c, int buttons, int qualifiers)
     // If only CTRL is held down, do not edit
     if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
         return;
-
+        
+    // Send char as an event to allow changing it
+    using namespace CharEntry;
+    
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = this;
+    eventData[P_CHAR] = c;
+    eventData[P_BUTTONS] = buttons;
+    eventData[P_QUALIFIERS] = qualifiers;
+    SendEvent(E_CHARENTRY, eventData);
+    c = eventData[P_CHAR].GetUInt();
+    
     if (c >= 0x20 && (!maxLength_ || line_.LengthUTF8() < maxLength_))
     {
         String charStr;
