@@ -4459,6 +4459,27 @@ Properties:
 - int weakRefs // readonly
 
 
+### ParticleEffect2D
+
+Methods:
+
+- bool Load(File@)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+
 ### ParticleEmitter
 
 Methods:
@@ -4588,6 +4609,7 @@ Properties:
 - bool castShadows
 - String category // readonly
 - float drawDistance
+- ParticleEffect2D@ effect
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -4596,7 +4618,6 @@ Properties:
 - float lodBias
 - Material@ material
 - uint maxLights
-- ParticleModel2D@ model
 - Node@ node // readonly
 - uint numAttributes // readonly
 - bool occludee
@@ -4613,27 +4634,6 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - float zValue
 - uint zoneMask
-
-
-### ParticleModel2D
-
-Methods:
-
-- bool Load(File@)
-- bool Save(File@) const
-- void SendEvent(const String&, VariantMap& = VariantMap ( ))
-
-Properties:
-
-- ShortStringHash baseType // readonly
-- String category // readonly
-- uint memoryUse // readonly
-- String name
-- int refs // readonly
-- ShortStringHash type // readonly
-- String typeName // readonly
-- uint useTimer // readonly
-- int weakRefs // readonly
 
 
 ### Pass

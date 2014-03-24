@@ -5388,6 +5388,33 @@ String typeName;
 int weakRefs;
 };
 
+class ParticleEffect2D
+{
+// Methods:
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+int refs;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
 class ParticleEmitter
 {
 // Methods:
@@ -5542,6 +5569,7 @@ bool castShadows;
 /* readonly */
 String category;
 float drawDistance;
+ParticleEffect2D effect;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -5553,7 +5581,6 @@ uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
-ParticleModel2D model;
 /* readonly */
 Node node;
 /* readonly */
@@ -5577,33 +5604,6 @@ int weakRefs;
 BoundingBox worldBoundingBox;
 float zValue;
 uint zoneMask;
-};
-
-class ParticleModel2D
-{
-// Methods:
-bool Load(File);
-bool Save(File) const;
-void SendEvent(const String&, VariantMap& = VariantMap ( ));
-
-// Properties:
-/* readonly */
-ShortStringHash baseType;
-/* readonly */
-String category;
-/* readonly */
-uint memoryUse;
-String name;
-/* readonly */
-int refs;
-/* readonly */
-ShortStringHash type;
-/* readonly */
-String typeName;
-/* readonly */
-uint useTimer;
-/* readonly */
-int weakRefs;
 };
 
 class Pass
