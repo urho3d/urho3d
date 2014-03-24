@@ -51,21 +51,21 @@ void CreateScene()
     camera.orthographic = true;
     camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
 
-    ParticleModel2D@ particleModel = cache.GetResource("ParticleModel2D", "Urho2D/sun.pex");
-    if (particleModel is null)
+    ParticleEffect2D@ particleEffect = cache.GetResource("ParticleEffect2D", "Urho2D/sun.pex");
+    if (particleEffect is null)
         return;
 
     particleNode = scene_.CreateChild("ParticleEmitter2D");
     ParticleEmitter2D@ particleEmitter = particleNode.CreateComponent("ParticleEmitter2D");
-    particleEmitter.model = particleModel;
+    particleEmitter.effect = particleEffect;
 
-    ParticleModel2D@ greenSpiralModel = cache.GetResource("ParticleModel2D", "Urho2D/greenspiral.pex");
-    if (greenSpiralModel is null)
+    ParticleEffect2D@ greenSpiralEffect = cache.GetResource("ParticleEffect2D", "Urho2D/greenspiral.pex");
+    if (greenSpiralEffect is null)
         return;
 
     Node@ greenSpiralNode = scene_.CreateChild("GreenSpiral");
     ParticleEmitter2D@ greenSpiralEmitter = greenSpiralNode.CreateComponent("ParticleEmitter2D");
-    greenSpiralEmitter.model = greenSpiralModel;
+    greenSpiralEmitter.effect = greenSpiralEffect;
 }
 
 void CreateInstructions()

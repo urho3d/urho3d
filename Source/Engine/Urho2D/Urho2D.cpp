@@ -43,8 +43,8 @@
 #include "ConstraintWheel2D.h"
 #include "Context.h"
 #include "Drawable2D.h"
+#include "ParticleEffect2D.h"
 #include "ParticleEmitter2D.h"
-#include "ParticleModel2D.h"
 #include "PhysicsWorld2D.h"
 #include "RigidBody2D.h"
 #include "Sprite2D.h"
@@ -65,14 +65,15 @@ void RegisterUrho2DLibrary(Context* context)
     StaticSprite2D::RegisterObject(context);
     AnimatedSprite2D::RegisterObject(context);
     Animation2D::RegisterObject(context);
+    ParticleEffect2D::RegisterObject(context);
     ParticleEmitter2D::RegisterObject(context);
-    ParticleModel2D::RegisterObject(context);
+
     Sprite2D::RegisterObject(context);
     SpriteSheet2D::RegisterObject(context);
 
     PhysicsWorld2D::RegisterObject(context);
     RigidBody2D::RegisterObject(context);
-    
+
     CollisionShape2D::RegisterObject(context);
     CollisionBox2D::RegisterObject(context);
     CollisionChain2D::RegisterObject(context);

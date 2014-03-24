@@ -29,7 +29,7 @@
 #include "InputEvents.h"
 #include "Octree.h"
 #include "ParticleEmitter2D.h"
-#include "ParticleModel2D.h"
+#include "ParticleEffect2D.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
@@ -85,21 +85,21 @@ void Urho2DParticle::CreateScene()
     camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    ParticleModel2D* particleModel = cache->GetResource<ParticleModel2D>("Urho2D/sun.pex");
-    if (!particleModel)
+    ParticleEffect2D* particleEffect = cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex");
+    if (!particleEffect)
         return;
 
     particleNode_ = scene_->CreateChild("ParticleEmitter2D");
     ParticleEmitter2D* particleEmitter = particleNode_->CreateComponent<ParticleEmitter2D>();
-    particleEmitter->SetModel(particleModel);
+    particleEmitter->SetEffect(particleEffect);
 
-    ParticleModel2D* greenSpiralModel = cache->GetResource<ParticleModel2D>("Urho2D/greenspiral.pex");
-    if (!greenSpiralModel)
+    ParticleEffect2D* greenSpiralEffect = cache->GetResource<ParticleEffect2D>("Urho2D/greenspiral.pex");
+    if (!greenSpiralEffect)
         return;
 
     Node* greenSpiralNode = scene_->CreateChild("GreenSpiral");
     ParticleEmitter2D* greenSpiralEmitter = greenSpiralNode->CreateComponent<ParticleEmitter2D>();
-    greenSpiralEmitter->SetModel(greenSpiralModel);
+    greenSpiralEmitter->SetEffect(greenSpiralEffect);
 }
 
 void Urho2DParticle::CreateInstructions()
