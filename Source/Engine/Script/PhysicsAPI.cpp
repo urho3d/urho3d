@@ -173,8 +173,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void set_gravityOverride(const Vector3&in)", asMETHOD(RigidBody, SetGravityOverride), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "const Vector3& get_gravityOverride() const", asMETHOD(RigidBody, GetGravityOverride), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "const Vector3& get_centerOfMass() const", asMETHOD(RigidBody, GetCenterOfMass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RigidBody", "void set_phantom(bool)", asMETHOD(RigidBody, SetPhantom), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RigidBody", "bool get_phantom() const", asMETHOD(RigidBody, IsPhantom), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_trigger(bool)", asMETHOD(RigidBody, SetTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "bool get_trigger() const", asMETHOD(RigidBody, IsTrigger), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_kinematic(bool)", asMETHOD(RigidBody, SetKinematic), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_kinematic() const", asMETHOD(RigidBody, IsKinematic), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_active() const", asMETHOD(RigidBody, IsActive), asCALL_THISCALL);

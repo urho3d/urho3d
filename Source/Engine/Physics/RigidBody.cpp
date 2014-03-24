@@ -74,7 +74,7 @@ RigidBody::RigidBody(Context* context) :
     lastPosition_(Vector3::ZERO),
     lastRotation_(Quaternion::IDENTITY),
     kinematic_(false),
-    phantom_(false),
+    trigger_(false),
     useGravity_(true),
     hasSmoothedTransform_(false),
     readdBody_(false),
@@ -126,7 +126,7 @@ void RigidBody::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(RigidBody, "Collision Event Mode", collisionEventMode_, collisionEventModeNames, COLLISION_ACTIVE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", kinematic_, false, AM_DEFAULT);
-    ATTRIBUTE(RigidBody, VAR_BOOL, "Is Phantom", phantom_, false, AM_DEFAULT);
+    ATTRIBUTE(RigidBody, VAR_BOOL, "Is Trigger", trigger_, false, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Gravity Override", GetGravityOverride, SetGravityOverride, Vector3, Vector3::ZERO, AM_DEFAULT);
 }
 
@@ -456,11 +456,11 @@ void RigidBody::SetKinematic(bool enable)
     }
 }
 
-void RigidBody::SetPhantom(bool enable)
+void RigidBody::SetTrigger(bool enable)
 {
-    if (enable != phantom_)
+    if (enable != trigger_)
     {
-        phantom_ = enable;
+        trigger_ = enable;
         AddBodyToWorld();
         MarkNetworkUpdate();
     }
@@ -960,7 +960,7 @@ void RigidBody::AddBodyToWorld()
     UpdateGravity();
 
     int flags = body_->getCollisionFlags();
-    if (phantom_)
+    if (trigger_)
         flags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
     else
         flags &= ~btCollisionObject::CF_NO_CONTACT_RESPONSE;

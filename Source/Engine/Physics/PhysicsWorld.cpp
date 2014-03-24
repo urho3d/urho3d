@@ -674,7 +674,7 @@ void PhysicsWorld::SendCollisionEvents()
             WeakPtr<Node> nodeWeakA(nodeA);
             WeakPtr<Node> nodeWeakB(nodeB);
 
-            bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
+            bool phantom = bodyA->IsTrigger() || bodyB->IsTrigger();
             bool newCollision = !previousCollisions_.Contains(i->first_);
 
             physicsCollisionData_[PhysicsCollision::P_NODEA] = nodeA;
@@ -766,7 +766,7 @@ void PhysicsWorld::SendCollisionEvents()
                 if (!bodyA || !bodyB)
                     continue;
 
-                bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
+                bool phantom = bodyA->IsTrigger() || bodyB->IsTrigger();
 
                 // Skip collision event signaling if both objects are static, or if collision event mode does not match
                 if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
