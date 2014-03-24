@@ -6270,7 +6270,7 @@ float mass;
 Node node;
 /* readonly */
 uint numAttributes;
-bool phantom;
+bool trigger;
 Vector3 position;
 /* readonly */
 int refs;

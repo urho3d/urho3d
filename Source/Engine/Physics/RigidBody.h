@@ -273,7 +273,7 @@ private:
     mutable Quaternion lastRotation_;
     /// Kinematic flag.
     bool kinematic_;
-    /// Phantom flag.
+    /// Trigger flag.
     bool trigger_;
     /// Use gravity flag.
     bool useGravity_;

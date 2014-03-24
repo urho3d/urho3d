@@ -45,7 +45,7 @@
 		<attribute name="Collision Event Mode" value="Always" />
 		<attribute name="Use Gravity" value="true" />
 		<attribute name="Is Kinematic" value="false" />
-		<attribute name="Is Phantom" value="false" />
+		<attribute name="Is Trigger" value="false" />
 	</component>
 	<node id="3">
 		<attribute name="Name" value="" />

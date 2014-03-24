@@ -674,14 +674,14 @@ void PhysicsWorld::SendCollisionEvents()
             WeakPtr<Node> nodeWeakA(nodeA);
             WeakPtr<Node> nodeWeakB(nodeB);
 
-            bool phantom = bodyA->IsTrigger() || bodyB->IsTrigger();
+            bool trigger = bodyA->IsTrigger() || bodyB->IsTrigger();
             bool newCollision = !previousCollisions_.Contains(i->first_);
 
             physicsCollisionData_[PhysicsCollision::P_NODEA] = nodeA;
             physicsCollisionData_[PhysicsCollision::P_NODEB] = nodeB;
             physicsCollisionData_[PhysicsCollision::P_BODYA] = bodyA;
             physicsCollisionData_[PhysicsCollision::P_BODYB] = bodyB;
-            physicsCollisionData_[PhysicsCollision::P_PHANTOM] = phantom;
+            physicsCollisionData_[PhysicsCollision::P_TRIGGER] = trigger;
 
             contacts_.Clear();
 
@@ -713,7 +713,7 @@ void PhysicsWorld::SendCollisionEvents()
             nodeCollisionData_[NodeCollision::P_BODY] = bodyA;
             nodeCollisionData_[NodeCollision::P_OTHERNODE] = nodeB;
             nodeCollisionData_[NodeCollision::P_OTHERBODY] = bodyB;
-            nodeCollisionData_[NodeCollision::P_PHANTOM] = phantom;
+            nodeCollisionData_[NodeCollision::P_TRIGGER] = trigger;
             nodeCollisionData_[NodeCollision::P_CONTACTS] = contacts_.GetBuffer();
 
             if (newCollision)
@@ -766,7 +766,7 @@ void PhysicsWorld::SendCollisionEvents()
                 if (!bodyA || !bodyB)
                     continue;
 
-                bool phantom = bodyA->IsTrigger() || bodyB->IsTrigger();
+                bool trigger = bodyA->IsTrigger() || bodyB->IsTrigger();
 
                 // Skip collision event signaling if both objects are static, or if collision event mode does not match
                 if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
@@ -786,7 +786,7 @@ void PhysicsWorld::SendCollisionEvents()
                 physicsCollisionData_[PhysicsCollisionEnd::P_BODYB] = bodyB;
                 physicsCollisionData_[PhysicsCollisionEnd::P_NODEA] = nodeA;
                 physicsCollisionData_[PhysicsCollisionEnd::P_NODEB] = nodeB;
-                physicsCollisionData_[PhysicsCollisionEnd::P_PHANTOM] = phantom;
+                physicsCollisionData_[PhysicsCollisionEnd::P_TRIGGER] = trigger;
 
                 SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData_);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
@@ -796,7 +796,7 @@ void PhysicsWorld::SendCollisionEvents()
                 nodeCollisionData_[NodeCollisionEnd::P_BODY] = bodyA;
                 nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = nodeB;
                 nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = bodyB;
-                nodeCollisionData_[NodeCollisionEnd::P_PHANTOM] = phantom;
+                nodeCollisionData_[NodeCollisionEnd::P_TRIGGER] = trigger;
 
                 nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData_);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
