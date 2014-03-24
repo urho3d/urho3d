@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-class ParticleModel2D;
+class ParticleEffect2D;
 
 /// 2D particle.
  struct Particle2D
@@ -91,15 +91,15 @@ public:
     /// Update before octree reinsertion. is called from a worker thread.
     virtual void Update(const FrameInfo& frame);
 
-    /// Set particle model.
-    void SetModel(ParticleModel2D* model);
-    /// Return particle model.
-    ParticleModel2D* GetModel() const;
+    /// Set particle effect.
+    void SetEffect(ParticleEffect2D* effect);
+    /// Return particle effect.
+    ParticleEffect2D* GetEffect() const;
 
     /// Set particle model attr.
-    void SetParticleModelAttr(ResourceRef value);
+    void SetParticleEffectAttr(ResourceRef value);
     /// Return particle model attr.
-    ResourceRef GetParticleModelAttr() const;
+    ResourceRef GetParticleEffectAttr() const;
 
 private:
     /// Handle node being assigned.
@@ -115,8 +115,8 @@ private:
     /// Update particle.
     void UpdateParticle(Particle2D& particle, float timeStep, const Vector3& worldPosition, float worldScale);
 
-    /// Particle model.
-    SharedPtr<ParticleModel2D> model_;
+    /// Particle effect.
+    SharedPtr<ParticleEffect2D> effect_;
     /// Num particles.
     int numParticles_;
     /// Emission time.

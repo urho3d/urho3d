@@ -43,8 +43,8 @@
 #include "ConstraintWheel2D.h"
 #include "ConstraintRope2D.h"
 #include "Drawable2D.h"
+#include "ParticleEffect2D.h"
 #include "ParticleEmitter2D.h"
-#include "ParticleModel2D.h"
 #include "PhysicsWorld2D.h"
 #include "RigidBody2D.h"
 #include "Scene.h"
@@ -145,20 +145,20 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedSprite2D", "Animation2D@+ get_animation() const", asMETHOD(AnimatedSprite2D, GetAnimation), asCALL_THISCALL);
 }
 
-static void RegisterParticleModel2D(asIScriptEngine* engine)
+static void RegisterParticleEffect2D(asIScriptEngine* engine)
 {
     engine->RegisterEnum("EmitterType2D");
     engine->RegisterEnumValue("EmitterType2D", "EMITTER_TYPE_GRAVITY", EMITTER_TYPE_GRAVITY);
     engine->RegisterEnumValue("EmitterType2D", "EMITTER_TYPE_RADIAL", EMITTER_TYPE_RADIAL);
 
-    RegisterResource<ParticleModel2D>(engine, "ParticleModel2D");
+    RegisterResource<ParticleEffect2D>(engine, "ParticleEffect2D");
 }
 
 static void RegisterParticleEmitter2D(asIScriptEngine* engine)
 {
     RegisterDrawable2D<ParticleEmitter2D>(engine, "ParticleEmitter2D");
-    engine->RegisterObjectMethod("ParticleEmitter2D", "void set_model(ParticleModel2D@+)", asMETHOD(ParticleEmitter2D, SetModel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleModel2D@+ get_model() const", asMETHOD(ParticleEmitter2D, GetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "void set_effect(ParticleEffect2D@+)", asMETHOD(ParticleEmitter2D, SetEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleEffect2D@+ get_effect() const", asMETHOD(ParticleEmitter2D, GetEffect), asCALL_THISCALL);
 }
 
 static void RegisterRigidBody2D(asIScriptEngine* engine)
@@ -587,7 +587,7 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterStaticSprite2D(engine);
     RegisterAnimation2D(engine);
     RegisterAnimatedSprite2D(engine);
-    RegisterParticleModel2D(engine);
+    RegisterParticleEffect2D(engine);
     RegisterParticleEmitter2D(engine);
 
     RegisterRigidBody2D(engine);
@@ -599,7 +599,7 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterCollisionChain2D(engine);
     RegisterCollisionEdge2D(engine);
     RegisterCollisionPolygon2D(engine);
-    
+
     RegisterConstraint2D(engine);
     RegisterConstraintDistance2D(engine);
     RegisterConstraintFriction2D(engine);

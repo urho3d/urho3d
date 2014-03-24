@@ -47,23 +47,23 @@ function CreateScene()
     camera.orthographic = true
     camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
 
-    local particleModel = cache:GetResource("ParticleModel2D", "Urho2D/sun.pex")
-    if particleModel == nil then
+    local particleEffect = cache:GetResource("ParticleEffect2D", "Urho2D/sun.pex")
+    if particleEffect == nil then
         return
     end
 
     particleNode = scene_:CreateChild("ParticleEmitter2D")
     local particleEmitter = particleNode:CreateComponent("ParticleEmitter2D")
-    particleEmitter.model = particleModel
+    particleEmitter.effect = particleEffect
 
-    local greenSpiralModel = cache:GetResource("ParticleModel2D", "Urho2D/greenspiral.pex")
-    if greenSpiralModel == nil then
+    local greenSpiralEffect = cache:GetResource("ParticleEffect2D", "Urho2D/greenspiral.pex")
+    if greenSpiralEffect == nil then
         return
     end
 
     greenSpiralNode = scene_:CreateChild("GreenSpiral")
     local greenSpiralEmitter = greenSpiralNode:CreateComponent("ParticleEmitter2D")
-    greenSpiralEmitter.model = greenSpiralModel
+    greenSpiralEmitter.effect = greenSpiralEffect
 end
 
 function CreateInstructions()

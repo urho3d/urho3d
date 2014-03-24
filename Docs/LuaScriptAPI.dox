@@ -2988,6 +2988,8 @@ Properties:
 - unsigned checksum (readonly)
 - bool compressed (readonly)
 
+### ParticleEffect2D : Resource
+
 ### ParticleEmitter : BillboardSet
 
 Methods:
@@ -3098,14 +3100,12 @@ Properties:
 
 Methods:
 
-- void SetModel(ParticleModel2D* model)
-- ParticleModel2D* GetModel() const
+- void SetEffect(ParticleEffect2D* effect)
+- ParticleEffect2D* GetEffect() const
 
 Properties:
 
-- ParticleModel2D* model
-
-### ParticleModel2D : Resource
+- ParticleEffect2D* effect
 
 ### Pass : RefCounted
 
