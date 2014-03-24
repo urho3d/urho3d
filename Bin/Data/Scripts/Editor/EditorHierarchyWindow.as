@@ -8,6 +8,7 @@ const uint NO_ITEM = M_MAX_UNSIGNED;
 const ShortStringHash SCENE_TYPE("Scene");
 const ShortStringHash NODE_TYPE("Node");
 const ShortStringHash STATICMODELGROUP_TYPE("StaticModelGroup");
+const ShortStringHash SPLINEPATH_TYPE("SplinePath");
 const ShortStringHash CONSTRAINT_TYPE("Constraint");
 const String NO_CHANGE(uint8(0));
 const ShortStringHash TYPE_VAR("Type");
@@ -796,6 +797,23 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
                 SaveEditAction(action);
                 SetSceneModified();
             }
+
+            // Drag node to SplinePath to make it a control point
+            SplinePath@ spline = cast<SplinePath>(targetComponent);
+            if (spline !is null)
+            {
+                // Save undo action
+                EditAttributeAction action;
+                uint attrIndex = GetAttributeIndex(spline, "Control Points");
+                Variant oldIDs = spline.attributes[attrIndex];
+
+                for (uint i = 0; i < sourceNodes.length; ++i)
+                    spline.AddControlPoint(sourceNodes[i]);
+                    
+                action.Define(spline, attrIndex, oldIDs);
+                SaveEditAction(action);
+                SetSceneModified();
+            }
             
             // Drag a node to Constraint to make it the remote end of the constraint
             Constraint@ constraint = cast<Constraint>(targetComponent);
@@ -914,7 +932,8 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
 
         itemType = ITEM_COMPONENT;
 
-        if (sourceNode !is null && targetComponent !is null && (targetComponent.type == STATICMODELGROUP_TYPE || targetComponent.type == CONSTRAINT_TYPE))
+        if (sourceNode !is null && targetComponent !is null && (targetComponent.type == STATICMODELGROUP_TYPE ||
+            targetComponent.type == CONSTRAINT_TYPE || targetComponent.type == SPLINEPATH_TYPE))
             return true;
         else
             return false;
