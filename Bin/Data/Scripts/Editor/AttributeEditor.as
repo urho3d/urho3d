@@ -894,7 +894,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
     resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("Animation2D", anmFilters, ACTION_PICK | ACTION_OPEN));
-    resourcePickers.Push(ResourcePicker("ParticleModel2D", pexFilters, ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("ParticleEffect2D", pexFilters, ACTION_PICK | ACTION_OPEN));
 }
 
 ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
