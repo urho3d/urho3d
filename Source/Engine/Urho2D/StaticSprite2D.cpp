@@ -128,10 +128,10 @@ void StaticSprite2D::UpdateVertices()
     float rightX = width * (1.0f - hotSpotX);
     float bottomY = -height * hotSpotY;
     float topY = height * (1.0f - hotSpotY);
-    vertex0.position_ = Vector3(leftX, bottomY, zValue_);
-    vertex1.position_ = Vector3(leftX, topY, zValue_);
-    vertex2.position_ = Vector3(rightX, topY, zValue_);
-    vertex3.position_ = Vector3(rightX, bottomY, zValue_);
+    vertex0.position_ = Vector3(leftX, bottomY, 0.0f);
+    vertex1.position_ = Vector3(leftX, topY, 0.0f);
+    vertex2.position_ = Vector3(rightX, topY, 0.0f);
+    vertex3.position_ = Vector3(rightX, bottomY, 0.0f);
 
     float invTexW = 1.0f / (float)texture->GetWidth();
     float invTexH = 1.0f / (float)texture->GetHeight();

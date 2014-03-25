@@ -55,25 +55,29 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
 
+    /// Set layer.
+    void SetLayer(int layer);
+    /// Set order in layer.
+    void SetOrderInLayer(int orderInLayer);
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
-    /// Set material.
-    void SetMaterial(Material* material);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
-    /// Set Z value.
-    void SetZValue(float zValue);
+    /// Set material.
+    void SetMaterial(Material* material);
 
+    /// Return layer.
+    int GetLayer() const { return layer_; }
+    /// Return order in layer.
+    int GetOrderInLayer() const { return orderInLayer_; }
     /// Return sprite.
     Sprite2D* GetSprite() const { return sprite_; }
     /// Return texture.
     Texture2D* GetTexture() const { return sprite_ ? sprite_->GetTexture() : 0; }
-    /// Return material.
-    Material* GetMaterial() const;
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return Z value.
-    float GetZValue() const { return zValue_; }
+    /// Return material.
+    Material* GetMaterial() const;
 
     /// Return all vertices.
     const Vector<Vertex2D>& GetVertices() const { return vertices_; }
@@ -84,12 +88,12 @@ public:
     void SetSpriteAttr(ResourceRef value);
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
+    /// Set blend mode attribute.
+    void SetBlendModeAttr(BlendMode mode);
     /// Set material attribute.
     void SetMaterialAttr(ResourceRef value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
-    /// Set blend mode attribute.
-    void SetBlendModeAttr(BlendMode mode);
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -99,8 +103,10 @@ protected:
     /// Update the material's properties (blend mode and texture).
     void UpdateMaterial();
 
-    /// Z value.
-    float zValue_;
+    /// Layer.
+    int layer_;
+    /// Order in layer.
+    int orderInLayer_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Material. If null, use a default material. If non-null, use a clone of this for updating the diffuse texture.
@@ -121,5 +127,10 @@ protected:
     /// Material update pending flag.
     bool materialUpdatePending_;
 };
+
+inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
+{
+    return lhs->GetLayer() < rhs->GetLayer() || lhs->GetOrderInLayer() < rhs->GetOrderInLayer() || (int)lhs < (int)rhs;
+}
 
 }

@@ -47,7 +47,8 @@ extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    zValue_(0.0f),
+    layer_(0),
+    orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
     vertexBuffer_(new VertexBuffer(context_)),
     verticesDirty_(true),
@@ -66,10 +67,11 @@ Drawable2D::~Drawable2D()
 
 void Drawable2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_FLOAT, "Z Value", GetZValue, SetZValue, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_INT, "Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_INT, "Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
 }
 
@@ -138,6 +140,28 @@ UpdateGeometryType Drawable2D::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
+
+
+void Drawable2D::SetLayer(int layer)
+{
+    if (layer == layer_)
+        return;
+
+    layer_ = layer;
+
+    MarkNetworkUpdate();
+}
+
+void Drawable2D::SetOrderInLayer(int orderInLayer)
+{
+    if (orderInLayer == orderInLayer_)
+        return;
+
+    orderInLayer_ = orderInLayer;
+
+    MarkNetworkUpdate();
+}
+
 void Drawable2D::SetSprite(Sprite2D* sprite)
 {
     if (sprite == sprite_)
@@ -145,17 +169,6 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
 
     sprite_ = sprite;
     MarkDirty();
-    UpdateMaterial();
-    MarkNetworkUpdate();
-}
-
-void Drawable2D::SetMaterial(Material* material)
-{
-    if (material == material_)
-        return;
-
-    material_ = material;
-
     UpdateMaterial();
     MarkNetworkUpdate();
 }
@@ -170,13 +183,14 @@ void Drawable2D::SetBlendMode(BlendMode mode)
     MarkNetworkUpdate();
 }
 
-void Drawable2D::SetZValue(float zValue)
+void Drawable2D::SetMaterial(Material* material)
 {
-    if (zValue == zValue_)
+    if (material == material_)
         return;
 
-    zValue_ = zValue;
-    MarkDirty();
+    material_ = material;
+
+    UpdateMaterial();
     MarkNetworkUpdate();
 }
 
@@ -238,6 +252,14 @@ ResourceRef Drawable2D::GetSpriteAttr() const
     return ResourceRef(spriteSheet->GetType(), spriteSheet->GetName() + "@" + sprite_->GetName());
 }
 
+void Drawable2D::SetBlendModeAttr(BlendMode mode)
+{
+    // Delay applying material update
+    materialUpdatePending_ = true;
+
+    SetBlendMode(mode);
+}
+
 void Drawable2D::SetMaterialAttr(ResourceRef value)
 {
     // Delay applying material update
@@ -250,14 +272,6 @@ void Drawable2D::SetMaterialAttr(ResourceRef value)
 ResourceRef Drawable2D::GetMaterialAttr() const
 {
     return GetResourceRef(material_, Material::GetTypeStatic());
-}
-
-void Drawable2D::SetBlendModeAttr(BlendMode mode)
-{
-    // Delay applying material update
-    materialUpdatePending_ = true;
-
-    SetBlendMode(mode);
 }
 
 void Drawable2D::OnWorldBoundingBoxUpdate()
