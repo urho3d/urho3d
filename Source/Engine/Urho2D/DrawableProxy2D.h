@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 class Drawable2D;
+class IndexBuffer;
 class VertexBuffer;
 
 /// Proxy for 2D visible components.
@@ -61,8 +62,10 @@ protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Add batch.
-    void AddBatch(Material* material, unsigned vertexStart, unsigned vertexCount);
+    void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
+    /// Index buffer.
+    SharedPtr<IndexBuffer> indexBuffer_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Materials.

@@ -26,6 +26,7 @@
 #include "Drawable2D.h"
 #include "DrawableProxy2D.h"
 #include "Geometry.h"
+#include "IndexBuffer.h"
 #include "Log.h"
 #include "Material.h"
 #include "Node.h"
@@ -39,6 +40,7 @@ namespace Urho3D
 
 DrawableProxy2D::DrawableProxy2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
+    indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
     orderDirty_(true)
 {
@@ -86,52 +88,98 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
     if (vertexCount == 0)
         return;
 
-    vertexCount = vertexCount / 4 * 6;
+    unsigned indexCount = vertexCount / 4 * 6;
+    if (indexBuffer_->GetIndexCount() < indexCount)
+    {
+        bool largeIndices = indexCount > 0xFFFF;
+        indexBuffer_->SetSize(indexCount, largeIndices, true);
+        void* buffer = indexBuffer_->Lock(0, indexCount, true);
+        if (buffer)
+        {
+            unsigned quadCount = indexCount / 6;
+            if (largeIndices)
+            {
+                unsigned* dest = reinterpret_cast<unsigned*>(buffer);
+                for (unsigned i = 0; i < quadCount; ++i)
+                {
+                    unsigned base = i * 4;
+                    dest[0] = base;
+                    dest[1] = base + 1;
+                    dest[2] = base + 2;
+                    dest[3] = base;
+                    dest[4] = base + 2;
+                    dest[5] = base + 3;
+                    dest += 6;
+                }
+            }
+            else
+            {
+                unsigned short* dest = reinterpret_cast<unsigned short*>(buffer);
+                for (unsigned i = 0; i < quadCount; ++i)
+                {
+                    unsigned base = i * 4;
+                    dest[0] = (unsigned short)(base);
+                    dest[1] = (unsigned short)(base + 1);
+                    dest[2] = (unsigned short)(base + 2);
+                    dest[3] = (unsigned short)(base);
+                    dest[4] = (unsigned short)(base + 2);
+                    dest[5] = (unsigned short)(base + 3);
+                    dest += 6;
+                }
+            }
 
-    vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
+            indexBuffer_->Unlock();
+        }
+        else
+        {
+            LOGERROR("Failed to lock index buffer");
+            return;
+        }
+    }
+
+    if (vertexBuffer_->GetVertexCount() < vertexCount)
+        vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
+
     Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
     if (dest)
     {
-        unsigned start = 0;
-        unsigned count = 0;
         Material* material = 0;
+        unsigned iStart = 0;
+        unsigned iCount = 0;
+        unsigned vStart = 0;
+        unsigned vCount = 0;
 
         for (unsigned d = 0; d < drawables_.Size(); ++d)
         {
-            Material* currMaterial = drawables_[d]->GetUsedMaterial();
+            Material* usedMaterial = drawables_[d]->GetUsedMaterial();
             const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
-            if (!currMaterial || vertices.Empty())
+            if (!usedMaterial || vertices.Empty())
                 continue;
 
-            if (material != currMaterial)
+            if (material != usedMaterial)
             {
                 if (material)
                 {
-                    AddBatch(material, start, count);
-                    start += count;
-                    count = 0;
+                    AddBatch(material, iStart, iCount, vStart, vCount);
+                    iStart += iCount;
+                    iCount = 0;
+                    vStart += vCount;
+                    vCount = 0;
                 }
 
-                material = currMaterial;
+                material = usedMaterial;
             }
 
-            for (unsigned i = 0; i < vertices.Size(); i += 4)
-            {
-                dest[0] = vertices[i + 0];
-                dest[1] = vertices[i + 1];
-                dest[2] = vertices[i + 2];
+            for (unsigned i = 0; i < vertices.Size(); ++i)
+                dest[i] = vertices[i];
+            dest += vertices.Size();
 
-                dest[3] = vertices[i + 0];
-                dest[4] = vertices[i + 2];
-                dest[5] = vertices[i + 3];
-                dest += 6;
-            }
-
-            count += vertices.Size() / 4 * 6;
+            iCount += vertices.Size() / 4 * 6;
+            vCount += vertices.Size();
         }
 
         if (material)
-            AddBatch(material, start, count);
+            AddBatch(material, iStart, iCount, vStart, vCount);
 
         vertexBuffer_->Unlock();
     }
@@ -175,9 +223,9 @@ void DrawableProxy2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_;
 }
 
-void DrawableProxy2D::AddBatch(Material* material, unsigned vertexStart, unsigned vertexCount)
+void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
 {
-    if (!material)
+    if (!material || indexCount == 0 || vertexCount == 0)
         return;
 
     materials_.Push(SharedPtr<Material>(material));
@@ -186,11 +234,12 @@ void DrawableProxy2D::AddBatch(Material* material, unsigned vertexStart, unsigne
     if (geometries_.Size() < batchSize)
     {
         SharedPtr<Geometry> geometry(new Geometry(context_));
+        geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
         geometries_.Push(geometry);
     }
 
-    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, 0, 0, vertexStart, vertexCount);
+    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount);
 }
 
 }
