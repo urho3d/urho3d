@@ -79,6 +79,8 @@ public:
     /// Return material.
     Material* GetMaterial() const;
 
+    /// Return used material.
+    Material* GetUsedMaterial() const { return material_ ? material_ : defaultMaterial_; }
     /// Return all vertices.
     const Vector<Vertex2D>& GetVertices() const { return vertices_; }
     /// Mark vertices and geometry dirty.
@@ -126,6 +128,7 @@ protected:
     bool geometryDirty_;
     /// Material update pending flag.
     bool materialUpdatePending_;
+    SharedPtr<Material> defaultMaterial_;
 };
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)

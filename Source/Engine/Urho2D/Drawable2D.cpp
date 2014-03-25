@@ -299,7 +299,8 @@ void Drawable2D::UpdateMaterial()
     else
     {
         MaterialCache2D* materialCache = GetSubsystem<MaterialCache2D>();
-        batches_[0].material_ = materialCache->GetMaterial(GetTexture(), blendMode_);
+        defaultMaterial_ = materialCache->GetMaterial(GetTexture(), blendMode_);
+        batches_[0].material_ = defaultMaterial_;
     }
 }
 
