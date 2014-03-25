@@ -3741,7 +3741,7 @@ Methods:
 - void SetUseGravity(bool enable)
 - void SetGravityOverride(const Vector3& gravity)
 - void SetKinematic(bool enable)
-- void SetPhantom(bool enable)
+- void SetTrigger(bool enable)
 - void SetCollisionLayer(unsigned layer)
 - void SetCollisionMask(unsigned mask)
 - void SetCollisionLayerAndMask(unsigned layer, unsigned mask)
@@ -3779,7 +3779,7 @@ Methods:
 - const Vector3& GetGravityOverride() const
 - const Vector3& GetCenterOfMass() const
 - bool IsKinematic() const
-- bool IsPhantom() const
+- bool IsTrigger() const
 - bool IsActive() const
 - unsigned GetCollisionLayer() const
 - unsigned GetCollisionMask() const
@@ -3810,7 +3810,7 @@ Properties:
 - Vector3& gravityOverride
 - Vector3& centerOfMass (readonly)
 - bool kinematic
-- bool phantom
+- bool trigger
 - bool active (readonly)
 - unsigned collisionLayer
 - unsigned collisionMask

@@ -6270,7 +6270,6 @@ float mass;
 Node node;
 /* readonly */
 uint numAttributes;
-bool trigger;
 Vector3 position;
 /* readonly */
 int refs;
@@ -6278,6 +6277,7 @@ float restitution;
 float rollingFriction;
 Quaternion rotation;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */

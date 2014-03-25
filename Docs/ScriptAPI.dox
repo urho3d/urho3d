@@ -5230,13 +5230,13 @@ Properties:
 - float mass
 - Node@ node // readonly
 - uint numAttributes // readonly
-- bool phantom
 - Vector3 position
 - int refs // readonly
 - float restitution
 - float rollingFriction
 - Quaternion rotation
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - bool useGravity
@@ -9606,7 +9606,7 @@ Properties:
 - %NodeB : Node pointer
 - %BodyA : RigidBody pointer
 - %BodyB : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### PhysicsCollision
 - %World : PhysicsWorld pointer
@@ -9614,7 +9614,7 @@ Properties:
 - %NodeB : Node pointer
 - %BodyA : RigidBody pointer
 - %BodyB : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### PhysicsCollisionEnd
 - %World : PhysicsWorld pointer
@@ -9622,25 +9622,25 @@ Properties:
 - %NodeB : Node pointer
 - %BodyA : RigidBody pointer
 - %BodyB : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### NodeCollisionStart
 - %Body : RigidBody pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### NodeCollision
 - %Body : RigidBody pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### NodeCollisionEnd
 - %Body : RigidBody pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ## %Resource events
 
@@ -9833,6 +9833,12 @@ Properties:
 ### ModalChanged
 - %Element : UIElement pointer
 - %Modal : bool
+
+### CharEntry
+- %Element : UIElement pointer
+- %Char : int
+- %Buttons : int
+- %Qualifiers : int
 
 ### TextChanged
 - %Element : UIElement pointer
