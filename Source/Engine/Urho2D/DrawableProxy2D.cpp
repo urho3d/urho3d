@@ -30,6 +30,7 @@
 #include "Log.h"
 #include "Material.h"
 #include "Node.h"
+#include "Scene.h"
 #include "VertexBuffer.h"
 #include "Sort.h"
 
@@ -213,12 +214,30 @@ void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
     orderDirty_ = true;
 }
 
+void DrawableProxy2D::OnNodeSet(Node* node)
+{
+    Drawable::OnNodeSet(node);
+    
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        PODVector<Camera*> cameras;
+        scene->GetComponents(cameras, true);
+        if (!cameras.Empty())
+            cameraNode_ = cameras[0]->GetNode();
+    }
+}
+
 void DrawableProxy2D::OnWorldBoundingBoxUpdate()
 {
     boundingBox_.Clear();
 
-    for (unsigned i = 0; i < drawables_.Size(); ++i)
-        boundingBox_.Merge(drawables_[i]->GetWorldBoundingBox());
+    if (cameraNode_)
+    {
+        // Create dummy bounding box
+        Vector3 position = cameraNode_->GetWorldPosition();
+        boundingBox_.Merge(Vector3(position.x_, position.y_, 20.0f));
+    }
 
     worldBoundingBox_ = boundingBox_;
 }
