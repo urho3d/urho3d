@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #ifdef SDL_TIMER_WINDOWS
 
@@ -40,8 +40,8 @@ static BOOL hires_timer_available;
 static LARGE_INTEGER hires_start_ticks;
 /* The number of ticks per second of the high-resolution performance counter */
 static LARGE_INTEGER hires_ticks_per_second;
-#endif
 
+#ifndef __WINRT__
 static void
 timeSetPeriod(UINT uPeriod)
 {
@@ -75,14 +75,17 @@ SDL_TimerResolutionChanged(void *userdata, const char *name, const char *oldValu
         timeSetPeriod(uPeriod);
     }
 }
+#endif /* ifndef __WINRT__ */
+
+#endif /* !USE_GETTICKCOUNT */
 
 void
-SDL_InitTicks(void)
+SDL_TicksInit(void)
 {
     if (ticks_started) {
         return;
     }
-    ticks_started = TRUE;
+    ticks_started = SDL_TRUE;
 
     /* Set first ticks value */
 #ifdef USE_GETTICKCOUNT
@@ -96,13 +99,34 @@ SDL_InitTicks(void)
         QueryPerformanceCounter(&hires_start_ticks);
     } else {
         hires_timer_available = FALSE;
+#ifdef __WINRT__
+        start = 0;            /* the timer failed to start! */
+#else
         timeSetPeriod(1);     /* use 1 ms timer precision */
         start = timeGetTime();
-    }
-#endif
 
-    SDL_AddHintCallback(SDL_HINT_TIMER_RESOLUTION,
-                        SDL_TimerResolutionChanged, NULL);
+        SDL_AddHintCallback(SDL_HINT_TIMER_RESOLUTION,
+                            SDL_TimerResolutionChanged, NULL);
+#endif /* __WINRT__ */
+    }
+#endif /* USE_GETTICKCOUNT */
+}
+
+void
+SDL_TicksQuit(void)
+{
+#ifndef USE_GETTICKCOUNT
+    if (!hires_timer_available) {
+#ifndef __WINRT__
+        SDL_DelHintCallback(SDL_HINT_TIMER_RESOLUTION,
+                            SDL_TimerResolutionChanged, NULL);
+
+        timeSetPeriod(0);
+#endif /* __WINRT__ */
+    }
+#endif /* USE_GETTICKCOUNT */
+
+    ticks_started = SDL_FALSE;
 }
 
 Uint32
@@ -114,7 +138,7 @@ SDL_GetTicks(void)
 #endif
 
     if (!ticks_started) {
-        SDL_InitTicks();
+        SDL_TicksInit();
     }
 
 #ifdef USE_GETTICKCOUNT
@@ -129,7 +153,11 @@ SDL_GetTicks(void)
 
         return (DWORD) hires_now.QuadPart;
     } else {
+#ifdef __WINRT__
+        now = 0;
+#else
         now = timeGetTime();
+#endif /* __WINRT__ */
     }
 #endif
 
@@ -157,6 +185,19 @@ SDL_GetPerformanceFrequency(void)
     }
     return frequency.QuadPart;
 }
+
+#ifdef __WINRT__
+static void
+Sleep(DWORD timeout)
+{
+    static HANDLE mutex = 0;
+    if ( ! mutex )
+    {
+        mutex = CreateEventEx(0, 0, 0, EVENT_ALL_ACCESS);
+    }
+    WaitForSingleObjectEx(mutex, timeout, FALSE);
+}
+#endif
 
 void
 SDL_Delay(Uint32 ms)

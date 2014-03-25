@@ -43,6 +43,8 @@
 #include "ConstraintWheel2D.h"
 #include "Context.h"
 #include "Drawable2D.h"
+#include "DrawableProxy2D.h"
+#include "MaterialCache2D.h"
 #include "ParticleEffect2D.h"
 #include "ParticleEmitter2D.h"
 #include "PhysicsWorld2D.h"
@@ -60,6 +62,9 @@ const char* URHO2D_CATEGORY = "Urho2D";
 
 void RegisterUrho2DLibrary(Context* context)
 {
+    MaterialCache2D::RegisterObject(context);
+    DrawableProxy2D::RegisterObject(context);
+
     // Must register objects from base to derived order
     Drawable2D::RegisterObject(context);
     StaticSprite2D::RegisterObject(context);

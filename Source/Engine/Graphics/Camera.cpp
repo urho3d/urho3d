@@ -93,7 +93,7 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatioInternal, float, 1.0f, AM_DEFAULT);
     ENUM_ATTRIBUTE(Camera, "Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
@@ -149,6 +149,7 @@ void Camera::SetOrthoSize(float orthoSize)
 
 void Camera::SetOrthoSize(const Vector2& orthoSize)
 {
+    autoAspectRatio_ = false;
     orthoSize_ = orthoSize.y_;
     aspectRatio_ = orthoSize.x_ / orthoSize.y_;
     frustumDirty_ = true;
@@ -158,10 +159,8 @@ void Camera::SetOrthoSize(const Vector2& orthoSize)
 
 void Camera::SetAspectRatio(float aspectRatio)
 {
-    aspectRatio_ = aspectRatio;
-    frustumDirty_ = true;
-    projectionDirty_ = true;
-    MarkNetworkUpdate();
+    autoAspectRatio_ = false;
+    SetAspectRatioInternal(aspectRatio);
 }
 
 void Camera::SetZoom(float zoom)
@@ -554,6 +553,14 @@ const Matrix3x4& Camera::GetView() const
     }
     
     return view_;
+}
+
+void Camera::SetAspectRatioInternal(float aspectRatio)
+{
+    aspectRatio_ = aspectRatio;
+    frustumDirty_ = true;
+    projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetReflectionPlaneAttr(Vector4 value)

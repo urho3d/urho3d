@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
 
@@ -56,6 +56,11 @@
         const BOOL useDepthBuffer = (depthBits != 0);
         NSString *colorFormat = nil;
 
+        /* The EAGLRenderingAPI enum values currently map 1:1 to major GLES
+           versions, and this allows us to handle future OpenGL ES versions.
+         */
+        EAGLRenderingAPI api = majorVersion;
+
         if (rBits == 8 && gBits == 8 && bBits == 8) {
             /* if user specifically requests rbg888 or some color format higher than 16bpp */
             colorFormat = kEAGLColorFormatRGBA8;
@@ -71,11 +76,7 @@
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                         [NSNumber numberWithBool: retained], kEAGLDrawablePropertyRetainedBacking, colorFormat, kEAGLDrawablePropertyColorFormat, nil];
 
-        if (majorVersion > 1) {
-            context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:shareGroup];
-        } else {
-            context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1 sharegroup:shareGroup];
-        }
+        context = [[EAGLContext alloc] initWithAPI:api sharegroup:shareGroup];
         if (!context || ![EAGLContext setCurrentContext:context]) {
             [self release];
             SDL_SetError("OpenGL ES %d not supported", majorVersion);

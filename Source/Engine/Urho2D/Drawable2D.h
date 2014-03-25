@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class DrawableProxy2D;
+class MaterialCache2D;
 class VertexBuffer;
 
 /// Pixel size (equal 0.01f).
@@ -48,59 +50,63 @@ public:
 
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
-    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
 
+    /// Set layer.
+    void SetLayer(int layer);
+    /// Set order in layer.
+    void SetOrderInLayer(int orderInLayer);
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
-    /// Set material.
-    void SetMaterial(Material* material);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
-    /// Set Z value.
-    void SetZValue(float zValue);
+    /// Set material.
+    void SetMaterial(Material* material);
 
+    /// Return layer.
+    int GetLayer() const { return layer_; }
+    /// Return order in layer.
+    int GetOrderInLayer() const { return orderInLayer_; }
     /// Return sprite.
     Sprite2D* GetSprite() const { return sprite_; }
     /// Return texture.
     Texture2D* GetTexture() const { return sprite_ ? sprite_->GetTexture() : 0; }
-    /// Return material.
-    Material* GetMaterial() const;
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return Z value.
-    float GetZValue() const { return zValue_; }
+    /// Return material.
+    Material* GetMaterial() const;
 
+    /// Return used material.
+    Material* GetUsedMaterial() const;
     /// Return all vertices.
-    const Vector<Vertex2D>& GetVertices() const { return vertices_; }
-    /// Mark vertices and geometry dirty.
-    void MarkDirty(bool markWorldBoundingBoxDirty = true);
+    const Vector<Vertex2D>& GetVertices();
 
     /// Set sprite attribute.
     void SetSpriteAttr(ResourceRef value);
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
+    /// Set blend mode attribute.
+    void SetBlendModeAttr(BlendMode mode);
     /// Set material attribute.
     void SetMaterialAttr(ResourceRef value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
-    /// Set blend mode attribute.
-    void SetBlendModeAttr(BlendMode mode);
 
 protected:
-    /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     /// Update vertices.
     virtual void UpdateVertices() = 0;
     /// Update the material's properties (blend mode and texture).
-    void UpdateMaterial();
+    void UpdateDefaultMaterial();
 
-    /// Z value.
-    float zValue_;
+    /// Layer.
+    int layer_;
+    /// Order in layer.
+    int orderInLayer_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Material. If null, use a default material. If non-null, use a clone of this for updating the diffuse texture.
@@ -110,16 +116,29 @@ protected:
 
     /// Vertices.
     Vector<Vertex2D> vertices_;
-    /// Geometry.
-    SharedPtr<Geometry> geometry_;
-    /// Vertex buffer.
-    SharedPtr<VertexBuffer> vertexBuffer_;
     /// Vertices dirty flag.
     bool verticesDirty_;
-    /// Geometry dirty flag.
-    bool geometryDirty_;
     /// Material update pending flag.
     bool materialUpdatePending_;
+    /// Default material.
+    SharedPtr<Material> defaultMaterial_;
+    /// Material cache.
+    WeakPtr<MaterialCache2D> materialCache_;
+    /// Drawable proxy.
+    WeakPtr<DrawableProxy2D> drawableProxy_;
 };
+
+inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
+{
+    if (lhs->GetLayer() == rhs->GetLayer())
+    {
+        if (lhs->GetOrderInLayer() == rhs->GetOrderInLayer())
+            return lhs->GetID() < rhs->GetID();
+
+        return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
+    }
+
+    return lhs->GetLayer() < rhs->GetLayer();
+}
 
 }

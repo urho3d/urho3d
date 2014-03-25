@@ -156,6 +156,7 @@ bool flipY;
 uint id;
 /* readonly */
 bool inView;
+int layer;
 uint lightMask;
 float lodBias;
 Material material;
@@ -166,6 +167,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+int orderInLayer;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -182,7 +184,6 @@ uint viewMask;
 int weakRefs;
 /* readonly */
 BoundingBox worldBoundingBox;
-float zValue;
 uint zoneMask;
 };
 
@@ -3172,6 +3173,7 @@ bool enabledEffective;
 uint id;
 /* readonly */
 bool inView;
+int layer;
 uint lightMask;
 float lodBias;
 Material material;
@@ -3182,6 +3184,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+int orderInLayer;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -3197,7 +3200,6 @@ uint viewMask;
 int weakRefs;
 /* readonly */
 BoundingBox worldBoundingBox;
-float zValue;
 uint zoneMask;
 };
 
@@ -5577,6 +5579,7 @@ bool enabledEffective;
 uint id;
 /* readonly */
 bool inView;
+int layer;
 uint lightMask;
 float lodBias;
 Material material;
@@ -5587,6 +5590,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+int orderInLayer;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -5602,7 +5606,6 @@ uint viewMask;
 int weakRefs;
 /* readonly */
 BoundingBox worldBoundingBox;
-float zValue;
 uint zoneMask;
 };
 
@@ -6270,7 +6273,6 @@ float mass;
 Node node;
 /* readonly */
 uint numAttributes;
-bool phantom;
 Vector3 position;
 /* readonly */
 int refs;
@@ -6278,6 +6280,7 @@ float restitution;
 float rollingFriction;
 Quaternion rotation;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -8069,6 +8072,7 @@ bool flipY;
 uint id;
 /* readonly */
 bool inView;
+int layer;
 uint lightMask;
 float lodBias;
 Material material;
@@ -8079,6 +8083,7 @@ Node node;
 uint numAttributes;
 bool occludee;
 bool occluder;
+int orderInLayer;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -8094,7 +8099,6 @@ uint viewMask;
 int weakRefs;
 /* readonly */
 BoundingBox worldBoundingBox;
-float zValue;
 uint zoneMask;
 };
 

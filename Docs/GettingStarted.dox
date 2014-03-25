@@ -16,7 +16,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary.
 
-- For Android, the Android SDK and Android NDK (minimum API level 9) need to be installed. Optionally, also install Eclipse ADT plugin for building and deployment via Eclipse.
+- For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed. Optionally, also install Eclipse ADT plugin for building and deployment via Eclipse.
 
 To run Urho3D, the minimum system requirements are:
 

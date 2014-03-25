@@ -1,3 +1,24 @@
+/*
+  Simple DirectMedia Layer
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+*/
+
 /* list of OpenGL functions sorted alphabetically
    If you need to use a GL function from the SDL video subsystem,
    change its entry from SDL_PROC_UNUSED to SDL_PROC and rebuild.
@@ -30,7 +51,7 @@ SDL_PROC_UNUSED(void, glColor3bv, (const GLbyte *))
 SDL_PROC_UNUSED(void, glColor3d, (GLdouble, GLdouble, GLdouble))
 SDL_PROC_UNUSED(void, glColor3dv, (const GLdouble *))
 SDL_PROC_UNUSED(void, glColor3f, (GLfloat, GLfloat, GLfloat))
-SDL_PROC_UNUSED(void, glColor3fv, (const GLfloat *))
+SDL_PROC(void, glColor3fv, (const GLfloat *))
 SDL_PROC_UNUSED(void, glColor3i, (GLint, GLint, GLint))
 SDL_PROC_UNUSED(void, glColor3iv, (const GLint *))
 SDL_PROC_UNUSED(void, glColor3s, (GLshort, GLshort, GLshort))
@@ -85,12 +106,12 @@ SDL_PROC_UNUSED(void, glCopyTexSubImage2D,
 SDL_PROC_UNUSED(void, glCullFace, (GLenum mode))
 SDL_PROC_UNUSED(void, glDeleteLists, (GLuint list, GLsizei range))
 SDL_PROC(void, glDeleteTextures, (GLsizei n, const GLuint * textures))
-SDL_PROC_UNUSED(void, glDepthFunc, (GLenum func))
+SDL_PROC(void, glDepthFunc, (GLenum func))
 SDL_PROC_UNUSED(void, glDepthMask, (GLboolean flag))
 SDL_PROC_UNUSED(void, glDepthRange, (GLclampd zNear, GLclampd zFar))
 SDL_PROC(void, glDisable, (GLenum cap))
-SDL_PROC(void, glDisableClientState, (GLenum array))
-SDL_PROC(void, glDrawArrays, (GLenum mode, GLint first, GLsizei count))
+SDL_PROC_UNUSED(void, glDisableClientState, (GLenum array))
+SDL_PROC_UNUSED(void, glDrawArrays, (GLenum mode, GLint first, GLsizei count))
 SDL_PROC_UNUSED(void, glDrawBuffer, (GLenum mode))
 SDL_PROC_UNUSED(void, glDrawElements,
                 (GLenum mode, GLsizei count, GLenum type,
@@ -103,7 +124,7 @@ SDL_PROC_UNUSED(void, glEdgeFlagPointer,
                 (GLsizei stride, const GLvoid * pointer))
 SDL_PROC_UNUSED(void, glEdgeFlagv, (const GLboolean * flag))
 SDL_PROC(void, glEnable, (GLenum cap))
-SDL_PROC(void, glEnableClientState, (GLenum array))
+SDL_PROC_UNUSED(void, glEnableClientState, (GLenum array))
 SDL_PROC(void, glEnd, (void))
 SDL_PROC_UNUSED(void, glEndList, (void))
 SDL_PROC_UNUSED(void, glEvalCoord1d, (GLdouble u))
@@ -334,13 +355,13 @@ SDL_PROC_UNUSED(void, glRectsv, (const GLshort * v1, const GLshort * v2))
 SDL_PROC_UNUSED(GLint, glRenderMode, (GLenum mode))
 SDL_PROC(void, glRotated,
                 (GLdouble angle, GLdouble x, GLdouble y, GLdouble z))
-SDL_PROC_UNUSED(void, glRotatef,
+SDL_PROC(void, glRotatef,
                 (GLfloat angle, GLfloat x, GLfloat y, GLfloat z))
 SDL_PROC_UNUSED(void, glScaled, (GLdouble x, GLdouble y, GLdouble z))
 SDL_PROC_UNUSED(void, glScalef, (GLfloat x, GLfloat y, GLfloat z))
 SDL_PROC(void, glScissor, (GLint x, GLint y, GLsizei width, GLsizei height))
 SDL_PROC_UNUSED(void, glSelectBuffer, (GLsizei size, GLuint * buffer))
-SDL_PROC_UNUSED(void, glShadeModel, (GLenum mode))
+SDL_PROC(void, glShadeModel, (GLenum mode))
 SDL_PROC_UNUSED(void, glStencilFunc, (GLenum func, GLint ref, GLuint mask))
 SDL_PROC_UNUSED(void, glStencilMask, (GLuint mask))
 SDL_PROC_UNUSED(void, glStencilOp, (GLenum fail, GLenum zfail, GLenum zpass))
@@ -432,7 +453,7 @@ SDL_PROC_UNUSED(void, glVertex2sv, (const GLshort * v))
 SDL_PROC_UNUSED(void, glVertex3d, (GLdouble x, GLdouble y, GLdouble z))
 SDL_PROC_UNUSED(void, glVertex3dv, (const GLdouble * v))
 SDL_PROC_UNUSED(void, glVertex3f, (GLfloat x, GLfloat y, GLfloat z))
-SDL_PROC_UNUSED(void, glVertex3fv, (const GLfloat * v))
+SDL_PROC(void, glVertex3fv, (const GLfloat * v))
 SDL_PROC_UNUSED(void, glVertex3i, (GLint x, GLint y, GLint z))
 SDL_PROC_UNUSED(void, glVertex3iv, (const GLint * v))
 SDL_PROC_UNUSED(void, glVertex3s, (GLshort x, GLshort y, GLshort z))
@@ -448,7 +469,7 @@ SDL_PROC_UNUSED(void, glVertex4iv, (const GLint * v))
 SDL_PROC_UNUSED(void, glVertex4s,
                 (GLshort x, GLshort y, GLshort z, GLshort w))
 SDL_PROC_UNUSED(void, glVertex4sv, (const GLshort * v))
-SDL_PROC(void, glVertexPointer,
+SDL_PROC_UNUSED(void, glVertexPointer,
                 (GLint size, GLenum type, GLsizei stride,
                  const GLvoid * pointer))
 SDL_PROC(void, glViewport, (GLint x, GLint y, GLsizei width, GLsizei height))

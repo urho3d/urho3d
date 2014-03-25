@@ -125,6 +125,7 @@ Properties:
 - bool flipY
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -133,6 +134,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -144,7 +146,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -2630,6 +2631,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -2638,6 +2640,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -2648,7 +2651,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -4614,6 +4616,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -4622,6 +4625,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -4632,7 +4636,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -5230,13 +5233,13 @@ Properties:
 - float mass
 - Node@ node // readonly
 - uint numAttributes // readonly
-- bool phantom
 - Vector3 position
 - int refs // readonly
 - float restitution
 - float rollingFriction
 - Quaternion rotation
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - bool useGravity
@@ -6728,6 +6731,7 @@ Properties:
 - bool flipY
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -6736,6 +6740,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -6746,7 +6751,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -9606,7 +9610,7 @@ Properties:
 - %NodeB : Node pointer
 - %BodyA : RigidBody pointer
 - %BodyB : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### PhysicsCollision
 - %World : PhysicsWorld pointer
@@ -9614,7 +9618,7 @@ Properties:
 - %NodeB : Node pointer
 - %BodyA : RigidBody pointer
 - %BodyB : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### PhysicsCollisionEnd
 - %World : PhysicsWorld pointer
@@ -9622,25 +9626,25 @@ Properties:
 - %NodeB : Node pointer
 - %BodyA : RigidBody pointer
 - %BodyB : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### NodeCollisionStart
 - %Body : RigidBody pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### NodeCollision
 - %Body : RigidBody pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ### NodeCollisionEnd
 - %Body : RigidBody pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody pointer
-- %Phantom : bool
+- %Trigger : bool
 
 ## %Resource events
 
@@ -9834,6 +9838,12 @@ Properties:
 - %Element : UIElement pointer
 - %Modal : bool
 
+### CharEntry
+- %Element : UIElement pointer
+- %Char : int
+- %Buttons : int
+- %Qualifiers : int
+
 ### TextChanged
 - %Element : UIElement pointer
 - %Text : String
@@ -9911,6 +9921,13 @@ Properties:
 - %ElementY : int
 
 ### DragEnd
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### DragCancel
 - %Element : UIElement pointer
 - %X : int
 - %Y : int

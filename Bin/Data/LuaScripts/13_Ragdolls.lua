@@ -94,9 +94,9 @@ function CreateScene()
             -- Create a rigid body and a collision shape. These will act as a trigger for transforming the
             -- model into a ragdoll when hit by a moving object
             local body = modelNode:CreateComponent("RigidBody")
-            -- The phantom mode makes the rigid body only detect collisions, but impart no forces on the
+            -- The trigger mode makes the rigid body only detect collisions, but impart no forces on the
             -- colliding objects
-            body.phantom = true
+            body.trigger = true
             local shape = modelNode:CreateComponent("CollisionShape")
             -- Create the capsule shape with an offset so that it is correctly aligned with the model, which
             -- has its origin at the feet

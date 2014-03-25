@@ -131,6 +131,7 @@ void LoadConfig()
         if (cameraElem.HasAttribute("fov")) viewFov = cameraElem.GetFloat("fov");
         if (cameraElem.HasAttribute("speed")) cameraBaseSpeed = cameraElem.GetFloat("speed");
         if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
+        if (cameraElem.HasAttribute("mousewheelcameraposition")) mouseWheelCameraPosition = cameraElem.GetBool("mousewheelcameraposition");
         if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
         UpdateViewParameters();
     }
@@ -242,6 +243,7 @@ void SaveConfig()
     cameraElem.SetFloat("fov", viewFov);
     cameraElem.SetFloat("speed", cameraBaseSpeed);
     cameraElem.SetBool("limitrotation", limitRotation);
+    cameraElem.SetBool("mousewheelcameraposition", mouseWheelCameraPosition);
     cameraElem.SetUInt("viewportmode", viewportMode);
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);

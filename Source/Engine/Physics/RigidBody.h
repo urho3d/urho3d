@@ -116,8 +116,8 @@ public:
     void SetGravityOverride(const Vector3& gravity);
     /// Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
     void SetKinematic(bool enable);
-    /// Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
-    void SetPhantom(bool enable);
+    /// Set rigid body trigger mode. In trigger mode collisions are reported but do not apply forces.
+    void SetTrigger(bool enable);
     /// Set collision layer.
     void SetCollisionLayer(unsigned layer);
     /// Set collision mask.
@@ -197,8 +197,8 @@ public:
     const Vector3& GetCenterOfMass() const { return centerOfMass_; }
     /// Return kinematic mode flag.
     bool IsKinematic() const { return kinematic_; }
-    /// Return phantom mode flag.
-    bool IsPhantom() const { return phantom_; }
+    /// Return whether this RigidBody is acting as a trigger.
+    bool IsTrigger() const { return trigger_; }
     /// Return whether rigid body is active (not sleeping.)
     bool IsActive() const;
     /// Return collision layer.
@@ -273,8 +273,8 @@ private:
     mutable Quaternion lastRotation_;
     /// Kinematic flag.
     bool kinematic_;
-    /// Phantom flag.
-    bool phantom_;
+    /// Trigger flag.
+    bool trigger_;
     /// Use gravity flag.
     bool useGravity_;
     /// Smoothed transform mode.

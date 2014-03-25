@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 
@@ -148,9 +148,15 @@ VideoBootStrap COCOA_bootstrap = {
 int
 Cocoa_VideoInit(_THIS)
 {
+    SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
+
     Cocoa_InitModes(_this);
     Cocoa_InitKeyboard(_this);
     Cocoa_InitMouse(_this);
+
+    const char *hint = SDL_GetHint(SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES);
+    data->allow_spaces = ( (data->osversion >= 0x1070) && (!hint || (*hint != '0')) );
+
     return 0;
 }
 

@@ -33,6 +33,7 @@ namespace Urho3D
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
 static const unsigned DRAWABLE_ZONE = 0x4;
+static const unsigned DRAWABLE_2D = 0x8;
 static const unsigned DRAWABLE_ANY = 0xff;
 static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;

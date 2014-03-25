@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,9 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -30,8 +28,7 @@ extern "C" {
 /* *INDENT-ON* */
 #endif
 
-// Urho3D: do not use EGL includes to allow compiling on API level 8
-// #include <EGL/eglplatform.h>
+#include <EGL/eglplatform.h>
 #include <android/native_window_jni.h>
 
 #include "SDL_rect.h"
@@ -68,6 +65,10 @@ SDL_bool Android_JNI_HasClipboardText();
 
 /* Power support */
 int Android_JNI_GetPowerInfo(int* plugged, int* charged, int* battery, int* seconds, int* percent);
+    
+/* Joystick support */
+void Android_JNI_PollInputDevices();
+
 
 /* Touch support */
 int Android_JNI_GetTouchDeviceIds(int **ids);

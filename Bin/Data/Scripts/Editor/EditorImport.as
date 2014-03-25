@@ -160,7 +160,7 @@ void ImportTundraScene(const String&in fileName)
         int shapeType = -1;
         float mass = 0.0f;
         Vector3 bodySize;
-        bool phantom = false;
+        bool trigger = false;
         bool kinematic = false;
         uint collisionLayer;
         uint collisionMask;
@@ -203,7 +203,7 @@ void ImportTundraScene(const String&in fileName)
                 mass = GetComponentAttribute(compElem, "Mass").ToFloat();
                 bodySize = GetComponentAttribute(compElem, "Size").ToVector3();
                 collisionMeshName = GetComponentAttribute(compElem, "Collision mesh ref");
-                phantom = GetComponentAttribute(compElem, "Phantom").ToBool();
+                trigger = GetComponentAttribute(compElem, "Phantom").ToBool();
                 kinematic = GetComponentAttribute(compElem, "Kinematic").ToBool();
                 collisionLayer = GetComponentAttribute(compElem, "Collision Layer").ToInt();
                 collisionMask = GetComponentAttribute(compElem, "Collision Mask").ToInt();
@@ -294,7 +294,7 @@ void ImportTundraScene(const String&in fileName)
 
                 body.collisionLayer = collisionLayer;
                 body.collisionMask = collisionMask;
-                body.phantom = phantom;
+                body.trigger = trigger;
                 body.mass = mass;
             }
 

@@ -90,7 +90,7 @@ Urho3D uses the following third-party libraries:
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
 - Recast/Detour (https://github.com/memononen/recastnavigation/)
-- SDL 2.0.1 (http://www.libsdl.org/)
+- SDL 2.0.3 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
@@ -145,7 +145,7 @@ successfully:
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
 
-- For Android, the Android SDK and Android NDK (minimum API level 9) need to be
+- For Android, the Android SDK and Android NDK (minimum API level 12) need to be
   installed. Optionally, also install Eclipse ADT plugin for building and 
   deployment via Eclipse.
 

@@ -31,7 +31,7 @@ class RigidBody : public Component
     void SetUseGravity(bool enable);
     void SetGravityOverride(const Vector3& gravity);
     void SetKinematic(bool enable);
-    void SetPhantom(bool enable);
+    void SetTrigger(bool enable);
     void SetCollisionLayer(unsigned layer);
     void SetCollisionMask(unsigned mask);
     void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
@@ -71,7 +71,7 @@ class RigidBody : public Component
     const Vector3& GetGravityOverride() const;
     const Vector3& GetCenterOfMass() const;
     bool IsKinematic() const;
-    bool IsPhantom() const;
+    bool IsTrigger() const;
     bool IsActive() const;
     unsigned GetCollisionLayer() const;
     unsigned GetCollisionMask() const;
@@ -100,7 +100,7 @@ class RigidBody : public Component
     tolua_property__get_set Vector3& gravityOverride;
     tolua_readonly tolua_property__get_set Vector3& centerOfMass;
     tolua_property__is_set bool kinematic;
-    tolua_property__is_set bool phantom;
+    tolua_property__is_set bool trigger;
     tolua_readonly tolua_property__is_set bool active;
     tolua_property__get_set unsigned collisionLayer;
     tolua_property__get_set unsigned collisionMask;

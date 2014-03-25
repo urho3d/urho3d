@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by OvermindDL1 for Urho3D
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
 
@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include <limits.h> /* For INT_MAX */
 
-#include "SDL_x11video.h"
 #include "SDL_x11video.h"
 #include "SDL_x11touch.h"
 #include "SDL_x11xinput2.h"
@@ -248,7 +247,13 @@ X11_DispatchFocusOut(SDL_WindowData *data)
 #ifdef DEBUG_XEVENTS
     printf("window %p: Dispatching FocusOut\n", data);
 #endif
-    SDL_SetKeyboardFocus(NULL);
+    /* If another window has already processed a focus in, then don't try to
+     * remove focus here.  Doing so will incorrectly remove focus from that
+     * window, and the focus lost event for this window will have already
+     * been dispatched anyway. */
+    if (data->window == SDL_GetKeyboardFocus()) {
+        SDL_SetKeyboardFocus(NULL);
+    }
 #ifdef X_HAVE_UTF8_STRING
     if (data->ic) {
         X11_XUnsetICFocus(data->ic);
@@ -277,19 +282,40 @@ X11_DispatchEvent(_THIS)
     Display *display = videodata->display;
     SDL_WindowData *data;
     XEvent xevent;
-    int i;
+    int orig_event_type;
+    KeyCode orig_keycode;
     XClientMessageEvent m;
+    int i;
 
     SDL_zero(xevent);           /* valgrind fix. --ryan. */
     X11_XNextEvent(display, &xevent);
 
-    /* filter events catchs XIM events and sends them to the correct
-       handler */
+    /* Save the original keycode for dead keys, which are filtered out by
+       the XFilterEvent() call below.
+    */
+    orig_event_type = xevent.type;
+    if (orig_event_type == KeyPress || orig_event_type == KeyRelease) {
+        orig_keycode = xevent.xkey.keycode;
+    } else {
+        orig_keycode = 0;
+    }
+
+    /* filter events catchs XIM events and sends them to the correct handler */
     if (X11_XFilterEvent(&xevent, None) == True) {
 #if 0
         printf("Filtered event type = %d display = %d window = %d\n",
                xevent.type, xevent.xany.display, xevent.xany.window);
 #endif
+        if (orig_keycode) {
+            /* Make sure dead key press/release events are sent */
+            SDL_Scancode scancode = videodata->key_layout[orig_keycode];
+            // Urho3D: also send the original keycode
+            if (orig_event_type == KeyPress) {
+                SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(orig_keycode), scancode);
+            } else {
+                SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(orig_keycode), scancode);
+            }
+        }
         return;
     }
 
@@ -376,6 +402,14 @@ X11_DispatchEvent(_THIS)
 
         /* Gaining input focus? */
     case FocusIn:{
+            if (xevent.xfocus.mode == NotifyGrab || xevent.xfocus.mode == NotifyUngrab) {
+                /* Someone is handling a global hotkey, ignore it */
+#ifdef DEBUG_XEVENTS
+                printf("window %p: FocusIn (NotifyGrab/NotifyUngrab, ignoring)\n", data);
+#endif
+                break;
+            }
+
             if (xevent.xfocus.detail == NotifyInferior) {
 #ifdef DEBUG_XEVENTS
                 printf("window %p: FocusIn (NotifierInferior, ignoring)\n", data);
@@ -405,6 +439,13 @@ X11_DispatchEvent(_THIS)
 
         /* Losing input focus? */
     case FocusOut:{
+            if (xevent.xfocus.mode == NotifyGrab || xevent.xfocus.mode == NotifyUngrab) {
+                /* Someone is handling a global hotkey, ignore it */
+#ifdef DEBUG_XEVENTS
+                printf("window %p: FocusOut (NotifyGrab/NotifyUngrab, ignoring)\n", data);
+#endif
+                break;
+            }
             if (xevent.xfocus.detail == NotifyInferior) {
                 /* We still have focus if a child gets focus */
 #ifdef DEBUG_XEVENTS
@@ -450,6 +491,7 @@ X11_DispatchEvent(_THIS)
 #ifdef DEBUG_XEVENTS
             printf("window %p: KeyPress (X11 keycode = 0x%X)\n", data, xevent.xkey.keycode);
 #endif
+            // Urho3D: send also the original keycode
             SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(keycode), videodata->key_layout[keycode]);
 #if 0
             if (videodata->key_layout[keycode] == SDL_SCANCODE_UNKNOWN && keycode) {
@@ -493,6 +535,7 @@ X11_DispatchEvent(_THIS)
                 /* We're about to get a repeated key down, ignore the key up */
                 break;
             }
+            // Urho3D: also send the original keycode
             SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(keycode), videodata->key_layout[keycode]);
         }
         break;
@@ -660,7 +703,7 @@ X11_DispatchEvent(_THIS)
 
     case MotionNotify:{
             SDL_Mouse *mouse = SDL_GetMouse();
-            if(!mouse->relative_mode) {
+            if(!mouse->relative_mode || mouse->relative_mode_warp) {
 #ifdef DEBUG_MOTION
                 printf("window %p: X11 motion: %d,%d\n", xevent.xmotion.x, xevent.xmotion.y);
 #endif
@@ -955,11 +998,6 @@ X11_Pending(Display * display)
     return (0);
 }
 
-
-/* !!! FIXME: this should be exposed in a header, or something. */
-int SDL_GetNumTouch(void);
-void SDL_dbus_screensaver_tickle(_THIS);
-
 void
 X11_PumpEvents(_THIS)
 {
@@ -997,7 +1035,19 @@ X11_SuspendScreenSaver(_THIS)
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     int dummy;
     int major_version, minor_version;
+#endif /* SDL_VIDEO_DRIVER_X11_XSCRNSAVER */
 
+#if SDL_USE_LIBDBUS
+    if (SDL_dbus_screensaver_inhibit(_this)) {
+        return;
+    }
+
+    if (_this->suspend_screensaver) {
+        SDL_dbus_screensaver_tickle(_this);
+    }
+#endif
+
+#if SDL_VIDEO_DRIVER_X11_XSCRNSAVER
     if (SDL_X11_HAVE_XSS) {
         /* X11_XScreenSaverSuspend was introduced in MIT-SCREEN-SAVER 1.1 */
         if (!X11_XScreenSaverQueryExtension(data->display, &dummy, &dummy) ||
@@ -1009,12 +1059,6 @@ X11_SuspendScreenSaver(_THIS)
 
         X11_XScreenSaverSuspend(data->display, _this->suspend_screensaver);
         X11_XResetScreenSaver(data->display);
-    }
-#endif
-
-#if SDL_USE_LIBDBUS
-    if (_this->suspend_screensaver) {
-        SDL_dbus_screensaver_tickle(_this);
     }
 #endif
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "./SDL_internal.h"
 
 #if defined(__WIN32__)
 #include "core/windows/SDL_windows.h"
@@ -39,7 +39,9 @@
 #else  /* fprintf, _exit(), etc. */
 #include <stdio.h>
 #include <stdlib.h>
+#if ! defined(__WINRT__)
 #include <unistd.h>
+#endif
 #endif
 
 static SDL_assert_state
@@ -364,6 +366,19 @@ void SDL_ResetAssertionReport(void)
     }
 
     triggered_assertions = NULL;
+}
+
+SDL_AssertionHandler SDL_GetDefaultAssertionHandler(void)
+{
+    return SDL_PromptAssertion;
+}
+
+SDL_AssertionHandler SDL_GetAssertionHandler(void **userdata)
+{
+    if (userdata != NULL) {
+        *userdata = assertion_userdata;
+    }
+    return assertion_handler;
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

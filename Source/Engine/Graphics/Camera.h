@@ -55,13 +55,13 @@ public:
     void SetNearClip(float nearClip);
     /// Set far clip distance.
     void SetFarClip(float farClip);
-    /// Set field of view.
+    /// Set vertical field of view in degrees.
     void SetFov(float fov);
     /// Set orthographic mode view uniform size.
     void SetOrthoSize(float orthoSize);
-    /// Set orthographic mode view size.
+    /// Set orthographic mode view non-uniform size. Disables the auto aspect ratio -mode.
     void SetOrthoSize(const Vector2& orthoSize);
-    /// Set aspect ratio.
+    /// Set aspect ratio manually. Disables the auto aspect ratio -mode.
     void SetAspectRatio(float aspectRatio);
     /// Set polygon fill mode to use when rendering a scene.
     void SetFillMode(FillMode mode);
@@ -75,7 +75,7 @@ public:
     void SetViewOverrideFlags(unsigned flags);
     /// Set orthographic mode enabled/disabled.
     void SetOrthographic(bool enable);
-    /// Set automatic aspect ratio based on viewport dimensions.
+    /// Set automatic aspect ratio based on viewport dimensions. Enabled by default.
     void SetAutoAspectRatio(bool enable);
     /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
@@ -94,7 +94,7 @@ public:
     float GetFarClip() const { return farClip_; }
     /// Return near clip distance.
     float GetNearClip() const;
-    /// Return field of view.
+    /// Return vertical field of view in degrees.
     float GetFov() const { return fov_; }
     /// Return orthographic mode size.
     float GetOrthoSize() const { return orthoSize_; } 
@@ -163,6 +163,8 @@ public:
     /// Return if projection parameters are valid for rendering and raycasting.
     bool IsProjectionValid() const;
     
+    /// Set aspect ratio without disabling the "auto aspect ratio" mode. Called internally by View.
+    void SetAspectRatioInternal(float aspectRatio);
     /// Set reflection plane attribute.
     void SetReflectionPlaneAttr(Vector4 value);
     /// Return reflection plane attribute.

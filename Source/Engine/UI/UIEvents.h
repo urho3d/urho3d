@@ -188,6 +188,15 @@ EVENT(E_MODALCHANGED, ModalChanged)
     PARAM(P_MODAL, Modal);                  // bool
 }
 
+/// Char entry into a LineEdit. The char can be modified in the event data.
+EVENT(E_CHARENTRY, CharEntry)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_CHAR, Char);                    // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
 /// Editable text changed
 EVENT(E_TEXTCHANGED, TextChanged)
 {
@@ -311,6 +320,16 @@ EVENT(E_DRAGMOVE, DragMove)
 
 /// Drag behavior of a UI Element has finished
 EVENT(E_DRAGEND, DragEnd)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int
+    PARAM(P_ELEMENTY, ElementY);            // int
+}
+
+/// Drag of a UI Element was canceled by pressing ESC
+EVENT(E_DRAGCANCEL, DragCancel)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
     PARAM(P_X, X);                          // int

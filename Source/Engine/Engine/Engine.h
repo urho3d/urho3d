@@ -134,10 +134,6 @@ private:
     bool autoExit_;
     /// Initialized flag.
     bool initialized_;
-#ifdef ANDROID
-    /// Exit requested flag for preventing multiple finish activity requests.
-    bool exitRequested_;
-#endif
     /// Exiting flag.
     bool exiting_;
     /// Headless mode flag.

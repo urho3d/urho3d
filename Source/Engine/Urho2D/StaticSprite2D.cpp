@@ -63,8 +63,7 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-    // Assume flipping does not invalidate bounding box
-    MarkDirty(false);
+    verticesDirty_ = true;
     MarkNetworkUpdate();
 }
 
@@ -84,8 +83,35 @@ void StaticSprite2D::SetColor(const Color& color)
         return;
 
     color_ = color;
-    MarkDirty(false);
+    verticesDirty_ = true;
     MarkNetworkUpdate();
+}
+
+void StaticSprite2D::OnWorldBoundingBoxUpdate()
+{
+    boundingBox_.Clear();
+
+    if (sprite_)
+    {
+        const IntRect& rectangle_ = sprite_->GetRectangle();
+        float width = (float)rectangle_.Width() * PIXEL_SIZE;     // Compute width and height in pixels
+        float height = (float)rectangle_.Height() * PIXEL_SIZE;
+
+        const Vector2& hotSpot = sprite_->GetHotSpot();
+        float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
+        float hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
+
+        float leftX = -width * hotSpotX;
+        float rightX = width * (1.0f - hotSpotX);
+        float bottomY = -height * hotSpotY;
+        float topY = height * (1.0f - hotSpotY);
+
+        const Matrix3x4& worldTransform = node_->GetWorldTransform();
+        boundingBox_.Merge(worldTransform * Vector3(leftX, bottomY, 0.0f));
+        boundingBox_.Merge(worldTransform * Vector3(rightX, topY, 0.0f));
+    }
+
+    worldBoundingBox_ = boundingBox_;
 }
 
 void StaticSprite2D::UpdateVertices()
@@ -128,10 +154,13 @@ void StaticSprite2D::UpdateVertices()
     float rightX = width * (1.0f - hotSpotX);
     float bottomY = -height * hotSpotY;
     float topY = height * (1.0f - hotSpotY);
-    vertex0.position_ = Vector3(leftX, bottomY, zValue_);
-    vertex1.position_ = Vector3(leftX, topY, zValue_);
-    vertex2.position_ = Vector3(rightX, topY, zValue_);
-    vertex3.position_ = Vector3(rightX, bottomY, zValue_);
+
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+
+    vertex0.position_ = worldTransform * Vector3(leftX, bottomY, 0.0f);
+    vertex1.position_ = worldTransform * Vector3(leftX, topY, 0.0f);
+    vertex2.position_ = worldTransform * Vector3(rightX, topY, 0.0f);
+    vertex3.position_ = worldTransform * Vector3(rightX, bottomY, 0.0f);
 
     float invTexW = 1.0f / (float)texture->GetWidth();
     float invTexH = 1.0f / (float)texture->GetHeight();
@@ -164,7 +193,6 @@ void StaticSprite2D::UpdateVertices()
     vertices_.Push(vertex2);
     vertices_.Push(vertex3);
 
-    geometryDirty_ = true;
     verticesDirty_ = false;
 }
 

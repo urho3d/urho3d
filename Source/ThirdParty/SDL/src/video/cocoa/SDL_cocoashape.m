@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 
@@ -92,7 +92,7 @@ Cocoa_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShape
 
     pool = [[NSAutoreleasePool alloc] init];
     closure.view = [windata->nswindow contentView];
-    closure.path = [[NSBezierPath bezierPath] autorelease];
+    closure.path = [[NSBezierPath bezierPath] init];
     closure.window = shaper->window;
     SDL_TraverseShapeTree(data->shape,&ConvertRects,&closure);
     [closure.path addClip];

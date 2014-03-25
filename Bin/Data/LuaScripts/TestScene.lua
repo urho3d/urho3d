@@ -202,7 +202,7 @@ function InitScene()
         
         -- Create a capsule shape for detecting collisions
         local body = objectNode:CreateComponent("RigidBody")
-        body.phantom = true
+        body.trigger = true
         
         local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetCapsule(0.7, 1.8, Vector3(0.0, 0.9, 0.0))

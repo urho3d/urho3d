@@ -57,6 +57,8 @@ public:
     const Color& GetColor() const { return color_; }
 
 protected:
+    /// Recalculate the world-space bounding box.
+    virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices();
 

@@ -15,6 +15,7 @@ int  viewportBorderOffset = 2; // used to center borders over viewport seams,  s
 int  viewportBorderWidth = 4; // width of a viewport resize border
 IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
+bool mouseWheelCameraPosition = false;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -1136,8 +1137,13 @@ void UpdateView(float timeStep)
         }
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
         {
-            float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-            camera.zoom = Clamp(zoom, .1, 30);
+            if (mouseWheelCameraPosition)
+                cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+            else
+            {
+                float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                camera.zoom = Clamp(zoom, .1, 30);
+            }
         }
     }
 

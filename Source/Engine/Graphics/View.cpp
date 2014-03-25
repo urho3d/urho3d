@@ -487,7 +487,7 @@ void View::Update(const FrameInfo& frame)
     
     // Set automatic aspect ratio if required
     if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatio((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
+        camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
     
     GetDrawables();
     GetBatches();
@@ -515,7 +515,7 @@ void View::Render()
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
     // again to ensure correct projection will be used
     if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatio((float)(viewSize_.x_) / (float)(viewSize_.y_));
+        camera_->SetAspectRatioInternal((float)(viewSize_.x_) / (float)(viewSize_.y_));
     
     // Bind the face selection and indirection cube maps for point light shadows
     if (renderer_->GetDrawShadows())
