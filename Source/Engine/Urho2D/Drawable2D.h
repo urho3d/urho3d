@@ -130,7 +130,15 @@ protected:
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
 {
-    return lhs->GetLayer() < rhs->GetLayer() || lhs->GetOrderInLayer() < rhs->GetOrderInLayer() || lhs->GetID() < rhs->GetID();
+    if (lhs->GetLayer() == rhs->GetLayer())
+    {
+        if (lhs->GetOrderInLayer() == rhs->GetOrderInLayer())
+            return lhs->GetID() < rhs->GetID();
+
+        return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
+    }
+
+    return lhs->GetLayer() < rhs->GetLayer();
 }
 
 }
