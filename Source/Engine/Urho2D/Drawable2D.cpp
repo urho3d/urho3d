@@ -90,7 +90,7 @@ void Drawable2D::UpdateBatches(const FrameInfo& frame)
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
     batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = &worldTransform;
+    batches_[0].worldTransform_ = &Matrix3x4::IDENTITY;
 }
 
 void Drawable2D::UpdateGeometry(const FrameInfo& frame)
@@ -290,6 +290,13 @@ void Drawable2D::OnNodeSet(Node* node)
     }
 }
 
+void Drawable2D::OnMarkedDirty(Node* node)
+{
+    Drawable::OnMarkedDirty(node);
+
+    verticesDirty_ = true;
+}
+
 void Drawable2D::OnWorldBoundingBoxUpdate()
 {
     if (verticesDirty_)
@@ -301,7 +308,7 @@ void Drawable2D::OnWorldBoundingBoxUpdate()
             boundingBox_.Merge(vertices_[i].position_);
     }
 
-    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
+    worldBoundingBox_ = boundingBox_;
 }
 
 void Drawable2D::UpdateMaterial()
