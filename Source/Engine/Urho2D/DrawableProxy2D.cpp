@@ -99,6 +99,10 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
         for (unsigned d = 0; d < drawables_.Size(); ++d)
         {
             Material* currMaterial = drawables_[d]->GetUsedMaterial();
+            const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
+            if (!currMaterial || vertices.Empty())
+                continue;
+
             if (material != currMaterial)
             {
                 if (material)
@@ -111,7 +115,6 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
                 material = currMaterial;
             }
 
-            const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
             for (unsigned i = 0; i < vertices.Size(); i += 4)
             {
                 dest[0] = vertices[i + 0];

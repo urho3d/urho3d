@@ -86,8 +86,6 @@ public:
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
     /// Update before octree reinsertion. is called from a worker thread.
     virtual void Update(const FrameInfo& frame);
 
@@ -127,6 +125,10 @@ private:
     float emitParticleTime_;
     /// Particles.
     Vector<Particle2D> particles_;
+    /// Bounding box min point.
+    Vector3 boundingBoxMinPoint_;
+    /// Bounding box max point.
+    Vector3 boundingBoxMaxPoint_;
 };
 
 }

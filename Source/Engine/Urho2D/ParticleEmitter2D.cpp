@@ -41,7 +41,9 @@ ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     numParticles_(0), 
     emissionTime_(0.0f),
     emissionRate_(1.0f),
-    emitParticleTime_(0.0f)
+    emitParticleTime_(0.0f),
+    boundingBoxMinPoint_(Vector3::ZERO),
+    boundingBoxMaxPoint_(Vector3::ZERO)
 {
 }
 
@@ -71,15 +73,6 @@ void ParticleEmitter2D::OnSetEnabled()
     }
 }
 
-void ParticleEmitter2D::UpdateBatches(const FrameInfo& frame)
-{
-    // const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
-
-    batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = &Matrix3x4::IDENTITY;
-}
-
 void ParticleEmitter2D::Update(const FrameInfo& frame)
 {
     if (!effect_)
@@ -88,6 +81,9 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
     float timeStep = frame.timeStep_;
     Vector3 worldPosition = GetNode()->GetWorldPosition();
     float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
+
+    boundingBoxMinPoint_ = Vector3(M_INFINITY, M_INFINITY, 0.0f);
+    boundingBoxMaxPoint_ = Vector3(-M_INFINITY, -M_INFINITY, 0.0f);
 
     int particleIndex = 0;
     while (particleIndex < numParticles_)
@@ -185,14 +181,10 @@ void ParticleEmitter2D::OnNodeSet(Node* node)
 
 void ParticleEmitter2D::OnWorldBoundingBoxUpdate()
 {
-    if (verticesDirty_)
-    {
-        UpdateVertices();
+    boundingBox_.Clear();
 
-        boundingBox_.Clear();
-        for (unsigned i = 0; i < vertices_.Size(); ++i)
-            boundingBox_.Merge(vertices_[i].position_);
-    }
+    boundingBox_.Merge(boundingBoxMinPoint_);
+    boundingBox_.Merge(boundingBoxMaxPoint_);
 
     worldBoundingBox_ = boundingBox_;
 }
@@ -245,7 +237,6 @@ void ParticleEmitter2D::UpdateVertices()
         vertices_.Push(vertex3);
     }
 
-    geometryDirty_ = true;
     verticesDirty_ = false;
 }
 
@@ -350,6 +341,12 @@ void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep, con
     particle.size_ += particle.sizeDelta_ * timeStep;
     particle.rotation_ += particle.rotationDelta_ * timeStep;
     particle.color_ += particle.colorDelta_ * timeStep;
+
+    float halfSize = particle.size_ * 0.5f;
+    boundingBoxMinPoint_.x_ = Min(boundingBoxMinPoint_.x_, particle.position_.x_ - halfSize);
+    boundingBoxMinPoint_.y_ = Min(boundingBoxMinPoint_.y_, particle.position_.y_ - halfSize);
+    boundingBoxMaxPoint_.x_ = Max(boundingBoxMaxPoint_.x_, particle.position_.x_ - halfSize);
+    boundingBoxMaxPoint_.y_ = Max(boundingBoxMaxPoint_.y_, particle.position_.y_ - halfSize);
 }
 
 }

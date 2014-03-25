@@ -24,6 +24,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable2D.h"
+#include "DrawableProxy2D.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Material.h"
@@ -50,15 +51,9 @@ Drawable2D::Drawable2D(Context* context) :
     layer_(0),
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
-    vertexBuffer_(new VertexBuffer(context_)),
     verticesDirty_(true),
-    geometryDirty_(true),
     materialUpdatePending_(false)
-{
-    geometry_ = new Geometry(context);
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
-    batches_.Resize(1);
-    batches_[0].geometry_ = geometry_;
+{   
 }
 
 Drawable2D::~Drawable2D()
@@ -80,67 +75,20 @@ void Drawable2D::ApplyAttributes()
     if (materialUpdatePending_)
     {
         materialUpdatePending_ = false;
-        UpdateMaterial();
+        UpdateDefaultMaterial();
     }
 }
 
-void Drawable2D::UpdateBatches(const FrameInfo& frame)
+void Drawable2D::OnSetEnabled()
 {
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
+    if (!drawableProxy_)
+        return;
 
-    batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = &Matrix3x4::IDENTITY;
-}
-
-void Drawable2D::UpdateGeometry(const FrameInfo& frame)
-{
-    if (verticesDirty_)
-        UpdateVertices();
-
-    if (geometryDirty_ || vertexBuffer_->IsDataLost())
-    {
-        unsigned vertexCount = vertices_.Size() / 4 * 6;
-        if (vertexCount)
-        {
-            vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
-            Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
-            if (dest)
-            {
-                for (unsigned i = 0; i < vertices_.Size(); i += 4)
-                {
-                    dest[0] = vertices_[i + 0];
-                    dest[1] = vertices_[i + 1];
-                    dest[2] = vertices_[i + 2];
-
-                    dest[3] = vertices_[i + 0];
-                    dest[4] = vertices_[i + 2];
-                    dest[5] = vertices_[i + 3];
-
-                    dest += 6;
-                }
-
-                vertexBuffer_->Unlock();
-            }
-            else
-                LOGERROR("Failed to lock vertex buffer");
-        }
-        geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, vertexCount);
-
-        vertexBuffer_->ClearDataLost();
-        geometryDirty_ = false;
-    }
-}
-
-UpdateGeometryType Drawable2D::GetUpdateGeometryType()
-{
-    if (geometryDirty_ || vertexBuffer_->IsDataLost())
-        return UPDATE_MAIN_THREAD;
+    if (IsEnabledEffective())
+        drawableProxy_->AddDrawable(this);
     else
-        return UPDATE_NONE;
+        drawableProxy_->RemoveDrawable(this);
 }
-
-
 
 void Drawable2D::SetLayer(int layer)
 {
@@ -148,6 +96,9 @@ void Drawable2D::SetLayer(int layer)
         return;
 
     layer_ = layer;
+
+    if (drawableProxy_)
+        drawableProxy_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -158,6 +109,9 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
         return;
 
     orderInLayer_ = orderInLayer;
+    
+    if (drawableProxy_)
+        drawableProxy_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -167,19 +121,22 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
     if (sprite == sprite_)
         return;
 
-    sprite_ = sprite;
-    MarkDirty();
-    UpdateMaterial();
+    sprite_ = sprite;    
+    
+    verticesDirty_ = true;
+    OnMarkedDirty(node_);
+    UpdateDefaultMaterial();
     MarkNetworkUpdate();
 }
 
-void Drawable2D::SetBlendMode(BlendMode mode)
+void Drawable2D::SetBlendMode(BlendMode blendMode)
 {
-    if (mode == blendMode_)
+    if (blendMode == blendMode_)
         return;
 
-    blendMode_ = mode;
-    UpdateMaterial();
+    blendMode_ = blendMode;
+
+    UpdateDefaultMaterial();
     MarkNetworkUpdate();
 }
 
@@ -190,7 +147,6 @@ void Drawable2D::SetMaterial(Material* material)
 
     material_ = material;
 
-    UpdateMaterial();
     MarkNetworkUpdate();
 }
 
@@ -199,13 +155,16 @@ Material* Drawable2D::GetMaterial() const
     return material_;
 }
 
-void Drawable2D::MarkDirty(bool markWorldBoundingBoxDirty)
+Material* Drawable2D::GetUsedMaterial() const
 {
-    verticesDirty_ = true;
-    geometryDirty_ = true;
+    return material_ ? material_ : defaultMaterial_;
+}
 
-    if (markWorldBoundingBoxDirty)
-        OnMarkedDirty(node_);
+const Vector<Vertex2D>& Drawable2D::GetVertices()
+{
+    if (verticesDirty_)
+        UpdateVertices();
+    return vertices_;
 }
 
 void Drawable2D::SetSpriteAttr(ResourceRef value)
@@ -286,6 +245,9 @@ void Drawable2D::OnNodeSet(Node* node)
         if (scene)
         {
             materialCache_ = scene->GetOrCreateComponent<MaterialCache2D>();
+            drawableProxy_ = scene->GetOrCreateComponent<DrawableProxy2D>();
+            if (IsEnabledEffective())
+                drawableProxy_->AddDrawable(this);
         }
     }
 }
@@ -297,33 +259,13 @@ void Drawable2D::OnMarkedDirty(Node* node)
     verticesDirty_ = true;
 }
 
-void Drawable2D::OnWorldBoundingBoxUpdate()
-{
-    if (verticesDirty_)
-    {
-        UpdateVertices();
-
-        boundingBox_.Clear();
-        for (unsigned i = 0; i < vertices_.Size(); ++i)
-            boundingBox_.Merge(vertices_[i].position_);
-    }
-
-    worldBoundingBox_ = boundingBox_;
-}
-
-void Drawable2D::UpdateMaterial()
+void Drawable2D::UpdateDefaultMaterial()
 {
     // Delay the material update
     if (materialUpdatePending_)
         return;
-
-    if (material_)
-        batches_[0].material_ = material_;
-    else
-    {
-        defaultMaterial_ = materialCache_->GetMaterial(GetTexture(), blendMode_);
-        batches_[0].material_ = defaultMaterial_;
-    }
+    
+    defaultMaterial_ = materialCache_->GetMaterial(GetTexture(), blendMode_);
 }
 
 }

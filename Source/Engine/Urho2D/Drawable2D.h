@@ -50,12 +50,8 @@ public:
 
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
-    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
 
     /// Set layer.
     void SetLayer(int layer);
@@ -82,11 +78,9 @@ public:
     Material* GetMaterial() const;
 
     /// Return used material.
-    Material* GetUsedMaterial() const { return material_ ? material_ : defaultMaterial_; }
+    Material* GetUsedMaterial() const;
     /// Return all vertices.
-    const Vector<Vertex2D>& GetVertices() const { return vertices_; }
-    /// Mark vertices and geometry dirty.
-    void MarkDirty(bool markWorldBoundingBoxDirty = true);
+    const Vector<Vertex2D>& GetVertices();
 
     /// Set sprite attribute.
     void SetSpriteAttr(ResourceRef value);
@@ -104,12 +98,10 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices() = 0;
     /// Update the material's properties (blend mode and texture).
-    void UpdateMaterial();
+    void UpdateDefaultMaterial();
 
     /// Layer.
     int layer_;
@@ -124,14 +116,8 @@ protected:
 
     /// Vertices.
     Vector<Vertex2D> vertices_;
-    /// Geometry.
-    SharedPtr<Geometry> geometry_;
-    /// Vertex buffer.
-    SharedPtr<VertexBuffer> vertexBuffer_;
     /// Vertices dirty flag.
     bool verticesDirty_;
-    /// Geometry dirty flag.
-    bool geometryDirty_;
     /// Material update pending flag.
     bool materialUpdatePending_;
     /// Default material.
@@ -144,7 +130,7 @@ protected:
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
 {
-    return lhs->GetLayer() < rhs->GetLayer() || lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
+    return lhs->GetLayer() < rhs->GetLayer() || lhs->GetOrderInLayer() < rhs->GetOrderInLayer() || lhs->GetID() < rhs->GetID();
 }
 
 }
