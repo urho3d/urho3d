@@ -190,7 +190,7 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType DrawableProxy2D::GetUpdateGeometryType()
 {
-    return UPDATE_WORKER_THREAD;
+    return UPDATE_MAIN_THREAD;
 }
 
 void DrawableProxy2D::AddDrawable(Drawable2D* drawable)
@@ -217,7 +217,7 @@ void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
 void DrawableProxy2D::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
-    
+
     Scene* scene = GetScene();
     if (scene)
     {
