@@ -59,15 +59,11 @@ public:
     void MarkOrderDirty() { orderDirty_ = true; }
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
-    /// Camera node.
-    WeakPtr<Node> cameraNode_;
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Vertex buffer.

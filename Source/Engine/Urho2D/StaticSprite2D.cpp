@@ -106,12 +106,11 @@ void StaticSprite2D::OnWorldBoundingBoxUpdate()
         float bottomY = -height * hotSpotY;
         float topY = height * (1.0f - hotSpotY);
 
-        const Matrix3x4& worldTransform = node_->GetWorldTransform();
-        boundingBox_.Merge(worldTransform * Vector3(leftX, bottomY, 0.0f));
-        boundingBox_.Merge(worldTransform * Vector3(rightX, topY, 0.0f));
+        boundingBox_.Merge(Vector3(leftX, bottomY, 0.0f));
+        boundingBox_.Merge(Vector3(rightX, topY, 0.0f));
     }
 
-    worldBoundingBox_ = boundingBox_;
+    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
 void StaticSprite2D::UpdateVertices()

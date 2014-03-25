@@ -92,7 +92,7 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
     unsigned indexCount = vertexCount / 4 * 6;
     if (indexBuffer_->GetIndexCount() < indexCount)
     {
-        bool largeIndices = indexCount > 0xFFFF;
+        bool largeIndices = indexCount > 0xffff;
         indexBuffer_->SetSize(indexCount, largeIndices, true);
         void* buffer = indexBuffer_->Lock(0, indexCount, true);
         if (buffer)
@@ -214,31 +214,10 @@ void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
     orderDirty_ = true;
 }
 
-void DrawableProxy2D::OnNodeSet(Node* node)
-{
-    Drawable::OnNodeSet(node);
-
-    Scene* scene = GetScene();
-    if (scene)
-    {
-        PODVector<Camera*> cameras;
-        scene->GetComponents(cameras, true);
-        if (!cameras.Empty())
-            cameraNode_ = cameras[0]->GetNode();
-    }
-}
-
 void DrawableProxy2D::OnWorldBoundingBoxUpdate()
 {
-    boundingBox_.Clear();
-
-    if (cameraNode_)
-    {
-        // Create dummy bounding box
-        Vector3 position = cameraNode_->GetWorldPosition();
-        boundingBox_.Merge(Vector3(position.x_, position.y_, 20.0f));
-    }
-
+    // Set a large dummy bounding box to ensure the proxy is rendered
+    boundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
     worldBoundingBox_ = boundingBox_;
 }
 
