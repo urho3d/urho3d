@@ -58,6 +58,8 @@ Drawable2D::Drawable2D(Context* context) :
 
 Drawable2D::~Drawable2D()
 {
+    if (drawableProxy_)
+        drawableProxy_->RemoveDrawable(this);
 }
 
 void Drawable2D::RegisterObject(Context* context)

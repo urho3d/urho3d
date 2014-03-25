@@ -87,6 +87,14 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="160 0 174 14" />
     </element>
+    <element type="DrawableProxy2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 0 174 14" />
+    </element>
+    <element type="MaterialCache2D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 0 174 14" />
+    </element>
     <element type="RigidBody">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="80 0 94 14" />
