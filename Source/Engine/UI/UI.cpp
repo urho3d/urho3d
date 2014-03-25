@@ -1282,9 +1282,14 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     int key = eventData[P_KEY].GetInt();
 
-    // Cancel UI Dragging
+    // Cancel UI dragging
     if (key == KEY_ESC && dragElement_)
     {
+        IntVector2 cursorPos;
+        bool cursorVisible;
+        GetCursorPositionAndVisible(cursorPos, cursorVisible);
+        SendDragEvent(E_DRAGCANCEL, dragElement_, cursorPos);
+        
         dragElement_.Reset();
         dragBeginPending_ = false;
         return;

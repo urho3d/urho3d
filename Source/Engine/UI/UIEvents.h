@@ -328,6 +328,16 @@ EVENT(E_DRAGEND, DragEnd)
     PARAM(P_ELEMENTY, ElementY);            // int
 }
 
+/// Drag of a UI Element was canceled by pressing ESC
+EVENT(E_DRAGCANCEL, DragCancel)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int
+    PARAM(P_ELEMENTY, ElementY);            // int
+}
+
 /// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable
 EVENT(E_UIDROPFILE, UIDropFile)
 {
