@@ -144,7 +144,7 @@ protected:
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
 {
-    return lhs->GetLayer() < rhs->GetLayer() || lhs->GetOrderInLayer() < rhs->GetOrderInLayer() || (int)lhs < (int)rhs;
+    return lhs->GetLayer() < rhs->GetLayer() || lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
 }
 
 }
