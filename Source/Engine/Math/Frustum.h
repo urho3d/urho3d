@@ -49,7 +49,7 @@ static const unsigned NUM_FRUSTUM_VERTICES = 8;
 class URHO3D_API Frustum
 {
 public:
-    /// Construct undefined.
+    /// Construct a degenerate frustum with all points at origin.
     Frustum();
     /// Copy-construct from another frustum.
     Frustum(const Frustum& frustum);

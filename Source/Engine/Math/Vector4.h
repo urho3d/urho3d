@@ -31,8 +31,12 @@ namespace Urho3D
 class URHO3D_API Vector4
 {
 public:
-    /// Construct undefined.
-    Vector4()
+    /// Construct a zero vector.
+    Vector4() :
+        x_(0.0f),
+        y_(0.0f),
+        z_(0.0f),
+        w_(0.0f)
     {
     }
     

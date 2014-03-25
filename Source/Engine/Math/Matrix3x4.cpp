@@ -31,10 +31,7 @@ const Matrix3x4 Matrix3x4::ZERO(
     0.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f);
 
-const Matrix3x4 Matrix3x4::IDENTITY(
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f);
+const Matrix3x4 Matrix3x4::IDENTITY;
 
 Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
 {

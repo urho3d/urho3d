@@ -31,10 +31,7 @@ const Matrix3 Matrix3::ZERO(
     0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f);
 
-const Matrix3 Matrix3::IDENTITY(
-    1.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f);
+const Matrix3 Matrix3::IDENTITY;
 
 Matrix3 Matrix3::Inverse() const
 {

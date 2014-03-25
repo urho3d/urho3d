@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API Quaternion
 {
 public:
-    /// Construct identity quaternion.
+    /// Construct an identity quaternion.
     Quaternion() :
         w_(1.0f),
         x_(0.0f),
