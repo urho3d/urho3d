@@ -77,6 +77,15 @@
                         <attribute name="Text" value="Limit camera pitch" />
                     </element>
                 </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="MouseWheelCameraPositionToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Mouse wheel camera position" />
+                    </element>
+                </element>
                 <element type="BorderImage" style="EditorDivider" />
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="20" />

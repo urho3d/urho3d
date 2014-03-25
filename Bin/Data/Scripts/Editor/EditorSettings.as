@@ -37,6 +37,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ limitRotationToggle = settingsDialog.GetChild("LimitRotationToggle", true);
     limitRotationToggle.checked = limitRotation;
 
+    CheckBox@ mouseWheelCameraPositionToggle = settingsDialog.GetChild("MouseWheelCameraPositionToggle", true);
+    mouseWheelCameraPositionToggle.checked = mouseWheelCameraPosition;
+
     LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
 
@@ -102,6 +105,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(speedEdit, "TextChanged", "EditCameraSpeed");
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
         SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
+        SubscribeToEvent(mouseWheelCameraPositionToggle, "Toggled", "EditMouseWheelCameraPosition");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
         SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
         SubscribeToEvent(moveStepEdit, "TextChanged", "EditMoveStep");
@@ -184,6 +188,12 @@ void EditLimitRotation(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetPtr();
     limitRotation = edit.checked;
+}
+
+void EditMouseWheelCameraPosition(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    mouseWheelCameraPosition = edit.checked;
 }
 
 void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)
