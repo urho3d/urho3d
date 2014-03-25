@@ -125,7 +125,7 @@ public:
     /// Rotate around the Z axis.
     void Roll(float angle, bool fixedAxis = false);
     /// Look at a target world position.
-    void LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP);
+    void LookAt(const Vector3& target, const Vector3& up = Vector3::UP);
     /// Modify scale in parent space uniformly.
     void Scale(float scale);
     /// Modify scale in parent space.

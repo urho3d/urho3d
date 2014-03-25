@@ -172,7 +172,7 @@ public:
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
     /// Define from a direction to look in and an up direction.
-    void FromLookRotation(const Vector3& direction, const Vector3&up = Vector3::UP);
+    void FromLookRotation(const Vector3& direction, const Vector3& up = Vector3::UP);
 
     /// Normalize to unit length.
     void Normalize()

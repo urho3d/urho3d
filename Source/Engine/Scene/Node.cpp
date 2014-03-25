@@ -398,14 +398,14 @@ void Node::Roll(float angle, bool fixedAxis)
     Rotate(Quaternion(angle, Vector3::FORWARD), fixedAxis);
 }
 
-void Node::LookAt(const Vector3& target, const Vector3& upAxis)
+void Node::LookAt(const Vector3& target, const Vector3& up)
 {
     Vector3 lookDir = target - GetWorldPosition();
     // Check if target is very close, in that case can not reliably calculate lookat direction
     if (lookDir.Equals(Vector3::ZERO))
         return;
     Quaternion rotation;
-    rotation.FromLookRotation(lookDir, upAxis);
+    rotation.FromLookRotation(lookDir, up);
     // Return doing nothing if rotation became invalid
     if (rotation.IsNaN())
         return;
