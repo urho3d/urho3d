@@ -274,6 +274,22 @@ ResourceRef Drawable2D::GetMaterialAttr() const
     return GetResourceRef(material_, Material::GetTypeStatic());
 }
 
+void Drawable2D::OnNodeSet(Node* node)
+{
+    Drawable::OnNodeSet(node);
+
+    if (node)
+    {
+        node->AddListener(this);
+
+        Scene* scene = GetScene();
+        if (scene)
+        {
+            materialCache_ = scene->GetOrCreateComponent<MaterialCache2D>();
+        }
+    }
+}
+
 void Drawable2D::OnWorldBoundingBoxUpdate()
 {
     if (verticesDirty_)
@@ -298,8 +314,7 @@ void Drawable2D::UpdateMaterial()
         batches_[0].material_ = material_;
     else
     {
-        MaterialCache2D* materialCache = GetSubsystem<MaterialCache2D>();
-        defaultMaterial_ = materialCache->GetMaterial(GetTexture(), blendMode_);
+        defaultMaterial_ = materialCache_->GetMaterial(GetTexture(), blendMode_);
         batches_[0].material_ = defaultMaterial_;
     }
 }

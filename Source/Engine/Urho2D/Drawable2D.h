@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class DrawableProxy2D;
+class MaterialCache2D;
 class VertexBuffer;
 
 /// Pixel size (equal 0.01f).
@@ -98,6 +100,8 @@ public:
     ResourceRef GetMaterialAttr() const;
 
 protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
@@ -128,7 +132,12 @@ protected:
     bool geometryDirty_;
     /// Material update pending flag.
     bool materialUpdatePending_;
+    /// Default material.
     SharedPtr<Material> defaultMaterial_;
+    /// Material cache.
+    WeakPtr<MaterialCache2D> materialCache_;
+    /// Drawable proxy.
+    WeakPtr<DrawableProxy2D> drawableProxy_;
 };
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)

@@ -33,7 +33,7 @@ namespace Urho3D
 {
 
 MaterialCache2D::MaterialCache2D(Context* context) :
-    Object(context)
+    Component(context)
 {
 }
 
@@ -41,21 +41,9 @@ MaterialCache2D::~MaterialCache2D()
 {
 }
 
-void MaterialCache2D::ReleaseAllMaterials()
+void MaterialCache2D::RegisterObject(Context* context)
 {
-    materials_.Clear();
-}
-
-void MaterialCache2D::ReleaseMaterial(Texture2D* texture)
-{
-    materials_.Erase(texture);
-}
-
-void MaterialCache2D::ReleaseMaterial(Texture2D* texture, BlendMode blendMode)
-{
-    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator i = materials_.Find(texture);
-    if (i != materials_.End())
-        i->second_.Erase(blendMode);
+    context->RegisterFactory<MaterialCache2D>();
 }
 
 Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
@@ -82,7 +70,7 @@ Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 Material* MaterialCache2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
 {
     Material* material = new Material(context_);
-    
+
     Technique* tech = new Technique(context_);
     Pass* pass = tech->CreatePass(PASS_ALPHA);
     pass->SetBlendMode(blendMode);
@@ -92,7 +80,7 @@ Material* MaterialCache2D::CreateMaterial(Texture2D* texture, BlendMode blendMod
 
     pass->SetPixelShader("Basic");
     pass->SetPixelShaderDefines("DIFFMAP VERTEXCOLOR");
-    
+
     pass->SetDepthWrite(false);
 
     material->SetTechnique(0, tech);

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "Component.h"
 #include "GraphicsDefs.h"
 
 namespace Urho3D
@@ -32,7 +32,7 @@ class Texture2D;
 class Material;
 
 /// Material cache for 2D.
-class URHO3D_API MaterialCache2D : public Object
+class URHO3D_API MaterialCache2D : public Component
 {
     OBJECT(MaterialCache2D);
 
@@ -41,13 +41,8 @@ public:
     MaterialCache2D(Context* context);
     /// Destruct.
     virtual ~MaterialCache2D();
-    
-    /// Release all materials.
-    void ReleaseAllMaterials();
-    /// Release material by texture.
-    void ReleaseMaterial(Texture2D* texture);
-    /// Release material by texture and blend mode.
-    void ReleaseMaterial(Texture2D* texture, BlendMode blendMode);
+    /// Register object factory.
+    static void RegisterObject(Context* context);
 
     /// Return material by texture and blend mode.
     Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
