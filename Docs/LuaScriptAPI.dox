@@ -1481,21 +1481,26 @@ Properties:
 
 Methods:
 
+- void SetLayer(int layer)
+- void SetOrderInLayer(int orderInLayer)
 - void SetSprite(Sprite2D* sprite)
-- void SetMaterial(Material* material)
 - void SetBlendMode(BlendMode mode)
-- void SetZValue(float zValue)
+- void SetMaterial(Material* material)
+- int GetLayer() const
+- int GetOrderInLayer() const
 - Sprite2D* GetSprite() const
-- Material* GetMaterial() const
+- Texture2D* GetTexture() const
 - BlendMode GetBlendMode() const
-- float GetZValue() const
+- Material* GetMaterial() const
 
 Properties:
 
+- int layer
+- int orderInLayer
 - Sprite2D* sprite
-- Material* material
+- Texture2D* texture (readonly)
 - BlendMode blendMode
-- float zValue
+- Material* material
 
 ### DropDownList : Menu
 

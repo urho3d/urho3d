@@ -125,6 +125,7 @@ Properties:
 - bool flipY
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -133,6 +134,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -144,7 +146,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -2630,6 +2631,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -2638,6 +2640,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -2648,7 +2651,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -4614,6 +4616,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -4622,6 +4625,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -4632,7 +4636,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -6728,6 +6731,7 @@ Properties:
 - bool flipY
 - uint id // readonly
 - bool inView // readonly
+- int layer
 - uint lightMask
 - float lodBias
 - Material@ material
@@ -6736,6 +6740,7 @@ Properties:
 - uint numAttributes // readonly
 - bool occludee
 - bool occluder
+- int orderInLayer
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
@@ -6746,7 +6751,6 @@ Properties:
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
-- float zValue
 - uint zoneMask
 
 
@@ -9917,6 +9921,13 @@ Properties:
 - %ElementY : int
 
 ### DragEnd
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### DragCancel
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
