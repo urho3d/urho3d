@@ -239,8 +239,6 @@ void Drawable2D::OnNodeSet(Node* node)
 
     if (node)
     {
-        node->AddListener(this);
-
         Scene* scene = GetScene();
         if (scene)
         {
