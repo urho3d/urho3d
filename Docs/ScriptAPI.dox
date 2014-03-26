@@ -1771,22 +1771,24 @@ Methods:
 
 Properties:
 
+- float angularOffset
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - ShortStringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
+- float correctionFactor
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
-- float maxLength
+- Vector2 linearOffset
+- float maxForce
+- float maxTorque
 - Node@ node // readonly
 - uint numAttributes // readonly
 - RigidBody2D@ otherBody
-- Vector2 otherBodyAnchor
 - RigidBody2D@ ownerBody // readonly
-- Vector2 ownerBodyAnchor
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly

@@ -1054,18 +1054,24 @@ Properties:
 
 Methods:
 
-- void SetOwnerBodyAnchor(const Vector2& anchor)
-- void SetOtherBodyAnchor(const Vector2& anchor)
-- void SetMaxLength(float maxLength)
-- const Vector2& GetOwnerBodyAnchor() const
-- const Vector2& GetOtherBodyAnchor() const
-- float GetMaxLength() const
+- void SetLinearOffset(const Vector2& linearOffset)
+- void SetAngularOffset(float angularOffset)
+- void SetMaxForce(float maxForce)
+- void SetMaxTorque(float maxTorque)
+- void SetCorrectionFactor(float correctionFactor)
+- const Vector2& GetLinearOffset() const
+- float GetAngularOffset() const
+- float GetMaxForce() const
+- float GetMaxTorque() const
+- float GetCorrectionFactor() const
 
 Properties:
 
-- Vector2& ownerBodyAnchor
-- Vector2& otherBodyAnchor
-- float maxLength
+- Vector2& linearOffset
+- float angularOffset
+- float maxForce
+- float maxTorque
+- float correctionFactor
 
 ### ConstraintMouse2D : Constraint2D
 
