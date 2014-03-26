@@ -298,6 +298,22 @@ EVENT(E_ELEMENTREMOVED, ElementRemoved)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
+/// Hovering on an UI element has started
+EVENT(E_HOVERBEGIN, HoverBegin)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int
+    PARAM(P_ELEMENTY, ElementY);            // int
+}
+
+/// Hovering on an UI element has ended
+EVENT(E_HOVEREND, HoverEnd)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+}
+
 /// Drag behavior of a UI Element has started
 EVENT(E_DRAGBEGIN, DragBegin)
 {
