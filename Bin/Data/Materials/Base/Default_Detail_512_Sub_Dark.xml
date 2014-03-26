@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<material>
+	<technique name="Techniques/DiffNormal.xml" quality="0" loddistance="0" />
+	<texture unit="diffuse" name="Textures/Base/512_diff_sub_dark.png" />
+	<texture unit="normal" name="Textures/Base/512_diff_sub_normal.png" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+	<parameter name="MatEmissiveColor" value="0 0 0" />
+	<parameter name="MatEnvMapColor" value="1 1 1" />
+	<parameter name="MatSpecColor" value="0.1 0.1 0.1 1" />
+	<cull value="ccw" />
+	<shadowcull value="ccw" />
+	<depthbias constant="0" slopescaled="0" />
+</material>

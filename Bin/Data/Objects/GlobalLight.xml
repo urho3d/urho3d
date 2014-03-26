@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<node id="16777230">
+	<attribute name="Is Enabled" value="true" />
+	<attribute name="Name" value="" />
+	<attribute name="Position" value="57.0499 125.824 20.4375" />
+	<attribute name="Rotation" value="1 0 0 0" />
+	<attribute name="Scale" value="1 1 1" />
+	<attribute name="Variables" />
+	<node id="16777226">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Light Primary" />
+		<attribute name="Position" value="-57.0499 -52.8865 -2.71744" />
+		<attribute name="Rotation" value="0.635543 0.309976 -0.635543 0.309975" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777225">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.22 0.24 0.25 1" />
+			<attribute name="Specular Intensity" value="0.25" />
+		</component>
+	</node>
+	<node id="16777227">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Light Primary" />
+		<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+		<attribute name="Rotation" value="0.635543 0.309975 0.635544 -0.309976" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777226">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.22 0.24 0.25 1" />
+			<attribute name="Specular Intensity" value="0.25" />
+		</component>
+	</node>
+	<node id="16777228">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Light Primary" />
+		<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+		<attribute name="Rotation" value="-1.98453e-007 -3.89799e-007 0.898794 -0.438372" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777227">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.22 0.24 0.25 1" />
+			<attribute name="Specular Intensity" value="0.25" />
+		</component>
+	</node>
+	<node id="16777229">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Light Primary" />
+		<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+		<attribute name="Rotation" value="0.898794 0.438372 3.3768e-007 -6.92344e-007" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777228">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Color" value="0.22 0.24 0.25 1" />
+			<attribute name="Specular Intensity" value="0.25" />
+		</component>
+	</node>
+</node>

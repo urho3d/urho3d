@@ -1,0 +1,1005 @@
+<?xml version="1.0"?>
+<scene id="1">
+	<attribute name="Name" value="" />
+	<attribute name="Time Scale" value="1" />
+	<attribute name="Smoothing Constant" value="50" />
+	<attribute name="Snap Threshold" value="5" />
+	<attribute name="Elapsed Time" value="0" />
+	<attribute name="Next Replicated Node ID" value="65" />
+	<attribute name="Next Replicated Component ID" value="67" />
+	<attribute name="Next Local Node ID" value="16777232" />
+	<attribute name="Next Local Component ID" value="16777224" />
+	<attribute name="Variables" />
+	<attribute name="Variable Names" value="" />
+	<component type="Octree" id="1" />
+	<component type="PhysicsWorld" id="2" />
+	<component type="DebugRenderer" id="3" />
+	<node id="16777216">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="0 -3.94427 7.88854" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="16777217">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8865 -2.71744" />
+			<attribute name="Rotation" value="0.635543 0.309976 -0.635543 0.309975" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777216">
+				<attribute name="Is Enabled" value="false" />
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+		<node id="16777218">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+			<attribute name="Rotation" value="0.635543 0.309975 0.635544 -0.309976" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777217">
+				<attribute name="Is Enabled" value="false" />
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+		<node id="16777219">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+			<attribute name="Rotation" value="-1.98453e-007 -3.89799e-007 0.898794 -0.438372" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777218">
+				<attribute name="Is Enabled" value="false" />
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+		<node id="16777220">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="-57.0499 -52.8864 -2.7174" />
+			<attribute name="Rotation" value="0.898794 0.438372 3.3768e-007 -6.92344e-007" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777219">
+				<attribute name="Is Enabled" value="false" />
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.22 0.24 0.25 1" />
+				<attribute name="Specular Intensity" value="0.25" />
+			</component>
+		</node>
+	</node>
+	<node id="16777221">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Light" />
+		<attribute name="Position" value="0 -3.94427 7.88854" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Zone" id="16777220">
+			<attribute name="Bounding Box Min" value="-1000 -1000 -1000" />
+			<attribute name="Bounding Box Max" value="1000 1000 1000" />
+			<attribute name="Ambient Color" value="0.5 0.5 0.62 1" />
+			<attribute name="Fog Color" value="0.5 0.5 0.62 1" />
+			<attribute name="Fog Start" value="300" />
+		</component>
+		<node id="16777222">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sun Light" />
+			<attribute name="Position" value="0 46.6348 0" />
+			<attribute name="Rotation" value="0.703235 0.633378 -0.234271 -0.222282" />
+			<attribute name="Scale" value="0.02 0.02 0.02" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777221">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.9 0.95 1 1" />
+				<attribute name="Specular Intensity" value="1.3" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="16777223">
+			<attribute name="Is Enabled" value="false" />
+			<attribute name="Name" value="Light Secondary" />
+			<attribute name="Position" value="0 -8.46154 0" />
+			<attribute name="Rotation" value="-0.898794 -0.438372 2.73731e-008 -2.19451e-008" />
+			<attribute name="Scale" value="0.999998 1 0.999998" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777222">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.85 0.93 0.68 1" />
+				<attribute name="Per Vertex" value="true" />
+			</component>
+		</node>
+		<node id="16777224">
+			<attribute name="Is Enabled" value="false" />
+			<attribute name="Name" value="Light Primary" />
+			<attribute name="Position" value="0 19.9698 0" />
+			<attribute name="Rotation" value="1.09365e-008 5.3341e-009 0.898794 -0.438372" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="Light" id="16777223">
+				<attribute name="Light Type" value="Directional" />
+				<attribute name="Color" value="0.5 0.5 0.5 1" />
+				<attribute name="Specular Intensity" value="0" />
+				<attribute name="Per Vertex" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777225">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-7.18403 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="10">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 0.566061" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="12">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Silver.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="9">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 1.6628" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="11">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Titanium.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="7">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="9">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Nickel.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="8">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="10">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Platinum.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="6">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="8">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Gold.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="5">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="7">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Copper.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="4">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 4.85689" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="6">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Cobalt.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="3">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 3.77764" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="5">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Chromium.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="2">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 2.6845" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="4">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Metals/Basic_Aluminium.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777226">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-8.81555 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="11">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 0.566061" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="13">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Yellow.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="12">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 1.6628" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="14">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Red.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="13">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="15">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Blue.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="14">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="16">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/White.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="15">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="17">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Gray.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="16">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="18">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Green.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="17">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 4.85689" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="19">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Orange.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="18">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 3.77764" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="20">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Pink.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="19">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 2.6845" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="21">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors/Purple.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777227">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-10.7127 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="20">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 0.566061" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="22">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Colors.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="21">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 1.6628" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="23">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/ColorSimple.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="22">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="24">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Default_512_Dark.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="23">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="25">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Default_512_Blue.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="24">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="26">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Default_512_Gray.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="25">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="27">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Default_512_Orange.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="26">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 4.85689" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="28">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Default_512_White.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="27">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 3.77764" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="29">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Generated_512_Red.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="28">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 2.6845" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="30">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Base/Generated_512_Sub_Yellow.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777228">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-12.7514 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="29">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 0.566061" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="31">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Metal.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="30">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 1.6628" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="32">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Lava.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="31">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="33">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Default.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="32">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="34">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Decal.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="33">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="35">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Fabric.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="34">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="36">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Fire.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="35">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 4.85689" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="37">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Glass.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="36">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 3.77764" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="38">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Grass.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="37">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 2.6845" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="39">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Ground.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777229">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-14.955 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="38">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 0.566061" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="40">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Water.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="39">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 1.6628" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="41">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Wall.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="40">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="42">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Road.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="41">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="43">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Plastic.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="42">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="44">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Roof.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="43">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="45">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Sand.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="44">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 4.85689" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="46">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Skybox.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="45">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 3.77764" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="47">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Stone.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="46">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 2.6845" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="48">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Terrain.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777230">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-19.9839 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="49">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="51">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_TriggerButton.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="50">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="52">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_Trigger.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="51">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="53">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_Zone.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="52">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="54">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/DefaultMat.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="16777231">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="-17.4618 -3.08412 -1.12819" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<node id="56">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 0.566061" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="58">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_Portal.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="57">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 1.6628" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="59">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_NoTexture.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="58">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 7.99658" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="60">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_Clip.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="59">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 9.05185" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="61">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/Wood.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="60">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 6.93416" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="62">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_ClipAI.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="61">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 5.90005" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="63">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_ClipPhysics.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="62">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 4.85689" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="64">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_ClipPlayer.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="63">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 3.77764" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="65">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_ClipWorld.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="64">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Sphere" />
+			<attribute name="Position" value="7.78863 3.8887 2.6845" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="66">
+				<attribute name="Model" value="Model;Models/Sphere.mdl" />
+				<attribute name="Material" value="Material;Materials/Dev/tool_Model.xml" />
+				<attribute name="Is Occluder" value="true" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+</scene>
