@@ -33,13 +33,7 @@ namespace Urho3D
 
 ConstraintRevolute2D::ConstraintRevolute2D(Context* context) :
     Constraint2D(context),
-    anchor_(Vector2::ZERO),
-    lowerAngle_(0.0f),
-    upperAngle_(0.0f),
-    maxMotorTorque_(0.0f),
-    motorSpeed_(0.0f),
-    enableLimit_(false),
-    enableMotor_(false)
+    anchor_(Vector2::ZERO)
 {
 }
 
@@ -74,10 +68,10 @@ void ConstraintRevolute2D::SetAnchor(const Vector2& anchor)
 
 void ConstraintRevolute2D::SetEnableLimit(bool enableLimit)
 {
-    if (enableLimit == enableLimit_)
+    if (enableLimit == jointDef_.enableLimit)
         return;
 
-    enableLimit_ = enableLimit;
+    jointDef_.enableLimit = enableLimit;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -85,10 +79,10 @@ void ConstraintRevolute2D::SetEnableLimit(bool enableLimit)
 
 void ConstraintRevolute2D::SetLowerAngle(float lowerAngle)
 {
-    if (lowerAngle == lowerAngle_)
+    if (lowerAngle == jointDef_.lowerAngle)
         return;
 
-    lowerAngle_ = lowerAngle;
+    jointDef_.lowerAngle = lowerAngle;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -96,10 +90,10 @@ void ConstraintRevolute2D::SetLowerAngle(float lowerAngle)
 
 void ConstraintRevolute2D::SetUpperAngle(float upperAngle)
 {
-    if (upperAngle == upperAngle_)
+    if (upperAngle == jointDef_.upperAngle)
         return;
 
-    upperAngle_ = upperAngle;
+    jointDef_.upperAngle = upperAngle;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -107,10 +101,10 @@ void ConstraintRevolute2D::SetUpperAngle(float upperAngle)
 
 void ConstraintRevolute2D::SetEnableMotor(bool enableMotor)
 {
-    if (enableMotor == enableMotor_)
+    if (enableMotor == jointDef_.enableMotor)
         return;
 
-    enableMotor_ = enableMotor;
+    jointDef_.enableMotor = enableMotor;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -118,10 +112,10 @@ void ConstraintRevolute2D::SetEnableMotor(bool enableMotor)
 
 void ConstraintRevolute2D::SetMotorSpeed(float motorSpeed)
 {
-    if (motorSpeed == motorSpeed_)
+    if (motorSpeed == jointDef_.motorSpeed)
         return;
 
-    motorSpeed_ = motorSpeed;
+    jointDef_.motorSpeed = motorSpeed;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -129,16 +123,16 @@ void ConstraintRevolute2D::SetMotorSpeed(float motorSpeed)
 
 void ConstraintRevolute2D::SetMaxMotorTorque(float maxMotorTorque)
 {
-    if (maxMotorTorque == maxMotorTorque_)
+    if (maxMotorTorque == jointDef_.maxMotorTorque)
         return;
 
-    maxMotorTorque_ = maxMotorTorque;
+    jointDef_.maxMotorTorque = maxMotorTorque;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintRevolute2D::CreateJointDef()
+b2JointDef* ConstraintRevolute2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -148,16 +142,9 @@ b2JointDef* ConstraintRevolute2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2RevoluteJointDef* jointDef = new b2RevoluteJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
-    jointDef->enableLimit = enableLimit_;
-    jointDef->lowerAngle = lowerAngle_;
-    jointDef->upperAngle = upperAngle_;
-    jointDef->enableMotor = enableMotor_;
-    jointDef->motorSpeed = motorSpeed_;
-    jointDef->maxMotorTorque = maxMotorTorque_;
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
 
-    return jointDef;
+    return &jointDef_;
 }
 
 }

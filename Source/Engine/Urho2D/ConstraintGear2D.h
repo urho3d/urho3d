@@ -52,18 +52,18 @@ public:
     /// Return other constraint.
     Constraint2D* GetOtherConstraint() const { return otherConstraint_; }
     /// Return ratio.
-    float GetRatio() const { return ratio_; }
+    float GetRatio() const { return jointDef_.ratio; }
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
 
+    /// Box2D joint def.
+    b2GearJointDef jointDef_;
     /// Owner body constraint.
     WeakPtr<Constraint2D> ownerConstraint_;
     /// Other body constraint.
     WeakPtr<Constraint2D> otherConstraint_;
-    /// Ratio.
-    float ratio_;
 };
 
 }

@@ -40,30 +40,36 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set owner body anchor.
-    void SetOwnerBodyAnchor(const Vector2& anchor);
-    /// Set other body anchor.
-    void SetOtherBodyAnchor(const Vector2& anchor);
-    /// Set max length.
-    void SetMaxLength(float maxLength);
+    /// Set linear offset.
+    void SetLinearOffset(const Vector2& linearOffset);
+    /// Set angular offset.
+    void SetAngularOffset(float angularOffset);
+    /// Set max force.
+    void SetMaxForce(float maxForce);
+    /// Set max torque.
+    void SetMaxTorque(float maxTorque);
+    /// Set correction factor.
+    void SetCorrectionFactor(float correctionFactor);
 
-    /// Return owner body anchor.
-    const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
-    /// Return other body anchor.
-    const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
-    /// Return max length.
-    float GetMaxLength() const { return maxLength_; }
+    /// Return linear offset.
+    const Vector2& GetLinearOffset() const { return linearOffset_; }
+    /// Return angular offset.
+    float GetAngularOffset() const { return jointDef_.angularOffset; }
+    /// Return max force.
+    float GetMaxForce() const { return jointDef_.maxForce; }
+    /// Return max torque.
+    float GetMaxTorque() const { return jointDef_.maxTorque; }
+    /// Return correction factor.
+    float GetCorrectionFactor() const { return jointDef_.correctionFactor; }
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
 
-    /// Owner body anchor.
-    Vector2 ownerBodyAnchor_;
-    /// Other body anchor.
-    Vector2 otherBodyAnchor_;
-    /// Max length.
-    float maxLength_;
+    /// Box2D joint def.
+    b2MotorJointDef jointDef_;
+    /// Linear offset.
+    Vector2 linearOffset_;
 };
 
 }

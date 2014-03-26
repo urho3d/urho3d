@@ -34,13 +34,7 @@ namespace Urho3D
 ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) :
     Constraint2D(context),
     anchor_(Vector2::ZERO),
-    axis_(Vector2::RIGHT),
-    enableLimit_(false),
-    lowerTranslation_(0),
-    upperTranslation_(0),
-    enableMotor_(false),
-    maxMotorForce_(0),
-    motorSpeed_(0)
+    axis_(Vector2::RIGHT)
 {
 }
 
@@ -83,12 +77,14 @@ void ConstraintPrismatic2D::SetAxis(const Vector2& axis)
 
     RecreateJoint();
     MarkNetworkUpdate();
-}void ConstraintPrismatic2D::SetEnableLimit(bool enableLimit)
+}
+
+void ConstraintPrismatic2D::SetEnableLimit(bool enableLimit)
 {
-    if (enableLimit == enableLimit_)
+    if (enableLimit == jointDef_.enableLimit)
         return;
 
-    enableLimit_ = enableLimit;
+    jointDef_.enableLimit = enableLimit;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -96,10 +92,10 @@ void ConstraintPrismatic2D::SetAxis(const Vector2& axis)
 
 void ConstraintPrismatic2D::SetLowerTranslation(float lowerTranslation)
 {
-    if (lowerTranslation == lowerTranslation_)
+    if (lowerTranslation == jointDef_.lowerTranslation)
         return;
 
-    lowerTranslation_ = lowerTranslation;
+    jointDef_.lowerTranslation = lowerTranslation;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -107,10 +103,10 @@ void ConstraintPrismatic2D::SetLowerTranslation(float lowerTranslation)
 
 void ConstraintPrismatic2D::SetUpperTranslation(float upperTranslation)
 {
-    if (upperTranslation == upperTranslation_)
+    if (upperTranslation == jointDef_.upperTranslation)
         return;
 
-    upperTranslation_ = upperTranslation;
+    jointDef_.upperTranslation = upperTranslation;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -118,10 +114,10 @@ void ConstraintPrismatic2D::SetUpperTranslation(float upperTranslation)
 
 void ConstraintPrismatic2D::SetEnableMotor(bool enableMotor)
 {
-    if (enableMotor == enableMotor_)
+    if (enableMotor == jointDef_.enableMotor)
         return;
 
-    enableMotor_ = enableMotor;
+    jointDef_.enableMotor = enableMotor;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -129,10 +125,10 @@ void ConstraintPrismatic2D::SetEnableMotor(bool enableMotor)
 
 void ConstraintPrismatic2D::SetMaxMotorForce(float maxMotorForce)
 {
-    if (maxMotorForce == maxMotorForce_)
+    if (maxMotorForce == jointDef_.maxMotorForce)
         return;
 
-    maxMotorForce_ = maxMotorForce;
+    jointDef_.maxMotorForce = maxMotorForce;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -140,17 +136,16 @@ void ConstraintPrismatic2D::SetMaxMotorForce(float maxMotorForce)
 
 void ConstraintPrismatic2D::SetMotorSpeed(float motorSpeed)
 {
-    if (motorSpeed == motorSpeed_)
+    if (motorSpeed == jointDef_.motorSpeed)
         return;
 
-    motorSpeed_ = motorSpeed;
+    jointDef_.motorSpeed = motorSpeed;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-
-b2JointDef* ConstraintPrismatic2D::CreateJointDef()
+b2JointDef* ConstraintPrismatic2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -160,16 +155,9 @@ b2JointDef* ConstraintPrismatic2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2PrismaticJointDef* jointDef = new b2PrismaticJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_), ToB2Vec2(axis_));
-    jointDef->enableLimit = enableLimit_;
-    jointDef->lowerTranslation = lowerTranslation_;
-    jointDef->upperTranslation = upperTranslation_;
-    jointDef->enableMotor = enableMotor_;
-    jointDef->maxMotorForce = maxMotorForce_;
-    jointDef->motorSpeed = motorSpeed_;    
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_), ToB2Vec2(axis_));
 
-    return jointDef;
+    return &jointDef_;
 }
 
 }

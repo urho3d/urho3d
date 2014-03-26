@@ -2,15 +2,21 @@ $#include "ConstraintMotor2D.h"
 
 class ConstraintMotor2D : Constraint2D
 {
-    void SetOwnerBodyAnchor(const Vector2& anchor);
-    void SetOtherBodyAnchor(const Vector2& anchor);
-    void SetMaxLength(float maxLength);
+    void SetLinearOffset(const Vector2& linearOffset);
+    void SetAngularOffset(float angularOffset);
+    void SetMaxForce(float maxForce);
+    void SetMaxTorque(float maxTorque);
+    void SetCorrectionFactor(float correctionFactor);
 
-    const Vector2& GetOwnerBodyAnchor() const;
-    const Vector2& GetOtherBodyAnchor() const;
-    float GetMaxLength() const;
+    const Vector2& GetLinearOffset() const;
+    float GetAngularOffset() const;
+    float GetMaxForce() const;
+    float GetMaxTorque() const;
+    float GetCorrectionFactor() const;
 
-    tolua_property__get_set Vector2& ownerBodyAnchor;
-    tolua_property__get_set Vector2& otherBodyAnchor;
-    tolua_property__get_set float maxLength;
+    tolua_property__get_set Vector2& linearOffset;
+    tolua_property__get_set float angularOffset;
+    tolua_property__get_set float maxForce;
+    tolua_property__get_set float maxTorque;
+    tolua_property__get_set float correctionFactor;
 };

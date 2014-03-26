@@ -52,23 +52,20 @@ public:
     /// Return target.
     const Vector2& GetTarget() const { return target_; }
     /// Return max force.
-    float GetMaxForce() const { return maxForce_; }
+    float GetMaxForce() const { return jointDef_.maxForce; }
     /// Return frequency Hz.
-    float GetFrequencyHz() const { return frequencyHz_; }
+    float GetFrequencyHz() const { return jointDef_.frequencyHz; }
     /// Return damping ratio.
-    float GetDampingRatio() const { return dampingRatio_; }
+    float GetDampingRatio() const { return jointDef_.dampingRatio; }
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
+
+    /// Box2D joint def.
+    b2MouseJointDef jointDef_; 
     /// Target.
     Vector2 target_;
-    /// Max foce.
-    float maxForce_;
-    /// Frequency Hz.
-    float frequencyHz_;
-    /// Damping ratio.
-    float dampingRatio_;
 };
 
 }

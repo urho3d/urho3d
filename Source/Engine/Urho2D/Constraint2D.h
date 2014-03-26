@@ -73,8 +73,8 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Create joint def.
-    virtual b2JointDef* CreateJointDef() { return 0; };
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef() { return 0; };
     /// Recreate joint.
     void RecreateJoint();
     /// Initialize joint def.

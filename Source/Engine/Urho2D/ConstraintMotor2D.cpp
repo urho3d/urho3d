@@ -33,9 +33,7 @@ namespace Urho3D
 
 ConstraintMotor2D::ConstraintMotor2D(Context* context) :
     Constraint2D(context),
-    ownerBodyAnchor_(Vector2::ZERO),
-    otherBodyAnchor_(Vector2::ZERO),
-    maxLength_(0.0f)
+    linearOffset_(Vector2::ZERO)
 {
 
 }
@@ -48,47 +46,70 @@ void ConstraintMotor2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintMotor2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_VECTOR2, "Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_VECTOR2, "Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Max Length", GetMaxLength, SetMaxLength, float, 0.0f, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_VECTOR2, "Linear Offset", GetLinearOffset, SetLinearOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Angular Offset", GetAngularOffset, SetAngularOffset, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Max Force", GetMaxForce, SetMaxForce, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Max Torque", GetMaxTorque, SetMaxTorque, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Correction Factor", GetCorrectionFactor, SetCorrectionFactor, float, 0.3f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(ConstraintMotor2D, Constraint2D);
 }
 
-void ConstraintMotor2D::SetOwnerBodyAnchor(const Vector2& anchor)
+void ConstraintMotor2D::SetLinearOffset(const Vector2& linearOffset)
 {
-    if (anchor == ownerBodyAnchor_)
+    if (linearOffset == linearOffset_)
         return;
 
-    ownerBodyAnchor_ = anchor;
+    linearOffset_ = linearOffset;
+    
+    RecreateJoint();
+    MarkNetworkUpdate();
+}
+
+void ConstraintMotor2D::SetAngularOffset(float angularOffset)
+{
+    if (angularOffset == jointDef_.angularOffset)
+        return;
+
+    jointDef_.angularOffset = angularOffset;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-void ConstraintMotor2D::SetOtherBodyAnchor(const Vector2& anchor)
+void ConstraintMotor2D::SetMaxForce(float maxForce)
 {
-    if (anchor == otherBodyAnchor_)
+    if (maxForce == jointDef_.maxForce)
         return;
 
-    otherBodyAnchor_ = anchor;
+    jointDef_.maxForce = maxForce;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-void ConstraintMotor2D::SetMaxLength(float maxLength)
+void ConstraintMotor2D::SetMaxTorque(float maxTorque)
 {
-    maxLength = Max(0.0f, maxLength);
-    if (maxLength == maxLength_)
+    if (maxTorque == jointDef_.maxTorque)
         return;
 
-    maxLength_ = maxLength;
+    jointDef_.maxTorque = maxTorque;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintMotor2D::CreateJointDef()
+void ConstraintMotor2D::SetCorrectionFactor(float correctionFactor)
+{
+    if (correctionFactor == jointDef_.correctionFactor)
+        return;
+
+    jointDef_.correctionFactor = correctionFactor;
+
+    RecreateJoint();
+    MarkNetworkUpdate();
+}
+
+b2JointDef* ConstraintMotor2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -98,14 +119,10 @@ b2JointDef* ConstraintMotor2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2RopeJointDef* jointDef = new b2RopeJointDef;
-    InitializeJointDef(jointDef);
+    jointDef_.Initialize(bodyA, bodyB);
+    jointDef_.linearOffset = ToB2Vec2(linearOffset_);
 
-    jointDef->localAnchorA = ToB2Vec2(ownerBodyAnchor_);
-    jointDef->localAnchorB = ToB2Vec2(otherBodyAnchor_);
-    jointDef->maxLength = maxLength_;
-
-    return jointDef;
+    return &jointDef_;
 }
 
 }

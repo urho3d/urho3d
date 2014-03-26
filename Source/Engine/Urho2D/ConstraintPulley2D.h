@@ -60,13 +60,15 @@ public:
     /// Return other body anchor.
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
     /// Return ratio.
-    float GetRatio() const { return ratio_; }
+    float GetRatio() const { return jointDef_.ratio; }
 
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return Joint def.
+    virtual b2JointDef* GetJointDef();
 
+    /// Box2D joint def.
+    b2PulleyJointDef jointDef_;
     /// Owner body ground anchor.
     Vector2 ownerBodyGroundAnchor_;
     /// Other body ground anchor.
@@ -75,8 +77,6 @@ private:
     Vector2 ownerBodyAnchor_;
     /// Other body anchor.
     Vector2 otherBodyAnchor_;
-    /// Ratio.
-    float ratio_;
 };
 
 }

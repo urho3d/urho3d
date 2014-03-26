@@ -33,9 +33,7 @@ namespace Urho3D
 
 ConstraintFriction2D::ConstraintFriction2D(Context* context) :
     Constraint2D(context),
-    anchor_(Vector2::ZERO),
-    maxForce_(0.0f),
-    maxTorque_(0.0f)
+    anchor_(Vector2::ZERO)
 {
 
 }
@@ -67,10 +65,10 @@ void ConstraintFriction2D::SetAnchor(const Vector2& anchor)
 
 void ConstraintFriction2D::SetMaxForce(float maxForce)
 {
-    if (maxForce == maxForce_)
+    if (maxForce == jointDef_.maxForce)
         return;
 
-    maxForce_ = maxForce;
+    jointDef_.maxForce = maxForce;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -79,16 +77,16 @@ void ConstraintFriction2D::SetMaxForce(float maxForce)
 
 void ConstraintFriction2D::SetMaxTorque(float maxTorque)
 {
-    if (maxTorque == maxTorque_)
+    if (maxTorque == jointDef_.maxTorque)
         return;
 
-    maxTorque_ = maxTorque;
+    jointDef_.maxTorque = maxTorque;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintFriction2D::CreateJointDef()
+b2JointDef* ConstraintFriction2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -98,12 +96,9 @@ b2JointDef* ConstraintFriction2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2FrictionJointDef* jointDef = new b2FrictionJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
-    jointDef->maxForce = maxForce_;
-    jointDef->maxTorque = maxTorque_;
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_));    
 
-    return jointDef;
+    return &jointDef_;
 }
 
 }

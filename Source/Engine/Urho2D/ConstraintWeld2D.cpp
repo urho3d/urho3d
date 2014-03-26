@@ -33,9 +33,7 @@ namespace Urho3D
 
 ConstraintWeld2D::ConstraintWeld2D(Context* context) :
     Constraint2D(context),
-    anchor_(Vector2::ZERO),
-    frequencyHz_(0.0f),
-    dampingRatio_(0.0f)
+    anchor_(Vector2::ZERO)
 {
 }
 
@@ -66,10 +64,10 @@ void ConstraintWeld2D::SetAnchor(const Vector2& anchor)
 
 void ConstraintWeld2D::SetFrequencyHz(float frequencyHz)
 {
-    if (frequencyHz == frequencyHz_)
+    if (frequencyHz == jointDef_.frequencyHz)
         return;
 
-    frequencyHz_ = frequencyHz;
+    jointDef_.frequencyHz = frequencyHz;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -77,16 +75,16 @@ void ConstraintWeld2D::SetFrequencyHz(float frequencyHz)
 
 void ConstraintWeld2D::SetDampingRatio(float dampingRatio)
 {
-    if (dampingRatio == dampingRatio_)
+    if (dampingRatio == jointDef_.dampingRatio)
         return;
 
-    dampingRatio_ = dampingRatio;
+    jointDef_.dampingRatio = dampingRatio;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintWeld2D::CreateJointDef()
+b2JointDef* ConstraintWeld2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -96,12 +94,9 @@ b2JointDef* ConstraintWeld2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2WeldJointDef* jointDef = new b2WeldJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
-    jointDef->frequencyHz = frequencyHz_;
-    jointDef->dampingRatio = dampingRatio_;
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
 
-    return jointDef;
+    return &jointDef_;
 }
 
 }

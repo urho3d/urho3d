@@ -34,8 +34,7 @@ namespace Urho3D
 ConstraintRope2D::ConstraintRope2D(Context* context) :
     Constraint2D(context),
     ownerBodyAnchor_(Vector2::ZERO),
-    otherBodyAnchor_(Vector2::ZERO),
-    maxLength_(0.0f)
+    otherBodyAnchor_(Vector2::ZERO)
 {
 
 }
@@ -79,16 +78,16 @@ void ConstraintRope2D::SetOtherBodyAnchor(const Vector2& anchor)
 void ConstraintRope2D::SetMaxLength(float maxLength)
 {
     maxLength = Max(0.0f, maxLength);
-    if (maxLength == maxLength_)
+    if (maxLength == jointDef_.maxLength)
         return;
 
-    maxLength_ = maxLength;
+    jointDef_.maxLength = maxLength;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintRope2D::CreateJointDef()
+b2JointDef* ConstraintRope2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -98,14 +97,11 @@ b2JointDef* ConstraintRope2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2RopeJointDef* jointDef = new b2RopeJointDef;
-    InitializeJointDef(jointDef);
+    InitializeJointDef(&jointDef_);
+    jointDef_.localAnchorA = ToB2Vec2(ownerBodyAnchor_);
+    jointDef_.localAnchorB = ToB2Vec2(otherBodyAnchor_);
 
-    jointDef->localAnchorA = ToB2Vec2(ownerBodyAnchor_);
-    jointDef->localAnchorB = ToB2Vec2(otherBodyAnchor_);
-    jointDef->maxLength = maxLength_;
-
-    return jointDef;
+    return &jointDef_;
 }
 
 }
