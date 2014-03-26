@@ -63,6 +63,8 @@ private:
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle view update begin event. Determine Drawable2D's and their batches here.
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
+    /// Check visibility.
+    bool CheckVisibility(Drawable2D* drawable) const;
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
@@ -78,6 +80,10 @@ private:
     PODVector<Drawable2D*> drawables_;
     /// Order dirty.
     bool orderDirty_;
+    /// Frustum for current frame.
+    const Frustum* frustum_;
+    /// Frustum bounding box for current frame.
+    BoundingBox frustumBoundingBox_;
     /// Drawable visibility results.
     PODVector<bool> drawablesVisible_;
     /// Total index count for the current frame.

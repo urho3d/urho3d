@@ -46,6 +46,7 @@ DrawableProxy2D::DrawableProxy2D(Context* context) :
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
     orderDirty_(true),
+    frustum_(0),
     indexCount_(0),
     vertexCount_(0)
 {
@@ -210,13 +211,20 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
     if (drawablesVisible_.Size() != drawables_.Size())
         drawablesVisible_.Resize(drawables_.Size());
 
-    /// \todo We could add frustum culling, but that would be problematic if we have several viewports. Right now all Drawable2D's
-    /// are always submitted for rendering
+    Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
+    frustum_ = &camera->GetFrustum();
+    if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
+    {
+        // Define bounding box with min and max points
+        frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]); 
+        frustum_ = 0;
+    }
+
     for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
         Material* usedMaterial = drawables_[i]->GetUsedMaterial();
         const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
-        if (drawables_[i]->GetUsedMaterial() && vertices.Size())
+        if (drawables_[i]->GetUsedMaterial() && vertices.Size() && CheckVisibility(drawables_[i]))
         {
             drawablesVisible_[i] = true;
             vertexCount_ += vertices.Size();
@@ -275,6 +283,15 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
         batches_[i].material_ = materials_[i];
         batches_[i].geometry_ = geometries_[i];
     }
+}
+
+bool DrawableProxy2D::CheckVisibility(Drawable2D* drawable) const
+{
+    const BoundingBox& box = drawable->GetWorldBoundingBox();
+    if (frustum_)
+        return frustum_->IsInsideFast(box) != OUTSIDE;
+
+    return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
 }
 
 void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
