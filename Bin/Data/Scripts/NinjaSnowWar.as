@@ -253,7 +253,7 @@ void CreateOverlays()
         height = 64;
 
     sight = BorderImage();
-    sight.texture = cache.GetResource("Texture2D", "Textures/Sight.png");
+    sight.texture = cache.GetResource("Texture2D", "Textures/NinjaSnowWar/Sight.png");
     sight.SetAlignment(HA_CENTER, VA_CENTER);
     sight.SetSize(height, height);
     ui.root.AddChild(sight);
@@ -284,14 +284,14 @@ void CreateOverlays()
     ui.root.AddChild(messageText);
 
     BorderImage@ healthBorder = BorderImage();
-    healthBorder.texture = cache.GetResource("Texture2D", "Textures/HealthBarBorder.png");
+    healthBorder.texture = cache.GetResource("Texture2D", "Textures/NinjaSnowWar/HealthBarBorder.png");
     healthBorder.SetAlignment(HA_CENTER, VA_TOP);
     healthBorder.SetPosition(0, 8);
     healthBorder.SetSize(120, 20);
     ui.root.AddChild(healthBorder);
 
     healthBar = BorderImage();
-    healthBar.texture = cache.GetResource("Texture2D", "Textures/HealthBarInside.png");
+    healthBar.texture = cache.GetResource("Texture2D", "Textures/NinjaSnowWar/HealthBarInside.png");
     healthBar.SetPosition(2, 2);
     healthBar.SetSize(116, 16);
     healthBorder.AddChild(healthBar);

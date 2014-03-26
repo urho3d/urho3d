@@ -57,7 +57,7 @@ class Ninja : GameObject
     {
         // Start playing the idle animation immediately, even before the first physics update
         AnimationController@ animCtrl = node.children[0].GetComponent("AnimationController");
-        animCtrl.PlayExclusive("Models/Ninja_Idle3.ani", LAYER_MOVE, true);
+        animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Idle3.ani", LAYER_MOVE, true);
     }
 
     void SetControls(const Controls&in newControls)
@@ -153,19 +153,19 @@ class Ninja : GameObject
                 // Walk or sidestep animation
                 if (sideMove)
                 {
-                    animCtrl.PlayExclusive("Models/Ninja_Stealth.ani", LAYER_MOVE, true, 0.2);
-                    animCtrl.SetSpeed("Models/Ninja_Stealth.ani", animDir * 2.2);
+                    animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Stealth.ani", LAYER_MOVE, true, 0.2);
+                    animCtrl.SetSpeed("Models/NinjaSnowWar/Ninja_Stealth.ani", animDir * 2.2);
                 }
                 else
                 {
-                    animCtrl.PlayExclusive("Models/Ninja_Walk.ani", LAYER_MOVE, true, 0.2);
-                    animCtrl.SetSpeed("Models/Ninja_Walk.ani", animDir * 1.6);
+                    animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Walk.ani", LAYER_MOVE, true, 0.2);
+                    animCtrl.SetSpeed("Models/NinjaSnowWar/Ninja_Walk.ani", animDir * 1.6);
                 }
             }
             else
             {
                 // Idle animation
-                animCtrl.PlayExclusive("Models/Ninja_Idle3.ani", LAYER_MOVE, true, 0.2);
+                animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Idle3.ani", LAYER_MOVE, true, 0.2);
             }
 
             // Overall damping to cap maximum speed
@@ -180,8 +180,8 @@ class Ninja : GameObject
                     body.position = body.position + Vector3(0, 0.03, 0);
                     body.ApplyImpulse(Vector3(0, ninjaJumpForce, 0));
                     inAirTime = 1.0f;
-                    animCtrl.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false,  0.1);
-                    animCtrl.SetTime("Models/Ninja_JumpNoHeight.ani", 0.0); // Always play from beginning
+                    animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_JumpNoHeight.ani", LAYER_MOVE, false,  0.1);
+                    animCtrl.SetTime("Models/NinjaSnowWar/Ninja_JumpNoHeight.ani", 0.0); // Always play from beginning
                     okToJump = false;
                 }
             }
@@ -213,7 +213,7 @@ class Ninja : GameObject
 
             // Falling/jumping/sliding animation
             if (inAirTime > 0.1f)
-                animCtrl.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false, 0.1);
+                animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_JumpNoHeight.ani", LAYER_MOVE, false, 0.1);
         }
 
         // Shooting
@@ -221,15 +221,15 @@ class Ninja : GameObject
             throwTime -= timeStep;
 
         // Start fading the attack animation after it has progressed past a certain point
-        if (animCtrl.GetTime("Models/Ninja_Attack1.ani") > 0.1)
-            animCtrl.Fade("Models/Ninja_Attack1.ani", 0.0, 0.5);
+        if (animCtrl.GetTime("Models/NinjaSnowWar/Ninja_Attack1.ani") > 0.1)
+            animCtrl.Fade("Models/NinjaSnowWar/Ninja_Attack1.ani", 0.0, 0.5);
 
         if ((controls.IsPressed(CTRL_FIRE, prevControls)) && (throwTime <= 0))
         {
             Vector3 projectileVel = GetAim() * ninjaThrowVelocity;
 
-            animCtrl.Play("Models/Ninja_Attack1.ani", LAYER_ATTACK, false, 0.0);
-            animCtrl.SetTime("Models/Ninja_Attack1.ani", 0.0); // Always play from beginning
+            animCtrl.Play("Models/NinjaSnowWar/Ninja_Attack1.ani", LAYER_ATTACK, false, 0.0);
+            animCtrl.SetTime("Models/NinjaSnowWar/Ninja_Attack1.ani", 0.0); // Always play from beginning
 
             Node@ snowball = SpawnObject(node.position + vel * timeStep + q * ninjaThrowPosition, GetAim(), "SnowBall");
             RigidBody@ snowballBody = snowball.GetComponent("RigidBody");
@@ -290,8 +290,8 @@ class Ninja : GameObject
         {
             // Backward death
             animCtrl.StopLayer(LAYER_ATTACK, 0.1);
-            animCtrl.PlayExclusive("Models/Ninja_Death1.ani", LAYER_MOVE, false, 0.2);
-            animCtrl.SetSpeed("Models/Ninja_Death1.ani", 0.5);
+            animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Death1.ani", LAYER_MOVE, false, 0.2);
+            animCtrl.SetSpeed("Models/NinjaSnowWar/Ninja_Death1.ani", 0.5);
             if ((deathTime >= 0.3) && (deathTime < 0.8))
                 modelNode.Translate(Vector3(0, 0, 4.25 * timeStep));
         }
@@ -299,8 +299,8 @@ class Ninja : GameObject
         {
             // Forward death
             animCtrl.StopLayer(LAYER_ATTACK, 0.1);
-            animCtrl.PlayExclusive("Models/Ninja_Death2.ani", LAYER_MOVE, false, 0.2);
-            animCtrl.SetSpeed("Models/Ninja_Death2.ani", 0.5);
+            animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Death2.ani", LAYER_MOVE, false, 0.2);
+            animCtrl.SetSpeed("Models/NinjaSnowWar/Ninja_Death2.ani", 0.5);
             if ((deathTime >= 0.4) && (deathTime < 0.8))
                 modelNode.Translate(Vector3(0, 0, -4.25 * timeStep));
         }
