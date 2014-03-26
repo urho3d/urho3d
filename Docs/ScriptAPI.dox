@@ -9908,6 +9908,16 @@ Properties:
 - %Parent : UIElement pointer
 - %Element : UIElement pointer
 
+### HoverBegin
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### HoverEnd
+- %Element : UIElement pointer
+
 ### DragBegin
 - %Element : UIElement pointer
 - %X : int
