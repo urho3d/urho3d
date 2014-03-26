@@ -78,7 +78,7 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
     // Fill index buffer
     if (indexBuffer_->GetIndexCount() < indexCount_)
     {
-        bool largeIndices = indexCount_ > 0xffff;
+        bool largeIndices = vertexCount_ > 0xffff;
         indexBuffer_->SetSize(indexCount_, largeIndices, true);
         void* buffer = indexBuffer_->Lock(0, indexCount_, true);
         if (buffer)

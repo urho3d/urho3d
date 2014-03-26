@@ -24,6 +24,7 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "Log.h"
 #include "ShaderPrecache.h"
 #include "ShaderVariation.h"
@@ -112,8 +113,20 @@ void ShaderPrecache::LoadShaders(Graphics* graphics, Deserializer& source)
     XMLElement shader = xmlFile.GetRoot().GetChild("shader");
     while (shader)
     {
-        ShaderVariation* vs = graphics->GetShader(VS, shader.GetAttribute("vs"), shader.GetAttribute("vsdefines"));
-        ShaderVariation* ps = graphics->GetShader(PS, shader.GetAttribute("ps"), shader.GetAttribute("psdefines"));
+        String vsDefines = shader.GetAttribute("vsdefines");
+        String psDefines = shader.GetAttribute("psdefines");
+        
+        // Check for illegal variations on OpenGL ES and skip them
+        #ifdef GL_ES_VERSION_2_0
+        if (vsDefines.Contains("INSTANCED") || (psDefines.Contains("POINTLIGHT") && psDefines.Contains("SHADOW")))
+        {
+            shader = shader.GetNext("shader");
+            continue;
+        }
+        #endif
+        
+        ShaderVariation* vs = graphics->GetShader(VS, shader.GetAttribute("vs"), vsDefines);
+        ShaderVariation* ps = graphics->GetShader(PS, shader.GetAttribute("ps"), psDefines);
         // Set the shaders active to actually compile them
         graphics->SetShaders(vs, ps);
         
