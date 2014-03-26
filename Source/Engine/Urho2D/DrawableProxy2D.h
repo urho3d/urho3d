@@ -58,16 +58,14 @@ public:
     /// Mark order dirty.
     void MarkOrderDirty() { orderDirty_ = true; }
 
-protected:
+private:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Handle view update begin event. Determine Drawable2D's and their batches here.
+    void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
-private:
-    /// Handle view update begin event. Determine Drawable2D's and their batches here.
-    void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
-    
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Vertex buffer.
@@ -77,15 +75,15 @@ private:
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
     /// Drawables.
-    PODVector<Drawable2D* > drawables_;
-    /// Drawable visibility results.
-    PODVector<bool> drawablesVisible_;
-    /// Total vertex count for the current frame.
-    unsigned vertexCount_;
-    /// Total index count for the current frame.
-    unsigned indexCount_;
+    PODVector<Drawable2D*> drawables_;
     /// Order dirty.
     bool orderDirty_;
+    /// Drawable visibility results.
+    PODVector<bool> drawablesVisible_;
+    /// Total index count for the current frame.
+    unsigned indexCount_;
+    /// Total vertex count for the current frame.
+    unsigned vertexCount_;
 };
 
 }

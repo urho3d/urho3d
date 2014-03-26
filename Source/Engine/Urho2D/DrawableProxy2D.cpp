@@ -45,9 +45,9 @@ DrawableProxy2D::DrawableProxy2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
-    vertexCount_(0),
+    orderDirty_(true),
     indexCount_(0),
-    orderDirty_(true)
+    vertexCount_(0)
 {
     SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(DrawableProxy2D, HandleBeginViewUpdate));
 }
@@ -59,94 +59,6 @@ DrawableProxy2D::~DrawableProxy2D()
 void DrawableProxy2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<DrawableProxy2D>();
-}
-
-void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace BeginViewUpdate;
-    
-    // Check that we are updating the correct scene
-    if (GetScene() != eventData[P_SCENE].GetPtr())
-        return;
-    
-    PROFILE(UpdateDrawableProxy2D);
-    
-    if (orderDirty_)
-    {
-        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
-        orderDirty_ = false;
-    }
-    
-    vertexCount_ = 0;
-    
-    if (drawablesVisible_.Size() != drawables_.Size())
-        drawablesVisible_.Resize(drawables_.Size());
-    
-    /// \todo We could add frustum culling, but that would be problematic if we have several viewports. Right now all Drawable2D's
-    /// are always submitted for rendering
-    for (unsigned i = 0; i < drawables_.Size(); ++i)
-    {
-        Material* usedMaterial = drawables_[i]->GetUsedMaterial();
-        const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
-        if (drawables_[i]->GetUsedMaterial() && vertices.Size())
-        {
-            drawablesVisible_[i] = true;
-            vertexCount_ += vertices.Size();
-        }
-        else
-            drawablesVisible_[i] = false;
-    }
-    
-    indexCount_ = vertexCount_ / 4 * 6;
-    
-    // Go through the drawables to form geometries & batches, but upload the actual vertex data later
-    materials_.Clear();
-    
-    Material* material = 0;
-    unsigned iStart = 0;
-    unsigned iCount = 0;
-    unsigned vStart = 0;
-    unsigned vCount = 0;
-
-    for (unsigned d = 0; d < drawables_.Size(); ++d)
-    {
-        if (!drawablesVisible_[d])
-            continue;
-        
-        Material* usedMaterial = drawables_[d]->GetUsedMaterial();
-        const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
-
-        if (material != usedMaterial)
-        {
-            if (material)
-            {
-                AddBatch(material, iStart, iCount, vStart, vCount);
-                iStart += iCount;
-                iCount = 0;
-                vStart += vCount;
-                vCount = 0;
-            }
-
-            material = usedMaterial;
-        }
-
-        iCount += vertices.Size() / 4 * 6;
-        vCount += vertices.Size();
-    }
-
-    if (material)
-        AddBatch(material, iStart, iCount, vStart, vCount);
-
-    // Now the amount of batches is known. Build the part of source batches that are sensitive to threading issues
-    // (material & geometry pointers)
-    unsigned count = materials_.Size();
-    batches_.Resize(count);
-
-    for (unsigned i = 0; i < count; ++i)
-    {
-        batches_[i].material_ = materials_[i];
-        batches_[i].geometry_ = geometries_[i];
-    }
 }
 
 void DrawableProxy2D::UpdateBatches(const FrameInfo& frame)
@@ -230,13 +142,13 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
             {
                 if (!drawablesVisible_[d])
                     continue;
-                
+
                 const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
                 for (unsigned i = 0; i < vertices.Size(); ++i)
                     dest[i] = vertices[i];
                 dest += vertices.Size();
             }
-            
+
             vertexBuffer_->Unlock();
         }
         else
@@ -275,6 +187,94 @@ void DrawableProxy2D::OnWorldBoundingBoxUpdate()
     // Set a large dummy bounding box to ensure the proxy is rendered
     boundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
     worldBoundingBox_ = boundingBox_;
+}
+
+void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace BeginViewUpdate;
+
+    // Check that we are updating the correct scene
+    if (GetScene() != eventData[P_SCENE].GetPtr())
+        return;
+
+    PROFILE(UpdateDrawableProxy2D);
+
+    if (orderDirty_)
+    {
+        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
+        orderDirty_ = false;
+    }
+
+    vertexCount_ = 0;
+
+    if (drawablesVisible_.Size() != drawables_.Size())
+        drawablesVisible_.Resize(drawables_.Size());
+
+    /// \todo We could add frustum culling, but that would be problematic if we have several viewports. Right now all Drawable2D's
+    /// are always submitted for rendering
+    for (unsigned i = 0; i < drawables_.Size(); ++i)
+    {
+        Material* usedMaterial = drawables_[i]->GetUsedMaterial();
+        const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
+        if (drawables_[i]->GetUsedMaterial() && vertices.Size())
+        {
+            drawablesVisible_[i] = true;
+            vertexCount_ += vertices.Size();
+        }
+        else
+            drawablesVisible_[i] = false;
+    }
+
+    indexCount_ = vertexCount_ / 4 * 6;
+
+    // Go through the drawables to form geometries & batches, but upload the actual vertex data later
+    materials_.Clear();
+
+    Material* material = 0;
+    unsigned iStart = 0;
+    unsigned iCount = 0;
+    unsigned vStart = 0;
+    unsigned vCount = 0;
+
+    for (unsigned d = 0; d < drawables_.Size(); ++d)
+    {
+        if (!drawablesVisible_[d])
+            continue;
+
+        Material* usedMaterial = drawables_[d]->GetUsedMaterial();
+        const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
+
+        if (material != usedMaterial)
+        {
+            if (material)
+            {
+                AddBatch(material, iStart, iCount, vStart, vCount);
+                iStart += iCount;
+                iCount = 0;
+                vStart += vCount;
+                vCount = 0;
+            }
+
+            material = usedMaterial;
+        }
+
+        iCount += vertices.Size() / 4 * 6;
+        vCount += vertices.Size();
+    }
+
+    if (material)
+        AddBatch(material, iStart, iCount, vStart, vCount);
+
+    // Now the amount of batches is known. Build the part of source batches that are sensitive to threading issues
+    // (material & geometry pointers)
+    unsigned count = materials_.Size();
+    batches_.Resize(count);
+
+    for (unsigned i = 0; i < count; ++i)
+    {
+        batches_[i].material_ = materials_[i];
+        batches_[i].geometry_ = geometries_[i];
+    }
 }
 
 void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
