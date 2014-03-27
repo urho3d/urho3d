@@ -61,7 +61,7 @@
 #define LUA_LCPATH1	";" LUA_LCDIR "?.so"
 #define LUA_LCPATH2	";" LUA_LCDIR "loadall.so"
 
-#define LUA_PATH_DEFAULT	"./?.lua" "./" LUA_RDIR "?.lua;" LUA_IDIR "?.lua;" LUA_JPATH LUA_LLPATH LUA_RLPATH
+#define LUA_PATH_DEFAULT	"./?.lua;./" LUA_RDIR "?.lua;" LUA_IDIR "?.lua" LUA_JPATH LUA_LLPATH LUA_RLPATH
 #define LUA_CPATH_DEFAULT	"./?.so" LUA_LCPATH1 LUA_RCPATH LUA_LCPATH2
 #endif
 
