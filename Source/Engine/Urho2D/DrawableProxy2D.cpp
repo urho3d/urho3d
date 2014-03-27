@@ -35,6 +35,7 @@
 #include "Scene.h"
 #include "VertexBuffer.h"
 #include "Sort.h"
+#include "WorkQueue.h"
 
 #include "DebugNew.h"
 
@@ -183,11 +184,36 @@ void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
     orderDirty_ = true;
 }
 
+bool DrawableProxy2D::CheckVisibility(Drawable2D* drawable) const
+{
+    const BoundingBox& box = drawable->GetWorldBoundingBox();
+    if (frustum_)
+        return frustum_->IsInsideFast(box) != OUTSIDE;
+
+    return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
+}
+
 void DrawableProxy2D::OnWorldBoundingBoxUpdate()
 {
     // Set a large dummy bounding box to ensure the proxy is rendered
     boundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
     worldBoundingBox_ = boundingBox_;
+}
+
+void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
+{
+    DrawableProxy2D* proxy = reinterpret_cast<DrawableProxy2D*>(item->aux_);
+    Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
+    Drawable2D** end = reinterpret_cast<Drawable2D**>(item->end_);
+
+    while (start != end)
+    {
+        Drawable2D* drawable = *start++;
+        if (proxy->CheckVisibility(drawable) && drawable->GetUsedMaterial() && drawable->GetVertices().Size())
+            drawable->SetVisibility(true);
+        else
+            drawable->SetVisibility(false);
+    }
 }
 
 void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
@@ -206,8 +232,6 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
         orderDirty_ = false;
     }
 
-    vertexCount_ = 0;
-
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = &camera->GetFrustum();
     if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
@@ -217,22 +241,41 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
         frustum_ = 0;
     }
 
-    for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
-        drawables_[i]->SetVisibility(false);
+        PROFILE(CheckDrawableVisibility);
 
-        if (CheckVisibility(drawables_[i]) && drawables_[i]->GetUsedMaterial())
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+        int drawablesPerItem = drawables_.Size() / numWorkItems;
+        
+        PODVector<Drawable2D*>::Iterator start = drawables_.Begin();
+        for (int i = 0; i < numWorkItems; ++i)
         {
-            // Delay call Drawable2D::GetVertices
-            const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
-            if (!vertices.Empty())
-            {
-                drawables_[i]->SetVisibility(true);
-                vertexCount_ += vertices.Size();
-            }
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = CheckDrawableVisibility;
+            item->aux_ = this;
+
+            PODVector<Drawable2D*>::Iterator end = drawables_.End();
+            if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                end = start + drawablesPerItem;
+            
+            item->start_ = &(*start);
+            item->end_ = &(*end);
+            queue->AddWorkItem(item);
+            
+            start = end;
         }
+
+        queue->Complete(M_MAX_UNSIGNED);
     }
 
+    vertexCount_ = 0;
+    for (unsigned i = 0; i < drawables_.Size(); ++i)
+    {
+        if (drawables_[i]->GetVisibility())
+            vertexCount_ += drawables_[i]->GetVertices().Size();
+    }
     indexCount_ = vertexCount_ / 4 * 6;
 
     // Go through the drawables to form geometries & batches, but upload the actual vertex data later
@@ -283,15 +326,6 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
         batches_[i].material_ = materials_[i];
         batches_[i].geometry_ = geometries_[i];
     }
-}
-
-bool DrawableProxy2D::CheckVisibility(Drawable2D* drawable) const
-{
-    const BoundingBox& box = drawable->GetWorldBoundingBox();
-    if (frustum_)
-        return frustum_->IsInsideFast(box) != OUTSIDE;
-
-    return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
 }
 
 void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)

@@ -57,14 +57,14 @@ public:
     void RemoveDrawable(Drawable2D* drawable);
     /// Mark order dirty.
     void MarkOrderDirty() { orderDirty_ = true; }
+    /// Check visibility.
+    bool CheckVisibility(Drawable2D* drawable) const;
 
 private:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle view update begin event. Determine Drawable2D's and their batches here.
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
-    /// Check visibility.
-    bool CheckVisibility(Drawable2D* drawable) const;
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
