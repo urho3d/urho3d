@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Drawable.h"
+#include "Material.h"
 #include "Sprite2D.h"
 
 namespace Urho3D
@@ -135,6 +136,11 @@ inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
 
     if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
         return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
+
+    Material* lhsUsedMaterial = lhs->GetUsedMaterial();
+    Material* rhsUsedMaterial = rhs->GetUsedMaterial();
+    if (lhsUsedMaterial != rhsUsedMaterial)
+        return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
 
     return lhs->GetID() < rhs->GetID();
 }
