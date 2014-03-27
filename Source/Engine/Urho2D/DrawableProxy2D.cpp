@@ -216,21 +216,24 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
     if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
     {
         // Define bounding box with min and max points
-        frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]); 
+        frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]);
         frustum_ = 0;
     }
 
     for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
-        Material* usedMaterial = drawables_[i]->GetUsedMaterial();
-        const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
-        if (drawables_[i]->GetUsedMaterial() && vertices.Size() && CheckVisibility(drawables_[i]))
+        drawablesVisible_[i] = false;
+
+        if (CheckVisibility(drawables_[i]) && drawables_[i]->GetUsedMaterial())
         {
-            drawablesVisible_[i] = true;
-            vertexCount_ += vertices.Size();
+            // Delay call Drawable2D::GetVertices
+            const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
+            if (!vertices.Empty())
+            {
+                drawablesVisible_[i] = true;
+                vertexCount_ += vertices.Size();
+            }
         }
-        else
-            drawablesVisible_[i] = false;
     }
 
     indexCount_ = vertexCount_ / 4 * 6;
