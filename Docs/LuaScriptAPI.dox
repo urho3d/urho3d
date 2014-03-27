@@ -1835,6 +1835,7 @@ Methods:
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
 - void SetFlushGPU(bool enable)
+- void SetOrientations(const String orientations)
 - bool ToggleFullscreen()
 - void Maximize()
 - void Minimize()
@@ -1858,6 +1859,7 @@ Methods:
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
 - bool GetFlushGPU() const
+- const String GetOrientations() const
 - bool IsDeviceLost() const
 - unsigned GetNumPrimitives() const
 - unsigned GetNumBatches() const
@@ -1890,6 +1892,7 @@ Properties:
 - bool tripleBuffer (readonly)
 - bool sRGB
 - bool flushGPU
+- String orientations
 - bool deviceLost (readonly)
 - unsigned numPrimitives (readonly)
 - unsigned numBatches (readonly)

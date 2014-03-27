@@ -3730,6 +3730,7 @@ Array<int> multiSampleLevels;
 uint numBatches;
 /* readonly */
 uint numPrimitives;
+String orientations;
 /* readonly */
 int refs;
 /* readonly */

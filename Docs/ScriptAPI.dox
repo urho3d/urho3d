@@ -3092,6 +3092,7 @@ Properties:
 - int[]@ multiSampleLevels // readonly
 - uint numBatches // readonly
 - uint numPrimitives // readonly
+- String orientations
 - int refs // readonly
 - bool resizable // readonly
 - IntVector2[]@ resolutions // readonly
