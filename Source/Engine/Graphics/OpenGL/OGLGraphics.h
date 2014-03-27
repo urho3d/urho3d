@@ -101,6 +101,8 @@ public:
     void SetSRGB(bool enable);
     /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
     void SetFlushGPU(bool enable) {}
+    /// Set allowed screen orientations as a space-separated list of "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Affects currently only iOS platform.
+    void SetOrientations(const String& orientations);
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
@@ -256,6 +258,8 @@ public:
     bool GetSRGB() const { return sRGB_; }
     /// Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
     bool GetFlushGPU() const { return false; }
+    /// Return allowed screen orientations.
+    const String& GetOrientations() const { return orientations_; }
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
     /// Return number of primitives drawn this frame.
@@ -593,6 +597,8 @@ private:
     mutable String lastShaderName_;
     /// Shader precache utility.
     SharedPtr<ShaderPrecache> shaderPrecache_;
+    /// Allowed screen orientations.
+    String orientations_;
 };
 
 /// Register Graphics library objects.

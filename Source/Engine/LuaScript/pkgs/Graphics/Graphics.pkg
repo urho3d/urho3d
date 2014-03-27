@@ -13,6 +13,7 @@ class Graphics : public Object
     
     void SetSRGB(bool enable);
     void SetFlushGPU(bool enable);
+    void SetOrientations(const String orientations);
     bool ToggleFullscreen();
     void Maximize();
     void Minimize();
@@ -37,6 +38,7 @@ class Graphics : public Object
     bool GetTripleBuffer() const;
     bool GetSRGB() const;
     bool GetFlushGPU() const;
+    const String GetOrientations() const;
     bool IsDeviceLost() const;
     unsigned GetNumPrimitives() const;
     unsigned GetNumBatches() const;
@@ -68,6 +70,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool tripleBuffer;
     tolua_property__get_set bool sRGB;
     tolua_property__get_set bool flushGPU;
+    tolua_property__get_set String orientations;
     tolua_readonly tolua_property__is_set bool deviceLost;
     tolua_readonly tolua_property__get_set unsigned numPrimitives;
     tolua_readonly tolua_property__get_set unsigned numBatches;

@@ -210,7 +210,8 @@ Graphics::Graphics(Context* context_) :
     defaultTextureFilterMode_(FILTER_BILINEAR),
     releasingGPUObjects_(false),
     shaderPath_("Shaders/GLSL/"),
-    shaderExtension_(".glsl")
+    shaderExtension_(".glsl"),
+    orientations_("LandscapeLeft LandscapeRight")
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -339,8 +340,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         Release(false, true);
 
         #ifdef IOS
-        SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-
         // On iOS window needs to be resizable to handle orientation changes properly
         resizable = true;
         #endif
@@ -378,7 +377,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             flags |= SDL_WINDOW_RESIZABLE;
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
-        
+
+        SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
+
         for (;;)
         {
             if (!externalWindow_)
@@ -540,6 +541,12 @@ void Graphics::SetSRGB(bool enable)
         sRGB_ = enable;
         impl_->fboDirty_ = true;
     }
+}
+
+void Graphics::SetOrientations(const String& orientations)
+{
+    orientations_ = orientations.Trimmed();
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 }
 
 bool Graphics::ToggleFullscreen()
@@ -1037,7 +1044,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         return;
     
     ClearParameterSources();
-    
+
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
     if (vs && !vs->GetGPUObject())
     {

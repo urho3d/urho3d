@@ -142,7 +142,9 @@ The full list of supported parameters, their datatypes and default values:
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
+- FlushGPU (bool) Whether to flush GPU command buffer each frame for less input latency. Effective only on Direct3D9. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
+- Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".
 - DumpShaders (string) Filename to dump used shader variations to for precaching.
 - %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.

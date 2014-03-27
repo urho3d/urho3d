@@ -200,8 +200,11 @@ The engine can be configured using the following command line options.
 -tq <level>  Texture quality level, default 2 (high)
 -tf <level>  Texture filter mode, default 2 (trilinear)
 -af <level>  Texture anisotropy level, default 4. Also sets anisotropic filter mode
+-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D9
 -borderless  Borderless window mode
 -headless    Headless mode. No application window will be created
+-landscape   Use landscape orientations (iOS only, default)
+-portrait    Use portrait orientations (iOS only)
 -prepass     Use light pre-pass rendering
 -deferred    Use deferred rendering
 -lqshadows   Use low-quality (1-sample) shadow filtering
