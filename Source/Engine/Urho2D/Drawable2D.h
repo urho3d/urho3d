@@ -82,6 +82,10 @@ public:
     Material* GetUsedMaterial() const;
     /// Return all vertices.
     const Vector<Vertex2D>& GetVertices();
+    /// Set visibility.
+    void SetVisibility(bool visibility) { visibility_ = visibility; }
+    /// Return visibility.
+    bool GetVisibility() const { return visibility_; }
 
     /// Set sprite attribute.
     void SetSpriteAttr(ResourceRef value);
@@ -127,6 +131,8 @@ protected:
     WeakPtr<MaterialCache2D> materialCache_;
     /// Drawable proxy.
     WeakPtr<DrawableProxy2D> drawableProxy_;
+    /// Test visible.
+    bool visibility_;
 };
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)

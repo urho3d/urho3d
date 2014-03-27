@@ -141,7 +141,7 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
 
             for (unsigned d = 0; d < drawables_.Size(); ++d)
             {
-                if (!drawablesVisible_[d])
+                if (!drawables_[d]->GetVisibility())
                     continue;
 
                 const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
@@ -208,9 +208,6 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
 
     vertexCount_ = 0;
 
-    if (drawablesVisible_.Size() != drawables_.Size())
-        drawablesVisible_.Resize(drawables_.Size());
-
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = &camera->GetFrustum();
     if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
@@ -222,7 +219,7 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
 
     for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
-        drawablesVisible_[i] = false;
+        drawables_[i]->SetVisibility(false);
 
         if (CheckVisibility(drawables_[i]) && drawables_[i]->GetUsedMaterial())
         {
@@ -230,7 +227,7 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
             const Vector<Vertex2D>& vertices = drawables_[i]->GetVertices();
             if (!vertices.Empty())
             {
-                drawablesVisible_[i] = true;
+                drawables_[i]->SetVisibility(true);
                 vertexCount_ += vertices.Size();
             }
         }
@@ -249,7 +246,7 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
 
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
-        if (!drawablesVisible_[d])
+        if (!drawables_[d]->GetVisibility())
             continue;
 
         Material* usedMaterial = drawables_[d]->GetUsedMaterial();

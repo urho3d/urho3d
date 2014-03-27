@@ -52,7 +52,8 @@ Drawable2D::Drawable2D(Context* context) :
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
     verticesDirty_(true),
-    materialUpdatePending_(false)
+    materialUpdatePending_(false),
+    visibility_(true)
 {
 }
 

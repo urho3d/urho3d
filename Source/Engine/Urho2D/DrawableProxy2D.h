@@ -84,8 +84,6 @@ private:
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.
     BoundingBox frustumBoundingBox_;
-    /// Drawable visibility results.
-    PODVector<bool> drawablesVisible_;
     /// Total index count for the current frame.
     unsigned indexCount_;
     /// Total vertex count for the current frame.
