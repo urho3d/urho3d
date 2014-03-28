@@ -310,37 +310,11 @@ View::~View()
 
 bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 {
-    Scene* scene = viewport->GetScene();
-    Camera* camera = viewport->GetCamera();
-    if (!scene || !camera || !camera->IsEnabledEffective())
-        return false;
-    
-    // If scene is loading asynchronously, it is incomplete and should not be rendered
-    if (scene->IsAsyncLoading())
-        return false;
-    
-    Octree* octree = scene->GetComponent<Octree>();
-    if (!octree)
-        return false;
-    
-    // Do not accept view if camera projection is illegal
-    // (there is a possibility of crash if occlusion is used and it can not clip properly)
-    if (!camera->IsProjectionValid())
-        return false;
-    
-    scene_ = scene;
-    octree_ = octree;
-    camera_ = camera;
-    cameraNode_ = camera->GetNode();
-    renderTarget_ = renderTarget;
     renderPath_ = viewport->GetRenderPath();
+    if (!renderPath_)
+        return false;
     
-    gBufferPassName_ = StringHash();
-    basePassName_  = PASS_BASE;
-    alphaPassName_ = PASS_ALPHA;
-    lightPassName_ = PASS_LIGHT;
-    litBasePassName_ = PASS_LITBASE;
-    litAlphaPassName_ = PASS_LITALPHA;
+    hasScenePasses_ = false;
     
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
@@ -352,6 +326,8 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         
         if (command.type_ == CMD_SCENEPASS)
         {
+            hasScenePasses_ = true;
+            
             ScenePassInfo info;
             info.pass_ = command.pass_;
             info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
@@ -386,6 +362,42 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         else if (command.type_ == CMD_FORWARDLIGHTS && !command.pass_.Empty())
             lightPassName_ = command.pass_;
     }
+    
+    
+    scene_ = viewport->GetScene();
+    camera_ = viewport->GetCamera();
+    octree_ = 0;
+    // Get default zone first in case we do not have zones defined
+    cameraZone_ = farClipZone_ = renderer_->GetDefaultZone();
+    
+    if (hasScenePasses_)
+    {
+        if (!scene_ || !camera_ || !camera_->IsEnabledEffective())
+            return false;
+        
+        // If scene is loading asynchronously, it is incomplete and should not be rendered
+        if (scene_->IsAsyncLoading())
+            return false;
+        
+        octree_ = scene_->GetComponent<Octree>();
+        if (!octree_)
+            return false;
+        
+        // Do not accept view if camera projection is illegal
+        // (there is a possibility of crash if occlusion is used and it can not clip properly)
+        if (!camera_->IsProjectionValid())
+            return false;
+    }
+    
+    cameraNode_ = camera_ ? camera_->GetNode() : (Node*)0;
+    renderTarget_ = renderTarget;
+    
+    gBufferPassName_ = StringHash();
+    basePassName_  = PASS_BASE;
+    alphaPassName_ = PASS_ALPHA;
+    lightPassName_ = PASS_LIGHT;
+    litBasePassName_ = PASS_LITBASE;
+    litAlphaPassName_ = PASS_LITALPHA;
     
     // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
@@ -447,7 +459,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     minInstances_ = renderer_->GetMinInstances();
     
     // Set possible quality overrides from the camera
-    unsigned viewOverrideFlags = camera_->GetViewOverrideFlags();
+    unsigned viewOverrideFlags = camera_ ? camera_->GetViewOverrideFlags() : VO_NONE;
     if (viewOverrideFlags & VO_LOW_MATERIAL_QUALITY)
         materialQuality_ = QUALITY_LOW;
     if (viewOverrideFlags & VO_DISABLE_SHADOWS)
@@ -464,9 +476,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 
 void View::Update(const FrameInfo& frame)
 {
-    if (!camera_ || !octree_)
-        return;
-    
     frame_.camera_ = camera_;
     frame_.timeStep_ = frame.timeStep_;
     frame_.frameNumber_ = frame.frameNumber_;
@@ -485,6 +494,9 @@ void View::Update(const FrameInfo& frame)
     for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
     
+    if (hasScenePasses_ && (!camera_ || !octree_))
+        return;
+    
     // Set automatic aspect ratio if required
     if (camera_->GetAutoAspectRatio())
         camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
@@ -495,7 +507,7 @@ void View::Update(const FrameInfo& frame)
 
 void View::Render()
 {
-    if (!octree_ || !camera_)
+    if (hasScenePasses_ && (!octree_ || !camera_))
         return;
     
     // Actually update geometry data now
@@ -514,15 +526,20 @@ void View::Render()
     
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
     // again to ensure correct projection will be used
-    if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatioInternal((float)(viewSize_.x_) / (float)(viewSize_.y_));
+    if (camera_)
+    {
+        if (camera_->GetAutoAspectRatio())
+            camera_->SetAspectRatioInternal((float)(viewSize_.x_) / (float)(viewSize_.y_));
+    }
     
     // Bind the face selection and indirection cube maps for point light shadows
+    #ifndef GL_ES_VERSION_2_0
     if (renderer_->GetDrawShadows())
     {
         graphics_->SetTexture(TU_FACESELECT, renderer_->GetFaceSelectCubeMap());
         graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     }
+    #endif
     
     if (renderTarget_)
     {
@@ -550,7 +567,7 @@ void View::Render()
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
-    if (!renderTarget_)
+    if (!renderTarget_ && octree_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective())
@@ -597,10 +614,6 @@ void View::GetDrawables()
     int bestPriority = M_MIN_INT;
     Vector3 cameraPos = cameraNode_->GetWorldPosition();
     
-    // Get default zone first in case we do not have zones defined
-    Zone* defaultZone = renderer_->GetDefaultZone();
-    cameraZone_ = farClipZone_ = defaultZone;
-    
     for (PODVector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
     {
         Drawable* drawable = *i;
@@ -640,7 +653,7 @@ void View::GetDrawables()
             }
         }
     }
-    if (farClipZone_ == defaultZone)
+    if (farClipZone_ == renderer_->GetDefaultZone())
         farClipZone_ = cameraZone_;
     
     // If occlusion in use, get & render the occluders
@@ -1589,8 +1602,8 @@ void View::RenderQuad(RenderPathCommand& command)
         graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
     }
 
-    float nearClip = camera_->GetNearClip();
-    float farClip = camera_->GetFarClip();
+    float nearClip = camera_ ? camera_->GetNearClip() : DEFAULT_NEARCLIP;
+    float farClip = camera_ ? camera_->GetFarClip() : DEFAULT_FARCLIP;
     graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
     graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
     graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);

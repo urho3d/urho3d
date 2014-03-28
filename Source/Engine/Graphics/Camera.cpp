@@ -34,11 +34,6 @@ namespace Urho3D
 
 extern const char* SCENE_CATEGORY;
 
-static const float DEFAULT_NEARCLIP = 0.1f;
-static const float DEFAULT_FARCLIP = 1000.0f;
-static const float DEFAULT_FOV = 45.0f;
-static const float DEFAULT_ORTHOSIZE = 20.0f;
-
 static const char* fillModeNames[] =
 {
     "Solid",
@@ -62,7 +57,7 @@ Camera::Camera(Context* context) :
     orthographic_(false),
     nearClip_(DEFAULT_NEARCLIP),
     farClip_(DEFAULT_FARCLIP),
-    fov_(DEFAULT_FOV),
+    fov_(DEFAULT_CAMERA_FOV),
     orthoSize_(DEFAULT_ORTHOSIZE),
     aspectRatio_(1.0f),
     zoom_(1.0f),
@@ -92,7 +87,7 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_CAMERA_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatioInternal, float, 1.0f, AM_DEFAULT);
     ENUM_ATTRIBUTE(Camera, "Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);

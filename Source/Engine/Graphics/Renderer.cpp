@@ -596,7 +596,7 @@ void Renderer::Update(float timeStep)
         if (numViews_ == views_.Size())
             views_.Push(SharedPtr<View>(new View(context_)));
         
-        // Check if view can be defined successfully (has valid scene, camera and octree)
+        // Check if view can be defined successfully (has either valid scene, camera and octree, or no scene passes)
         assert(numViews_ < views_.Size());
         View* view = views_[numViews_];
         if (!view->Define(renderTarget, viewport))
@@ -606,6 +606,9 @@ void Renderer::Update(float timeStep)
         
         const IntRect& viewRect = viewport->GetRect();
         Scene* scene = viewport->GetScene();
+        if (!scene)
+            continue;
+        
         Octree* octree = scene->GetComponent<Octree>();
         
         // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
