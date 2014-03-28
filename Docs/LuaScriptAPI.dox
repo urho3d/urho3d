@@ -708,14 +708,14 @@ Properties:
 
 Methods:
 
-- void SetSensor(bool sensor)
+- void SetTrigger(bool trigger)
 - void SetCategoryBits(int categoryBits)
 - void SetMaskBits(int maskBits)
 - void SetGroupIndex(int groupIndex)
 - void SetDensity(float density)
 - void SetFriction(float friction)
 - void SetRestitution(float restitution)
-- bool IsSensor() const
+- bool IsTrigger() const
 - int GetCategoryBits() const
 - int GetMaskBits() const
 - int GetGroupIndex() const
@@ -728,7 +728,7 @@ Methods:
 
 Properties:
 
-- bool sensor
+- bool trigger
 - int categoryBits
 - int maskBits
 - int groupIndex

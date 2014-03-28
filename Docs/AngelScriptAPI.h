@@ -1246,9 +1246,9 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 Vector2 size;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1313,8 +1313,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1378,8 +1378,8 @@ float radius;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1440,8 +1440,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1507,8 +1507,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1637,8 +1637,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */

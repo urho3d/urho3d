@@ -1053,9 +1053,9 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - Vector2 size
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -1107,8 +1107,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint vertexCount
@@ -1159,8 +1159,8 @@ Properties:
 - float radius
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -1208,8 +1208,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - Vector2 vertex1
@@ -1262,8 +1262,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint vertexCount
@@ -1368,8 +1368,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
