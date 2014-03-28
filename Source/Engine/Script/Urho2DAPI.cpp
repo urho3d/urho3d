@@ -307,8 +307,8 @@ template <class T> void RegisterCollisionShape2D(asIScriptEngine* engine, const 
 {
     RegisterComponent<T>(engine, className);
     RegisterSubclass<CollisionShape2D, T>(engine, "CollisionShape2D", className);
-    engine->RegisterObjectMethod(className, "void set_sensor(bool)", asMETHOD(T, SetSensor), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_sensor() const", asMETHOD(T, IsSensor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_trigger(bool)", asMETHOD(T, SetTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_trigger() const", asMETHOD(T, IsTrigger), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_categoryBits(int)", asMETHOD(T, SetCategoryBits), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_categoryBits() const", asMETHOD(T, GetCategoryBits), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maskBits(int)", asMETHOD(T, SetMaskBits), asCALL_THISCALL);

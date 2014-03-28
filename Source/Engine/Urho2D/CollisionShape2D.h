@@ -46,8 +46,8 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
-    /// Set sensor (trigger).
-    void SetSensor(bool sensor);
+    /// Set trigger.
+    void SetTrigger(bool trigger);
     /// Set filter category bits.
     void SetCategoryBits(int categoryBits);
     /// Set filter mask bits.
@@ -66,8 +66,8 @@ public:
     /// Release fixture.
     void ReleaseFixture();
 
-    /// Return sensor (trigger).
-    bool IsSensor() const { return fixtureDef_.isSensor; }
+    /// Return trigger.
+    bool IsTrigger() const { return fixtureDef_.isSensor; }
     /// Return filter category bits.
     int GetCategoryBits() const { return fixtureDef_.filter.categoryBits; }
     /// Return filter mask bits.

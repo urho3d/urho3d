@@ -2,7 +2,7 @@ $#include "CollisionShape2D.h"
 
 class CollisionShape2D : Component
 {
-    void SetSensor(bool sensor);
+    void SetTrigger(bool trigger);
     void SetCategoryBits(int categoryBits);
     void SetMaskBits(int maskBits);
     void SetGroupIndex(int groupIndex);
@@ -10,7 +10,7 @@ class CollisionShape2D : Component
     void SetFriction(float friction);
     void SetRestitution(float restitution);
 
-    bool IsSensor() const;
+    bool IsTrigger() const;
     int GetCategoryBits() const;
     int GetMaskBits() const;
     int GetGroupIndex() const;
@@ -21,7 +21,7 @@ class CollisionShape2D : Component
     float GetInertia() const;
     Vector2 GetMassCenter() const;
 
-    tolua_property__is_set bool sensor;
+    tolua_property__is_set bool trigger;
     tolua_property__get_set int categoryBits;
     tolua_property__get_set int maskBits;
     tolua_property__get_set int groupIndex;
