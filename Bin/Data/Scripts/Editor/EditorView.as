@@ -1340,9 +1340,10 @@ void HandlePostRenderUpdate()
     ViewRaycast(false);
 }
 
-void DrawNodeDebug(Node@ node, DebugRenderer@ debug)
+void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
 {
-    debug.AddNode(node, 1.0, false);
+    if (drawNode)
+        debug.AddNode(node, 1.0, false);
 
     // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
     // components can have a large performance hit
@@ -1351,8 +1352,9 @@ void DrawNodeDebug(Node@ node, DebugRenderer@ debug)
         for (uint j = 0; j < node.numComponents; ++j)
             node.components[j].DrawDebugGeometry(debug, false);
 
+        // To avoid cluttering the view, do not draw the node axes for child nodes
         for (uint k = 0; k < node.numChildren; ++k)
-            DrawNodeDebug(node.children[k], debug);
+            DrawNodeDebug(node.children[k], debug, false);
     }
 }
 
