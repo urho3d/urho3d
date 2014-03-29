@@ -24,6 +24,6 @@
 pushd %~dp0
 cmake -E make_directory Build
 echo on
-set "OPT="
+@set "OPT="
 cmake -E chdir Build cmake %OPT% -G "MinGW Makefiles" %* ..\Source
 @popd

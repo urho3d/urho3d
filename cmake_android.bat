@@ -49,6 +49,6 @@ if "%use_mklink%" == "1" (
     if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
 ) 
 echo on
-set "OPT="
+@set "OPT="
 cmake -E chdir %build% cmake %OPT% -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
 @popd
