@@ -3348,6 +3348,7 @@ Properties:
 - bool negative // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- int numShadowSplits // readonly
 - bool occludee
 - bool occluder
 - bool perVertex
@@ -5055,7 +5056,6 @@ Properties:
 - int materialQuality
 - int maxInstanceTriangles
 - int maxOccluderTriangles
-- int maxShadowCascades
 - int maxShadowMaps
 - int maxSortedInstances
 - int minInstances

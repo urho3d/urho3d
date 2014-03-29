@@ -4067,6 +4067,8 @@ bool negative;
 Node node;
 /* readonly */
 uint numAttributes;
+/* readonly */
+int numShadowSplits;
 bool occludee;
 bool occluder;
 bool perVertex;
@@ -6059,7 +6061,6 @@ bool hdrRendering;
 int materialQuality;
 int maxInstanceTriangles;
 int maxOccluderTriangles;
-int maxShadowCascades;
 int maxShadowMaps;
 int maxSortedInstances;
 int minInstances;

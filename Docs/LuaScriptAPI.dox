@@ -2147,6 +2147,7 @@ Methods:
 - Texture* GetRampTexture() const
 - Texture* GetShapeTexture() const
 - Frustum GetFrustum() const
+- int GetNumShadowSplits() const
 - bool IsNegative() const
 
 Properties:
@@ -2170,6 +2171,7 @@ Properties:
 - Texture* rampTexture
 - Texture* shapeTexture
 - Frustum frustum (readonly)
+- int numShadowSplits (readonly)
 - bool negative (readonly)
 - Color effectiveColor (readonly)
 - float effectiveSpecularIntensity (readonly)
@@ -3560,7 +3562,6 @@ Methods:
 - void SetShadowQuality(int quality)
 - void SetReuseShadowMaps(bool enable)
 - void SetMaxShadowMaps(int shadowMaps)
-- void SetMaxShadowCascades(int cascades)
 - void SetDynamicInstancing(bool enable)
 - void SetMinInstances(int instances)
 - void SetMaxInstanceTriangles(int triangles)
@@ -3583,7 +3584,6 @@ Methods:
 - int GetShadowQuality() const
 - bool GetReuseShadowMaps() const
 - int GetMaxShadowMaps() const
-- int GetMaxShadowCascades() const
 - bool GetDynamicInstancing() const
 - int GetMinInstances() const
 - int GetMaxInstanceTriangles() const
@@ -3624,7 +3624,6 @@ Properties:
 - int shadowQuality
 - bool reuseShadowMaps
 - int maxShadowMaps
-- int maxShadowCascades
 - bool dynamicInstancing
 - int minInstances
 - int maxInstanceTriangles
@@ -5870,50 +5869,6 @@ Properties:
 - int CM_CLAMP
 - int CM_PINGPONG
 
-### DeferredLightPSVariation
-
-- int DLPS_NONE
-- int DLPS_SPOT
-- int DLPS_POINT
-- int DLPS_POINTMASK
-- int DLPS_SPEC
-- int DLPS_SPOTSPEC
-- int DLPS_POINTSPEC
-- int DLPS_POINTMASKSPEC
-- int DLPS_SHADOW
-- int DLPS_SPOTSHADOW
-- int DLPS_POINTSHADOW
-- int DLPS_POINTMASKSHADOW
-- int DLPS_SHADOWSPEC
-- int DLPS_SPOTSHADOWSPEC
-- int DLPS_POINTSHADOWSPEC
-- int DLPS_POINTMASKSHADOWSPEC
-- int DLPS_ORTHO
-- int DLPS_ORTHOSPOT
-- int DLPS_ORTHOPOINT
-- int DLPS_ORTHOPOINTMASK
-- int DLPS_ORTHOSPEC
-- int DLPS_ORTHOSPOTSPEC
-- int DLPS_ORTHOPOINTSPEC
-- int DLPS_ORTHOPOINTMASKSPEC
-- int DLPS_ORTHOSHADOW
-- int DLPS_ORTHOSPOTSHADOW
-- int DLPS_ORTHOPOINTSHADOW
-- int DLPS_ORTHOPOINTMASKSHADOW
-- int DLPS_ORTHOSHADOWSPEC
-- int DLPS_ORTHOSPOTSHADOWSPEC
-- int DLPS_ORTHOPOINTSHADOWSPEC
-- int DLPS_ORTHOPOINTMASKSHADOWSPEC
-- int MAX_DEFERRED_LIGHT_PS_VARIATIONS
-
-### DeferredLightVSVariation
-
-- int DLVS_NONE
-- int DLVS_DIR
-- int DLVS_ORTHO
-- int DLVS_ORTHODIR
-- int MAX_DEFERRED_LIGHT_VS_VARIATIONS
-
 ### EmitterType
 
 - int EMITTER_SPHERE
@@ -5996,47 +5951,11 @@ Properties:
 - int LM_HORIZONTAL
 - int LM_VERTICAL
 
-### LightPSVariation
-
-- int LPS_NONE
-- int LPS_SPOT
-- int LPS_POINT
-- int LPS_POINTMASK
-- int LPS_SPEC
-- int LPS_SPOTSPEC
-- int LPS_POINTSPEC
-- int LPS_POINTMASKSPEC
-- int LPS_SHADOW
-- int LPS_SPOTSHADOW
-- int LPS_POINTSHADOW
-- int LPS_POINTMASKSHADOW
-- int LPS_SHADOWSPEC
-- int LPS_SPOTSHADOWSPEC
-- int LPS_POINTSHADOWSPEC
-- int LPS_POINTMASKSHADOWSPEC
-- int MAX_LIGHT_PS_VARIATIONS
-
 ### LightType
 
 - int LIGHT_DIRECTIONAL
 - int LIGHT_SPOT
 - int LIGHT_POINT
-
-### LightVSVariation
-
-- int LVS_DIR
-- int LVS_SPOT
-- int LVS_POINT
-- int LVS_SPEC
-- int LVS_SPOTSPEC
-- int LVS_POINTSPEC
-- int LVS_SHADOW
-- int LVS_SPOTSHADOW
-- int LVS_POINTSHADOW
-- int LVS_DIRSPECSHADOW
-- int LVS_SPOTSPECSHADOW
-- int LVS_POINTSPECSHADOW
-- int MAX_LIGHT_VS_VARIATIONS
 
 ### LockState
 
@@ -6221,15 +6140,6 @@ Properties:
 - int ELEMENT_INSTANCEMATRIX3
 - int MAX_VERTEX_ELEMENTS
 
-### VertexLightVSVariation
-
-- int VLVS_NOLIGHTS
-- int VLVS_1LIGHT
-- int VLVS_2LIGHTS
-- int VLVS_3LIGHTS
-- int VLVS_4LIGHTS
-- int MAX_VERTEXLIGHT_VS_VARIATIONS
-
 ### VerticalAlignment
 
 - int VA_TOP
@@ -6406,7 +6316,6 @@ Properties:
 - int HAT_LEFT
 - int HAT_RIGHT
 - int HAT_UP
-- int INSTANCING_BUFFER_DEFAULT_SIZE
 - int KEY_0
 - int KEY_1
 - int KEY_2
@@ -6806,7 +6715,6 @@ Properties:
 - int SHADOWQUALITY_HIGH_24BIT
 - int SHADOWQUALITY_LOW_16BIT
 - int SHADOWQUALITY_LOW_24BIT
-- int SHADOW_MIN_PIXELS
 - unsigned VO_DISABLE_OCCLUSION
 - unsigned VO_DISABLE_SHADOWS
 - unsigned VO_LOW_MATERIAL_QUALITY
