@@ -21,19 +21,19 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
-    #ifdef HEIGHTFOG
-        out float3 oWorldPos : TEXCOORD8,
-    #endif
+    out float4 oWorldPos : TEXCOORD3,
     #if PERPIXEL
-        out float4 oLightVec : TEXCOORD1,
+        #ifdef SHADOW
+            out float4 oShadowPos[NUMCASCADES] : TEXCOORD4,
+        #endif
         #ifdef SPOTLIGHT
-            out float4 oSpotPos : TEXCOORD2,
+            out float4 oSpotPos : TEXCOORD5,
         #endif
         #ifdef POINTLIGHT
-            out float3 oCubeMaskVec : TEXCOORD2,
+            out float3 oCubeMaskVec : TEXCOORD5,
         #endif
     #else
-        out float4 oVertexLight : TEXCOORD1,
+        out float3 oVertexLight : TEXCOORD4,
     #endif
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
@@ -44,10 +44,7 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
-
-    #ifdef HEIGHTFOG
-        oWorldPos = worldPos;
-    #endif
+    oWorldPos = float4(worldPos, GetDepth(oPos));
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -55,47 +52,46 @@ void VS(float4 iPos : POSITION,
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
-        float4 projWorldPos = float4(worldPos, 1.0);
-    
-        #ifdef DIRLIGHT
-            oLightVec = float4(cLightDir, GetDepth(oPos));
-        #else
-            oLightVec = float4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(oPos));
+        float4 projWorldPos = float4(worldPos.xyz, 1.0);
+
+        #ifdef SHADOW
+            // Shadow projection: transform from world space to shadow space
+            GetShadowPos(projWorldPos, oShadowPos);
         #endif
-    
+
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
             oSpotPos = mul(projWorldPos, cLightMatrices[0]);
         #endif
-    
+
         #ifdef POINTLIGHT
-            oCubeMaskVec = mul(oLightVec.xyz, (float3x3)cLightMatrices[0]);
+            oCubeMaskVec = mul(worldPos - cLightPos.xyz, (float3x3)cLightMatrices[0]);
         #endif
     #else
         // Ambient & per-vertex lighting
-        oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
+        oVertexLight = GetAmbient(GetZonePos(worldPos));
 
         #ifdef NUMVERTEXLIGHTS
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-                oVertexLight.rgb += GetVertexLightVolumetric(i, worldPos) * cVertexLights[i * 3].rgb;
+                oVertexLight += GetVertexLightVolumetric(i, worldPos) * cVertexLights[i * 3].rgb;
         #endif
     #endif
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
-    #ifdef HEIGHTFOG
-        float3 iWorldPos : TEXCOORD8,
-    #endif
+    float4 iWorldPos : TEXCOORD3,
     #ifdef PERPIXEL
-        float4 iLightVec : TEXCOORD1,
+        #ifdef SHADOW
+            float4 iShadowPos[NUMCASCADES] : TEXCOORD4,
+        #endif
         #ifdef SPOTLIGHT
-            float4 iSpotPos : TEXCOORD2,
+            float4 iSpotPos : TEXCOORD5,
         #endif
         #ifdef CUBEMASK
-            float3 iCubeMaskVec : TEXCOORD2,
+            float3 iCubeMaskVec : TEXCOORD5,
         #endif
     #else
-        float4 iVertexLight : TEXCOORD1,
+        float3 iVertexLight : TEXCOORD4,
     #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -118,13 +114,29 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    #if PERPIXEL
+    // Get fog factor
+    #ifdef HEIGHTFOG
+        float fogFactor = GetHeightFogFactor(iWorldPos.w, iWorldPos.y);
+    #else
+        float fogFactor = GetFogFactor(iWorldPos.w);
+    #endif
+
+    #ifdef PERPIXEL
         // Per-pixel forward lighting
         float3 lightColor;
         float3 finalColor;
         float diff;
     
-        diff = GetDiffuseVolumetric(iLightVec.xyz);
+        #ifdef DIRLIGHT
+            diff = GetDiffuseVolumetric(cLightDirPS);
+        #else
+            float3 lightVec = (cLightPosPS.xyz - iWorldPos.xyz) * cLightPosPS.w;
+            diff = GetDiffuseVolumetric(lightVec);
+        #endif
+
+        #ifdef SHADOW
+            diff *= GetShadow(iShadowPos, iWorldPos.w);
+        #endif
 
         #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
@@ -134,23 +146,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
             lightColor = cLightColor.rgb;
         #endif
 
-        #ifdef HEIGHTFOG
-            float fogFactor = GetHeightFogFactor(iLightVec.w, iWorldPos.y);
-        #else
-            float fogFactor = GetFogFactor(iLightVec.w);
-        #endif
-    
         finalColor = diff * lightColor * diffColor.rgb;
         oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
     #else
         // Ambient & per-vertex lighting
-        float3 finalColor = iVertexLight.rgb * diffColor.rgb;
-        
-        #ifdef HEIGHTFOG
-            float fogFactor = GetHeightFogFactor(iVertexLight.a, iWorldPos.y);
-        #else
-            float fogFactor = GetFogFactor(iVertexLight.a);
-        #endif
+        float3 finalColor = iVertexLight * diffColor.rgb;
 
         oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif

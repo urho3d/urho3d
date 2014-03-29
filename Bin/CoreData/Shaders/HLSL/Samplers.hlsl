@@ -36,7 +36,7 @@ float3 DecodeNormal(float4 normalInput)
         normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
         return normal;
     #else
-        return normalize(normalInput.rgb * 2.0 - 1.0);
+        return normalInput.rgb * 2.0 - 1.0;
     #endif
 }
 #endif

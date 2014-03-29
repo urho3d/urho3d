@@ -65,7 +65,11 @@ float GetVertexLightVolumetric(int index, float3 worldPos)
 #ifdef SHADOW
 
 #ifdef DIRLIGHT
-    #define NUMCASCADES 4
+    #ifdef SM3
+        #define NUMCASCADES 4
+    #else
+        #define NUMCASCADES 3
+    #endif
 #else
     #define NUMCASCADES 1
 #endif
@@ -77,7 +81,9 @@ void GetShadowPos(float4 projWorldPos, out float4 shadowPos[NUMCASCADES])
         shadowPos[0] = mul(projWorldPos, cLightMatrices[0]);
         shadowPos[1] = mul(projWorldPos, cLightMatrices[1]);
         shadowPos[2] = mul(projWorldPos, cLightMatrices[2]);
-        shadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
+        #ifdef SM3
+            shadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
+        #endif
     #elif defined(SPOTLIGHT)
         shadowPos[0] = mul(projWorldPos, cLightMatrices[1]);
     #else
@@ -130,7 +136,11 @@ float GetIntensity(float3 color)
 #ifdef SHADOW
 
 #ifdef DIRLIGHT
-    #define NUMCASCADES 4
+    #ifdef SM3
+        #define NUMCASCADES 4
+    #else
+        #define NUMCASCADES 3
+    #endif
 #else
     #define NUMCASCADES 1
 #endif
@@ -207,15 +217,24 @@ float GetDirShadow(const float4 iShadowPos[NUMCASCADES], float depth)
 {
     float4 shadowPos;
 
-    if (depth < cShadowSplits.x)
-        shadowPos = iShadowPos[0];
-    else if (depth < cShadowSplits.y)
-        shadowPos = iShadowPos[1];
-    else if (depth < cShadowSplits.z)
-        shadowPos = iShadowPos[2];
-    else
-        shadowPos = iShadowPos[3];
-        
+    #ifdef SM3
+        if (depth < cShadowSplits.x)
+            shadowPos = iShadowPos[0];
+        else if (depth < cShadowSplits.y)
+            shadowPos = iShadowPos[1];
+        else if (depth < cShadowSplits.z)
+            shadowPos = iShadowPos[2];
+        else
+            shadowPos = iShadowPos[3];
+    #else
+        if (depth < cShadowSplits.x)
+            shadowPos = iShadowPos[0];
+        else if (depth < cShadowSplits.y)
+            shadowPos = iShadowPos[1];
+        else
+            shadowPos = iShadowPos[2];
+    #endif
+
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 

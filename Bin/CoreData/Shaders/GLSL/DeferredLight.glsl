@@ -80,7 +80,7 @@ void PS()
         lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0);
     #elif defined(CUBEMASK)
         mat3 lightVecRot = mat3(cLightMatricesPS[0][0].xyz, cLightMatricesPS[0][1].xyz, cLightMatricesPS[0][2].xyz);
-        lightColor = textureCube(sLightCubeMap, lightVecRot * lightVec).rgb * cLightColor.rgb;
+        lightColor = textureCube(sLightCubeMap, lightVecRot * -lightVec).rgb * cLightColor.rgb;
     #else
         lightColor = cLightColor.rgb;
     #endif

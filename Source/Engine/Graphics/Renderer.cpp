@@ -200,15 +200,9 @@ static const char* lightVSVariations[] =
     "PERPIXEL DIRLIGHT ",
     "PERPIXEL SPOTLIGHT ",
     "PERPIXEL POINTLIGHT ",
-    "PERPIXEL DIRLIGHT SPECULAR ",
-    "PERPIXEL SPOTLIGHT SPECULAR ",
-    "PERPIXEL POINTLIGHT SPECULAR ",
     "PERPIXEL DIRLIGHT SHADOW ",
     "PERPIXEL SPOTLIGHT SHADOW ",
     "PERPIXEL POINTLIGHT SHADOW ",
-    "PERPIXEL DIRLIGHT SPECULAR SHADOW ",
-    "PERPIXEL SPOTLIGHT SPECULAR SHADOW ",
-    "PERPIXEL POINTLIGHT SPECULAR SHADOW "
 };
 
 static const char* vertexLightVSVariations[] =
@@ -268,7 +262,6 @@ Renderer::Renderer(Context* context) :
     shadowMapSize_(1024),
     shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
     maxShadowMaps_(1),
-    maxShadowCascades_(MAX_CASCADE_SPLITS),
     minInstances_(2),
     maxInstanceTriangles_(500),
     maxSortedInstances_(1000),
@@ -404,6 +397,9 @@ void Renderer::SetShadowQuality(int quality)
         quality |= SHADOWQUALITY_HIGH_16BIT;
     if (!graphics_->GetHiresShadowMapFormat())
         quality &= SHADOWQUALITY_HIGH_16BIT;
+    // Shader Model 2 can not reliably support four samples without exceeding pixel shader instruction count limit
+    if (!graphics_->GetSM3Support())
+        quality &= ~SHADOWQUALITY_HIGH_16BIT;
     
     if (quality != shadowQuality_)
     {
@@ -431,17 +427,6 @@ void Renderer::SetMaxShadowMaps(int shadowMaps)
     {
         if ((int)i->second_.Size() > maxShadowMaps_)
             i->second_.Resize(maxShadowMaps_);
-    }
-}
-
-void Renderer::SetMaxShadowCascades(int cascades)
-{
-    cascades = Clamp(cascades, 1, MAX_CASCADE_SPLITS);
-    
-    if (cascades != maxShadowCascades_)
-    {
-        maxShadowCascades_ = cascades;
-        ResetShadowMaps();
     }
 }
 
@@ -839,9 +824,10 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     // Adjust the size for directional or point light shadow map atlases
     if (type == LIGHT_DIRECTIONAL)
     {
-        if (maxShadowCascades_ > 1)
+        unsigned numSplits = light->GetNumShadowSplits();
+        if (numSplits > 1)
             width *= 2;
-        if (maxShadowCascades_ > 2)
+        if (numSplits > 2)
             height *= 2;
     }
     else if (type == LIGHT_POINT)
@@ -1062,7 +1048,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     // Make sure shaders are loaded now
     if (vertexShaders.Size() && pixelShaders.Size())
     {
-        bool heightFog = graphics_->GetSM3Support() && batch.zone_ && batch.zone_->GetHeightFog();
+        // Height fog is not supported on Shader Model 2 due to possibly exceeding pixel shader instruction limit
+        bool heightFog = batch.zone_ && batch.zone_->GetHeightFog() && graphics_->GetSM3Support();
         
         // If instancing is not supported, but was requested, or the object is too large to be instanced,
         // choose static geometry vertex shader instead
@@ -1092,10 +1079,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             
             bool materialHasSpecular = batch.material_ ? batch.material_->GetSpecular() : true;
             if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && materialHasSpecular)
-            {
-                vsi += LVS_SPEC;
                 psi += LPS_SPEC;
-            }
             if (allowShadows && lightQueue->shadowMap_)
             {
                 vsi += LVS_SHADOW;
@@ -1123,10 +1107,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             }
             
             if (heightFog)
-            {
-                vsi += MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS;
                 psi += MAX_LIGHT_PS_VARIATIONS;
-            }
             
             batch.vertexShader_ = vertexShaders[vsi];
             batch.pixelShader_ = pixelShaders[psi];
@@ -1141,17 +1122,11 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
                     numVertexLights = batch.lightQueue_->vertexLights_.Size();
                 
                 unsigned vsi = batch.geometryType_ * MAX_VERTEXLIGHT_VS_VARIATIONS + numVertexLights;
-                if (heightFog)
-                    vsi += MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS;
-                
                 batch.vertexShader_ = vertexShaders[vsi];
             }
             else
             {
                 unsigned vsi = batch.geometryType_;
-                if (heightFog)
-                    vsi += MAX_GEOMETRYTYPES;
-                
                 batch.vertexShader_ = vertexShaders[vsi];
             }
             
@@ -1430,6 +1405,8 @@ void Renderer::Initialize()
     
     if (!graphics_->GetShadowMapFormat())
         drawShadows_ = false;
+    // Validate the shadow quality level
+    SetShadowQuality(shadowQuality_);
     
     defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
     defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
@@ -1503,31 +1480,29 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
         // Load forward pixel lit variations
-        vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS * 2);
+        vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
         pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS * 2);
         
-        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS * 2; ++j)
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
         {
-            unsigned k = j % (MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-            unsigned h = j / (MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-            unsigned g = k / MAX_LIGHT_VS_VARIATIONS;
-            unsigned l = k % MAX_LIGHT_VS_VARIATIONS;
+            unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
+            unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
             
             vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
-                lightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
+                lightVSVariations[l] + geometryVSVariations[g]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
-            unsigned k = j % MAX_LIGHT_PS_VARIATIONS;
+            unsigned l = j % MAX_LIGHT_PS_VARIATIONS;
             unsigned h = j / MAX_LIGHT_PS_VARIATIONS;
-            if (k & LPS_SHADOW)
+            if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
-                    lightPSVariations[k] + shadowVariations[shadows] + heightFogVariations[h]);
+                    lightPSVariations[l] + shadowVariations[shadows] + heightFogVariations[h]);
             }
             else
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +
-                    lightPSVariations[k] + heightFogVariations[h]);
+                    lightPSVariations[l] + heightFogVariations[h]);
         }
     }
     else
@@ -1535,26 +1510,22 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         // Load vertex light variations
         if (pass->GetLightingMode() == LIGHTING_PERVERTEX)
         {
-            vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS * 2);
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS * 2; ++j)
+            vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)
             {
-                unsigned k = j % (MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
-                unsigned h = j / (MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS);
-                unsigned g = k / MAX_VERTEXLIGHT_VS_VARIATIONS;
-                unsigned l = k % MAX_VERTEXLIGHT_VS_VARIATIONS;
+                unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
+                unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
-                    vertexLightVSVariations[l] + geometryVSVariations[g] + heightFogVariations[h]);
+                    vertexLightVSVariations[l] + geometryVSVariations[g]);
             }
         }
         else
         {
-            vertexShaders.Resize(MAX_GEOMETRYTYPES * 2);
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * 2; ++j)
+            vertexShaders.Resize(MAX_GEOMETRYTYPES);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             {
-                unsigned k = j % MAX_GEOMETRYTYPES;
-                unsigned h = j / MAX_GEOMETRYTYPES;
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
-                    geometryVSVariations[k] + heightFogVariations[h]);
+                    geometryVSVariations[j]);
             }
         }
         

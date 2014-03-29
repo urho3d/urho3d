@@ -807,6 +807,7 @@ static void RegisterLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "void set_shapeTexture(Texture@+)", asMETHOD(Light, SetShapeTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "Texture@+ get_shapeTexture() const", asMETHOD(Light, GetShapeTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "Frustum get_frustum() const", asMETHOD(Light, GetFrustum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "int get_numShadowSplits() const", asMETHOD(Light, GetNumShadowSplits), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "bool get_negative() const", asMETHOD(Light, IsNegative), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "Color get_effectiveColor() const", asMETHOD(Light, GetEffectiveColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float get_effectiveSpecularIntensity() const", asMETHOD(Light, GetEffectiveSpecularIntensity), asCALL_THISCALL);
@@ -1329,8 +1330,6 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "int get_shadowMapSize() const", asMETHOD(Renderer, GetShadowMapSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_shadowQuality(int)", asMETHOD(Renderer, SetShadowQuality), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_shadowQuality() const", asMETHOD(Renderer, GetShadowQuality), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_maxShadowCascades(int)", asMETHOD(Renderer, SetMaxShadowCascades), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "int get_maxShadowCascades() const", asMETHOD(Renderer, GetMaxShadowCascades), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxShadowMaps(int)", asMETHOD(Renderer, SetMaxShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxShadowMaps() const", asMETHOD(Renderer, GetMaxShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_reuseShadowMaps(bool)", asMETHOD(Renderer, SetReuseShadowMaps), asCALL_THISCALL);

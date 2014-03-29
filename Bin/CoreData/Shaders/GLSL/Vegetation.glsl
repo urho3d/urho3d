@@ -8,18 +8,15 @@ uniform float cWindHeightPivot;
 uniform float cWindPeriod;
 uniform vec2 cWindWorldSpacing;
 
-varying vec2 vTexCoord;
-#ifdef HEIGHTFOG
-    varying vec3 vWorldPos;
+#ifdef NORMALMAP
+    varying vec4 vTexCoord;
+    varying vec4 vTangent;
+#else
+    varying vec2 vTexCoord;
 #endif
+varying vec3 vNormal;
+varying vec4 vWorldPos;
 #ifdef PERPIXEL
-    varying vec4 vLightVec;
-    #ifdef SPECULAR
-        varying vec3 vEyeVec;
-    #endif
-    #ifndef NORMALMAP
-        varying vec3 vNormal;
-    #endif
     #ifdef SHADOW
         varying vec4 vShadowPos[NUMCASCADES];
     #endif
@@ -30,13 +27,14 @@ varying vec2 vTexCoord;
         varying vec3 vCubeMaskVec;
     #endif
 #else
-    varying vec4 vVertexLight;
-    varying vec3 vNormal;
-    #ifdef NORMALMAP
-        varying vec3 vTangent;
-        varying vec3 vBitangent;
-    #endif
+    varying vec3 vVertexLight;
     varying vec4 vScreenPos;
+    #ifdef ENVCUBEMAP
+        varying vec3 vReflectionVec;
+    #endif
+    #if defined(LIGHTMAP) || defined(AO)
+        varying vec2 vTexCoord2;
+    #endif
 #endif
 
 void VS()
@@ -51,24 +49,18 @@ void VS()
     worldPos.z -= windStrength * cos(windPeriod);
 
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = GetTexCoord(iTexCoord);
-
-    #ifdef HEIGHTFOG
-        vWorldPos = worldPos;
-    #endif
-
-    #if defined(PERPIXEL) && defined(NORMALMAP)
-        vec3 vNormal;
-        vec3 vTangent;
-        vec3 vBitangent;
-    #endif
-
     vNormal = GetWorldNormal(modelMatrix);
+    vWorldPos = vec4(worldPos, GetDepth(gl_Position));
+
     #ifdef NORMALMAP
-        vTangent = GetWorldTangent(modelMatrix);
-        vBitangent = cross(vTangent, vNormal) * iTangent.w;
+        vec3 tangent = GetWorldTangent(modelMatrix);
+        vec3 bitangent = cross(tangent, vNormal) * iTangent.w;
+        vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
+        vTangent = vec4(tangent, bitangent.z);
+    #else
+        vTexCoord = GetTexCoord(iTexCoord);
     #endif
-    
+
     #ifdef PERPIXEL
         // Per-pixel forward lighting
         vec4 projWorldPos = vec4(worldPos, 1.0);
@@ -85,38 +77,28 @@ void VS()
         #endif
     
         #ifdef POINTLIGHT
-            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (cLightPos.xyz - worldPos);
-        #endif
-    
-        #ifdef NORMALMAP
-            mat3 tbn = mat3(vTangent, vBitangent, vNormal);
-            #ifdef DIRLIGHT
-                vLightVec = vec4(cLightDir * tbn, GetDepth(gl_Position));
-            #else
-                vLightVec = vec4((cLightPos.xyz - worldPos) * tbn * cLightPos.w, GetDepth(gl_Position));
-            #endif
-            #ifdef SPECULAR
-                vEyeVec = (cCameraPos - worldPos) * tbn;
-            #endif
-        #else
-            #ifdef DIRLIGHT
-                vLightVec = vec4(cLightDir, GetDepth(gl_Position));
-            #else
-                vLightVec = vec4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(gl_Position));
-            #endif
-            #ifdef SPECULAR
-                vEyeVec = cCameraPos - worldPos;
-            #endif
+            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (worldPos - cLightPos.xyz);
         #endif
     #else
         // Ambient & per-vertex lighting
-        vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
+        #if defined(LIGHTMAP) || defined(AO)
+            // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
+            vVertexLight = vec3(0.0, 0.0, 0.0);
+            vTexCoord2 = iTexCoord2;
+        #else
+            vVertexLight = GetAmbient(GetZonePos(worldPos));
+        #endif
         
         #ifdef NUMVERTEXLIGHTS
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-                vVertexLight.rgb += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
+                vVertexLight += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
         #endif
         
         vScreenPos = GetScreenPos(gl_Position);
+
+        #ifdef ENVCUBEMAP
+            vReflectionVec = worldPos - cCameraPos;
+        #endif
     #endif
 }

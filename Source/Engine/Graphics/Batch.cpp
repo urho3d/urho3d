@@ -234,6 +234,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         
         graphics->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
         graphics->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
+        graphics->SetShaderParameter(PSP_CAMERAPOS, cameraEffectiveTransform.Translation());
         
         float nearClip = camera_->GetNearClip();
         float farClip = camera_->GetFarClip();

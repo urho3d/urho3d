@@ -69,14 +69,7 @@ void PS(
         float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
     #endif
 
-    // With a cubemasked shadowed point light and hardware depth reconstruction, SM2 runs out of instructions,
-    // so skip normalization of normals in that case
-    #if defined(SM3) || defined(HWSHADOW) || !defined(POINTLIGHT) || !defined(SHADOW) || !defined(CUBEMASK)
-        float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
-    #else
-        float3 normal = normalInput.rgb * 2.0 - 1.0;
-    #endif
-
+    float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;
     float3 lightDir;
@@ -97,7 +90,7 @@ void PS(
         float4 spotPos = mul(projWorldPos, cLightMatricesPS[0]);
         lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
     #elif defined(CUBEMASK)
-        lightColor = texCUBE(sLightCubeMap, mul(lightVec, (float3x3)cLightMatricesPS[0])).rgb * cLightColor.rgb;
+        lightColor = texCUBE(sLightCubeMap, mul(-lightVec, (float3x3)cLightMatricesPS[0])).rgb * cLightColor.rgb;
     #else
         lightColor = cLightColor.rgb;
     #endif

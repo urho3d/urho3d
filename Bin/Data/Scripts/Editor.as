@@ -17,8 +17,8 @@
 String configPath;
 String configFileName;
 
-// If loaded in OpenGL mode, remember the instancing setting in config instead of auto-disabling it
 bool instancingSetting = true;
+int shadowQualitySetting = 2;
 
 void Start()
 {
@@ -178,7 +178,7 @@ void LoadConfig()
         if (renderingElem.HasAttribute("texturequality")) renderer.textureQuality = renderingElem.GetInt("texturequality");
         if (renderingElem.HasAttribute("materialquality")) renderer.materialQuality = renderingElem.GetInt("materialquality");
         if (renderingElem.HasAttribute("shadowresolution")) SetShadowResolution(renderingElem.GetInt("shadowresolution"));
-        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = renderingElem.GetInt("shadowquality");
+        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = shadowQualitySetting = renderingElem.GetInt("shadowquality");
         if (renderingElem.HasAttribute("maxoccludertriangles")) renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
         if (renderingElem.HasAttribute("specularlighting")) renderer.specularLighting = renderingElem.GetBool("specularlighting");
         if (renderingElem.HasAttribute("dynamicinstancing")) renderer.dynamicInstancing = instancingSetting = renderingElem.GetBool("dynamicinstancing");
@@ -264,18 +264,17 @@ void SaveConfig()
     resourcesElem.SetAttribute("importpath", uiImportPath);
     resourcesElem.SetAttribute("recentscenes", Join(uiRecentScenes, ";"));
 
-    if (renderer !is null)
+    if (renderer !is null && graphics !is null)
     {
         renderingElem.SetInt("texturequality", renderer.textureQuality);
         renderingElem.SetInt("materialquality", renderer.materialQuality);
         renderingElem.SetInt("shadowresolution", GetShadowResolution());
-        renderingElem.SetInt("shadowquality", renderer.shadowQuality);
         renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
         renderingElem.SetBool("specularlighting", renderer.specularLighting);
-    }
-
-    if (graphics !is null)
+        // If Shader Model 3 is not supported, save the remembered instancing & quality settings instead of reduced settings
+        renderingElem.SetInt("shadowquality", graphics.sm3Support ? renderer.shadowQuality : shadowQualitySetting);
         renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
+    }
 
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
 

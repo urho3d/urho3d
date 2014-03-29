@@ -1167,6 +1167,9 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool allowLitBase = useLitBase_ && !light->IsNegative() && light == drawable->GetFirstLight() &&
         drawable->GetVertexLights().Empty() && !hasAmbientGradient;
+    // Ambient + shadowed point light on Shader Model 2 may exceed the pixel shader instruction count
+    if (allowLitBase && !graphics_->GetSM3Support() && light->GetLightType() == LIGHT_POINT && light->GetCastShadows())
+        allowLitBase = false;
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {
@@ -2189,18 +2192,20 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
 {
     unsigned width = shadowMap->GetWidth();
     unsigned height = shadowMap->GetHeight();
-    int maxCascades = renderer_->GetMaxShadowCascades();
     
     switch (light->GetLightType())
     {
     case LIGHT_DIRECTIONAL:
-        if (maxCascades == 1)
-            return IntRect(0, 0, width, height);
-        else if (maxCascades == 2)
-            return IntRect(splitIndex * width / 2, 0, (splitIndex + 1) * width / 2, height);
-        else
-            return IntRect((splitIndex & 1) * width / 2, (splitIndex / 2) * height / 2, ((splitIndex & 1) + 1) * width / 2,
-                (splitIndex / 2 + 1) * height / 2);
+        {
+            int numSplits = light->GetNumShadowSplits();
+            if (numSplits == 1)
+                return IntRect(0, 0, width, height);
+            else if (numSplits == 2)
+                return IntRect(splitIndex * width / 2, 0, (splitIndex + 1) * width / 2, height);
+            else
+                return IntRect((splitIndex & 1) * width / 2, (splitIndex / 2) * height / 2, ((splitIndex & 1) + 1) * width / 2,
+                    (splitIndex / 2 + 1) * height / 2);
+        }
         
     case LIGHT_SPOT:
         return IntRect(0, 0, width, height);
@@ -2227,8 +2232,9 @@ void View::SetupShadowCameras(LightQueryResult& query)
             
             float nearSplit = camera_->GetNearClip();
             float farSplit;
+            int numSplits = light->GetNumShadowSplits();
             
-            while (splits < renderer_->GetMaxShadowCascades())
+            while (splits < numSplits)
             {
                 // If split is completely beyond camera far clip, we are done
                 if (nearSplit > camera_->GetFarClip())

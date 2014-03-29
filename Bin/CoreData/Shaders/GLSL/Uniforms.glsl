@@ -41,6 +41,7 @@ uniform mat4 cZone;
 #endif
 
 uniform vec3 cAmbientColor;
+uniform vec3 cCameraPosPS;
 uniform float cDeltaTimePS;
 uniform float cElapsedTimePS;
 uniform vec4 cFogParams;
