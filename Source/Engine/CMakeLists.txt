@@ -83,7 +83,7 @@ if (APPLE)
 elseif (MSVC)
     set (AMALG_EXCLUDES_PLATFORM_SPECIFIC |Camera|Color|Frustum|MathAPI|Network|Precompiled|ResourceCache|Text\\.|Window)
 endif ()
-set (AMALG_EXCLUDES "(Camera|CollisionShape|Constraint|HttpRequest|Light|SoundSource|Variant${AMALG_EXCLUDES_PLATFORM_SPECIFIC})")
+set (AMALG_EXCLUDES "(CollisionShape|Constraint|HttpRequest|SoundSource|Variant${AMALG_EXCLUDES_PLATFORM_SPECIFIC})")
 set (AMALG_FINAL_TARGET 1)
 
 # Define dependency libs
