@@ -304,6 +304,8 @@ private:
     bool deferredAmbient_;
     /// Forward light base pass optimization flag. If in use, combine the base pass and first light for all opaque objects.
     bool useLitBase_;
+    /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
+    bool hasScenePasses_;
     /// Renderpath.
     RenderPath* renderPath_;
     /// Per-thread octree query results.

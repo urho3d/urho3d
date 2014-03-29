@@ -93,8 +93,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
 
 static void ConstructIntRect(IntRect* ptr)
 {
-    // Init to zero because performance is not critical
-    new(ptr) IntRect(IntRect::ZERO);
+    new(ptr) IntRect();
 }
 
 static void ConstructIntRectCopy(const IntRect& rect, IntRect* ptr)
@@ -139,8 +138,7 @@ static void RegisterIntRect(asIScriptEngine* engine)
 
 static void ConstructIntVector2(IntVector2* ptr)
 {
-    // Init to zero because performance is not critical
-    new(ptr) IntVector2(IntVector2::ZERO);
+    new(ptr) IntVector2();
 }
 
 static void ConstructIntVector2Copy(const IntVector2& vector, IntVector2* ptr)
@@ -189,8 +187,7 @@ static void RegisterIntVector2(asIScriptEngine* engine)
 
 static void ConstructVector2(Vector2* ptr)
 {
-    // Init to zero because performance is not critical
-    new(ptr) Vector2(Vector2::ZERO);
+    new(ptr) Vector2();
 }
 
 static void ConstructVector2Copy(const Vector2& vector, Vector2* ptr)
@@ -252,8 +249,7 @@ static void RegisterVector2(asIScriptEngine* engine)
 
 static void ConstructVector3(Vector3* ptr)
 {
-    // Init to zero because performance is not critical
-    new(ptr) Vector3(Vector3::ZERO);
+    new(ptr) Vector3();
 }
 
 static void ConstructVector3Copy(const Vector3& vector, Vector3* ptr)
@@ -318,8 +314,7 @@ static void RegisterVector3(asIScriptEngine* engine)
 
 static void ConstructVector4(Vector4* ptr)
 {
-    // Init to zero because performance is not critical
-    new(ptr) Vector4(Vector4::ZERO);
+    new(ptr) Vector4();
 }
 
 static void ConstructVector4Copy(const Vector4& vector, Vector4* ptr)
@@ -716,8 +711,7 @@ static void RegisterPlane(asIScriptEngine* engine)
 
 static void ConstructRay(Ray* ptr)
 {
-    // Initialize to zero because performance is not critical
-    new(ptr) Ray(Vector3::ZERO, Vector3::ZERO);
+    new(ptr) Ray();
 }
 
 static void ConstructRayCopy(const Ray& ray, Ray* ptr)

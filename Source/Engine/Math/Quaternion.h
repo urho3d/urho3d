@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API Quaternion
 {
 public:
-    /// Construct identity quaternion.
+    /// Construct an identity quaternion.
     Quaternion() :
         w_(1.0f),
         x_(0.0f),
@@ -172,7 +172,7 @@ public:
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
     /// Define from a direction to look in and an up direction.
-    void FromLookRotation(const Vector3& direction, const Vector3&up = Vector3::UP);
+    void FromLookRotation(const Vector3& direction, const Vector3& up = Vector3::UP);
 
     /// Normalize to unit length.
     void Normalize()

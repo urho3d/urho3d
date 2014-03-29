@@ -237,7 +237,8 @@ Graphics::Graphics(Context* context) :
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
     shaderPath_("Shaders/HLSL/"),
-    shaderExtension_(".hlsl")
+    shaderExtension_(".hlsl"),
+    orientations_("LandscapeLeft LandscapeRight")
 {
     SetTextureUnitMappings();
     
@@ -371,6 +372,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
+
     if (!impl_->window_)
     {
         if (!OpenWindow(width, height, resizable, borderless))
@@ -524,6 +527,12 @@ void Graphics::SetSRGB(bool enable)
 void Graphics::SetFlushGPU(bool enable)
 {
     flushGPU_ = enable;
+}
+
+void Graphics::SetOrientations(const String& orientations)
+{
+    orientations_ = orientations.Trimmed();
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 }
 
 bool Graphics::ToggleFullscreen()
@@ -2376,7 +2385,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
     }
     else
         impl_->window_ = SDL_CreateWindowFrom(externalWindow_, 0);
-    
+
     if (!impl_->window_)
     {
         LOGERROR("Could not create window");

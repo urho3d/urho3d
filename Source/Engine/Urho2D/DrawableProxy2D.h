@@ -57,17 +57,17 @@ public:
     void RemoveDrawable(Drawable2D* drawable);
     /// Mark order dirty.
     void MarkOrderDirty() { orderDirty_ = true; }
+    /// Check visibility.
+    bool CheckVisibility(Drawable2D* drawable) const;
 
-protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+private:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Handle view update begin event. Determine Drawable2D's and their batches here.
+    void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
-    /// Camera node.
-    WeakPtr<Node> cameraNode_;
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Vertex buffer.
@@ -77,9 +77,17 @@ protected:
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
     /// Drawables.
-    PODVector<Drawable2D* > drawables_;
+    PODVector<Drawable2D*> drawables_;
     /// Order dirty.
     bool orderDirty_;
+    /// Frustum for current frame.
+    const Frustum* frustum_;
+    /// Frustum bounding box for current frame.
+    BoundingBox frustumBoundingBox_;
+    /// Total index count for the current frame.
+    unsigned indexCount_;
+    /// Total vertex count for the current frame.
+    unsigned vertexCount_;
 };
 
 }

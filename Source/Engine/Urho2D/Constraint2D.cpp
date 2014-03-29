@@ -75,13 +75,11 @@ void Constraint2D::CreateJoint()
     if (joint_)
         return;
 
-    b2JointDef* jointDef = CreateJointDef();
+    b2JointDef* jointDef = GetJointDef();
     if (jointDef)
     {
         joint_ = physicsWorld_->GetWorld()->CreateJoint(jointDef);
         joint_->SetUserData(this);
-
-        delete jointDef;
     }
 }
 

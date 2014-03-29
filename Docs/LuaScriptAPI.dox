@@ -708,14 +708,14 @@ Properties:
 
 Methods:
 
-- void SetSensor(bool sensor)
+- void SetTrigger(bool trigger)
 - void SetCategoryBits(int categoryBits)
 - void SetMaskBits(int maskBits)
 - void SetGroupIndex(int groupIndex)
 - void SetDensity(float density)
 - void SetFriction(float friction)
 - void SetRestitution(float restitution)
-- bool IsSensor() const
+- bool IsTrigger() const
 - int GetCategoryBits() const
 - int GetMaskBits() const
 - int GetGroupIndex() const
@@ -728,7 +728,7 @@ Methods:
 
 Properties:
 
-- bool sensor
+- bool trigger
 - int categoryBits
 - int maskBits
 - int groupIndex
@@ -1054,18 +1054,24 @@ Properties:
 
 Methods:
 
-- void SetOwnerBodyAnchor(const Vector2& anchor)
-- void SetOtherBodyAnchor(const Vector2& anchor)
-- void SetMaxLength(float maxLength)
-- const Vector2& GetOwnerBodyAnchor() const
-- const Vector2& GetOtherBodyAnchor() const
-- float GetMaxLength() const
+- void SetLinearOffset(const Vector2& linearOffset)
+- void SetAngularOffset(float angularOffset)
+- void SetMaxForce(float maxForce)
+- void SetMaxTorque(float maxTorque)
+- void SetCorrectionFactor(float correctionFactor)
+- const Vector2& GetLinearOffset() const
+- float GetAngularOffset() const
+- float GetMaxForce() const
+- float GetMaxTorque() const
+- float GetCorrectionFactor() const
 
 Properties:
 
-- Vector2& ownerBodyAnchor
-- Vector2& otherBodyAnchor
-- float maxLength
+- Vector2& linearOffset
+- float angularOffset
+- float maxForce
+- float maxTorque
+- float correctionFactor
 
 ### ConstraintMouse2D : Constraint2D
 
@@ -1829,6 +1835,7 @@ Methods:
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
 - void SetFlushGPU(bool enable)
+- void SetOrientations(const String orientations)
 - bool ToggleFullscreen()
 - void Maximize()
 - void Minimize()
@@ -1852,6 +1859,7 @@ Methods:
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
 - bool GetFlushGPU() const
+- const String GetOrientations() const
 - bool IsDeviceLost() const
 - unsigned GetNumPrimitives() const
 - unsigned GetNumBatches() const
@@ -1884,6 +1892,7 @@ Properties:
 - bool tripleBuffer (readonly)
 - bool sRGB
 - bool flushGPU
+- String orientations
 - bool deviceLost (readonly)
 - unsigned numPrimitives (readonly)
 - unsigned numBatches (readonly)

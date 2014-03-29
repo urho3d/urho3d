@@ -31,8 +31,9 @@ namespace Urho3D
 class URHO3D_API Plane
 {
 public:
-    /// Construct undefined.
-    Plane()
+    /// Construct a degenerate plane with zero normal and parameter.
+    Plane() :
+        d_(0.0f)
     {
     }
     

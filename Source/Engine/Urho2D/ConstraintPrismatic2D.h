@@ -62,38 +62,28 @@ public:
     /// Return axis.
     const Vector2& GetAxis() const { return axis_; }
     /// Return enable limit.
-    bool GetEnableLimit() const { return enableLimit_; }
+    bool GetEnableLimit() const { return jointDef_.enableLimit; }
     /// Return lower translation.
-    float GetLowerTranslation() const { return lowerTranslation_; }
+    float GetLowerTranslation() const { return jointDef_.lowerTranslation; }
     /// Return upper translation.
-    float GetUpperTranslation() const { return upperTranslation_; }
+    float GetUpperTranslation() const { return jointDef_.upperTranslation; }
     /// Return enable motor.
-    bool GetEnableMotor() const { return enableMotor_; }
+    bool GetEnableMotor() const { return jointDef_.enableMotor; }
     /// Return maxmotor force.
-    float GetMaxMotorForce() const { return maxMotorForce_; }
+    float GetMaxMotorForce() const { return jointDef_.maxMotorForce; }
     /// Return motor speed.
-    float GetMotorSpeed() const { return motorSpeed_; }
+    float GetMotorSpeed() const { return jointDef_.motorSpeed; }
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
 
+    /// Box2D joint def.
+    b2PrismaticJointDef jointDef_;
     /// Anchor.
     Vector2 anchor_;
     /// Axis.
     Vector2 axis_;
-    /// Enable limit.
-    bool enableLimit_;
-    /// Lower translation.
-    float lowerTranslation_;
-    /// Upper translation.
-    float upperTranslation_;
-    /// Enable motor.
-    bool enableMotor_;
-    /// Maxmotor force.
-    float maxMotorForce_;
-    /// Motor speed.
-    float motorSpeed_;
 };
 
 }

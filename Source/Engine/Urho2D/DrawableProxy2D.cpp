@@ -26,13 +26,16 @@
 #include "Drawable2D.h"
 #include "DrawableProxy2D.h"
 #include "Geometry.h"
+#include "GraphicsEvents.h"
 #include "IndexBuffer.h"
 #include "Log.h"
 #include "Material.h"
 #include "Node.h"
+#include "Profiler.h"
 #include "Scene.h"
 #include "VertexBuffer.h"
 #include "Sort.h"
+#include "WorkQueue.h"
 
 #include "DebugNew.h"
 
@@ -43,8 +46,12 @@ DrawableProxy2D::DrawableProxy2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
-    orderDirty_(true)
+    orderDirty_(true),
+    frustum_(0),
+    indexCount_(0),
+    vertexCount_(0)
 {
+    SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(DrawableProxy2D, HandleBeginViewUpdate));
 }
 
 DrawableProxy2D::~DrawableProxy2D()
@@ -58,46 +65,27 @@ void DrawableProxy2D::RegisterObject(Context* context)
 
 void DrawableProxy2D::UpdateBatches(const FrameInfo& frame)
 {
-    unsigned count = materials_.Size();
-    batches_.Resize(count);
+    unsigned count = batches_.Size();
 
+    // Update non-thread critical parts of the source batches
     for (unsigned i = 0; i < count; ++i)
     {
         batches_[i].distance_ = 10.0f + (count - i) * 0.001f;
-        batches_[i].material_ = materials_[i];
-        batches_[i].geometry_ = geometries_[i];
         batches_[i].worldTransform_ = &Matrix3x4::IDENTITY;
     }
 }
 
 void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
 {
-    materials_.Clear();
-
-    if (orderDirty_)
+    // Fill index buffer
+    if (indexBuffer_->GetIndexCount() < indexCount_)
     {
-        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
-        orderDirty_ = false;
-    }
-
-    float timeStep = frame.timeStep_;
-
-    unsigned vertexCount = 0;
-    for (unsigned i = 0; i < drawables_.Size(); ++i)
-        vertexCount += drawables_[i]->GetVertices().Size();
-
-    if (vertexCount == 0)
-        return;
-
-    unsigned indexCount = vertexCount / 4 * 6;
-    if (indexBuffer_->GetIndexCount() < indexCount)
-    {
-        bool largeIndices = indexCount > 0xFFFF;
-        indexBuffer_->SetSize(indexCount, largeIndices, true);
-        void* buffer = indexBuffer_->Lock(0, indexCount, true);
+        bool largeIndices = vertexCount_ > 0xffff;
+        indexBuffer_->SetSize(indexCount_, largeIndices, true);
+        void* buffer = indexBuffer_->Lock(0, indexCount_, true);
         if (buffer)
         {
-            unsigned quadCount = indexCount / 6;
+            unsigned quadCount = indexCount_ / 6;
             if (largeIndices)
             {
                 unsigned* dest = reinterpret_cast<unsigned*>(buffer);
@@ -138,54 +126,36 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
         }
     }
 
-    if (vertexBuffer_->GetVertexCount() < vertexCount)
-        vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
+    if (vertexBuffer_->GetVertexCount() < vertexCount_)
+        vertexBuffer_->SetSize(vertexCount_, MASK_VERTEX2D);
 
-    Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
-    if (dest)
+    if (vertexCount_)
     {
-        Material* material = 0;
-        unsigned iStart = 0;
-        unsigned iCount = 0;
-        unsigned vStart = 0;
-        unsigned vCount = 0;
-
-        for (unsigned d = 0; d < drawables_.Size(); ++d)
+        Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount_, true));
+        if (dest)
         {
-            Material* usedMaterial = drawables_[d]->GetUsedMaterial();
-            const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
-            if (!usedMaterial || vertices.Empty())
-                continue;
+            Material* material = 0;
+            unsigned iStart = 0;
+            unsigned iCount = 0;
+            unsigned vStart = 0;
+            unsigned vCount = 0;
 
-            if (material != usedMaterial)
+            for (unsigned d = 0; d < drawables_.Size(); ++d)
             {
-                if (material)
-                {
-                    AddBatch(material, iStart, iCount, vStart, vCount);
-                    iStart += iCount;
-                    iCount = 0;
-                    vStart += vCount;
-                    vCount = 0;
-                }
+                if (!drawables_[d]->GetVisibility())
+                    continue;
 
-                material = usedMaterial;
+                const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
+                for (unsigned i = 0; i < vertices.Size(); ++i)
+                    dest[i] = vertices[i];
+                dest += vertices.Size();
             }
 
-            for (unsigned i = 0; i < vertices.Size(); ++i)
-                dest[i] = vertices[i];
-            dest += vertices.Size();
-
-            iCount += vertices.Size() / 4 * 6;
-            vCount += vertices.Size();
+            vertexBuffer_->Unlock();
         }
-
-        if (material)
-            AddBatch(material, iStart, iCount, vStart, vCount);
-
-        vertexBuffer_->Unlock();
+        else
+            LOGERROR("Failed to lock vertex buffer");
     }
-    else
-        LOGERROR("Failed to lock vertex buffer");
 }
 
 UpdateGeometryType DrawableProxy2D::GetUpdateGeometryType()
@@ -214,32 +184,148 @@ void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
     orderDirty_ = true;
 }
 
-void DrawableProxy2D::OnNodeSet(Node* node)
+bool DrawableProxy2D::CheckVisibility(Drawable2D* drawable) const
 {
-    Drawable::OnNodeSet(node);
+    const BoundingBox& box = drawable->GetWorldBoundingBox();
+    if (frustum_)
+        return frustum_->IsInsideFast(box) != OUTSIDE;
 
-    Scene* scene = GetScene();
-    if (scene)
-    {
-        PODVector<Camera*> cameras;
-        scene->GetComponents(cameras, true);
-        if (!cameras.Empty())
-            cameraNode_ = cameras[0]->GetNode();
-    }
+    return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
 }
 
 void DrawableProxy2D::OnWorldBoundingBoxUpdate()
 {
-    boundingBox_.Clear();
+    // Set a large dummy bounding box to ensure the proxy is rendered
+    boundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
+    worldBoundingBox_ = boundingBox_;
+}
 
-    if (cameraNode_)
+void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
+{
+    DrawableProxy2D* proxy = reinterpret_cast<DrawableProxy2D*>(item->aux_);
+    Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
+    Drawable2D** end = reinterpret_cast<Drawable2D**>(item->end_);
+
+    while (start != end)
     {
-        // Create dummy bounding box
-        Vector3 position = cameraNode_->GetWorldPosition();
-        boundingBox_.Merge(Vector3(position.x_, position.y_, 20.0f));
+        Drawable2D* drawable = *start++;
+        if (proxy->CheckVisibility(drawable) && drawable->GetUsedMaterial() && drawable->GetVertices().Size())
+            drawable->SetVisibility(true);
+        else
+            drawable->SetVisibility(false);
+    }
+}
+
+void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace BeginViewUpdate;
+
+    // Check that we are updating the correct scene
+    if (GetScene() != eventData[P_SCENE].GetPtr())
+        return;
+
+    PROFILE(UpdateDrawableProxy2D);
+
+    if (orderDirty_)
+    {
+        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
+        orderDirty_ = false;
     }
 
-    worldBoundingBox_ = boundingBox_;
+    Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
+    frustum_ = &camera->GetFrustum();
+    if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
+    {
+        // Define bounding box with min and max points
+        frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]);
+        frustum_ = 0;
+    }
+
+    {
+        PROFILE(CheckDrawableVisibility);
+
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+        int drawablesPerItem = drawables_.Size() / numWorkItems;
+        
+        PODVector<Drawable2D*>::Iterator start = drawables_.Begin();
+        for (int i = 0; i < numWorkItems; ++i)
+        {
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = CheckDrawableVisibility;
+            item->aux_ = this;
+
+            PODVector<Drawable2D*>::Iterator end = drawables_.End();
+            if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                end = start + drawablesPerItem;
+            
+            item->start_ = &(*start);
+            item->end_ = &(*end);
+            queue->AddWorkItem(item);
+            
+            start = end;
+        }
+
+        queue->Complete(M_MAX_UNSIGNED);
+    }
+
+    vertexCount_ = 0;
+    for (unsigned i = 0; i < drawables_.Size(); ++i)
+    {
+        if (drawables_[i]->GetVisibility())
+            vertexCount_ += drawables_[i]->GetVertices().Size();
+    }
+    indexCount_ = vertexCount_ / 4 * 6;
+
+    // Go through the drawables to form geometries & batches, but upload the actual vertex data later
+    materials_.Clear();
+
+    Material* material = 0;
+    unsigned iStart = 0;
+    unsigned iCount = 0;
+    unsigned vStart = 0;
+    unsigned vCount = 0;
+
+    for (unsigned d = 0; d < drawables_.Size(); ++d)
+    {
+        if (!drawables_[d]->GetVisibility())
+            continue;
+
+        Material* usedMaterial = drawables_[d]->GetUsedMaterial();
+        const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
+
+        if (material != usedMaterial)
+        {
+            if (material)
+            {
+                AddBatch(material, iStart, iCount, vStart, vCount);
+                iStart += iCount;
+                iCount = 0;
+                vStart += vCount;
+                vCount = 0;
+            }
+
+            material = usedMaterial;
+        }
+
+        iCount += vertices.Size() / 4 * 6;
+        vCount += vertices.Size();
+    }
+
+    if (material)
+        AddBatch(material, iStart, iCount, vStart, vCount);
+
+    // Now the amount of batches is known. Build the part of source batches that are sensitive to threading issues
+    // (material & geometry pointers)
+    unsigned count = materials_.Size();
+    batches_.Resize(count);
+
+    for (unsigned i = 0; i < count; ++i)
+    {
+        batches_[i].material_ = materials_[i];
+        batches_[i].geometry_ = geometries_[i];
+    }
 }
 
 void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
@@ -258,7 +344,7 @@ void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned
         geometries_.Push(geometry);
     }
 
-    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount);
+    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
 }
 
 }

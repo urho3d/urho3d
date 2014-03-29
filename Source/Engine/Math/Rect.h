@@ -202,8 +202,12 @@ public:
 class URHO3D_API IntRect
 {
 public:
-    /// Construct an undefined rect.
-    IntRect()
+    /// Construct a zero rect.
+    IntRect() :
+        left_(0),
+        top_(0),
+        right_(0),
+        bottom_(0)
     {
     }
     

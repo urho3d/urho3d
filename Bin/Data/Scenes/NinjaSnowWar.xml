@@ -62,12 +62,12 @@
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="16777220">
-			<attribute name="Model" value="Model;Models/Level.mdl" />
-			<attribute name="Material" value="Material;Materials/Snow.xml" />
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/Level.mdl" />
+			<attribute name="Material" value="Material;Materials/NinjaSnowWar/Snow.xml" />
 		</component>
 		<component type="CollisionShape" id="16777221">
 			<attribute name="Shape Type" value="TriangleMesh" />
-			<attribute name="Model" value="Model;Models/Level.mdl" />
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/Level.mdl" />
 			<attribute name="Collision Margin" value="0.01" />
 		</component>
 		<component type="RigidBody" id="16777223">
@@ -83,8 +83,8 @@
 		<attribute name="Scale" value="300 1 300" />
 		<attribute name="Variables" />
 		<component type="Skybox" id="16777222">
-			<attribute name="Model" value="Model;Models/CloudPlane.mdl" />
-			<attribute name="Material" value="Material;Materials/CloudPlane.xml" />
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/CloudPlane.mdl" />
+			<attribute name="Material" value="Material;Materials/NinjaSnowWar/CloudPlane.xml" />
 		</component>
 	</node>
 </scene>

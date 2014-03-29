@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Drawable.h"
+#include "Material.h"
 #include "Sprite2D.h"
 
 namespace Urho3D
@@ -81,6 +82,10 @@ public:
     Material* GetUsedMaterial() const;
     /// Return all vertices.
     const Vector<Vertex2D>& GetVertices();
+    /// Set visibility.
+    void SetVisibility(bool visibility) { visibility_ = visibility; }
+    /// Return visibility.
+    bool GetVisibility() const { return visibility_; }
 
     /// Set sprite attribute.
     void SetSpriteAttr(ResourceRef value);
@@ -126,19 +131,24 @@ protected:
     WeakPtr<MaterialCache2D> materialCache_;
     /// Drawable proxy.
     WeakPtr<DrawableProxy2D> drawableProxy_;
+    /// Test visible.
+    bool visibility_;
 };
 
 inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
 {
-    if (lhs->GetLayer() == rhs->GetLayer())
-    {
-        if (lhs->GetOrderInLayer() == rhs->GetOrderInLayer())
-            return lhs->GetID() < rhs->GetID();
+    if (lhs->GetLayer() != rhs->GetLayer())
+        return lhs->GetLayer() < rhs->GetLayer();
 
+    if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
         return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
-    }
 
-    return lhs->GetLayer() < rhs->GetLayer();
+    Material* lhsUsedMaterial = lhs->GetUsedMaterial();
+    Material* rhsUsedMaterial = rhs->GetUsedMaterial();
+    if (lhsUsedMaterial != rhsUsedMaterial)
+        return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
+
+    return lhs->GetID() < rhs->GetID();
 }
 
 }

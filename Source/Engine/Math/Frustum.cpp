@@ -56,6 +56,7 @@ void ProjectAndMergeEdge(Vector3 v0, Vector3 v1, Rect& rect, const Matrix4& proj
 
 Frustum::Frustum()
 {
+    UpdatePlanes();
 }
 
 Frustum::Frustum(const Frustum& frustum)

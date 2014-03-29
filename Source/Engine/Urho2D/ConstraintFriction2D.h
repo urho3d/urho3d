@@ -50,20 +50,18 @@ public:
     /// Return anchor.
     const Vector2& GetAnchor() const { return anchor_; }
     /// Set max force.
-    float GetMaxForce() const { return maxForce_; }
+    float GetMaxForce() const { return jointDef_.maxForce; }
     /// Set max torque.
-    float GetMaxTorque() const { return maxTorque_; }
+    float GetMaxTorque() const { return jointDef_.maxTorque; }
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
 
+    /// Box2D joint def.
+    b2FrictionJointDef jointDef_;
     /// Anchor.
     Vector2 anchor_;
-    /// Max force.
-    float maxForce_;
-    /// Max torque.
-    float maxTorque_;
 };
 
 }

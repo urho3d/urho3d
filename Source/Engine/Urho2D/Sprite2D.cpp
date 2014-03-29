@@ -54,6 +54,7 @@ bool Sprite2D::Load(Deserializer& source)
     if (!texture->Load(source))
         return false;
 
+    texture->SetName(GetName());
     SetTexture(texture);
 
     if (texture)

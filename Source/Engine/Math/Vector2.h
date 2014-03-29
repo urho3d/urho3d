@@ -32,8 +32,10 @@ namespace Urho3D
 class URHO3D_API Vector2
 {
 public:
-    /// Construct undefined.
-    Vector2()
+    /// Construct a zero vector.
+    Vector2() :
+        x_(0.0f),
+        y_(0.0f)
     {
     }
     
@@ -207,8 +209,10 @@ inline Vector2 operator * (float lhs, const Vector2& rhs) { return rhs * lhs; }
 class URHO3D_API IntVector2
 {
 public:
-    /// Construct undefined.
-    IntVector2()
+    /// Construct a zero vector.
+    IntVector2() :
+        x_(0),
+        y_(0)
     {
     }
     

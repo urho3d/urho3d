@@ -168,8 +168,8 @@ private:
     void ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle mouse or touch move.
     void ProcessMove(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
-    /// Send a UI element drag event.
-    void SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
+    /// Send a UI element drag or hover begin event.
+    void SendDragOrHoverEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
     /// Send a UI click or double click event.
     void SendClickEvent(StringHash eventType, UIElement* element, const IntVector2& pos, int button, int buttons, int qualifiers);
     /// Handle screen mode event.
@@ -274,6 +274,8 @@ private:
     WeakPtr<UIElement> clickElement_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
+    /// Currently hovered elements.
+    HashMap<WeakPtr<UIElement>, bool> hoveredElements_;
 };
 
 /// Register UI library objects.

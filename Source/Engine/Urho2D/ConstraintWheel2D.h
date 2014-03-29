@@ -60,34 +60,26 @@ public:
     /// Return axis.
     const Vector2& GetAxis() const { return axis_; }
     /// Return enable motor.
-    bool GetEnableMotor() const { return enableMotor_; }
+    bool GetEnableMotor() const { return jointDef_.enableMotor; }
     /// Return maxMotor torque.
-    float GetMaxMotorTorque() const { return maxMotorTorque_; }
+    float GetMaxMotorTorque() const { return jointDef_.maxMotorTorque; }
     /// Return motor speed.
-    float GetMotorSpeed() const { return motorSpeed_; }
+    float GetMotorSpeed() const { return jointDef_.motorSpeed; }
     /// Return frequency Hz.
-    float GetFrequencyHz() const { return frequencyHz_; }
+    float GetFrequencyHz() const { return jointDef_.frequencyHz; }
     /// Return damping ratio.
-    float GetDampingRatio() const { return dampingRatio_; }
-
+    float GetDampingRatio() const { return jointDef_.dampingRatio; }
+   
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
 
+    /// Box2D joint def.
+    b2WheelJointDef jointDef_;
     /// Anchor.
     Vector2 anchor_;
     /// Axis.
     Vector2 axis_;
-    /// Enable motor.
-    bool enableMotor_;
-    /// Max motor torque.
-    float maxMotorTorque_;
-    /// Motor speed.
-    float motorSpeed_;
-    /// Frequency Hz.
-    float frequencyHz_;
-    /// Damping ratio.
-    float dampingRatio_;
 };
 
 }

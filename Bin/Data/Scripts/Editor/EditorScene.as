@@ -86,7 +86,6 @@ bool ResetScene()
     // Create a scene with default values, these will be overridden when loading scenes
     editorScene.Clear();
     editorScene.CreateComponent("Octree");
-    editorScene.CreateComponent("PhysicsWorld");
     editorScene.CreateComponent("DebugRenderer");
 
     // Release resources that became unused after the scene clear
@@ -486,9 +485,9 @@ bool SceneDelete()
         if (index == NO_ITEM || nodeIndex == NO_ITEM)
             continue;
 
-        // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
-        if (node is editorScene && (component.typeName == "Octree" || component.typeName == "PhysicsWorld" ||
-            component.typeName == "DebugRenderer"))
+        // Do not allow to remove the Octree, DebugRenderer or MaterialCache2D or DrawableProxy2D from the root node
+        if (node is editorScene && (component.typeName == "Octree" || component.typeName == "DebugRenderer" ||
+            component.typeName == "MaterialCache2D" || component.typeName == "DrawableProxy2D"))
             continue;
 
         // Create undo action

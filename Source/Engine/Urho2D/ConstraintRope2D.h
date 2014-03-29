@@ -52,18 +52,18 @@ public:
     /// Return other body anchor.
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
     /// Return max length.
-    float GetMaxLength() const { return maxLength_; }
+    float GetMaxLength() const { return jointDef_.maxLength; }
 
 private:
-    /// Create Joint def.
-    virtual b2JointDef* CreateJointDef();
+    /// Return joint def.
+    virtual b2JointDef* GetJointDef();
 
+    /// Box2D joint def.
+    b2RopeJointDef jointDef_;
     /// Owner body anchor.
     Vector2 ownerBodyAnchor_;
     /// Other body anchor.
     Vector2 otherBodyAnchor_;
-    /// Max length.
-    float maxLength_;
 };
 
 }

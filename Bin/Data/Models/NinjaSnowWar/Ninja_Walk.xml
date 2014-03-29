@@ -1,0 +1,4 @@
+<animation>
+    <trigger normalizedtime="0.25" type="String" value="Joint21" />
+    <trigger normalizedtime="0.75" type="String" value="Joint26" />
+</animation>

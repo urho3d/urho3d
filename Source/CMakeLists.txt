@@ -28,6 +28,9 @@ cmake_minimum_required (VERSION 2.8.6)
 
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
+    if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
+        cmake_policy (SET CMP0022 NEW)
+    endif ()
 endif ()
 
 # Set CMake modules search path

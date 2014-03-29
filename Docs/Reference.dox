@@ -142,7 +142,9 @@ The full list of supported parameters, their datatypes and default values:
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
+- FlushGPU (bool) Whether to flush GPU command buffer each frame for less input latency. Effective only on Direct3D9. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
+- Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".
 - DumpShaders (string) Filename to dump used shader variations to for precaching.
 - %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
@@ -1610,20 +1612,32 @@ In order to make 2D Game in Urho3D, Urho2D is provided. Urho2D include 2D graphi
 - Sprite2D: a sprite is defined with texture and texture rectangle and hot spot.
 - SpriteSheet2D: a sprite sheet(texture atlas) include some sprites in it.
 - StaticSprite2D: a drawable component to display a sprite.
-- Animation2D: two-demensional animation with some frames, a frame include duration and a sprite.
+- Animation2D: 2D animation with some frames, a frame include duration and a sprite.
 - AnimatedSprite2D : a drawable component to display an animation.
-- ParticleModel2D: two-demensional particle model file.
-- ParticleEmitter2D: a two-dimensional particle effect.
-- PhysicsWorld2D: implements two-dimensional physics simulation. Two-demensional physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
-- RigidBody2D: a two-demensional physics object instance.
-- CollisionShape2D: defines two-dimensional physics collision geometry. 
-- CollisionBox2D: defines two-dimensional physics collision box.
-- CollisionCircle2D: defines two-dimensional physics collision circle.
-- CollisionEdge2D: defines two-dimensional physics collision edge.
-- CollisionChain2D: defines two-dimensional physics collision chain.
-- CollisionPolygon2D: defines two-dimensional physics collision polygon.
+- ParticleEffect2D: 2D particle model file.
+- ParticleEmitter2D: a 2D particle effect.
+- PhysicsWorld2D: implements 2D physics simulation. 2D physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
+- RigidBody2D: a 2D physics object instance.
+- CollisionShape2D: base class for 2D physics collision shape. 
+- CollisionBox2D: defines 2D physics collision box.
+- CollisionCircle2D: defines 2D physics collision circle.
+- CollisionEdge2D: defines 2D physics collision edge.
+- CollisionChain2D: defines 2D physics collision chain.
+- CollisionPolygon2D: defines 2D physics collision polygon.
+- Constraint2D: base class for 2D physics constraint.
+- ConstraintDistance2D: define 2D physics distance constraint.
+- ConstraintFriction2D: define 2D physics friction constraint.
+- ConstraintGear2D: define 2D physics gear constraint.
+- ConstraintMotor2D: define 2D physics motor constraint.
+- ConstraintMouse2D: define 2D physics mouse constraint.
+- ConstraintPrismatic2D: define 2D physics prismatic constraint.
+- ConstraintPulley2D: define 2D physics pulley constraint.
+- ConstraintRevolute2D: define 2D physics revolute constraint.
+- ConstraintRope2D: define 2D physics rope constraint.
+- ConstraintWeld2D: define 2D physics weld constraint.
+- ConstraintWheel2D: define 2D physics wheel constraint.
 
-In order to use Urho2D, it is need set camera to 2D mode first, it can be done with following code:
+In order to use Urho2D, it is need set camera to orthographic mode first, it can be done with following code:
 
 C++:
 \code
@@ -1672,7 +1686,6 @@ Lua:
     -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
     camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
 \endcode 
-
 
 \page Serialization Serialization
 

@@ -258,6 +258,9 @@ bool Engine::Initialize(const VariantMap& parameters)
         graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
         graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
+        graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
+        graphics->SetOrientations(GetParameter(parameters, "Orientations", "LandscapeLeft LandscapeRight").GetString());
+        
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
             GetParameter(parameters, "WindowHeight", 0).GetInt(),
@@ -269,11 +272,12 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "MultiSample", 1).GetInt()
         ))
             return false;
+
         if (HasParameter(parameters, "DumpShaders"))
             graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
-
         if (HasParameter(parameters, "RenderPath"))
             renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
+
         renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
@@ -626,6 +630,12 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["Headless"] = true;
             else if (argument == "nolimit")
                 ret["FrameLimiter"] = false;
+            else if (argument == "flushgpu")
+                ret["FlushGPU"] = true;
+            else if (argument == "landscape")
+                ret["Orientations"] = "LandscapeLeft LandscapeRight " + ret["Orientations"].GetString();
+            else if (argument == "portrait")
+                ret["Orientations"] = "Portrait PortraitUpsideDown " + ret["Orientations"].GetString();
             else if (argument == "nosound")
                 ret["Sound"] = false;
             else if (argument == "noip")

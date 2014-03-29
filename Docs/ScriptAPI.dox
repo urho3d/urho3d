@@ -1053,9 +1053,9 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - Vector2 size
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -1107,8 +1107,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint vertexCount
@@ -1159,8 +1159,8 @@ Properties:
 - float radius
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -1208,8 +1208,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - Vector2 vertex1
@@ -1262,8 +1262,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint vertexCount
@@ -1368,8 +1368,8 @@ Properties:
 - uint numAttributes // readonly
 - int refs // readonly
 - float restitution
-- bool sensor
 - bool temporary
+- bool trigger
 - ShortStringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -1771,22 +1771,24 @@ Methods:
 
 Properties:
 
+- float angularOffset
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - ShortStringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
+- float correctionFactor
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
-- float maxLength
+- Vector2 linearOffset
+- float maxForce
+- float maxTorque
 - Node@ node // readonly
 - uint numAttributes // readonly
 - RigidBody2D@ otherBody
-- Vector2 otherBodyAnchor
 - RigidBody2D@ ownerBody // readonly
-- Vector2 ownerBodyAnchor
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -3090,6 +3092,7 @@ Properties:
 - int[]@ multiSampleLevels // readonly
 - uint numBatches // readonly
 - uint numPrimitives // readonly
+- String orientations
 - int refs // readonly
 - bool resizable // readonly
 - IntVector2[]@ resolutions // readonly
@@ -9904,6 +9907,16 @@ Properties:
 ### ElementRemoved
 - %Root : UIElement pointer
 - %Parent : UIElement pointer
+- %Element : UIElement pointer
+
+### HoverBegin
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### HoverEnd
 - %Element : UIElement pointer
 
 ### DragBegin

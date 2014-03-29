@@ -1246,9 +1246,9 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 Vector2 size;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1313,8 +1313,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1378,8 +1378,8 @@ float radius;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1440,8 +1440,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1507,8 +1507,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -1637,8 +1637,8 @@ uint numAttributes;
 /* readonly */
 int refs;
 float restitution;
-bool sensor;
 bool temporary;
+bool trigger;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -2130,6 +2130,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 
 // Properties:
+float angularOffset;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -2140,21 +2141,22 @@ ShortStringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
+float correctionFactor;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 /* readonly */
 uint id;
-float maxLength;
+Vector2 linearOffset;
+float maxForce;
+float maxTorque;
 /* readonly */
 Node node;
 /* readonly */
 uint numAttributes;
 RigidBody2D otherBody;
-Vector2 otherBodyAnchor;
 /* readonly */
 RigidBody2D ownerBody;
-Vector2 ownerBodyAnchor;
 /* readonly */
 int refs;
 bool temporary;
@@ -3728,6 +3730,7 @@ Array<int> multiSampleLevels;
 uint numBatches;
 /* readonly */
 uint numPrimitives;
+String orientations;
 /* readonly */
 int refs;
 /* readonly */

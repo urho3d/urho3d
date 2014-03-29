@@ -52,12 +52,15 @@ Drawable2D::Drawable2D(Context* context) :
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
     verticesDirty_(true),
-    materialUpdatePending_(false)
-{   
+    materialUpdatePending_(false),
+    visibility_(true)
+{
 }
 
 Drawable2D::~Drawable2D()
 {
+    if (drawableProxy_)
+        drawableProxy_->RemoveDrawable(this);
 }
 
 void Drawable2D::RegisterObject(Context* context)
@@ -109,7 +112,7 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
         return;
 
     orderInLayer_ = orderInLayer;
-    
+
     if (drawableProxy_)
         drawableProxy_->MarkOrderDirty();
 
@@ -121,8 +124,8 @@ void Drawable2D::SetSprite(Sprite2D* sprite)
     if (sprite == sprite_)
         return;
 
-    sprite_ = sprite;    
-    
+    sprite_ = sprite;
+
     verticesDirty_ = true;
     OnMarkedDirty(node_);
     UpdateDefaultMaterial();
@@ -146,6 +149,9 @@ void Drawable2D::SetMaterial(Material* material)
         return;
 
     material_ = material;
+
+    if (drawableProxy_)
+        drawableProxy_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -262,8 +268,11 @@ void Drawable2D::UpdateDefaultMaterial()
     // Delay the material update
     if (materialUpdatePending_)
         return;
-    
+
     defaultMaterial_ = materialCache_->GetMaterial(GetTexture(), blendMode_);
+
+    if (drawableProxy_)
+        drawableProxy_->MarkOrderDirty();
 }
 
 }

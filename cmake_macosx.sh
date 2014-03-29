@@ -32,7 +32,7 @@ fi
 cmake -E make_directory $BUILD
 
 # Create project with the Xcode generator
-OPT=-Wno-dev    # \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
+OPT=
 cmake -E chdir $BUILD cmake $OPT -G "Xcode" $@ $SOURCE
 
 # Temporary fix: can be removed when CMake minimum required has reached 2.8.12

@@ -77,10 +77,10 @@ void CreateGizmo()
 {
     gizmoNode = Node();
     gizmo = gizmoNode.CreateComponent("StaticModel");
-    gizmo.model = cache.GetResource("Model", "Models/Axes.mdl");
-    gizmo.materials[0] = cache.GetResource("Material", "Materials/RedUnlit.xml");
-    gizmo.materials[1] = cache.GetResource("Material", "Materials/GreenUnlit.xml");
-    gizmo.materials[2] = cache.GetResource("Material", "Materials/BlueUnlit.xml");
+    gizmo.model = cache.GetResource("Model", "Models/Editor/Axes.mdl");
+    gizmo.materials[0] = cache.GetResource("Material", "Materials/Editor/RedUnlit.xml");
+    gizmo.materials[1] = cache.GetResource("Material", "Materials/Editor/GreenUnlit.xml");
+    gizmo.materials[2] = cache.GetResource("Material", "Materials/Editor/BlueUnlit.xml");
     gizmo.enabled = false;
     gizmo.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
     gizmo.occludee = false;
@@ -155,15 +155,15 @@ void PositionGizmo()
         switch (editMode)
         {
         case EDIT_MOVE:
-            gizmo.model = cache.GetResource("Model", "Models/Axes.mdl");
+            gizmo.model = cache.GetResource("Model", "Models/Editor/Axes.mdl");
             break;
 
         case EDIT_ROTATE:
-            gizmo.model = cache.GetResource("Model", "Models/RotateAxes.mdl");
+            gizmo.model = cache.GetResource("Model", "Models/Editor/RotateAxes.mdl");
             break;
 
         case EDIT_SCALE:
-            gizmo.model = cache.GetResource("Model", "Models/ScaleAxes.mdl");
+            gizmo.model = cache.GetResource("Model", "Models/Editor/ScaleAxes.mdl");
             break;
         }
 
@@ -236,17 +236,20 @@ void UseGizmo()
 
     if (gizmoAxisX.selected != gizmoAxisX.lastSelected)
     {
-        gizmo.materials[0] = cache.GetResource("Material", gizmoAxisX.selected ? "Materials/BrightRedUnlit.xml" : "Materials/RedUnlit.xml");
+        gizmo.materials[0] = cache.GetResource("Material", gizmoAxisX.selected ? "Materials/Editor/BrightRedUnlit.xml" :
+            "Materials/Editor/RedUnlit.xml");
         gizmoAxisX.lastSelected = gizmoAxisX.selected;
     }
     if (gizmoAxisY.selected != gizmoAxisY.lastSelected)
     {
-        gizmo.materials[1] = cache.GetResource("Material", gizmoAxisY.selected ? "Materials/BrightGreenUnlit.xml" : "Materials/GreenUnlit.xml");
+        gizmo.materials[1] = cache.GetResource("Material", gizmoAxisY.selected ? "Materials/Editor/BrightGreenUnlit.xml" :
+            "Materials/Editor/GreenUnlit.xml");
         gizmoAxisY.lastSelected = gizmoAxisY.selected;
     }
     if (gizmoAxisZ.selected != gizmoAxisZ.lastSelected)
     {
-        gizmo.materials[2] = cache.GetResource("Material", gizmoAxisZ.selected ? "Materials/BrightBlueUnlit.xml" : "Materials/BlueUnlit.xml");
+        gizmo.materials[2] = cache.GetResource("Material", gizmoAxisZ.selected ? "Materials/Editor/BrightBlueUnlit.xml" :
+            "Materials/Editor/BlueUnlit.xml");
         gizmoAxisZ.lastSelected = gizmoAxisZ.selected;
     };
 

@@ -41,7 +41,7 @@ extern const char* SCENE_CATEGORY;
 
 static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
 static const float DEFAULT_RANGE = 10.0f;
-static const float DEFAULT_FOV = 30.0f;
+static const float DEFAULT_LIGHT_FOV = 30.0f;
 static const float DEFAULT_SPECULARINTENSITY = 1.0f;
 static const float DEFAULT_BRIGHTNESS = 1.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
@@ -95,7 +95,7 @@ Light::Light(Context* context) :
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
-    fov_(DEFAULT_FOV),
+    fov_(DEFAULT_LIGHT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
     shadowFadeDistance_(0.0f),
@@ -120,7 +120,7 @@ void Light::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);

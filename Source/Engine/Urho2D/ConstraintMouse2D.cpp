@@ -33,10 +33,7 @@ namespace Urho3D
 
 ConstraintMouse2D::ConstraintMouse2D(Context* context) :
     Constraint2D(context),
-    target_(Vector2::ZERO),
-    maxForce_(0.0f),
-    frequencyHz_(5.0f),
-    dampingRatio_(0.7f)
+    target_(Vector2::ZERO)
 {
 }
 
@@ -50,8 +47,8 @@ void ConstraintMouse2D::RegisterObject(Context* context)
 
     REF_ACCESSOR_ATTRIBUTE(ConstraintMouse2D, VAR_VECTOR2, "Target", GetTarget, SetTarget, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ConstraintMouse2D, VAR_FLOAT, "Max Force", GetMaxForce, SetMaxForce, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMouse2D, VAR_FLOAT, "Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMouse2D, VAR_FLOAT, "Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConstraintMouse2D, VAR_FLOAT, "Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 5.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConstraintMouse2D, VAR_FLOAT, "Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.7f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(ConstraintMouse2D, Constraint2D);
 }
 
@@ -68,10 +65,10 @@ void ConstraintMouse2D::SetTarget(const Vector2& target)
 
 void ConstraintMouse2D::SetMaxForce(float maxForce)
 {
-    if (maxForce == maxForce_)
+    if (maxForce == jointDef_.maxForce)
         return;
 
-    maxForce_ = maxForce;
+    jointDef_.maxForce = maxForce;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -79,10 +76,10 @@ void ConstraintMouse2D::SetMaxForce(float maxForce)
 
 void ConstraintMouse2D::SetFrequencyHz(float frequencyHz)
 {
-    if (frequencyHz == frequencyHz_)
+    if (frequencyHz == jointDef_.frequencyHz)
         return;
 
-    frequencyHz_ = frequencyHz;
+    jointDef_.frequencyHz = frequencyHz;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -90,16 +87,16 @@ void ConstraintMouse2D::SetFrequencyHz(float frequencyHz)
 
 void ConstraintMouse2D::SetDampingRatio(float dampingRatio)
 {
-    if (dampingRatio == dampingRatio_)
+    if (dampingRatio == jointDef_.dampingRatio)
         return;
 
-    dampingRatio_ = dampingRatio;
+    jointDef_.dampingRatio = dampingRatio;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintMouse2D::CreateJointDef()
+b2JointDef* ConstraintMouse2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -109,15 +106,10 @@ b2JointDef* ConstraintMouse2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2MouseJointDef* jointDef = new b2MouseJointDef;
-    InitializeJointDef(jointDef);
+    InitializeJointDef(&jointDef_);
+    jointDef_.target = ToB2Vec2(target_);
 
-    jointDef->target = ToB2Vec2(target_);
-    jointDef->maxForce = maxForce_;
-    jointDef->frequencyHz = frequencyHz_;
-    jointDef->dampingRatio = dampingRatio_;
-
-    return jointDef;
+    return &jointDef_;
 }
 
 }

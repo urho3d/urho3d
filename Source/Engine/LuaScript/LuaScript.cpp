@@ -46,7 +46,6 @@ extern "C"
 #include "DebugNew.h"
 
 extern int tolua_AudioLuaAPI_open(lua_State*);
-extern int tolua_ContainerLuaAPI_open(lua_State*);
 extern int tolua_CoreLuaAPI_open(lua_State*);
 extern int tolua_EngineLuaAPI_open(lua_State*);
 extern int tolua_GraphicsLuaAPI_open(lua_State*);
@@ -87,7 +86,6 @@ LuaScript::LuaScript(Context* context) :
     RegisterLoader();
     ReplacePrint();
 
-    tolua_ContainerLuaAPI_open(luaState_);
     tolua_MathLuaAPI_open(luaState_);
     tolua_CoreLuaAPI_open(luaState_);
     tolua_IOLuaAPI_open(luaState_);

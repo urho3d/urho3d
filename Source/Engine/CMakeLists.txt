@@ -170,17 +170,19 @@ if (NOT XCODE AND NOT MSVC)
         endif ()
     endif ()
 endif ()
-# \todo This is a deprecated property in CMake version 2.8.12 - Remove below commands when CMake minimum version is 2.8.12
-set_target_properties (${TARGET_NAME} PROPERTIES LINK_INTERFACE_LIBRARIES "")
-if (URHO3D_LIB_TYPE STREQUAL SHARED)
-    if (NOT MSVC AND CMAKE_VERSION VERSION_LESS 2.8.11)
-        get_target_property (LINK_LIBRARIES ${TARGET_NAME} LINK_LIBRARIES)
-        target_link_libraries (${TARGET_NAME} LINK_PRIVATE ${LINK_LIBRARIES})
+# todo This is a deprecated property in CMake version 2.8.12 - Remove below commands when CMake minimum version is 2.8.12
+if (CMAKE_VERSION VERSION_LESS 2.8.12)
+    set_target_properties (${TARGET_NAME} PROPERTIES LINK_INTERFACE_LIBRARIES "")
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
+        if (NOT MSVC AND CMAKE_VERSION VERSION_LESS 2.8.11)
+            get_target_property (LINK_LIBRARIES ${TARGET_NAME} LINK_LIBRARIES)
+            target_link_libraries (${TARGET_NAME} LINK_PRIVATE ${LINK_LIBRARIES})
+        endif ()
+    else ()
+        set_target_properties (${TARGET_NAME} PROPERTIES LINK_LIBRARIES "")
     endif ()
-else ()
-    set_target_properties (${TARGET_NAME} PROPERTIES LINK_LIBRARIES "")
 endif ()
-# \endtodo
+# end todo
 
 # Generate platform specific export header file automatically
 if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)

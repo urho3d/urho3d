@@ -54,7 +54,7 @@ CollisionShape2D::~CollisionShape2D()
 
 void CollisionShape2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_BOOL, "Sensor", IsSensor, SetSensor, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_BOOL, "Trigger", IsTrigger, SetTrigger, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Category Bits", GetCategoryBits, SetCategoryBits, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Mask Bits", GetMaskBits, SetMaskBits, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Group Index", GetGroupIndex, SetGroupIndex, int, 0, AM_DEFAULT);
@@ -81,15 +81,15 @@ void CollisionShape2D::OnSetEnabled()
     }
 }
 
-void CollisionShape2D::SetSensor(bool sensor)
+void CollisionShape2D::SetTrigger(bool trigger)
 {
-    if (fixtureDef_.isSensor == sensor)
+    if (fixtureDef_.isSensor == trigger)
         return;
 
-    fixtureDef_.isSensor = sensor;
+    fixtureDef_.isSensor = trigger;
 
     if (fixture_)
-        fixture_->SetSensor(sensor);
+        fixture_->SetSensor(trigger);
     
     MarkNetworkUpdate();
 }

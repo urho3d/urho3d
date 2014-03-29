@@ -307,8 +307,8 @@ template <class T> void RegisterCollisionShape2D(asIScriptEngine* engine, const 
 {
     RegisterComponent<T>(engine, className);
     RegisterSubclass<CollisionShape2D, T>(engine, "CollisionShape2D", className);
-    engine->RegisterObjectMethod(className, "void set_sensor(bool)", asMETHOD(T, SetSensor), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_sensor() const", asMETHOD(T, IsSensor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_trigger(bool)", asMETHOD(T, SetTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_trigger() const", asMETHOD(T, IsTrigger), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_categoryBits(int)", asMETHOD(T, SetCategoryBits), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_categoryBits() const", asMETHOD(T, GetCategoryBits), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maskBits(int)", asMETHOD(T, SetMaskBits), asCALL_THISCALL);
@@ -464,12 +464,16 @@ static void RegisterConstraintGear2D(asIScriptEngine* engine)
 static void RegisterConstraintMotor2D(asIScriptEngine* engine)
 {
     RegisterConstraint2D<ConstraintMotor2D>(engine, "ConstraintMotor2D");
-    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_ownerBodyAnchor(const Vector2&)", asMETHOD(ConstraintMotor2D, SetOwnerBodyAnchor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintMotor2D", "const Vector2& get_ownerBodyAnchor() const", asMETHOD(ConstraintMotor2D, GetOwnerBodyAnchor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_otherBodyAnchor(const Vector2&)", asMETHOD(ConstraintMotor2D, SetOtherBodyAnchor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintMotor2D", "const Vector2& get_otherBodyAnchor() const", asMETHOD(ConstraintMotor2D, GetOtherBodyAnchor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_maxLength(float)", asMETHOD(ConstraintMotor2D, SetMaxLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintMotor2D", "float get_maxLength() const", asMETHOD(ConstraintMotor2D, GetMaxLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_linearOffset(const Vector2&)", asMETHOD(ConstraintMotor2D, SetLinearOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "const Vector2& get_linearOffset() const", asMETHOD(ConstraintMotor2D, GetLinearOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_angularOffset(float)", asMETHOD(ConstraintMotor2D, SetAngularOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "float get_angularOffset() const", asMETHOD(ConstraintMotor2D, GetAngularOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_maxForce(float)", asMETHOD(ConstraintMotor2D, SetMaxForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "float get_maxForce() const", asMETHOD(ConstraintMotor2D, GetMaxForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_maxTorque(float)", asMETHOD(ConstraintMotor2D, SetMaxTorque), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "float get_maxTorque() const", asMETHOD(ConstraintMotor2D, GetMaxTorque), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "void set_correctionFactor(float)", asMETHOD(ConstraintMotor2D, SetCorrectionFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintMotor2D", "float get_correctionFactor() const", asMETHOD(ConstraintMotor2D, GetCorrectionFactor), asCALL_THISCALL);
 }
 
 static void RegisterConstraintMouse2D(asIScriptEngine* engine)

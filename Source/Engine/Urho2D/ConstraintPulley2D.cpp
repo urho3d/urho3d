@@ -36,8 +36,7 @@ ConstraintPulley2D::ConstraintPulley2D(Context* context) :
     ownerBodyGroundAnchor_(-1.0f, 1.0f),
     otherBodyGroundAnchor_(1.0f, 1.0f),
     ownerBodyAnchor_(-1.0f, 0.0f),
-    otherBodyAnchor_(1.0f, 0.0f),
-    ratio_(1.0f)
+    otherBodyAnchor_(1.0f, 0.0f)
 {
 
 }
@@ -104,16 +103,16 @@ void ConstraintPulley2D::SetOtherBodyAnchor(const Vector2& anchor)
 
 void ConstraintPulley2D::SetRatio(float ratio)
 {
-    if (ratio == ratio)
+    if (ratio == jointDef_.ratio)
         return;
 
-    ratio_ = ratio;
+    jointDef_.ratio = ratio;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintPulley2D::CreateJointDef()
+b2JointDef* ConstraintPulley2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -123,10 +122,9 @@ b2JointDef* ConstraintPulley2D::CreateJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    b2PulleyJointDef* jointDef = new b2PulleyJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyGroundAnchor_), ToB2Vec2(otherBodyGroundAnchor_), ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_), ratio_);
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyGroundAnchor_), ToB2Vec2(otherBodyGroundAnchor_), ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_), jointDef_.ratio);
 
-    return jointDef;
+    return &jointDef_;
 }
 
 }

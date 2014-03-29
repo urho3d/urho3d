@@ -31,8 +31,11 @@ namespace Urho3D
 class URHO3D_API Vector3
 {
 public:
-    /// Construct undefined.
-    Vector3()
+    /// Construct a zero vector.
+    Vector3() :
+        x_(0.0f),
+        y_(0.0f),
+        z_(0.0f)
     {
     }
     

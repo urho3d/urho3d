@@ -32,6 +32,8 @@
 namespace Urho3D
 {
 
+extern const char* blendModeNames[];
+
 MaterialCache2D::MaterialCache2D(Context* context) :
     Component(context)
 {
@@ -51,7 +53,7 @@ Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = materials_.Find(texture);
     if (t == materials_.End())
     {
-        Material* material(CreateMaterial(texture, blendMode));
+        SharedPtr<Material> material(CreateMaterial(texture, blendMode));
         materials_[texture][blendMode] = material;
         return material;
     }
@@ -61,7 +63,7 @@ Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
     if (b != materials.End())
         return b->second_;
 
-    Material* material(CreateMaterial(texture, blendMode));
+    SharedPtr<Material> material(CreateMaterial(texture, blendMode));
     materials[blendMode] = material;
 
     return material;
@@ -70,6 +72,7 @@ Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 Material* MaterialCache2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
 {
     Material* material = new Material(context_);
+    material->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
 
     Technique* tech = new Technique(context_);
     Pass* pass = tech->CreatePass(PASS_ALPHA);

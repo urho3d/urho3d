@@ -37,7 +37,7 @@ class Sphere;
 class URHO3D_API Ray
 {
 public:
-    /// Construct undefined.
+    /// Construct a degenerate ray with zero origin and direction.
     Ray()
     {
     }

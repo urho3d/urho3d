@@ -34,12 +34,7 @@ namespace Urho3D
 ConstraintWheel2D::ConstraintWheel2D(Context* context) :
     Constraint2D(context),
     anchor_(Vector2::ZERO),
-    axis_(Vector2::RIGHT),    
-    enableMotor_(false), 
-    maxMotorTorque_(0.0f),
-    motorSpeed_(0.0f),
-    frequencyHz_(2.0f),
-    dampingRatio_(0.7f)
+    axis_(Vector2::RIGHT)
 {
 }
 
@@ -83,12 +78,13 @@ void ConstraintWheel2D::SetAxis(const Vector2& axis)
     MarkNetworkUpdate();
 }
 
+
 void ConstraintWheel2D::SetEnableMotor(bool enableMotor)
 {
-    if (enableMotor == enableMotor_)
+    if (enableMotor == jointDef_.enableMotor)
         return;
 
-    enableMotor_ = enableMotor;
+    jointDef_.enableMotor = enableMotor;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -96,10 +92,10 @@ void ConstraintWheel2D::SetEnableMotor(bool enableMotor)
 
 void ConstraintWheel2D::SetMaxMotorTorque(float maxMotorTorque)
 {
-    if (maxMotorTorque == maxMotorTorque_)
+    if (maxMotorTorque == jointDef_.maxMotorTorque)
         return;
 
-    maxMotorTorque_ = maxMotorTorque;
+    jointDef_.maxMotorTorque = maxMotorTorque;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -107,10 +103,10 @@ void ConstraintWheel2D::SetMaxMotorTorque(float maxMotorTorque)
 
 void ConstraintWheel2D::SetMotorSpeed(float motorSpeed)
 {
-    if (motorSpeed == motorSpeed_)
+    if (motorSpeed == jointDef_.motorSpeed)
         return;
 
-    motorSpeed_ = motorSpeed;
+    jointDef_.motorSpeed = motorSpeed;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -118,10 +114,10 @@ void ConstraintWheel2D::SetMotorSpeed(float motorSpeed)
 
 void ConstraintWheel2D::SetFrequencyHz(float frequencyHz)
 {
-    if (frequencyHz == frequencyHz_)
+    if (frequencyHz == jointDef_.frequencyHz)
         return;
 
-    frequencyHz_ = frequencyHz;
+    jointDef_.frequencyHz = frequencyHz;
 
     RecreateJoint();
     MarkNetworkUpdate();
@@ -129,16 +125,16 @@ void ConstraintWheel2D::SetFrequencyHz(float frequencyHz)
 
 void ConstraintWheel2D::SetDampingRatio(float dampingRatio)
 {
-    if (dampingRatio == dampingRatio_)
+    if (dampingRatio == jointDef_.dampingRatio)
         return;
 
-    dampingRatio_ = dampingRatio;
+    jointDef_.dampingRatio = dampingRatio;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintWheel2D::CreateJointDef()
+b2JointDef* ConstraintWheel2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -147,16 +143,10 @@ b2JointDef* ConstraintWheel2D::CreateJointDef()
     b2Body* bodyB = otherBody_->GetBody();
     if (!bodyA || !bodyB)
         return 0;
+    
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_), ToB2Vec2(axis_));
 
-    b2WheelJointDef* jointDef = new b2WheelJointDef;
-    jointDef->Initialize(bodyA, bodyB, ToB2Vec2(anchor_), ToB2Vec2(axis_));
-    jointDef->enableMotor = enableMotor_;
-    jointDef->maxMotorTorque = maxMotorTorque_;
-    jointDef->motorSpeed = motorSpeed_;
-    jointDef->frequencyHz = frequencyHz_;
-    jointDef->dampingRatio = dampingRatio_;    
-
-    return jointDef;
+    return &jointDef_;
 }
 
 }

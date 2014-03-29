@@ -32,8 +32,7 @@ namespace Urho3D
 {
 
 ConstraintGear2D::ConstraintGear2D(Context* context) :
-    Constraint2D(context),
-    ratio_(1.0f)
+    Constraint2D(context)
 {
 }
 
@@ -86,16 +85,16 @@ void ConstraintGear2D::SetOtherConstraint(Constraint2D* constraint)
 
 void ConstraintGear2D::SetRatio(float ratio)
 {
-    if (ratio == ratio_)
+    if (ratio == jointDef_.ratio)
         return;
 
-    ratio_ = ratio;
+    jointDef_.ratio = ratio;
 
     RecreateJoint();
     MarkNetworkUpdate();
 }
 
-b2JointDef* ConstraintGear2D::CreateJointDef()
+b2JointDef* ConstraintGear2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
         return 0;
@@ -113,14 +112,11 @@ b2JointDef* ConstraintGear2D::CreateJointDef()
     if (!jointA || !jointB)
         return 0;
 
-    b2GearJointDef* jointDef = new b2GearJointDef;
-    InitializeJointDef(jointDef);
-
-    jointDef->joint1 = jointA;
-    jointDef->joint2 = jointB;
-    jointDef->ratio = ratio_;
-
-    return jointDef;
+    InitializeJointDef(&jointDef_);
+    jointDef_.joint1 = jointA;
+    jointDef_.joint2 = jointB;
+    
+    return &jointDef_;
 }
 
 }
