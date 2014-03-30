@@ -23,6 +23,15 @@
 # Set project name
 project (Urho3D-Docs)
 
+# Macro for enabling IDE-specific integration with Urho3D documentation (See comments in Doxyfile for more detail instructions)
+macro (enable_help IDE)
+    if (${IDE} OR CMAKE_EXTRA_GENERATOR MATCHES ${IDE})
+        set (${IDE}_HELP YES)
+    else ()
+        set (${IDE}_HELP NO)
+    endif ()
+endmacro ()
+
 # There could be bug in CMake find_package() command, it currently does not honor NO_CMAKE_FIND_ROOT_PATH option for a non-rooted search as per CMake's documentation
 # As a workaround, we unset CMAKE_FIND_ROOT_PATH (even when we are cross-compiling) but in this scope ONLY in order to always do a non-rooted search for Doxygen package
 unset (CMAKE_FIND_ROOT_PATH)
@@ -38,6 +47,9 @@ if (DOXYGEN_FOUND)
         else ()
             set (EXCLUDE_GRAPHICS_API OpenGL)
         endif ()
+        foreach (IDE XCODE MSVC Eclipse)
+            enable_help (${IDE})
+        endforeach ()
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
     endif ()
 
