@@ -5,6 +5,11 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
+// When rendering a shadowed point light, disable specular calculations on Shader Model 2 to avoid exceeding the instruction limit
+#if !defined(SM3) && defined(SHADOW) && defined(POINTLIGHT)
+    #undef SPECULAR
+#endif
+
 sampler2D sWeightMap0 : register(S0);
 sampler2D sDetailMap1 : register(S1);
 sampler2D sDetailMap2 : register(S2);

@@ -403,8 +403,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     deferred_ = false;
     deferredAmbient_ = false;
     useLitBase_ = false;
-    useShadowLitBase_ = graphics_->GetSM3Support() || renderer_->GetShadowQuality() < SHADOWQUALITY_HIGH_16BIT;
-    
+
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
@@ -881,7 +880,7 @@ void View::GetBatches()
                             if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
                                 continue;
                             
-                            Pass* pass = tech->GetPass(PASS_SHADOW);
+                            Pass* pass = tech->GetSupportedPass(PASS_SHADOW);
                             // Skip if material has no shadow pass
                             if (!pass)
                                 continue;
@@ -1002,7 +1001,7 @@ void View::GetBatches()
                 for (unsigned k = 0; k < scenePasses_.Size(); ++k)
                 {
                     ScenePassInfo& info = scenePasses_[k];
-                    destBatch.pass_ = tech->GetPass(info.pass_);
+                    destBatch.pass_ = tech->GetSupportedPass(info.pass_);
                     if (!destBatch.pass_)
                         continue;
                     
@@ -1168,10 +1167,6 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool allowLitBase = useLitBase_ && !light->IsNegative() && light == drawable->GetFirstLight() &&
         drawable->GetVertexLights().Empty() && !hasAmbientGradient;
-    // On Shader Model 2 disable lit base optimization from shadowed lights when using high shadow quality due to the risk of
-    // exceeding pixel shader instruction count
-    if (allowLitBase && light->GetCastShadows() && !useShadowLitBase_)
-        allowLitBase = false;
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {
@@ -1192,22 +1187,22 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
         if (i < 32 && allowLitBase)
         {
-            destBatch.pass_ = tech->GetPass(litBasePassName_);
+            destBatch.pass_ = tech->GetSupportedPass(litBasePassName_);
             if (destBatch.pass_)
             {
                 destBatch.isBase_ = true;
                 drawable->SetBasePass(i);
             }
             else
-                destBatch.pass_ = tech->GetPass(lightPassName_);
+                destBatch.pass_ = tech->GetSupportedPass(lightPassName_);
         }
         else
-            destBatch.pass_ = tech->GetPass(lightPassName_);
+            destBatch.pass_ = tech->GetSupportedPass(lightPassName_);
         
         // If no lit pass, check for lit alpha
         if (!destBatch.pass_)
         {
-            destBatch.pass_ = tech->GetPass(litAlphaPassName_);
+            destBatch.pass_ = tech->GetSupportedPass(litAlphaPassName_);
             isLitAlpha = true;
         }
         

@@ -695,9 +695,9 @@ When setting the initial screen mode, Graphics does a few checks:
 %Shader model 2 has the following limitations due to limited pixel shader instruction count:
 
 - Directional light shadows support a maximum of 3 cascade splits instead of 4.
-- Combining the ambient pass with the first forward light (lit base pass optimization) is not supported with shadowed lights when 4 shadow samples are being used.
 - Shadowed point lights do not support specular calculations in forward rendering.
-- Height fog is not supported.
+- Complex materials do not combine the ambient pass with the first forward light (lit base pass optimization.)
+- Complex forward rendered materials (eg. normal + specular map + alpha masking) combined with shadow mapping or height fog may not work.
 
 \section Rendering_Renderer Renderer
 
@@ -939,7 +939,7 @@ A technique definition looks like this:
 
 \code
 <technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" >
-    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow"
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" sm3="false|true"
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
@@ -951,7 +951,7 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.)
+The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.) The sm3 attribute can also be specified per pass, to disable for example a too complex lit base optimization pass on SM2.
 
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 

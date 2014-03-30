@@ -1046,8 +1046,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     // Make sure shaders are loaded now
     if (vertexShaders.Size() && pixelShaders.Size())
     {
-        // Height fog is not supported on Shader Model 2 due to possibly exceeding pixel shader instruction limit
-        bool heightFog = batch.zone_ && batch.zone_->GetHeightFog() && graphics_->GetSM3Support();
+        bool heightFog = batch.zone_ && batch.zone_->GetHeightFog();
         
         // If instancing is not supported, but was requested, or the object is too large to be instanced,
         // choose static geometry vertex shader instead
@@ -1494,10 +1493,6 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         {
             unsigned l = j % MAX_LIGHT_PS_VARIATIONS;
             unsigned h = j / MAX_LIGHT_PS_VARIATIONS;
-            
-            // On Shader Model 2 specular calculations are not supported with shadowed point lights
-            if (!isSM3 && (l & LPS_SHADOW) && (l & 3) >= LPS_POINT)
-                l &= ~LPS_SPEC;
             
             if (l & LPS_SHADOW)
             {

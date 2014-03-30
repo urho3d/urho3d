@@ -5,6 +5,11 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
+// When rendering a shadowed point light, disable specular calculations on Shader Model 2 to avoid exceeding the instruction limit
+#if !defined(SM3) && defined(SHADOW) && defined(POINTLIGHT)
+    #undef SPECULAR
+#endif
+
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
