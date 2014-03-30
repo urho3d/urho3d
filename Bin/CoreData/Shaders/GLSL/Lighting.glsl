@@ -81,29 +81,25 @@ vec4 GetShadowPos(int index, vec4 projWorldPos)
 #endif
 
 #ifdef COMPILEPS
-float GetDiffuse(vec3 normal, vec3 lightVec, out vec3 lightDir)
+float GetDiffuse(vec3 normal, vec3 worldPos, out vec3 lightDir)
 {
     #ifdef DIRLIGHT
-        #ifdef NORMALMAP
-            // In normal mapped forward lighting, the tangent space light vector needs renormalization
-            lightDir = normalize(lightVec);
-        #else
-            lightDir = lightVec;
-        #endif
-
+        lightDir = cLightDirPS;
         return max(dot(normal, lightDir), 0.0);
     #else
+        vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         lightDir = lightVec / lightDist;
         return max(dot(normal, lightDir), 0.0) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
     #endif
 }
 
-float GetDiffuseVolumetric(vec3 lightVec)
+float GetDiffuseVolumetric(vec3 worldPos)
 {
     #ifdef DIRLIGHT
         return 1.0;
     #else
+        vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         return texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
     #endif

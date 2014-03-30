@@ -33,7 +33,11 @@ float3 DecodeNormal(float4 normalInput)
     #ifdef PACKEDNORMAL
         float3 normal;
         normal.xy = normalInput.ag * 2.0 - 1.0;
-        normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
+        #ifdef SM3
+            normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
+        #else
+            normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
+        #endif
         return normal;
     #else
         return normalInput.rgb * 2.0 - 1.0;

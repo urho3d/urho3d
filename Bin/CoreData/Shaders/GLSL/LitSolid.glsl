@@ -134,14 +134,8 @@ void PS()
         vec3 lightColor;
         vec3 lightDir;
         vec3 finalColor;
-        float diff;
 
-        #ifdef DIRLIGHT
-            diff = GetDiffuse(normal, cLightDirPS, lightDir);
-        #else
-            vec3 lightVec = (cLightPosPS.xyz - vWorldPos.xyz) * cLightPosPS.w;
-            diff = GetDiffuse(normal, lightVec, lightDir);
-        #endif
+        float diff = GetDiffuse(normal, vWorldPos.xyz, lightDir);
 
         #ifdef SHADOW
             diff *= GetShadow(vShadowPos, vWorldPos.w);

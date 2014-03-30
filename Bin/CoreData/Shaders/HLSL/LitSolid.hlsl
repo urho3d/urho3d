@@ -5,11 +5,6 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
-// With SM2 alpha-masked point light shadows become too complex, so disable specular lighting
-#if !defined(SM3) && defined(POINTLIGHT) && defined(SHADOW) && defined(ALPHAMASK)
-    #undef SPECULAR
-#endif
-
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
@@ -165,22 +160,27 @@ void PS(
     #else
         float4 diffColor = cMatDiffColor;
     #endif
-    
+
     // Get material specular albedo
     #ifdef SPECMAP
         float3 specColor = cMatSpecColor.rgb * tex2D(sSpecMap, iTexCoord.xy).rgb;
     #else
         float3 specColor = cMatSpecColor.rgb;
     #endif
-    
+
     // Get normal
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent.xyz, float3(iTexCoord.zw, iTangent.w), iNormal);
-        float3 normal = normalize(mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn));
+        // We may be running low on instructions on Shader Model 2, so skip normalize if necessary
+        #if defined(SM3) || !defined(SHADOW) || !defined(SPECULAR)
+            float3 normal = normalize(mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn));
+        #else
+            float3 normal = mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn);
+        #endif
     #else
         float3 normal = normalize(iNormal);
     #endif
-    
+
     // Get fog factor
     #ifdef HEIGHTFOG
         float fogFactor = GetHeightFogFactor(iWorldPos.w, iWorldPos.y);
@@ -193,19 +193,13 @@ void PS(
         float3 lightDir;
         float3 lightColor;
         float3 finalColor;
-        float diff;
 
-        #ifdef DIRLIGHT
-            diff = GetDiffuse(normal, cLightDirPS, lightDir);
-        #else
-            float3 lightVec = (cLightPosPS.xyz - iWorldPos.xyz) * cLightPosPS.w;
-            diff = GetDiffuse(normal, lightVec, lightDir);
-        #endif
+        float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
 
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos, iWorldPos.w);
         #endif
-    
+
         #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)

@@ -179,8 +179,7 @@ static const char* shadowVariations[] =
     "",
     ""
     #else
-    // On Direct3D the quality is always "low" if not using hardware shadow compare
-    "SHADOWCMP",
+    "LQSHADOW SHADOWCMP",
     "LQSHADOW",
     "SHADOWCMP",
     ""
@@ -397,9 +396,6 @@ void Renderer::SetShadowQuality(int quality)
         quality |= SHADOWQUALITY_HIGH_16BIT;
     if (!graphics_->GetHiresShadowMapFormat())
         quality &= SHADOWQUALITY_HIGH_16BIT;
-    // Shader Model 2 can not reliably support four samples without exceeding pixel shader instruction count limit
-    if (!graphics_->GetSM3Support())
-        quality &= ~SHADOWQUALITY_HIGH_16BIT;
     
     if (quality != shadowQuality_)
     {
@@ -897,7 +893,9 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
         else
         {
-            newShadowMap->SetFilterMode(FILTER_BILINEAR);
+            // When shadow compare must be done manually, use nearest filtering so that the filtering of point lights and other
+            // shadowed lights matches
+            newShadowMap->SetFilterMode(graphics_->GetHardwareShadowSupport() ? FILTER_BILINEAR : FILTER_NEAREST);
             // If no dummy color rendertarget for this size exists yet, create one now
             if (!colorShadowMaps_.Contains(searchKey))
             {
@@ -1469,6 +1467,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     PROFILE(LoadPassShaders);
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+    bool isSM3 = graphics_->GetSM3Support();
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
@@ -1495,6 +1494,11 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         {
             unsigned l = j % MAX_LIGHT_PS_VARIATIONS;
             unsigned h = j / MAX_LIGHT_PS_VARIATIONS;
+            
+            // On Shader Model 2 specular calculations are not supported with shadowed point lights
+            if (!isSM3 && (l & LPS_SHADOW) && (l & 3) >= LPS_POINT)
+                l &= ~LPS_SPEC;
+            
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " +

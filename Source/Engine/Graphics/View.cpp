@@ -403,6 +403,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     deferred_ = false;
     deferredAmbient_ = false;
     useLitBase_ = false;
+    useShadowLitBase_ = graphics_->GetSM3Support() || renderer_->GetShadowQuality() < SHADOWQUALITY_HIGH_16BIT;
     
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
@@ -1167,8 +1168,9 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool allowLitBase = useLitBase_ && !light->IsNegative() && light == drawable->GetFirstLight() &&
         drawable->GetVertexLights().Empty() && !hasAmbientGradient;
-    // Ambient + shadowed point light on Shader Model 2 may exceed the pixel shader instruction count
-    if (allowLitBase && !graphics_->GetSM3Support() && light->GetLightType() == LIGHT_POINT && light->GetCastShadows())
+    // On Shader Model 2 disable lit base optimization from shadowed lights when using high shadow quality due to the risk of
+    // exceeding pixel shader instruction count
+    if (allowLitBase && light->GetCastShadows() && !useShadowLitBase_)
         allowLitBase = false;
     
     for (unsigned i = 0; i < batches.Size(); ++i)

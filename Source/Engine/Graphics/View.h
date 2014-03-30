@@ -304,6 +304,8 @@ private:
     bool deferredAmbient_;
     /// Forward light base pass optimization flag. If in use, combine the base pass and first light for all opaque objects.
     bool useLitBase_;
+    /// Forward light base pass optimization flag for shadowed lights. False on SM2 when using 4-sample shadow mapping.
+    bool useShadowLitBase_;
     /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
     bool hasScenePasses_;
     /// Renderpath.

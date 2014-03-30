@@ -553,6 +553,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         if (shadowMap)
         {
             {
+                // Calculate point light shadow sampling offsets (unrolled cube map)
                 unsigned faceWidth = shadowMap->GetWidth() / 2;
                 unsigned faceHeight = shadowMap->GetHeight() / 3;
                 float width = (float)shadowMap->GetWidth();
@@ -578,6 +579,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             }
             
             {
+                // Calculate shadow camera depth parameters for point light shadows and shadow fade parameters for
+                //  directional light shadows, stored in the same uniform
                 Camera* shadowCamera = lightQueue_->shadowSplits_[0].shadowCamera_;
                 float nearClip = shadowCamera->GetNearClip();
                 float farClip = shadowCamera->GetFarClip();

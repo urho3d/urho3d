@@ -142,14 +142,8 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 lightDir;
         float3 lightColor;
         float3 finalColor;
-        float diff;
-
-        #ifdef DIRLIGHT
-            diff = GetDiffuse(normal, cLightDirPS, lightDir);
-        #else
-            float3 lightVec = (cLightPosPS.xyz - iWorldPos.xyz) * cLightPosPS.w;
-            diff = GetDiffuse(normal, lightVec, lightDir);
-        #endif
+        
+        float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
 
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos, iWorldPos.w);

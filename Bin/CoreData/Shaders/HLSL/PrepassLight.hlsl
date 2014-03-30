@@ -49,13 +49,13 @@ void PS(
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
         #ifdef ORTHO
-            float depth = tex2D(sDepthBuffer, iScreenPos).r;
+            float depth = Sample(sDepthBuffer, iScreenPos).r;
             float3 worldPos = lerp(iNearRay, iFarRay, depth);
         #else
-            float depth = tex2D(sDepthBuffer, iScreenPos).r;
+            float depth = Sample(sDepthBuffer, iScreenPos).r;
             float3 worldPos = iFarRay * depth;
         #endif
-        float4 normalInput = tex2D(sNormalBuffer, iScreenPos);
+        float4 normalInput = Sample(sNormalBuffer, iScreenPos);
     #else
         #ifdef ORTHO
             float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
@@ -71,15 +71,9 @@ void PS(
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;
     float3 lightDir;
-    float diff;
 
     // Accumulate light at half intensity to allow 2x "overburn"
-    #ifdef DIRLIGHT
-        diff = 0.5 * GetDiffuse(normal, cLightDirPS, lightDir);
-    #else
-        float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
-        diff = 0.5 * GetDiffuse(normal, lightVec, lightDir);
-    #endif
+    float diff = 0.5 * GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
         diff *= GetShadowDeferred(projWorldPos, depth);
@@ -89,7 +83,7 @@ void PS(
         float4 spotPos = mul(projWorldPos, cLightMatricesPS[0]);
         lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
     #elif defined(CUBEMASK)
-        lightColor = texCUBE(sLightCubeMap, mul(-lightVec, (float3x3)cLightMatricesPS[0])).rgb * cLightColor.rgb;
+        lightColor = texCUBE(sLightCubeMap, mul(worldPos - cLightPosPS.xyz, (float3x3)cLightMatricesPS[0])).rgb * cLightColor.rgb;
     #else
         lightColor = cLightColor.rgb;
     #endif

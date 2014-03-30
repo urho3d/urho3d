@@ -125,14 +125,8 @@ void PS(float2 iTexCoord : TEXCOORD0,
         // Per-pixel forward lighting
         float3 lightColor;
         float3 finalColor;
-        float diff;
-    
-        #ifdef DIRLIGHT
-            diff = GetDiffuseVolumetric(cLightDirPS);
-        #else
-            float3 lightVec = (cLightPosPS.xyz - iWorldPos.xyz) * cLightPosPS.w;
-            diff = GetDiffuseVolumetric(lightVec);
-        #endif
+        
+        float diff = GetDiffuseVolumetric(iWorldPos.xyz);
 
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos, iWorldPos.w);

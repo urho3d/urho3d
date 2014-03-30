@@ -695,7 +695,8 @@ When setting the initial screen mode, Graphics does a few checks:
 %Shader model 2 has the following limitations due to limited pixel shader instruction count:
 
 - Directional light shadows support a maximum of 3 cascade splits instead of 4.
-- High quality (4 samples) shadow mapping is not supported.
+- Combining the ambient pass with the first forward light (lit base pass optimization) is not supported with shadowed lights when 4 shadow samples are being used.
+- Shadowed point lights do not support specular calculations in forward rendering.
 - Height fog is not supported.
 
 \section Rendering_Renderer Renderer

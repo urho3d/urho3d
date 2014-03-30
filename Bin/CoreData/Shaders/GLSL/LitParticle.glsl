@@ -94,14 +94,8 @@ void PS()
         vec3 lightColor;
         vec3 lightDir;
         vec3 finalColor;
-        float diff;
 
-        #ifdef DIRLIGHT
-            diff = GetDiffuseVolumetric(cLightDirPS);
-        #else
-            vec3 lightVec = (cLightPosPS.xyz - vWorldPos.xyz) * cLightPosPS.w;
-            diff = GetDiffuseVolumetric(lightVec);
-        #endif
+        float diff = GetDiffuseVolumetric(vWorldPos.xyz);
 
         #ifdef SHADOW
             diff *= GetShadow(vShadowPos, vWorldPos.w);
