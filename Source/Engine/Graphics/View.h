@@ -306,6 +306,8 @@ private:
     bool useLitBase_;
     /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
     bool hasScenePasses_;
+    /// Flip vertical flag.
+    bool flipVertical_;
     /// Renderpath.
     RenderPath* renderPath_;
     /// Per-thread octree query results.

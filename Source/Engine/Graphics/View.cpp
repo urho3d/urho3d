@@ -315,6 +315,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         return false;
     
     hasScenePasses_ = false;
+    flipVertical_ = false;
     
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
@@ -398,6 +399,13 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     lightPassName_ = PASS_LIGHT;
     litBasePassName_ = PASS_LITBASE;
     litAlphaPassName_ = PASS_LITALPHA;
+    
+    // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
+    // as a render texture produced on Direct3D9
+    #ifdef USE_OPENGL
+    if (renderTarget_)
+        flipVertical_ = true;
+    #endif
     
     // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
@@ -494,12 +502,12 @@ void View::Update(const FrameInfo& frame)
     for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
     
-    if (hasScenePasses_ && (!camera_ || !octree_))
-        return;
-    
-    // Set automatic aspect ratio if required
-    if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
+    if (camera_)
+    {
+        // Set automatic aspect ratio if required
+        if (camera_->GetAutoAspectRatio())
+            camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
+    }
     
     GetDrawables();
     GetBatches();
@@ -507,9 +515,6 @@ void View::Update(const FrameInfo& frame)
 
 void View::Render()
 {
-    if (hasScenePasses_ && (!octree_ || !camera_))
-        return;
-    
     // Actually update geometry data now
     UpdateGeometries();
     
@@ -541,20 +546,17 @@ void View::Render()
     }
     #endif
     
-    if (renderTarget_)
-    {
-        // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
-        // as a render texture produced on Direct3D9
-        #ifdef USE_OPENGL
-        camera_->SetFlipVertical(true);
-        #endif
-    }
+    #ifdef USE_OPENGL
+    if (camera_)
+        camera_->SetFlipVertical(flipVertical_);
+    #endif
     
     // Render
     ExecuteRenderPathCommands();
     
     #ifdef USE_OPENGL
-    camera_->SetFlipVertical(false);
+    if (camera_)
+        camera_->SetFlipVertical(false);
     #endif
     
     graphics_->SetDepthBias(0.0f, 0.0f);
@@ -567,7 +569,7 @@ void View::Render()
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
-    if (!renderTarget_ && octree_)
+    if (!renderTarget_ && camera_ && octree_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective())
@@ -599,6 +601,9 @@ Renderer* View::GetRenderer() const
 
 void View::GetDrawables()
 {
+    if (!camera_ || !octree_)
+        return;
+    
     PROFILE(GetDrawables);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
@@ -765,6 +770,9 @@ void View::GetDrawables()
 
 void View::GetBatches()
 {
+    if (!camera_ || !octree_)
+        return;
+    
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
@@ -1872,7 +1880,7 @@ void View::DrawFullscreenQuad(bool nearQuad)
     Matrix4 projection = Matrix4::IDENTITY;
     
     #ifdef USE_OPENGL
-    if (camera_->GetFlipVertical())
+    if (flipVertical_)
         projection.m11_ = -1.0f;
     model.m23_ = nearQuad ? -1.0f : 1.0f;
     #else

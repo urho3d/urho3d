@@ -587,27 +587,26 @@ void Renderer::Update(float timeStep)
         
         const IntRect& viewRect = viewport->GetRect();
         Scene* scene = viewport->GetScene();
-        if (!scene)
-            continue;
-        
-        Octree* octree = scene->GetComponent<Octree>();
-        
-        // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
-        // However, if the same scene is viewed from multiple cameras, update the octree only once
-        if (!updatedOctrees_.Contains(octree))
+        Octree* octree = scene ? scene->GetComponent<Octree>() : 0;
+        if (scene && octree)
         {
-            frame_.camera_ = viewport->GetCamera();
-            frame_.viewSize_ = viewRect.Size();
-            if (frame_.viewSize_ == IntVector2::ZERO)
-                frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
-            octree->Update(frame_);
-            updatedOctrees_.Insert(octree);
-            
-            // Set also the view for the debug renderer already here, so that it can use culling
-            /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
-            DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
-            if (debug)
-                debug->SetView(viewport->GetCamera());
+            // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
+            // However, if the same scene is viewed from multiple cameras, update the octree only once
+            if (!updatedOctrees_.Contains(octree))
+            {
+                frame_.camera_ = viewport->GetCamera();
+                frame_.viewSize_ = viewRect.Size();
+                if (frame_.viewSize_ == IntVector2::ZERO)
+                    frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
+                octree->Update(frame_);
+                updatedOctrees_.Insert(octree);
+                
+                // Set also the view for the debug renderer already here, so that it can use culling
+                /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
+                DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+                if (debug)
+                    debug->SetView(viewport->GetCamera());
+            }
         }
         
         // Update view. This may queue further views
