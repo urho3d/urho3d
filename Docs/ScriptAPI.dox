@@ -4655,6 +4655,7 @@ Properties:
 - String pixelShader
 - String pixelShaderDefines
 - int refs // readonly
+- bool sm3
 - String vertexShader
 - String vertexShaderDefines
 - int weakRefs // readonly

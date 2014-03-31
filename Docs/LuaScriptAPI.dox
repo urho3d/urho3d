@@ -3125,6 +3125,14 @@ Properties:
 
 ### Pass : RefCounted
 
+Methods:
+
+- bool IsSM3() const
+
+Properties:
+
+- bool SM3 (readonly)
+
 ### PhysicsRaycastResult
 
 

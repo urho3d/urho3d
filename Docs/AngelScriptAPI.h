@@ -5627,6 +5627,7 @@ String pixelShader;
 String pixelShaderDefines;
 /* readonly */
 int refs;
+bool sm3;
 String vertexShader;
 String vertexShaderDefines;
 /* readonly */
