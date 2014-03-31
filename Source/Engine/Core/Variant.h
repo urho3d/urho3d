@@ -24,11 +24,11 @@
 
 #include "Color.h"
 #include "HashMap.h"
-#include "Quaternion.h"
+#include "Matrix3.h"
+#include "Matrix3x4.h"
 #include "Ptr.h"
 #include "Rect.h"
 #include "StringHash.h"
-#include "Vector4.h"
 
 namespace Urho3D
 {
@@ -55,6 +55,9 @@ enum VariantType
     VAR_INTRECT,
     VAR_INTVECTOR2,
     VAR_PTR,
+    VAR_MATRIX3,
+    VAR_MATRIX3X4,
+    VAR_MATRIX4,
     MAX_VAR_TYPES
 };
 
@@ -333,6 +336,27 @@ public:
         *this = value;
     }
 
+    /// Construct from a Matrix3.
+    Variant(const Matrix3& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
+    /// Construct from a Matrix3x4.
+    Variant(const Matrix3x4& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
+    /// Construct from a Matrix4.
+    Variant(const Matrix4& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+    
     /// Construct from type and value.
     Variant(const String& type, const String& value) :
         type_(VAR_NONE)
@@ -559,6 +583,30 @@ public:
         return *this;
     }
     
+    /// Assign from a Matrix3.
+    Variant& operator = (const Matrix3& rhs)
+    {
+        SetType(VAR_MATRIX3);
+        *(reinterpret_cast<Matrix3*>(value_.ptr_)) = rhs;
+        return *this;
+    }
+    
+    /// Assign from a Matrix3x4.
+    Variant& operator = (const Matrix3x4& rhs)
+    {
+        SetType(VAR_MATRIX3X4);
+        *(reinterpret_cast<Matrix3x4*>(value_.ptr_)) = rhs;
+        return *this;
+    }
+    
+    /// Assign from a Matrix4.
+    Variant& operator = (const Matrix4& rhs)
+    {
+        SetType(VAR_MATRIX4);
+        *(reinterpret_cast<Matrix4*>(value_.ptr_)) = rhs;
+        return *this;
+    }
+    
     /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
     /// Test for equality with an integer. To return true, both the type and value must match.
@@ -623,6 +671,13 @@ public:
             return false;
     }
     
+    /// Test for equality with a Matrix3. To return true, both the type and value must match.
+    bool operator == (const Matrix3& rhs) const { return type_ == VAR_MATRIX3 ? *(reinterpret_cast<const Matrix3*>(value_.ptr_)) == rhs : false; }
+    /// Test for equality with a Matrix3x4. To return true, both the type and value must match.
+    bool operator == (const Matrix3x4& rhs) const { return type_ == VAR_MATRIX3X4 ? *(reinterpret_cast<const Matrix3x4*>(value_.ptr_)) == rhs : false; }
+    /// Test for equality with a Matrix4. To return true, both the type and value must match.
+    bool operator == (const Matrix4& rhs) const { return type_ == VAR_MATRIX4 ? *(reinterpret_cast<const Matrix4*>(value_.ptr_)) == rhs : false; }
+    
     /// Test for inequality with another variant.
     bool operator != (const Variant& rhs) const { return !(*this == rhs); }
     /// Test for inequality with an integer.
@@ -665,6 +720,12 @@ public:
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a RefCounted pointer.
     bool operator != (RefCounted* rhs) const { return !(*this == rhs); }
+    /// Test for inequality with a Matrix3.
+    bool operator != (const Matrix3& rhs) const { return !(*this == rhs); }
+    /// Test for inequality with a Matrix3x4.
+    bool operator != (const Matrix3x4& rhs) const { return !(*this == rhs); }
+    /// Test for inequality with a Matrix4.
+    bool operator != (const Matrix4& rhs) const { return !(*this == rhs); }
     
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
@@ -729,6 +790,12 @@ public:
     const IntVector2& GetIntVector2() const { return type_ == VAR_INTVECTOR2 ? *reinterpret_cast<const IntVector2*>(&value_) : IntVector2::ZERO; }
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
     RefCounted* GetPtr() const { return type_ == VAR_PTR ? *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_) : (RefCounted*)0; }
+    /// Return a Matrix3 or identity on type mismatch.
+    const Matrix3& GetMatrix3() const { return type_ == VAR_MATRIX3 ? *(reinterpret_cast<const Matrix3*>(value_.ptr_)) : Matrix3::IDENTITY; }
+    /// Return a Matrix3x4 or identity on type mismatch.
+    const Matrix3x4& GetMatrix3x4() const { return type_ == VAR_MATRIX3X4 ? *(reinterpret_cast<const Matrix3x4*>(value_.ptr_)) : Matrix3x4::IDENTITY; }
+    /// Return a Matrix4 or identity on type mismatch.
+    const Matrix4& GetMatrix4() const { return type_ == VAR_MATRIX4 ? *(reinterpret_cast<const Matrix4*>(value_.ptr_)) : Matrix4::IDENTITY; }
     /// Return value's type.
     VariantType GetType() const { return type_; }
     /// Return value's type name.

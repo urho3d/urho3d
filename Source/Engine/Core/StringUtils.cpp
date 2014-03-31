@@ -371,7 +371,110 @@ Variant ToVectorVariant(const char* source)
     case 4:
         ret.FromString(VAR_VECTOR4, source);
         break;
+        
+    case 9:
+        ret.FromString(VAR_MATRIX3, source);
+        break;
+
+    case 12:
+        ret.FromString(VAR_MATRIX3X4, source);
+        break;
+
+    case 16:
+        ret.FromString(VAR_MATRIX4, source);
+        break;
     }
+    
+    return ret;
+}
+
+Matrix3 ToMatrix3(const String& source)
+{
+    return ToMatrix3(source.CString());
+}
+
+Matrix3 ToMatrix3(const char* source)
+{
+    Matrix3 ret(Matrix3::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 9)
+        return ret;
+    
+    char* ptr = (char*)source;
+    ret.m00_ = (float)strtod(ptr, &ptr);
+    ret.m01_ = (float)strtod(ptr, &ptr);
+    ret.m02_ = (float)strtod(ptr, &ptr);
+    ret.m10_ = (float)strtod(ptr, &ptr);
+    ret.m11_ = (float)strtod(ptr, &ptr);
+    ret.m12_ = (float)strtod(ptr, &ptr);
+    ret.m20_ = (float)strtod(ptr, &ptr);
+    ret.m21_ = (float)strtod(ptr, &ptr);
+    ret.m22_ = (float)strtod(ptr, &ptr);
+    
+    return ret;
+}
+
+Matrix3x4 ToMatrix3x4(const String& source)
+{
+    return ToMatrix3x4(source.CString());
+}
+
+Matrix3x4 ToMatrix3x4(const char* source)
+{
+    Matrix3x4 ret(Matrix3x4::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 12)
+        return ret;
+    
+    char* ptr = (char*)source;
+    ret.m00_ = (float)strtod(ptr, &ptr);
+    ret.m01_ = (float)strtod(ptr, &ptr);
+    ret.m02_ = (float)strtod(ptr, &ptr);
+    ret.m03_ = (float)strtod(ptr, &ptr);
+    ret.m10_ = (float)strtod(ptr, &ptr);
+    ret.m11_ = (float)strtod(ptr, &ptr);
+    ret.m12_ = (float)strtod(ptr, &ptr);
+    ret.m13_ = (float)strtod(ptr, &ptr);
+    ret.m20_ = (float)strtod(ptr, &ptr);
+    ret.m21_ = (float)strtod(ptr, &ptr);
+    ret.m22_ = (float)strtod(ptr, &ptr);
+    ret.m23_ = (float)strtod(ptr, &ptr);
+    
+    return ret;
+}
+
+Matrix4 ToMatrix4(const String& source)
+{
+    return ToMatrix4(source.CString());
+}
+
+Matrix4 ToMatrix4(const char* source)
+{
+    Matrix4 ret(Matrix4::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 16)
+        return ret;
+    
+    char* ptr = (char*)source;
+    ret.m00_ = (float)strtod(ptr, &ptr);
+    ret.m01_ = (float)strtod(ptr, &ptr);
+    ret.m02_ = (float)strtod(ptr, &ptr);
+    ret.m03_ = (float)strtod(ptr, &ptr);
+    ret.m10_ = (float)strtod(ptr, &ptr);
+    ret.m11_ = (float)strtod(ptr, &ptr);
+    ret.m12_ = (float)strtod(ptr, &ptr);
+    ret.m13_ = (float)strtod(ptr, &ptr);
+    ret.m20_ = (float)strtod(ptr, &ptr);
+    ret.m21_ = (float)strtod(ptr, &ptr);
+    ret.m22_ = (float)strtod(ptr, &ptr);
+    ret.m23_ = (float)strtod(ptr, &ptr);
+    ret.m30_ = (float)strtod(ptr, &ptr);
+    ret.m31_ = (float)strtod(ptr, &ptr);
+    ret.m32_ = (float)strtod(ptr, &ptr);
+    ret.m33_ = (float)strtod(ptr, &ptr);
     
     return ret;
 }
