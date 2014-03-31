@@ -4560,6 +4560,7 @@ Vector3 Scale() const;
 Matrix3 Scaled(const Vector3&) const;
 void SetScale(const Vector3&);
 void SetScale(float);
+String ToString() const;
 Matrix3 Transpose() const;
 
 // Properties:
@@ -4589,6 +4590,7 @@ void SetScale(float);
 void SetTranslation(const Vector3&);
 Matrix3 ToMatrix3() const;
 Matrix4 ToMatrix4() const;
+String ToString() const;
 Vector3 Translation() const;
 
 // Properties:
@@ -4620,6 +4622,7 @@ void SetScale(const Vector3&);
 void SetScale(float);
 void SetTranslation(const Vector3&);
 Matrix3 ToMatrix3() const;
+String ToString() const;
 Vector3 Translation() const;
 Matrix4 Transpose() const;
 
@@ -8144,6 +8147,9 @@ int ToInt() const;
 IntRect ToIntRect() const;
 IntVector2 ToIntVector2() const;
 String ToLower() const;
+Matrix3 ToMatrix3() const;
+Matrix3x4 ToMatrix3x4() const;
+Matrix4 ToMatrix4() const;
 Quaternion ToQuaternion() const;
 uint ToUInt() const;
 String ToUpper() const;
@@ -9292,6 +9298,9 @@ uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
 const IntRect& GetIntRect() const;
 const IntVector2& GetIntVector2() const;
+const Matrix3& GetMatrix3() const;
+const Matrix3x4& GetMatrix3x4() const;
+const Matrix4& GetMatrix4() const;
 const Quaternion& GetQuaternion() const;
 const ResourceRef& GetResourceRef() const;
 const ResourceRefList& GetResourceRefList() const;
@@ -9885,6 +9894,9 @@ XMLElement GetChild(const String& = String ( )) const;
 Color GetColor(const String&) const;
 float GetFloat(const String&) const;
 int GetInt(const String&) const;
+Matrix3 GetMatrix3(const String&) const;
+Matrix3x4 GetMatrix3x4(const String&) const;
+Matrix4 GetMatrix4(const String&) const;
 XMLElement GetNext(const String& = String ( )) const;
 Quaternion GetQuaternion(const String&) const;
 ResourceRef GetResourceRef() const;
@@ -9915,6 +9927,9 @@ bool SetBoundingBox(const BoundingBox&);
 bool SetColor(const String&, const Color&);
 bool SetFloat(const String&, float);
 bool SetInt(const String&, int);
+bool SetMatrix3(const String&, const Matrix3&);
+bool SetMatrix3x4(const String&, const Matrix3x4&);
+bool SetMatrix4(const String&, const Matrix4&);
 bool SetQuaternion(const String&, const Quaternion&);
 bool SetResourceRef(const String&, const ResourceRef&);
 bool SetResourceRefList(const String&, const ResourceRefList&);
@@ -10442,6 +10457,9 @@ VAR_VARIANTMAP,
 VAR_INTRECT,
 VAR_INTVECTOR2,
 VAR_PTR,
+VAR_MATRIX3,
+VAR_MATRIX3X4,
+VAR_MATRIX4,
 };
 
 enum VerticalAlignment

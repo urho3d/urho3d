@@ -2378,6 +2378,7 @@ Methods:
 - Matrix3 Scaled(const Vector3& scale) const
 - bool Equals(const Matrix3& rhs) const
 - Matrix3 Inverse() const
+- String ToString() const
 
 Properties:
 
@@ -2434,6 +2435,7 @@ Methods:
 - bool Equals(const Matrix3x4& rhs) const
 - void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 - Matrix3x4 Inverse() const
+- String ToString() const
 
 Properties:
 
@@ -2486,6 +2488,7 @@ Methods:
 - bool Equals(const Matrix4& rhs) const
 - void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 - Matrix4 Inverse() const
+- String ToString() const
 
 Properties:
 
@@ -5198,6 +5201,12 @@ Methods:
 - Variant* new(const IntRect& value)
 - Variant(const IntVector2& value) (GC)
 - Variant* new(const IntVector2& value)
+- Variant(const Matrix3& value) (GC)
+- Variant* new(const Matrix3& value)
+- Variant(const Matrix3x4& value) (GC)
+- Variant* new(const Matrix3x4& value)
+- Variant(const Matrix4& value) (GC)
+- Variant* new(const Matrix4& value)
 - Variant(const String type, const String value) (GC)
 - Variant* new(const String type, const String value)
 - Variant(VariantType type, const String value) (GC)
@@ -5225,6 +5234,9 @@ Methods:
 - bool operator==(const IntVector2& rhs) const
 - bool operator==(const StringHash& rhs) const
 - bool operator==(const ShortStringHash& rhs) const
+- bool operator==(const Matrix3& rhs) const
+- bool operator==(const Matrix3x4& rhs) const
+- bool operator==(const Matrix4& rhs) const
 - void SetInt(int value)
 - void SetUint(unsigned value)
 - void SetStringHash(const StringHash& value)
@@ -5242,6 +5254,9 @@ Methods:
 - void SetResourceRefList(const ResourceRefList& value)
 - void SetIntRect(const IntRect& value)
 - void SetIntVector2(const IntVector2& value)
+- void SetMatrix3(const Matrix3& value)
+- void SetMatrix3x4(const Matrix3x4& value)
+- void SetMatrix4(const Matrix4& value)
 - int GetInt() const
 - int GetUInt() const
 - StringHash GetStringHash()
@@ -5259,6 +5274,9 @@ Methods:
 - const ResourceRefList& GetResourceRefList() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
+- const Matrix3& GetMatrix3() const
+- const Matrix3x4& GetMatrix3x4() const
+- const Matrix4& GetMatrix4() const
 - VariantType GetType() const
 - String GetTypeName() const
 - String ToString() const
@@ -5298,6 +5316,9 @@ Methods:
 - void SetIntRect(const String key, const IntRect value)
 - void SetIntVector2(const String key, const IntVector2 value)
 - void SetPtr(const String key, void* value)
+- void SetMatrix3(const String key, const Matrix3 value)
+- void SetMatrix3x4(const String key, const Matrix3x4 value)
+- void SetMatrix4(const String key, const Matrix4 value)
 - int GetInt(const String key)
 - int GetUInt(const String key)
 - StringHash GetStringHash(const String key)
@@ -5316,6 +5337,9 @@ Methods:
 - const IntRect& GetIntRect(const String key)
 - const IntVector2& GetIntVector2(const String key)
 - const void* GetPtr(const String type, const String key)
+- const Matrix3& GetMatrix3(const String key)
+- const Matrix3x4& GetMatrix3x4(const String key)
+- const Matrix4& GetMatrix4(const String key)
 
 ### Vector2
 
@@ -5671,6 +5695,9 @@ Methods:
 - bool SetVector3(const String name, const Vector3& value)
 - bool SetVector4(const String name, const Vector4& value)
 - bool SetVectorVariant(const String name, const Variant& value)
+- bool SetMatrix3(const String name, const Matrix3& value)
+- bool SetMatrix3x4(const String name, const Matrix3x4& value)
+- bool SetMatrix4(const String name, const Matrix4& value)
 - bool IsNull() const
 - bool NotNull() const
 - bool operatorbool() const
@@ -5701,6 +5728,9 @@ Methods:
 - Vector3 GetVector3(const String name) const
 - Vector4 GetVector4(const String name) const
 - Vector4 GetVector(const String name) const
+- Matrix3 GetMatrix3(const String name) const
+- Matrix3x4 GetMatrix3x4(const String name) const
+- Matrix4 GetMatrix4(const String name) const
 - XMLFile* GetFile() const
 
 Properties:
@@ -6129,6 +6159,9 @@ Properties:
 - int VAR_INTRECT
 - int VAR_INTVECTOR2
 - int VAR_PTR
+- int VAR_MATRIX3
+- int VAR_MATRIX3X4
+- int VAR_MATRIX4
 - int MAX_VAR_TYPES
 
 ### VertexElement
@@ -6221,8 +6254,8 @@ Properties:
 - float Random(float range)
 - float Random()
 - float Random(float min, float max)
-- int RandomInt(int min, int max)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -6241,6 +6274,9 @@ Properties:
 - IntRect ToIntRect(const String source)
 - IntVector2 ToIntVector2(const String source)
 - unsigned ToLower(unsigned ch)
+- Matrix3 ToMatrix3(const String source)
+- Matrix3x4 ToMatrix3x4(const String source)
+- Matrix4 ToMatrix4(const String source)
 - Quaternion ToQuaternion(const String source)
 - Rect ToRect(const String source)
 - String ToString(void* value)
