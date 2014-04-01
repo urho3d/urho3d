@@ -21,8 +21,9 @@
 //
 
 #include "Precompiled.h"
-#include "Context.h"
 #include "AttributeAnimation.h"
+#include "Context.h"
+#include "ObjectAnimation.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -34,6 +35,7 @@ AttributeAnimation::AttributeAnimation(Context* context) :
     Resource(context),
     cycleMode_(CM_LOOP),
     valueType_(VAR_NONE),
+    isInterpolatable_(false),
     beginTime_(M_INFINITY),
     endTime_(-M_INFINITY)
 {
@@ -105,13 +107,18 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
 
     for (unsigned i = 0; i < keyframes_.Size(); ++i)
     {
-        const KeyFrame& keyFrame = keyframes_[i];
+        const AttributeKeyFrame& keyFrame = keyframes_[i];
         XMLElement keyFrameEleme = dest.CreateChild("KeyFrame");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
         keyFrameEleme.SetAttribute("value", keyFrame.value_.ToString());
     }
     
     return true;
+}
+
+void AttributeAnimation::SetObjectAnimation(ObjectAnimation* objectAnimation)
+{
+    objectAnimation_ = objectAnimation;
 }
 
 void AttributeAnimation::SetCycleMode(CycleMode cycleMode)
@@ -125,7 +132,10 @@ void AttributeAnimation::SetValueType(VariantType valueType)
         return;
 
     valueType_ = valueType;
-    
+
+    isInterpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || 
+        (valueType_ == VAR_VECTOR4) || (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
+
     keyframes_.Clear();
     beginTime_ = M_INFINITY;
     endTime_ = -M_INFINITY;
@@ -134,14 +144,14 @@ void AttributeAnimation::SetValueType(VariantType valueType)
 bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
 {
     if (valueType_ == VAR_NONE)
-        valueType_ = value.GetType();
+        SetValueType(value.GetType());
     else if (value.GetType() != valueType_)
         return false;
 
     beginTime_ = Min(time, beginTime_);
     endTime_ = Max(time, endTime_);
 
-    KeyFrame keyFrame;
+    AttributeKeyFrame keyFrame;
     keyFrame.time_ = time;
     keyFrame.value_ = value;
 
@@ -162,125 +172,69 @@ bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
     return true;
 }
 
-void AttributeAnimation::GetAnimationValue(float time, Variant& value) const
+void AttributeAnimation::SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
 {
-    if (keyframes_.Empty())
-        return;
+    AttributeEventFrame eventFrame;
+    eventFrame.time_ = time;
+    eventFrame.eventType_ = eventType;
+    eventFrame.eventData_ = eventData;
 
-    float scaledTime = CalculateScaledTime(time);
-
-    for (unsigned i = 1; i < keyframes_.Size(); ++i)
+    if (eventFrames_.Empty() || time >= eventFrames_.Back().time_)
+        eventFrames_.Push(eventFrame);
+    else
     {
-        if (keyframes_[i].time_ > scaledTime)
+        for (unsigned i = 0; i < eventFrames_.Size(); ++i)
         {
-            Interpolation(keyframes_[i - 1], keyframes_[i], scaledTime, value);
-            break;
+            if (time < eventFrames_[i].time_)
+            {
+                eventFrames_.Insert(i, eventFrame);
+                break;
+            }
         }
     }
 }
 
-float AttributeAnimation::CalculateScaledTime(float time) const
+ObjectAnimation* AttributeAnimation::GetObjectAnimation() const
+{
+    return objectAnimation_;
+}
+
+float AttributeAnimation::CalculateScaledTime(float currentTime) const
 {
     switch (cycleMode_)
     {
     case CM_LOOP:
         {
             float span = endTime_ - beginTime_;
-            return beginTime_ + fmodf(time - beginTime_, span);
+            return beginTime_ + fmodf(currentTime - beginTime_, span);
         }
 
     case CM_CLAMP:
-        return Clamp(time, beginTime_, endTime_);
+        return Clamp(currentTime, beginTime_, endTime_);
 
     case CM_PINGPONG:
         {
             float span = endTime_ - beginTime_;
             float doubleSpan = span * 2.0f;
-            float fract = fmodf(time - beginTime_, doubleSpan);
+            float fract = fmodf(currentTime - beginTime_, doubleSpan);
             return (fract < span) ? beginTime_ + fract : beginTime_ + doubleSpan - fract;
         }
         break;
     }
 
-    return time;
+    return beginTime_;
 }
 
-void AttributeAnimation::Interpolation(const KeyFrame& loKeyFrame, const KeyFrame& hiKeyFrame, float scaledTime, Variant& value) const
+void AttributeAnimation::GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const
 {
-    switch (valueType_)
+    for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {
-    case VAR_INT:
-        value = loKeyFrame.value_.GetInt();
-        return;
-    case VAR_BOOL:
-        value = loKeyFrame.value_.GetBool();
-        return;
-    case VAR_FLOAT:
-        {
-            float factor = (scaledTime - loKeyFrame.time_) / (hiKeyFrame.time_ - loKeyFrame.time_);
-            value = Lerp(loKeyFrame.value_.GetFloat(), hiKeyFrame.value_.GetFloat(), factor);
-        }
-        return;
-    case VAR_VECTOR2:
-        {
-            float factor = (scaledTime - loKeyFrame.time_) / (hiKeyFrame.time_ - loKeyFrame.time_);
-            value = loKeyFrame.value_.GetVector2().Lerp(hiKeyFrame.value_.GetVector2(), factor);
-        }
-        return;
-    case VAR_VECTOR3:
-        {
-            float factor = (scaledTime - loKeyFrame.time_) / (hiKeyFrame.time_ - loKeyFrame.time_);
-            value = loKeyFrame.value_.GetVector3().Lerp(hiKeyFrame.value_.GetVector3(), factor);
-        }
-        return;
-    case VAR_VECTOR4:
-        {
-            float factor = (scaledTime - loKeyFrame.time_) / (hiKeyFrame.time_ - loKeyFrame.time_);
-            value = loKeyFrame.value_.GetVector4().Lerp(hiKeyFrame.value_.GetVector4(), factor);
-        }
-        return;
-    case VAR_QUATERNION:
-        {
-            float factor = (scaledTime - loKeyFrame.time_) / (hiKeyFrame.time_ - loKeyFrame.time_);
-            value = loKeyFrame.value_.GetQuaternion().Slerp(hiKeyFrame.value_.GetQuaternion(), factor);
-        }
-        return;
-    case VAR_COLOR:
-        {
-            float factor = (scaledTime - loKeyFrame.time_) / (hiKeyFrame.time_ - loKeyFrame.time_);
-            value = loKeyFrame.value_.GetColor().Lerp(hiKeyFrame.value_.GetColor(), factor);
-        }
-        return;
-    case VAR_STRING:
-        value = loKeyFrame.value_.GetString();
-        return;
-    case VAR_BUFFER:
-        value = loKeyFrame.value_.GetBuffer();
-        return;
-    case VAR_VOIDPTR:
-        value = loKeyFrame.value_.GetVoidPtr();
-        return;
-    case VAR_RESOURCEREF:
-        value = loKeyFrame.value_.GetResourceRef();
-        return;
-    case VAR_RESOURCEREFLIST:
-        value = loKeyFrame.value_.GetResourceRefList();
-        return;
-    case VAR_VARIANTVECTOR:
-        value = loKeyFrame.value_.GetVariantVector();
-        return;
-    case VAR_VARIANTMAP:
-        value = loKeyFrame.value_.GetVariantMap();
-        return;
-    case VAR_INTRECT:
-        value = loKeyFrame.value_.GetIntRect();
-        return;
-    case VAR_INTVECTOR2:
-        value = loKeyFrame.value_.GetIntVector2();
-        return;
-    case VAR_PTR:
-        value = loKeyFrame.value_.GetPtr();
-        return;
+        const AttributeEventFrame& eventFrame = eventFrames_[i];
+        if (eventFrame.time_ >= endTime)
+            break;
+
+        if (eventFrame.time_ >= beginTime)
+            eventFrames.Push(&eventFrame);
     }
 }
 

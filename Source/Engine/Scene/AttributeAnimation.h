@@ -28,6 +28,7 @@
 namespace Urho3D
 {
 
+class ObjectAnimation;
 class XMLElement;
 
 /// Cycle mode.
@@ -39,6 +40,26 @@ enum CycleMode
     CM_CLAMP,
     /// Pingpong Mode.
     CM_PINGPONG,
+};
+
+/// Attribute key frame
+struct AttributeKeyFrame
+{
+    /// Time.
+    float time_;
+    /// Value.
+    Variant value_;
+};
+
+/// Attribute event frame.
+struct AttributeEventFrame
+{
+    /// Time.
+    float time_;
+    /// Event type.
+    StringHash eventType_;
+    /// Event data.
+    VariantMap eventData_;
 };
 
 /// Base class for attribute animation.
@@ -63,49 +84,54 @@ public:
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
 
+    /// Set object animation.
+    void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set cycle mode.
     void SetCycleMode(CycleMode cycleMode);
     /// Set value type.
     void SetValueType(VariantType valueType);
     /// Set key frame.
     bool SetKeyFrame(float time, const Variant& value);
+    /// Set event frame.
+    void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
 
+    /// Return object animation.
+    ObjectAnimation* GetObjectAnimation() const;
     /// Return cycle mode.
     CycleMode GetCycleMode() const { return cycleMode_; }
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
+    /// Is interpolatable.
+    bool IsInterpolatable() const;
     /// Return begin time.
     float GetBeginTime() const { return beginTime_; }
     /// Return end time.
     float GetEndTime() const { return endTime_; }
-    /// Get animation value.
-    void GetAnimationValue(float time, Variant& value) const;
+    /// Calculate scaled time.
+    float CalculateScaledTime(float currentTime) const;
+    /// Return all key frames.
+    const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyframes_; }
+    /// Return all event frames between time.
+    void GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const;
 
 protected:
-    /// Key frame
-    struct KeyFrame
-    {
-        /// Time.
-        float time_;
-        /// Value.
-        Variant value_;
-    };
 
-    /// Calculate scaled time.
-    float CalculateScaledTime(float animationTime) const;
-    /// Interpolation.
-    void Interpolation(const KeyFrame& loKeyFrame, const KeyFrame& hiKeyFrame, float scaledTime, Variant& value) const;
-
+    /// Object animation.
+    WeakPtr<ObjectAnimation> objectAnimation_;
     /// Cycle mode.
     CycleMode cycleMode_;
     /// Value type.
     VariantType valueType_;
+    /// Is interpolatable.
+    bool isInterpolatable_;
     /// Begin time.
     float beginTime_;
     /// End time.
     float endTime_;
     /// Key frames.
-    Vector<KeyFrame> keyframes_;
+    Vector<AttributeKeyFrame> keyframes_;
+    /// Event frames.
+    Vector<AttributeEventFrame> eventFrames_;
 };
 
 }

@@ -26,6 +26,7 @@
 #include "Cursor.h"
 #include "HashSet.h"
 #include "Log.h"
+#include "ObjectAnimation.h"
 #include "ResourceCache.h"
 #include "Sort.h"
 #include "UI.h"
@@ -1581,15 +1582,43 @@ UIElement* UIElement::GetElementEventSender() const
     return element;
 }
 
+
+void UIElement::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
+{
+    Animatable::OnObjectAnimationAdded(objectAnimation);
+
+    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
+    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
+    {
+        UIElement* child = GetChild(i->first_);
+        if (child)
+            child->SetObjectAnimation(i->second_);
+    }
+}
+
+void UIElement::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
+{
+    Animatable::OnObjectAnimationRemoved(objectAnimation);
+
+    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
+    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
+    {
+        UIElement* child = GetChild(i->first_);
+        if (child && child->GetObjectAnimation() == i->second_)
+            child->SetObjectAnimation(0);
+    }
+}
+
+
 void UIElement::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInfos_.Size() == 1)
+    if (attributeAnimationInstances_.Size() == 1)
         SubscribeToEvent(E_POSTUPDATE, HANDLER(UIElement, HandlePostUpdate));
 }
 
 void UIElement::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInfos_.Size() == 0)
+    if (attributeAnimationInstances_.Empty())
         UnsubscribeFromEvent(E_POSTUPDATE);
 }
 

@@ -197,13 +197,13 @@ void Component::MarkNetworkUpdate()
 
 void Component::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInfos_.Size() == 1)
+    if (attributeAnimationInstances_.Size() == 1)
         SubscribeToEvent(GetScene(), E_SCENEPOSTUPDATE, HANDLER(Component, HandleScenePostUpdate));        
 }
 
 void Component::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInfos_.Empty())
+    if (attributeAnimationInstances_.Empty())
         UnsubscribeFromEvent(GetScene(), E_SCENEPOSTUPDATE);
 }
 

@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "ObjectAnimation.h"
 #include "Profiler.h"
 #include "ReplicationState.h"
 #include "Scene.h"
@@ -1439,15 +1440,41 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
+void Node::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
+{
+    Animatable::OnObjectAnimationAdded(objectAnimation);
+
+    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
+    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
+    {
+        Node* child = GetChild(i->first_);
+        if (child)
+            child->SetObjectAnimation(i->second_);
+    }
+}
+
+void Node::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
+{
+    Animatable::OnObjectAnimationRemoved(objectAnimation);
+
+    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
+    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
+    {
+        Node* child = GetChild(i->first_);
+        if (child && child->GetObjectAnimation() == i->second_)
+            child->SetObjectAnimation(0);
+    }
+}
+
 void Node::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInfos_.Size() == 1)
+    if (attributeAnimationInstances_.Size() == 1)
         SubscribeToEvent(GetScene(), E_SCENEPOSTUPDATE, HANDLER(Node, HandleScenePostUpdate));        
 }
 
 void Node::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInfos_.Empty())
+    if (attributeAnimationInstances_.Empty())
         UnsubscribeFromEvent(GetScene(), E_SCENEPOSTUPDATE);
 }
 

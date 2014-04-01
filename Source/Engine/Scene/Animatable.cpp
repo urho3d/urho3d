@@ -23,7 +23,11 @@
 #include "Precompiled.h"
 #include "Animatable.h"
 #include "AttributeAnimation.h"
+#include "AttributeAnimationInstance.h"
+#include "Context.h"
 #include "Log.h"
+#include "ObjectAnimation.h"
+#include "ResourceCache.h"
 
 #include "DebugNew.h"
 
@@ -40,101 +44,141 @@ Animatable::~Animatable()
 {
 }
 
+void Animatable::RegisterObject(Context* context)
+{
+    ACCESSOR_ATTRIBUTE(Animatable, VAR_RESOURCEREF, "Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef, ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
+}
+
 void Animatable::SetAnimationEnabled(bool animationEnabled)
 {
     animationEnabled_ = animationEnabled;
 }
 
-void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* animation)
+void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
 {
-    unsigned index = M_MAX_UNSIGNED;
-    for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
+    if (objectAnimation == objectAnimation_)
+        return;
+
+    if (objectAnimation_)
+        OnObjectAnimationRemoved(objectAnimation_);
+
+    objectAnimation_ = objectAnimation;
+
+    if (objectAnimation_)
+        OnObjectAnimationAdded(objectAnimation_);
+}
+
+void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation)
+{
+    const AttributeAnimation* currentAnimation = GetAttributeAnimation(name);
+    if (currentAnimation == attributeAnimation)
+        return;
+
+    if (attributeAnimation)
     {
-        AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
-        if (!attributeAnimationInfo.info_->name_.Compare(name, true))
+        const Vector<AttributeInfo>* attributes = GetAttributes();
+        if (!attributes)
         {
-            index = i;
-            break;
+            LOGERROR(GetTypeName() + " has no attributes");
+            return;
         }
-    }
 
-    if (animation)
-    {
-        if (index == M_MAX_UNSIGNED)
+        for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
         {
-            const Vector<AttributeInfo>* attributes = GetAttributes();
-            if (!attributes)
+            const AttributeInfo& attributeInfo = *i;
+            if (!attributeInfo.name_.Compare(name, true))
             {
-                LOGERROR(GetTypeName() + " has no attributes");
-                return;
-            }
-
-            for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
-            {
-                const AttributeInfo* attributeInfo = &(*i);
-                if (!attributeInfo->name_.Compare(name, true))
+                if (attributeAnimation->GetValueType() == attributeInfo.type_)
                 {
-                    if (animation->GetValueType() == attributeInfo->type_)
-                    {
-                        AttributeAnimationInfo atrAnimInfo(attributeInfo, animation);
-                        attributeAnimationInfos_.Push(atrAnimInfo);
+                    SharedPtr<AttributeAnimationInstance> attributeAnimationInstance(new AttributeAnimationInstance(this, attributeInfo, attributeAnimation));
+                    attributeAnimationInstances_[name] = attributeAnimationInstance;
 
+                    if (!currentAnimation)
                         OnAttributeAnimationAdded();
-                    }
-                    else
-                    {
-                        LOGERROR("Error value type");
-                        return;
-                    }
-
                 }
+                else
+                {
+                    LOGERROR("Error value type");
+                    return;
+                }
+
             }
-        }
-        else
-        {
-            // Replace old animation and reset time
-            attributeAnimationInfos_[index].animation_ = animation;
-            attributeAnimationInfos_[index].time_ = 0.0f;
         }
     }
     else
     {
-        if (index != M_MAX_UNSIGNED)
+        if (currentAnimation)
         {
-            attributeAnimationInfos_.Erase(index);
-
+            attributeAnimationInstances_.Erase(name);
             OnAttributeAnimationRemoved();
         }
     }
 }
 
-AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
+const ObjectAnimation* Animatable::GetObjectAnimation() const
 {
-    for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
+    return objectAnimation_;
+}
+
+const AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
+{
+    HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Find(name);
+    if (i != attributeAnimationInstances_.End())
+        return i->second_->GetAttributeAnimation();
+    return 0;
+}
+
+void Animatable::SetObjectAnimationAttr(ResourceRef value)
+{
+    if (!value.name_.Empty())
     {
-        const AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
-        if (!attributeAnimationInfo.info_->name_.Compare(name, true))
-        {
-            return attributeAnimationInfo.animation_;
-        }
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_));
+    }
+}
+
+ResourceRef Animatable::GetObjectAnimationAttr() const
+{
+    if (objectAnimation_ && !objectAnimation_->GetParentAnimation())
+        return GetResourceRef(objectAnimation_, ObjectAnimation::GetTypeStatic());
+    return ResourceRef();
+}
+
+void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
+{
+    if (!objectAnimation)
+        return;
+
+    // Set all attribute animations from the object animation
+    HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations = objectAnimation->GetAttributeAnimations();
+    for (HashMap<String, SharedPtr<AttributeAnimation> >::Iterator i = attributeAnimations.Begin(); i != attributeAnimations.End(); ++i)
+        SetAttributeAnimation(i->first_, i->second_);
+}
+
+void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
+{
+    if (!objectAnimation)
+        return;
+
+    // Just remove all attribute animations from the object animation
+    Vector<String> names;
+    for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::Iterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
+    {
+        if (i->second_->GetAttributeAnimation()->GetObjectAnimation() == objectAnimation)
+            names.Push(i->first_);
     }
 
-    return 0;
+    for (unsigned int i = 0; i < names.Size(); ++i)
+        SetAttributeAnimation(names[i], 0);
 }
 
 void Animatable::UpdateAttributeAnimations(float timeStep)
 {
     if (!animationEnabled_)
         return;
-
-    for (unsigned i = 0; i < attributeAnimationInfos_.Size(); ++i)
-    {
-        AttributeAnimationInfo& attributeAnimationInfo = attributeAnimationInfos_[i];
-
-        attributeAnimationInfo.time_ += timeStep;
-        attributeAnimationInfo.animation_->GetAnimationValue(attributeAnimationInfo.time_, attributeAnimationInfo.value_);
-        OnSetAttribute(*attributeAnimationInfo.info_, attributeAnimationInfo.value_);
-    }        
+    
+    for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
+        i->second_->Update(timeStep);
 }
 
 }

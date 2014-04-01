@@ -468,6 +468,10 @@ public:
     UIElement* GetElementEventSender() const;
 
 protected:
+    /// Handle object animation added.
+    virtual void OnObjectAnimationAdded(ObjectAnimation* objectAnimation);
+    /// Handle object animation removed.
+    virtual void OnObjectAnimationRemoved(ObjectAnimation* objectAnimation);
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
     /// Handle attribute animation removed.

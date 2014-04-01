@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "AttributeAnimation.h"
 #include "StaticSprite2D.h"
 
 namespace Urho3D
