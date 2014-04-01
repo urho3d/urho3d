@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "AttributeAnimation.h"
+#include "XMLFile.h"
 
 #include "DebugNew.h"
 
@@ -29,7 +30,7 @@ namespace Urho3D
 {
 
 AttributeAnimation::AttributeAnimation(Context* context) :
-    Serializable(context),
+    Resource(context),
     cycleMode_(CM_LOOP),
     valueType_(VAR_NONE),
     beginTime_(M_INFINITY),
@@ -39,6 +40,77 @@ AttributeAnimation::AttributeAnimation(Context* context) :
 
 AttributeAnimation::~AttributeAnimation()
 {
+}
+
+void AttributeAnimation::RegisterObject(Context* context)
+{
+    context->RegisterFactory<AttributeAnimation>();
+}
+
+bool AttributeAnimation::Load(Deserializer& source)
+{
+    XMLFile xmlFile(context_);
+    if (xmlFile.Load(source))
+        return false;
+
+    XMLElement rootElem = xmlFile.GetRoot("AttributeAnimation");
+    if (!rootElem)
+        return false;
+
+    return LoadXML(rootElem);
+}
+
+bool AttributeAnimation::Save(Serializer& dest) const
+{
+    XMLFile xmlFile(context_);
+
+    XMLElement rootElem = xmlFile.CreateRoot("AttributeAnimation");
+    if (!SaveXML(rootElem))
+        return false;
+
+    return xmlFile.Save(dest);
+}
+
+bool AttributeAnimation::LoadXML(const XMLElement& source)
+{
+    if (source.GetName() != "AttributeAnimation")
+        return false;
+    
+    keyframes_.Clear();
+
+    cycleMode_ = (CycleMode)source.GetInt("cycle mode");
+    valueType_ = (VariantType)source.GetInt("value type");
+
+    XMLElement keyFrameEleme = source.GetChild("KeyFrame");
+    while (keyFrameEleme)
+    {
+        float time = keyFrameEleme.GetFloat("time");
+        Variant value(valueType_, keyFrameEleme.GetAttribute("value"));
+        SetKeyFrame(time, value);
+
+        keyFrameEleme = keyFrameEleme.GetNext("KeyFrame");
+    }
+
+    return true;
+}
+
+bool AttributeAnimation::SaveXML(XMLElement& dest) const
+{
+    if (dest.GetName() != "AttributeAnimation")
+        return false;
+
+    dest.SetInt("cycle mode", (int)cycleMode_);
+    dest.SetInt("value type", (int)valueType_);
+
+    for (unsigned i = 0; i < keyframes_.Size(); ++i)
+    {
+        const KeyFrame& keyFrame = keyframes_[i];
+        XMLElement keyFrameEleme = dest.CreateChild("KeyFrame");
+        keyFrameEleme.SetFloat("time", keyFrame.time_);
+        keyFrameEleme.SetAttribute("value", keyFrame.value_.ToString());
+    }
+    
+    return true;
 }
 
 void AttributeAnimation::SetCycleMode(CycleMode cycleMode)

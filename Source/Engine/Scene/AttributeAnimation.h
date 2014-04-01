@@ -22,11 +22,13 @@
 
 #pragma once
 
-#include "Serializable.h"
+#include "Resource.h"
 #include "Variant.h"
 
 namespace Urho3D
 {
+
+class XMLElement;
 
 /// Cycle mode.
 enum CycleMode
@@ -40,7 +42,7 @@ enum CycleMode
 };
 
 /// Base class for attribute animation.
-class URHO3D_API AttributeAnimation : public Serializable
+class URHO3D_API AttributeAnimation : public Resource
 {
     OBJECT(AttributeAnimation);
 
@@ -49,7 +51,18 @@ public:
     AttributeAnimation(Context* context);
     /// Destruct.
     virtual ~AttributeAnimation();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
     
+    /// Load resource. Return true if successful.
+    virtual bool Load(Deserializer& source);
+    /// Save resource. Return true if successful.
+    virtual bool Save(Serializer& dest) const;
+    /// Load from XML data. Return true if successful.
+    bool LoadXML(const XMLElement& source);
+    /// Save as XML data. Return true if successful.
+    bool SaveXML(XMLElement& dest) const;
+
     /// Set cycle mode.
     void SetCycleMode(CycleMode cycleMode);
     /// Set value type.
