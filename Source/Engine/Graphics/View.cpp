@@ -648,8 +648,7 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
     
     Vector3 nearVector, farVector;
     camera->GetFrustumSize(nearVector, farVector);
-    Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
-    graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
+    graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
     
     if (setProjection)
     {
