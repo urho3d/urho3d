@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Context.h"
 #include "AttributeAnimation.h"
 #include "XMLFile.h"
 
