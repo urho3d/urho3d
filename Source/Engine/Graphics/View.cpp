@@ -599,6 +599,80 @@ Renderer* View::GetRenderer() const
     return renderer_;
 }
 
+void View::SetGlobalShaderParameters()
+{
+    graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
+    graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
+    
+    if (scene_)
+    {
+        float elapsedTime = scene_->GetElapsedTime();
+        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+    }
+}
+
+void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool overrideView)
+{
+    if (!camera)
+        return;
+    
+    Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
+    
+    graphics_->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
+    graphics_->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
+    graphics_->SetShaderParameter(PSP_CAMERAPOS, cameraEffectiveTransform.Translation());
+    
+    float nearClip = camera->GetNearClip();
+    float farClip = camera->GetFarClip();
+    graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
+    graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(PSP_FARCLIP, farClip);
+
+    Vector4 depthMode = Vector4::ZERO;
+    if (camera->IsOrthographic())
+    {
+        depthMode.x_ = 1.0f;
+        #ifdef USE_OPENGL
+        depthMode.z_ = 0.5f;
+        depthMode.w_ = 0.5f;
+        #else
+        depthMode.z_ = 1.0f;
+        #endif
+    }
+    else
+        depthMode.w_ = 1.0f / camera->GetFarClip();
+    
+    graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
+    
+    Vector3 nearVector, farVector;
+    camera->GetFrustumSize(nearVector, farVector);
+    Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
+    graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
+    
+    if (setProjection)
+    {
+        Matrix4 projection = camera->GetProjection();
+        #ifdef USE_OPENGL
+        // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
+        float constantBias = 2.0f * graphics->GetDepthConstantBias();
+        // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
+        // so use a higher constant bias
+        #ifdef GL_ES_VERSION_2_0
+        constantBias *= 2.0f;
+        #endif
+        projection.m22_ += projection.m32_ * constantBias;
+        projection.m23_ += projection.m33_ * constantBias;
+        #endif
+        
+        if (overrideView)
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+        else
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
+    }
+}
+
 void View::GetDrawables()
 {
     if (!camera_ || !octree_)
@@ -1599,24 +1673,11 @@ void View::RenderQuad(RenderPathCommand& command)
     const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
     for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
         graphics_->SetShaderParameter(k->first_, k->second_);
-
-    graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
-    graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
-
-    if (scene_)
-    {
-        float elapsedTime = scene_->GetElapsedTime();
-        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
-        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
-    }
-
-    float nearClip = camera_ ? camera_->GetNearClip() : DEFAULT_NEARCLIP;
-    float farClip = camera_ ? camera_->GetFarClip() : DEFAULT_FARCLIP;
-    graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
-    graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
-    graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);
-    graphics_->SetShaderParameter(PSP_FARCLIP, farClip);
     
+    SetGlobalShaderParameters();
+    SetCameraShaderParameters(camera_, false, false);
+    
+    /// \todo Refactor into a function to set the viewport parameters
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
     float widthRange = 0.5f * viewSize_.x_ / rtWidth;
@@ -1850,7 +1911,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetDepthStencil(GetDepthStencil(destination));
     graphics_->SetViewport(viewRect_);
     
-    String shaderName = "CopyFramebuffer";
+    static const String shaderName("CopyFramebuffer");
     graphics_->SetShaders(graphics_->GetShader(VS, shaderName), graphics_->GetShader(PS, shaderName));
     
     float rtWidth = (float)rtSize_.x_;

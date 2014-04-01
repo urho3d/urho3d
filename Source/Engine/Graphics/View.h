@@ -147,6 +147,10 @@ public:
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues.
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+    /// Set global (per-frame) shader parameters. Called by Batch and internally by View.
+    void SetGlobalShaderParameters();
+    /// Set camera-specific shader parameters. Called by Batch and internally by View.
+    void SetCameraShaderParameters(Camera* camera, bool setProjectionMatrix, bool overrideView);
     
 private:
     /// Query the octree for drawable objects.
