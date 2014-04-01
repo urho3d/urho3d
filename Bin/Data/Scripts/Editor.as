@@ -50,6 +50,8 @@ void Start()
     cache.returnFailedResources = true;
     // Use OS mouse without grabbing it
     input.mouseVisible = true;
+    // Use system clipboard to allow transport of text in & out from the editor
+    ui.useSystemClipboard = true;
 
     // Create root scene node
     CreateScene();
