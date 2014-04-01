@@ -7600,7 +7600,7 @@ Properties:
 - String typeName // readonly
 - bool useMutableGlyphs
 - bool useScreenKeyboard
-- bool useSystemClipBoard
+- bool useSystemClipboard
 - int weakRefs // readonly
 
 

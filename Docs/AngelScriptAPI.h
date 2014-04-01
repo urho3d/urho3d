@@ -9139,7 +9139,7 @@ ShortStringHash type;
 String typeName;
 bool useMutableGlyphs;
 bool useScreenKeyboard;
-bool useSystemClipBoard;
+bool useSystemClipboard;
 /* readonly */
 int weakRefs;
 };
