@@ -52,7 +52,8 @@ Node::Node(Context* context) :
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
     worldRotation_(Quaternion::IDENTITY),
-    owner_(0)
+    owner_(0),
+    ignoreNetworkUpdate_(false)
 {
 }
 
@@ -1332,7 +1333,7 @@ void Node::CleanupConnection(Connection* connection)
 
 void Node::MarkNetworkUpdate()
 {
-    if (!networkUpdate_ && scene_ && id_ < FIRST_LOCAL_ID)
+    if (!ignoreNetworkUpdate_ && !networkUpdate_ && scene_ && id_ < FIRST_LOCAL_ID)
     {
         scene_->MarkNetworkUpdate(this);
         networkUpdate_ = true;
@@ -1653,8 +1654,10 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
 void Node::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScenePostUpdate;
-
+    
+    ignoreNetworkUpdate_ = true;
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+    ignoreNetworkUpdate_ = false;
 }
 
 }

@@ -37,7 +37,8 @@ Component::Component(Context* context) :
     node_(0),
     id_(0),
     networkUpdate_(false),
-    enabled_(true)
+    enabled_(true),
+    ignoreNetworkUpdate_(false)
 {
 }
 
@@ -184,7 +185,7 @@ void Component::CleanupConnection(Connection* connection)
 
 void Component::MarkNetworkUpdate()
 {
-    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
+    if (!ignoreNetworkUpdate_ &&  !networkUpdate_ && id_ < FIRST_LOCAL_ID)
     {
         Scene* scene = GetScene();
         if (scene)
@@ -240,6 +241,8 @@ void Component::HandleScenePostUpdate(StringHash eventType, VariantMap& eventDat
 {
     using namespace ScenePostUpdate;
 
+    ignoreNetworkUpdate_ = true;
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+    ignoreNetworkUpdate_ = false;
 }
 }
