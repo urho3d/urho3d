@@ -442,7 +442,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "void FromEulerAngles(float, float, float)", asMETHOD(Quaternion, FromEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromRotationTo(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromRotationTo), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromAxes(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void FromLookRotation(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "bool FromLookRotation(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void Normalize()", asMETHOD(Quaternion, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Normalized() const", asMETHOD(Quaternion, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Inverse() const", asMETHOD(Quaternion, Inverse), asCALL_THISCALL);
