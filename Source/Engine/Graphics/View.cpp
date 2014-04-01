@@ -656,7 +656,7 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
         Matrix4 projection = camera->GetProjection();
         #ifdef USE_OPENGL
         // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
-        float constantBias = 2.0f * graphics->GetDepthConstantBias();
+        float constantBias = 2.0f * graphics_->GetDepthConstantBias();
         // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
         // so use a higher constant bias
         #ifdef GL_ES_VERSION_2_0
