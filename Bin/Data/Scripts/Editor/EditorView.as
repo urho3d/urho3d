@@ -51,7 +51,8 @@ enum EditMode
     EDIT_MOVE = 0,
     EDIT_ROTATE,
     EDIT_SCALE,
-    EDIT_SELECT
+    EDIT_SELECT,
+    EDIT_SPAWN
 }
 
 enum AxisMode
@@ -366,7 +367,8 @@ Array<String> editModeText = {
     "Move",
     "Rotate",
     "Scale",
-    "Select"
+    "Select",
+    "Spawn"
 };
 
 Array<String> axisModeText = {
@@ -1383,14 +1385,22 @@ void ViewRaycast(bool mouseClick)
     if (ui.HasModalElement())
         return;
 
+    IntVector2 pos = ui.cursorPosition;
+    UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
+    if(editMode==EDIT_SPAWN)
+    {
+        if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
+            SpawnObject();
+        return;
+    }
+
     // Do not raycast / change selection if hovering over the gizmo
     if (IsGizmoSelected())
         return;
 
     DebugRenderer@ debug = editorScene.debugRenderer;
 
-    IntVector2 pos = ui.cursorPosition;
-    UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
+ 
     if (pickMode == PICK_UI_ELEMENTS)
     {
         bool leftClick = mouseClick && input.mouseButtonPress[MOUSEB_LEFT];
