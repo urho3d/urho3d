@@ -6,11 +6,15 @@ LineEdit@ randomRotationZ;
 LineEdit@ randomScaleMinEdit;
 LineEdit@ randomScaleMaxEdit;
 LineEdit@ NumberSpawnedObjectsEdit;
+LineEdit@ spawnRadiusEdit;
+LineEdit@ spawnCountEdit;
 
 Window@ spawnWindow;
 Vector3 randomRotation=Vector3(0.f,0.f,0.f);
 float randomScaleMin=1;
 float randomScaleMax=1;
+float spawnCount=1;
+float spawnRadius=0;
 bool useNormal=true;
 
 int numberSpawnedObjects=1;
@@ -44,15 +48,25 @@ void CreateSpawnEditor()
 	randomScaleMaxEdit.text=String(randomScaleMax);
 	CheckBox@ useNormalToggle = spawnWindow.GetChild("UseNormal", true);
     useNormalToggle.checked = useNormal;
+
 	
 	NumberSpawnedObjectsEdit=spawnWindow.GetChild("NumberSpawnedObjects", true);
 	NumberSpawnedObjectsEdit.text=String(numberSpawnedObjects);
+	
+		
+	spawnRadiusEdit=spawnWindow.GetChild("SpawnRadius", true);
+	spawnCountEdit=spawnWindow.GetChild("SpawnCount", true);
+	spawnRadiusEdit.text=String(spawnRadius);
+	spawnCountEdit.text=String(spawnCount);
+	
 	
 	SubscribeToEvent(randomRotationX, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationY, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationZ, "TextChanged", "EditRandomRotation");
 	SubscribeToEvent(randomScaleMinEdit, "TextChanged", "EditRandomScale");
 	SubscribeToEvent(randomScaleMaxEdit, "TextChanged", "EditRandomScale");
+	SubscribeToEvent(spawnRadiusEdit, "TextChanged", "EditSpawnRadius");
+	SubscribeToEvent(spawnCountEdit, "TextChanged", "EditSpawnCount");
 	SubscribeToEvent(useNormalToggle, "Toggled", "ToggleUseNormal");
 	SubscribeToEvent(NumberSpawnedObjectsEdit, "TextFinished", "UpdateNumberSpawnedObjects");
 	SubscribeToEvent(spawnWindow.GetChild("SetSpawnMode", true), "Released", "SetSpawnMode");
@@ -61,7 +75,6 @@ void CreateSpawnEditor()
 
 bool ShowSpawnEditor()
 {
-    //RefreshMaterialEditor();
     spawnWindow.visible = true;
     spawnWindow.BringToFront();
     return true;
@@ -91,12 +104,12 @@ void EditRandomRotation(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
     randomRotation = Vector3(randomRotationX.text.ToFloat(), randomRotationY.text.ToFloat(), randomRotationZ.text.ToFloat());
-    if (edit.name == "RandomRotation.x")
-        edit.text = String(randomRotation.x);
-    else if (edit.name == "RandomRotation.y")
-        edit.text = String(randomRotation.y);
-    else if (edit.name == "RandomRotation.z")
-        edit.text = String(randomRotation.z);
+    //if (edit.name == "RandomRotation.x")
+    //    edit.text = String(randomRotation.x);
+    //else if (edit.name == "RandomRotation.y")
+    //    edit.text = String(randomRotation.y);
+    //else if (edit.name == "RandomRotation.z")
+    //    edit.text = String(randomRotation.z);
     UpdateHierarchyItem(editorScene);
 }
 
@@ -105,10 +118,10 @@ void EditRandomScale(StringHash eventType, VariantMap& eventData)
     LineEdit@ edit = eventData["Element"].GetPtr();
     randomScaleMin = randomScaleMinEdit.text.ToFloat();
 	randomScaleMax = randomScaleMaxEdit.text.ToFloat();
-	if (edit.name == "RandomScaleMin")
-        edit.text = String(randomScaleMin);
-    else if (edit.name == "RandomScaleMax")
-        edit.text = String(randomScaleMax);
+	//if (edit.name == "RandomScaleMin")
+    //    edit.text = String(randomScaleMin);
+    //else if (edit.name == "RandomScaleMax")
+    //    edit.text = String(randomScaleMax);
     UpdateHierarchyItem(editorScene);
 }
 
@@ -128,6 +141,19 @@ void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
 	edit.text=String(numberSpawnedObjects);
 	
 	RefreshPickedObjects();
+}
+
+void EditSpawnRadius(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+	spawnRadius=edit.text.ToFloat();
+	//edit.text=String(spawnRadius);
+}
+void EditSpawnCount(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+	spawnCount=edit.text.ToFloat();
+	//edit.text=String(spawnCount);
 }
 
 void RefreshPickedObjects()
@@ -234,32 +260,39 @@ void SpawnObject()
 {
 	if(spawnedObjectsNames.length==0) return;
 	IntRect view = activeViewport.viewport.rect;
-	IntVector2 pos = ui.cursorPosition;
-	Ray cameraRay = camera.GetScreenRay(
-		float(pos.x - view.left) / view.width,
-		float(pos.y - view.top) / view.height);
+	
+	for(int i=0;i<spawnCount;i++)
+	{	
+		Vector2 norm=Vector2(Random(-1,1),Random(-1,1));
+		norm.Normalize();
+		norm=norm*(spawnRadius*Random(0,1));
+		IntVector2 pos = IntVector2(ui.cursorPosition.x+norm.x,ui.cursorPosition.y+norm.y);
+		Ray cameraRay = camera.GetScreenRay(
+			float(pos.x - view.left) / view.width,
+			float(pos.y - view.top) / view.height);
 
-	if (pickMode < PICK_RIGIDBODIES)
-	{
-		if (editorScene.octree is null)
-			return;
-		RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-			pickModeDrawableFlags[pickMode], 0x7fffffff);
-		if (result.drawable !is null)
-			PlaceObject(result.position, result.normal);
-	}
-	else
-	{
-		if (editorScene.physicsWorld is null)
-			return;
+		if (pickMode < PICK_RIGIDBODIES)
+		{
+			if (editorScene.octree is null)
+				return;
+			RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
+				pickModeDrawableFlags[pickMode], 0x7fffffff);
+			if (result.drawable !is null)
+				PlaceObject(result.position, result.normal);
+		}
+		else
+		{
+			if (editorScene.physicsWorld is null)
+				return;
 
-		// If we are not running the actual physics update, refresh collisions before raycasting
-		if (!runUpdate)
-			editorScene.physicsWorld.UpdateCollisions();
+			// If we are not running the actual physics update, refresh collisions before raycasting
+			if (!runUpdate)
+				editorScene.physicsWorld.UpdateCollisions();
 
-		PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-		if (result.body !is null)
-			PlaceObject(result.position, result.normal);
+			PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
+			if (result.body !is null)
+				PlaceObject(result.position, result.normal);
+		}
 	}
 }
 
