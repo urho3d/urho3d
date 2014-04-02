@@ -201,7 +201,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             unsigned length = text_->GetSelectionLength();
 
             if (text_->GetSelectionLength())
-                GetSubsystem<UI>()->SetClipBoardText(line_.SubstringUTF8(start, length));
+                GetSubsystem<UI>()->SetClipboardText(line_.SubstringUTF8(start, length));
 
             if (key == 'X' && editable_)
             {
@@ -219,7 +219,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case 'V':
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
-            const String& clipBoard = GetSubsystem<UI>()->GetClipBoardText();
+            const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();
             if (!clipBoard.Empty())
             {
                 // Remove selected text first

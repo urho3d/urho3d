@@ -13,6 +13,9 @@ Rect ToRect(const String source);
 Vector2 ToVector2(const String source);
 Vector3 ToVector3(const String source);
 Vector4 ToVector4(const String source, bool allowMissingCoords = false);
+Matrix3 ToMatrix3(const String source);
+Matrix3x4 ToMatrix3x4(const String source);
+Matrix4 ToMatrix4(const String source);
 
 String ToString(void* value);
 String ToStringHex(unsigned value);

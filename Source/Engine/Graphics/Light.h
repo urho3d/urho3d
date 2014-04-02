@@ -250,6 +250,8 @@ public:
     Texture* GetShapeTexture() const { return shapeTexture_; }
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
+    /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
+    int GetNumShadowSplits() const;
     /// Return whether light has negative (darkening) color.
     bool IsNegative() const { return GetEffectiveColor().SumRGB() < 0.0f; }
     

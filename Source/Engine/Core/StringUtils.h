@@ -75,10 +75,22 @@ URHO3D_API Vector3 ToVector3(const char* source);
 URHO3D_API Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
 /// Parse a Vector4 from a C string.
 URHO3D_API Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
-/// Parse a float or Vector variant from a string.
+/// Parse a float, Vector or Matrix variant from a string.
 URHO3D_API Variant ToVectorVariant(const String& source);
-/// Parse a float or Vector variant from a string.
+/// Parse a float, Vector or Matrix variant from a C string.
 URHO3D_API Variant ToVectorVariant(const char* source);
+/// Parse a Matrix3 from a string.
+URHO3D_API Matrix3 ToMatrix3(const String& source);
+/// Parse a Matrix3 from a C string.
+URHO3D_API Matrix3 ToMatrix3(const char* source);
+/// Parse a Matrix3x4 from a string.
+URHO3D_API Matrix3x4 ToMatrix3x4(const String& source);
+/// Parse a Matrix3x4 from a C string.
+URHO3D_API Matrix3x4 ToMatrix3x4(const char* source);
+/// Parse a Matrix4 from a string.
+URHO3D_API Matrix4 ToMatrix4(const String& source);
+/// Parse a Matrix4 from a C string.
+URHO3D_API Matrix4 ToMatrix4(const char* source);
 /// Convert a pointer to string (returns hexadecimal.)
 URHO3D_API String ToString(void* value);
 /// Convert an unsigned integer to string as hexadecimal.

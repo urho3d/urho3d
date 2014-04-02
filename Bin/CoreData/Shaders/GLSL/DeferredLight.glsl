@@ -62,14 +62,8 @@ void PS()
     vec4 projWorldPos = vec4(worldPos, 1.0);
     vec3 lightColor;
     vec3 lightDir;
-    float diff;
-
-    #ifdef DIRLIGHT
-        diff = GetDiffuse(normal, cLightDirPS, lightDir);
-    #else
-        vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
-        diff = GetDiffuse(normal, lightVec, lightDir);
-    #endif
+    
+    float diff = GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
         diff *= GetShadowDeferred(projWorldPos, depth);
@@ -80,7 +74,7 @@ void PS()
         lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0);
     #elif defined(CUBEMASK)
         mat3 lightVecRot = mat3(cLightMatricesPS[0][0].xyz, cLightMatricesPS[0][1].xyz, cLightMatricesPS[0][2].xyz);
-        lightColor = textureCube(sLightCubeMap, lightVecRot * lightVec).rgb * cLightColor.rgb;
+        lightColor = textureCube(sLightCubeMap, lightVecRot * (worldPos - cLightPosPS.xyz)).rgb * cLightColor.rgb;
     #else
         lightColor = cLightColor.rgb;
     #endif

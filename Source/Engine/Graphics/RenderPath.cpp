@@ -50,7 +50,7 @@ static const char* sortModeNames[] =
     0
 };
 
-TextureUnit ParseTextureUnitName(const String& name);
+TextureUnit ParseTextureUnitName(String name);
 
 void RenderTargetInfo::Load(const XMLElement& element)
 {
@@ -183,13 +183,7 @@ void RenderPathCommand::Load(const XMLElement& element)
     {
         TextureUnit unit = TU_DIFFUSE;
         if (textureElem.HasAttribute("unit"))
-        {
-            String unitName = textureElem.GetAttributeLower("unit");
-            if (unitName.Length() > 1)
-                unit = ParseTextureUnitName(unitName);
-            else
-                unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_TEXTURE_UNITS - 1);
-        }
+            unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
         if (unit < MAX_TEXTURE_UNITS)
         {
             String name = textureElem.GetAttribute("name");

@@ -449,10 +449,26 @@ bool XMLElement::SetVector4(const String& name, const Vector4& value)
 bool XMLElement::SetVectorVariant(const String& name, const Variant& value)
 {
     VariantType type = value.GetType();
-    if (type == VAR_FLOAT || type == VAR_VECTOR2 || type == VAR_VECTOR3 || type == VAR_VECTOR4)
+    if (type == VAR_FLOAT || type == VAR_VECTOR2 || type == VAR_VECTOR3 || type == VAR_VECTOR4 || type == VAR_MATRIX3 ||
+        type == VAR_MATRIX3X4 || type == VAR_MATRIX4)
         return SetAttribute(name, value.ToString());
     else
         return false;
+}
+
+bool XMLElement::SetMatrix3(const String& name, const Matrix3& value)
+{
+    return SetAttribute(name, value.ToString());
+}
+
+bool XMLElement::SetMatrix3x4(const String& name, const Matrix3x4& value)
+{
+    return SetAttribute(name, value.ToString());
+}
+
+bool XMLElement::SetMatrix4(const String& name, const Matrix4& value)
+{
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::IsNull() const
@@ -827,6 +843,21 @@ Vector4 XMLElement::GetVector(const String& name) const
 Variant XMLElement::GetVectorVariant(const String& name) const
 {
     return ToVectorVariant(GetAttribute(name));
+}
+
+Matrix3 XMLElement::GetMatrix3(const String& name) const
+{
+    return ToMatrix3(GetAttribute(name));
+}
+
+Matrix3x4 XMLElement::GetMatrix3x4(const String& name) const
+{
+    return ToMatrix3x4(GetAttribute(name));
+}
+
+Matrix4 XMLElement::GetMatrix4(const String& name) const
+{
+    return ToMatrix4(GetAttribute(name));
 }
 
 XMLFile* XMLElement::GetFile() const

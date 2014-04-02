@@ -52,6 +52,7 @@ StringHash VSP_LIGHTMATRICES("LightMatrices");
 StringHash VSP_SKINMATRICES("SkinMatrices");
 StringHash VSP_VERTEXLIGHTS("VertexLights");
 StringHash PSP_AMBIENTCOLOR("AmbientColor");
+StringHash PSP_CAMERAPOS("CameraPosPS");
 StringHash PSP_DELTATIME("DeltaTimePS");
 StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
 StringHash PSP_FOGCOLOR("FogColor");

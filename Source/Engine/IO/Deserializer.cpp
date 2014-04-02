@@ -115,94 +115,104 @@ float Deserializer::ReadFloat()
 
 IntRect Deserializer::ReadIntRect()
 {
-    IntRect ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    int data[4];
+    Read(data, sizeof data);
+    return IntRect(data);
 }
 
 IntVector2 Deserializer::ReadIntVector2()
 {
-    IntVector2 ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    int data[2];
+    Read(data, sizeof data);
+    return IntVector2(data);
 }
 
 Rect Deserializer::ReadRect()
 {
-    Rect ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    float data[4];
+    Read(data, sizeof data);
+    return Rect(data);
 }
 
 Vector2 Deserializer::ReadVector2()
 {
-    Vector2 ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    float data[2];
+    Read(data, sizeof data);
+    return Vector2(data);
 }
 
 Vector3 Deserializer::ReadVector3()
 {
-    Vector3 ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    float data[3];
+    Read(data, sizeof data);
+    return Vector3(data);
 }
 
 Vector3 Deserializer::ReadPackedVector3(float maxAbsCoord)
 {
-    Vector3 ret;
     float invV = maxAbsCoord / 32767.0f;
     short coords[3];
-    
-    Read(&coords[0], sizeof coords);
-    ret.x_ = coords[0] * invV;
-    ret.y_ = coords[1] * invV;
-    ret.z_ = coords[2] * invV;
+    Read(coords, sizeof coords);
+    Vector3 ret(coords[0] * invV, coords[1] * invV, coords[2] * invV);
     return ret;
 }
 
 Vector4 Deserializer::ReadVector4()
 {
-    Vector4 ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    float data[4];
+    Read(data, sizeof data);
+    return Vector4(data);
 }
 
 Quaternion Deserializer::ReadQuaternion()
 {
-    Quaternion ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    float data[4];
+    Read(data, sizeof data);
+    return Quaternion(data);
 }
 
 Quaternion Deserializer::ReadPackedQuaternion()
 {
     short coords[4];
-    Quaternion ret;
-    
-    Read(&coords[0], sizeof coords);
-    ret.w_ = coords[0] * invQ;
-    ret.x_ = coords[1] * invQ;
-    ret.y_ = coords[2] * invQ;
-    ret.z_ = coords[3] * invQ;
+    Read(coords, sizeof coords);
+    Quaternion ret(coords[0] * invQ, coords[1] * invQ, coords[2] * invQ, coords[3] * invQ);
     ret.Normalize();
     return ret;
 }
 
+Matrix3 Deserializer::ReadMatrix3()
+{
+    float data[9];
+    Read(data, sizeof data);
+    return Matrix3(data);
+}
+
+Matrix3x4 Deserializer::ReadMatrix3x4()
+{
+    float data[12];
+    Read(data, sizeof data);
+    return Matrix3x4(data);
+}
+
+Matrix4 Deserializer::ReadMatrix4()
+{
+    float data[16];
+    Read(data, sizeof data);
+    return Matrix4(data);
+}
+
 Color Deserializer::ReadColor()
 {
-    Color ret;
-    Read((void*)ret.Data(), sizeof ret);
-    return ret;
+    float data[4];
+    Read(data, sizeof data);
+    return Color(data);
 }
 
 BoundingBox Deserializer::ReadBoundingBox()
 {
-    BoundingBox ret;
-    ret.min_ = ReadVector3();
-    ret.max_ = ReadVector3();
-    ret.defined_ = true;
-    return ret;
+    float data[6];
+    Read(data, sizeof data);
+    return BoundingBox(Vector3(&data[0]), Vector3(&data[3]));
 }
 
 String Deserializer::ReadString()
@@ -328,6 +338,15 @@ Variant Deserializer::ReadVariant(VariantType type)
         
     case VAR_INTVECTOR2:
         return Variant(ReadIntVector2());
+        
+    case VAR_MATRIX3:
+        return Variant(ReadMatrix3());
+        
+    case VAR_MATRIX3X4:
+        return Variant(ReadMatrix3x4());
+        
+    case VAR_MATRIX4:
+        return Variant(ReadMatrix4());
         
     default:
         return Variant();

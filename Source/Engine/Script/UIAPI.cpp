@@ -644,8 +644,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "UIElement@+ get_dragElement() const", asMETHOD(UI, GetDragElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHOD(UI, GetRootModalElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_clipBoardText(const String&in)", asMETHOD(UI, SetClipBoardText), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipBoardText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_clipBoardText(const String&in)", asMETHOD(UI, SetClipboardText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipboardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHOD(UI, SetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHOD(UI, GetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_dragBeginInterval(float)", asMETHOD(UI, SetDragBeginInterval), asCALL_THISCALL);
@@ -658,8 +658,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHOD(UI, GetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_useSystemClipBoard(bool)", asMETHOD(UI, SetUseSystemClipBoard), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_useSystemClipBoard() const", asMETHOD(UI, GetUseSystemClipBoard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useSystemClipboard(bool)", asMETHOD(UI, SetUseSystemClipboard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useSystemClipboard() const", asMETHOD(UI, GetUseSystemClipboard), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_useScreenKeyboard(bool)", asMETHOD(UI, SetUseScreenKeyboard), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_useScreenKeyboard() const", asMETHOD(UI, GetUseScreenKeyboard), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_useMutableGlyphs(bool)", asMETHOD(UI, SetUseMutableGlyphs), asCALL_THISCALL);

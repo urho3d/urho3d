@@ -32,6 +32,7 @@ namespace Urho3D
 {
 
 static const int CONVERSION_BUFFER_LENGTH = 128;
+static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
 

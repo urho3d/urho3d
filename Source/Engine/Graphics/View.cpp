@@ -315,6 +315,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         return false;
     
     hasScenePasses_ = false;
+    flipVertical_ = false;
     
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
@@ -399,11 +400,18 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     litBasePassName_ = PASS_LITBASE;
     litAlphaPassName_ = PASS_LITALPHA;
     
+    // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
+    // as a render texture produced on Direct3D9
+    #ifdef USE_OPENGL
+    if (renderTarget_)
+        flipVertical_ = true;
+    #endif
+    
     // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
     deferredAmbient_ = false;
     useLitBase_ = false;
-    
+
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
@@ -494,12 +502,12 @@ void View::Update(const FrameInfo& frame)
     for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
     
-    if (hasScenePasses_ && (!camera_ || !octree_))
-        return;
-    
-    // Set automatic aspect ratio if required
-    if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
+    if (camera_)
+    {
+        // Set automatic aspect ratio if required
+        if (camera_->GetAutoAspectRatio())
+            camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
+    }
     
     GetDrawables();
     GetBatches();
@@ -507,9 +515,6 @@ void View::Update(const FrameInfo& frame)
 
 void View::Render()
 {
-    if (hasScenePasses_ && (!octree_ || !camera_))
-        return;
-    
     // Actually update geometry data now
     UpdateGeometries();
     
@@ -541,20 +546,17 @@ void View::Render()
     }
     #endif
     
-    if (renderTarget_)
-    {
-        // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
-        // as a render texture produced on Direct3D9
-        #ifdef USE_OPENGL
-        camera_->SetFlipVertical(true);
-        #endif
-    }
+    #ifdef USE_OPENGL
+    if (camera_)
+        camera_->SetFlipVertical(flipVertical_);
+    #endif
     
     // Render
     ExecuteRenderPathCommands();
     
     #ifdef USE_OPENGL
-    camera_->SetFlipVertical(false);
+    if (camera_)
+        camera_->SetFlipVertical(false);
     #endif
     
     graphics_->SetDepthBias(0.0f, 0.0f);
@@ -567,7 +569,7 @@ void View::Render()
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
-    if (!renderTarget_ && octree_)
+    if (!renderTarget_ && camera_ && octree_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective())
@@ -597,8 +599,84 @@ Renderer* View::GetRenderer() const
     return renderer_;
 }
 
+void View::SetGlobalShaderParameters()
+{
+    graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
+    graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
+    
+    if (scene_)
+    {
+        float elapsedTime = scene_->GetElapsedTime();
+        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+    }
+}
+
+void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool overrideView)
+{
+    if (!camera)
+        return;
+    
+    Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
+    
+    graphics_->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
+    graphics_->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
+    graphics_->SetShaderParameter(PSP_CAMERAPOS, cameraEffectiveTransform.Translation());
+    
+    float nearClip = camera->GetNearClip();
+    float farClip = camera->GetFarClip();
+    graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
+    graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(PSP_FARCLIP, farClip);
+
+    Vector4 depthMode = Vector4::ZERO;
+    if (camera->IsOrthographic())
+    {
+        depthMode.x_ = 1.0f;
+        #ifdef USE_OPENGL
+        depthMode.z_ = 0.5f;
+        depthMode.w_ = 0.5f;
+        #else
+        depthMode.z_ = 1.0f;
+        #endif
+    }
+    else
+        depthMode.w_ = 1.0f / camera->GetFarClip();
+    
+    graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
+    
+    Vector3 nearVector, farVector;
+    camera->GetFrustumSize(nearVector, farVector);
+    graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
+    
+    if (setProjection)
+    {
+        Matrix4 projection = camera->GetProjection();
+        #ifdef USE_OPENGL
+        // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
+        float constantBias = 2.0f * graphics_->GetDepthConstantBias();
+        // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
+        // so use a higher constant bias
+        #ifdef GL_ES_VERSION_2_0
+        constantBias *= 2.0f;
+        #endif
+        projection.m22_ += projection.m32_ * constantBias;
+        projection.m23_ += projection.m33_ * constantBias;
+        #endif
+        
+        if (overrideView)
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+        else
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
+    }
+}
+
 void View::GetDrawables()
 {
+    if (!camera_ || !octree_)
+        return;
+    
     PROFILE(GetDrawables);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
@@ -765,6 +843,9 @@ void View::GetDrawables()
 
 void View::GetBatches()
 {
+    if (!camera_ || !octree_)
+        return;
+    
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
@@ -880,7 +961,7 @@ void View::GetBatches()
                             if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
                                 continue;
                             
-                            Pass* pass = tech->GetPass(PASS_SHADOW);
+                            Pass* pass = tech->GetSupportedPass(PASS_SHADOW);
                             // Skip if material has no shadow pass
                             if (!pass)
                                 continue;
@@ -1001,7 +1082,7 @@ void View::GetBatches()
                 for (unsigned k = 0; k < scenePasses_.Size(); ++k)
                 {
                     ScenePassInfo& info = scenePasses_[k];
-                    destBatch.pass_ = tech->GetPass(info.pass_);
+                    destBatch.pass_ = tech->GetSupportedPass(info.pass_);
                     if (!destBatch.pass_)
                         continue;
                     
@@ -1187,22 +1268,22 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
         if (i < 32 && allowLitBase)
         {
-            destBatch.pass_ = tech->GetPass(litBasePassName_);
+            destBatch.pass_ = tech->GetSupportedPass(litBasePassName_);
             if (destBatch.pass_)
             {
                 destBatch.isBase_ = true;
                 drawable->SetBasePass(i);
             }
             else
-                destBatch.pass_ = tech->GetPass(lightPassName_);
+                destBatch.pass_ = tech->GetSupportedPass(lightPassName_);
         }
         else
-            destBatch.pass_ = tech->GetPass(lightPassName_);
+            destBatch.pass_ = tech->GetSupportedPass(lightPassName_);
         
         // If no lit pass, check for lit alpha
         if (!destBatch.pass_)
         {
-            destBatch.pass_ = tech->GetPass(litAlphaPassName_);
+            destBatch.pass_ = tech->GetSupportedPass(litAlphaPassName_);
             isLitAlpha = true;
         }
         
@@ -1591,24 +1672,11 @@ void View::RenderQuad(RenderPathCommand& command)
     const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
     for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
         graphics_->SetShaderParameter(k->first_, k->second_);
-
-    graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
-    graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
-
-    if (scene_)
-    {
-        float elapsedTime = scene_->GetElapsedTime();
-        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
-        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
-    }
-
-    float nearClip = camera_ ? camera_->GetNearClip() : DEFAULT_NEARCLIP;
-    float farClip = camera_ ? camera_->GetFarClip() : DEFAULT_FARCLIP;
-    graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
-    graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
-    graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);
-    graphics_->SetShaderParameter(PSP_FARCLIP, farClip);
     
+    SetGlobalShaderParameters();
+    SetCameraShaderParameters(camera_, false, false);
+    
+    /// \todo Refactor into a function to set the viewport parameters
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
     float widthRange = 0.5f * viewSize_.x_ / rtWidth;
@@ -1842,7 +1910,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetDepthStencil(GetDepthStencil(destination));
     graphics_->SetViewport(viewRect_);
     
-    String shaderName = "CopyFramebuffer";
+    static const String shaderName("CopyFramebuffer");
     graphics_->SetShaders(graphics_->GetShader(VS, shaderName), graphics_->GetShader(PS, shaderName));
     
     float rtWidth = (float)rtSize_.x_;
@@ -1872,7 +1940,7 @@ void View::DrawFullscreenQuad(bool nearQuad)
     Matrix4 projection = Matrix4::IDENTITY;
     
     #ifdef USE_OPENGL
-    if (camera_->GetFlipVertical())
+    if (flipVertical_)
         projection.m11_ = -1.0f;
     model.m23_ = nearQuad ? -1.0f : 1.0f;
     #else
@@ -2189,18 +2257,20 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
 {
     unsigned width = shadowMap->GetWidth();
     unsigned height = shadowMap->GetHeight();
-    int maxCascades = renderer_->GetMaxShadowCascades();
     
     switch (light->GetLightType())
     {
     case LIGHT_DIRECTIONAL:
-        if (maxCascades == 1)
-            return IntRect(0, 0, width, height);
-        else if (maxCascades == 2)
-            return IntRect(splitIndex * width / 2, 0, (splitIndex + 1) * width / 2, height);
-        else
-            return IntRect((splitIndex & 1) * width / 2, (splitIndex / 2) * height / 2, ((splitIndex & 1) + 1) * width / 2,
-                (splitIndex / 2 + 1) * height / 2);
+        {
+            int numSplits = light->GetNumShadowSplits();
+            if (numSplits == 1)
+                return IntRect(0, 0, width, height);
+            else if (numSplits == 2)
+                return IntRect(splitIndex * width / 2, 0, (splitIndex + 1) * width / 2, height);
+            else
+                return IntRect((splitIndex & 1) * width / 2, (splitIndex / 2) * height / 2, ((splitIndex & 1) + 1) * width / 2,
+                    (splitIndex / 2 + 1) * height / 2);
+        }
         
     case LIGHT_SPOT:
         return IntRect(0, 0, width, height);
@@ -2227,8 +2297,9 @@ void View::SetupShadowCameras(LightQueryResult& query)
             
             float nearSplit = camera_->GetNearClip();
             float farSplit;
+            int numSplits = light->GetNumShadowSplits();
             
-            while (splits < renderer_->GetMaxShadowCascades())
+            while (splits < numSplits)
             {
                 // If split is completely beyond camera far clip, we are done
                 if (nearSplit > camera_->GetFarClip())

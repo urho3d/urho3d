@@ -94,7 +94,7 @@ UI::UI(Context* context) :
     #else
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
     #endif
-    useSystemClipBoard_(false),
+    useSystemClipboard_(false),
     #if defined(ANDROID) || defined(IOS)
     useScreenKeyboard_(true),
     #else
@@ -481,10 +481,10 @@ bool UI::SaveLayout(Serializer& dest, UIElement* element)
     return element && element->SaveXML(dest);
 }
 
-void UI::SetClipBoardText(const String& text)
+void UI::SetClipboardText(const String& text)
 {
     clipBoard_ = text;
-    if (useSystemClipBoard_)
+    if (useSystemClipboard_)
         SDL_SetClipboardText(text.CString());
 }
 
@@ -525,9 +525,9 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
     nonFocusedMouseWheel_ = nonFocusedMouseWheel;
 }
 
-void UI::SetUseSystemClipBoard(bool enable)
+void UI::SetUseSystemClipboard(bool enable)
 {
-    useSystemClipBoard_ = enable;
+    useSystemClipboard_ = enable;
 }
 
 void UI::SetUseScreenKeyboard(bool enable)
@@ -599,9 +599,9 @@ UIElement* UI::GetDragElement() const
     return dragBeginPending_ ? (UIElement*)0 : dragElement_;
 }
 
-const String& UI::GetClipBoardText() const
+const String& UI::GetClipboardText() const
 {
-    if (useSystemClipBoard_)
+    if (useSystemClipboard_)
     {
         char* text = SDL_GetClipboardText();
         clipBoard_ = String(text);

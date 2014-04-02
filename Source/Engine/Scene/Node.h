@@ -124,8 +124,8 @@ public:
     void Yaw(float angle, bool fixedAxis = false);
     /// Rotate around the Z axis.
     void Roll(float angle, bool fixedAxis = false);
-    /// Look at a target world position.
-    void LookAt(const Vector3& target, const Vector3& up = Vector3::UP);
+    /// Look at a target world position. Return true if successful, or false if resulted in an illegal rotation, in which case the current rotation remains.
+    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP);
     /// Modify scale in parent space uniformly.
     void Scale(float scale);
     /// Modify scale in parent space.

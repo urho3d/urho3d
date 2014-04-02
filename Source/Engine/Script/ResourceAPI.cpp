@@ -269,6 +269,9 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool SetVector3(const String&in, const Vector3&in)", asMETHOD(XMLElement, SetVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetVector4(const String&in, const Vector4&in)", asMETHOD(XMLElement, SetVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetVectorVariant(const String&in, const Variant&in)", asMETHOD(XMLElement, SetVectorVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetMatrix3(const String&in, const Matrix3&in)", asMETHOD(XMLElement, SetMatrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetMatrix3x4(const String&in, const Matrix3x4&in)", asMETHOD(XMLElement, SetMatrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetMatrix4(const String&in, const Matrix4&in)", asMETHOD(XMLElement, SetMatrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool HasAttribute(const String&in) const", asMETHODPR(XMLElement, HasAttribute, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String GetValue() const", asMETHOD(XMLElement, GetValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String GetAttribute(const String&in arg0 = String()) const", asMETHODPR(XMLElement, GetAttribute, (const String&) const, String), asCALL_THISCALL);
@@ -294,6 +297,9 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "Vector3 GetVector3(const String&in) const", asMETHOD(XMLElement, GetVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector4 GetVector4(const String&in) const", asMETHOD(XMLElement, GetVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Variant GetVectorVariant(const String&in) const", asMETHOD(XMLElement, GetVectorVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "Matrix3 GetMatrix3(const String&in) const", asMETHOD(XMLElement, GetMatrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "Matrix3x4 GetMatrix3x4(const String&in) const", asMETHOD(XMLElement, GetMatrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "Matrix4 GetMatrix4(const String&in) const", asMETHOD(XMLElement, GetMatrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool set_value(const String&in)", asMETHODPR(XMLElement, SetValue, (const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String get_value() const", asMETHOD(XMLElement, GetValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String get_name() const", asMETHOD(XMLElement, GetName), asCALL_THISCALL);

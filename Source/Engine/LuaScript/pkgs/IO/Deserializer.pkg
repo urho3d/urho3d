@@ -28,6 +28,9 @@ class Deserializer
     Vector4 ReadVector4();
     Quaternion ReadQuaternion();
     Quaternion ReadPackedQuaternion();
+    Matrix3 ReadMatrix3();
+    Matrix3x4 ReadMatrix3x4();
+    Matrix4 ReadMatrix4();
     Color ReadColor();
     BoundingBox ReadBoundingBox();
     String ReadString();

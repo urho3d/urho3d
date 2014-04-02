@@ -30,7 +30,7 @@ class Quaternion
     void FromRotationTo(const Vector3& start, const Vector3& end);
     void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     void FromRotationMatrix(const Matrix3& matrix);
-    void FromLookRotation(const Vector3& direction, const Vector3& up);
+    bool FromLookRotation(const Vector3& direction, const Vector3& up);
     
     void Normalize();
     

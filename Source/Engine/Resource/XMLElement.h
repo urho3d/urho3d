@@ -144,9 +144,15 @@ public:
     bool SetVector3(const String& name, const Vector3& value);
     /// Set a Vector4 attribute.
     bool SetVector4(const String& name, const Vector4& value);
-    /// Set a float or Vector attribute stored in a variant.
+    /// Set a float, Vector or Matrix attribute stored in a variant.
     bool SetVectorVariant(const String& name, const Variant& value);
-
+    /// Set a Matrix3 attribute.
+    bool SetMatrix3(const String& name, const Matrix3& value);
+    /// Set a Matrix3x4 attribute.
+    bool SetMatrix3x4(const String& name, const Matrix3x4& value);
+    /// Set a Matrix4 attribute.
+    bool SetMatrix4(const String& name, const Matrix4& value);
+    
     /// Return whether does not refer to an element or an XPath node.
     bool IsNull() const;
     /// Return whether refers to an element or an XPath node.
@@ -229,16 +235,22 @@ public:
     VariantVector GetVariantVector() const;
     /// Return a variant map attribute, or empty if missing.
     VariantMap GetVariantMap() const;
-    /// Return a Vector2 attribute, or default if missing.
+    /// Return a Vector2 attribute, or zero vector if missing.
     Vector2 GetVector2(const String& name) const;
-    /// Return a Vector3 attribute, or default if missing.
+    /// Return a Vector3 attribute, or zero vector if missing.
     Vector3 GetVector3(const String& name) const;
-    /// Return a Vector4 attribute, or default if missing.
+    /// Return a Vector4 attribute, or zero vector if missing.
     Vector4 GetVector4(const String& name) const;
     /// Return any Vector attribute as Vector4. Missing coordinates will be zero.
     Vector4 GetVector(const String& name) const;
-    /// Return a float or Vector attribute as Variant.
+    /// Return a float, Vector or Matrix attribute as Variant.
     Variant GetVectorVariant(const String& name) const;
+    /// Return a Matrix3 attribute, or zero matrix if missing.
+    Matrix3 GetMatrix3(const String& name) const;
+    /// Return a Matrix3x4 attribute, or zero matrix if missing.
+    Matrix3x4 GetMatrix3x4(const String& name) const;
+    /// Return a Matrix4 attribute, or zero matrix if missing.
+    Matrix4 GetMatrix4(const String& name) const;
     /// Return XML file.
     XMLFile* GetFile() const;
     /// Return pugixml xml_node_struct.

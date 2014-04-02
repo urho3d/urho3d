@@ -31,6 +31,7 @@ uniform float4x4 cLightMatrices[4];
 #ifdef COMPILEPS
 // Pixel shader uniforms
 uniform float3 cAmbientColor;
+uniform float3 cCameraPosPS;
 uniform float cDeltaTimePS;
 uniform float cElapsedTimePS;
 uniform float4 cFogParams;

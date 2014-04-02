@@ -686,11 +686,18 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
+- For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. For testing, SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
 - Is hardware instancing supported? This requires %Shader %Model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
-- Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
+- Are hardware shadow maps supported? Both AMD & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
+
+%Shader model 2 has the following limitations due to limited pixel shader instruction count:
+
+- Directional light shadows support a maximum of 3 cascade splits instead of 4.
+- Shadowed point lights do not support specular calculations in forward rendering.
+- Complex materials do not combine the ambient pass with the first forward light (lit base pass optimization.)
+- Complex forward rendered materials (eg. normal + specular map + alpha masking) combined with shadow mapping or height fog may not work.
 
 \section Rendering_Renderer Renderer
 
@@ -723,7 +730,7 @@ In the default render paths, the rendering operations proceed in the following o
 
 \section Rendering_Drawable Rendering components
 
-The rendering-related components defined by the %Graphics, %UI and Urho2D libraries are:
+The rendering-related components defined by the %Graphics and %UI libraries are:
 
 - Octree: spatial partitioning of Drawables for accelerated visibility queries. Needs to be created to the Scene (root node.)
 - Camera: describes a viewpoint for rendering, including projection parameters (FOV, near/far distance, perspective/orthographic)
@@ -741,6 +748,8 @@ The rendering-related components defined by the %Graphics, %UI and Urho2D librar
 - DecalSet: renders decal geometry on top of objects.
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
+
+Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D" library.
 
 \section Rendering_Optimizations Optimizations
 
@@ -930,7 +939,7 @@ A technique definition looks like this:
 
 \code
 <technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" >
-    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow"
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" sm3="false|true"
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
@@ -942,7 +951,7 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.)
+The sm3 attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.) The sm3 attribute can also be specified per pass, to disable for example a too complex lit base optimization pass on SM2.
 
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
@@ -990,10 +999,8 @@ Vertex shader:
 
 - NUMVERTEXLIGHTS=1,2,3 or 4: number of vertex lights influencing the object
 - DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
-- SPEC: the per-pixel forward light has specular calculations
 - SHADOW: the per-pixel forward light has shadowing
 - SKINNED, INSTANCED, BILLBOARD: choosing the geometry type
-- HEIGHTFOG: object's zone has height fog mode
 
 Pixel shader:
 

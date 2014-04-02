@@ -1339,21 +1339,33 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
     case VAR_FLOAT:
         SetShaderParameter(param, value.GetFloat());
         break;
-        
+
     case VAR_VECTOR2:
         SetShaderParameter(param, value.GetVector2());
         break;
-        
+
     case VAR_VECTOR3:
         SetShaderParameter(param, value.GetVector3());
         break;
-        
+
     case VAR_VECTOR4:
         SetShaderParameter(param, value.GetVector4());
         break;
 
     case VAR_COLOR:
         SetShaderParameter(param, value.GetColor());
+        break;
+
+    case VAR_MATRIX3:
+        SetShaderParameter(param, value.GetMatrix3());
+        break;
+        
+    case VAR_MATRIX3X4:
+        SetShaderParameter(param, value.GetMatrix3x4());
+        break;
+        
+    case VAR_MATRIX4:
+        SetShaderParameter(param, value.GetMatrix4());
         break;
 
     default:

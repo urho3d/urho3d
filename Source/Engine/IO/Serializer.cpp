@@ -134,6 +134,21 @@ bool Serializer::WritePackedQuaternion(const Quaternion& value)
     return Write(&coords[0], sizeof coords) == sizeof value;
 }
 
+bool Serializer::WriteMatrix3(const Matrix3& value)
+{
+    return Write(value.Data(), sizeof value) == sizeof value;
+}
+
+bool Serializer::WriteMatrix3x4(const Matrix3x4& value)
+{
+    return Write(value.Data(), sizeof value) == sizeof value;
+}
+
+bool Serializer::WriteMatrix4(const Matrix4& value)
+{
+    return Write(value.Data(), sizeof value) == sizeof value;
+}
+
 bool Serializer::WriteColor(const Color& value)
 {
     return Write(value.Data(), sizeof value) == sizeof value;
@@ -277,7 +292,16 @@ bool Serializer::WriteVariantData(const Variant& value)
         
     case VAR_INTVECTOR2:
         return WriteIntVector2(value.GetIntVector2());
-            
+        
+    case VAR_MATRIX3:
+        return WriteMatrix3(value.GetMatrix3());
+        
+    case VAR_MATRIX3X4:
+        return WriteMatrix3x4(value.GetMatrix3x4());
+        
+    case VAR_MATRIX4:
+        return WriteMatrix4(value.GetMatrix4());
+        
     default:
         return false;
     }

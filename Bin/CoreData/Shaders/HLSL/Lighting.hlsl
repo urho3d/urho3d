@@ -65,7 +65,11 @@ float GetVertexLightVolumetric(int index, float3 worldPos)
 #ifdef SHADOW
 
 #ifdef DIRLIGHT
-    #define NUMCASCADES 4
+    #ifdef SM3
+        #define NUMCASCADES 4
+    #else
+        #define NUMCASCADES 3
+    #endif
 #else
     #define NUMCASCADES 1
 #endif
@@ -77,7 +81,9 @@ void GetShadowPos(float4 projWorldPos, out float4 shadowPos[NUMCASCADES])
         shadowPos[0] = mul(projWorldPos, cLightMatrices[0]);
         shadowPos[1] = mul(projWorldPos, cLightMatrices[1]);
         shadowPos[2] = mul(projWorldPos, cLightMatrices[2]);
-        shadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
+        #ifdef SM3
+            shadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
+        #endif
     #elif defined(SPOTLIGHT)
         shadowPos[0] = mul(projWorldPos, cLightMatrices[1]);
     #else
@@ -88,29 +94,25 @@ void GetShadowPos(float4 projWorldPos, out float4 shadowPos[NUMCASCADES])
 #endif
 
 #ifdef COMPILEPS
-float GetDiffuse(float3 normal, float3 lightVec, out float3 lightDir)
+float GetDiffuse(float3 normal, float3 worldPos, out float3 lightDir)
 {
     #ifdef DIRLIGHT
-        #ifdef NORMALMAP
-            // In normal mapped forward lighting, the tangent space light vector needs renormalization
-            lightDir = normalize(lightVec);
-        #else
-            lightDir = lightVec;
-        #endif
-
+        lightDir = cLightDirPS;
         return saturate(dot(normal, lightDir));
     #else
+        float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         lightDir = lightVec / lightDist;
         return saturate(dot(normal, lightDir)) * tex1D(sLightRampMap, lightDist).r;
     #endif
 }
 
-float GetDiffuseVolumetric(float3 lightVec)
+float GetDiffuseVolumetric(float3 worldPos)
 {
     #ifdef DIRLIGHT
         return 1.0;
     #else
+        float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         return tex1D(sLightRampMap, lightDist).r;
     #endif
@@ -130,7 +132,11 @@ float GetIntensity(float3 color)
 #ifdef SHADOW
 
 #ifdef DIRLIGHT
-    #define NUMCASCADES 4
+    #ifdef SM3
+        #define NUMCASCADES 4
+    #else
+        #define NUMCASCADES 3
+    #endif
 #else
     #define NUMCASCADES 1
 #endif
@@ -207,15 +213,24 @@ float GetDirShadow(const float4 iShadowPos[NUMCASCADES], float depth)
 {
     float4 shadowPos;
 
-    if (depth < cShadowSplits.x)
-        shadowPos = iShadowPos[0];
-    else if (depth < cShadowSplits.y)
-        shadowPos = iShadowPos[1];
-    else if (depth < cShadowSplits.z)
-        shadowPos = iShadowPos[2];
-    else
-        shadowPos = iShadowPos[3];
-        
+    #ifdef SM3
+        if (depth < cShadowSplits.x)
+            shadowPos = iShadowPos[0];
+        else if (depth < cShadowSplits.y)
+            shadowPos = iShadowPos[1];
+        else if (depth < cShadowSplits.z)
+            shadowPos = iShadowPos[2];
+        else
+            shadowPos = iShadowPos[3];
+    #else
+        if (depth < cShadowSplits.x)
+            shadowPos = iShadowPos[0];
+        else if (depth < cShadowSplits.y)
+            shadowPos = iShadowPos[1];
+        else
+            shadowPos = iShadowPos[2];
+    #endif
+
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 

@@ -442,7 +442,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "void FromEulerAngles(float, float, float)", asMETHOD(Quaternion, FromEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromRotationTo(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromRotationTo), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromAxes(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void FromLookRotation(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "bool FromLookRotation(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void Normalize()", asMETHOD(Quaternion, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Normalized() const", asMETHOD(Quaternion, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Inverse() const", asMETHOD(Quaternion, Inverse), asCALL_THISCALL);
@@ -497,6 +497,7 @@ static void RegisterMatrix3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3", "Matrix3 Transpose() const", asMETHODPR(Matrix3, Transpose, () const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Matrix3 Inverse() const", asMETHODPR(Matrix3, Inverse, () const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "bool Equals(const Matrix3&in) const", asMETHOD(Matrix3, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "String ToString() const", asMETHOD(Matrix3, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Matrix3", "float m00", offsetof(Matrix3, m00_));
     engine->RegisterObjectProperty("Matrix3", "float m01", offsetof(Matrix3, m01_));
     engine->RegisterObjectProperty("Matrix3", "float m02", offsetof(Matrix3, m02_));
@@ -557,6 +558,7 @@ static void RegisterMatrix4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix4,Decompose, (Vector3 &, Quaternion &, Vector3 &) const, void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Matrix4 Inverse() const", asMETHODPR(Matrix4, Inverse, () const, Matrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "bool Equals(const Matrix4&in) const", asMETHOD(Matrix4, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "String ToString() const", asMETHOD(Matrix4, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Matrix4", "float m00", offsetof(Matrix4, m00_));
     engine->RegisterObjectProperty("Matrix4", "float m01", offsetof(Matrix4, m01_));
     engine->RegisterObjectProperty("Matrix4", "float m02", offsetof(Matrix4, m02_));
@@ -644,6 +646,7 @@ static void RegisterMatrix3x4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3x4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix3x4, Decompose, (Vector3&, Quaternion&, Vector3&) const, void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 Inverse() const", asMETHODPR(Matrix3x4, Inverse, () const, Matrix3x4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "bool Equals(const Matrix3x4&in) const", asMETHOD(Matrix3x4, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "String ToString() const", asMETHOD(Matrix3x4, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Matrix3x4", "float m00", offsetof(Matrix3x4, m00_));
     engine->RegisterObjectProperty("Matrix3x4", "float m01", offsetof(Matrix3x4, m01_));
     engine->RegisterObjectProperty("Matrix3x4", "float m02", offsetof(Matrix3x4, m02_));

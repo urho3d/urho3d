@@ -28,6 +28,9 @@ class XMLElement
     bool SetVector3(const String name, const Vector3& value);
     bool SetVector4(const String name, const Vector4& value);
     bool SetVectorVariant(const String name, const Variant& value);
+    bool SetMatrix3(const String name, const Matrix3& value);
+    bool SetMatrix3x4(const String name, const Matrix3x4& value);
+    bool SetMatrix4(const String name, const Matrix4& value);
 
     bool IsNull() const;
     bool NotNull() const;
@@ -58,21 +61,24 @@ class XMLElement
     Quaternion GetQuaternion(const String name) const;
     Variant GetVariant() const;
     Variant GetVariantValue(VariantType type) const;
-    
+
     ResourceRef GetResourceRef() const;
     ResourceRefList GetResourceRefList() const;
-    
+
     VariantMap GetVariantMap() const;
-    
+
     Vector2 GetVector2(const String name) const;
     Vector3 GetVector3(const String name) const;
     Vector4 GetVector4(const String name) const;
     Vector4 GetVector(const String name) const;
-    
+    Matrix3 GetMatrix3(const String name) const;
+    Matrix3x4 GetMatrix3x4(const String name) const;
+    Matrix4 GetMatrix4(const String name) const;
+
     XMLFile* GetFile() const;
-    
+
     static const XMLElement EMPTY;
-    
+
     tolua_readonly tolua_property__is_set bool null;
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set String value;

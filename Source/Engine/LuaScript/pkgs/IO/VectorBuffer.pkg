@@ -45,6 +45,9 @@ class VectorBuffer
     Vector4 ReadVector4();
     Quaternion ReadQuaternion();
     Quaternion ReadPackedQuaternion();
+    Matrix3 ReadMatrix3();
+    Matrix3x4 ReadMatrix3x4();
+    Matrix4 ReadMatrix4();
     Color ReadColor();
     BoundingBox ReadBoundingBox();
     String ReadString();
@@ -86,6 +89,9 @@ class VectorBuffer
     bool WriteVector4(const Vector4& value);
     bool WriteQuaternion(const Quaternion& value);
     bool WritePackedQuaternion(const Quaternion& value);
+    bool WriteMatrix3(const Matrix3& value);
+    bool WriteMatrix3x4(const Matrix3x4& value);
+    bool WriteMatrix4(const Matrix4& value);
     bool WriteColor(const Color& value);
     bool WriteBoundingBox(const BoundingBox& value);
     bool WriteString(const String value);

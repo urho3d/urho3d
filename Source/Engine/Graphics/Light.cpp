@@ -24,6 +24,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "Graphics.h"
 #include "Light.h"
 #include "Node.h"
 #include "OctreeQuery.h"
@@ -383,6 +384,33 @@ Frustum Light::GetFrustum() const
         Matrix3x4::IDENTITY);
     Frustum ret;
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, frustumTransform);
+    return ret;
+}
+
+int Light::GetNumShadowSplits() const
+{
+    int ret = 1;
+    
+    if (shadowCascade_.splits_[1] > shadowCascade_.splits_[0])
+    {
+        ++ret;
+        if (shadowCascade_.splits_[2] > shadowCascade_.splits_[1])
+        {
+            ++ret;
+            if (shadowCascade_.splits_[3] > shadowCascade_.splits_[2])
+                ++ret;
+        }
+    }
+    
+    ret = Min(ret, MAX_CASCADE_SPLITS);
+    // Shader Model 2 can only support 3 splits max. due to pixel shader instruction count limits
+    if (ret == 4)
+    {
+        Graphics* graphics = GetSubsystem<Graphics>();
+        if (graphics && !graphics->GetSM3Support())
+            --ret;
+    }
+    
     return ret;
 }
 

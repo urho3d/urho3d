@@ -147,6 +147,10 @@ public:
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues.
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+    /// Set global (per-frame) shader parameters. Called by Batch and internally by View.
+    void SetGlobalShaderParameters();
+    /// Set camera-specific shader parameters. Called by Batch and internally by View.
+    void SetCameraShaderParameters(Camera* camera, bool setProjectionMatrix, bool overrideView);
     
 private:
     /// Query the octree for drawable objects.
@@ -306,6 +310,8 @@ private:
     bool useLitBase_;
     /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
     bool hasScenePasses_;
+    /// Flip vertical flag.
+    bool flipVertical_;
     /// Renderpath.
     RenderPath* renderPath_;
     /// Per-thread octree query results.

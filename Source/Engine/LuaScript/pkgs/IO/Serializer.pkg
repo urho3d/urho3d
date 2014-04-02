@@ -22,6 +22,9 @@ class Serializer
     bool WriteVector4(const Vector4& value);
     bool WriteQuaternion(const Quaternion& value);
     bool WritePackedQuaternion(const Quaternion& value);
+    bool WriteMatrix3(const Matrix3& value);
+    bool WriteMatrix3x4(const Matrix3x4& value);
+    bool WriteMatrix4(const Matrix4& value);
     bool WriteColor(const Color& value);
     bool WriteBoundingBox(const BoundingBox& value);
     bool WriteString(const String value);
