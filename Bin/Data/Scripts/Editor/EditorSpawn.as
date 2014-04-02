@@ -238,17 +238,21 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
     SetSceneModified();
 }
 
+Vector3 RandomizeSpawnPosition(const Vector3&in position)
+{
+    float angle = Random() * 360.0;
+    float distance = Random() * spawnRadius;
+    return position + Quaternion(0, angle, 0) * Vector3(0, 0, distance);
+}
+
 void SpawnObject()
 {
     if(spawnedObjectsNames.length==0) return;
     IntRect view = activeViewport.viewport.rect;
     
     for(int i=0;i<spawnCount;i++)
-    {	
-        Vector2 norm=Vector2(Random(-1,1),Random(-1,1));
-        norm.Normalize();
-        norm=norm*(spawnRadius*Random(0,1));
-        IntVector2 pos = IntVector2(ui.cursorPosition.x+norm.x,ui.cursorPosition.y+norm.y);
+    {
+        IntVector2 pos = IntVector2(ui.cursorPosition.x,ui.cursorPosition.y);
         Ray cameraRay = camera.GetScreenRay(
             float(pos.x - view.left) / view.width,
             float(pos.y - view.top) / view.height);
@@ -257,8 +261,19 @@ void SpawnObject()
         {
             if (editorScene.octree is null)
                 return;
+
             RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
                 pickModeDrawableFlags[pickMode], 0x7fffffff);
+
+            // Randomize in a circle around original hit position
+            if (spawnRadius > 0)
+            {
+                Vector3 position = RandomizeSpawnPosition(result.position);
+                position.y += spawnRadius;
+                result = editorScene.octree.RaycastSingle(Ray(position, Vector3(0, -1, 0)), RAY_TRIANGLE, spawnRadius * 2.0,
+                    pickModeDrawableFlags[pickMode], 0x7fffffff);
+            }
+
             if (result.drawable !is null)
                 PlaceObject(result.position, result.normal);
         }
@@ -272,6 +287,15 @@ void SpawnObject()
                 editorScene.physicsWorld.UpdateCollisions();
 
             PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
+
+            // Randomize in a circle around original hit position
+            if (spawnRadius > 0)
+            {
+                Vector3 position = RandomizeSpawnPosition(result.position);
+                position.y += spawnRadius;
+                result = editorScene.physicsWorld.RaycastSingle(Ray(position, Vector3(0, -1, 0)), spawnRadius * 2.0);
+            }
+
             if (result.body !is null)
                 PlaceObject(result.position, result.normal);
         }
