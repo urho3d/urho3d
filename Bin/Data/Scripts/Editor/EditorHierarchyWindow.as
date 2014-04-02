@@ -72,6 +72,7 @@ void CreateHierarchyWindow()
     SubscribeToEvent(hierarchyWindow.GetChild("ExpandButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(hierarchyWindow.GetChild("CollapseButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(hierarchyList, "SelectionChanged", "HandleHierarchyListSelectionChange");
+    SubscribeToEvent(hierarchyList, "ItemDoubleClicked", "HandleHierarchyListDoubleClick");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
     SubscribeToEvent(editorScene, "NodeAdded", "HandleNodeAdded");
@@ -719,6 +720,18 @@ void HandleHierarchyListSelectionChange()
     PositionGizmo();
     UpdateAttributeInspector();
     UpdateCameraPreview();
+}
+
+void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ item = eventData["Item"].GetPtr();
+    int type = item.vars[TYPE_VAR].GetInt();
+    // Locate nodes from the scene by double-clicking
+    if (type == ITEM_NODE)
+    {
+        Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
+        LocateNode(node);
+    }
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)

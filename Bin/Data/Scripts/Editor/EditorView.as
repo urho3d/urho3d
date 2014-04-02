@@ -1306,7 +1306,6 @@ void SteppedObjectManipulation(int key)
         UpdateNodeAttributes();
 }
 
-
 void HandlePostRenderUpdate()
 {
     DebugRenderer@ debug = editorScene.debugRenderer;
@@ -1562,6 +1561,34 @@ bool StopTestAnimation()
 {
     testAnimState = null;
     return true;
+}
+
+void LocateNode(Node@ node)
+{
+    if (node is null || node is editorScene)
+        return;
+
+    Vector3 center = node.worldPosition;
+    float distance = newNodeDistance;
+
+    for (uint i = 0; i < node.numComponents; ++i)
+    {
+        // Determine view distance from drawable component's bounding box. Skip skybox, as its box is very large, as well as lights
+        Drawable@ drawable = cast<Drawable>(node.components[i]);
+        if (drawable !is null && cast<Skybox>(drawable) is null && cast<Light>(drawable) is null)
+        {
+            BoundingBox box = drawable.worldBoundingBox;
+            center = box.center;
+            // Ensure the object fits on the screen
+            distance = Max(distance, newNodeDistance + box.size.length);
+            break;
+        }
+    }
+
+    if (distance > viewFarClip)
+        distance = viewFarClip;
+
+    cameraNode.worldPosition = center - cameraNode.worldDirection * distance;
 }
 
 Vector3 SelectedNodesCenterPoint()
