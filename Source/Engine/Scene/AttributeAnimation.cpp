@@ -60,6 +60,25 @@ void AttributeAnimation::RegisterObject(Context* context)
     context->RegisterFactory<AttributeAnimation>();
 }
 
+bool AttributeAnimation::Load(Deserializer& source)
+{
+    XMLFile xmlFile(context_);
+    if (!xmlFile.Load(source))
+        return false;
+
+    return LoadXML(xmlFile.GetRoot());
+}
+
+bool AttributeAnimation::Save(Serializer& dest) const
+{
+    XMLFile xmlFile(context_);
+
+    if (!SaveXML(xmlFile.CreateRoot("attributeAnimation")))
+        return false;
+
+    return xmlFile.Save(dest);
+}
+
 bool AttributeAnimation::LoadXML(const XMLElement& source)
 {
     valueType_ = VAR_NONE;

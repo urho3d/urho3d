@@ -75,6 +75,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Load resource. Return true if successful.
+    virtual bool Load(Deserializer& source);
+    /// Save resource. Return true if successful.
+    virtual bool Save(Serializer& dest) const;
     /// Load from XML data. Return true if successful.
     bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.

@@ -45,6 +45,25 @@ void ObjectAnimation::RegisterObject(Context* context)
     context->RegisterFactory<ObjectAnimation>();
 }
 
+bool ObjectAnimation::Load(Deserializer& source)
+{
+    XMLFile xmlFile(context_);
+    if (!xmlFile.Load(source))
+        return false;
+
+    return LoadXML(xmlFile.GetRoot());
+}
+
+bool ObjectAnimation::Save(Serializer& dest) const
+{
+    XMLFile xmlFile(context_);
+
+    if (!SaveXML(xmlFile.CreateRoot("objectAnimation")))
+        return false;
+
+    return xmlFile.Save(dest);
+}
+
 bool ObjectAnimation::LoadXML(const XMLElement& source)
 {
     attributeAnimations_.Clear();
