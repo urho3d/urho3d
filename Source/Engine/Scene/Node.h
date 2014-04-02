@@ -449,8 +449,6 @@ private:
     StringHash nameHash_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
-    /// Ignore network update.
-    bool ignoreNetworkUpdate_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode, id)); }

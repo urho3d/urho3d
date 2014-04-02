@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "HashSet.h"
 #include "Serializable.h"
 
 namespace Urho3D
@@ -74,11 +75,17 @@ protected:
     virtual void OnAttributeAnimationRemoved() = 0;
     /// Update attribute animations.
     void UpdateAttributeAnimations(float timeStep);
+    /// Is animated network attribute.
+    bool IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const;
+    /// Return attribute animation instance.
+    const AttributeAnimationInstance* GetAttributeAnimationInstance(const String& name) const;
 
     /// Animation enabled.
     bool animationEnabled_;
     /// Animation.
     SharedPtr<ObjectAnimation> objectAnimation_;
+    /// Animated network attribute set.
+    HashSet<const AttributeInfo*> animatedNetworkAttributes_;
     /// Attribute animation instances.
     HashMap<String, SharedPtr<AttributeAnimationInstance> > attributeAnimationInstances_;
 };

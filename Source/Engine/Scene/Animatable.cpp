@@ -70,48 +70,89 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
 
 void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation)
 {
-    const AttributeAnimation* currentAnimation = GetAttributeAnimation(name);
-    if (currentAnimation == attributeAnimation)
-        return;
+    const AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
 
     if (attributeAnimation)
     {
-        const Vector<AttributeInfo>* attributes = GetAttributes();
-        if (!attributes)
+        if (currentInstance && attributeAnimation == currentInstance->GetAttributeAnimation())
+            return;
+
+        // Get attribute info
+        const AttributeInfo* attributeInfo = 0;
+        if (currentInstance)
+            attributeInfo = &currentInstance->GetAttributeInfo();
+        else
         {
-            LOGERROR(GetTypeName() + " has no attributes");
+            const Vector<AttributeInfo>* attributes = GetAttributes();
+            if (!attributes)
+            {
+                LOGERROR(GetTypeName() + " has no attributes");
+                return;
+            }
+
+            for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
+            {
+                if (name == (*i).name_)
+                {
+                    attributeInfo = &(*i);
+                    break;
+                }
+            }
+        }
+
+        if (!attributeInfo)
+        {
+            LOGERROR("Invalid name: " + name);
             return;
         }
 
-        for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
+        // Check value type is same with attribute type
+        if (attributeAnimation->GetValueType() != attributeInfo->type_)
         {
-            const AttributeInfo& attributeInfo = *i;
-            if (!attributeInfo.name_.Compare(name, true))
-            {
-                if (attributeAnimation->GetValueType() == attributeInfo.type_)
-                {
-                    SharedPtr<AttributeAnimationInstance> attributeAnimationInstance(new AttributeAnimationInstance(this, attributeInfo, attributeAnimation));
-                    attributeAnimationInstances_[name] = attributeAnimationInstance;
-
-                    if (!currentAnimation)
-                        OnAttributeAnimationAdded();
-                }
-                else
-                {
-                    LOGERROR("Error value type");
-                    return;
-                }
-
-            }
+            LOGERROR("Invalid value type");
+            return;
         }
+
+        // Add network attribute to set
+        if (attributeInfo->mode_ & AM_NET)
+        {
+            const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
+            for (Vector<AttributeInfo>::ConstIterator i = networkAttributes->Begin(); i != networkAttributes->End(); ++i)
+            {
+                if (name == (*i).name_)
+                {
+                    animatedNetworkAttributes_.Insert(&(*i));
+                    break;
+                }
+            }            
+        }
+
+        attributeAnimationInstances_[name] = new AttributeAnimationInstance(this, *attributeInfo, attributeAnimation);
+
+        if (!currentInstance)
+            OnAttributeAnimationAdded();
     }
     else
     {
-        if (currentAnimation)
+        if (!currentInstance)
+            return;
+
+        // Remove network attribute from set
+        if (currentInstance->GetAttributeInfo().mode_ & AM_NET)
         {
-            attributeAnimationInstances_.Erase(name);
-            OnAttributeAnimationRemoved();
+            const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
+            for (Vector<AttributeInfo>::ConstIterator i = networkAttributes->Begin(); i != networkAttributes->End(); ++i)
+            {
+                if (name == (*i).name_)
+                {
+                    animatedNetworkAttributes_.Erase(&(*i));
+                    break;
+                }
+            }            
         }
+
+        attributeAnimationInstances_.Erase(name);
+        OnAttributeAnimationRemoved();
     }
 }
 
@@ -122,10 +163,8 @@ const ObjectAnimation* Animatable::GetObjectAnimation() const
 
 const AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
 {
-    HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Find(name);
-    if (i != attributeAnimationInstances_.End())
-        return i->second_->GetAttributeAnimation();
-    return 0;
+    const AttributeAnimationInstance* instance = GetAttributeAnimationInstance(name);
+    return instance ? instance->GetAttributeAnimation() : 0;
 }
 
 void Animatable::SetObjectAnimationAttr(ResourceRef value)
@@ -179,6 +218,20 @@ void Animatable::UpdateAttributeAnimations(float timeStep)
     
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
         i->second_->Update(timeStep);
+}
+
+bool Animatable::IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const
+{
+    return animatedNetworkAttributes_.Find(&attrInfo) != animatedNetworkAttributes_.End();
+}
+
+const AttributeAnimationInstance* Animatable::GetAttributeAnimationInstance(const String& name) const
+{
+    HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Find(name);
+    if (i != attributeAnimationInstances_.End())
+        return i->second_;
+
+    return 0;
 }
 
 }

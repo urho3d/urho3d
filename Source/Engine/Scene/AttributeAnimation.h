@@ -102,7 +102,7 @@ public:
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
     /// Is interpolatable.
-    bool IsInterpolatable() const;
+    bool IsInterpolatable() const { return isInterpolatable_; }
     /// Return begin time.
     float GetBeginTime() const { return beginTime_; }
     /// Return end time.
@@ -111,6 +111,8 @@ public:
     float CalculateScaledTime(float currentTime) const;
     /// Return all key frames.
     const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyframes_; }
+    /// Has event frames.
+    bool HasEventFrames() const { return eventFrames_.Size() != 0; }
     /// Return all event frames between time.
     void GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const;
 

@@ -59,9 +59,12 @@ void AttributeAnimationInstance::Update(float timeStep)
         return;
     
     currentTime_ += timeStep;
-    float scaledTime = attributeAnimation_->CalculateScaledTime(currentTime_);
-
+    
     const Vector<AttributeKeyFrame>& keyFrames = attributeAnimation_->GetKeyFrames();
+    if (keyFrames.Size() < 2)
+        return;
+
+    float scaledTime = attributeAnimation_->CalculateScaledTime(currentTime_);
     for (unsigned i = 1; i < keyFrames.Size(); ++i)
     {
         const AttributeKeyFrame& currKeyFrame = keyFrames[i];
@@ -76,29 +79,32 @@ void AttributeAnimationInstance::Update(float timeStep)
         }
     }
 
-    Vector<const AttributeEventFrame*> eventFrames;
-    switch (attributeAnimation_->GetCycleMode())
+    if (attributeAnimation_->HasEventFrames())
     {
-    case CM_LOOP:
-        if (lastScaledTime_ < scaledTime)
-            attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-        else
+        Vector<const AttributeEventFrame*> eventFrames;
+        switch (attributeAnimation_->GetCycleMode())
         {
-            attributeAnimation_->GetEventFrames(lastScaledTime_, attributeAnimation_->GetEndTime(), eventFrames);
-            attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), scaledTime, eventFrames);
+        case CM_LOOP:
+            if (lastScaledTime_ < scaledTime)
+                attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
+            else
+            {
+                attributeAnimation_->GetEventFrames(lastScaledTime_, attributeAnimation_->GetEndTime(), eventFrames);
+                attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), scaledTime, eventFrames);
+            }
+            break;
+        case CM_CLAMP:
+            attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
+            break;
+
+        case CM_PINGPONG:
+            // Not implement
+            break;
         }
-        break;
-    case CM_CLAMP:
-        attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-        break;
 
-    case CM_PINGPONG:
-        // Not implement
-        break;
+        for (unsigned i = 0; i < eventFrames.Size(); ++i)
+            animatable_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
     }
-
-    for (unsigned i = 0; i < eventFrames.Size(); ++i)
-        animatable_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
 
     lastScaledTime_ = scaledTime;
 }

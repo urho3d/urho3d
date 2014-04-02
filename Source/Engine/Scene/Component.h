@@ -120,8 +120,6 @@ protected:
     bool networkUpdate_;
     /// Enabled flag.
     bool enabled_;
-    /// Ignore network update.
-    bool ignoreNetworkUpdate_;
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
