@@ -56,6 +56,9 @@ static const char* typeNames[] =
     "IntRect",
     "IntVector2",
     "Ptr",
+    "Matrix3",
+    "Matrix3x4",
+    "Matrix4",
     0
 };
 
@@ -91,6 +94,18 @@ Variant& Variant::operator = (const Variant& rhs)
 
     case VAR_PTR:
         *(reinterpret_cast<WeakPtr<RefCounted>*>(&value_)) = *(reinterpret_cast<const WeakPtr<RefCounted>*>(&rhs.value_));
+        break;
+        
+    case VAR_MATRIX3:
+        *(reinterpret_cast<Matrix3*>(value_.ptr_)) = *(reinterpret_cast<const Matrix3*>(rhs.value_.ptr_));
+        break;
+        
+    case VAR_MATRIX3X4:
+        *(reinterpret_cast<Matrix3x4*>(value_.ptr_)) = *(reinterpret_cast<const Matrix3x4*>(rhs.value_.ptr_));
+        break;
+        
+    case VAR_MATRIX4:
+        *(reinterpret_cast<Matrix4*>(value_.ptr_)) = *(reinterpret_cast<const Matrix4*>(rhs.value_.ptr_));
         break;
         
     default:
@@ -154,6 +169,15 @@ bool Variant::operator == (const Variant& rhs) const
 
     case VAR_INTVECTOR2:
         return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
+
+    case VAR_MATRIX3:
+        return *(reinterpret_cast<const Matrix3*>(value_.ptr_)) == *(reinterpret_cast<const Matrix3*>(rhs.value_.ptr_));
+
+    case VAR_MATRIX3X4:
+        return *(reinterpret_cast<const Matrix3x4*>(value_.ptr_)) == *(reinterpret_cast<const Matrix3x4*>(rhs.value_.ptr_));
+
+    case VAR_MATRIX4:
+        return *(reinterpret_cast<const Matrix4*>(value_.ptr_)) == *(reinterpret_cast<const Matrix4*>(rhs.value_.ptr_));
 
     default:
         return true;
@@ -269,6 +293,18 @@ void Variant::FromString(VariantType type, const char* value)
         *this = (RefCounted*)0;
         break;
         
+    case VAR_MATRIX3:
+        *this = ToMatrix3(value);
+        break;
+        
+    case VAR_MATRIX3X4:
+        *this = ToMatrix3x4(value);
+        break;
+        
+    case VAR_MATRIX4:
+        *this = ToMatrix4(value);
+        break;
+        
     default:
         SetType(VAR_NONE);
     }
@@ -346,6 +382,15 @@ String Variant::ToString() const
         // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String::EMPTY;
+
+    case VAR_MATRIX3:
+        return (reinterpret_cast<const Matrix3*>(value_.ptr_))->ToString();
+
+    case VAR_MATRIX3X4:
+        return (reinterpret_cast<const Matrix3x4*>(value_.ptr_))->ToString();
+        
+    case VAR_MATRIX4:
+        return (reinterpret_cast<const Matrix4*>(value_.ptr_))->ToString();
     }
 }
 
@@ -416,6 +461,15 @@ bool Variant::IsZero() const
     case VAR_PTR:
         return *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_) == (RefCounted*)0;
         
+    case VAR_MATRIX3:
+        return *reinterpret_cast<const Matrix3*>(value_.ptr_) == Matrix3::IDENTITY;
+        
+    case VAR_MATRIX3X4:
+        return *reinterpret_cast<const Matrix3x4*>(value_.ptr_) == Matrix3x4::IDENTITY;
+        
+    case VAR_MATRIX4:
+        return *reinterpret_cast<const Matrix4*>(value_.ptr_) == Matrix4::IDENTITY;
+        
     default:
         return true;
     }
@@ -456,6 +510,18 @@ void Variant::SetType(VariantType newType)
         (reinterpret_cast<WeakPtr<RefCounted>*>(&value_))->~WeakPtr<RefCounted>();
         break;
         
+    case VAR_MATRIX3:
+        delete reinterpret_cast<Matrix3*>(value_.ptr_);
+        break;
+        
+    case VAR_MATRIX3X4:
+        delete reinterpret_cast<Matrix3x4*>(value_.ptr_);
+        break;
+        
+    case VAR_MATRIX4:
+        delete reinterpret_cast<Matrix4*>(value_.ptr_);
+        break;
+        
     default:
         break;
     }
@@ -490,6 +556,18 @@ void Variant::SetType(VariantType newType)
 
     case VAR_PTR:
         new(reinterpret_cast<WeakPtr<RefCounted>*>(&value_)) WeakPtr<RefCounted>();
+        break;
+        
+    case VAR_MATRIX3:
+        value_.ptr_ = new Matrix3();
+        break;
+        
+    case VAR_MATRIX3X4:
+        value_.ptr_ = new Matrix3x4();
+        break;
+        
+    case VAR_MATRIX4:
+        value_.ptr_ = new Matrix4();
         break;
         
     default:
@@ -577,6 +655,26 @@ template<> void* Variant::Get<void*>() const
     return GetVoidPtr();
 }
 
+template<> RefCounted* Variant::Get<RefCounted*>() const
+{
+    return GetPtr();
+}
+
+template<> const Matrix3& Variant::Get<const Matrix3&>() const
+{
+    return GetMatrix3();
+}
+
+template<> const Matrix3x4& Variant::Get<const Matrix3x4&>() const
+{
+    return GetMatrix3x4();
+}
+
+template<> const Matrix4& Variant::Get<const Matrix4&>() const
+{
+    return GetMatrix4();
+}
+
 template<> ResourceRef Variant::Get<ResourceRef>() const
 {
     return GetResourceRef();
@@ -642,9 +740,19 @@ template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() co
     return GetBuffer();
 }
 
-template<> RefCounted* Variant::Get<RefCounted*>() const
+template<> Matrix3 Variant::Get<Matrix3>() const
 {
-    return GetPtr();
+    return GetMatrix3();
+}
+
+template<> Matrix3x4 Variant::Get<Matrix3x4>() const
+{
+    return GetMatrix3x4();
+}
+
+template<> Matrix4 Variant::Get<Matrix4>() const
+{
+    return GetMatrix4();
 }
 
 String Variant::GetTypeName(VariantType type)

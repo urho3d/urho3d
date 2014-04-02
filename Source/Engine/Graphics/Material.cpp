@@ -65,19 +65,31 @@ static const char* cullModeNames[] =
     0
 };
 
-TextureUnit ParseTextureUnitName(const String& name)
+TextureUnit ParseTextureUnitName(String name)
 {
+    name = name.ToLower().Trimmed();
+    
     TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
-    if (name == "diff")
-        unit = TU_DIFFUSE;
-    else if (name == "albedo")
-        unit = TU_DIFFUSE;
-    else if (name == "norm")
-        unit = TU_NORMAL;
-    else if (name == "spec")
-        unit = TU_SPECULAR;
-    else if (name == "env")
-        unit = TU_ENVIRONMENT;
+    if (unit == MAX_TEXTURE_UNITS)
+    {
+        // Check also for shorthand names
+        if (name == "diff")
+            unit = TU_DIFFUSE;
+        else if (name == "albedo")
+            unit = TU_DIFFUSE;
+        else if (name == "norm")
+            unit = TU_NORMAL;
+        else if (name == "spec")
+            unit = TU_SPECULAR;
+        else if (name == "env")
+            unit = TU_ENVIRONMENT;
+        // Finally check for specifying the texture unit directly as a number
+        else if (name.Length() < 3)
+            unit = (TextureUnit)Clamp(ToInt(name), 0, MAX_TEXTURE_UNITS);
+    }
+    
+    if (unit == MAX_TEXTURE_UNITS)
+        LOGERROR("Unknown texture unit name " + name);
     
     return unit;
 }
@@ -193,18 +205,8 @@ bool Material::Load(const XMLElement& source)
     {
         TextureUnit unit = TU_DIFFUSE;
         if (textureElem.HasAttribute("unit"))
-        {
-            String unitName = textureElem.GetAttributeLower("unit");
-            if (unitName.Length() > 1)
-            {
-                unit = ParseTextureUnitName(unitName);
-                if (unit >= MAX_MATERIAL_TEXTURE_UNITS)
-                    LOGERROR("Unknown or illegal texture unit " + unitName);
-            }
-            else
-                unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_MATERIAL_TEXTURE_UNITS - 1);
-        }
-        if (unit != MAX_MATERIAL_TEXTURE_UNITS)
+            unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
+        if (unit < MAX_MATERIAL_TEXTURE_UNITS)
         {
             String name = textureElem.GetAttribute("name");
             // Detect cube maps by file extension: they are defined by an XML file

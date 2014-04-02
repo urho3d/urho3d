@@ -207,80 +207,17 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         graphics->SetDepthWrite(pass_->GetDepthWrite());
     }
     
-    // Set shaders
+    // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
     
-    // Set global frame parameters
+    // Set global (per-frame) shader parameters
     if (graphics->NeedParameterUpdate(SP_FRAME, (void*)0))
-    {
-        const FrameInfo& frame = view->GetFrameInfo();
-        graphics->SetShaderParameter(VSP_DELTATIME, frame.timeStep_);
-        graphics->SetShaderParameter(PSP_DELTATIME, frame.timeStep_);
-        
-        Scene* scene = view->GetScene();
-        if (scene)
-        {
-            float elapsedTime = scene->GetElapsedTime();
-            graphics->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
-            graphics->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
-        }
-    }
+        view->SetGlobalShaderParameters();
     
     // Set camera shader parameters
     unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash)))
-    {
-        Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
-        
-        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
-        graphics->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
-        
-        float nearClip = camera_->GetNearClip();
-        float farClip = camera_->GetFarClip();
-        graphics->SetShaderParameter(VSP_NEARCLIP, nearClip);
-        graphics->SetShaderParameter(VSP_FARCLIP, farClip);
-        graphics->SetShaderParameter(PSP_NEARCLIP, nearClip);
-        graphics->SetShaderParameter(PSP_FARCLIP, farClip);
-
-        Vector4 depthMode = Vector4::ZERO;
-        if (camera_->IsOrthographic())
-        {
-            depthMode.x_ = 1.0f;
-            #ifdef USE_OPENGL
-            depthMode.z_ = 0.5f;
-            depthMode.w_ = 0.5f;
-            #else
-            depthMode.z_ = 1.0f;
-            #endif
-        }
-        else
-            depthMode.w_ = 1.0f / camera_->GetFarClip();
-        
-        graphics->SetShaderParameter(VSP_DEPTHMODE, depthMode);
-        
-        Vector3 nearVector, farVector;
-        camera_->GetFrustumSize(nearVector, farVector);
-        Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
-        graphics->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
-        
-        Matrix4 projection = camera_->GetProjection();
-        #ifdef USE_OPENGL
-        // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
-        float constantBias = 2.0f * graphics->GetDepthConstantBias();
-        // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
-        // so use a higher constant bias
-        #ifdef GL_ES_VERSION_2_0
-        constantBias *= 2.0f;
-        #endif
-        projection.m22_ += projection.m32_ * constantBias;
-        projection.m23_ += projection.m33_ * constantBias;
-        #endif
-        
-        if (overrideView_)
-            graphics->SetShaderParameter(VSP_VIEWPROJ, projection);
-        else
-            graphics->SetShaderParameter(VSP_VIEWPROJ, projection * camera_->GetView());
-    }
+        view->SetCameraShaderParameters(camera_, true, overrideView_);
     
     // Set viewport shader parameters
     IntVector2 rtSize = graphics->GetRenderTargetDimensions();
@@ -552,6 +489,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         if (shadowMap)
         {
             {
+                // Calculate point light shadow sampling offsets (unrolled cube map)
                 unsigned faceWidth = shadowMap->GetWidth() / 2;
                 unsigned faceHeight = shadowMap->GetHeight() / 3;
                 float width = (float)shadowMap->GetWidth();
@@ -577,6 +515,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             }
             
             {
+                // Calculate shadow camera depth parameters for point light shadows and shadow fade parameters for
+                //  directional light shadows, stored in the same uniform
                 Camera* shadowCamera = lightQueue_->shadowSplits_[0].shadowCamera_;
                 float nearClip = shadowCamera->GetNearClip();
                 float farClip = shadowCamera->GetFarClip();

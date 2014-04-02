@@ -59,15 +59,9 @@ enum LightVSVariation
     LVS_DIR = 0,
     LVS_SPOT,
     LVS_POINT,
-    LVS_SPEC,
-    LVS_SPOTSPEC,
-    LVS_POINTSPEC,
     LVS_SHADOW,
     LVS_SPOTSHADOW,
     LVS_POINTSHADOW,
-    LVS_DIRSPECSHADOW,
-    LVS_SPOTSPECSHADOW,
-    LVS_POINTSPECSHADOW,
     MAX_LIGHT_VS_VARIATIONS
 };
 
@@ -193,8 +187,6 @@ public:
     void SetReuseShadowMaps(bool enable);
     /// Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
     void SetMaxShadowMaps(int shadowMaps);
-    /// Set maximum number of directional light shadow map cascades. Affects the size of directional light shadow maps.
-    void SetMaxShadowCascades(int cascades);
     /// Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
     /// Set minimum number of instances required in a batch group to render as instanced.
@@ -240,8 +232,6 @@ public:
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
     /// Return maximum number of shadow maps per resolution.
     int GetMaxShadowMaps() const { return maxShadowMaps_; }
-    /// Return maximum number of directional light shadow map cascades.
-    int GetMaxShadowCascades() const { return maxShadowCascades_; }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return minimum number of instances required in a batch group to render as instanced.
@@ -443,8 +433,6 @@ private:
     int shadowQuality_;
     /// Maximum number of shadow maps per resolution.
     int maxShadowMaps_;
-    /// Maximum number of directional light shadow cascades.
-    int maxShadowCascades_;
     /// Minimum number of instances required in a batch group to render as instanced.
     int minInstances_;
     /// Maximum triangles per object for instancing.

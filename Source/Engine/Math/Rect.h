@@ -39,14 +39,6 @@ public:
     {
     }
     
-    /// Copy-construct from another rect.
-    Rect(const Rect& rect) :
-        min_(rect.min_),
-        max_(rect.max_),
-        defined_(rect.defined_)
-    {
-    }
-    
     /// Construct from minimum and maximum vectors.
     Rect(const Vector2& min, const Vector2& max) :
         min_(min),
@@ -71,6 +63,22 @@ public:
     {
     }
 
+    /// Construct from a float array.
+    Rect(const float* data) :
+        min_(data[0], data[1]),
+        max_(data[2], data[3]),
+        defined_(true)
+    {
+    }
+    
+    /// Copy-construct from another rect.
+    Rect(const Rect& rect) :
+        min_(rect.min_),
+        max_(rect.max_),
+        defined_(rect.defined_)
+    {
+    }
+    
     /// Assign from another rect.
     Rect& operator = (const Rect& rhs)
     {

@@ -13,7 +13,7 @@ uniform float2 cWindWorldSpacing;
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
-    #ifdef LIGHTMAP
+    #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
     #ifdef NORMALMAP
@@ -29,15 +29,15 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float2 oTexCoord : TEXCOORD0,
+    #ifndef NORMALMAP
+        out float2 oTexCoord : TEXCOORD0,
+    #else
+        out float4 oTexCoord : TEXCOORD0,
+        out float4 oTangent : TEXCOORD3,
+    #endif
+    out float3 oNormal : TEXCOORD1,
+    out float4 oWorldPos : TEXCOORD2,
     #ifdef PERPIXEL
-        out float4 oLightVec : TEXCOORD1,
-        #ifndef NORMALMAP
-            out float3 oNormal : TEXCOORD2,
-        #endif
-        #ifdef SPECULAR
-            out float3 oEyeVec : TEXCOORD3,
-        #endif
         #ifdef SHADOW
             out float4 oShadowPos[NUMCASCADES] : TEXCOORD4,
         #endif
@@ -48,16 +48,14 @@ void VS(float4 iPos : POSITION,
             out float3 oCubeMaskVec : TEXCOORD5,
         #endif
     #else
-        out float4 oVertexLight : TEXCOORD1,
-        out float3 oNormal : TEXCOORD2,
-        #ifdef NORMALMAP
-            out float3 oTangent : TEXCOORD3,
-            out float3 oBitangent : TEXCOORD4,
-        #endif
+        out float3 oVertexLight : TEXCOORD4,
         out float4 oScreenPos : TEXCOORD5,
-    #endif
-    #ifdef HEIGHTFOG
-        out float3 oWorldPos : TEXCOORD8,
+        #ifdef ENVCUBEMAP
+            out float3 oReflectionVec : TEXCOORD6,
+        #endif
+        #if defined(LIGHTMAP) || defined(AO)
+            out float2 oTexCoord2 : TEXCOORD7,
+        #endif
     #endif
     out float4 oPos : POSITION)
 {
@@ -71,34 +69,22 @@ void VS(float4 iPos : POSITION,
     worldPos.z -= windStrength * cos(windPeriod);
 
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetTexCoord(iTexCoord);
-
-    #ifdef HEIGHTFOG
-        oWorldPos = worldPos;
-    #endif
-
-    #if defined(PERPIXEL) && defined(NORMALMAP)
-        float3 oNormal;
-        float3 oTangent;
-        float3 oBitangent;
-    #endif
-
     oNormal = GetWorldNormal(modelMatrix);
+    oWorldPos = float4(worldPos, GetDepth(oPos));
+
     #ifdef NORMALMAP
-        oTangent = GetWorldTangent(modelMatrix);
-        oBitangent = cross(oTangent, oNormal) * iTangent.w;
+        float3 tangent = GetWorldTangent(modelMatrix);
+        float3 bitangent = cross(tangent, oNormal) * iTangent.w;
+        oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
+        oTangent = float4(tangent, bitangent.z);
+    #else
+        oTexCoord = GetTexCoord(iTexCoord);
     #endif
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
-        float4 projWorldPos = float4(worldPos, 1.0);
+        float4 projWorldPos = float4(worldPos.xyz, 1.0);
 
-        #ifdef DIRLIGHT
-            oLightVec = float4(cLightDir, GetDepth(oPos));
-        #else
-            oLightVec = float4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(oPos));
-        #endif
-    
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
             GetShadowPos(projWorldPos, oShadowPos);
@@ -110,27 +96,28 @@ void VS(float4 iPos : POSITION,
         #endif
 
         #ifdef POINTLIGHT
-            oCubeMaskVec = mul(oLightVec.xyz, (float3x3)cLightMatrices[0]);
-        #endif
-
-        #ifdef NORMALMAP
-            float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
-            oLightVec.xyz = mul(tbn, oLightVec.xyz);
-            #ifdef SPECULAR
-                oEyeVec = mul(tbn, cCameraPos - worldPos);
-            #endif
-        #elif defined(SPECULAR)
-            oEyeVec = cCameraPos - worldPos;
+            oCubeMaskVec = mul(cLightPos.xyz - worldPos, (float3x3)cLightMatrices[0]);
         #endif
     #else
         // Ambient & per-vertex lighting
-        oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
+        #if defined(LIGHTMAP) || defined(AO)
+            // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
+            oVertexLight = float3(0.0, 0.0, 0.0);
+            oTexCoord2 = iTexCoord2;
+        #else
+            oVertexLight = GetAmbient(GetZonePos(worldPos));
+        #endif
 
         #ifdef NUMVERTEXLIGHTS
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-                oVertexLight.rgb += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
+                oVertexLight += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
         
         oScreenPos = GetScreenPos(oPos);
+
+        #ifdef ENVCUBEMAP
+            oReflectionVec = worldPos - cCameraPos;
+        #endif
     #endif
 }

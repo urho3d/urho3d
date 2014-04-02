@@ -2,7 +2,7 @@
     <pass name="base" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="NORMALMAP ENVCUBEMAP" />
     <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP" />
-    <pass name="material" vsdefines="ENVCUBEMAP" psdefines="MATERIAL ENVCUBEMAP" depthtest="equal" depthwrite="false" />
+    <pass name="material" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="MATERIAL NORMALMAP ENVCUBEMAP" depthtest="equal" depthwrite="false" />
     <pass name="deferred" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="DEFERRED NORMALMAP ENVCUBEMAP" />
     <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />

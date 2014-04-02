@@ -74,7 +74,7 @@ public:
     /// Save a UI layout to an XML file. Return true if successful.
     bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.
-    void SetClipBoardText(const String& text);
+    void SetClipboardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
     /// Set UI drag event start interval in seconds.
@@ -88,7 +88,7 @@ public:
     /// Set whether mouse wheel can control also a non-focused element.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     /// Set whether to use system clipboard. Default false.
-    void SetUseSystemClipBoard(bool enable);
+    void SetUseSystemClipboard(bool enable);
     /// Set whether to show the on-screen keyboard (if supported) when a %LineEdit is focused. Default true on mobile devices.
     void SetUseScreenKeyboard(bool enable);
     /// Set whether to use mutable (eraseable) glyphs to ensure a font face never expands to more than one texture. Default false.
@@ -115,7 +115,7 @@ public:
     /// Return currently dragged element.
     UIElement* GetDragElement() const;
     /// Return clipboard text.
-    const String& GetClipBoardText() const;
+    const String& GetClipboardText() const;
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
     /// Return UI drag start event interval in seconds.
@@ -129,7 +129,7 @@ public:
     /// Return whether mouse wheel can control also a non-focused element.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
     /// Return whether is using the system clipboard.
-    bool GetUseSystemClipBoard() const { return useSystemClipBoard_; }
+    bool GetUseSystemClipboard() const { return useSystemClipboard_; }
     /// Return whether focusing a %LineEdit will show the on-screen keyboard.
     bool GetUseScreenKeyboard() const { return useScreenKeyboard_; }
     /// Return whether is using mutable (eraseable) glyphs for fonts.
@@ -252,7 +252,7 @@ private:
     /// Flag to switch mouse wheel event to be sent to non-focused element at cursor.
     bool nonFocusedMouseWheel_;
     /// Flag for using operating system clipboard instead of internal.
-    bool useSystemClipBoard_;
+    bool useSystemClipboard_;
     /// Flag for showing the on-screen keyboard on focusing a %LineEdit.
     bool useScreenKeyboard_;
     /// Flag for using mutable (eraseable) font glyphs.

@@ -6,15 +6,9 @@
 #include "Fog.glsl"
 
 varying vec2 vTexCoord;
-#ifdef HEIGHTFOG
-    varying vec3 vWorldPos;
-#endif
+varying vec3 vNormal;
+varying vec4 vWorldPos;
 #ifdef PERPIXEL
-    varying vec4 vLightVec;
-    #ifdef SPECULAR
-        varying vec3 vEyeVec;
-    #endif
-    varying vec3 vNormal;
     #ifdef SHADOW
         varying vec4 vShadowPos[NUMCASCADES];
     #endif
@@ -25,9 +19,14 @@ varying vec2 vTexCoord;
         varying vec3 vCubeMaskVec;
     #endif
 #else
-    varying vec4 vVertexLight;
-    varying vec3 vNormal;
+    varying vec3 vVertexLight;
     varying vec4 vScreenPos;
+    #ifdef ENVCUBEMAP
+        varying vec3 vReflectionVec;
+    #endif
+    #if defined(LIGHTMAP) || defined(AO)
+        varying vec2 vTexCoord2;
+    #endif
 #endif
 
 #ifdef COMPILEPS
@@ -43,12 +42,9 @@ void VS()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = GetTexCoord(iTexCoord);
     vNormal = GetWorldNormal(modelMatrix);
-
-    #ifdef HEIGHTFOG
-        vWorldPos = worldPos;
-    #endif
+    vWorldPos = vec4(worldPos, GetDepth(gl_Position));
+    vTexCoord = GetTexCoord(iTexCoord);
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
@@ -64,29 +60,31 @@ void VS()
             // Spotlight projection: transform from world space to projector texture coordinates
             vSpotPos = cLightMatrices[0] * projWorldPos;
         #endif
-
+    
         #ifdef POINTLIGHT
-            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (cLightPos.xyz - worldPos);
-        #endif
-
-        #ifdef DIRLIGHT
-            vLightVec = vec4(cLightDir, GetDepth(gl_Position));
-        #else
-            vLightVec = vec4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(gl_Position));
-        #endif
-        #ifdef SPECULAR
-            vEyeVec = cCameraPos - worldPos;
+            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (worldPos - cLightPos.xyz);
         #endif
     #else
         // Ambient & per-vertex lighting
-        vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
-
+        #if defined(LIGHTMAP) || defined(AO)
+            // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
+            vVertexLight = vec3(0.0, 0.0, 0.0);
+            vTexCoord2 = iTexCoord2;
+        #else
+            vVertexLight = GetAmbient(GetZonePos(worldPos));
+        #endif
+        
         #ifdef NUMVERTEXLIGHTS
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-                vVertexLight.rgb += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
+                vVertexLight += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
         #endif
         
         vScreenPos = GetScreenPos(gl_Position);
+
+        #ifdef ENVCUBEMAP
+            vReflectionVec = worldPos - cCameraPos;
+        #endif
     #endif
 }
 
@@ -103,21 +101,28 @@ void PS()
     // Get material specular albedo
     vec3 specColor = cMatSpecColor.rgb;
 
+    // Get normal
+    vec3 normal = normalize(vNormal);
+
+    // Get fog factor
+    #ifdef HEIGHTFOG
+        float fogFactor = GetHeightFogFactor(vWorldPos.w, vWorldPos.y);
+    #else
+        float fogFactor = GetFogFactor(vWorldPos.w);
+    #endif
+
     #if defined(PERPIXEL)
         // Per-pixel forward lighting
         vec3 lightColor;
         vec3 lightDir;
         vec3 finalColor;
-        float diff;
-
-        vec3 normal = normalize(vNormal);
-
-        diff = GetDiffuse(normal, vLightVec.xyz, lightDir);
+        
+        float diff = GetDiffuse(normal, vWorldPos.xyz, lightDir);
 
         #ifdef SHADOW
-            diff *= GetShadow(vShadowPos, vLightVec.w);
+            diff *= GetShadow(vShadowPos, vWorldPos.w);
         #endif
-
+    
         #if defined(SPOTLIGHT)
             lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
         #elif defined(CUBEMASK)
@@ -125,54 +130,39 @@ void PS()
         #else
             lightColor = cLightColor.rgb;
         #endif
-
+    
         #ifdef SPECULAR
-            float spec = GetSpecular(normal, vEyeVec, lightDir, cMatSpecColor.a);
+            float spec = GetSpecular(normal, cCameraPosPS - vWorldPos.xyz, lightDir, cMatSpecColor.a);
             finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
         #else
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
 
-        #ifdef HEIGHTFOG
-            float fogFactor = GetHeightFogFactor(vLightVec.w, vWorldPos.y);
-        #else
-            float fogFactor = GetFogFactor(vLightVec.w);
-        #endif
-
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
+            finalColor += cMatEmissiveColor;
             gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
             gl_FragColor = vec4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
-        vec3 normal = vNormal;
-
         float specPower = cMatSpecColor.a / 255.0;
 
         gl_FragData[0] = vec4(normal * 0.5 + 0.5, specPower);
-        gl_FragData[1] = vec4(EncodeDepth(vVertexLight.a), 0.0);
+        gl_FragData[1] = vec4(EncodeDepth(vWorldPos.w), 0.0);
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
-        vec3 normal = vNormal;
-
         float specIntensity = specColor.g;
         float specPower = cMatSpecColor.a / 255.0;
 
-        #ifdef HEIGHTFOG
-            float fogFactor = GetHeightFogFactor(vVertexLight.a, vWorldPos.y);
-        #else
-            float fogFactor = GetFogFactor(vVertexLight.a);
-        #endif
-
-        gl_FragData[0] = vec4(GetFog(vVertexLight.rgb * diffColor.rgb, fogFactor), 1.0);
+        gl_FragData[0] = vec4(GetFog(vVertexLight * diffColor.rgb, fogFactor), 1.0);
         gl_FragData[1] = fogFactor * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
-        gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
+        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), 0.0);
     #else
         // Ambient & per-vertex lighting
-        vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
+        vec3 finalColor = vVertexLight * diffColor.rgb;
 
         #ifdef MATERIAL
             // Add light pre-pass accumulation result
@@ -181,12 +171,6 @@ void PS()
             vec3 lightSpecColor = lightInput.a * lightInput.rgb / max(GetIntensity(lightInput.rgb), 0.001);
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
-        #endif
-
-        #ifdef HEIGHTFOG
-            float fogFactor = GetHeightFogFactor(vVertexLight.a, vWorldPos.y);
-        #else
-            float fogFactor = GetFogFactor(vVertexLight.a);
         #endif
 
         gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);

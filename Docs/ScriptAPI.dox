@@ -2496,6 +2496,9 @@ Methods:
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
 - uint ReadNetID()
 - Quaternion ReadPackedQuaternion()
 - Vector3 ReadPackedVector3(float)
@@ -2869,6 +2872,9 @@ Methods:
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
 - uint ReadNetID()
 - Quaternion ReadPackedQuaternion()
 - Vector3 ReadPackedVector3(float)
@@ -2899,6 +2905,9 @@ Methods:
 - bool WriteIntRect(const IntRect&)
 - bool WriteIntVector2(const IntVector2&)
 - bool WriteLine(const String&)
+- bool WriteMatrix3(const Matrix3&)
+- bool WriteMatrix3x4(const Matrix3x4&)
+- bool WriteMatrix4(const Matrix4&)
 - bool WriteNetID(uint)
 - bool WritePackedQuaternion(const Quaternion&)
 - bool WritePackedVector3(const Vector3&, float)
@@ -3126,6 +3135,9 @@ Methods:
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
 - uint ReadNetID()
 - Quaternion ReadPackedQuaternion()
 - Vector3 ReadPackedVector3(float)
@@ -3348,6 +3360,7 @@ Properties:
 - bool negative // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- int numShadowSplits // readonly
 - bool occludee
 - bool occluder
 - bool perVertex
@@ -3763,6 +3776,7 @@ Methods:
 - Matrix3 Scaled(const Vector3&) const
 - void SetScale(const Vector3&)
 - void SetScale(float)
+- String ToString() const
 - Matrix3 Transpose() const
 
 Properties:
@@ -3794,6 +3808,7 @@ Methods:
 - void SetTranslation(const Vector3&)
 - Matrix3 ToMatrix3() const
 - Matrix4 ToMatrix4() const
+- String ToString() const
 - Vector3 Translation() const
 
 Properties:
@@ -3827,6 +3842,7 @@ Methods:
 - void SetScale(float)
 - void SetTranslation(const Vector3&)
 - Matrix3 ToMatrix3() const
+- String ToString() const
 - Vector3 Translation() const
 - Matrix4 Transpose() const
 
@@ -4257,7 +4273,7 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
-- void LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ))
+- bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ))
 - void Pitch(float, bool = false)
 - void Remove()
 - void RemoveAllChildren()
@@ -4654,6 +4670,7 @@ Properties:
 - String pixelShader
 - String pixelShaderDefines
 - int refs // readonly
+- bool sm3
 - String vertexShader
 - String vertexShaderDefines
 - int weakRefs // readonly
@@ -4846,7 +4863,7 @@ Methods:
 - void FromAngleAxis(float, const Vector3&)
 - void FromAxes(const Vector3&, const Vector3&, const Vector3&)
 - void FromEulerAngles(float, float, float)
-- void FromLookRotation(const Vector3&, const Vector3&)
+- bool FromLookRotation(const Vector3&, const Vector3&)
 - void FromRotationTo(const Vector3&, const Vector3&)
 - Quaternion Inverse() const
 - bool IsNaN() const
@@ -5055,7 +5072,6 @@ Properties:
 - int materialQuality
 - int maxInstanceTriangles
 - int maxOccluderTriangles
-- int maxShadowCascades
 - int maxShadowMaps
 - int maxSortedInstances
 - int minInstances
@@ -5345,7 +5361,7 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
-- void LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ))
+- bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ))
 - void Pitch(float, bool = false)
 - void RegisterVar(const String&)
 - void Remove()
@@ -5859,6 +5875,9 @@ Methods:
 - bool WriteIntRect(const IntRect&)
 - bool WriteIntVector2(const IntVector2&)
 - bool WriteLine(const String&)
+- bool WriteMatrix3(const Matrix3&)
+- bool WriteMatrix3x4(const Matrix3x4&)
+- bool WriteMatrix4(const Matrix4&)
 - bool WriteNetID(uint)
 - bool WritePackedQuaternion(const Quaternion&)
 - bool WritePackedVector3(const Vector3&, float)
@@ -6795,6 +6814,9 @@ Methods:
 - IntRect ToIntRect() const
 - IntVector2 ToIntVector2() const
 - String ToLower() const
+- Matrix3 ToMatrix3() const
+- Matrix3x4 ToMatrix3x4() const
+- Matrix4 ToMatrix4() const
 - Quaternion ToQuaternion() const
 - uint ToUInt() const
 - String ToUpper() const
@@ -7578,7 +7600,7 @@ Properties:
 - String typeName // readonly
 - bool useMutableGlyphs
 - bool useScreenKeyboard
-- bool useSystemClipBoard
+- bool useSystemClipboard
 - int weakRefs // readonly
 
 
@@ -7741,6 +7763,9 @@ Methods:
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
+- const Matrix3& GetMatrix3() const
+- const Matrix3x4& GetMatrix3x4() const
+- const Matrix4& GetMatrix4() const
 - const Quaternion& GetQuaternion() const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
@@ -7858,6 +7883,9 @@ Methods:
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
 - uint ReadNetID()
 - Quaternion ReadPackedQuaternion()
 - Vector3 ReadPackedVector3(float)
@@ -7889,6 +7917,9 @@ Methods:
 - bool WriteIntRect(const IntRect&)
 - bool WriteIntVector2(const IntVector2&)
 - bool WriteLine(const String&)
+- bool WriteMatrix3(const Matrix3&)
+- bool WriteMatrix3x4(const Matrix3x4&)
+- bool WriteMatrix4(const Matrix4&)
 - bool WriteNetID(uint)
 - bool WritePackedQuaternion(const Quaternion&)
 - bool WritePackedVector3(const Vector3&, float)
@@ -8248,6 +8279,9 @@ Methods:
 - Color GetColor(const String&) const
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
+- Matrix3 GetMatrix3(const String&) const
+- Matrix3x4 GetMatrix3x4(const String&) const
+- Matrix4 GetMatrix4(const String&) const
 - XMLElement GetNext(const String& = String ( )) const
 - Quaternion GetQuaternion(const String&) const
 - ResourceRef GetResourceRef() const
@@ -8278,6 +8312,9 @@ Methods:
 - bool SetColor(const String&, const Color&)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
+- bool SetMatrix3(const String&, const Matrix3&)
+- bool SetMatrix3x4(const String&, const Matrix3x4&)
+- bool SetMatrix4(const String&, const Matrix4&)
 - bool SetQuaternion(const String&, const Quaternion&)
 - bool SetResourceRef(const String&, const ResourceRef&)
 - bool SetResourceRefList(const String&, const ResourceRefList&)
@@ -8775,6 +8812,9 @@ Properties:
 - VAR_INTRECT
 - VAR_INTVECTOR2
 - VAR_PTR
+- VAR_MATRIX3
+- VAR_MATRIX3X4
+- VAR_MATRIX4
 
 
 ### VerticalAlignment

@@ -21,6 +21,9 @@ enum VariantType
     VAR_INTRECT,
     VAR_INTVECTOR2,
     VAR_PTR,
+    VAR_MATRIX3,
+    VAR_MATRIX3X4,
+    VAR_MATRIX4,
     MAX_VAR_TYPES
 };
 
@@ -31,7 +34,7 @@ struct ResourceRef
     ResourceRef(ShortStringHash type, String name);
     ResourceRef(const ResourceRef& rhs);
     ~ResourceRef();
-    
+
     ShortStringHash type_ @ type;
     String name_ @ name;
 
@@ -43,7 +46,7 @@ struct ResourceRefList
     ResourceRefList();
     ResourceRefList(ShortStringHash type);
     ~ResourceRefList();
-    
+
     ShortStringHash type_ @ type;
 
     bool operator == (const ResourceRefList& rhs) const;
@@ -69,6 +72,9 @@ class Variant
     Variant(const ResourceRefList& value);
     Variant(const IntRect& value);
     Variant(const IntVector2& value);
+    Variant(const Matrix3& value);
+    Variant(const Matrix3x4& value);
+    Variant(const Matrix4& value);
     Variant(const String type, const String value);
     Variant(VariantType type, const String value);
     Variant(VariantType type, const char* value);
@@ -94,6 +100,9 @@ class Variant
     bool operator == (const IntVector2& rhs) const;
     bool operator == (const StringHash& rhs) const;
     bool operator == (const ShortStringHash& rhs) const;
+    bool operator == (const Matrix3& rhs) const;
+    bool operator == (const Matrix3x4& rhs) const;
+    bool operator == (const Matrix4& rhs) const;
 
     tolua_outside void VariantSetInt @ SetInt(int value);
     tolua_outside void VariantSetUint @ SetUint(unsigned value);
@@ -112,7 +121,10 @@ class Variant
     tolua_outside void VariantSetResourceRefList @ SetResourceRefList(const ResourceRefList& value);
     tolua_outside void VariantSetIntRect @ SetIntRect(const IntRect& value);
     tolua_outside void VariantSetIntVector2 @ SetIntVector2(const IntVector2& value);
-    
+    tolua_outside void VariantSetMatrix3 @ SetMatrix3(const Matrix3& value);
+    tolua_outside void VariantSetMatrix3x4 @ SetMatrix3x4(const Matrix3x4& value);
+    tolua_outside void VariantSetMatrix4 @ SetMatrix4(const Matrix4& value);
+
     int GetInt() const;
     int GetUInt() const;
     StringHash GetStringHash();
@@ -130,13 +142,16 @@ class Variant
     const ResourceRefList& GetResourceRefList() const;
     const IntRect& GetIntRect() const;
     const IntVector2& GetIntVector2() const;
+    const Matrix3& GetMatrix3() const;
+    const Matrix3x4& GetMatrix3x4() const;
+    const Matrix4& GetMatrix4() const;
 
     VariantType GetType() const;
     String GetTypeName() const;
     String ToString() const;
     bool IsZero() const;
     bool IsEmpty() const;
-    
+
     tolua_readonly tolua_property__get_set VariantType type;
     tolua_readonly tolua_property__get_set String typeName;
     tolua_readonly tolua_property__is_set bool zero;
@@ -147,7 +162,7 @@ class VariantMap
 {
     VariantMap();
     ~VariantMap();
-    
+
     tolua_outside void VariantMapSetInt @ SetInt(const String key, int value);
     tolua_outside void VariantMapSetUInt @ SetUInt(const String key, unsigned value);
     tolua_outside void VariantMapSetStringHash @ SetStringHash(const String key, const StringHash& value);
@@ -166,6 +181,9 @@ class VariantMap
     tolua_outside void VariantMapSetIntRect @ SetIntRect(const String key, const IntRect value);
     tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const String key, const IntVector2 value);
     tolua_outside void VariantMapSetPtr @ SetPtr(const String key, void* value);
+    tolua_outside void VariantMapSetMatrix3 @ SetMatrix3(const String key, const Matrix3 value);
+    tolua_outside void VariantMapSetMatrix3x4 @ SetMatrix3x4(const String key, const Matrix3x4 value);
+    tolua_outside void VariantMapSetMatrix4 @ SetMatrix4(const String key, const Matrix4 value);
 
     tolua_outside int VariantMapGetInt @ GetInt(const String key);
     tolua_outside int VariantMapGetUInt @ GetUInt(const String key);
@@ -185,6 +203,9 @@ class VariantMap
     tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const String key);
     tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const String key);
     tolua_outside const void* VariantMapGetPtr @ GetPtr(const String type, const String key);
+    tolua_outside const Matrix3& VariantMapGetMatrix3 @ GetMatrix3(const String key);
+    tolua_outside const Matrix3x4& VariantMapGetMatrix3x4 @ GetMatrix3x4(const String key);
+    tolua_outside const Matrix4& VariantMapGetMatrix4 @ GetMatrix4(const String key);
 };
 
 ${
@@ -269,6 +290,21 @@ static void VariantSetIntRect(Variant* variant, const IntRect& value)
 }
 
 static void VariantSetIntVector2(Variant* variant, const IntVector2& value)
+{
+    *variant = value;
+}
+
+static void VariantSetMatrix3(Variant* variant, const Matrix3& value)
+{
+    *variant = value;
+}
+
+static void VariantSetMatrix3x4(Variant* variant, const Matrix3x4& value)
+{
+    *variant = value;
+}
+
+static void VariantSetMatrix4(Variant* variant, const Matrix4& value)
 {
     *variant = value;
 }
@@ -368,6 +404,21 @@ static void VariantMapSetPtr(VariantMap* vmap, const String& key, void* value)
     (*vmap)[ShortStringHash(key)] = value;
 }
 
+static void VariantMapSetMatrix3(VariantMap* vmap, const String& key, const Matrix3& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+static void VariantMapSetMatrix3x4(VariantMap* vmap, const String& key, const Matrix3x4& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+static void VariantMapSetMatrix4(VariantMap* vmap, const String& key, const Matrix4& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
 static const Variant& FindVariant(const VariantMap* vmap, const String& key)
 {
     VariantMap::ConstIterator i = vmap->Find(ShortStringHash(key));
@@ -458,6 +509,21 @@ static const IntRect& VariantMapGetIntRect(const VariantMap* vmap, const String&
 static const IntVector2& VariantMapGetIntVector2(const VariantMap* vmap, const String& key)
 {
     return FindVariant(vmap, key).GetIntVector2();
+}
+
+static const Matrix3& VariantMapGetMatrix3(const VariantMap* vmap, const String& key)
+{
+    return FindVariant(vmap, key).GetMatrix3();
+}
+
+static const Matrix3x4& VariantMapGetMatrix3x4(const VariantMap* vmap, const String& key)
+{
+    return FindVariant(vmap, key).GetMatrix3x4();
+}
+
+static const Matrix4& VariantMapGetMatrix4(const VariantMap* vmap, const String& key)
+{
+    return FindVariant(vmap, key).GetMatrix4();
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_VariantMap_SetPtr00

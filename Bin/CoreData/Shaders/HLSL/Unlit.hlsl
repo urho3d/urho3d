@@ -19,10 +19,7 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
-    out float oDepth : TEXCOORD1,
-    #ifdef HEIGHTFOG
-        out float3 oWorldPos : TEXCOORD8,
-    #endif
+    out float4 oWorldPos : TEXCOORD2,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
@@ -32,11 +29,7 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
-    oDepth = GetDepth(oPos);
-
-    #ifdef HEIGHTFOG
-        oWorldPos = worldPos;
-    #endif
+    oWorldPos = float4(worldPos, GetDepth(oPos));
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -44,10 +37,7 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
-    float iDepth : TEXCOORD1,
-    #ifdef HEIGHTFOG
-        float3 iWorldPos : TEXCOORD8,
-    #endif
+    float4 iWorldPos: TEXCOORD2,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
@@ -61,6 +51,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
     out float4 oColor : COLOR0)
 {
+    // Get material diffuse albedo
     #ifdef DIFFMAP
         float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
         #ifdef ALPHAMASK
@@ -75,10 +66,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
+    // Get fog factor
     #ifdef HEIGHTFOG
-        float fogFactor = GetHeightFogFactor(iDepth, iWorldPos.y);
+        float fogFactor = GetHeightFogFactor(iWorldPos.w, iWorldPos.y);
     #else
-        float fogFactor = GetFogFactor(iDepth);
+        float fogFactor = GetFogFactor(iWorldPos.w);
     #endif
 
     #if defined(PREPASS)

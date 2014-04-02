@@ -274,6 +274,8 @@ public:
     
     /// Return float data.
     const float* Data() const { return &m00_; }
+    /// Return as string.
+    String ToString() const;
     
     float m00_;
     float m01_;

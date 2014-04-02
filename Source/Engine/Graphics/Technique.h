@@ -58,6 +58,8 @@ public:
     void SetDepthWrite(bool enable);
     /// Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
     void SetAlphaMask(bool enable);
+    /// Set whether requires %Shader %Model 3.
+    void SetIsSM3(bool enable);
     /// Set vertex shader name.
     void SetVertexShader(const String& name);
     /// Set pixel shader name.
@@ -85,6 +87,8 @@ public:
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return alpha masking hint.
     bool GetAlphaMask() const { return alphaMask_; }
+    /// Return whether requires %Shader %Model 3.
+    bool IsSM3() const { return isSM3_; }
     /// Return vertex shader name.
     const String& GetVertexShader() const { return vertexShaderName_; }
     /// Return pixel shader name.
@@ -113,6 +117,8 @@ private:
     bool depthWrite_;
     /// Alpha masking hint.
     bool alphaMask_;
+    /// Require %Shader %Model 3 flag.
+    bool isSM3_;
     /// Vertex shader name.
     String vertexShaderName_;
     /// Pixel shader name.
@@ -166,9 +172,19 @@ public:
         return passPtr ? passPtr->Get() : 0;
     }
     
+    /// Return a pass that is supported for rendering, or null if not found.
+    Pass* GetSupportedPass(StringHash type) const
+    {
+        SharedPtr<Pass>* passPtr = passes_.Find(type.Value());
+        Pass* pass = passPtr ? passPtr->Get() : 0;
+        return pass && (!pass->IsSM3() || sm3Support_) ? pass : 0;
+    }
+    
 private:
     /// Require %Shader %Model 3 flag.
     bool isSM3_;
+    /// Cached %Shader %Model 3 support flag.
+    bool sm3Support_;
     /// Passes.
     HashTable<SharedPtr<Pass>, 16> passes_;
 };

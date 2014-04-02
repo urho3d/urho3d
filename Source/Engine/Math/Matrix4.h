@@ -444,13 +444,15 @@ public:
         return true;
     }
     
-    /// Return decomposition to translation, rotation and scale
+    /// Return decomposition to translation, rotation and scale.
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-    /// Return inverse
+    /// Return inverse.
     Matrix4 Inverse() const;
     
     /// Return float data
     const float* Data() const { return &m00_; }
+    /// Return as string.
+    String ToString() const;
     
     float m00_;
     float m01_;

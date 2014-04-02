@@ -9,6 +9,8 @@ enum PassLightingMode
 
 class Pass : public RefCounted
 {
+    bool IsSM3() const;
+    tolua_readonly tolua_property__is_set bool SM3;
 };
 
 class Technique : public Resource

@@ -36,6 +36,6 @@ if not "%1" == "" (
     goto loop
 )
 echo on
-set "OPT="
+@set "OPT="
 cmake -E chdir Build cmake %OPT% -G "Visual Studio %version%%arch%" %* ..\Source
 @popd

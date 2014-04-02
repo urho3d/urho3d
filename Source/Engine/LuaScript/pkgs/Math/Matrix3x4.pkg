@@ -43,6 +43,8 @@ class Matrix3x4
 
     Matrix3x4 Inverse() const;
     
+    String ToString() const;
+    
     float m00_ @ m00;
     float m01_ @ m01;
     float m02_ @ m02;

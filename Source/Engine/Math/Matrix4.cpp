@@ -23,6 +23,10 @@
 #include "Precompiled.h"
 #include "Matrix4.h"
 
+#include <cstdio>
+
+#include "DebugNew.h"
+
 namespace Urho3D
 {
 
@@ -103,6 +107,14 @@ Matrix4 Matrix4::Inverse() const
         i10, i11, i12, i13,
         i20, i21, i22, i23,
         i30, i31, i32, i33);
+}
+
+String Matrix4::ToString() const
+{
+    char tempBuffer[MATRIX_CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g", m00_, m01_, m02_, m03_, m10_, m11_, m12_, m13_, m20_,
+        m21_, m22_, m23_, m30_, m31_, m32_, m33_);
+    return String(tempBuffer);
 }
 
 }

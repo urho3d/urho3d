@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Graphics.h"
 #include "Log.h"
 #include "Technique.h"
 #include "Profiler.h"
@@ -75,7 +76,8 @@ Pass::Pass(StringHash type) :
     lightingMode_(LIGHTING_UNLIT),
     shadersLoadedFrameNumber_(0),
     depthWrite_(true),
-    alphaMask_(false)
+    alphaMask_(false),
+    isSM3_(false)
 {
     // Guess default lighting mode from pass name
     if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
@@ -111,6 +113,11 @@ void Pass::SetDepthWrite(bool enable)
 void Pass::SetAlphaMask(bool enable)
 {
     alphaMask_ = enable;
+}
+
+void Pass::SetIsSM3(bool enable)
+{
+    isSM3_ = enable;
 }
 
 void Pass::SetVertexShader(const String& name)
@@ -152,6 +159,8 @@ Technique::Technique(Context* context) :
     Resource(context),
     isSM3_(false)
 {
+    Graphics* graphics = GetSubsystem<Graphics>();
+    sm3Support_ = graphics ? graphics->GetSM3Support() : true;
 }
 
 Technique::~Technique()
@@ -199,8 +208,12 @@ bool Technique::Load(Deserializer& source)
         if (passElem.HasAttribute("name"))
         {
             StringHash nameHash(passElem.GetAttribute("name"));
+            
             Pass* newPass = CreatePass(nameHash);
             ++numPasses;
+            
+            if (passElem.HasAttribute("sm3"))
+                newPass->SetIsSM3(passElem.GetBool("sm3"));
             
             // Append global defines only when pass does not redefine the shader
             if (passElem.HasAttribute("vs"))

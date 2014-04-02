@@ -264,6 +264,9 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteVector4(const Vector4&in)", asMETHODPR(T, WriteVector4, (const Vector4&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteQuaternion(const Quaternion&in)", asMETHODPR(T, WriteQuaternion, (const Quaternion&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WritePackedQuaternion(const Quaternion&in)", asMETHODPR(T, WritePackedQuaternion, (const Quaternion&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteMatrix3(const Matrix3&in)", asMETHODPR(T, WriteMatrix3, (const Matrix3&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteMatrix3x4(const Matrix3x4&in)", asMETHODPR(T, WriteMatrix3x4, (const Matrix3x4&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteMatrix4(const Matrix4&in)", asMETHODPR(T, WriteMatrix4, (const Matrix4&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteColor(const Color&in)", asMETHODPR(T, WriteColor, (const Color&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteBoundingBox(const BoundingBox&in)", asMETHODPR(T, WriteBoundingBox, (const BoundingBox&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteString(const String&in)", asMETHODPR(T, WriteString, (const String&), bool), asCALL_THISCALL);
@@ -306,6 +309,9 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "Vector4 ReadVector4()", asMETHODPR(T, ReadVector4, (), Vector4), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion ReadQuaternion()", asMETHODPR(T, ReadQuaternion, (), Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion ReadPackedQuaternion()", asMETHODPR(T, ReadPackedQuaternion, (), Quaternion), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Matrix3 ReadMatrix3()", asMETHODPR(T, ReadMatrix3, (), Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Matrix3x4 ReadMatrix3x4()", asMETHODPR(T, ReadMatrix3x4, (), Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Matrix4 ReadMatrix4()", asMETHODPR(T, ReadMatrix4, (), Matrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Color ReadColor()", asMETHODPR(T, ReadColor, (), Color), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "BoundingBox ReadBoundingBox()", asMETHODPR(T, ReadBoundingBox, (), BoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "String ReadString()", asMETHODPR(T, ReadString, (), String), asCALL_THISCALL);
@@ -598,7 +604,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Pitch(float, bool fixedAxis = false)", asMETHOD(T, Pitch), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Yaw(float, bool fixedAxis = false)", asMETHOD(T, Yaw), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Roll(float, bool fixedAxis = false)", asMETHOD(T, Roll), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void LookAt(const Vector3&in, const Vector3&in up = Vector3(0, 1, 0))", asMETHOD(T, LookAt), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LookAt(const Vector3&in, const Vector3&in up = Vector3(0, 1, 0))", asMETHOD(T, LookAt), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = String(), CreateMode mode = REPLICATED, uint id = 0)", asMETHODPR(T, CreateChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
