@@ -45,25 +45,12 @@ void ObjectAnimation::RegisterObject(Context* context)
     context->RegisterFactory<ObjectAnimation>();
 }
 
-bool ObjectAnimation::Load(Deserializer& source)
-{
-    // Not implement
-    return false;
-}
-
-bool ObjectAnimation::Save(Serializer& dest) const
-{
-    // Not implement
-    return false;
-}
-
 bool ObjectAnimation::LoadXML(const XMLElement& source)
 {
-    if (source.GetName() != "ObjectAnimation")
-        return false;
+    attributeAnimations_.Clear();
     
     XMLElement animElem;
-    animElem = source.GetChild("AttributeAnimation");
+    animElem = source.GetChild("attributeAnimation");
     while (animElem)
     {
         String name = animElem.GetAttribute("name");
@@ -74,7 +61,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
 
         AddAttributeAnimation(name, animation);
 
-        animElem = animElem.GetNext("AttributeAnimation");
+        animElem = animElem.GetNext("attributeAnimation");
     }
 
     return true;
@@ -82,12 +69,9 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
 
 bool ObjectAnimation::SaveXML(XMLElement& dest) const
 {
-    if (dest.GetName() != "ObjectAnimation")
-        return false;
-
     for (HashMap<String, SharedPtr<AttributeAnimation> >::ConstIterator i = attributeAnimations_.Begin(); i != attributeAnimations_.End(); ++i)
     {
-        XMLElement animElem = dest.CreateChild("AttributeAnimation");
+        XMLElement animElem = dest.CreateChild("attributeAnimation");
         animElem.SetAttribute("name", i->first_);
 
         if (!i->second_->SaveXML(animElem))

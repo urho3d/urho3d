@@ -45,10 +45,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Load from binary data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
-    /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
     /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.

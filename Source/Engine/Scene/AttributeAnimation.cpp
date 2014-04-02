@@ -52,58 +52,33 @@ void AttributeAnimation::RegisterObject(Context* context)
     context->RegisterFactory<AttributeAnimation>();
 }
 
-bool AttributeAnimation::Load(Deserializer& source)
-{
-    keyFrames_.Clear();
-
-    cycleMode_ = (CycleMode)source.ReadInt();
-    valueType_ = (VariantType)source.ReadInt();
-    unsigned count = source.ReadUInt();
-
-    for (unsigned i = 0; i < count; ++i)
-    {
-        float time = source.ReadFloat();
-        Variant value = source.ReadVariant();
-        SetKeyFrame(time, value);
-    }
-
-    return true;
-}
-
-bool AttributeAnimation::Save(Serializer& dest) const
-{
-    dest.WriteInt((int)cycleMode_);
-    dest.WriteInt((int)valueType_);
-    dest.WriteUInt(keyFrames_.Size());
-
-    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
-    {
-        const AttributeKeyFrame& keyFrame = keyFrames_[i];
-        dest.WriteFloat(keyFrame.time_);
-        dest.WriteVariant(keyFrame.value_);
-    }
-
-    return true;
-}
-
 bool AttributeAnimation::LoadXML(const XMLElement& source)
 {
-    if (source.GetName() != "AttributeAnimation")
-        return false;
-    
-    keyFrames_.Clear();
+    valueType_ = VAR_NONE;
+    eventFrames_.Clear();
 
-    cycleMode_ = (CycleMode)source.GetInt("cycle mode");
-    valueType_ = (VariantType)source.GetInt("value type");
+    cycleMode_ = (CycleMode)source.GetInt("cycleMode");
+    SetValueType((VariantType)source.GetInt("valueType"));
 
-    XMLElement keyFrameEleme = source.GetChild("KeyFrame");
+    XMLElement keyFrameEleme = source.GetChild("keyFrame");
     while (keyFrameEleme)
     {
         float time = keyFrameEleme.GetFloat("time");
         Variant value(valueType_, keyFrameEleme.GetAttribute("value"));
         SetKeyFrame(time, value);
 
-        keyFrameEleme = keyFrameEleme.GetNext("KeyFrame");
+        keyFrameEleme = keyFrameEleme.GetNext("keyFrame");
+    }
+
+    XMLElement eventFrameElem = source.GetChild("eventFrame");
+    while (eventFrameElem)
+    {
+        float time = eventFrameElem.GetFloat("time");
+        unsigned eventType = eventFrameElem.GetUInt("eventType");
+        VariantMap eventData = eventFrameElem.GetChild("eventData").GetVariantMap();
+        
+        SetEventFrame(time, StringHash(eventType), eventData);
+        eventFrameElem = eventFrameElem.GetNext("eventFrame");
     }
 
     return true;
@@ -111,18 +86,24 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
-    if (dest.GetName() != "AttributeAnimation")
-        return false;
-
-    dest.SetInt("cycle mode", (int)cycleMode_);
-    dest.SetInt("value type", (int)valueType_);
+    dest.SetInt("cycleMode", (int)cycleMode_);
+    dest.SetInt("valueType", (int)valueType_);
 
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {
         const AttributeKeyFrame& keyFrame = keyFrames_[i];
-        XMLElement keyFrameEleme = dest.CreateChild("KeyFrame");
+        XMLElement keyFrameEleme = dest.CreateChild("keyFrame");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
         keyFrameEleme.SetAttribute("value", keyFrame.value_.ToString());
+    }
+
+    for (unsigned i = 0; i < eventFrames_.Size(); ++i)
+    {
+        const AttributeEventFrame& eventFrame = eventFrames_[i];
+        XMLElement eventFrameElem = dest.CreateChild("eventFrame");
+        eventFrameElem.SetFloat("time", eventFrame.time_);
+        eventFrameElem.SetUInt("eventType", eventFrame.eventType_.Value());
+        eventFrameElem.CreateChild("eventData").SetVariantMap(eventFrame.eventData_);
     }
 
     return true;
