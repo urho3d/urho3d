@@ -69,7 +69,7 @@ void CreateUI()
     CreateEditorSettingsDialog();
     CreateEditorPreferencesDialog();
     CreateMaterialEditor();
-	CreateSpawnEditor();
+    CreateSpawnEditor();
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
@@ -406,7 +406,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Hierarchy", @ShowHierarchyWindow, 'H', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Material editor", @ShowMaterialEditor));
-		popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
+        popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
         CreateChildDivider(popup);

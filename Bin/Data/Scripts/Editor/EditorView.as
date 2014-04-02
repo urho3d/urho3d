@@ -1386,17 +1386,15 @@ void ViewRaycast(bool mouseClick)
     if (ui.HasModalElement())
         return;
 
-	IntVector2 pos = ui.cursorPosition;
+    IntVector2 pos = ui.cursorPosition;
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
-	if(editMode==EDIT_SPAWN)
-	{
-		if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
-			SpawnObject();
-		return;
-	}
-	
-	
-	
+    if(editMode==EDIT_SPAWN)
+    {
+        if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
+            SpawnObject();
+        return;
+    }
+
     // Do not raycast / change selection if hovering over the gizmo
     if (IsGizmoSelected())
         return;
