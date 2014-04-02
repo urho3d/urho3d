@@ -14,7 +14,7 @@ class LuaScriptInstance : public Component
     void ScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* sender);
     const String GetScriptFileName() const;
     const String GetScriptObjectType() const;
-    
+
     tolua_property__get_set const String scriptFileName;
     tolua_property__get_set const String scriptObjectType;
 };
@@ -33,7 +33,7 @@ function LuaScriptObject:GetNode()
 end
 
 function LuaScriptObject:SubscribeToEvent(param1, param2, param3)
-    local instance = self.instance    
+    local instance = self.instance
     if instance == nil then
         return
     end
@@ -90,11 +90,23 @@ function CreateScriptObjectInstance(object, instance)
     instance.object = o
     o.instance = instance
     o.node = instance:GetNode()
-    
+
+    local existKeys = {}
+    for k, v in pairs(o) do
+        existKeys[k] = true
+    end
+
     -- Call start function
     o:Start()
+
+    local attrNames = {}
+    for k, v in pairs(o) do
+        if existKeys[k] == nil then
+            table.insert(attrNames, k)
+        end
+    end
     
-    return o
+    return attrNames, o
 end
 
 function DestroyScriptObjectInstance(instance)

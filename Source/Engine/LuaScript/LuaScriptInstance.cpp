@@ -147,6 +147,8 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
 
     ReleaseObject();
 
+    int top = lua_gettop(luaState_);
+
     WeakPtr<LuaFunction> function = luaScript_->GetFunction("CreateScriptObjectInstance");
     if (!function || !function->BeginCall())
         return;
@@ -154,11 +156,37 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
     function->PushLuaTable(scriptObjectType);
     function->PushUserType((void*)this, "LuaScriptInstance");
     
-    if (!function->EndCall(1))
+    // Return script object and attribute names
+    if (!function->EndCall(2))
         return;
 
     scriptObjectType_ = scriptObjectType;
     scriptObjectRef_ = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+    
+    // Get all attribute names
+    Vector<String> attributeNames;
+    if (lua_istable(luaState_, -1))
+    {
+        int length = lua_objlen(luaState_, -1);
+        for (int i = 1; i <= length; ++i)
+        {
+            lua_pushinteger(luaState_, i);
+            lua_gettable(luaState_, -2);
+
+            if (!lua_isstring(luaState_, -1))
+            {
+                lua_pop(luaState_, 1);
+                continue;
+            }
+
+            String name = lua_tostring(luaState_, -1);
+            attributeNames.Push(name);
+
+            lua_pop(luaState_, 1);
+        }
+    }
+
+    lua_settop(luaState_, top);
 
     // Find script object method refs
     FindScriptObjectMethodRefs();
