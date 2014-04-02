@@ -1582,34 +1582,6 @@ UIElement* UIElement::GetElementEventSender() const
     return element;
 }
 
-
-void UIElement::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
-{
-    Animatable::OnObjectAnimationAdded(objectAnimation);
-
-    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
-    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
-    {
-        UIElement* child = GetChild(i->first_);
-        if (child)
-            child->SetObjectAnimation(i->second_);
-    }
-}
-
-void UIElement::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
-{
-    Animatable::OnObjectAnimationRemoved(objectAnimation);
-
-    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
-    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
-    {
-        UIElement* child = GetChild(i->first_);
-        if (child && child->GetObjectAnimation() == i->second_)
-            child->SetObjectAnimation(0);
-    }
-}
-
-
 void UIElement::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInstances_.Size() == 1)

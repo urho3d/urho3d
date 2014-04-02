@@ -24,6 +24,8 @@
 #include "AttributeAnimation.h"
 #include "Context.h"
 #include "ObjectAnimation.h"
+#include "Deserializer.h"
+#include "Serializer.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -52,26 +54,36 @@ void AttributeAnimation::RegisterObject(Context* context)
 
 bool AttributeAnimation::Load(Deserializer& source)
 {
-    XMLFile xmlFile(context_);
-    if (xmlFile.Load(source))
-        return false;
+    keyFrames_.Clear();
 
-    XMLElement rootElem = xmlFile.GetRoot("AttributeAnimation");
-    if (!rootElem)
-        return false;
+    cycleMode_ = (CycleMode)source.ReadInt();
+    valueType_ = (VariantType)source.ReadInt();
+    unsigned count = source.ReadUInt();
 
-    return LoadXML(rootElem);
+    for (unsigned i = 0; i < count; ++i)
+    {
+        float time = source.ReadFloat();
+        Variant value = source.ReadVariant();
+        SetKeyFrame(time, value);
+    }
+
+    return true;
 }
 
 bool AttributeAnimation::Save(Serializer& dest) const
 {
-    XMLFile xmlFile(context_);
+    dest.WriteInt((int)cycleMode_);
+    dest.WriteInt((int)valueType_);
+    dest.WriteUInt(keyFrames_.Size());
 
-    XMLElement rootElem = xmlFile.CreateRoot("AttributeAnimation");
-    if (!SaveXML(rootElem))
-        return false;
+    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+    {
+        const AttributeKeyFrame& keyFrame = keyFrames_[i];
+        dest.WriteFloat(keyFrame.time_);
+        dest.WriteVariant(keyFrame.value_);
+    }
 
-    return xmlFile.Save(dest);
+    return true;
 }
 
 bool AttributeAnimation::LoadXML(const XMLElement& source)
@@ -79,7 +91,7 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     if (source.GetName() != "AttributeAnimation")
         return false;
     
-    keyframes_.Clear();
+    keyFrames_.Clear();
 
     cycleMode_ = (CycleMode)source.GetInt("cycle mode");
     valueType_ = (VariantType)source.GetInt("value type");
@@ -105,14 +117,14 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
     dest.SetInt("cycle mode", (int)cycleMode_);
     dest.SetInt("value type", (int)valueType_);
 
-    for (unsigned i = 0; i < keyframes_.Size(); ++i)
+    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {
-        const AttributeKeyFrame& keyFrame = keyframes_[i];
+        const AttributeKeyFrame& keyFrame = keyFrames_[i];
         XMLElement keyFrameEleme = dest.CreateChild("KeyFrame");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
         keyFrameEleme.SetAttribute("value", keyFrame.value_.ToString());
     }
-    
+
     return true;
 }
 
@@ -136,7 +148,7 @@ void AttributeAnimation::SetValueType(VariantType valueType)
     isInterpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || 
         (valueType_ == VAR_VECTOR4) || (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
 
-    keyframes_.Clear();
+    keyFrames_.Clear();
     beginTime_ = M_INFINITY;
     endTime_ = -M_INFINITY;
 }
@@ -155,15 +167,15 @@ bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
     keyFrame.time_ = time;
     keyFrame.value_ = value;
 
-    if (keyframes_.Empty() || time >= keyframes_.Back().time_)
-        keyframes_.Push(keyFrame);
+    if (keyFrames_.Empty() || time >= keyFrames_.Back().time_)
+        keyFrames_.Push(keyFrame);
     else
     {
-        for (unsigned i = 0; i < keyframes_.Size(); ++i)
+        for (unsigned i = 0; i < keyFrames_.Size(); ++i)
         {
-            if (time < keyframes_[i].time_)
+            if (time < keyFrames_[i].time_)
             {
-                keyframes_.Insert(i, keyFrame);
+                keyFrames_.Insert(i, keyFrame);
                 break;
             }
         }

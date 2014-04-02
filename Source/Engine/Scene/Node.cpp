@@ -1444,32 +1444,6 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
-void Node::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
-{
-    Animatable::OnObjectAnimationAdded(objectAnimation);
-
-    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
-    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
-    {
-        Node* child = GetChild(i->first_);
-        if (child)
-            child->SetObjectAnimation(i->second_);
-    }
-}
-
-void Node::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
-{
-    Animatable::OnObjectAnimationRemoved(objectAnimation);
-
-    const HashMap<String, SharedPtr<ObjectAnimation> >& childObjectAnimations = objectAnimation->GetObjectAnimations();
-    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = childObjectAnimations.Begin(); i != childObjectAnimations.End(); ++i)
-    {
-        Node* child = GetChild(i->first_);
-        if (child && child->GetObjectAnimation() == i->second_)
-            child->SetObjectAnimation(0);
-    }
-}
-
 void Node::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInstances_.Size() == 1)

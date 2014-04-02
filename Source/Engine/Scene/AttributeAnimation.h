@@ -110,7 +110,7 @@ public:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime) const;
     /// Return all key frames.
-    const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyframes_; }
+    const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyFrames_; }
     /// Has event frames.
     bool HasEventFrames() const { return eventFrames_.Size() != 0; }
     /// Return all event frames between time.
@@ -131,7 +131,7 @@ protected:
     /// End time.
     float endTime_;
     /// Key frames.
-    Vector<AttributeKeyFrame> keyframes_;
+    Vector<AttributeKeyFrame> keyFrames_;
     /// Event frames.
     Vector<AttributeEventFrame> eventFrames_;
 };

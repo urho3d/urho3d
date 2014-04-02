@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "ObjectAnimation.h"
 #include "ResourceCache.h"
+#include "XMLElement.h"
 
 #include "DebugNew.h"
 
@@ -47,6 +48,132 @@ Animatable::~Animatable()
 void Animatable::RegisterObject(Context* context)
 {
     ACCESSOR_ATTRIBUTE(Animatable, VAR_RESOURCEREF, "Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef, ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
+}
+
+bool Animatable::Load(Deserializer& source, bool setInstanceDefault)
+{
+    if (!Serializable::Load(source, setInstanceDefault))
+        return false;
+
+    bool hasObjectAnimation = source.ReadBool();
+    if (hasObjectAnimation)
+    {
+        SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
+        if (!objectAnimation->Load(source))
+            return false;
+        SetObjectAnimation(objectAnimation);
+    }
+
+    unsigned count = source.ReadUInt();
+    for (unsigned i = 0; i < count; ++i)
+    {
+        String name = source.ReadString();
+        SharedPtr<AttributeAnimation> attributeAnimation(new AttributeAnimation(context_));
+        if (!attributeAnimation->Load(source))
+            return false;
+
+        SetAttributeAnimation(name, attributeAnimation);
+    }
+
+    return true;
+}
+
+bool Animatable::Save(Serializer& dest) const
+{
+    if (!Serializable::Save(dest))
+        return false;
+
+    if (objectAnimation_ && objectAnimation_->GetName().Empty())
+    {
+        dest.WriteBool(true);
+        if (!objectAnimation_->Save(dest))
+            return false;
+    }
+    else
+        dest.WriteBool(false);
+
+    unsigned count = 0;
+    for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
+    {
+        AttributeAnimation* attributeAnimation = i->second_->GetAttributeAnimation();
+        if (attributeAnimation->GetObjectAnimation())
+            continue;
+        ++count;
+    }
+
+    dest.WriteUInt(count);
+    for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
+    {
+        AttributeAnimation* attributeAnimation = i->second_->GetAttributeAnimation();
+        if (attributeAnimation->GetObjectAnimation())
+            continue;
+
+        const AttributeInfo& attr = i->second_->GetAttributeInfo();
+        dest.WriteString(attr.name_);
+        if (!attributeAnimation->Save(dest))
+            return false;
+    }
+
+    return true;
+}
+
+bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
+{
+    if (!Serializable::LoadXML(source, setInstanceDefault))
+        return false;
+    
+    XMLElement elem = source.GetChild("ObjectAnimation");
+    if (elem)
+    {
+        SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
+        if (!objectAnimation->LoadXML(elem))
+            return false;
+
+        SetObjectAnimation(objectAnimation);
+    }
+
+    elem = source.GetChild("AttributeAnimation");
+    while (elem)
+    {
+        String name = elem.GetAttribute("name");
+        SharedPtr<AttributeAnimation> attributeAnimation(new AttributeAnimation(context_));
+        if (!attributeAnimation->LoadXML(elem))
+            return false;
+
+        SetAttributeAnimation(name, attributeAnimation);
+        elem = elem.GetNext("AttributeAnimation");
+    }
+
+    return true;
+}
+
+bool Animatable::SaveXML(XMLElement& dest) const
+{
+    if (!Serializable::SaveXML(dest))
+        return false;
+
+    // Object animation without name
+    if (objectAnimation_ && objectAnimation_->GetName().Empty())
+    {
+        XMLElement elem = dest.CreateChild("objectAnimation");
+        if (!objectAnimation_->SaveXML(elem))
+            return false;
+    }
+
+    for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
+    {
+        AttributeAnimation* attributeAnimation = i->second_->GetAttributeAnimation();
+        if (attributeAnimation->GetObjectAnimation())
+            continue;
+
+        const AttributeInfo& attr = i->second_->GetAttributeInfo();
+        XMLElement elem = dest.CreateChild("attributeAnimation");
+        elem.SetAttribute("name", attr.name_);
+        if (!attributeAnimation->SaveXML(elem))
+            return false;
+    }
+
+    return true;
 }
 
 void Animatable::SetAnimationEnabled(bool animationEnabled)
@@ -178,9 +305,7 @@ void Animatable::SetObjectAnimationAttr(ResourceRef value)
 
 ResourceRef Animatable::GetObjectAnimationAttr() const
 {
-    if (objectAnimation_ && !objectAnimation_->GetParentAnimation())
-        return GetResourceRef(objectAnimation_, ObjectAnimation::GetTypeStatic());
-    return ResourceRef();
+    return GetResourceRef(objectAnimation_, ObjectAnimation::GetTypeStatic());
 }
 
 void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)

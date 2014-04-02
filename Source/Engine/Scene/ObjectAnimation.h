@@ -51,15 +51,6 @@ public:
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
 
-    /// Set parent animation.
-    void SetParentAnimation(ObjectAnimation* parentAnimation) { parentAnimation_ = parentAnimation; }
-    /// Add object animation.
-    void AddChildAnimation(const String& name, ObjectAnimation* objectAnimation);
-    /// Remove object animation.
-    void RemoveChildAnimation(const String& name);
-    /// Remove object animation.
-    void RemoveChildAnimation(ObjectAnimation* objectAnimation);
-
     /// Add attribute animation.
     void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation);
     /// Remove attribute animation.
@@ -67,22 +58,12 @@ public:
     /// Remove attribute animation.
     void RemoveAttributeAnimation(AttributeAnimation* attributeAnimation);
 
-    /// Return parent animation.
-    ObjectAnimation* GetParentAnimation() const { return parentAnimation_; }
-    /// Return object animation by name.
-    ObjectAnimation* GetObjectAnimation(const String& name) const;
     /// Return attribute animation by name.
     AttributeAnimation* GetAttributeAnimation(const String& name) const;
-    /// Return all object animations.
-    const HashMap<String, SharedPtr<ObjectAnimation> >& GetObjectAnimations() const { return objectAnimations_; }
     /// Return all attribute animations.
     const HashMap<String, SharedPtr<AttributeAnimation> >& GetAttributeAnimations() const { return attributeAnimations_; }
 
 private:
-    /// Parent animation.
-    WeakPtr<ObjectAnimation> parentAnimation_;
-    /// Name to object animation mapping.
-    HashMap<String, SharedPtr<ObjectAnimation> > objectAnimations_;
     /// Name to attribute animation mapping.
     HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations_;
 };

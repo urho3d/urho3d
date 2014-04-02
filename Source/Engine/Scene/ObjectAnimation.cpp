@@ -47,26 +47,14 @@ void ObjectAnimation::RegisterObject(Context* context)
 
 bool ObjectAnimation::Load(Deserializer& source)
 {
-    XMLFile xmlFile(context_);
-    if (xmlFile.Load(source))
-        return false;
-
-    XMLElement rootElem = xmlFile.GetRoot("ObjectAnimation");
-    if (!rootElem)
-        return false;
-
-    return LoadXML(rootElem);
+    // Not implement
+    return false;
 }
 
 bool ObjectAnimation::Save(Serializer& dest) const
 {
-    XMLFile xmlFile(context_);
-
-    XMLElement rootElem = xmlFile.CreateRoot("ObjectAnimation");
-    if (!SaveXML(rootElem))
-        return false;
-
-    return xmlFile.Save(dest);
+    // Not implement
+    return false;
 }
 
 bool ObjectAnimation::LoadXML(const XMLElement& source)
@@ -89,20 +77,6 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
         animElem = animElem.GetNext("AttributeAnimation");
     }
 
-    animElem = source.GetChild("ObjectAnimation");
-    while (animElem)
-    {
-        String name = animElem.GetAttribute("name");
-
-        SharedPtr<ObjectAnimation> animation(new ObjectAnimation(context_));
-        if (!animation->LoadXML(animElem))
-            return false;
-        
-        AddChildAnimation(name, animation);
-
-        animElem = animElem.GetNext("ObjectAnimation");
-    }
-
     return true;
 }
 
@@ -120,46 +94,7 @@ bool ObjectAnimation::SaveXML(XMLElement& dest) const
             return false;
     }
 
-    for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = objectAnimations_.Begin(); i != objectAnimations_.End(); ++i)
-    {
-        XMLElement animElem = dest.CreateChild("ObjectAnimation");
-        animElem.SetAttribute("name", i->first_);
-
-        if (!i->second_->SaveXML(animElem))
-            return false;
-    }
-
     return true;
-}
-
-void ObjectAnimation::AddChildAnimation(const String& name, ObjectAnimation* objectAnimation)
-{
-    if (!objectAnimation)
-        return;
-
-    objectAnimation->SetParentAnimation(this);
-    objectAnimations_[name] = objectAnimation;
-}
-
-void ObjectAnimation::RemoveChildAnimation(const String& name)
-{
-    RemoveChildAnimation(GetObjectAnimation(name));
-}
-
-void ObjectAnimation::RemoveChildAnimation(ObjectAnimation* objectAnimation)
-{
-    if (!objectAnimation)
-        return;
-
-    for (HashMap<String, SharedPtr<ObjectAnimation> >::Iterator i = objectAnimations_.Begin(); i != objectAnimations_.End(); ++i)
-    {
-        if (i->second_ == objectAnimation)
-        {
-            objectAnimation->SetParentAnimation(0);
-            objectAnimations_.Erase(i);
-            return;
-        }
-    }
 }
 
 void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation)
@@ -192,18 +127,10 @@ void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnim
     }
 }
 
-ObjectAnimation* ObjectAnimation::GetObjectAnimation(const String& name) const
-{
-    HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = objectAnimations_.Find(name);
-    if (i != objectAnimations_.End())
-        return i->second_;
-    return 0;
-}
-
 AttributeAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) const
 {
     HashMap<String, SharedPtr<AttributeAnimation> >::ConstIterator i = attributeAnimations_.Find(name);
-    if (i != objectAnimations_.End())
+    if (i != attributeAnimations_.End())
         return i->second_;
     return 0;
 }

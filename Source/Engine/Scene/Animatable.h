@@ -45,6 +45,15 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Load from binary data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
+    /// Save as binary data. Return true if successful.
+    virtual bool Save(Serializer& dest) const;
+    /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Save as XML data. Return true if successful.
+    virtual bool SaveXML(XMLElement& dest) const;
+
     /// Set animation enabled.
     void SetAnimationEnabled(bool enable);
     /// Set object animation.
@@ -65,14 +74,14 @@ public:
     ResourceRef GetObjectAnimationAttr() const;
 
 protected:
-    /// Handle object animation added.
-    virtual void OnObjectAnimationAdded(ObjectAnimation* objectAnimation);
-    /// Handle object animation removed.
-    virtual void OnObjectAnimationRemoved(ObjectAnimation* objectAnimation);
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded() = 0;
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved() = 0;
+    /// Handle object animation added.
+    void OnObjectAnimationAdded(ObjectAnimation* objectAnimation);
+    /// Handle object animation removed.
+    void OnObjectAnimationRemoved(ObjectAnimation* objectAnimation);
     /// Update attribute animations.
     void UpdateAttributeAnimations(float timeStep);
     /// Is animated network attribute.
