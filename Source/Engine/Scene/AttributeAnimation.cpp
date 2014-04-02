@@ -33,6 +33,14 @@
 namespace Urho3D
 {
 
+const char* cycleModeNames[] = 
+{
+    "Loop",
+    "Clamp",
+    "Pingpong",
+    0
+};
+
 AttributeAnimation::AttributeAnimation(Context* context) :
     Resource(context),
     cycleMode_(CM_LOOP),
@@ -57,8 +65,18 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
 
-    cycleMode_ = (CycleMode)source.GetInt("cycleMode");
-    SetValueType((VariantType)source.GetInt("valueType"));
+    String cycleModeString = source.GetAttribute("cycleMode");
+    cycleMode_ = CM_LOOP;
+    for (int i = 0; i <= CM_PINGPONG; ++i)
+    {
+        if (cycleModeString == cycleModeNames[i])
+        {
+            cycleMode_ = (CycleMode)i;
+            break;
+        }
+    }
+
+    SetValueType(Variant::GetTypeFromName(source.GetAttribute("valueType")));
 
     XMLElement keyFrameEleme = source.GetChild("keyFrame");
     while (keyFrameEleme)
@@ -86,8 +104,8 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
-    dest.SetInt("cycleMode", (int)cycleMode_);
-    dest.SetInt("valueType", (int)valueType_);
+    dest.SetAttribute("cycleMode", cycleModeNames[cycleMode_]);
+    dest.SetAttribute("valueType", Variant::GetTypeName(valueType_));
 
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {

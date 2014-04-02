@@ -36,14 +36,7 @@ namespace Urho3D
 {
 
 extern const char* URHO2D_CATEGORY;
-
-static const char* cycleModeNames[] = 
-{
-    "Loop",
-    "Clamp",
-    "Pingpong",
-    0
-};
+extern const char* cycleModeNames[];
 
 template<> CycleMode Variant::Get<CycleMode>() const
 {
