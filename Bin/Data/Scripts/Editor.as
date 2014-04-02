@@ -13,6 +13,8 @@
 #include "Scripts/Editor/EditorSecondaryToolbar.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
+#include "Scripts/Editor/EditorSpawn.as"
+
 
 String configPath;
 String configFileName;
