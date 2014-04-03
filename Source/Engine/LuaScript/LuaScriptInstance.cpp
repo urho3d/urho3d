@@ -72,6 +72,7 @@ LuaScriptInstance::LuaScriptInstance(Context* context) :
 {
     luaScript_ = GetSubsystem<LuaScript>();
     luaState_ = luaScript_->GetState();
+    attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
 }
 
 LuaScriptInstance::~LuaScriptInstance()
@@ -92,6 +93,12 @@ void LuaScriptInstance::RegisterObject(Context* context)
 
 void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
+    if (attr.ptr_ != (void*)0xffffffff)
+    {
+        Serializable::OnSetAttribute(attr, src);
+        return;
+    }
+
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
 
@@ -100,7 +107,7 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
     if (name.Back() == '_')
         length -= 1;
 
-	int top = lua_gettop(luaState_);
+    int top = lua_gettop(luaState_);
 
     String functionName = String("Set") + name.Substring(0, 1).ToUpper() + name.Substring(1, length - 1);
     WeakPtr<LuaFunction> function = GetScriptObjectFunction(functionName);
@@ -115,7 +122,6 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
     }
     else
     {
-
         lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
         lua_pushstring(luaState_, name.CString());
 
@@ -159,11 +165,17 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
         lua_settable(luaState_, -3);
     }
 
-	lua_settop(luaState_, top);
+    lua_settop(luaState_, top);
 }
 
 void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
 {
+    if (attr.ptr_ != (void*)0xffffffff)
+    {
+        Serializable::OnGetAttribute(attr, dest);
+        return;
+    }
+
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
 
@@ -176,7 +188,7 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
 
     String functionName = String("Get") + name.Substring(0, 1).ToUpper() + name.Substring(1, length - 1);
     WeakPtr<LuaFunction> function = GetScriptObjectFunction(functionName);
-	// If get function exist
+    // If get function exist
     if (function)
     {
         if (function->BeginCall(this))
@@ -285,8 +297,6 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
         return;
 
     ReleaseObject();
-
-
 
     WeakPtr<LuaFunction> function = luaScript_->GetFunction("CreateScriptObjectInstance");
     if (!function || !function->BeginCall())
@@ -485,7 +495,7 @@ void LuaScriptInstance::GetScriptAttributes()
     }
     lua_pop(luaState_, 1);
 
-    attributeInfos_.Clear();
+    attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
 
     for (unsigned i = 0; i < names.Size(); ++i)
     {
@@ -498,7 +508,7 @@ void LuaScriptInstance::GetScriptAttributes()
         AttributeInfo info;
         info.mode_ = AM_FILE;
         info.name_ = names[i];
-        info.ptr_ = 0;
+        info.ptr_ = (void*)0xffffffff;
 
         switch (type)
         {
@@ -673,7 +683,7 @@ void LuaScriptInstance::ReleaseObject()
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
 
-    attributeInfos_.Clear();
+    attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
 
     if (IsEnabledEffective())
         UnsubscribeFromScriptMethodEvents();
