@@ -6080,6 +6080,8 @@ int maxOccluderTriangles;
 int maxShadowMaps;
 int maxSortedInstances;
 int minInstances;
+float mobileShadowBiasAdd;
+float mobileShadowBiasMul;
 /* readonly */
 uint numBatches;
 /* readonly */

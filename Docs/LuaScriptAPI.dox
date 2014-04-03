@@ -3589,6 +3589,8 @@ Methods:
 - void SetMaxOccluderTriangles(int triangles)
 - void SetOcclusionBufferSize(int size)
 - void SetOccluderSizeThreshold(float screenSize)
+- void SetMobileShadowBiasMul(float mul)
+- void SetMobileShadowBiasAdd(float add)
 - void ReloadShaders()
 - unsigned GetNumViewports() const
 - Viewport* GetViewport(unsigned index) const
@@ -3611,6 +3613,8 @@ Methods:
 - int GetMaxOccluderTriangles() const
 - int GetOcclusionBufferSize() const
 - float GetOccluderSizeThreshold() const
+- float GetMobileShadowBiasMul() const
+- float GetMobileShadowBiasAdd() const
 - unsigned GetNumViews() const
 - unsigned GetNumPrimitives() const
 - unsigned GetNumBatches() const
@@ -3651,6 +3655,8 @@ Properties:
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold
+- float mobileShadowBiasMul
+- float mobileShadowBiasAdd
 - unsigned numViews (readonly)
 - unsigned numPrimitives (readonly)
 - unsigned numBatches (readonly)

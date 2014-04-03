@@ -25,7 +25,7 @@ String sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 bool rememberResourcePath = true;
 
 // Exceptions for string attributes that should not be continuously edited
-Array<String> noTextChangedAttrs = {"Class Name", "Script Object Type"};
+Array<String> noTextChangedAttrs = {"Script File", "Class Name", "Script Object Type", "Script File Name"};
 
 WeakHandle testAnimState;
 

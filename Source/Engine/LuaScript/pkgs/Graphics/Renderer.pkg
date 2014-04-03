@@ -24,6 +24,8 @@ class Renderer
     void SetMaxOccluderTriangles(int triangles);
     void SetOcclusionBufferSize(int size);
     void SetOccluderSizeThreshold(float screenSize);
+    void SetMobileShadowBiasMul(float mul);
+    void SetMobileShadowBiasAdd(float add);
     void ReloadShaders();
     
     unsigned GetNumViewports() const;
@@ -47,6 +49,8 @@ class Renderer
     int GetMaxOccluderTriangles() const;
     int GetOcclusionBufferSize() const;
     float GetOccluderSizeThreshold() const;
+    float GetMobileShadowBiasMul() const;
+    float GetMobileShadowBiasAdd() const;
     unsigned GetNumViews() const;
     unsigned GetNumPrimitives() const;
     unsigned GetNumBatches() const;
@@ -86,6 +90,8 @@ class Renderer
     tolua_property__get_set int maxOccluderTriangles;
     tolua_property__get_set int occlusionBufferSize;
     tolua_property__get_set float occluderSizeThreshold;
+    tolua_property__get_set float mobileShadowBiasMul;
+    tolua_property__get_set float mobileShadowBiasAdd;
     tolua_readonly tolua_property__get_set unsigned numViews;
     tolua_readonly tolua_property__get_set unsigned numPrimitives;
     tolua_readonly tolua_property__get_set unsigned numBatches;

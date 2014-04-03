@@ -51,7 +51,8 @@ enum EditMode
     EDIT_MOVE = 0,
     EDIT_ROTATE,
     EDIT_SCALE,
-    EDIT_SELECT
+    EDIT_SELECT,
+    EDIT_SPAWN
 }
 
 enum AxisMode
@@ -366,7 +367,8 @@ Array<String> editModeText = {
     "Move",
     "Rotate",
     "Scale",
-    "Select"
+    "Select",
+    "Spawn"
 };
 
 Array<String> axisModeText = {
@@ -1304,7 +1306,6 @@ void SteppedObjectManipulation(int key)
         UpdateNodeAttributes();
 }
 
-
 void HandlePostRenderUpdate()
 {
     DebugRenderer@ debug = editorScene.debugRenderer;
@@ -1384,14 +1385,22 @@ void ViewRaycast(bool mouseClick)
     if (ui.HasModalElement())
         return;
 
+    IntVector2 pos = ui.cursorPosition;
+    UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
+    if(editMode==EDIT_SPAWN)
+    {
+        if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
+            SpawnObject();
+        return;
+    }
+
     // Do not raycast / change selection if hovering over the gizmo
     if (IsGizmoSelected())
         return;
 
     DebugRenderer@ debug = editorScene.debugRenderer;
 
-    IntVector2 pos = ui.cursorPosition;
-    UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
+ 
     if (pickMode == PICK_UI_ELEMENTS)
     {
         bool leftClick = mouseClick && input.mouseButtonPress[MOUSEB_LEFT];
@@ -1552,6 +1561,34 @@ bool StopTestAnimation()
 {
     testAnimState = null;
     return true;
+}
+
+void LocateNode(Node@ node)
+{
+    if (node is null || node is editorScene)
+        return;
+
+    Vector3 center = node.worldPosition;
+    float distance = newNodeDistance;
+
+    for (uint i = 0; i < node.numComponents; ++i)
+    {
+        // Determine view distance from drawable component's bounding box. Skip skybox, as its box is very large, as well as lights
+        Drawable@ drawable = cast<Drawable>(node.components[i]);
+        if (drawable !is null && cast<Skybox>(drawable) is null && cast<Light>(drawable) is null)
+        {
+            BoundingBox box = drawable.worldBoundingBox;
+            center = box.center;
+            // Ensure the object fits on the screen
+            distance = Max(distance, newNodeDistance + box.size.length);
+            break;
+        }
+    }
+
+    if (distance > viewFarClip)
+        distance = viewFarClip;
+
+    cameraNode.worldPosition = center - cameraNode.worldDirection * distance;
 }
 
 Vector3 SelectedNodesCenterPoint()
