@@ -37,12 +37,26 @@ namespace Urho3D
 
 static void RegisterAttributeAnimation(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("CycleMode");
+    engine->RegisterEnumValue("CycleMode", "CM_LOOP", CM_LOOP);
+    engine->RegisterEnumValue("CycleMode", "CM_CLAMP", CM_CLAMP);
+    engine->RegisterEnumValue("CycleMode", "CM_PINGPONG", CM_PINGPONG);
+
     RegisterResource<AttributeAnimation>(engine, "AttributeAnimation");
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_cycleMode(CycleMode)", asMETHOD(AttributeAnimation, SetCycleMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "CycleMode get_cycleMode() const", asMETHOD(AttributeAnimation, GetCycleMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_valueType(VariantType)", asMETHOD(AttributeAnimation, SetValueType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "VariantType get_valueType() const", asMETHOD(AttributeAnimation, GetValueType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void SetKeyFrame(float, const Variant&)", asMETHOD(AttributeAnimation, SetKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void SetEventFrame(float, const String&, const Variant&)", asMETHOD(AttributeAnimation, SetEventFrame), asCALL_THISCALL);
 }
 
 static void RegisterObjectAnimation(asIScriptEngine* engine)
 {
     RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(AttributeAnimation@+)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (AttributeAnimation*), void), asCALL_THISCALL);
 }
 
 static void RegisterSerializable(asIScriptEngine* engine)
