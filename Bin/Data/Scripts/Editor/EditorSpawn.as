@@ -10,14 +10,14 @@ LineEdit@ spawnRadiusEdit;
 LineEdit@ spawnCountEdit;
 
 Window@ spawnWindow;
-Vector3 randomRotation=Vector3(0.f,0.f,0.f);
-float randomScaleMin=1;
-float randomScaleMax=1;
-float spawnCount=1;
-float spawnRadius=0;
-bool useNormal=true;
+Vector3 randomRotation = Vector3(0, 0, 0);
+float randomScaleMin = 1;
+float randomScaleMax = 1;
+float spawnCount = 1;
+float spawnRadius = 0;
+bool useNormal = true;
 
-int numberSpawnedObjects=1;
+int numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
 
 void CreateSpawnEditor()
@@ -35,27 +35,27 @@ void CreateSpawnEditor()
 
     HideSpawnEditor();
     SubscribeToEvent(spawnWindow.GetChild("CloseButton", true), "Released", "HideSpawnEditor");
-    randomRotationX=spawnWindow.GetChild("RandomRotation.x", true);
-    randomRotationY=spawnWindow.GetChild("RandomRotation.y", true);
-    randomRotationZ=spawnWindow.GetChild("RandomRotation.z", true);
-    randomRotationX.text=String(randomRotation.x);
-    randomRotationY.text=String(randomRotation.y);
-    randomRotationZ.text=String(randomRotation.z);
+    randomRotationX = spawnWindow.GetChild("RandomRotation.x", true);
+    randomRotationY = spawnWindow.GetChild("RandomRotation.y", true);
+    randomRotationZ = spawnWindow.GetChild("RandomRotation.z", true);
+    randomRotationX.text = String(randomRotation.x);
+    randomRotationY.text = String(randomRotation.y);
+    randomRotationZ.text = String(randomRotation.z);
     
-    randomScaleMinEdit=spawnWindow.GetChild("RandomScaleMin", true);
-    randomScaleMaxEdit=spawnWindow.GetChild("RandomScaleMax", true);
-    randomScaleMinEdit.text=String(randomScaleMin);
-    randomScaleMaxEdit.text=String(randomScaleMax);
+    randomScaleMinEdit = spawnWindow.GetChild("RandomScaleMin", true);
+    randomScaleMaxEdit = spawnWindow.GetChild("RandomScaleMax", true);
+    randomScaleMinEdit.text = String(randomScaleMin);
+    randomScaleMaxEdit.text = String(randomScaleMax);
     CheckBox@ useNormalToggle = spawnWindow.GetChild("UseNormal", true);
     useNormalToggle.checked = useNormal;
 
-    NumberSpawnedObjectsEdit=spawnWindow.GetChild("NumberSpawnedObjects", true);
-    NumberSpawnedObjectsEdit.text=String(numberSpawnedObjects);
+    NumberSpawnedObjectsEdit = spawnWindow.GetChild("NumberSpawnedObjects", true);
+    NumberSpawnedObjectsEdit.text = String(numberSpawnedObjects);
     
-    spawnRadiusEdit=spawnWindow.GetChild("SpawnRadius", true);
-    spawnCountEdit=spawnWindow.GetChild("SpawnCount", true);
-    spawnRadiusEdit.text=String(spawnRadius);
-    spawnCountEdit.text=String(spawnCount);
+    spawnRadiusEdit = spawnWindow.GetChild("SpawnRadius", true);
+    spawnCountEdit = spawnWindow.GetChild("SpawnCount", true);
+    spawnRadiusEdit.text = String(spawnRadius);
+    spawnCountEdit.text = String(spawnCount);
     
     SubscribeToEvent(randomRotationX, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationY, "TextChanged", "EditRandomRotation");
@@ -124,20 +124,20 @@ void ToggleUseNormal(StringHash eventType, VariantMap& eventData)
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    numberSpawnedObjects=edit.text.ToFloat();
-    edit.text=String(numberSpawnedObjects); 
+    numberSpawnedObjects = edit.text.ToFloat();
+    edit.text = String(numberSpawnedObjects); 
     RefreshPickedObjects();
 }
 
 void EditSpawnRadius(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    spawnRadius=edit.text.ToFloat();
+    spawnRadius = edit.text.ToFloat();
 }
 void EditSpawnCount(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    spawnCount=edit.text.ToFloat();
+    spawnCount = edit.text.ToFloat();
 }
 
 void RefreshPickedObjects()
@@ -171,12 +171,17 @@ void EditSpawnedObjectName(StringHash eventType, VariantMap& eventData)
     LineEdit@ nameEdit = eventData["Element"].GetPtr();
     int index = nameEdit.vars["Index"].GetUInt();
     String resourceName = nameEdit.text;
-    XMLFile@ xml = cache.GetResource("XMLFile", resourceName);
-    if(xml !is null)
-        spawnedObjectsNames[index]=resourceName;
-    else
-        spawnedObjectsNames[index]=String("");    
+    spawnedObjectsNames[index] = VerifySpawnedObjectFile(resourceName);
     RefreshPickedObjects();
+}
+
+String VerifySpawnedObjectFile(const String&in resourceName)
+{
+    File@ file = cache.GetFile(resourceName);
+    if(file !is null)
+        return resourceName;
+    else
+        return String();
 }
 
 void PickSpawnedObject(StringHash eventType, VariantMap& eventData)
@@ -200,42 +205,34 @@ void PickSpawnedObjectNameDone(StringHash eventType, VariantMap& eventData)
     }
 
     String resourceName = GetResourceNameFromFullName(eventData["FileName"].GetString());
-    XMLFile@ xml = cache.GetResource("XMLFile", resourceName);
-    if(xml !is null)
-        spawnedObjectsNames[resourcePickIndex]=resourceName;
-    else
-        spawnedObjectsNames[resourcePickIndex]=String("");
+    spawnedObjectsNames[resourcePickIndex] = VerifySpawnedObjectFile(resourceName);
     @resourcePicker = null;
     RefreshPickedObjects();
 }
 
 void SetSpawnMode(StringHash eventType, VariantMap& eventData)
 {
-    editMode=EDIT_SPAWN;
+    editMode = EDIT_SPAWN;
 }
 
 void PlaceObject(Vector3 spawnPosition, Vector3 normal)
 {
     Quaternion spawnRotation;
-    if(useNormal)spawnRotation=Quaternion(Vector3(0.f,1.f,0.f),normal);
-    int number=RandomInt(0,spawnedObjectsNames.length);
-    XMLFile@ xml = cache.GetResource("XMLFile", spawnedObjectsNames[number]);
-    Node@ spawnedObject =editorScene.InstantiateXML(xml, spawnPosition, spawnRotation);
-    if(spawnedObject is null)
+    if (useNormal)
+        spawnRotation = Quaternion(Vector3(0, 1, 0), normal);
+    spawnRotation = Quaternion(Random(-randomRotation.x, randomRotation.x),
+        Random(-randomRotation.y, randomRotation.y), Random(-randomRotation.z, randomRotation.z)) * spawnRotation;
+
+    int number = RandomInt(0, spawnedObjectsNames.length);
+    File@ file = cache.GetFile(spawnedObjectsNames[number]);
+    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition, spawnRotation, Random(randomScaleMin, randomScaleMax));
+    if (spawnedObject is null)
     {
-        spawnedObjectsNames[number]=spawnedObjectsNames[spawnedObjectsNames.length-1];
+        spawnedObjectsNames[number] = spawnedObjectsNames[spawnedObjectsNames.length - 1];
         --numberSpawnedObjects;
         RefreshPickedObjects();
         return;
     }
-    
-    spawnedObject.scale=spawnedObject.scale*Random(randomScaleMin, randomScaleMax);
-    spawnedObject.Rotate(Quaternion(Random(-randomRotation.x,randomRotation.x),
-    Random(-randomRotation.y,randomRotation.y),Random(-randomRotation.z,randomRotation.z)),false);
-    CreateNodeAction action;
-    action.Define(spawnedObject);
-    SaveEditAction(action);
-    SetSceneModified();
 }
 
 Vector3 RandomizeSpawnPosition(const Vector3&in position)
@@ -247,12 +244,12 @@ Vector3 RandomizeSpawnPosition(const Vector3&in position)
 
 void SpawnObject()
 {
-    if(spawnedObjectsNames.length==0) return;
+    if(spawnedObjectsNames.length == 0) return;
     IntRect view = activeViewport.viewport.rect;
     
-    for(int i=0;i<spawnCount;i++)
+    for(int i = 0;i<spawnCount;i++)
     {
-        IntVector2 pos = IntVector2(ui.cursorPosition.x,ui.cursorPosition.y);
+        IntVector2 pos = IntVector2(ui.cursorPosition.x, ui.cursorPosition.y);
         Ray cameraRay = camera.GetScreenRay(
             float(pos.x - view.left) / view.width,
             float(pos.y - view.top) / view.height);
