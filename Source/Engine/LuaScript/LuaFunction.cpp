@@ -165,7 +165,7 @@ bool LuaFunction::PushVariant(const Variant& variant)
         return true;
 
     case VAR_COLOR:
-        PushUserType(variant.GetQuaternion(), "Color");
+        PushUserType(variant.GetColor(), "Color");
         return true;
 
     case VAR_STRING:
