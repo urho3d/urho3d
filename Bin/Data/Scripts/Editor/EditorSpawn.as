@@ -231,7 +231,7 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
     
     spawnedObject.scale=spawnedObject.scale*Random(randomScaleMin, randomScaleMax);
     spawnedObject.Rotate(Quaternion(Random(-randomRotation.x,randomRotation.x),
-    Random(-randomRotation.y,randomRotation.y),Random(-randomRotation.z,randomRotation.z)),false);
+    Random(-randomRotation.y,randomRotation.y),Random(-randomRotation.z,randomRotation.z)));
     CreateNodeAction action;
     action.Define(spawnedObject);
     SaveEditAction(action);

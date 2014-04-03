@@ -214,16 +214,16 @@ function MoveCamera(timeStep)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if input:GetKeyDown(KEY_W) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_S) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_A) then
-        cameraNode:TranslateRelative(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_D) then
-        cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
 
     -- Toggle debug geometry with space
@@ -238,7 +238,7 @@ function AnimateScene(timeStep)
 
     -- Rotate the lights around the world Y-axis
     for i, v in ipairs(lightNodes) do
-        v:Rotate(Quaternion(0.0, LIGHT_ROTATION_SPEED * timeStep, 0.0), true)
+        v:Rotate(Quaternion(0.0, LIGHT_ROTATION_SPEED * timeStep, 0.0), TS_WORLD)
     end
 
     -- Rotate the individual billboards within the billboard sets, then recommit to make the changes visible

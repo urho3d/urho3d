@@ -134,19 +134,17 @@ function MoveCamera(timeStep)
     local MOVE_SPEED = 4.0
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    -- Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could
-    -- multiply the desired direction with the node's orientation quaternion, and use just Translate()
     if input:GetKeyDown(KEY_W) then
-        cameraNode:TranslateRelative(Vector3.UP * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 1.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_S) then
-        cameraNode:TranslateRelative(Vector3.DOWN * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, -1.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_A) then
-        cameraNode:TranslateRelative(Vector3.LEFT * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_D) then
-        cameraNode:TranslateRelative(Vector3.RIGHT * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
 
     if input:GetKeyDown(KEY_PAGEUP) then

@@ -173,16 +173,15 @@ void StaticScene::MoveCamera(float timeStep)
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    // Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could
-    // multiply the desired direction with the node's orientation quaternion, and use just Translate()
+    // Use the Translate() function (default local space) to move relative to the node's orientation.
     if (input->GetKeyDown('W'))
-        cameraNode_->TranslateRelative(Vector3::FORWARD * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('S'))
-        cameraNode_->TranslateRelative(Vector3::BACK * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('A'))
-        cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
-        cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
 void StaticScene::SubscribeToEvents()

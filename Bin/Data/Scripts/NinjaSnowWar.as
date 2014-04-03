@@ -1117,13 +1117,13 @@ void UpdateFreelookCamera()
         speedMultiplier = 0.1;
 
     if (input.keyDown['W'])
-        gameCameraNode.TranslateRelative(Vector3(0, 0, 10) * timeStep * speedMultiplier);
+        gameCameraNode.Translate(Vector3(0, 0, 10) * timeStep * speedMultiplier);
     if (input.keyDown['S'])
-        gameCameraNode.TranslateRelative(Vector3(0, 0, -10) * timeStep * speedMultiplier);
+        gameCameraNode.Translate(Vector3(0, 0, -10) * timeStep * speedMultiplier);
     if (input.keyDown['A'])
-        gameCameraNode.TranslateRelative(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
+        gameCameraNode.Translate(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
     if (input.keyDown['D'])
-        gameCameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
+        gameCameraNode.Translate(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
     playerControls.yaw += mouseSensitivity * input.mouseMoveX;
     playerControls.pitch += mouseSensitivity * input.mouseMoveY;

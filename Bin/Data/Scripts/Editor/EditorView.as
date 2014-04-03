@@ -1099,48 +1099,41 @@ void UpdateView(float timeStep)
 
         if (input.keyDown['W'] || input.keyDown[KEY_UP])
         {
-            cameraNode.TranslateRelative(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
+            cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
             FadeUI();
         }
         if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
         {
-            cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
+            cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
             FadeUI();
         }
         if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
         {
-            cameraNode.TranslateRelative(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+            cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
             FadeUI();
         }
         if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
         {
-            cameraNode.TranslateRelative(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+            cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
             FadeUI();
         }
-        if (input.keyDown[KEY_PAGEUP])
+        if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
         {
-            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier);
+            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
             FadeUI();
         }
-        if (input.keyDown[KEY_PAGEDOWN])
+        if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
         {
-            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['E'])
-        {
-            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['Q'])
-        {
-            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier);
+            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
             FadeUI();
         }
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
         {
             if (mouseWheelCameraPosition)
-                cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+            {
+                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
+                    speedMultiplier);
+            }
             else
             {
                 float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
