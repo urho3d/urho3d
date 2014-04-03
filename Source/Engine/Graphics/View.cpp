@@ -656,11 +656,6 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
         #ifdef USE_OPENGL
         // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
         float constantBias = 2.0f * graphics_->GetDepthConstantBias();
-        // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
-        // so use a higher constant bias
-        #ifdef GL_ES_VERSION_2_0
-        constantBias *= 2.0f;
-        #endif
         projection.m22_ += projection.m32_ * constantBias;
         projection.m23_ += projection.m33_ * constantBias;
         #endif
@@ -2800,7 +2795,14 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
             multiplier = 1.0f + (multiplier - 1.0f) * queue.light_->GetShadowCascade().biasAutoAdjust_;
         }
         
-        graphics_->SetDepthBias(multiplier * parameters.constantBias_, multiplier * parameters.slopeScaledBias_);
+        // Perform further modification of depth bias on OpenGL ES, as shadow calculations' precision is limited
+        float addition = 0.0f;
+        #ifdef GL_ES_VERSION_2_0
+        multiplier *= renderer_->GetMobileShadowBiasMul();
+        addition = renderer_->GetMobileShadowBiasAdd();
+        #endif
+        
+        graphics_->SetDepthBias(multiplier * parameters.constantBias_ + addition, multiplier * parameters.slopeScaledBias_);
         
         const ShadowBatchQueue& shadowQueue = queue.shadowSplits_[i];
         if (!shadowQueue.shadowBatches_.IsEmpty())

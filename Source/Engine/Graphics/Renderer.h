@@ -201,6 +201,10 @@ public:
     void SetOcclusionBufferSize(int size);
     /// Set required screen size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
+    /// Set shadow depth bias multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
+    void SetMobileShadowBiasMul(float mul);
+    /// Set shadow depth bias addition for mobile platforms (OpenGL ES.)  No effect on desktops. Default 0.0001.
+    void SetMobileShadowBiasAdd(float add);
     /// Force reload of shaders.
     void ReloadShaders();
     
@@ -246,6 +250,10 @@ public:
     int GetOcclusionBufferSize() const { return occlusionBufferSize_; }
     /// Return occluder screen size threshold.
     float GetOccluderSizeThreshold() const { return occluderSizeThreshold_; }
+    /// Return shadow depth bias multiplier for mobile platforms.
+    float GetMobileShadowBiasMul() const { return mobileShadowBiasMul_; }
+    /// Return shadow depth bias addition for mobile platforms.
+    float GetMobileShadowBiasAdd() const { return mobileShadowBiasAdd_; }
     /// Return number of views rendered.
     unsigned GetNumViews() const { return numViews_; }
     /// Return number of primitives rendered.
@@ -445,6 +453,10 @@ private:
     int occlusionBufferSize_;
     /// Occluder screen size threshold.
     float occluderSizeThreshold_;
+    /// Mobile platform shadow depth bias multiplier.
+    float mobileShadowBiasMul_;
+    /// Mobile platform shadow depth bias addition.
+    float mobileShadowBiasAdd_;
     /// Number of views.
     unsigned numViews_;
     /// Number of occlusion buffers in use.

@@ -267,7 +267,9 @@ Renderer::Renderer(Context* context) :
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.025f),
-    numViews_(0), 
+    mobileShadowBiasMul_(2.0f),
+    mobileShadowBiasAdd_(0.0001f),
+    numViews_(0),
     numOcclusionBuffers_(0),
     numShadowCameras_(0),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
@@ -458,6 +460,16 @@ void Renderer::SetOcclusionBufferSize(int size)
 {
     occlusionBufferSize_ = Max(size, 1);
     occlusionBuffers_.Clear();
+}
+
+void Renderer::SetMobileShadowBiasMul(float mul)
+{
+    mobileShadowBiasMul_ = mul;
+}
+
+void Renderer::SetMobileShadowBiasAdd(float add)
+{
+    mobileShadowBiasAdd_ = add;
 }
 
 void Renderer::SetOccluderSizeThreshold(float screenSize)
