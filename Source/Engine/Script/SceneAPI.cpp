@@ -23,7 +23,9 @@
 #include "Precompiled.h"
 #include "APITemplates.h"
 #include "Animatable.h"
+#include "AttributeAnimation.h"
 #include "DebugRenderer.h"
+#include "ObjectAnimation.h"
 #include "PackageFile.h"
 #include "Scene.h"
 #include "SmoothedTransform.h"
@@ -32,6 +34,16 @@
 
 namespace Urho3D
 {
+
+static void RegisterAttributeAnimation(asIScriptEngine* engine)
+{
+    RegisterResource<AttributeAnimation>(engine, "AttributeAnimation");
+}
+
+static void RegisterObjectAnimation(asIScriptEngine* engine)
+{
+    RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
+}
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
@@ -265,6 +277,8 @@ static void RegisterScene(asIScriptEngine* engine)
 
 void RegisterSceneAPI(asIScriptEngine* engine)
 {
+    RegisterAttributeAnimation(engine);
+    RegisterObjectAnimation(engine);
     RegisterSerializable(engine);
     RegisterAnimatable(engine);
     RegisterNode(engine);

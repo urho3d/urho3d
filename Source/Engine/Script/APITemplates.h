@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Addons.h"
+#include "Animatable.h"
 #include "BorderImage.h"
 #include "Context.h"
 #include "Drawable.h"
@@ -450,7 +451,14 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
 template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* className)
 {
     RegisterSerializable<T>(engine, className);
-    RegisterSubclass<Object, T>(engine, "Animatable", className);
+    RegisterSubclass<Animatable, T>(engine, "Animatable", className);
+
+    engine->RegisterObjectMethod(className, "void set_animationEnabled(bool)", asMETHODPR(T, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_animationEnabled() const", asMETHODPR(T, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(T, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(T, GetObjectAnimation, () const, const ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimation(const String&in, AttributeAnimation@+)", asMETHODPR(T, SetAttributeAnimation, (const String&, AttributeAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(T, GetAttributeAnimation, (const String&) const, const AttributeAnimation*), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Component.
