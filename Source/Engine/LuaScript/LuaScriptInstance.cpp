@@ -213,25 +213,25 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         dest = tolua_tourho3dstring(luaState_, -1, "");
         break;
     case VAR_VECTOR2:
-        dest = *((Vector2*)tolua_tousertype(luaState_,1,0));
+        dest = *((Vector2*)tolua_tousertype(luaState_, -1, 0));
         break;
     case VAR_VECTOR3:
-        dest = *((Vector3*)tolua_tousertype(luaState_,1,0));
+        dest = *((Vector3*)tolua_tousertype(luaState_, -1, 0));
         break;
     case VAR_VECTOR4:
-        dest = *((Vector4*)tolua_tousertype(luaState_,1,0));
+        dest = *((Vector4*)tolua_tousertype(luaState_, -1, 0));
         break;
     case VAR_QUATERNION:
-        dest = *((Quaternion*)tolua_tousertype(luaState_,1,0));
+        dest = *((Quaternion*)tolua_tousertype(luaState_, -1, 0));
         break;
     case VAR_COLOR:
-        dest = *((Color*)tolua_tousertype(luaState_,1,0));
+        dest = *((Color*)tolua_tousertype(luaState_, -1, 0));
         break;
     case VAR_INTRECT:
-        dest = *((IntRect*)tolua_tousertype(luaState_,1,0));
+        dest = *((IntRect*)tolua_tousertype(luaState_, -1, 0));
         break;
     case VAR_INTVECTOR2:
-        dest = *((IntVector2*)tolua_tousertype(luaState_,1,0));
+        dest = *((IntVector2*)tolua_tousertype(luaState_, -1, 0));
         break;
     default:
         LOGERROR("Unsupported data type");
