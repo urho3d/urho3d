@@ -272,13 +272,13 @@ void Billboards::MoveCamera(float timeStep)
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
-        cameraNode_->TranslateRelative(Vector3::FORWARD * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('S'))
-        cameraNode_->TranslateRelative(Vector3::BACK * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('A'))
-        cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
-        cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
     
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
@@ -298,7 +298,7 @@ void Billboards::AnimateScene(float timeStep)
     
     // Rotate the lights around the world Y-axis
     for (unsigned i = 0; i < lightNodes.Size(); ++i)
-        lightNodes[i]->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), true);
+        lightNodes[i]->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
     
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
     for (unsigned i = 0; i < billboardNodes.Size(); ++i)

@@ -54,7 +54,7 @@ void CreateScene()
     for (uint i = 0; i < NUM_OBJECTS; ++i)
     {
         Node@ boxNode = scene_.CreateChild("Box");
-        boxNode.position = Vector3(Random(200.0f) - 100.0f, Random(200.0f) - 100.0f, Random(200.0f) - 100.0f);
+        boxNode.position = Vector3(Random(20.0f) - 10.0f, Random(20.0f) - 10.0f, Random(20.0f) - 10.0f);
         // Orient using random pitch, yaw and roll Euler angles
         boxNode.rotation = Quaternion(Random(360.0f), Random(360.0f), Random(360.0f));
         StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
@@ -129,13 +129,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown['W'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['S'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['A'])
-        cameraNode.TranslateRelative(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['D'])
-        cameraNode.TranslateRelative(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 }
 
 void SubscribeToEvents()

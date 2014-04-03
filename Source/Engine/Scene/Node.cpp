@@ -356,60 +356,140 @@ void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation
     SetWorldScale(scale);
 }
 
-void Node::Translate(const Vector3& delta)
+void Node::Translate(const Vector3& delta, TransformSpace space)
 {
-    position_ += delta;
+    switch (space)
+    {
+    case TS_LOCAL:
+        position_ += rotation_ * delta;
+        break;
+        
+    case TS_PARENT:
+        position_ += delta;
+        break;
+        
+    case TS_WORLD:
+        position_ += (parent_ == scene_ || !parent_) ? delta : parent_->GetWorldTransform().Inverse() * Vector4(delta, 0.0f);
+        break;
+    }
+    
     MarkDirty();
-
+    
     MarkNetworkUpdate();
 }
 
-void Node::TranslateRelative(const Vector3& delta)
+void Node::Rotate(const Quaternion& delta, TransformSpace space)
 {
-    position_ += rotation_ * delta;
-    MarkDirty();
-
-    MarkNetworkUpdate();
-}
-
-void Node::Rotate(const Quaternion& delta, bool fixedAxis)
-{
-    if (!fixedAxis)
+    switch (space)
+    {
+    case TS_LOCAL:
         rotation_ = (rotation_ * delta).Normalized();
-    else
+        break;
+        
+    case TS_PARENT:
         rotation_ = (delta * rotation_).Normalized();
-    MarkDirty();
+        break;
+        
+    case TS_WORLD:
+        if (parent_ == scene_ || !parent_)
+            rotation_ = (delta * rotation_).Normalized();
+        else
+        {
+            Quaternion worldRotation = GetWorldRotation();
+            rotation_ = rotation_ * worldRotation.Inverse() * delta * worldRotation;
+        }
+        break;
+    }
 
+    MarkDirty();
+    
     MarkNetworkUpdate();
 }
 
-void Node::Yaw(float angle, bool fixedAxis)
+void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space)
 {
-    Rotate(Quaternion(angle, Vector3::UP), fixedAxis);
+    Vector3 parentSpacePoint;
+    Quaternion oldRotation = rotation_;
+    
+    switch (space)
+    {
+    case TS_LOCAL:
+        parentSpacePoint = GetTransform() * point;
+        rotation_ = (rotation_ * delta).Normalized();
+        break;
+        
+    case TS_PARENT:
+        parentSpacePoint = point;
+        rotation_ = (delta * rotation_).Normalized();
+        break;
+        
+    case TS_WORLD:
+        if (parent_ == scene_ || !parent_)
+        {
+            parentSpacePoint = point;
+            rotation_ = (delta * rotation_).Normalized();
+        }
+        else
+        {
+            parentSpacePoint = parent_->GetWorldTransform().Inverse() * point;
+            Quaternion worldRotation = GetWorldRotation();
+            rotation_ = rotation_ * worldRotation.Inverse() * delta * worldRotation;
+        }
+        break;
+    }
+    
+    Vector3 oldRelativePos = oldRotation.Inverse() * (position_ - parentSpacePoint);
+    position_ = rotation_ * oldRelativePos + parentSpacePoint;
+
+    MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
-void Node::Pitch(float angle, bool fixedAxis)
+void Node::Yaw(float angle, TransformSpace space)
 {
-    Rotate(Quaternion(angle, Vector3::RIGHT), fixedAxis);
+    Rotate(Quaternion(angle, Vector3::UP), space);
 }
 
-void Node::Roll(float angle, bool fixedAxis)
+void Node::Pitch(float angle, TransformSpace space)
 {
-    Rotate(Quaternion(angle, Vector3::FORWARD), fixedAxis);
+    Rotate(Quaternion(angle, Vector3::RIGHT), space);
 }
 
-bool Node::LookAt(const Vector3& target, const Vector3& up)
+void Node::Roll(float angle, TransformSpace space)
 {
+    Rotate(Quaternion(angle, Vector3::FORWARD), space);
+}
+
+bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space)
+{
+    Vector3 worldSpaceTarget;
+    
+    switch (space)
+    {
+    case TS_LOCAL:
+        worldSpaceTarget = GetWorldTransform() * target;
+        break;
+        
+    case TS_PARENT:
+        worldSpaceTarget = (parent_ == scene_ || !parent_) ? target : parent_->GetWorldTransform() * target;
+        break;
+        
+    case TS_WORLD:
+        worldSpaceTarget = target;
+        break;
+    }
+    
     Vector3 lookDir = target - GetWorldPosition();
     // Check if target is very close, in that case can not reliably calculate lookat direction
     if (lookDir.Equals(Vector3::ZERO))
         return false;
-    Quaternion rotation;
+    Quaternion newRotation;
     // Do nothing if setting look rotation failed
-    if (!rotation.FromLookRotation(lookDir, up))
+    if (!newRotation.FromLookRotation(lookDir, up))
         return false;
     
-    SetRotation((parent_ == scene_ || !parent_) ? rotation : parent_->GetWorldRotation().Inverse() * rotation);
+    SetWorldRotation(newRotation);
     return true;
 }
 

@@ -2518,7 +2518,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
     // Center shadow camera to the view space bounding box
     Quaternion rot(shadowCameraNode->GetWorldRotation());
     Vector3 adjust(center.x_, center.y_, 0.0f);
-    shadowCameraNode->Translate(rot * adjust);
+    shadowCameraNode->Translate(rot * adjust, TS_WORLD);
     
     // If the shadow map viewport is known, snap to whole texels
     if (shadowMapWidth > 0.0f)
@@ -2528,7 +2528,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
         float invActualSize = 1.0f / (shadowMapWidth - 2.0f);
         Vector2 texelSize(viewSize.x_ * invActualSize, viewSize.y_ * invActualSize);
         Vector3 snap(-fmodf(viewPos.x_, texelSize.x_), -fmodf(viewPos.y_, texelSize.y_), 0.0f);
-        shadowCameraNode->Translate(rot * snap);
+        shadowCameraNode->Translate(rot * snap, TS_WORLD);
     }
 }
 
