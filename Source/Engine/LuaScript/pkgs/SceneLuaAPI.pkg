@@ -1,3 +1,5 @@
+$pfile "Scene/AttributeAnimation.pkg"
+$pfile "Scene/ObjectAnimation.pkg"
 $pfile "Scene/Serializable.pkg"
 $pfile "Scene/Animatable.pkg"
 $pfile "Scene/Component.pkg"

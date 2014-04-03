@@ -2,4 +2,14 @@ $#include "Animatable.h"
 
 class Animatable : Serializable
 {
+    void SetAnimationEnabled(bool enable);
+    void SetObjectAnimation(ObjectAnimation* objectAnimation);
+    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation);
+
+    bool GetAnimationEnabled() const;
+    const ObjectAnimation* GetObjectAnimation() const;
+    const AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    
+    tolua_property__get_set bool animationEnabled;
+    tolua_property__get_set ObjectAnimation* objectAnimation;
 };
