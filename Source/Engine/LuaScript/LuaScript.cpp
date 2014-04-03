@@ -425,6 +425,9 @@ void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
 
 void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // Call also user-subscribed PostUpdate handler (if any)
+    HandleEvent(eventType, eventData);
+    
     if (coroutineUpdate_ && coroutineUpdate_->BeginCall())
     {
         using namespace PostUpdate;
