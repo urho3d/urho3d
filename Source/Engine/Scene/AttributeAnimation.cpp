@@ -73,7 +73,8 @@ bool AttributeAnimation::Save(Serializer& dest) const
 {
     XMLFile xmlFile(context_);
 
-    if (!SaveXML(xmlFile.CreateRoot("attributeAnimation")))
+    XMLElement rootElem = xmlFile.CreateRoot("attributeAnimation");
+    if (!SaveXML(rootElem))
         return false;
 
     return xmlFile.Save(dest);

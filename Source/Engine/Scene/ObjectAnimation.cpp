@@ -58,7 +58,8 @@ bool ObjectAnimation::Save(Serializer& dest) const
 {
     XMLFile xmlFile(context_);
 
-    if (!SaveXML(xmlFile.CreateRoot("objectAnimation")))
+    XMLElement rootElem = xmlFile.CreateRoot("objectAnimation");
+    if (!SaveXML(rootElem))
         return false;
 
     return xmlFile.Save(dest);
