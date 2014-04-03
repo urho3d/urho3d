@@ -63,6 +63,12 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Handle attribute read access.
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
+    /// Return attribute descriptions, or null if none defined.
+    virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -104,13 +110,15 @@ public:
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
-    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName);
+    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName) const;
 
 protected:
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 
 private:
+    /// Find script object attributes.
+    void GetScriptAttributes();
     /// Find script object method refs.
     void FindScriptObjectMethodRefs();
     /// Subscribe to script method events.
@@ -138,6 +146,8 @@ private:
     lua_State* luaState_;
     /// Script file name.
     String scriptFileName_;
+    /// Attributes, including script object variables.
+    Vector<AttributeInfo> attributeInfos_;
     /// Script object type.
     String scriptObjectType_;
     /// Script object ref.

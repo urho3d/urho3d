@@ -91,9 +91,9 @@ function CreateScriptObjectInstance(object, instance)
     o.instance = instance
     o.node = instance:GetNode()
 
-    local existKeys = {}
+    local keys = {}
     for k, v in pairs(o) do
-        existKeys[k] = true
+        keys[k] = true
     end
 
     -- Call start function
@@ -101,12 +101,12 @@ function CreateScriptObjectInstance(object, instance)
 
     local attrNames = {}
     for k, v in pairs(o) do
-        if existKeys[k] == nil then
+        if keys[k] == nil then
             table.insert(attrNames, k)
         end
     end
-    
-    return attrNames, o
+
+    return o, attrNames
 end
 
 function DestroyScriptObjectInstance(instance)

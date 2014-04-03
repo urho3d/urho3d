@@ -90,6 +90,145 @@ void LuaScriptInstance::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
+void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    if (scriptObjectRef_ == LUA_REFNIL)
+        return;
+
+    String name = attr.name_;
+    unsigned length = name.Length();
+    if (name.Back() == '_')
+        length -= 1;
+
+	int top = lua_gettop(luaState_);
+
+    String functionName = String("Set") + name.Substring(0, 1).ToUpper() + name.Substring(1, length - 1);
+    WeakPtr<LuaFunction> function = GetScriptObjectFunction(functionName);
+    // If set function exist
+    if (function)
+    {
+        if (function->BeginCall(this))
+        {
+            function->PushVariant(src);
+            function->EndCall();
+        }
+    }
+    else
+    {
+
+        lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
+        lua_pushstring(luaState_, name.CString());
+
+        switch (attr.type_)
+        {
+        case VAR_BOOL:
+            lua_pushboolean(luaState_, src.GetBool());
+            break;
+        case VAR_FLOAT:
+            lua_pushnumber(luaState_, src.GetFloat());
+            break;
+        case VAR_STRING:
+            tolua_pushurho3dstring(luaState_, src.GetString());
+            break;
+        case VAR_VECTOR2:
+            tolua_pushusertype(luaState_, (void*)&(src.GetVector2()), "Vector2");
+            break;
+        case VAR_VECTOR3:
+            tolua_pushusertype(luaState_, (void*)&(src.GetVector3()), "Vector3");
+            break;
+        case VAR_VECTOR4:
+            tolua_pushusertype(luaState_, (void*)&(src.GetVector4()), "Vector4");
+            break;
+        case VAR_QUATERNION:
+            tolua_pushusertype(luaState_, (void*)&(src.GetQuaternion()), "Quaternion");
+            break;
+        case VAR_COLOR:
+            tolua_pushusertype(luaState_, (void*)&(src.GetColor()), "Color");
+            break;
+        case VAR_INTRECT:
+            tolua_pushusertype(luaState_, (void*)&(src.GetIntRect()), "IntRect");
+            break;
+        case VAR_INTVECTOR2:
+            tolua_pushusertype(luaState_, (void*)&(src.GetIntVector2()), "IntVector2");
+            break;
+        default:
+            LOGERROR("Unsupported data type");
+            lua_settop(luaState_, top);
+            return;
+        }
+        lua_settable(luaState_, -3);
+    }
+
+	lua_settop(luaState_, top);
+}
+
+void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
+{
+    if (scriptObjectRef_ == LUA_REFNIL)
+        return;
+
+    String name = attr.name_;
+    unsigned length = name.Length();
+    if (name.Back() == '_')
+        length -= 1;
+
+    int top = lua_gettop(luaState_);
+
+    String functionName = String("Get") + name.Substring(0, 1).ToUpper() + name.Substring(1, length - 1);
+    WeakPtr<LuaFunction> function = GetScriptObjectFunction(functionName);
+	// If get function exist
+    if (function)
+    {
+        if (function->BeginCall(this))
+            function->EndCall(1);
+    }
+    else
+    {
+        lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
+        lua_pushstring(luaState_, name.CString());
+        lua_gettable(luaState_, -2);
+    }
+
+    switch (attr.type_)
+    {
+    case VAR_BOOL:
+        dest = lua_toboolean(luaState_, -1) != 0;
+        break;
+    case VAR_FLOAT:
+        dest = (float)lua_tonumber(luaState_, -1);
+        break;
+    case VAR_STRING:
+        dest = tolua_tourho3dstring(luaState_, -1, "");
+        break;
+    case VAR_VECTOR2:
+        dest = *((Vector2*)tolua_tousertype(luaState_,1,0));
+        break;
+    case VAR_VECTOR3:
+        dest = *((Vector3*)tolua_tousertype(luaState_,1,0));
+        break;
+    case VAR_VECTOR4:
+        dest = *((Vector4*)tolua_tousertype(luaState_,1,0));
+        break;
+    case VAR_QUATERNION:
+        dest = *((Quaternion*)tolua_tousertype(luaState_,1,0));
+        break;
+    case VAR_COLOR:
+        dest = *((Color*)tolua_tousertype(luaState_,1,0));
+        break;
+    case VAR_INTRECT:
+        dest = *((IntRect*)tolua_tousertype(luaState_,1,0));
+        break;
+    case VAR_INTVECTOR2:
+        dest = *((IntVector2*)tolua_tousertype(luaState_,1,0));
+        break;
+    default:
+        LOGERROR("Unsupported data type");
+        return;
+    }
+
+    lua_settop(luaState_, top);
+}
+
 void LuaScriptInstance::ApplyAttributes()
 {
     WeakPtr<LuaFunction> function = scriptObjectMethods_[LSOM_APPLYATTRIBUTES];
@@ -147,7 +286,7 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
 
     ReleaseObject();
 
-    int top = lua_gettop(luaState_);
+
 
     WeakPtr<LuaFunction> function = luaScript_->GetFunction("CreateScriptObjectInstance");
     if (!function || !function->BeginCall())
@@ -155,38 +294,14 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
 
     function->PushLuaTable(scriptObjectType);
     function->PushUserType((void*)this, "LuaScriptInstance");
-    
+
     // Return script object and attribute names
     if (!function->EndCall(2))
         return;
 
+    GetScriptAttributes();
     scriptObjectType_ = scriptObjectType;
     scriptObjectRef_ = luaL_ref(luaState_, LUA_REGISTRYINDEX);
-    
-    // Get all attribute names
-    Vector<String> attributeNames;
-    if (lua_istable(luaState_, -1))
-    {
-        int length = lua_objlen(luaState_, -1);
-        for (int i = 1; i <= length; ++i)
-        {
-            lua_pushinteger(luaState_, i);
-            lua_gettable(luaState_, -2);
-
-            if (!lua_isstring(luaState_, -1))
-            {
-                lua_pop(luaState_, 1);
-                continue;
-            }
-
-            String name = lua_tostring(luaState_, -1);
-            attributeNames.Push(name);
-
-            lua_pop(luaState_, 1);
-        }
-    }
-
-    lua_settop(luaState_, top);
 
     // Find script object method refs
     FindScriptObjectMethodRefs();
@@ -336,11 +451,94 @@ void LuaScriptInstance::OnMarkedDirty(Node* node)
         scene->DelayedMarkedDirty(this);
         return;
     }
-    
+
     WeakPtr<LuaFunction> function = scriptObjectMethods_[LSOM_TRANSFORMCHANGED];
     if (function && function->BeginCall(this))
     {
         function->EndCall();
+    }
+}
+
+void LuaScriptInstance::GetScriptAttributes()
+{
+    // Get all attribute names
+    Vector<String> names;
+    if (lua_istable(luaState_, -1))
+    {
+        int length = lua_objlen(luaState_, -1);
+        for (int i = 1; i <= length; ++i)
+        {
+            lua_pushinteger(luaState_, i);
+            lua_gettable(luaState_, -2);
+
+            if (!lua_isstring(luaState_, -1))
+            {
+                lua_pop(luaState_, 1);
+                continue;
+            }
+
+            String name = lua_tostring(luaState_, -1);
+            names.Push(name);
+
+            lua_pop(luaState_, 1);
+        }
+    }
+    lua_pop(luaState_, 1);
+
+    attributeInfos_.Clear();
+
+    for (unsigned i = 0; i < names.Size(); ++i)
+    {
+        lua_pushstring(luaState_, names[i].CString());
+        lua_gettable(luaState_, -2);
+
+        // Get attribute type
+        int type = lua_type(luaState_, -1);
+
+        AttributeInfo info;
+        info.mode_ = AM_FILE;
+        info.name_ = names[i];
+        info.ptr_ = 0;
+
+        switch (type)
+        {
+        case LUA_TBOOLEAN:
+            info.type_ = VAR_BOOL;
+            break;
+        case LUA_TNUMBER:
+            info.type_ = VAR_FLOAT;
+            break;
+        case LUA_TSTRING:
+            info.type_ = VAR_STRING;
+            break;
+        case LUA_TUSERDATA:
+            {
+                String typeName = tolua_typename(luaState_, -1);
+                lua_pop(luaState_, 1);
+
+                if (typeName == "Vector2")
+                    info.type_ = VAR_VECTOR2;
+                else if (typeName == "Vector3")
+                    info.type_ = VAR_VECTOR3;
+                else if (typeName == "Vector4")
+                    info.type_ = VAR_VECTOR4;
+                else if (typeName == "Quaternion")
+                    info.type_ = VAR_QUATERNION;
+                else if (typeName == "Color")
+                    info.type_ = VAR_COLOR;
+                else if (typeName == "Intrect")
+                    info.type_ = VAR_INTRECT;
+                else if (typeName == "Intvector2")
+                    info.type_ = VAR_INTVECTOR2;
+            }
+            break;
+        default:
+            break;
+        }
+        lua_pop(luaState_, 1);
+
+        if (info.type_ != VAR_NONE)
+            attributeInfos_.Push(info);
     }
 }
 
@@ -357,7 +555,7 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
 {
     Scene* scene = GetScene();
     PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
-    
+
     if (scene && scriptObjectMethods_[LSOM_UPDATE])
         SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
 
@@ -369,7 +567,7 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
         SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
-    
+
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
         node_->AddListener(this);
 }
@@ -378,7 +576,7 @@ void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
 {
     Scene* scene = GetScene();
     PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
-    
+
     if (scene && scriptObjectMethods_[LSOM_UPDATE])
         UnsubscribeFromEvent(scene, E_SCENEUPDATE);
 
@@ -390,7 +588,7 @@ void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
         UnsubscribeFromEvent(physicsWorld, E_PHYSICSPOSTSTEP);
-    
+
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
         node_->RemoveListener(this);
 }
@@ -475,6 +673,8 @@ void LuaScriptInstance::ReleaseObject()
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
 
+    attributeInfos_.Clear();
+
     if (IsEnabledEffective())
         UnsubscribeFromScriptMethodEvents();
 
@@ -490,7 +690,7 @@ void LuaScriptInstance::ReleaseObject()
     }
 }
 
-WeakPtr<LuaFunction> LuaScriptInstance::GetScriptObjectFunction(const String& functionName)
+WeakPtr<LuaFunction> LuaScriptInstance::GetScriptObjectFunction(const String& functionName) const
 {
     return luaScript_->GetFunction(scriptObjectType_ + "." + functionName, true);
 }
