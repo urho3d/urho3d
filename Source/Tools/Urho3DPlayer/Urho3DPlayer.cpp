@@ -129,6 +129,14 @@ void Urho3DPlayer::Start()
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
         scriptFile_ = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_);
 
+        /// \hack If we are running the editor, also instantiate Lua subsystem to enable editing Lua ScriptInstances
+#ifdef ENABLE_LUA
+        if (scriptFileName_.Contains("Editor.as", false))
+        {
+            LuaScript* luaScript = new LuaScript(context_);
+            context_->RegisterSubsystem(luaScript);
+        }
+#endif
         // If script loading is successful, proceed to main loop
         if (scriptFile_ && scriptFile_->Execute("void Start()"))
         {
