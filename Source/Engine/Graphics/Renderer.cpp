@@ -172,7 +172,7 @@ static const unsigned short spotLightIndexData[] =
 
 static const char* shadowVariations[] =
 {
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     // No specific hardware shadow compare variation on OpenGL, it is always supported
     "LQSHADOW ",
     "LQSHADOW ",
@@ -872,7 +872,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     int retries = 3;
     
     // OpenGL: create shadow map only. Color rendertarget is not needed
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
@@ -966,7 +966,7 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
         newBuffer->SetFilterMode(filtered ? FILTER_BILINEAR : FILTER_NEAREST);
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
-        #ifdef USE_OPENGL
+        #ifdef URHO3D_OPENGL
         // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
         // Otherwise eg. the AutoExposure post process will not work correctly
         if (persistentKey && Texture::GetDataType(format) == GL_FLOAT)
@@ -1622,7 +1622,7 @@ void Renderer::CreateGeometries()
     pointLightGeometry_->SetIndexBuffer(plib);
     pointLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, plib->GetIndexCount());
     
-    #if !defined(USE_OPENGL) || !defined(GL_ES_VERSION_2_0)
+    #if !defined(URHO3D_OPENGL) || !defined(GL_ES_VERSION_2_0)
     if (graphics_->GetShadowMapFormat())
     {
         faceSelectCubeMap_ = new TextureCube(context_);
@@ -1666,7 +1666,7 @@ void Renderer::SetIndirectionTextureData()
         {
             for (unsigned x = 0; x < 256; ++x)
             {
-                #ifdef USE_OPENGL
+                #ifdef URHO3D_OPENGL
                 dest[0] = x;
                 dest[1] = 255 - y;
                 dest[2] = faceX;

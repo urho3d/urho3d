@@ -15,7 +15,7 @@ endif ()
 set (INCLUDE_DIRS_ONLY ../../include)
 
 # Setup target
-if (ENABLE_LUAJIT AND ENABLE_64BIT AND APPLE AND NOT IOS)
+if (URHO3D_LUAJIT AND URHO3D_64BIT AND APPLE AND NOT IOS)
     setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable (NODEPS)

@@ -35,34 +35,25 @@ if (CMAKE_HOST_WIN32)
 endif ()
 
 # Enable testing
-if (ENABLE_TESTING)
+if (URHO3D_TESTING)
     enable_testing ()
-    add_definitions (-DENABLE_TESTING)
-    set (TEST_TIME_OUT 5)    # in seconds
+    add_definitions (-DURHO3D_TESTING)
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
-if (NOT DEFINED ENABLE_SSE)
-    set (ENABLE_SSE 1)
-endif ()
-if (ENABLE_SSE)
-    add_definitions (-DENABLE_SSE)
+if (URHO3D_SSE)
+    add_definitions (-DURHO3D_SSE)
 endif ()
 
 # Enable structured exception handling and minidumps on MSVC only.
-if (MSVC)
-    if (NOT DEFINED ENABLE_MINIDUMPS)
-        set (ENABLE_MINIDUMPS 1)
-    endif ()
-    if (ENABLE_MINIDUMPS)
-        add_definitions (-DENABLE_MINIDUMPS)
-    endif ()
+if (MSVC AND URHO3D_MINIDUMPS)
+    add_definitions (-DURHO3D_MINIDUMPS)
 endif ()
 
 # By default use the MSVC dynamic runtime. To eliminate the need to distribute the runtime installer,
 # this can be switched off if not using Urho3D as a shared library.
 if (MSVC)
-    if (USE_STATIC_RUNTIME)
+    if (URHO3D_STATIC_RUNTIME)
         set (RELEASE_RUNTIME /MT)
         set (DEBUG_RUNTIME /MTd)
     else ()
@@ -72,32 +63,32 @@ if (MSVC)
 endif ()
 
 # Enable file watcher support for automatic resource reloads by default.
-if (ENABLE_FILEWATCHER OR NOT DEFINED ENABLE_FILEWATCHER)
-    add_definitions (-DENABLE_FILEWATCHER)
+if (URHO3D_FILEWATCHER)
+    add_definitions (-DURHO3D_FILEWATCHER)
 endif ()
 
 # Enable profiling by default. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
-if (ENABLE_PROFILING OR NOT DEFINED ENABLE_PROFILING)
-    add_definitions (-DENABLE_PROFILING)
+if (URHO3D_PROFILING)
+    add_definitions (-DURHO3D_PROFILING)
 endif ()
 
 # Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
-if (ENABLE_LOGGING OR NOT DEFINED ENABLE_LOGGING)
-    add_definitions (-DENABLE_LOGGING)
+if (URHO3D_LOGGING)
+    add_definitions (-DURHO3D_LOGGING)
 endif ()
 
 # If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
 # with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
 # enabled, but Windows graphics card drivers are usually better optimized for Direct3D. Direct3D can
-# be manually enabled for MinGW with -DUSE_OPENGL=0, but is likely to fail due to missing headers
+# be manually enabled for MinGW with -DURHO3D_OPENGL=0, but is likely to fail due to missing headers
 # and libraries, unless the MinGW-w64 distribution is used.
 if (NOT MSVC)
-    if (NOT WIN32 OR NOT DEFINED USE_OPENGL)
-        set (USE_OPENGL 1)
+    if (NOT WIN32 OR NOT DEFINED URHO3D_OPENGL)
+        set (URHO3D_OPENGL 1)
     endif ()
 endif ()
-if (USE_OPENGL)
-    add_definitions (-DUSE_OPENGL)
+if (URHO3D_OPENGL)
+    add_definitions (-DURHO3D_OPENGL)
 endif ()
 
 # If not on Windows, enable Unix mode for kNet library.
@@ -106,29 +97,24 @@ if (NOT WIN32)
 endif ()
 
 # Add definitions for GLEW
-if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
+if (NOT IOS AND NOT ANDROID AND NOT RASPI AND URHO3D_OPENGL)
     add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
 endif ()
 
-# Enable AngelScript by default
-if (NOT DEFINED ENABLE_ANGELSCRIPT)
-    set (ENABLE_ANGELSCRIPT 1)
-endif ()
-
 # Add definition for AngelScript
-if (ENABLE_ANGELSCRIPT)
-    add_definitions (-DENABLE_ANGELSCRIPT)
+if (URHO3D_ANGELSCRIPT)
+    add_definitions (-DURHO3D_ANGELSCRIPT)
 endif ()
 
 # Add definition for Lua and LuaJIT
-if (ENABLE_LUAJIT)
-    add_definitions (-DENABLE_LUAJIT)
+if (URHO3D_LUAJIT)
+    add_definitions (-DURHO3D_LUAJIT)
     set (JIT JIT)
-    # Implied ENABLE_LUA
-    set (ENABLE_LUA 1)
+    # Implied URHO3D_LUA
+    set (URHO3D_LUA 1)
 endif ()
-if (ENABLE_LUA)
-    add_definitions (-DENABLE_LUA)
+if (URHO3D_LUA)
+    add_definitions (-DURHO3D_LUA)
 endif ()
 
 # Default library type is STATIC
@@ -160,7 +146,7 @@ endif ()
 if (IOS)
     # IOS-specific setup
     add_definitions (-DIOS)
-    if (ENABLE_64BIT)
+    if (URHO3D_64BIT)
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_INCLUDING_64_BIT))
     else ()
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
@@ -172,7 +158,7 @@ if (IOS)
     set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
 elseif (XCODE)
     # MacOSX-Xcode-specific setup
-    if (NOT ENABLE_64BIT)
+    if (NOT URHO3D_64BIT)
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
     set (CMAKE_OSX_SYSROOT macosx)	# Set Base SDK to "Latest OS X"
@@ -193,7 +179,7 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
     # SSE flag is redundant if already compiling as 64bit
-    if (ENABLE_SSE AND NOT ENABLE_64BIT)
+    if (URHO3D_SSE AND NOT URHO3D_64BIT)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE")
     endif ()
@@ -206,7 +192,7 @@ else ()
         # Most of the flags are already setup in android.toolchain.cmake module
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector")
-        if (ENABLE_64BIT)
+        if (URHO3D_64BIT)
             # TODO: Revisit this again when ARM also support 64bit
             # For now just reference it to suppress "unused variable" warning
         endif ()
@@ -224,19 +210,19 @@ else ()
         else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
-            if (ENABLE_64BIT)
+            if (URHO3D_64BIT)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
             else ()
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-                if (ENABLE_SSE)
+                if (URHO3D_SSE)
                     if (NOT WIN32)
                         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
                         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
                     else ()
                         message (STATUS "Using SSE2 instead of SSE because SSE fails on some Windows ports of GCC")
-                        message (STATUS "Disable SSE with the CMake option -DENABLE_SSE=0 if this is not desired")
+                        message (STATUS "Disable SSE with the CMake option -DURHO3D_SSE=0 if this is not desired")
                         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
                         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
                     endif ()
@@ -294,15 +280,6 @@ elseif (CMAKE_CROSSCOMPILING)
     endif ()
 endif ()
 set_output_directories (${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Bin RUNTIME PDB)
-
-# Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
-if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
-    ENABLE_MINIDUMPS AND USE_MKLINK AND USE_STATIC_RUNTIME AND
-    ENABLE_64BIT AND
-    SCP_TO_TARGET AND
-    ANDROID_ABI AND
-    ENABLE_SAFE_LUA)
-endif ()
 
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
@@ -461,8 +438,8 @@ macro (setup_executable)
     
     if (IOS)
         set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
-    elseif (CMAKE_CROSSCOMPILING AND NOT ANDROID AND SCP_TO_TARGET)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
+    elseif (CMAKE_CROSSCOMPILING AND NOT ANDROID AND URHO3D_SCP_TO_TARGET)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0)
     endif ()
     if (DEST_RUNTIME_DIR)
         # Need to check if the variable is defined first because this macro could be called by CMake project outside of Urho3D that does not wish to install anything
@@ -603,7 +580,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # Engine/LuaJIT external dependency
-    if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
+    if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32)
             list (APPEND LINK_LIBS_ONLY dl m)
         endif ()
@@ -614,7 +591,7 @@ macro (define_dependency_libs TARGET)
         # Core
         if (WIN32)
             list (APPEND LINK_LIBS_ONLY winmm)
-            if (ENABLE_MINIDUMPS)
+            if (URHO3D_MINIDUMPS)
                 list (APPEND LINK_LIBS_ONLY dbghelp)
             endif ()
         elseif (NOT ANDROID)
@@ -622,7 +599,7 @@ macro (define_dependency_libs TARGET)
         endif ()
 
         # Graphics
-        if (USE_OPENGL)
+        if (URHO3D_OPENGL)
             if (WIN32)
                 list (APPEND LINK_LIBS_ONLY opengl32)
             elseif (ANDROID)
@@ -652,9 +629,9 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
-    if (ENABLE_LUAJIT AND ${TARGET} MATCHES Urho3D)
+    if (URHO3D_LUAJIT AND ${TARGET} MATCHES Urho3D)
         # 64-bit Mac OS X
-        if (ENABLE_64BIT AND APPLE AND NOT IOS)
+        if (URHO3D_64BIT AND APPLE AND NOT IOS)
             set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pagezero_size 10000 -image_base 100000000")
         endif ()
         # GCC-specific

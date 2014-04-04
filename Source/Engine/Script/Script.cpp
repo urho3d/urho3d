@@ -272,7 +272,7 @@ void Script::SetExecuteConsoleCommands(bool enable)
 
 void Script::DumpAPI(DumpMode mode)
 {
-    // Does not use LOGRAW macro here to ensure the messages are always dumped regardless of ENABLE_LOGGING compiler directive and of Log subsystem availability
+    // Does not use LOGRAW macro here to ensure the messages are always dumped regardless of URHO3D_LOGGING compiler directive and of Log subsystem availability
     if (mode == DOXYGEN)
         Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
     else if (mode == C_HEADER)

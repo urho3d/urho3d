@@ -557,7 +557,7 @@ In unmodified AngelScript, this would have to be written as:
 \page LuaScripting Lua scripting
 
 Lua scripting in Urho3D has its dedicated LuaScript subsystem that must be instantiated before the scripting capabilities can be used. Lua support is not compiled in by default but must be enabled by the CMake
-build option -DENABLE_LUA=1. For more details see \ref Build_Options "Build options". Instantiating the subsystem is done like this:
+build option -DURHO3D_LUA=1. For more details see \ref Build_Options "Build options". Instantiating the subsystem is done like this:
 
 \code
 context_->RegisterSubsystem(new LuaScript(context_));

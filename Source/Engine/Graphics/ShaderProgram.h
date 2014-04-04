@@ -22,6 +22,6 @@
 
 #pragma once
 
-#ifdef USE_OPENGL
+#ifdef URHO3D_OPENGL
 #include "OpenGL/OGLShaderProgram.h"
 #endif

@@ -69,7 +69,7 @@ public:
     void SetDefaultScene(Scene* scene);
     /// Set whether to execute engine console commands as script code. Default true.
     void SetExecuteConsoleCommands(bool enable);
-    /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when ENABLE_LOGGING not defined.
+    /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when URHO3D_LOGGING not defined.
     void DumpAPI(DumpMode mode= DOXYGEN);
     /// Log a message from the script engine.
     void MessageCallback(const asSMessageInfo* msg);
@@ -102,7 +102,7 @@ private:
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
     /// Return a script function/method execution context for the current execution nesting level.
     asIScriptContext* GetScriptFileContext();
-    /// Output a sanitated row of script API. No-ops when ENABLE_LOGGING not defined.
+    /// Output a sanitated row of script API. No-ops when URHO3D_LOGGING not defined.
     void OutputAPIRow(DumpMode mode, const String& row, bool removeReference = false, String separator = ";");
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);

@@ -34,7 +34,7 @@ endif ()
 
 # Makefile: Build mode
 # When LuaJIT is enabled for Urho3D, always build as static library to be linked against in main Urho3D executable or library CMake target
-# Use -DENABLE_LUAJIT_AMALG=1 to compile LuaJIT core as one huge C file and allows GCC to generate faster and shorter code
+# Use -DURHO3D_LUAJIT_AMALG=1 to compile LuaJIT core as one huge C file and allows GCC to generate faster and shorter code
 # Use -Dxxxxx=0/1/2 as CMake build option to turn off/on the features and debugging support below
 
 # Makefile: Features
@@ -120,7 +120,7 @@ if (MSVC)
     endif ()
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_HASJIT ${MSVC_HASJIT}\n")
     
-    if (ENABLE_64BIT)
+    if (URHO3D_64BIT)
         set (MSVC_ARCH_BITS 64)
         set (MSVC_TARGET_ARCH X64)
     else ()
@@ -228,7 +228,7 @@ else ()
     set (LJVM_BOUT lj_vm.s)
     enable_language (ASM)
     if (TARGET_LJARCH STREQUAL x64)
-        if (ENABLE_64BIT)
+        if (URHO3D_64BIT)
             set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m64")
         else ()
             set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
@@ -250,7 +250,7 @@ generate_source (vmdef.lua vmdef ${LJLIB_C})
 generate_source (lj_folddef.h folddef src/lj_opt_fold.c)
 
 # Define source files
-if (ENABLE_LUAJIT_AMALG)
+if (URHO3D_LUAJIT_AMALG)
     set (LJCORE_C src/ljamalg.c)
 else ()
     set (LJCORE_C src/lj_gc.c src/lj_err.c src/lj_char.c src/lj_bc.c src/lj_obj.c
@@ -276,7 +276,7 @@ setup_library ()
 
 # On Android platform, use 'adb push' to copy the tool(s) from android-Bin to Android (virtual) device; use 'adb shell' to login into a remote shell to execute the tool in the (virtual) device
 # The tools are not built on iOS platform as there is no (easy) way to execute them on the iOS device
-if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
+if (NOT IOS AND URHO3D_TOOLS)
     # Define target name for LuaJIT interpreter cum compiler
     set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
 

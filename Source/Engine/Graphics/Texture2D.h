@@ -22,7 +22,7 @@
 
 #pragma once
 
-#ifdef USE_OPENGL
+#ifdef URHO3D_OPENGL
 #include "OpenGL/OGLTexture2D.h"
 #else
 #include "Direct3D9/D3D9Texture2D.h"

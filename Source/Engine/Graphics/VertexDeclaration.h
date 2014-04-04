@@ -22,6 +22,6 @@
 
 #pragma once
 
-#ifndef USE_OPENGL
+#ifndef URHO3D_OPENGL
 #include "Direct3D9/D3D9VertexDeclaration.h"
 #endif

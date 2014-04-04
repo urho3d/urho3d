@@ -142,7 +142,7 @@ void DebugHud::Update()
             shadowQualityTexts[renderer->GetShadowQuality()],
             renderer->GetMaxOccluderTriangles() > 0 ? "On" : "Off",
             renderer->GetDynamicInstancing() ? "On" : "Off",
-            #ifdef USE_OPENGL
+            #ifdef URHO3D_OPENGL
             "OGL");
             #else
             graphics->GetSM3Support() ? "SM3" : "SM2");

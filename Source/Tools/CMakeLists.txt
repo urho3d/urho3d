@@ -30,23 +30,14 @@ include_directories (${URHO3D_INCLUDE_DIRS})
 # Urho3DPlayer application
 add_subdirectory (Urho3DPlayer)
 
-# Do not build tools for Raspberry Pi unless it is explicitly enabled
-if (NOT DEFINED ENABLE_TOOLS)
-    if (RASPI)
-        set (ENABLE_TOOLS 0)
-    else ()
-        set (ENABLE_TOOLS 1)
-    endif ()
-endif ()
-
-# Do not build tools for iOS and Android regardless of the ENABLE_TOOLS build option
-if (NOT IOS AND NOT ANDROID AND ENABLE_TOOLS)
+# Do not build tools for iOS and Android regardless of the URHO3D_TOOLS build option
+if (NOT IOS AND NOT ANDROID AND URHO3D_TOOLS)
     # Urho3D tools
     add_subdirectory (AssetImporter)
     add_subdirectory (OgreImporter)
     add_subdirectory (PackageTool)
     add_subdirectory (RampGenerator)
-    if (ENABLE_ANGELSCRIPT)
+    if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
 endif ()

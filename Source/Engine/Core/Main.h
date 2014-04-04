@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return function; \
 }
 // MSVC release mode: write minidump on crash
-#elif defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
+#elif defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 #define DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \

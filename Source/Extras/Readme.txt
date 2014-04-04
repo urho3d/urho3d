@@ -6,7 +6,7 @@ OgreBatchConverter
 
 - Contributed by Carlo Carollo. Converts multiple Ogre .mesh.xml files (also from
   subdirectories) by invoking the OgreImporter tool. Use the CMake option
-  ENABLE_EXTRAS to include in the build.
+  URHO3D_EXTRAS to include in the build.
 
 OgreMaxscriptExport
 

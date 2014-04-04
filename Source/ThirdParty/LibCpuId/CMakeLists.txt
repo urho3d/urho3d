@@ -10,7 +10,7 @@ file (GLOB H_FILES
     src/*.h
 )
 
-if (MSVC AND ENABLE_64BIT)
+if (MSVC AND URHO3D_64BIT)
     enable_language (ASM_MASM)
     # Commented out due to cmake bug
     #set (ASM_FILES src/masm-x64.asm)

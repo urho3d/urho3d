@@ -44,7 +44,7 @@ static Log* GetLog()
     return GetScriptContext()->GetSubsystem<Log>();
 }
 
-#ifdef ENABLE_LOGGING
+#ifdef URHO3D_LOGGING
 
 static void Print(const String& value, bool error)
 {

@@ -25,7 +25,7 @@
 namespace Urho3D
 {
 
-#if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
+#if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 /// Write a minidump. Needs to be called from within a structured exception handler.
 URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointers);
 #endif

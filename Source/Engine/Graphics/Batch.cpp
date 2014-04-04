@@ -99,7 +99,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
         0.5f * (float)viewport.Height() / height
     );
     
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     offset.x_ += scale.x_;
     offset.y_ += scale.y_;
     offset.y_ = 1.0f - offset.y_;
@@ -143,7 +143,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
     spotProj.m22_ = 1.0f / Max(light->GetRange(), M_EPSILON);
     spotProj.m32_ = 1.0f;
     
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
     texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
     #else
@@ -231,7 +231,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         float widthRange = 0.5f * viewport.Width() / rtWidth;
         float heightRange = 0.5f * viewport.Height() / rtHeight;
         
-        #ifdef USE_OPENGL
+        #ifdef URHO3D_OPENGL
         Vector4 bufferUVOffset(((float)viewport.left_) / rtWidth + widthRange,
             1.0f - (((float)viewport.top_) / rtHeight + heightRange), widthRange, heightRange);
         #else
@@ -412,7 +412,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
-                    #ifdef USE_OPENGL
+                    #ifdef URHO3D_OPENGL
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
                     #else
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
@@ -475,7 +475,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
-                    #ifdef USE_OPENGL
+                    #ifdef URHO3D_OPENGL
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
                     #else
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
@@ -494,7 +494,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                 unsigned faceHeight = shadowMap->GetHeight() / 3;
                 float width = (float)shadowMap->GetWidth();
                 float height = (float)shadowMap->GetHeight();
-                #ifdef USE_OPENGL
+                #ifdef URHO3D_OPENGL
                     float mulX = (float)(faceWidth - 3) / width;
                     float mulY = (float)(faceHeight - 3) / height;
                     float addX = 1.5f / width;

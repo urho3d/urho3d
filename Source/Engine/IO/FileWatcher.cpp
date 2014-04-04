@@ -51,7 +51,7 @@ FileWatcher::FileWatcher(Context* context) :
     fileSystem_(GetSubsystem<FileSystem>()),
     watchSubDirs_(false)
 {
-#if defined(ENABLE_FILEWATCHER)
+#if defined(URHO3D_FILEWATCHER)
 #if defined(__linux__)
     watchHandle_ = inotify_init();
 #elif defined(__APPLE__) && !defined(IOS)
@@ -63,7 +63,7 @@ FileWatcher::FileWatcher(Context* context) :
 FileWatcher::~FileWatcher()
 {
     StopWatching();
-#if defined(ENABLE_FILEWATCHER)
+#if defined(URHO3D_FILEWATCHER)
 #if defined(__linux__)
     close(watchHandle_);
 #endif
@@ -81,7 +81,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     // Stop any previous watching
     StopWatching();
     
-#if defined(ENABLE_FILEWATCHER)
+#if defined(URHO3D_FILEWATCHER)
 #if defined(WIN32)
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
     
@@ -216,7 +216,7 @@ void FileWatcher::StopWatching()
 
 void FileWatcher::ThreadFunction()
 {
-#if defined(ENABLE_FILEWATCHER)
+#if defined(URHO3D_FILEWATCHER)
 #if defined(WIN32)
     unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;

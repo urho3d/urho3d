@@ -28,12 +28,12 @@
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
 #include "ScriptFile.h"
 #include "Script.h"
 #endif
 
-#ifdef ENABLE_LUA
+#ifdef URHO3D_LUA
 #include "LuaScript.h"
 #endif
 
@@ -122,7 +122,7 @@ void Urho3DPlayer::Start()
     String extension = GetExtension(scriptFileName_);
     if (extension != ".lua" && extension != ".luc")
     {
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
         // Instantiate and register the AngelScript subsystem
         context_->RegisterSubsystem(new Script(context_));
 
@@ -130,7 +130,7 @@ void Urho3DPlayer::Start()
         scriptFile_ = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_);
 
         /// \hack If we are running the editor, also instantiate Lua subsystem to enable editing Lua ScriptInstances
-#ifdef ENABLE_LUA
+#ifdef URHO3D_LUA
         if (scriptFileName_.Contains("Editor.as", false))
         {
             LuaScript* luaScript = new LuaScript(context_);
@@ -153,7 +153,7 @@ void Urho3DPlayer::Start()
     }
     else
     {
-#ifdef ENABLE_LUA
+#ifdef URHO3D_LUA
         // Instantiate and register the Lua script subsystem
         LuaScript* luaScript = new LuaScript(context_);
         context_->RegisterSubsystem(luaScript);
@@ -176,7 +176,7 @@ void Urho3DPlayer::Start()
 
 void Urho3DPlayer::Stop()
 {
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
     if (scriptFile_)
     {
         // Execute the optional stop function
@@ -189,7 +189,7 @@ void Urho3DPlayer::Stop()
     }
 #endif
     
-#ifdef ENABLE_LUA
+#ifdef URHO3D_LUA
     else
     {
         LuaScript* luaScript = GetSubsystem<LuaScript>();
@@ -201,7 +201,7 @@ void Urho3DPlayer::Stop()
 
 void Urho3DPlayer::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
 {
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
     if (scriptFile_->GetFunction("void Stop()"))
         scriptFile_->Execute("void Stop()");
 #endif
@@ -209,7 +209,7 @@ void Urho3DPlayer::HandleScriptReloadStarted(StringHash eventType, VariantMap& e
 
 void Urho3DPlayer::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
 {
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
     // Restart the script application after reload
     if (!scriptFile_->Execute("void Start()"))
     {
@@ -221,7 +221,7 @@ void Urho3DPlayer::HandleScriptReloadFinished(StringHash eventType, VariantMap& 
 
 void Urho3DPlayer::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
 {
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
     scriptFile_.Reset();
     ErrorExit();
 #endif
