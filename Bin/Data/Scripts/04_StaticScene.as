@@ -8,7 +8,6 @@
 
 Scene@ scene_;
 Node@ cameraNode;
-Node@ boxNode;
 float yaw = 0.0f;
 float pitch = 0.0f;
 

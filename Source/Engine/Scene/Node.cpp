@@ -361,6 +361,7 @@ void Node::Translate(const Vector3& delta, TransformSpace space)
     switch (space)
     {
     case TS_LOCAL:
+        // Note: local space translation disregards local scale for scale-independent movement speed
         position_ += rotation_ * delta;
         break;
         
