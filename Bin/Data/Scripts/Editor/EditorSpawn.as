@@ -13,11 +13,11 @@ Window@ spawnWindow;
 Vector3 randomRotation = Vector3(0, 0, 0);
 float randomScaleMin = 1;
 float randomScaleMax = 1;
-float spawnCount = 1;
+uint spawnCount = 1;
 float spawnRadius = 0;
 bool useNormal = true;
 
-int numberSpawnedObjects = 1;
+uint numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
 
 void CreateSpawnEditor()
@@ -82,7 +82,6 @@ void HideSpawnEditor()
     spawnWindow.visible = false;
 }
 
-
 void PickSpawnObject()
 {
     @resourcePicker = GetResourcePicker(ShortStringHash("Node"));
@@ -95,7 +94,6 @@ void PickSpawnObject()
     CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickSpawnObjectDone");
 }
-
 
 void EditRandomRotation(StringHash eventType, VariantMap& eventData)
 {
@@ -112,20 +110,16 @@ void EditRandomScale(StringHash eventType, VariantMap& eventData)
     UpdateHierarchyItem(editorScene);
 }
 
-
-
 void ToggleUseNormal(StringHash eventType, VariantMap& eventData)
 {
     useNormal = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
-
-
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    numberSpawnedObjects = edit.text.ToFloat();
-    edit.text = String(numberSpawnedObjects); 
+    numberSpawnedObjects = edit.text.ToUInt();
+    edit.text = String(numberSpawnedObjects);
     RefreshPickedObjects();
 }
 
@@ -134,10 +128,11 @@ void EditSpawnRadius(StringHash eventType, VariantMap& eventData)
     LineEdit@ edit = eventData["Element"].GetPtr();
     spawnRadius = edit.text.ToFloat();
 }
+
 void EditSpawnCount(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    spawnCount = edit.text.ToFloat();
+    spawnCount = edit.text.ToUInt();
 }
 
 void RefreshPickedObjects()
@@ -170,9 +165,9 @@ void EditSpawnedObjectName(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ nameEdit = eventData["Element"].GetPtr();
     int index = nameEdit.vars["Index"].GetUInt();
-    String resourceName = nameEdit.text;
-    spawnedObjectsNames[index] = VerifySpawnedObjectFile(resourceName);
-    RefreshPickedObjects();
+    String resourceName = VerifySpawnedObjectFile(nameEdit.text);
+    nameEdit.text = resourceName;
+    spawnedObjectsNames[index] = resourceName;
 }
 
 String VerifySpawnedObjectFile(const String&in resourceName)
@@ -298,4 +293,3 @@ void SpawnObject()
         }
     }
 }
-
