@@ -221,7 +221,7 @@ def makefile_travis_ci
     ENV['SKIP_NATIVE'] = '1'
   else
     jit = 'JIT'
-    amalg = '-DENABLE_AMALG=1'
+    amalg = '-DURHO3D_AMALG=1'
   end
   system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
@@ -268,7 +268,7 @@ def xcode_travis_ci
     xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
   else
     jit = 'JIT'
-    amalg = '-DENABLE_AMALG=1'
+    amalg = '-DURHO3D_AMALG=1'
     platform_prefix = ''
   end
   system "./cmake_macosx.sh -DIOS=$IOS -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DENABLE_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'

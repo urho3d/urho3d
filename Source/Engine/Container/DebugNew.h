@@ -22,7 +22,7 @@
 
 #pragma once
 
-#if defined(_MSC_VER) && defined(_DEBUG) && !defined(ENABLE_AMALG)
+#if defined(_MSC_VER) && defined(_DEBUG) && !defined(URHO3D_AMALG)
 
 #define _CRTDBG_MAP_ALLOC
 
