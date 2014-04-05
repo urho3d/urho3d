@@ -22,7 +22,7 @@
 
 #pragma once
 
-#ifdef USE_OPENGL
+#ifdef URHO3D_OPENGL
 #include "OpenGL/OGLGPUObject.h"
 #else
 #include "Direct3D9/D3D9GPUObject.h"

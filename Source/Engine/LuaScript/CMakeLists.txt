@@ -24,7 +24,7 @@
 set (TARGET_NAME LuaScript)
 
 # Optionally enable Lua / C++ wrapper safety checks
-if (NOT ENABLE_SAFE_LUA)
+if (NOT URHO3D_SAFE_LUA)
     add_definitions (-DTOLUA_RELEASE)
 endif ()
 

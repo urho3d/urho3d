@@ -25,10 +25,10 @@ env:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - DISPLAY=:99.0
   matrix:
-    - LINUX=1               ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC SITE_UPDATE=1
-    - LINUX=1               ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
-    - WINDOWS=1 ARCH=x86_64 ENABLE_64BIT=1 URHO3D_LIB_TYPE=STATIC
-    - WINDOWS=1 ARCH=x86_64 ENABLE_64BIT=1 URHO3D_LIB_TYPE=SHARED
+    - LINUX=1               URHO3D_64BIT=1 URHO3D_LIB_TYPE=STATIC SITE_UPDATE=1
+    - LINUX=1               URHO3D_64BIT=1 URHO3D_LIB_TYPE=SHARED
+    - WINDOWS=1 ARCH=x86_64 URHO3D_64BIT=1 URHO3D_LIB_TYPE=STATIC
+    - WINDOWS=1 ARCH=x86_64 URHO3D_64BIT=1 URHO3D_LIB_TYPE=SHARED
     - LINUX=1                              URHO3D_LIB_TYPE=STATIC
     - LINUX=1                              URHO3D_LIB_TYPE=SHARED
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=STATIC
@@ -51,7 +51,7 @@ before_install:
     - sudo apt-get update -q -y
 install:
     - sudo apt-get install -q -y --no-install-recommends libasound2-dev
-    - bash -c "[ x$ENABLE_64BIT == 'x' ]" && sudo apt-get remove -q -y gvfs-daemons && sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true
+    - bash -c "[ x$URHO3D_64BIT == 'x' ]" && sudo apt-get remove -q -y gvfs-daemons && sudo apt-get install -q -y libxrandr-dev:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true
     - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32 || true
     - bash -e /etc/init.d/xvfb start
 script: rake travis_ci

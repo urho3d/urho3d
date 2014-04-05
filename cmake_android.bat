@@ -22,14 +22,14 @@
 
 @echo off
 pushd %~dp0
-:: Define USE_MKLINK to 1 to enable out-of-source build and symbolic linking of resources from Bin directory
+:: Define URHO3D_MKLINK to 1 to enable out-of-source build and symbolic linking of resources from Bin directory
 set "build=Source\Android"
 set "source=.."
 set "use_mklink="
-if exist android-Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (android-Build\CMakeCache.txt) do if "%%i" == "USE_MKLINK" set "use_mklink=%%k"
+if exist android-Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (android-Build\CMakeCache.txt) do if "%%i" == "URHO3D_MKLINK" set "use_mklink=%%k"
 :loop
 if not "%1" == "" (
-    if "%1" == "-DUSE_MKLINK" set "use_mklink=%~2"
+    if "%1" == "-DURHO3D_MKLINK" set "use_mklink=%~2"
     shift
     shift
     goto loop

@@ -69,7 +69,7 @@ inline int	btGetVersion()
 		#else
 
 // Urho3D: allow to disable SSE
-#if (defined (ENABLE_SSE) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
+#if (defined (URHO3D_SSE) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
 			#if _MSC_VER>1400
 				#define BT_USE_SIMD_VECTOR3
 			#endif
@@ -164,7 +164,7 @@ inline int	btGetVersion()
 	//non-windows systems
 
 // Urho3D: allow to disable SSE
-#if (defined (ENABLE_SSE) && defined (__APPLE__) && (!defined (BT_USE_DOUBLE_PRECISION)))
+#if (defined (URHO3D_SSE) && defined (__APPLE__) && (!defined (BT_USE_DOUBLE_PRECISION)))
     #if defined (__i386__) || defined (__x86_64__)
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE

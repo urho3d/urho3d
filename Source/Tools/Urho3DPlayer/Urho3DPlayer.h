@@ -53,7 +53,7 @@ private:
     /// Script file name.
     String scriptFileName_;
     
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;
 #endif

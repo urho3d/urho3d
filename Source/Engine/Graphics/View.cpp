@@ -315,7 +315,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         return false;
     
     hasScenePasses_ = false;
-    flipVertical_ = false;
     
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
@@ -400,13 +399,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     litBasePassName_ = PASS_LITBASE;
     litAlphaPassName_ = PASS_LITALPHA;
     
-    // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
-    // as a render texture produced on Direct3D9
-    #ifdef USE_OPENGL
-    if (renderTarget_)
-        flipVertical_ = true;
-    #endif
-    
     // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
     deferredAmbient_ = false;
@@ -453,7 +445,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     rtSize_ = IntVector2(rtWidth, rtHeight);
     
     // On OpenGL flip the viewport if rendering to a texture for consistent UV addressing with Direct3D9
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     if (renderTarget_)
     {
         viewRect_.bottom_ = rtSize_.y_ - viewRect_.top_;
@@ -502,12 +494,12 @@ void View::Update(const FrameInfo& frame)
     for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
     
-    if (camera_)
-    {
-        // Set automatic aspect ratio if required
-        if (camera_->GetAutoAspectRatio())
-            camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
-    }
+    if (hasScenePasses_ && (!camera_ || !octree_))
+        return;
+    
+    // Set automatic aspect ratio if required
+    if (camera_->GetAutoAspectRatio())
+        camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
     
     GetDrawables();
     GetBatches();
@@ -515,6 +507,9 @@ void View::Update(const FrameInfo& frame)
 
 void View::Render()
 {
+    if (hasScenePasses_ && (!octree_ || !camera_))
+        return;
+    
     // Actually update geometry data now
     UpdateGeometries();
     
@@ -546,15 +541,20 @@ void View::Render()
     }
     #endif
     
-    #ifdef USE_OPENGL
-    if (camera_)
-        camera_->SetFlipVertical(flipVertical_);
-    #endif
+    if (renderTarget_)
+    {
+        // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
+        // as a render texture produced on Direct3D9
+        #ifdef URHO3D_OPENGL
+        if (camera_)
+            camera_->SetFlipVertical(true);
+        #endif
+    }
     
     // Render
     ExecuteRenderPathCommands();
     
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     if (camera_)
         camera_->SetFlipVertical(false);
     #endif
@@ -569,7 +569,7 @@ void View::Render()
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
-    if (!renderTarget_ && camera_ && octree_)
+    if (!renderTarget_ && octree_ && camera_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective())
@@ -634,7 +634,7 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
     if (camera->IsOrthographic())
     {
         depthMode.x_ = 1.0f;
-        #ifdef USE_OPENGL
+        #ifdef URHO3D_OPENGL
         depthMode.z_ = 0.5f;
         depthMode.w_ = 0.5f;
         #else
@@ -653,7 +653,7 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
     if (setProjection)
     {
         Matrix4 projection = camera->GetProjection();
-        #ifdef USE_OPENGL
+        #ifdef URHO3D_OPENGL
         // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
         float constantBias = 2.0f * graphics_->GetDepthConstantBias();
         projection.m22_ += projection.m32_ * constantBias;
@@ -669,9 +669,6 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
 
 void View::GetDrawables()
 {
-    if (!camera_ || !octree_)
-        return;
-    
     PROFILE(GetDrawables);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
@@ -838,9 +835,6 @@ void View::GetDrawables()
 
 void View::GetBatches()
 {
-    if (!camera_ || !octree_)
-        return;
-    
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
@@ -1677,7 +1671,7 @@ void View::RenderQuad(RenderPathCommand& command)
     float widthRange = 0.5f * viewSize_.x_ / rtWidth;
     float heightRange = 0.5f * viewSize_.y_ / rtHeight;
     
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
         1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
     #else
@@ -1705,7 +1699,7 @@ void View::RenderQuad(RenderPathCommand& command)
         float height = (float)renderTargets_[nameHash]->GetHeight();
         
         graphics_->SetShaderParameter(invSizeName, Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
-        #ifdef USE_OPENGL
+        #ifdef URHO3D_OPENGL
         graphics_->SetShaderParameter(offsetsName, Vector4::ZERO);
         #else
         graphics_->SetShaderParameter(offsetsName, Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
@@ -1781,7 +1775,7 @@ void View::AllocateScreenBuffers()
     bool needSubstitute = false;
     unsigned numViewportTextures = 0;
 
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers.
     if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
@@ -1804,7 +1798,7 @@ void View::AllocateScreenBuffers()
         needSubstitute = true;
     }
 
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     if (deferred_ && !hdrRendering)
         format = Graphics::GetRGBAFormat();
     #endif
@@ -1913,7 +1907,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     float widthRange = 0.5f * viewSize_.x_ / rtWidth;
     float heightRange = 0.5f * viewSize_.y_ / rtHeight;
     
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
         1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
     #else
@@ -1934,8 +1928,8 @@ void View::DrawFullscreenQuad(bool nearQuad)
     Matrix3x4 model = Matrix3x4::IDENTITY;
     Matrix4 projection = Matrix4::IDENTITY;
     
-    #ifdef USE_OPENGL
-    if (flipVertical_)
+    #ifdef URHO3D_OPENGL
+    if (camera_ && camera_->GetFlipVertical())
         projection.m11_ = -1.0f;
     model.m23_ = nearQuad ? -1.0f : 1.0f;
     #else
@@ -2472,7 +2466,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
             shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 2.0f) / shadowMapWidth));
         else
         {
-            #ifdef USE_OPENGL
+            #ifdef URHO3D_OPENGL
                 shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 3.0f) / shadowMapWidth));
             #else
                 shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 4.0f) / shadowMapWidth));

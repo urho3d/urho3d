@@ -22,7 +22,7 @@
 
 #include "Precompiled.h"
 
-#if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
+#if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 
 #include "ProcessUtils.h"
 

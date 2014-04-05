@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-#ifdef USE_OPENGL
+#ifdef URHO3D_OPENGL
 static const float posAdjust = 0.0f;
 #else
 static const float posAdjust = 0.5f;

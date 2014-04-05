@@ -85,7 +85,7 @@ Engine::Engine(Context* context) :
     maxInactiveFps_(60),
     pauseMinimized_(false),
     #endif
-#ifdef ENABLE_TESTING
+#ifdef URHO3D_TESTING
     timeOut_(0),
 #endif
     autoExit_(true),
@@ -100,11 +100,11 @@ Engine::Engine(Context* context) :
     // Create subsystems which do not depend on engine initialization or startup parameters
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
-    #ifdef ENABLE_PROFILING
+    #ifdef URHO3D_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
     #endif
     context_->RegisterSubsystem(new FileSystem(context_));
-    #ifdef ENABLE_LOGGING
+    #ifdef URHO3D_LOGGING
     context_->RegisterSubsystem(new Log(context_));
     #endif
     context_->RegisterSubsystem(new ResourceCache(context_));
@@ -300,7 +300,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Init FPU state of main thread
     InitFPU();
 
-    #ifdef ENABLE_TESTING
+    #ifdef URHO3D_TESTING
     if (HasParameter(parameters, "TimeOut"))
         timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
     #endif
@@ -448,7 +448,7 @@ void Engine::DumpProfiler()
 
 void Engine::DumpResources()
 {
-    #ifdef ENABLE_LOGGING
+    #ifdef URHO3D_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
@@ -472,7 +472,7 @@ void Engine::DumpResources()
 
 void Engine::DumpMemory()
 {
-    #ifdef ENABLE_LOGGING
+    #ifdef URHO3D_LOGGING
     #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtMemState state;
     _CrtMemCheckpoint(&state);
@@ -583,7 +583,7 @@ void Engine::ApplyFrameLimit()
     }
 
     elapsed = frameTimer_.GetUSec(true);
-    #ifdef ENABLE_TESTING
+    #ifdef URHO3D_TESTING
     if (timeOut_ > 0)
     {
         timeOut_ -= elapsed;
@@ -731,7 +731,7 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["TextureAnisotropy"] = ToInt(value);
                 ++i;
             }
-            #ifdef ENABLE_TESTING
+            #ifdef URHO3D_TESTING
             else if (argument == "timeout" && !value.Empty())
             {
                 ret["TimeOut"] = ToInt(value);

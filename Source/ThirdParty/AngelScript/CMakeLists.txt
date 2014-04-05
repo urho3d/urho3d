@@ -18,7 +18,7 @@ if (IOS OR ANDROID OR RASPI)
     endif ()
 endif ()
 
-if (MSVC AND ENABLE_64BIT)
+if (MSVC AND URHO3D_64BIT)
     enable_language (ASM_MASM)
     # Commented out due to cmake bug
     #set (ASM_FILES source/as_callfunc_x64_msvc_asm.asm)

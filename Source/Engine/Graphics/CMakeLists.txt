@@ -21,7 +21,7 @@
 #
 
 # Define source files
-if (USE_OPENGL)
+if (URHO3D_OPENGL)
     set (GRAPHICS_SYS_DIR OpenGL)
 else ()
     set (GRAPHICS_SYS_DIR Direct3D9)
@@ -29,9 +29,9 @@ endif ()
 define_source_files (GLOB_CPP_PATTERNS *.cpp ${GRAPHICS_SYS_DIR}/*.cpp GLOB_H_PATTERNS *.h ${GRAPHICS_SYS_DIR}/*.h PARENT_SCOPE)
 
 # Define dependency libs
-if (USE_OPENGL AND NOT IOS AND NOT ANDROID AND NOT RASPI)
+if (URHO3D_OPENGL AND NOT IOS AND NOT ANDROID AND NOT RASPI)
     set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/GLEW PARENT_SCOPE)
 endif ()
-if (NOT USE_OPENGL)
+if (NOT URHO3D_OPENGL)
     set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/MojoShader PARENT_SCOPE)
 endif ()

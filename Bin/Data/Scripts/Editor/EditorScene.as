@@ -330,25 +330,45 @@ void LoadNode(const String&in fileName)
     SetResourcePath(GetPath(fileName), true, true);
 
     Vector3 position = GetNewNodePosition();
+    Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, instantiateMode);
+    if (newNode !is null)
+    {
+        FocusNode(newNode);
+        instantiateFileName = fileName;
+    }
+}
+
+Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quaternion& rotation, float scaleMod = 1.0f, CreateMode mode = REPLICATED)
+{
+    if (file is null)
+        return null;
+
     Node@ newNode;
 
-    String extension = GetExtension(fileName);
+    suppressSceneChanges = true;
+
+    String extension = GetExtension(file.name);
     if (extension != ".xml")
-        newNode = editorScene.Instantiate(file, position, Quaternion(), instantiateMode);
+        newNode = editorScene.Instantiate(file, position, rotation, mode);
     else
-        newNode = editorScene.InstantiateXML(file, position, Quaternion(), instantiateMode);
+        newNode = editorScene.InstantiateXML(file, position, rotation, mode);
+
+    suppressSceneChanges = false;
 
     if (newNode !is null)
     {
+        newNode.scale = newNode.scale * scaleMod;
+
         // Create an undo action for the load
         CreateNodeAction action;
         action.Define(newNode);
         SaveEditAction(action);
         SetSceneModified();
 
-        FocusNode(newNode);
-        instantiateFileName = fileName;
+        UpdateHierarchyItem(newNode);
     }
+
+    return newNode;
 }
 
 bool SaveNode(const String&in fileName)

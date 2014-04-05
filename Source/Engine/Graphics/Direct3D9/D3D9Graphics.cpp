@@ -489,7 +489,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     impl_->device_->EndScene();
     impl_->device_->Present(0, 0, 0, 0);
     
-    #ifdef ENABLE_LOGGING
+    #ifdef URHO3D_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
     if (borderless_)
@@ -2481,7 +2481,7 @@ bool Graphics::CreateInterface()
 
 bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 {
-#ifdef ENABLE_LUAJIT
+#ifdef URHO3D_LUAJIT
     DWORD behaviorFlags = D3DCREATE_FPU_PRESERVE;
 #else
     DWORD behaviorFlags = 0;

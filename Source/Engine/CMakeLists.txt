@@ -63,7 +63,7 @@ endif ()
 
 # Define source files
 set (SOURCES Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene UI Urho2D)
-if (ENABLE_ANGELSCRIPT)
+if (URHO3D_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
 foreach (SOURCE ${SOURCES})
@@ -233,8 +233,8 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
         COMMENT "Stripping shared library")
 endif ()
-if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND SCP_TO_TARGET)
+if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND URHO3D_SCP_TO_TARGET)
     # Ensure SCP is the last command
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
         COMMENT "Scp-ing library to target system")
 endif ()

@@ -502,7 +502,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     
     CheckFeatureSupport(extensions);
     
-    #ifdef ENABLE_LOGGING
+    #ifdef URHO3D_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
     if (borderless_)

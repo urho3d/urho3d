@@ -254,7 +254,7 @@ void Connection::SendClientUpdate()
 
 void Connection::SendRemoteEvents()
 {
-    #ifdef ENABLE_LOGGING
+    #ifdef URHO3D_LOGGING
     if (logStatistics_ && statsTimer_.GetMSec(false) > STATS_INTERVAL_MSEC)
     {
         statsTimer_.Reset();

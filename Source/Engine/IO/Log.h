@@ -92,7 +92,7 @@ private:
     bool quiet_;
 };
 
-#ifdef ENABLE_LOGGING
+#ifdef URHO3D_LOGGING
 #define LOGDEBUG(message) Log::Write(LOG_DEBUG, message)
 #define LOGINFO(message) Log::Write(LOG_INFO, message)
 #define LOGWARNING(message) Log::Write(LOG_WARNING, message)

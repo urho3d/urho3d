@@ -246,7 +246,7 @@ private:
     Profiler* profiler_;
 };
 
-#ifdef ENABLE_PROFILING
+#ifdef URHO3D_PROFILING
 #define PROFILE(name) AutoProfileBlock profile_ ## name (GetSubsystem<Profiler>(), #name)
 #else
 #define PROFILE(name)

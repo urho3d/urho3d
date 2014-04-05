@@ -52,7 +52,7 @@ if (WIN32)
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (PATH_SUFFIX /Urho3D)
-    if (ENABLE_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
+    if (URHO3D_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores URHO3D_64BIT build option
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
             # Probably target system is a RedHat-based distro
             set (LIB_SUFFIX 64)
@@ -111,7 +111,7 @@ elseif (WIN32)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     list (APPEND CPACK_GENERATOR RPM DEB)
 endif ()
-if (ENABLE_64BIT)
+if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
 endif ()
 set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
@@ -124,16 +124,16 @@ include (CPack)
 foreach (TARGET Box2D Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
-if (ENABLE_ANGELSCRIPT)
+if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
 endif ()
-if (ENABLE_LUA)
+if (URHO3D_LUA)
     add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
-    if (USE_OPENGL)
+    if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
     else ()
         add_subdirectory (ThirdParty/MojoShader)
@@ -150,13 +150,13 @@ add_subdirectory (Tools)
 # Urho3D samples
 # Samples are built on iOS platform too when enabled. Currently there is no available mechanism to package each sample apps into individual *.apk
 # for Android platform, so we deploy all samples into one apk and use a simple list view activity launcher to select the sample to run
-if (ENABLE_SAMPLES)
+if (URHO3D_SAMPLES)
     add_subdirectory (Samples)
 endif ()
 
 # Urho3D extras
-# Do not build extras for iOS and Android regardless of its build option 
-if (NOT IOS AND NOT ANDROID AND ENABLE_EXTRAS)   
+# Do not build extras for iOS and Android
+if (NOT IOS AND NOT ANDROID AND URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()
 

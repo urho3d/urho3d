@@ -393,7 +393,7 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
     Matrix4 ret(Matrix4::ZERO);
 
     // Whether to construct matrix using OpenGL or Direct3D clip space convention
-    #ifdef USE_OPENGL
+    #ifdef URHO3D_OPENGL
     bool openGLFormat = apiSpecific;
     #else
     bool openGLFormat = false;

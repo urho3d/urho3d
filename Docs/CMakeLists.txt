@@ -40,9 +40,9 @@ find_package (Doxygen QUIET)
 
 if (DOXYGEN_FOUND)
     # Generate platform specific Doxyfile automatically
-    if (NOT USE_OPENGL EQUAL DOXYFILE_USE_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
-        set (DOXYFILE_USE_OPENGL ${USE_OPENGL} CACHE INTERNAL "USE_OPENGL flag when Doxyfile was last generated")
-        if (USE_OPENGL)
+    if (NOT URHO3D_OPENGL EQUAL DOXYFILE_URHO3D_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+        set (DOXYFILE_URHO3D_OPENGL ${URHO3D_OPENGL} CACHE INTERNAL "URHO3D_OPENGL flag when Doxyfile was last generated")
+        if (URHO3D_OPENGL)
             set (EXCLUDE_GRAPHICS_API Direct3D9)
         else ()
             set (EXCLUDE_GRAPHICS_API OpenGL)
@@ -83,16 +83,16 @@ if (DOXYGEN_FOUND)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/LuaScriptAPI.dox COMMAND echo dummy >${CMAKE_CURRENT_BINARY_DIR}/LuaScriptAPI.dox)
     endif ()
 
-    # If ENABLE_DOCS build option is set then add the custom 'doc' target into the default 'all' target, i.e. a normal build would not only build the software but also the documentation
-    if (ENABLE_DOCS_QUIET)
-        set (ENABLE_DOCS 1)
+    # If URHO3D_DOCS build option is set then add the custom 'doc' target into the default 'all' target, i.e. a normal build would not only build the software but also the documentation
+    if (URHO3D_DOCS_QUIET)
+        set (URHO3D_DOCS 1)
         if (CMAKE_HOST_WIN32)
             set (REDIRECT_STDOUT 1>nul)     # In quiet mode, redirect standard output stream of Doxygen to a null device
         else ()
             set (REDIRECT_STDOUT 1>/dev/null)
         endif ()
     endif ()
-    if (ENABLE_DOCS)
+    if (URHO3D_DOCS)
         set (ALL ALL)
     endif ()
 
@@ -105,8 +105,8 @@ if (DOXYGEN_FOUND)
 endif ()
 
 # Make sure html output directory exists and not empty
-file (WRITE ${CMAKE_CURRENT_SOURCE_DIR}/html/Readme.txt "If ENABLE_DOCS build option is not set then use 'make doc' command or an equivalent command in IDE to re-generate Urho3D documentation before calling 'make install' or its equivalent.")
+file (WRITE ${CMAKE_CURRENT_SOURCE_DIR}/html/Readme.txt "If URHO3D_DOCS build option is not set then use 'make doc' command or an equivalent command in IDE to re-generate Urho3D documentation before calling 'make install' or its equivalent.")
     
 # Currently it is not possible to make built-in 'install' target to depend on 'doc' in CMake, therefore 'make doc' command need to be invoked manually before 'make install' in order to install the SDK with complete documentation
-# Unless, ENABLE_DOCS build option is set in which case the custom 'doc' target is part of the default 'all' target which in turn the 'install' target depends on, so a single 'make install' alone is suffice to install everything 
+# Unless, URHO3D_DOCS build option is set in which case the custom 'doc' target is part of the default 'all' target which in turn the 'install' target depends on, so a single 'make install' alone is suffice to install everything 
 install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html/ DESTINATION ${DEST_SHARE_DIR}/Docs USE_SOURCE_PERMISSIONS)
