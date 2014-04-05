@@ -29,8 +29,9 @@ struct lua_State;
 namespace Urho3D
 {
 
-class LuaScript;
+class LuaFile;
 class LuaFunction;
+class LuaScript;
 
 /// Lua Script object methods.
 enum LuaScriptObjectMethod
@@ -77,9 +78,9 @@ public:
     /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptObjectType);
     /// Create script object. Return true if successful.
-    bool CreateObject(const String& scriptFileName, const String& scriptObjectType);
-    /// Set script file name.
-    void SetScriptFileName(const String& scriptFileName);
+    bool CreateObject(LuaFile* scriptFile, const String& scriptObjectType);
+    /// Set script file.
+    void SetScriptFile(LuaFile* scriptFile);
     /// Set script object type.
     void SetScriptObjectType(const String& scriptObjectType);
     /// Set script file serialization attribute by calling a script function.
@@ -99,8 +100,8 @@ public:
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
 
-    /// Return script file name.
-    const String& GetScriptFileName() const { return scriptFileName_; }
+	/// Return script file.
+	LuaFile* GetScriptFile() const;
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
     /// Return script object ref.
@@ -111,6 +112,11 @@ public:
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
     WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName) const;
+
+	/// Set script file attribute.
+	void SetScriptFileAttr(ResourceRef value);
+	/// Return script file attribute.
+	ResourceRef GetScriptFileAttr() const;
 
 protected:
     /// Handle node transform being dirtied.
@@ -144,12 +150,12 @@ private:
     LuaScript* luaScript_;
     /// Lua state.
     lua_State* luaState_;
-    /// Script file name.
-    String scriptFileName_;
-    /// Attributes, including script object variables.
+    /// Script file.
+	SharedPtr<LuaFile> scriptFile_;
+	/// Script object type.
+	String scriptObjectType_;
+	/// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
-    /// Script object type.
-    String scriptObjectType_;
     /// Script object ref.
     int scriptObjectRef_;
     /// Script object method.

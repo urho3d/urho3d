@@ -84,8 +84,8 @@ void LuaScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<LuaScriptInstance>(LOGIC_CATEGORY);
 
-    // ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_STRING, "Script File Name", GetScriptFileName, SetScriptFileName, String, String::EMPTY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+	ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_STRING, "Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
@@ -260,40 +260,35 @@ void LuaScriptInstance::OnSetEnabled()
 
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
-    SetScriptFileName(String::EMPTY);
+	SetScriptFile(0);
     SetScriptObjectType(scriptObjectType);
     return scriptObjectRef_ != LUA_REFNIL;
 }
 
-bool LuaScriptInstance::CreateObject(const String& scriptFileName, const String& scriptObjectType)
+bool LuaScriptInstance::CreateObject(LuaFile* scriptFile, const String& scriptObjectType)
 {
-    SetScriptFileName(scriptFileName);
+    SetScriptFile(0);
     SetScriptObjectType(scriptObjectType);
     return scriptObjectRef_ != LUA_REFNIL;
 }
 
-void LuaScriptInstance::SetScriptFileName(const String& scriptFileName)
+void LuaScriptInstance::SetScriptFile(LuaFile* scriptFile)
 {
-    if (scriptFileName_ == scriptFileName)
-        return;
+	if (scriptFile == scriptFile_)
+		return;
 
-    scriptFileName_ = scriptFileName;
+	scriptFile_ = scriptFile;
 
-    if (scriptFileName_.Empty())
-        return;
+	if (!scriptFile_)
+		return;
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    LuaFile* luaFile = cache->GetResource<LuaFile>(scriptFileName_);
-    if (!luaFile)
-        return;
-
-    if (!luaFile->LoadAndExecute(luaState_))
-        LOGERROR("Execute Lua file failed: " + scriptFileName_);
+    if (!scriptFile_->LoadAndExecute(luaState_))
+        LOGERROR("Execute Lua file failed: " + scriptFile_->GetName());
 }
 
 void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
 {
-    if (scriptObjectType_ == scriptObjectType)
+    if (scriptObjectType == scriptObjectType_)
         return;
 
     ReleaseObject();
@@ -416,6 +411,11 @@ void LuaScriptInstance::ScriptUnsubscribeFromEvents(void* sender)
 
     UnsubscribeFromEvents(object);
     objectToEventTypeToFunctionMap_.Erase(it);
+}
+
+LuaFile* LuaScriptInstance::GetScriptFile() const
+{
+	return scriptFile_;
 }
 
 PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
@@ -703,6 +703,17 @@ void LuaScriptInstance::ReleaseObject()
 WeakPtr<LuaFunction> LuaScriptInstance::GetScriptObjectFunction(const String& functionName) const
 {
     return luaScript_->GetFunction(scriptObjectType_ + "." + functionName, true);
+}
+
+void LuaScriptInstance::SetScriptFileAttr(ResourceRef value)
+{
+	ResourceCache* cache = GetSubsystem<ResourceCache>();
+	SetScriptFile(cache->GetResource<LuaFile>(value.name_));
+}
+
+ResourceRef LuaScriptInstance::GetScriptFileAttr() const
+{
+	return GetResourceRef(scriptFile_, LuaFile::GetTypeStatic());
 }
 
 }
