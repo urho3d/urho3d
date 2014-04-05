@@ -209,8 +209,8 @@ if (RASPI)
 endif ()
 
 # Platform and compiler specific options
-if (ENABLE_MODERN_CPP)
-    add_definitions (-DENABLE_MODERN_CPP)
+if (URHO3D_MODERN_CPP)
+    add_definitions (-DURHO3D_MODERN_CPP)
     if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
         # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
         execute_process (COMMAND ${CMAKE_COMMAND} -E touch test_modern_cpp.cpp)

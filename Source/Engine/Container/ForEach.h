@@ -25,7 +25,7 @@
 #include "Vector.h"
 
 // Note: ForEach is not supported on all compilers, such as VS2008.
-#ifdef ENABLE_MODERN_CPP
+#ifdef URHO3D_MODERN_CPP
 
 namespace Urho3D {
 
