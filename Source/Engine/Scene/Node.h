@@ -43,6 +43,14 @@ enum CreateMode
     LOCAL = 1
 };
 
+/// Transform space for translations and rotations.
+enum TransformSpace
+{
+    TS_LOCAL = 0,
+    TS_PARENT,
+    TS_WORLD
+};
+
 /// %Scene node that may contain components and child nodes.
 class URHO3D_API Node : public Serializable
 {
@@ -112,20 +120,20 @@ public:
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// Set both position, rotation and scale in world space as an atomic opration.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// Move the scene node in parent space, which is the same as world space if the scene node is on the root level.
-    void Translate(const Vector3& delta);
-    /// Move the scene node in parent space relative to its current rotation.
-    void TranslateRelative(const Vector3& delta);
-    /// Rotate the scene node in parent space either relative to its current rotation axes, or a fixed axis.
-    void Rotate(const Quaternion& delta, bool fixedAxis = false);
+    /// Move the scene node in the chosen transform space.
+    void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
+    /// Rotate the scene node in the chosen transform space.
+    void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    /// Rotate around a point in the chosen transform space.
+    void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL);
     /// Rotate around the X axis.
-    void Pitch(float angle, bool fixedAxis = false);
+    void Pitch(float angle, TransformSpace space = TS_LOCAL);
     /// Rotate around the Y axis.
-    void Yaw(float angle, bool fixedAxis = false);
+    void Yaw(float angle, TransformSpace space = TS_LOCAL);
     /// Rotate around the Z axis.
-    void Roll(float angle, bool fixedAxis = false);
-    /// Look at a target world position. Return true if successful, or false if resulted in an illegal rotation, in which case the current rotation remains.
-    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP);
+    void Roll(float angle, TransformSpace space = TS_LOCAL);
+    /// Look at a target position in the chosen transform space. Note that the up vector is always specified in world space. Return true if successful, or false if resulted in an illegal rotation, in which case the current rotation remains.
+    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TS_WORLD);
     /// Modify scale in parent space uniformly.
     void Scale(float scale);
     /// Modify scale in parent space.

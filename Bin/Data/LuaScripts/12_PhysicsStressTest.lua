@@ -187,16 +187,16 @@ function MoveCamera(timeStep)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if input:GetKeyDown(KEY_W) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_S) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_A) then
-        cameraNode:TranslateRelative(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_D) then
-        cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
 
     -- "Shoot" a physics object with left mousebutton

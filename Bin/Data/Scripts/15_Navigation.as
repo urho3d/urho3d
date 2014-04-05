@@ -197,13 +197,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown['W'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['S'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['A'])
-        cameraNode.TranslateRelative(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['D'])
-        cameraNode.TranslateRelative(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 
     // Set destination or teleport with left mouse button
     if (input.mouseButtonPress[MOUSEB_LEFT])
@@ -327,7 +327,7 @@ void FollowPath(float timeStep)
             move = distance;
         
         jackNode.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
-        jackNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * move);
+        jackNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * move);
 
         // Remove waypoint if reached it
         if ((jackNode.position - nextWaypoint).length < 0.1)

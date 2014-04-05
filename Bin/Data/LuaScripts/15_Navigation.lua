@@ -189,16 +189,16 @@ function MoveCamera(timeStep)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if input:GetKeyDown(KEY_W) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_S) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_A) then
-        cameraNode:TranslateRelative(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_D) then
-        cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
     -- Set destination or teleport with left mouse button
     if input:GetMouseButtonPress(MOUSEB_LEFT) then
@@ -320,7 +320,7 @@ function FollowPath(timeStep)
         end
 
         jackNode:LookAt(nextWaypoint, Vector3(0.0, 1.0, 0.0))
-        jackNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * move)
+        jackNode:Translate(Vector3(0.0, 0.0, 1.0) * move)
 
         -- Remove waypoint if reached it
         if (jackNode.position - nextWaypoint):Length() < 0.1 then

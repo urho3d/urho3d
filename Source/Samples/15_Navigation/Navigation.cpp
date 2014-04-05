@@ -248,13 +248,13 @@ void Navigation::MoveCamera(float timeStep)
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
-        cameraNode_->TranslateRelative(Vector3::FORWARD * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('S'))
-        cameraNode_->TranslateRelative(Vector3::BACK * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('A'))
-        cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
-        cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
     
     // Set destination or teleport with left mouse button
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
@@ -383,7 +383,7 @@ void Navigation::FollowPath(float timeStep)
             move = distance;
         
         jackNode_->LookAt(nextWaypoint, Vector3::UP);
-        jackNode_->TranslateRelative(Vector3::FORWARD * move);
+        jackNode_->Translate(Vector3::FORWARD * move);
 
         // Remove waypoint if reached it
         if ((jackNode_->GetPosition() - nextWaypoint).Length() < 0.1f)

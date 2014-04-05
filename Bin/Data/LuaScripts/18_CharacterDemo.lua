@@ -264,7 +264,6 @@ function HandleUpdate(eventType, eventData)
 end
 
 function HandlePostUpdate(eventType, eventData)
-
     if characterNode == nil then
         return
     end

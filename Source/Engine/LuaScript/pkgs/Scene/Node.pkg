@@ -2,10 +2,18 @@ $#include "File.h"
 $#include "Node.h"
 $#include "LuaScriptInstance.h"
 
+
 enum CreateMode
 {
     REPLICATED = 0,
     LOCAL = 1
+};
+
+enum TransformSpace
+{
+    TS_LOCAL = 0,
+    TS_PARENT,
+    TS_WORLD
 };
 
 class Node : public Serializable
@@ -45,26 +53,26 @@ class Node : public Serializable
     void SetWorldScale(float scale);
     void SetWorldScale(const Vector3& scale);
     tolua_outside void NodeSetWorldScaleXYZ @ SetWorldScaleXYZ(float x, float y, float z);
-    
+
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
     
-    void Translate(const Vector3& delta);
-    tolua_outside void NodeTranslateXYZ @ TranslateXYZ(float x, float y, float z);
+    void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
+    tolua_outside void NodeTranslateXYZ @ TranslateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL);
+
+    void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    tolua_outside void NodeRotateXYZ @ RotateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL);
+
+    void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    tolua_outside void NodeRotateAroundXYZ @ RotateAroundXYZ(float pX, float pY, float pZ, float dX, float dY, float dZ, TransformSpace space = TS_LOCAL);
+
+    void Pitch(float angle, TransformSpace space = TS_LOCAL);
+    void Yaw(float angle, TransformSpace space = TS_LOCAL);
+    void Roll(float angle, TransformSpace space = TS_LOCAL);
     
-    void TranslateRelative(const Vector3& delta);
-    tolua_outside void NodeTranslateRelativeXYZ @ TranslateRelativeXYZ(float x, float y, float z);
-    
-    void Rotate(const Quaternion& delta, bool fixedAxis = false);
-    tolua_outside void NodeRotateXYZ @ RotateXYZ(float x, float y, float z, bool fixedAxis = false);
-    
-    void Pitch(float angle, bool fixedAxis = false);
-    void Yaw(float angle, bool fixedAxis = false);
-    void Roll(float angle, bool fixedAxis = false);
-    
-    bool LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP);
-    tolua_outside bool NodeLookAtXYZ @ LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f);
+    bool LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP, TransformSpace space = TS_WORLD);
+    tolua_outside bool NodeLookAtXYZ @ LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f, TransformSpace space = TS_WORLD);
 
     void Scale(float scale);
     void Scale(const Vector3& scale);
@@ -271,24 +279,24 @@ static void NodeSetWorldScaleXYZ(Node* node, float x, float y, float z)
     node->SetWorldScale(Vector3(x, y, z));
 }
 
-static void NodeTranslateXYZ(Node* node, float x, float y, float z)
+static void NodeTranslateXYZ(Node* node, float x, float y, float z, TransformSpace space = TS_LOCAL)
 {
-    node->Translate(Vector3(x, y, z));
+    node->Translate(Vector3(x, y, z), space);
 }
 
-static void NodeTranslateRelativeXYZ(Node* node, float x, float y, float z)
+static void NodeRotateXYZ(Node* node, float x, float y, float z, TransformSpace space = TS_LOCAL)
 {
-    node->TranslateRelative(Vector3(x, y, z));
+    node->Rotate(Quaternion(x, y, z), space);
 }
 
-static void NodeRotateXYZ(Node* node, float x, float y, float z, bool fixedAxis = false)
+static void NodeRotateAroundXYZ(Node* node, float pX, float pY, float pZ, float rX, float rY, float rZ, TransformSpace space = TS_LOCAL)
 {
-    node->Rotate(Quaternion(x, y, z), fixedAxis);
+    node->RotateAround(Vector3(pX, pY, pZ), Quaternion(rX, rY, rZ), space);
 }
 
-static bool NodeLookAtXYZ(Node* node, float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f)
+static bool NodeLookAtXYZ(Node* node, float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f, TransformSpace space = TS_WORLD)
 {
-    return node->LookAt(Vector3(x, y, z), Vector3(upX, upY, upZ));
+    return node->LookAt(Vector3(x, y, z), Vector3(upX, upY, upZ), space);
 }
 
 static void NodeScaleXYZ(Node* node, float x, float y, float z)
