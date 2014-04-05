@@ -2782,18 +2782,18 @@ Methods:
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
-- void Translate(const Vector3& delta)
-- void TranslateXYZ(float x, float y, float z)
-- void TranslateRelative(const Vector3& delta)
-- void TranslateRelativeXYZ(float x, float y, float z)
-- void Rotate(const Quaternion& delta, bool fixedAxis = false)
-- void RotateXYZ(float x, float y, float z, bool fixedAxis = false)
-- void Pitch(float angle, bool fixedAxis = false)
-- void Yaw(float angle, bool fixedAxis = false)
-- void Roll(float angle, bool fixedAxis = false)
+- void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL)
+- void TranslateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL)
+- void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL)
+- void RotateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL)
+- void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL)
+- void RotateAroundXYZ(float pX, float pY, float pZ, float dX, float dY, float dZ, TransformSpace space = TS_LOCAL)
+- void Pitch(float angle, TransformSpace space = TS_LOCAL)
+- void Yaw(float angle, TransformSpace space = TS_LOCAL)
+- void Roll(float angle, TransformSpace space = TS_LOCAL)
 - bool LookAt(const Vector3& target)
-- bool LookAt(const Vector3& target, const Vector3& upAxis)
-- bool LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f)
+- bool LookAt(const Vector3& target, const Vector3& upAxis, TransformSpace space = TS_WORLD)
+- bool LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f, TransformSpace space = TS_WORLD)
 - void Scale(float scale)
 - void Scale(const Vector3& scale)
 - void ScaleXYZ(float x, float y, float z)
@@ -6156,6 +6156,12 @@ Properties:
 - int TEXTURE_DYNAMIC
 - int TEXTURE_RENDERTARGET
 - int TEXTURE_DEPTHSTENCIL
+
+### TransformSpace
+
+- int TS_LOCAL
+- int TS_PARENT
+- int TS_WORLD
 
 ### TraversalMode
 
