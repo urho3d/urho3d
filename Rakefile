@@ -16,9 +16,9 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
-  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DENABLE_AMALG=1 -DENABLE_LUAJIT=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test' or abort 'Failed to configure/build/test Urho3D library'
+  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DURHO3D_AMALG=1 -DENABLE_LUAJIT=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test' or abort 'Failed to configure/build/test Urho3D library'
   scaffolding 'Build/generated/externallib'
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_AMALG=1 -DENABLE_LUAJIT=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=1 -DURHO3D_AMALG=1 -DENABLE_LUAJIT=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master rake travis_ci_site_update)
