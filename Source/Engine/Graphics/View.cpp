@@ -554,7 +554,7 @@ void View::Render()
     // Render
     ExecuteRenderPathCommands();
     
-    #ifdef URHO_OPENGL
+    #ifdef URHO3D_OPENGL
     if (camera_)
         camera_->SetFlipVertical(false);
     #endif
@@ -1928,7 +1928,7 @@ void View::DrawFullscreenQuad(bool nearQuad)
     Matrix3x4 model = Matrix3x4::IDENTITY;
     Matrix4 projection = Matrix4::IDENTITY;
     
-    #ifdef URHO_OPENGL
+    #ifdef URHO3D_OPENGL
     if (camera_ && camera_->GetFlipVertical())
         projection.m11_ = -1.0f;
     model.m23_ = nearQuad ? -1.0f : 1.0f;
