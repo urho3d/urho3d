@@ -257,6 +257,19 @@ static int FileSystemSystemRun(const String& fileName, CScriptArray* srcArgument
     return ptr->SystemRun(fileName, destArguments);
 }
 
+static unsigned FileSystemSystemRunAsync(const String& fileName, CScriptArray* srcArguments, FileSystem* ptr)
+{
+    if (!srcArguments)
+        return M_MAX_UNSIGNED;
+
+    unsigned numArguments = srcArguments->GetSize();
+    Vector<String> destArguments(numArguments);
+    for (unsigned i = 0; i < numArguments; ++i)
+        destArguments[i] = *(static_cast<String*>(srcArguments->At(i)));
+
+    return ptr->SystemRunAsync(fileName, destArguments);
+}
+
 static void RegisterSerialization(asIScriptEngine* engine)
 {
     engine->RegisterEnum("FileMode");
@@ -320,6 +333,8 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in)", asMETHOD(FileSystem, SystemCommand), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRun), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSystem", "uint SystemCommandAsync(const String&in)", asMETHOD(FileSystem, SystemCommandAsync), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "uint SystemRunAsync(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRunAsync), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const String&in, const String&in)", asMETHOD(FileSystem, SystemOpen), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "bool Copy(const String&in, const String&in)", asMETHOD(FileSystem, Copy), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "bool Rename(const String&in, const String&in)", asMETHOD(FileSystem, Rename), asCALL_THISCALL);
