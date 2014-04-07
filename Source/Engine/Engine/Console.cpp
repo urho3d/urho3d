@@ -225,7 +225,7 @@ bool Console::IsVisible() const
 
 unsigned Console::GetNumBufferedRows() const
 {
-    rowContainer_->GetNumItems();
+    return rowContainer_->GetNumItems();
 }
 
 const String& Console::GetHistoryRow(unsigned index) const
@@ -323,13 +323,14 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 
 void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!rowContainer_->GetNumItems())
+    if (!rowContainer_->GetNumItems() || pendingRows_.Empty())
         return;
     
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
     
     Text* text;
+    
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
         rowContainer_->RemoveItem((unsigned)0);
