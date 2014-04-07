@@ -183,11 +183,8 @@ void Console::SetNumRows(unsigned rows)
     displayedRows_ = rows;
     if (!GetNumBufferedRows())
         SetNumBufferedRows(2 * rows);
-    //todo: The height calculation is still a bit off
-    const IntRect& border = rowContainer_->GetScrollPanel()->GetBorder();
-    unsigned height = rows * rowContainer_->GetItem((unsigned)0)->GetHeight() + border.top_ + border.bottom_;
-    rowContainer_->SetMinHeight(height);
-    rowContainer_->SetHeight(height);
+    
+    UpdateElements();
 }
 
 void Console::SetNumHistoryRows(unsigned rows)
@@ -211,6 +208,12 @@ void Console::UpdateElements()
     background_->SetFixedWidth(width);
     background_->SetHeight(background_->GetMinHeight());
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
+    
+    //todo: The height calculation is still a bit off
+    const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetBorder();
+    int height = displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_;
+    rowContainer_->SetMinHeight(height);
+    rowContainer_->SetHeight(height);
 }
 
 XMLFile* Console::GetDefaultStyle() const
