@@ -28,9 +28,11 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
+#include "Input.h"
 #include "InputEvents.h"
 #include "IOEvents.h"
 #include "LineEdit.h"
+#include "ListView.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Text.h"
@@ -66,9 +68,7 @@ Console::Console(Context* context) :
     background_->SetPriority(200); // Show on top of the debug HUD
     background_->SetLayout(LM_VERTICAL);
 
-    rowContainer_ = new UIElement(context_);
-    rowContainer_->SetClipChildren(true);
-    rowContainer_->SetLayout(LM_VERTICAL);
+    rowContainer_ = new ListView(context_);
     background_->AddChild(rowContainer_);
 
     lineEdit_ = new LineEdit(context_);
@@ -98,10 +98,10 @@ void Console::SetDefaultStyle(XMLFile* style)
 
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
+    rowContainer_->SetStyle("ListView");
 
-    const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
-    for (unsigned i = 0; i < children.Size(); ++i)
-        children[i]->SetStyle("ConsoleText");
+    for (unsigned i = 0; i < rowContainer_->GetNumItems(); ++i)
+        rowContainer_->GetItem(i)->SetStyle("ConsoleText");
     
     lineEdit_->SetStyle("ConsoleLineEdit");
     
@@ -110,8 +110,8 @@ void Console::SetDefaultStyle(XMLFile* style)
 
 void Console::SetVisible(bool enable)
 {
+    Input* input = GetSubsystem<Input>();
     background_->SetVisible(enable);
-
     if (enable)
     {
         // Check if we have handler for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
@@ -123,9 +123,18 @@ void Console::SetVisible(bool enable)
 
         // Ensure the background has no empty space when shown without the lineedit
         background_->SetHeight(background_->GetMinHeight());
+
+        // Show OS mouse
+        savedMouseVisibility_ = input->IsMouseVisible();
+        input->SetMouseVisible(true);
     }
     else
+    {
         lineEdit_->SetFocus(false);
+
+        // Restore OS mouse visibility
+        input->SetMouseVisible(savedMouseVisibility_);
+    }
 }
 
 void Console::Toggle()
@@ -133,30 +142,31 @@ void Console::Toggle()
     SetVisible(!IsVisible());
 }
 
-void Console::SetNumRows(unsigned rows)
+void Console::SetNumBufferedRows(unsigned rows)
 {
-    if (!rows)
+    if (rows < displayedRows_)
         return;
 
     rowContainer_->DisableLayoutUpdate();
 
-    int delta = rowContainer_->GetNumChildren() - rows;
+    int delta = rowContainer_->GetNumItems() - rows;
     if (delta > 0)
     {
         // We have more, remove oldest rows first
         for (int i = 0; i < delta; ++i)
-            rowContainer_->RemoveChildAtIndex(0);
+            rowContainer_->RemoveItem((unsigned)0);
     }
     else
     {
         // We have less, add more rows at the bottom
         for (int i = 0; i > delta; --i)
         {
-            Text* text = rowContainer_->CreateChild<Text>();
+            Text* text = new Text(context_);
             // If style is already set, apply here to ensure proper height of the console when
             // amount of rows is changed
             if (background_->GetDefaultStyle())
                 text->SetStyle("ConsoleText");
+            rowContainer_->AddItem(text);
         }
     }
 
@@ -164,6 +174,19 @@ void Console::SetNumRows(unsigned rows)
     rowContainer_->UpdateLayout();
 
     UpdateElements();
+}
+
+void Console::SetNumRows(unsigned rows)
+{
+    if (!rows)
+        return;
+    displayedRows_ = rows;
+    if (!GetNumBufferedRows())
+        SetNumBufferedRows(2 * rows);
+    const IntRect& border = rowContainer_->GetScrollPanel()->GetBorder();
+    unsigned height = rows * rowContainer_->GetItem((unsigned)0)->GetHeight() + border.top_; border.bottom_;
+    rowContainer_->SetMinHeight(height);
+    rowContainer_->SetHeight(height);
 }
 
 void Console::SetNumHistoryRows(unsigned rows)
@@ -199,9 +222,9 @@ bool Console::IsVisible() const
     return background_ && background_->IsVisible();
 }
 
-unsigned Console::GetNumRows() const
+unsigned Console::GetNumBufferedRows() const
 {
-    return rowContainer_->GetNumChildren();
+    rowContainer_->GetNumItems();
 }
 
 const String& Console::GetHistoryRow(unsigned index) const
@@ -299,23 +322,26 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 
 void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!rowContainer_->GetNumChildren())
+    if (!rowContainer_->GetNumItems())
         return;
     
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
     
+    Text* text;
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
-        rowContainer_->RemoveChildAtIndex(0);
-        Text* text = rowContainer_->CreateChild<Text>();
+        rowContainer_->RemoveItem((unsigned)0);
+        text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
         // Make error message highlight
         text->SetStyle(pendingRows_[i].first_ == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
+        rowContainer_->AddItem(text);
     }
     
     pendingRows_.Clear();
     
+    rowContainer_->EnsureItemVisibility(text);
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
     printing_ = false;

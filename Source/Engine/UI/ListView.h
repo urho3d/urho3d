@@ -130,16 +130,16 @@ public:
     bool GetHierarchyMode() const { return hierarchyMode_; }
     /// Return base indent.
     int GetBaseIndent() const { return baseIndent_; }
+    /// Ensure full visibility of the item.
+    void EnsureItemVisibility(unsigned index);
+    /// Ensure full visibility of the item.
+    void EnsureItemVisibility(UIElement* item);
 
 protected:
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
-    /// Ensure full visibility of the item.
-    void EnsureItemVisibility(unsigned index);
-    /// Ensure full visibility of the item.
-    void EnsureItemVisibility(UIElement* item);
 
     /// Current selection.
     PODVector<unsigned> selections_;
