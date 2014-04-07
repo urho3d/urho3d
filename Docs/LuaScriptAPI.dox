@@ -901,6 +901,7 @@ Methods:
 - void SetVisible(bool enable)
 - void Toggle()
 - void SetAutoVisibleOnError(bool enable)
+- void SetNumBufferedRows(unsigned rows)
 - void SetNumRows(unsigned rows)
 - void SetNumHistoryRows(unsigned rows)
 - void SetFocusOnShow(bool enable)
@@ -910,6 +911,7 @@ Methods:
 - LineEdit* GetLineEdit() const
 - bool IsVisible() const
 - bool IsAutoVisibleOnError() const
+- unsigned GetNumBufferedRows() const
 - unsigned GetNumRows() const
 - unsigned GetNumHistoryRows() const
 - unsigned GetHistoryPosition() const
@@ -923,6 +925,7 @@ Properties:
 - LineEdit* lineEdit (readonly)
 - bool visible
 - bool autoVisibleOnError
+- unsigned numBufferedRows
 - unsigned numRows
 - unsigned numHistoryRows
 - unsigned historyPosition (readonly)

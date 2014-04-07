@@ -1814,6 +1814,7 @@ uint historyPosition;
 Array<String> historyRow;
 /* readonly */
 LineEdit lineEdit;
+uint numBufferedRows;
 uint numHistoryRows;
 uint numRows;
 /* readonly */
