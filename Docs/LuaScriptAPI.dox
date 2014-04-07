@@ -1767,6 +1767,8 @@ Methods:
 - bool CreateDir(const String pathName)
 - int SystemCommand(const String commandLine)
 - int SystemRun(const String fileName, const Vector<String>& arguments)
+- unsigned SystemCommandAsync(const String commandLine)
+- unsigned SystemRunAsync(const String fileName, const Vector<String>& arguments)
 - bool SystemOpen(const String fileName, const String mode = String::EMPTY)
 - bool Copy(const String srcFileName, const String destFileName)
 - bool Rename(const String srcFileName, const String destFileName)

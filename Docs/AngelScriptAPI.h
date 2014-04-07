@@ -3605,8 +3605,10 @@ bool Rename(const String&, const String&);
 Array<String> ScanDir(const String&, const String&, uint, bool) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 int SystemCommand(const String&);
+uint SystemCommandAsync(const String&);
 bool SystemOpen(const String&, const String&);
 int SystemRun(const String&, Array<String>);
+uint SystemRunAsync(const String&, Array<String>);
 
 // Properties:
 /* readonly */
