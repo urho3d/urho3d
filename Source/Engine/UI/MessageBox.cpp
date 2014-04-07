@@ -53,6 +53,8 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
 
     UI* ui = GetSubsystem<UI>();
     window_ = ui->LoadLayout(layoutFile, styleFile);
+    if (!window_)   // Error is already logged
+        return;
     ui->GetRoot()->AddChild(window_);
 
     // Set the title and message strings if they are given
