@@ -183,8 +183,9 @@ void Console::SetNumRows(unsigned rows)
     displayedRows_ = rows;
     if (!GetNumBufferedRows())
         SetNumBufferedRows(2 * rows);
+    //todo: The height calculation is still a bit off
     const IntRect& border = rowContainer_->GetScrollPanel()->GetBorder();
-    unsigned height = rows * rowContainer_->GetItem((unsigned)0)->GetHeight() + border.top_; border.bottom_;
+    unsigned height = rows * rowContainer_->GetItem((unsigned)0)->GetHeight() + border.top_ + border.bottom_;
     rowContainer_->SetMinHeight(height);
     rowContainer_->SetHeight(height);
 }
