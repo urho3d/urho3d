@@ -183,7 +183,13 @@ void Log::WriteRaw(const String& message, bool error)
     logInstance->lastMessage_ = message;
 
     #if defined(ANDROID)
-    __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
+    if (logInstance->quiet_)
+    {
+        if (error)
+            __android_log_print(ANDROID_LOG_ERROR, "Urho3D", message.CString());
+    }
+    else
+        __android_log_print(error ? ANDROID_LOG_ERROR : ANDROID_LOG_INFO, "Urho3D", message.CString());
     #elif defined(IOS)
     SDL_IOS_LogMessage(message.CString());
     #else
