@@ -913,6 +913,7 @@ Methods:
 - bool IsAutoVisibleOnError() const
 - unsigned GetNumBufferedRows() const
 - unsigned GetNumRows() const
+- void CopySelectedRows() const
 - unsigned GetNumHistoryRows() const
 - unsigned GetHistoryPosition() const
 - const String GetHistoryRow(unsigned index) const
@@ -2261,6 +2262,7 @@ Methods:
 - unsigned FindItem(UIElement* item) const
 - unsigned GetSelection() const
 - const PODVector<unsigned>& GetSelections() const
+- void CopySelectedItemsToClipboard() const
 - UIElement* GetSelectedItem() const
 - const PODVector<UIElement*>& GetSelectedItems() const
 - bool IsSelected(unsigned index) const

@@ -1794,6 +1794,7 @@ int weakRefs;
 class Console
 {
 // Methods:
+void CopySelectedRows() const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void Toggle();
 void UpdateElements();
@@ -4297,6 +4298,7 @@ void ApplyAttributes();
 void BringToFront();
 void ChangeSelection(int, bool);
 void ClearSelection();
+void CopySelectedItemsToClipboard();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
 void DisableLayoutUpdate();
 IntVector2 ElementToScreen(const IntVector2&);
