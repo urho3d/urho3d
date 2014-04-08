@@ -112,6 +112,8 @@ public:
     unsigned GetSelection() const;
     /// Return all selected indices.
     const PODVector<unsigned>& GetSelections() const { return selections_; }
+    /// Copy selected items to system clipboard. Currently only applicable to Text items.
+    void CopySelectedItemsToClipboard() const;
     /// Return first selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
     /// Return all selected items.

@@ -280,6 +280,7 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void ChangeSelection(int, bool)", asMETHOD(ListView, ChangeSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetSelections(Array<uint>@+)", asFUNCTION(ListViewSetSelections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "void ClearSelection()", asMETHOD(ListView, ClearSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void CopySelectedItemsToClipboard()", asMETHOD(ListView, CopySelectedItemsToClipboard), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void Expand(uint, bool, bool arg2 = false)", asMETHOD(ListView, Expand), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void ToggleExpand(uint, bool arg1 = false)", asMETHOD(ListView, ToggleExpand), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool IsSelected(uint) const", asMETHOD(ListView, IsSelected), asCALL_THISCALL);

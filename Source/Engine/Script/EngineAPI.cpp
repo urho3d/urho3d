@@ -39,6 +39,7 @@ static void RegisterConsole(asIScriptEngine* engine)
     RegisterObject<Console>(engine, "Console");
     engine->RegisterObjectMethod("Console", "void Toggle()", asMETHOD(Console, Toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void UpdateElements()", asMETHOD(Console, UpdateElements), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void CopySelectedRows() const", asMETHOD(Console, CopySelectedRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_defaultStyle(XMLFile@+)", asMETHOD(Console, SetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "XMLFile@+ get_defaultStyle() const", asMETHOD(Console, GetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_visible(bool)", asMETHOD(Console, SetVisible), asCALL_THISCALL);

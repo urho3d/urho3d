@@ -19,6 +19,7 @@ class Console : public Object
     bool IsAutoVisibleOnError() const;
     unsigned GetNumBufferedRows() const;
     unsigned GetNumRows() const;
+    void CopySelectedRows() const;
     unsigned GetNumHistoryRows() const;
     unsigned GetHistoryPosition() const;
     const String GetHistoryRow(unsigned index) const;

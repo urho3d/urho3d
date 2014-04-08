@@ -79,6 +79,8 @@ public:
     unsigned GetNumBufferedRows() const;
     /// Return number of displayed rows.
     unsigned GetNumRows() const { return displayedRows_; }
+    /// Copy selected rows to system clipboard.
+    void CopySelectedRows() const;
     /// Return history maximum size.
     unsigned GetNumHistoryRows() const { return historyRows_; }
     /// Return current history position.

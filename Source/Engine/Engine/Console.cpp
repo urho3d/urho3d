@@ -70,6 +70,8 @@ Console::Console(Context* context) :
     background_->SetLayout(LM_VERTICAL);
 
     rowContainer_ = new ListView(context_);
+    rowContainer_->SetHighlightMode(HM_ALWAYS);
+    rowContainer_->SetMultiselect(true);
     background_->AddChild(rowContainer_);
 
     lineEdit_ = new LineEdit(context_);
@@ -229,6 +231,11 @@ bool Console::IsVisible() const
 unsigned Console::GetNumBufferedRows() const
 {
     return rowContainer_->GetNumItems();
+}
+
+void Console::CopySelectedRows() const
+{
+    rowContainer_->CopySelectedItemsToClipboard();
 }
 
 const String& Console::GetHistoryRow(unsigned index) const
