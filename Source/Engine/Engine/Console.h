@@ -31,8 +31,8 @@ class BorderImage;
 class Engine;
 class Font;
 class LineEdit;
+class ListView;
 class Text;
-class UIElement;
 class XMLFile;
 
 /// %Console window with log history and command line prompt.
@@ -54,6 +54,8 @@ public:
     void Toggle();
     /// Automatically set console to visible when receiving an error log message.
     void SetAutoVisibleOnError(bool enable) { autoVisibleOnError_ = enable; }
+    /// Set number of buffered rows.
+    void SetNumBufferedRows(unsigned rows);
     /// Set number of displayed rows.
     void SetNumRows(unsigned rows);
     /// Set command history maximum size, 0 disables history.
@@ -73,8 +75,12 @@ public:
     bool IsVisible() const;
     /// Return true when console is set to automatically visible when receiving an error log message.
     bool IsAutoVisibleOnError() const { return autoVisibleOnError_; }
+    /// Return number of buffered rows.
+    unsigned GetNumBufferedRows() const;
     /// Return number of displayed rows.
-    unsigned GetNumRows() const;
+    unsigned GetNumRows() const { return displayedRows_; }
+    /// Copy selected rows to system clipboard.
+    void CopySelectedRows() const;
     /// Return history maximum size.
     unsigned GetNumHistoryRows() const { return historyRows_; }
     /// Return current history position.
@@ -101,7 +107,7 @@ private:
     /// Background.
     SharedPtr<BorderImage> background_;
     /// Container for text rows.
-    SharedPtr<UIElement> rowContainer_;
+    SharedPtr<ListView> rowContainer_;
     /// Line edit.
     SharedPtr<LineEdit> lineEdit_;
     /// Command history.
@@ -110,6 +116,8 @@ private:
     Vector<Pair<int, String> > pendingRows_;
     /// Current row being edited.
     String currentRow_;
+    /// Maximum displayed rows.
+    unsigned displayedRows_;
     /// Command history maximum rows.
     unsigned historyRows_;
     /// Command history current position.
@@ -118,6 +126,8 @@ private:
     bool printing_;
     /// Flag for automatically focusing the line edit on showing the console.
     bool focusOnShow_;
+    /// Saved OS mouse visiblity flag. Used internally to save and restore OS mouse visibility.
+    bool savedMouseVisibility_;
 };
 
 }

@@ -22,11 +22,14 @@
 
 #pragma once
 
-#include "Object.h"
 #include "HashSet.h"
+#include "List.h"
+#include "Object.h"
 
 namespace Urho3D
 {
+
+class AsyncExecRequest;
 
 /// Return files.
 static const unsigned SCAN_FILES = 0x1;
@@ -54,6 +57,10 @@ public:
     int SystemCommand(const String& commandLine);
     /// Run a specific program, block until it exits and return the exit code. Will fail if any allowed paths are defined.
     int SystemRun(const String& fileName, const Vector<String>& arguments);
+    /// Run a program using the command interpreter asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
+    unsigned SystemCommandAsync(const String& commandLine);
+    /// Run a specific program asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
+    unsigned SystemRunAsync(const String& fileName, const Vector<String>& arguments);
     /// Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined.
     bool SystemOpen(const String& fileName, const String& mode = String::EMPTY);
     /// Copy a file. Return true if successful.
@@ -62,7 +69,7 @@ public:
     bool Rename(const String& srcFileName, const String& destFileName);
     /// Delete a file. Return true if successful.
     bool Delete(const String& fileName);
-    /// Register a path as allowed to access. If no paths are registered, all are allowed.
+    /// Register a path as allowed to access. If no paths are registered, all are allowed. Registering allowed paths is considered securing the Urho3D execution environment: running programs and opening files externally through the system will fail afterward.
     void RegisterPath(const String& pathName);
     
     /// Return the absolute current working directory.
@@ -87,11 +94,17 @@ public:
 private:
     /// Scan directory, called internally.
     void ScanDirInternal(Vector<String>& result, String path, const String& startPath, const String& filter, unsigned flags, bool recursive) const;
+    /// Handle begin frame event to check for completed async executions.
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// Allowed directories.
     HashSet<String> allowedPaths_;
     /// Cached program directory.
     mutable String programDir_;
+    /// Async execution queue.
+    List<AsyncExecRequest*> asyncExecQueue_;
+    /// Next async execution ID.
+    unsigned nextAsyncExecID_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.

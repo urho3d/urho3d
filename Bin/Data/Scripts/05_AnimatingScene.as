@@ -62,7 +62,7 @@ void CreateScene()
         boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
 
         // Add the Rotator script object which will rotate the scene node each frame, when the scene sends its update event.
-        // This requires the C++ component ScriptInstance in the scene node, which acts as a container. We need to tell the 
+        // This requires the C++ component ScriptInstance in the scene node, which acts as a container. We need to tell the
         // script file and class name to instantiate the object (scriptFile is a global property which refers to the currently
         // executing script file.) There is also a shortcut for creating the ScriptInstance component and the script object,
         // which is shown in a later sample, but this is what happens "under the hood."
@@ -129,13 +129,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown['W'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['S'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['A'])
-        cameraNode.TranslateRelative(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['D'])
-        cameraNode.TranslateRelative(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 }
 
 void SubscribeToEvents()

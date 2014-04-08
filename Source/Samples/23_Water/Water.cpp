@@ -257,13 +257,13 @@ void Water::MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
-        cameraNode_->TranslateRelative(Vector3::FORWARD * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('S'))
-        cameraNode_->TranslateRelative(Vector3::BACK * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('A'))
-        cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
-        cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+        cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     // In case resolution has changed, adjust the reflection camera aspect ratio
     Graphics* graphics = GetSubsystem<Graphics>();

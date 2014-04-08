@@ -430,7 +430,7 @@ A number of build options can be defined explicitly when invoking the above
 cmake_xxxx batch files or shell scripts.
 
 |---------------------|-|------------------------------------------------------|
-|Defines              |V|Build Options                                         |
+|Build Option         |V|Description                                           |
 |---------------------|-|------------------------------------------------------|
 |URHO3D_64BIT         |0|Enable 64bit build                                    |
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support                  |
@@ -444,9 +444,12 @@ cmake_xxxx batch files or shell scripts.
 |URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only;         |
 |                     | | on Android only build Lua standalone tools)          |
 |URHO3D_EXTRAS        |0|Build extras (Desktop and RPI only)                   |
-|URHO3D_DOCS[_QUIET]  |0|Generate documentation as part of normal build (the   |
+|URHO3D_DOCS          |0|Generate documentation as part of normal build (the   |
 |                     | | 'doc' builtin target can be used to generate         |
 |                     | | documentation regardless of this option's value)     |
+|URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build,       |
+|                     | | suppress generation process from sending anything to |
+|                     | | stdout                                               |
 |URHO3D_SSE           |1|Enable SSE instruction set                            |
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)                   |
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support                            |
@@ -505,7 +508,8 @@ adhere to the current limitations:
   If you choose not to adhere with this build directory naming convention then
   you will have to install the Urho3D library into your local filesystem in
   order to use the Urho3D library in your external project
-  (See http://urho3d.github.io/documentation/a00004.html#UsingLibraryFromSDK).
+  (See http://urho3d.github.io/documentation/a00001.html#Building_Library and
+  http://urho3d.github.io/documentation/a00004.html#UsingLibraryFromSDK).
 - All the post-CMake workaround and/or bug fixes that are scripted in the batch
   files or shell scripts are not applied to the generated project file.
 

@@ -1814,6 +1814,7 @@ uint historyPosition;
 Array<String> historyRow;
 /* readonly */
 LineEdit lineEdit;
+uint numBufferedRows;
 uint numHistoryRows;
 uint numRows;
 /* readonly */
@@ -3604,8 +3605,10 @@ bool Rename(const String&, const String&);
 Array<String> ScanDir(const String&, const String&, uint, bool) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 int SystemCommand(const String&);
+uint SystemCommandAsync(const String&);
 bool SystemOpen(const String&, const String&);
 int SystemRun(const String&, Array<String>);
+uint SystemRunAsync(const String&, Array<String>);
 
 // Properties:
 /* readonly */
@@ -5146,8 +5149,8 @@ bool Load(File, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 Vector3 LocalToWorld(const Vector3&) const;
 Vector3 LocalToWorld(const Vector4&) const;
-bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ));
-void Pitch(float, bool = false);
+bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD);
+void Pitch(float, TransformSpace = TS_LOCAL);
 void Remove();
 void RemoveAllChildren();
 void RemoveAllComponents();
@@ -5158,8 +5161,9 @@ void RemoveComponent(const String&);
 void RemoveComponents(bool, bool);
 void RemoveInstanceDefault();
 void ResetToDefault();
-void Roll(float, bool = false);
-void Rotate(const Quaternion&, bool = false);
+void Roll(float, TransformSpace = TS_LOCAL);
+void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
+void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL);
 bool Save(File) const;
 bool SaveXML(File);
 bool SaveXML(XMLElement&) const;
@@ -5175,11 +5179,10 @@ void SetTransform(const Vector3&, const Quaternion&, float);
 void SetWorldTransform(const Vector3&, const Quaternion&);
 void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&);
 void SetWorldTransform(const Vector3&, const Quaternion&, float);
-void Translate(const Vector3&);
-void TranslateRelative(const Vector3&);
+void Translate(const Vector3&, TransformSpace = TS_LOCAL);
 Vector3 WorldToLocal(const Vector3&) const;
 Vector3 WorldToLocal(const Vector4&) const;
-void Yaw(float, bool = false);
+void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
 /* readonly */
@@ -6417,8 +6420,8 @@ bool LoadXML(File);
 bool LoadXML(const XMLElement&, bool = false);
 Vector3 LocalToWorld(const Vector3&) const;
 Vector3 LocalToWorld(const Vector4&) const;
-bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ));
-void Pitch(float, bool = false);
+bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD);
+void Pitch(float, TransformSpace = TS_LOCAL);
 void RegisterVar(const String&);
 void Remove();
 void RemoveAllChildren();
@@ -6430,8 +6433,9 @@ void RemoveComponent(const String&);
 void RemoveComponents(bool, bool);
 void RemoveInstanceDefault();
 void ResetToDefault();
-void Roll(float, bool = false);
-void Rotate(const Quaternion&, bool = false);
+void Roll(float, TransformSpace = TS_LOCAL);
+void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
+void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL);
 bool Save(File) const;
 bool SaveXML(File);
 bool SaveXML(XMLElement&) const;
@@ -6448,14 +6452,13 @@ void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&);
 void SetWorldTransform(const Vector3&, const Quaternion&, float);
 void StopAsyncLoading();
 const String& GetVarName(ShortStringHash) const;
-void Translate(const Vector3&);
-void TranslateRelative(const Vector3&);
+void Translate(const Vector3&, TransformSpace = TS_LOCAL);
 void UnregisterAllVars(const String&);
 void UnregisterVar(const String&);
 void Update(float);
 Vector3 WorldToLocal(const Vector3&) const;
 Vector3 WorldToLocal(const Vector4&) const;
-void Yaw(float, bool = false);
+void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
 /* readonly */
@@ -10451,6 +10454,13 @@ TEXTURE_STATIC,
 TEXTURE_DYNAMIC,
 TEXTURE_RENDERTARGET,
 TEXTURE_DEPTHSTENCIL,
+};
+
+enum TransformSpace
+{
+TS_LOCAL,
+TS_PARENT,
+TS_WORLD,
 };
 
 enum TraversalMode

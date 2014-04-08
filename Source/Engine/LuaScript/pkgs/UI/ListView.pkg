@@ -45,6 +45,7 @@ class ListView : public ScrollView
     unsigned FindItem(UIElement* item) const;
     unsigned GetSelection() const;
     const PODVector<unsigned>& GetSelections() const;
+    void CopySelectedItemsToClipboard() const;
     UIElement* GetSelectedItem() const;
     
     // PODVector<UIElement*> GetSelectedItems() const;

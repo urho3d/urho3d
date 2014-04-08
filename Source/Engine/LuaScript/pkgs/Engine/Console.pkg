@@ -6,6 +6,7 @@ class Console : public Object
     void SetVisible(bool enable);
     void Toggle();
     void SetAutoVisibleOnError(bool enable);
+    void SetNumBufferedRows(unsigned rows);
     void SetNumRows(unsigned rows);
     void SetNumHistoryRows(unsigned rows);
     void SetFocusOnShow(bool enable);
@@ -16,7 +17,9 @@ class Console : public Object
     LineEdit* GetLineEdit() const;
     bool IsVisible() const;
     bool IsAutoVisibleOnError() const;
+    unsigned GetNumBufferedRows() const;
     unsigned GetNumRows() const;
+    void CopySelectedRows() const;
     unsigned GetNumHistoryRows() const;
     unsigned GetHistoryPosition() const;
     const String GetHistoryRow(unsigned index) const;
@@ -27,6 +30,7 @@ class Console : public Object
     tolua_readonly tolua_property__get_set LineEdit* lineEdit;
     tolua_property__is_set bool visible;
     tolua_property__is_set bool autoVisibleOnError;
+    tolua_property__get_set unsigned numBufferedRows;
     tolua_property__get_set unsigned numRows;
     tolua_property__get_set unsigned numHistoryRows;
     tolua_readonly tolua_property__get_set unsigned historyPosition;

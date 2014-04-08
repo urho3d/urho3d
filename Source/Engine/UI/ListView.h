@@ -112,6 +112,8 @@ public:
     unsigned GetSelection() const;
     /// Return all selected indices.
     const PODVector<unsigned>& GetSelections() const { return selections_; }
+    /// Copy selected items to system clipboard. Currently only applicable to Text items.
+    void CopySelectedItemsToClipboard() const;
     /// Return first selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
     /// Return all selected items.
@@ -130,16 +132,16 @@ public:
     bool GetHierarchyMode() const { return hierarchyMode_; }
     /// Return base indent.
     int GetBaseIndent() const { return baseIndent_; }
+    /// Ensure full visibility of the item.
+    void EnsureItemVisibility(unsigned index);
+    /// Ensure full visibility of the item.
+    void EnsureItemVisibility(UIElement* item);
 
 protected:
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
-    /// Ensure full visibility of the item.
-    void EnsureItemVisibility(unsigned index);
-    /// Ensure full visibility of the item.
-    void EnsureItemVisibility(UIElement* item);
 
     /// Current selection.
     PODVector<unsigned> selections_;

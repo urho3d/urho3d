@@ -924,7 +924,7 @@ void CreateConsole()
 {
     Console@ console = engine.CreateConsole();
     console.defaultStyle = uiStyle;
-    console.numRows = 16;
+    console.numBufferedRows = 100;
     console.autoVisibleOnError = true;
 }
 

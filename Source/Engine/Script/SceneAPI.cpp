@@ -60,6 +60,11 @@ static void RegisterNode(asIScriptEngine* engine)
     engine->RegisterEnumValue("CreateMode", "REPLICATED", REPLICATED);
     engine->RegisterEnumValue("CreateMode", "LOCAL", LOCAL);
 
+    engine->RegisterEnum("TransformSpace");
+    engine->RegisterEnumValue("TransformSpace", "TS_LOCAL", TS_LOCAL);
+    engine->RegisterEnumValue("TransformSpace", "TS_PARENT", TS_PARENT);
+    engine->RegisterEnumValue("TransformSpace", "TS_WORLD", TS_WORLD);
+    
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");

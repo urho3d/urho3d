@@ -46,7 +46,7 @@ void Mover::SetParameters(float moveSpeed, float rotationSpeed, const BoundingBo
 
 void Mover::Update(float timeStep)
 {
-    node_->TranslateRelative(Vector3::FORWARD * moveSpeed_ * timeStep);
+    node_->Translate(Vector3::FORWARD * moveSpeed_ * timeStep);
     
     // If in risk of going outside the plane, rotate the model right
     Vector3 pos = node_->GetPosition();

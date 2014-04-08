@@ -23,9 +23,12 @@
 #include "Precompiled.h"
 #include "ArrayPtr.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "File.h"
 #include "FileSystem.h"
+#include "IOEvents.h"
 #include "Log.h"
+#include "Thread.h"
 
 #include <cstdio>
 #include <cstring>
@@ -63,13 +66,164 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 namespace Urho3D
 {
 
-FileSystem::FileSystem(Context* context) :
-    Object(context)
+int DoSystemCommand(const String& commandLine)
 {
+    return system(commandLine.CString());
+}
+
+int DoSystemRun(const String& fileName, const Vector<String>& arguments)
+{
+    String fixedFileName = GetNativePath(fileName);
+
+    #ifdef WIN32
+    // Add .exe extension if no extension defined
+    if (GetExtension(fixedFileName).Empty())
+        fixedFileName += ".exe";
+    
+    String commandLine = "\"" + fixedFileName + "\"";
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+        commandLine += " " + arguments[i];
+
+    STARTUPINFOW startupInfo;
+    PROCESS_INFORMATION processInfo;
+    memset(&startupInfo, 0, sizeof startupInfo);
+    memset(&processInfo, 0, sizeof processInfo);
+
+    WString commandLineW(commandLine);
+    if (!CreateProcessW(NULL, (wchar_t*)commandLineW.CString(), 0, 0, 0, CREATE_NO_WINDOW, 0, 0, &startupInfo, &processInfo))
+        return -1;
+
+    WaitForSingleObject(processInfo.hProcess, INFINITE);
+    DWORD exitCode;
+    GetExitCodeProcess(processInfo.hProcess, &exitCode);
+
+    CloseHandle(processInfo.hProcess);
+    CloseHandle(processInfo.hThread);
+
+    return exitCode;
+    #else
+    pid_t pid = fork();
+    if (!pid)
+    {
+        PODVector<const char*> argPtrs;
+        argPtrs.Push(fixedFileName.CString());
+        for (unsigned i = 0; i < arguments.Size(); ++i)
+            argPtrs.Push(arguments[i].CString());
+        argPtrs.Push(0);
+
+        execvp(argPtrs[0], (char**)&argPtrs[0]);
+        return -1; // Return -1 if we could not spawn the process
+    }
+    else if (pid > 0)
+    {
+        int exitCode;
+        wait(&exitCode);
+        return exitCode;
+    }
+    else
+        return -1;
+    #endif
+}
+
+/// Base class for async execution requests.
+class AsyncExecRequest : public Thread
+{
+public:
+    /// Construct.
+    AsyncExecRequest(unsigned& requestID) :
+        requestID_(requestID),
+        completed_(false)
+    {
+        // Increment ID for next request
+        ++requestID;
+        if (requestID == M_MAX_UNSIGNED)
+            requestID = 1;
+    }
+    
+    /// Return request ID.
+    unsigned GetRequestID() const { return requestID_; }
+    /// Return exit code. Valid when IsCompleted() is true.
+    int GetExitCode() const { return exitCode_; }
+    /// Return completion status.
+    bool IsCompleted() const { return completed_; }
+    
+protected:
+    /// Request ID.
+    unsigned requestID_;
+    /// Exit code.
+    int exitCode_;
+    /// Completed flag.
+    volatile bool completed_;
+};
+
+/// Async system command operation.
+class AsyncSystemCommand : public AsyncExecRequest
+{
+public:
+    /// Construct and run.
+    AsyncSystemCommand(unsigned requestID, const String& commandLine) :
+        AsyncExecRequest(requestID),
+        commandLine_(commandLine)
+    {
+        Run();
+    }
+    
+    /// The function to run in the thread.
+    virtual void ThreadFunction()
+    {
+        exitCode_ = DoSystemCommand(commandLine_);
+        completed_ = true;
+    }
+    
+private:
+    /// Command line.
+    String commandLine_;
+};
+
+/// Async system run operation.
+class AsyncSystemRun : public AsyncExecRequest
+{
+public:
+    /// Construct and run.
+    AsyncSystemRun(unsigned requestID, const String& fileName, const Vector<String>& arguments) :
+        AsyncExecRequest(requestID),
+        fileName_(fileName),
+        arguments_(arguments)
+    {
+        Run();
+    }
+    
+    /// The function to run in the thread.
+    virtual void ThreadFunction()
+    {
+        exitCode_ = DoSystemRun(fileName_, arguments_);
+        completed_ = true;
+    }
+    
+private:
+    /// File to run.
+    String fileName_;
+    /// Command line split in arguments.
+    const Vector<String>& arguments_;
+};
+
+FileSystem::FileSystem(Context* context) :
+    Object(context),
+    nextAsyncExecID_(1)
+{
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(FileSystem, HandleBeginFrame));
 }
 
 FileSystem::~FileSystem()
 {
+    // If any async exec items pending, delete them
+    if (asyncExecQueue_.Size())
+    {
+        for (List<AsyncExecRequest*>::Iterator i = asyncExecQueue_.Begin(); i != asyncExecQueue_.End(); ++i)
+            delete(*i);
+        
+        asyncExecQueue_.Clear();
+    }
 }
 
 bool FileSystem::SetCurrentDir(const String& pathName)
@@ -122,7 +276,7 @@ bool FileSystem::CreateDir(const String& pathName)
 int FileSystem::SystemCommand(const String& commandLine)
 {
     if (allowedPaths_.Empty())
-        return system(commandLine.CString());
+        return DoSystemCommand(commandLine);
     else
     {
         LOGERROR("Executing an external command is not allowed");
@@ -133,68 +287,43 @@ int FileSystem::SystemCommand(const String& commandLine)
 int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments)
 {
     if (allowedPaths_.Empty())
-    {
-        String fixedFileName = GetNativePath(fileName);
-
-        #ifdef WIN32
-        // Add .exe extension if no extension defined
-        if (GetExtension(fixedFileName).Empty())
-            fixedFileName += ".exe";
-        
-        String commandLine = "\"" + fixedFileName + "\"";
-        for (unsigned i = 0; i < arguments.Size(); ++i)
-            commandLine += " " + arguments[i];
-
-        STARTUPINFOW startupInfo;
-        PROCESS_INFORMATION processInfo;
-        memset(&startupInfo, 0, sizeof startupInfo);
-        memset(&processInfo, 0, sizeof processInfo);
-
-        WString commandLineW(commandLine);
-        if (!CreateProcessW(NULL, (wchar_t*)commandLineW.CString(), 0, 0, 0, CREATE_NO_WINDOW, 0, 0, &startupInfo, &processInfo))
-        {
-            LOGERROR("Failed to execute command " + commandLine);
-            return -1;
-        }
-
-        WaitForSingleObject(processInfo.hProcess, INFINITE);
-        DWORD exitCode;
-        GetExitCodeProcess(processInfo.hProcess, &exitCode);
-
-        CloseHandle(processInfo.hProcess);
-        CloseHandle(processInfo.hThread);
-
-        return exitCode;
-        #else
-        pid_t pid = fork();
-        if (!pid)
-        {
-            PODVector<const char*> argPtrs;
-            argPtrs.Push(fixedFileName.CString());
-            for (unsigned i = 0; i < arguments.Size(); ++i)
-                argPtrs.Push(arguments[i].CString());
-            argPtrs.Push(0);
-
-            execvp(argPtrs[0], (char**)&argPtrs[0]);
-            return -1; // Return -1 if we could not spawn the process
-        }
-        else if (pid > 0)
-        {
-            int exitCode;
-            wait(&exitCode);
-            return exitCode;
-        }
-        else
-        {
-            LOGERROR("Failed to fork");
-            return -1;
-        }
-        #endif
-    }
+        return DoSystemRun(fileName, arguments);
     else
     {
         LOGERROR("Executing an external command is not allowed");
         return -1;
+    }
+}
+
+unsigned FileSystem::SystemCommandAsync(const String& commandLine)
+{
+    if (allowedPaths_.Empty())
+    {
+        unsigned requestID = nextAsyncExecID_;
+        AsyncSystemCommand* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
+        asyncExecQueue_.Push(cmd);
+        return requestID;
+    }
+    else
+    {
+        LOGERROR("Executing an external command is not allowed");
+        return M_MAX_UNSIGNED;
+    }
+}
+
+unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments)
+{
+    if (allowedPaths_.Empty())
+    {
+        unsigned requestID = nextAsyncExecID_;
+        AsyncSystemRun* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
+        asyncExecQueue_.Push(cmd);
+        return requestID;
+    }
+    else
+    {
+        LOGERROR("Executing an external command is not allowed");
+        return M_MAX_UNSIGNED;
     }
 }
 
@@ -588,6 +717,29 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         closedir(dir);
     }
     #endif
+}
+
+void FileSystem::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+{
+    /// Go through the execution queue and post + remove completed requests
+    for (List<AsyncExecRequest*>::Iterator i = asyncExecQueue_.Begin(); i != asyncExecQueue_.End();)
+    {
+        AsyncExecRequest* request = *i;
+        if (request->IsCompleted())
+        {
+            using namespace AsyncExecFinished;
+            
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_REQUESTID] = request->GetRequestID();
+            eventData[P_EXITCODE] = request->GetExitCode();
+            SendEvent(E_ASYNCEXECFINISHED, eventData);
+            
+            delete request;
+            i = asyncExecQueue_.Erase(i);
+        }
+        else
+            ++i;
+    }
 }
 
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension)

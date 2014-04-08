@@ -122,16 +122,16 @@ function MoveCamera(timeStep)
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     local delta = MOVE_SPEED * timeStep
     if input:GetKeyDown(KEY_W) then
-        cameraNode:TranslateRelativeXYZ(0.0, 0.0, delta)
+        cameraNode:Translate(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_S) then
-        cameraNode:TranslateRelativeXYZ(0.0, 0.0, -delta)
+        cameraNode:Translate(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_A) then
-        cameraNode:TranslateRelativeXYZ(-delta, 0.0, 0.0)
+        cameraNode:Translate(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
     if input:GetKeyDown(KEY_D) then
-        cameraNode:TranslateRelativeXYZ(delta, 0.0, 0.0)
+        cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
 end
 

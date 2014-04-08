@@ -218,8 +218,11 @@
         <attribute name="Color" value="0.15 0.15 0.15 0.8" />
         <attribute name="Layout Border" value="4 4 4 4" />
     </element>
-    <element type="ConsoleText" style="Text" auto="false" />
-    <element type="ConsoleHighlightedText" style="Text" auto="false">
+    <element type="ConsoleText" style="Text" auto="false">
+        <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
+        <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
+    </element>
+    <element type="ConsoleHighlightedText" style="ConsoleText" auto="false">
         <attribute name="Color" value="1 0 0 1" />
     </element>
     <element type="ConsoleLineEdit" style="LineEdit" auto="false">

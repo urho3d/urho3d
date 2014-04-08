@@ -143,16 +143,14 @@ void MoveCamera(float timeStep)
     const float MOVE_SPEED = 4.0f;
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    // Use the TranslateRelative() function to move relative to the node's orientation. Alternatively we could
-    // multiply the desired direction with the node's orientation quaternion, and use just Translate()
     if (input.keyDown['W'])
-        cameraNode.TranslateRelative(Vector3(0.0f, 1.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, 1.0f, 0.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['S'])
-        cameraNode.TranslateRelative(Vector3(0.0f, -1.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(0.0f, -1.0f, 0.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['A'])
-        cameraNode.TranslateRelative(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
     if (input.keyDown['D'])
-        cameraNode.TranslateRelative(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 
     if (input.keyDown[KEY_PAGEUP])
     {

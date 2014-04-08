@@ -27,6 +27,8 @@
 #include "ListView.h"
 #include "Log.h"
 #include "Sort.h"
+#include "Text.h"
+#include "UI.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -856,6 +858,21 @@ PODVector<UIElement*> ListView::GetSelectedItems() const
     }
 
     return ret;
+}
+
+void ListView::CopySelectedItemsToClipboard() const
+{
+    String selectedText;
+
+    for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    {
+        // Only handle Text UI element
+        Text* text = dynamic_cast<Text*>(GetItem(*i));
+        if (text)
+            selectedText.Append(text->GetText()).Append("\n");
+    }
+
+    GetSubsystem<UI>()->SetClipboardText(selectedText);
 }
 
 bool ListView::IsSelected(unsigned index) const
