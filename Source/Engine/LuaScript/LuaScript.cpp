@@ -362,7 +362,7 @@ int LuaScript::Print(lua_State *L)
         lua_pop(L, 1);
     }
 
-    LOGRAW("Lua: " + string);
+    LOGRAW(string);
 
     return 0;
 }
