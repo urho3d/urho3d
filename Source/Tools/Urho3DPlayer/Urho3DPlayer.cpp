@@ -21,6 +21,7 @@
 //
 
 #include "Engine.h"
+#include "EngineEvents.h"
 #include "FileSystem.h"
 #include "Log.h"
 #include "Main.h"
@@ -134,6 +135,9 @@ void Urho3DPlayer::Start()
         if (scriptFileName_.Contains("Editor.as", false))
         {
             LuaScript* luaScript = new LuaScript(context_);
+            // Ensure we only have one console command line interpreter, only use AngelScript command line interpreter for now
+            // todo Should probably add an option in Editor to let user switch interpreter and show a unique command line prompt to indicate which scripting language is currently in effect
+            luaScript->UnsubscribeFromEvent(E_CONSOLECOMMAND);
             context_->RegisterSubsystem(luaScript);
         }
 #endif
