@@ -35,6 +35,7 @@
 #include "ListView.h"
 #include "Log.h"
 #include "ResourceCache.h"
+#include "ScrollBar.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -158,7 +159,7 @@ void Console::SetNumBufferedRows(unsigned rows)
     }
     else
     {
-        // We have less, add more rows at the bottom
+        // We have less, add more rows at the top
         for (int i = 0; i > delta; --i)
         {
             Text* text = new Text(context_);
@@ -166,10 +167,11 @@ void Console::SetNumBufferedRows(unsigned rows)
             // amount of rows is changed
             if (background_->GetDefaultStyle())
                 text->SetStyle("ConsoleText");
-            rowContainer_->AddItem(text);
+            rowContainer_->InsertItem(0, text);
         }
     }
 
+    rowContainer_->EnsureItemVisibility(rowContainer_->GetItem(rowContainer_->GetNumItems() - 1));
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
 
@@ -180,9 +182,10 @@ void Console::SetNumRows(unsigned rows)
 {
     if (!rows)
         return;
+
     displayedRows_ = rows;
-    if (!GetNumBufferedRows())
-        SetNumBufferedRows(2 * rows);
+    if (GetNumBufferedRows() < rows)
+        SetNumBufferedRows(rows);
     
     UpdateElements();
 }
@@ -205,15 +208,12 @@ void Console::UpdateElements()
 {
     int width = GetSubsystem<Graphics>()->GetWidth();
     const IntRect& border = background_->GetLayoutBorder();
+    const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetClipBorder();
     background_->SetFixedWidth(width);
     background_->SetHeight(background_->GetMinHeight());
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
-    
-    //todo: The height calculation is still a bit off
-    const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetBorder();
-    int height = displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_;
-    rowContainer_->SetMinHeight(height);
-    rowContainer_->SetHeight(height);
+    rowContainer_->SetFixedHeight(displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_ +
+        (rowContainer_->GetHorizontalScrollBar()->IsVisible() ? rowContainer_->GetHorizontalScrollBar()->GetHeight() : 0));
 }
 
 XMLFile* Console::GetDefaultStyle() const
@@ -333,7 +333,6 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     rowContainer_->DisableLayoutUpdate();
     
     Text* text;
-    
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
         rowContainer_->RemoveItem((unsigned)0);
@@ -349,6 +348,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     rowContainer_->EnsureItemVisibility(text);
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
+    UpdateElements();   // May need to readjust the height due to scrollbar visibility changes
     printing_ = false;
 }
 
