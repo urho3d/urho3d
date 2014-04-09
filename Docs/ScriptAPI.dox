@@ -9439,6 +9439,7 @@ Properties:
 
 ### ConsoleCommand
 - %Command : String
+- %Id : String
 
 ## %Drawable events
 
