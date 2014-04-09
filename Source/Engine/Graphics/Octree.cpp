@@ -22,13 +22,16 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "DebugRenderer.h"
+#include "Graphics.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Octree.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sort.h"
+#include "Timer.h"
 #include "WorkQueue.h"
 
 #include "DebugNew.h"
@@ -338,6 +341,11 @@ Octree::Octree(Context* context) :
     // Resize threaded ray query intermediate result vector according to number of worker threads
     WorkQueue* workQueue = GetSubsystem<WorkQueue>();
     rayQueryResults_.Resize(workQueue ? workQueue->GetNumThreads() + 1 : 1);
+    
+    // If the engine is running headless, subscribe to RenderUpdate events for manually updating the octree
+    // to allow raycasts and animation update
+    if (!GetSubsystem<Graphics>())
+        SubscribeToEvent(E_RENDERUPDATE, HANDLER(Octree, HandleRenderUpdate));
 }
 
 Octree::~Octree()
@@ -625,6 +633,23 @@ void Octree::DrawDebugGeometry(bool depthTest)
 {
     DebugRenderer* debug = GetComponent<DebugRenderer>();
     DrawDebugGeometry(debug, depthTest);
+}
+
+void Octree::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // When running in headless mode, update the Octree manually during the RenderUpdate event
+    Scene* scene = GetScene();
+    if (!scene || !scene->IsUpdateEnabled())
+        return;
+    
+    using namespace RenderUpdate;
+    
+    FrameInfo frame;
+    frame.frameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
+    frame.timeStep_ = eventData[P_TIMESTEP].GetFloat();
+    frame.camera_ = 0;
+    
+    Update(frame);
 }
 
 }
