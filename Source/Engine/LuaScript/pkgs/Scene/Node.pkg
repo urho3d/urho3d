@@ -4,7 +4,6 @@ $#include "LuaScriptInstance.h"
 $#include "Node.h"
 $#include "ResourceCache.h"
 
-
 enum CreateMode
 {
     REPLICATED = 0,
@@ -18,7 +17,7 @@ enum TransformSpace
     TS_WORLD
 };
 
-class Node : public Serializable
+class Node : public Animatable
 {
     Node();
     virtual ~Node();
