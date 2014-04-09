@@ -26,6 +26,7 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"
+#include "LuaFile.h"
 #include "LuaFunction.h"
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
@@ -95,6 +96,10 @@ void LuaIntegration::CreateScene()
     zone->SetFogStart(10.0f);
     zone->SetFogEnd(100.0f);
     
+    LuaFile* scriptFile = cache->GetResource<LuaFile>("LuaScripts/Rotator.lua");
+    if (!scriptFile)
+        return;
+
     // Create randomly positioned and oriented box StaticModels in the scene
     const unsigned NUM_OBJECTS = 2000;
     for (unsigned i = 0; i < NUM_OBJECTS; ++i)
@@ -110,7 +115,7 @@ void LuaIntegration::CreateScene()
         // Add our custom Rotator script object (using the LuaScriptInstance C++ component to instantiate / store it) which will
         // rotate the scene node each frame, when the scene sends its update event
         LuaScriptInstance* instance = boxNode->CreateComponent<LuaScriptInstance>();
-        instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
+        instance->CreateObject(scriptFile, "Rotator");
         
         // Call the script object's "SetRotationSpeed" function.
         WeakPtr<LuaFunction> function = instance->GetScriptObjectFunction("SetRotationSpeed");

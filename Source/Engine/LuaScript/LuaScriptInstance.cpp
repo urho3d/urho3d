@@ -267,7 +267,7 @@ bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 
 bool LuaScriptInstance::CreateObject(LuaFile* scriptFile, const String& scriptObjectType)
 {
-    SetScriptFile(0);
+    SetScriptFile(scriptFile);
     SetScriptObjectType(scriptObjectType);
     return scriptObjectRef_ != LUA_REFNIL;
 }
