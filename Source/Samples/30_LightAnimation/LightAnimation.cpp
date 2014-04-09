@@ -20,12 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "AttributeAnimation.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"
+#include "LightAnimation.h"
 #include "Material.h"
 #include "Model.h"
 #include "Octree.h"
@@ -36,20 +38,19 @@
 #include "Text.h"
 #include "UI.h"
 
-#include "StaticScene.h"
-
 #include "DebugNew.h"
+#include "Animatable.h"
 
-DEFINE_APPLICATION_MAIN(StaticScene)
+DEFINE_APPLICATION_MAIN(LightAnimation)
 
-StaticScene::StaticScene(Context* context) :
+LightAnimation::LightAnimation(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f)
 {
 }
 
-void StaticScene::Start()
+void LightAnimation::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -67,7 +68,7 @@ void StaticScene::Start()
     SubscribeToEvents();
 }
 
-void StaticScene::CreateScene()
+void LightAnimation::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -95,7 +96,16 @@ void StaticScene::CreateScene()
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
-    
+
+    /// Create light color animation
+    SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+    colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+    colorAnimation->SetKeyFrame(1.0f, Color::RED);
+    colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+    colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
+    colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+    light->SetAttributeAnimation("Color", colorAnimation);
+
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
     // LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll
@@ -123,7 +133,7 @@ void StaticScene::CreateScene()
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 }
 
-void StaticScene::CreateInstructions()
+void LightAnimation::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
@@ -139,7 +149,7 @@ void StaticScene::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void StaticScene::SetupViewport()
+void LightAnimation::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
     
@@ -150,7 +160,7 @@ void StaticScene::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
-void StaticScene::MoveCamera(float timeStep)
+void LightAnimation::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
@@ -184,13 +194,13 @@ void StaticScene::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
-void StaticScene::SubscribeToEvents()
+void LightAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(StaticScene, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(LightAnimation, HandleUpdate));
 }
 
-void StaticScene::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void LightAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
