@@ -211,6 +211,12 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     if (numItems)
     {
+        if (selection != M_MAX_UNSIGNED && qualifiers & QUAL_CTRL && key == KEY_C)
+        {
+            CopySelectedItemsToClipboard();
+            return;
+        }
+
         switch (key)
         {
         case KEY_LEFT:
