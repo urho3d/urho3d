@@ -2178,7 +2178,7 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 When contributing code to the Urho3D project, there are a few things to check so that the process goes smoothly.
 
-First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be very sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
+First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
 Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2014 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
@@ -2196,13 +2196,13 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - \ref Network "Network replication" of a component's attributes must be triggered manually by calling MarkNetworkUpdate() in each setter function that modifies a network-replicated attribute. See the Camera class for a straightforward example.
 
-- Define \ref Events "events" where you anticipate that an external party might be interested in hooking to something happening. For example the editor implements showing and updating the scene hierarchy through events that the scene nodes send as they add/remove child nodes and components.
+- Define \ref Events "events" where you anticipate that an external party may want to hook up to something happening. For example the editor updates its scene hierarchy window by subscribing to the scene change events: child node added/removed, component added/removed.
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
 - When you add a new third-party library, insert its license statement to the License.txt in the root directory.
 
-- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs :)
+- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
 */
 
 }
