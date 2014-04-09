@@ -267,7 +267,14 @@ void Script::SetDefaultScene(Scene* scene)
 
 void Script::SetExecuteConsoleCommands(bool enable)
 {
+    if (enable == executeConsoleCommands_)
+        return;
+
     executeConsoleCommands_ = enable;
+    if (enable)
+        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(Script, HandleConsoleCommand));
+    else
+        UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
 
 void Script::DumpAPI(DumpMode mode)
@@ -715,8 +722,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
 void Script::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-
-    if (executeConsoleCommands_)
+    if (eventData[P_ID].GetString() == GetTypeName())
         Execute(eventData[P_COMMAND].GetString());
 }
 

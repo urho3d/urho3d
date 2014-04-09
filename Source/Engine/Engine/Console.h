@@ -28,11 +28,13 @@ namespace Urho3D
 {
 
 class BorderImage;
+class DropDownList;
 class Engine;
 class Font;
 class LineEdit;
 class ListView;
 class Text;
+class UIElement;
 class XMLFile;
 
 /// %Console window with log history and command line prompt.
@@ -91,6 +93,8 @@ public:
     bool GetFocusOnShow() const { return focusOnShow_; }
 
 private:
+    /// Populate the command line interpreters that could handle the console command.
+    bool PopulateInterpreter();
     /// Handle enter pressed on the line edit.
     void HandleTextFinished(StringHash eventType, VariantMap& eventData);
     /// Handle unhandled key on the line edit for scrolling the history.
@@ -108,6 +112,10 @@ private:
     SharedPtr<BorderImage> background_;
     /// Container for text rows.
     SharedPtr<ListView> rowContainer_;
+    /// Container for the command line.
+    SharedPtr<UIElement> commandLine_;
+    /// Interpreter drop down list.
+    SharedPtr<DropDownList> interpreters_;
     /// Line edit.
     SharedPtr<LineEdit> lineEdit_;
     /// Command history.

@@ -24,6 +24,7 @@
 #include "Console.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "DropDownList.h"
 #include "EngineEvents.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -61,7 +62,7 @@ Console::Console(Context* context) :
     // By default prevent the automatic showing of the screen keyboard
     focusOnShow_ = !ui->GetUseScreenKeyboard();
 
-    background_ = new BorderImage(context_);
+    background_ = uiRoot->CreateChild<BorderImage>();
     background_->SetBringToBack(false);
     background_->SetClipChildren(true);
     background_->SetEnabled(true);
@@ -69,16 +70,16 @@ Console::Console(Context* context) :
     background_->SetPriority(200); // Show on top of the debug HUD
     background_->SetLayout(LM_VERTICAL);
 
-    rowContainer_ = new ListView(context_);
+    rowContainer_ = background_->CreateChild<ListView>();
     rowContainer_->SetHighlightMode(HM_ALWAYS);
     rowContainer_->SetMultiselect(true);
-    background_->AddChild(rowContainer_);
 
-    lineEdit_ = new LineEdit(context_);
-    lineEdit_->SetFocusMode(FM_FOCUSABLE); // Do not allow defocus with ESC
-    background_->AddChild(lineEdit_);
-
-    uiRoot->AddChild(background_);
+    commandLine_ = background_->CreateChild<UIElement>();
+    commandLine_->SetLayoutMode(LM_HORIZONTAL);
+    commandLine_->SetLayoutSpacing(1);
+    interpreters_ = commandLine_->CreateChild<DropDownList>();
+    lineEdit_ = commandLine_->CreateChild<LineEdit>();
+    lineEdit_->SetFocusMode(FM_FOCUSABLE);  // Do not allow defocus with ESC
 
     SetNumRows(DEFAULT_CONSOLE_ROWS);
 
@@ -101,11 +102,12 @@ void Console::SetDefaultStyle(XMLFile* style)
 
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
-    rowContainer_->SetStyle("ListView");
-
+    rowContainer_->SetStyleAuto();
     for (unsigned i = 0; i < rowContainer_->GetNumItems(); ++i)
         rowContainer_->GetItem(i)->SetStyle("ConsoleText");
-    
+    interpreters_->SetStyleAuto();
+    for (unsigned i = 0; i < interpreters_->GetNumItems(); ++i)
+        interpreters_->GetItem(i)->SetStyle("ConsoleText");
     lineEdit_->SetStyle("ConsoleLineEdit");
     
     UpdateElements();
@@ -117,11 +119,10 @@ void Console::SetVisible(bool enable)
     background_->SetVisible(enable);
     if (enable)
     {
-        // Check if we have handler for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
-        bool hasConsoleCommandEventHandler = context_->GetEventReceivers(this, E_CONSOLECOMMAND) != 0 ||
-            context_->GetEventReceivers(E_CONSOLECOMMAND) != 0;
-        lineEdit_->SetVisible(hasConsoleCommandEventHandler);
-        if (hasConsoleCommandEventHandler && focusOnShow_)
+        // Check if we have receivers for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
+        bool hasInterpreter = PopulateInterpreter();
+        commandLine_->SetVisible(hasInterpreter);
+        if (hasInterpreter && focusOnShow_)
             GetSubsystem<UI>()->SetFocusElement(lineEdit_);
 
         // Ensure the background has no empty space when shown without the lineedit
@@ -133,6 +134,7 @@ void Console::SetVisible(bool enable)
     }
     else
     {
+        interpreters_->SetFocus(false);
         lineEdit_->SetFocus(false);
 
         // Restore OS mouse visibility
@@ -211,11 +213,11 @@ void Console::UpdateElements()
     int width = GetSubsystem<Graphics>()->GetWidth();
     const IntRect& border = background_->GetLayoutBorder();
     const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetClipBorder();
-    background_->SetFixedWidth(width);
-    background_->SetHeight(background_->GetMinHeight());
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
     rowContainer_->SetFixedHeight(displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_ +
         (rowContainer_->GetHorizontalScrollBar()->IsVisible() ? rowContainer_->GetHorizontalScrollBar()->GetHeight() : 0));
+    background_->SetFixedWidth(width);
+    background_->SetHeight(background_->GetMinHeight());
 }
 
 XMLFile* Console::GetDefaultStyle() const
@@ -243,6 +245,32 @@ const String& Console::GetHistoryRow(unsigned index) const
     return index < history_.Size() ? history_[index] : String::EMPTY;
 }
 
+bool Console::PopulateInterpreter()
+{
+    interpreters_->RemoveAllItems();
+
+    HashSet<Object*>* receivers = context_->GetEventReceivers(E_CONSOLECOMMAND);
+    if (!receivers || receivers->Empty())
+        return false;
+
+    for (HashSet<Object*>::ConstIterator iter = receivers->Begin(); iter != receivers->End(); ++iter)
+    {
+        const String& name = (*iter)->GetTypeName();
+        Text* text = new Text(context_);
+        text->SetStyle("ConsoleText");
+        text->SetText(name);
+        interpreters_->AddItem(text);
+    }
+
+    const IntRect& border = interpreters_->GetPopup()->GetLayoutBorder();
+    interpreters_->SetMaxWidth(interpreters_->GetListView()->GetContentElement()->GetWidth() + border.left_ + border.right_);
+    bool enabled = interpreters_->GetNumItems() > 1;
+    interpreters_->SetEnabled(enabled);
+    interpreters_->SetFocusMode(enabled ? FM_FOCUSABLE_DEFOCUSABLE : FM_NOTFOCUSABLE);
+
+    return true;
+}
+
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextFinished;
@@ -255,6 +283,7 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
 
         VariantMap& eventData = GetEventDataMap();
         eventData[P_COMMAND] = line;
+        eventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
         SendEvent(E_CONSOLECOMMAND, eventData);
 
         // Store to history, then clear the lineedit

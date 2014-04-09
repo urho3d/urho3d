@@ -34,6 +34,9 @@ function Start()
     -- Execute the common startup for samples
     SampleStart()
     
+    -- Disable default execution of Lua from the console
+    SetExecuteConsoleCommands(false)
+
     -- Subscribe to console commands and the frame update
     SubscribeToEvent("ConsoleCommand", "HandleConsoleCommand")
     SubscribeToEvent("Update", "HandleUpdate")
@@ -50,9 +53,6 @@ function Start()
     
     -- Show OS mouse cursor
     input.mouseVisible = true
-
-    -- Disable default execution of Lua from the console
-    SetExecuteConsoleCommands(false)
 
     -- Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow()

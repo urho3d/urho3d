@@ -35,6 +35,9 @@ void Start()
     // Execute the common startup for samples
     SampleStart();
     
+    // Disable default execution of AngelScript from the console
+    script.executeConsoleCommands = false;
+
     // Subscribe to console commands and the frame update
     SubscribeToEvent("ConsoleCommand", "HandleConsoleCommand");
     SubscribeToEvent("Update", "HandleUpdate");
@@ -51,9 +54,6 @@ void Start()
     
     // Show OS mouse cursor
     input.mouseVisible = true;
-
-    // Disable default execution of AngelScript from the console
-    script.executeConsoleCommands = false;
 
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();

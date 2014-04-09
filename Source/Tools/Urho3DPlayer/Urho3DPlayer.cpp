@@ -133,13 +133,7 @@ void Urho3DPlayer::Start()
         /// \hack If we are running the editor, also instantiate Lua subsystem to enable editing Lua ScriptInstances
 #ifdef URHO3D_LUA
         if (scriptFileName_.Contains("Editor.as", false))
-        {
-            LuaScript* luaScript = new LuaScript(context_);
-            // Ensure we only have one console command line interpreter, only use AngelScript command line interpreter for now
-            // todo Should probably add an option in Editor to let user switch interpreter and show a unique command line prompt to indicate which scripting language is currently in effect
-            luaScript->UnsubscribeFromEvent(E_CONSOLECOMMAND);
-            context_->RegisterSubsystem(luaScript);
-        }
+            context_->RegisterSubsystem(new LuaScript(context_));
 #endif
         // If script loading is successful, proceed to main loop
         if (scriptFile_ && scriptFile_->Execute("void Start()"))

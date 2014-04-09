@@ -270,7 +270,14 @@ void LuaScript::ScriptUnsubscribeFromEvents(void* sender)
 
 void LuaScript::SetExecuteConsoleCommands(bool enable)
 {
+    if (enable == executeConsoleCommands_)
+        return;
+
     executeConsoleCommands_ = enable;
+    if (enable)
+        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+    else
+        UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
 
 void LuaScript::RegisterLoader()
@@ -355,7 +362,7 @@ int LuaScript::Print(lua_State *L)
         lua_pop(L, 1);
     }
 
-    LOGRAW(string);
+    LOGRAW(string + "\n");
 
     return 0;
 }
@@ -436,8 +443,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-    
-    if (executeConsoleCommands_)
+    if (eventData[P_ID].GetString() == GetTypeName())
         ExecuteString(eventData[P_COMMAND].GetString());
 }
 
