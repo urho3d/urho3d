@@ -127,6 +127,7 @@ void LoadConfig()
     XMLElement inspectorElem = configElem.GetChild("attributeinspector");
     XMLElement viewElem = configElem.GetChild("view");
     XMLElement resourcesElem = configElem.GetChild("resources");
+    XMLElement consoleElem = configElem.GetChild("console");
 
     if (!cameraElem.isNull)
     {
@@ -225,6 +226,12 @@ void LoadConfig()
         if (viewElem.HasAttribute("gridcolor")) gridColor = viewElem.GetColor("gridcolor");
         if (viewElem.HasAttribute("gridsubdivisioncolor")) gridSubdivisionColor = viewElem.GetColor("gridsubdivisioncolor");
     }
+
+    if (!consoleElem.isNull)
+    {
+        // Console does not exist yet at this point, so store the string in a global variable
+        if (consoleElem.HasAttribute("commandinterpreter")) consoleCommandInterpreter = consoleElem.GetAttribute("commandinterpreter");
+    }
 }
 
 void SaveConfig()
@@ -241,6 +248,7 @@ void SaveConfig()
     XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
     XMLElement viewElem = configElem.CreateChild("view");
     XMLElement resourcesElem = configElem.CreateChild("resources");
+    XMLElement consoleElem = configElem.CreateChild("console");
 
     cameraElem.SetFloat("nearclip", viewNearClip);
     cameraElem.SetFloat("farclip", viewFarClip);
@@ -306,6 +314,8 @@ void SaveConfig()
     viewElem.SetFloat("gridscale", gridScale);
     viewElem.SetColor("gridcolor", gridColor);
     viewElem.SetColor("gridsubdivisioncolor", gridSubdivisionColor);
+
+    consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

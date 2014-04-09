@@ -46,6 +46,8 @@ static void RegisterConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "bool get_visible() const", asMETHOD(Console, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_autoVisibleOnError(bool)", asMETHOD(Console, SetAutoVisibleOnError), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "bool get_autoVisibleOnError() const", asMETHOD(Console, IsAutoVisibleOnError), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void set_commandInterpreter(const String&in)", asMETHOD(Console, SetCommandInterpreter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "const String& get_commandInterpreter() const", asMETHOD(Console, GetCommandInterpreter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_numBufferedRows(uint)", asMETHOD(Console, SetNumBufferedRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint get_numBufferedRows() const", asMETHOD(Console, GetNumBufferedRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_numRows(uint)", asMETHOD(Console, SetNumRows), asCALL_THISCALL);

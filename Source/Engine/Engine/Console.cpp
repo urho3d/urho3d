@@ -83,6 +83,7 @@ Console::Console(Context* context) :
 
     SetNumRows(DEFAULT_CONSOLE_ROWS);
 
+    SubscribeToEvent(interpreters_, E_ITEMSELECTED, HANDLER(Console, HandleInterpreterSelected));
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
     SubscribeToEvent(E_SCREENMODE, HANDLER(Console, HandleScreenMode));
@@ -253,9 +254,17 @@ bool Console::PopulateInterpreter()
     if (!receivers || receivers->Empty())
         return false;
 
+    Vector<String> names;
     for (HashSet<Object*>::ConstIterator iter = receivers->Begin(); iter != receivers->End(); ++iter)
+        names.Push((*iter)->GetTypeName());
+    Sort(names.Begin(), names.End());
+
+    unsigned selection = M_MAX_UNSIGNED;
+    for (unsigned i = 0; i < names.Size(); ++i)
     {
-        const String& name = (*iter)->GetTypeName();
+        const String& name = names[i];
+        if (name == commandInterpreter_)
+            selection = i;
         Text* text = new Text(context_);
         text->SetStyle("ConsoleText");
         text->SetText(name);
@@ -268,7 +277,19 @@ bool Console::PopulateInterpreter()
     interpreters_->SetEnabled(enabled);
     interpreters_->SetFocusMode(enabled ? FM_FOCUSABLE_DEFOCUSABLE : FM_NOTFOCUSABLE);
 
+    if (selection == M_MAX_UNSIGNED)
+    {
+        selection = 0;
+        commandInterpreter_ = names[selection];
+    }
+    interpreters_->SetSelection(selection);
+
     return true;
+}
+
+void Console::HandleInterpreterSelected(StringHash eventType, VariantMap& eventData)
+{
+    commandInterpreter_ = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
 }
 
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)

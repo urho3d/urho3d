@@ -8,6 +8,7 @@ Menu@ recentSceneMenu;
 Window@ mruScenesPopup;
 Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
+String consoleCommandInterpreter;
 
 const ShortStringHash UI_ELEMENT_TYPE("UIElement");
 const ShortStringHash WINDOW_TYPE("Window");
@@ -924,6 +925,7 @@ void CreateConsole()
 {
     Console@ console = engine.CreateConsole();
     console.defaultStyle = uiStyle;
+    console.commandInterpreter = consoleCommandInterpreter;
     console.numBufferedRows = 100;
     console.autoVisibleOnError = true;
 }
