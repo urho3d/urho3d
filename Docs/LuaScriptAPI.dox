@@ -12,11 +12,13 @@ Methods:
 
 - void SetAnimationEnabled(bool enable)
 - void SetObjectAnimation(ObjectAnimation* objectAnimation)
-- void SetAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, float speed = 1.0f)
+- void SetAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
+- void SetAttributeAnimationWrapMode(const String name, WrapMode wrapMode)
 - void SetAttributeAnimationSpeed(const String name, float speed)
 - bool GetAnimationEnabled() const
 - ObjectAnimation* GetObjectAnimation() const
 - AttributeAnimation* GetAttributeAnimation(const String name) const
+- WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
 
 Properties:
@@ -238,17 +240,14 @@ Methods:
 - AttributeAnimation() (GC)
 - AttributeAnimation* new()
 - void delete()
-- void SetWrapMode(WrapMode wrapMode)
 - void SetValueType(VariantType valueType)
 - bool SetKeyFrame(float time, const Variant& value)
 - void SetEventFrame(float time, const StringHash& eventType)
 - void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
-- WrapMode GetWrapMode() const
 - VariantType GetValueType() const
 
 Properties:
 
-- WrapMode wrapMode
 - VariantType valueType
 
 ### Audio : Object
@@ -2980,10 +2979,11 @@ Methods:
 - ObjectAnimation() (GC)
 - ObjectAnimation* new()
 - void delete()
-- void AddAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, float speed = 1.0f)
+- void AddAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void RemoveAttributeAnimation(const String name)
 - void RemoveAttributeAnimation(AttributeAnimation* attributeAnimation)
 - AttributeAnimation* GetAttributeAnimation(const String name) const
+- WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
 
 ### Octree : Component

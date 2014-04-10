@@ -14,6 +14,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -23,8 +24,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -56,6 +58,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetMorphWeight(uint) const
 - bool IsInView(Camera@) const
@@ -75,8 +78,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetMorphWeight(uint, float)
 
 Properties:
@@ -136,6 +140,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -148,8 +153,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFlip(bool, bool)
 
 Properties:
@@ -265,6 +271,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetAutoFade(const String&) const
 - float GetFadeTarget(const String&) const
@@ -289,8 +296,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetAutoFade(const String&, float)
 - bool SetLayer(const String&, uint8)
 - bool SetLooped(const String&, bool)
@@ -410,7 +418,6 @@ Properties:
 - uint useTimer // readonly
 - VariantType valueType
 - int weakRefs // readonly
-- WrapMode wrapMode
 
 
 ### AttributeInfo
@@ -481,6 +488,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -493,8 +501,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -569,6 +578,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -598,8 +608,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -750,6 +761,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -779,8 +791,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -895,6 +908,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistance(const Vector3&) const
 - float GetDistanceSquared(const Vector3&) const
@@ -911,8 +925,9 @@ Methods:
 - Vector3 ScreenToWorldPoint(const Vector3&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetOrthoSize(const Vector2&)
 - Vector2 WorldToScreenPoint(const Vector3&) const
 
@@ -987,6 +1002,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -1016,8 +1032,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCheckedOffset(int, int)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -1127,6 +1144,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1138,8 +1156,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCenter(float, float)
 - void SetSize(float, float)
 
@@ -1186,6 +1205,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
@@ -1198,8 +1218,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetVertex(uint, const Vector2&)
 - void SetVertices(Vector2[]@)
 - const Vector2& GetVertex(uint) const
@@ -1246,6 +1267,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1257,8 +1279,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCenter(float, float)
 
 Properties:
@@ -1303,6 +1326,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1314,8 +1338,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetVertices(const Vector2&, const Vector2&)
 
 Properties:
@@ -1360,6 +1385,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
@@ -1372,8 +1398,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetVertex(uint, const Vector2&)
 - void SetVertices(Vector2[]@)
 - const Vector2& GetVertex(uint) const
@@ -1419,6 +1446,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1430,8 +1458,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetBox(const Vector3&, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
 - void SetCapsule(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
 - void SetCone(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
@@ -1482,6 +1511,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1493,8 +1523,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1583,6 +1614,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1594,8 +1626,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1693,6 +1726,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1704,8 +1738,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1752,6 +1787,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1763,8 +1799,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1799,6 +1836,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1810,8 +1848,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1850,6 +1889,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1861,8 +1901,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1900,6 +1941,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1911,8 +1953,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -1950,6 +1993,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1961,8 +2005,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2002,6 +2047,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2013,8 +2059,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2053,6 +2100,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2064,8 +2112,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2108,6 +2157,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2119,8 +2169,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2160,6 +2211,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2171,8 +2223,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2214,6 +2267,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2225,8 +2279,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2264,6 +2319,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2275,8 +2331,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2314,6 +2371,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2325,8 +2383,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2392,6 +2451,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -2421,8 +2481,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -2539,6 +2600,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2551,8 +2613,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2640,6 +2703,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2651,8 +2715,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2685,6 +2750,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2699,8 +2765,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2820,6 +2887,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2832,8 +2900,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2879,6 +2948,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2891,8 +2961,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -2950,6 +3021,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -2985,8 +3057,9 @@ Methods:
 - void SetAccelerator(int, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3603,6 +3676,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -3615,8 +3689,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -3691,6 +3766,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3720,8 +3796,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3851,6 +3928,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3888,8 +3966,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -4183,6 +4262,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -4213,8 +4293,9 @@ Methods:
 - void SetAccelerator(int, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -4380,6 +4461,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4391,8 +4473,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -4430,6 +4513,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Vector3 GetRandomPoint()
@@ -4446,8 +4530,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -4531,6 +4616,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4542,8 +4628,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -4584,6 +4671,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@ GetChild(const String&, bool = false) const
 - Node@[]@ GetChildren(bool = false) const
@@ -4623,8 +4711,9 @@ Methods:
 - void Scale(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetEnabled(bool, bool)
 - void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
@@ -4702,9 +4791,10 @@ Properties:
 
 Methods:
 
-- void AddAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void AddAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - bool Load(File@)
 - void RemoveAttributeAnimation(AttributeAnimation@)
 - void RemoveAttributeAnimation(const String&)
@@ -4735,6 +4825,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@[]@ GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
@@ -4753,8 +4844,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetSize(const BoundingBox&, uint)
 
 Properties:
@@ -4789,6 +4881,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4800,8 +4893,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -4880,6 +4974,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -4894,8 +4989,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetColor(const Color&)
 - void SetEmitting(bool, bool)
 
@@ -4984,6 +5080,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -4996,8 +5093,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -5088,6 +5186,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
@@ -5105,8 +5204,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - PhysicsRaycastResult SphereCast(const Ray&, float, float = M_INFINITY, uint = 0xffff)
 - void Update(float)
 - void UpdateCollisions()
@@ -5148,6 +5248,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - RigidBody2D@[]@ GetRigidBodies(const Rect&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
@@ -5163,8 +5264,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -5599,6 +5701,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 - bool Load(File@, bool = false)
@@ -5613,8 +5716,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCollisionLayerAndMask(uint, uint)
 - void SetTransform(const Vector3&, const Quaternion&)
 
@@ -5681,6 +5785,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -5692,8 +5797,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -5745,6 +5851,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@ GetChild(const String&, bool = false) const
 - Node@[]@ GetChildren(bool = false) const
@@ -5794,8 +5901,9 @@ Methods:
 - void Scale(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
@@ -5930,6 +6038,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -5941,8 +6050,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -5987,6 +6097,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -6016,8 +6127,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6132,6 +6244,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -6161,8 +6274,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6364,6 +6478,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -6376,8 +6491,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -6435,6 +6551,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -6464,8 +6581,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6577,6 +6695,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6588,8 +6707,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void Update(float, float)
 
 Properties:
@@ -6655,6 +6775,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6666,8 +6787,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -6699,6 +6821,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6714,8 +6837,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void Stop()
 
 Properties:
@@ -6757,6 +6881,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6773,8 +6898,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDistanceAttenuation(float, float, float)
 - void Stop()
 
@@ -6868,6 +6994,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetPoint(float) const
 - bool Load(File@, bool = false)
@@ -6883,8 +7010,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -6924,6 +7052,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -6950,8 +7079,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -7078,6 +7208,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
@@ -7092,8 +7223,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -7146,6 +7278,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -7160,8 +7293,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -7215,6 +7349,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -7227,8 +7362,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFlip(bool, bool)
 
 Properties:
@@ -7386,6 +7522,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetHeight(const Vector3&) const
 - Vector3 GetNormal(const Vector3&) const
@@ -7400,8 +7537,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -7452,6 +7590,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -7464,8 +7603,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -7518,6 +7658,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7547,8 +7688,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -7667,6 +7809,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -7680,8 +7823,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetFont(Font@, int)
 - bool SetFont(const String&, int)
 
@@ -7956,6 +8100,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7985,8 +8130,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8147,6 +8293,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -8176,8 +8323,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8496,6 +8644,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -8526,8 +8675,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8682,6 +8832,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -8711,8 +8862,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8951,6 +9103,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - AttributeAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -8963,8 +9116,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, AttributeAnimation@, float = 1.0f)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -9522,6 +9676,8 @@ Properties:
 - uint AM_NODEID
 - uint AM_NODEIDVECTOR
 - uint AM_NOEDIT
+- Color BLACK
+- Color BLUE
 - int CONTROLLER_AXIS_LEFTX
 - int CONTROLLER_AXIS_LEFTY
 - int CONTROLLER_AXIS_RIGHTX
@@ -9543,6 +9699,7 @@ Properties:
 - int CONTROLLER_BUTTON_START
 - int CONTROLLER_BUTTON_X
 - int CONTROLLER_BUTTON_Y
+- Color CYAN
 - uint DD_DISABLED
 - uint DD_SOURCE
 - uint DD_SOURCE_AND_TARGET
@@ -9560,6 +9717,8 @@ Properties:
 - uint DRAWABLE_ZONE
 - uint FIRST_LOCAL_ID
 - uint FIRST_REPLICATED_ID
+- Color GRAY
+- Color GREEN
 - int HAT_CENTER
 - int HAT_DOWN
 - int HAT_LEFT
@@ -9683,6 +9842,7 @@ Properties:
 - int LOG_INFO
 - int LOG_NONE
 - int LOG_WARNING
+- Color MAGENTA
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
 - int MOUSEB_RIGHT
@@ -9708,6 +9868,7 @@ Properties:
 - int QUAL_ANY
 - int QUAL_CTRL
 - int QUAL_SHIFT
+- Color RED
 - int SCANCODE_0
 - int SCANCODE_1
 - int SCANCODE_2
@@ -9960,10 +10121,13 @@ Properties:
 - int SHADOWQUALITY_HIGH_24BIT
 - int SHADOWQUALITY_LOW_16BIT
 - int SHADOWQUALITY_LOW_24BIT
+- Color TRANSPARENT
 - uint VO_DISABLE_OCCLUSION
 - uint VO_DISABLE_SHADOWS
 - uint VO_LOW_MATERIAL_QUALITY
 - uint VO_NONE
+- Color WHITE
+- Color YELLOW
 
 \page EventList Event list
 
