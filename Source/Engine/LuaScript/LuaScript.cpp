@@ -223,10 +223,12 @@ void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, co
     {
         LuaFunctionVector& functions = objectHandleFunctions_[object][eventType];
 
-        SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
-
-        if (!functions.Empty())
+        // Fix issue #256
+        HashSet<Object*>* receivers = context_->GetEventReceivers(object, eventType);
+        if ((!receivers || !receivers->Contains(this)) && !functions.Empty())
             functions.Clear();
+
+        SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
 
         if (!functions.Contains(function))
             functions.Push(function);
