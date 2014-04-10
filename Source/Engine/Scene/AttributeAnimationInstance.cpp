@@ -72,18 +72,21 @@ bool AttributeAnimationInstance::Update(float timeStep)
     bool finished = false;
     float scaledTime = CalculateScaledTime(currentTime_, finished);
 
-    for (unsigned i = 1; i < keyFrames.Size(); ++i)
+    unsigned index = 1;
+    for (; index < keyFrames.Size(); ++index)
     {
-        const AttributeKeyFrame& currKeyFrame = keyFrames[i];
-        if (scaledTime <= currKeyFrame.time_)
-        {
-            const AttributeKeyFrame& prevKeyFrame = keyFrames[i - 1];
-            if (!attributeAnimation_->IsInterpolatable())
-                animatable_->OnSetAttribute(attributeInfo_, prevKeyFrame.value_);
-            else
-                animatable_->OnSetAttribute(attributeInfo_, Interpolation(prevKeyFrame, currKeyFrame, scaledTime));
+        const AttributeKeyFrame& currKeyFrame = keyFrames[index];
+        if (scaledTime < currKeyFrame.time_)
             break;
-        }
+    }
+
+    const AttributeKeyFrame& prevKeyFrame = keyFrames[index - 1];
+    if (index >= keyFrames.Size() || !attributeAnimation_->IsInterpolatable())
+        animatable_->OnSetAttribute(attributeInfo_, prevKeyFrame.value_);
+    else
+    {
+        const AttributeKeyFrame& currKeyFrame = keyFrames[index];
+        animatable_->OnSetAttribute(attributeInfo_, Interpolation(prevKeyFrame, currKeyFrame, scaledTime));
     }
 
     if (attributeAnimation_->HasEventFrames())
