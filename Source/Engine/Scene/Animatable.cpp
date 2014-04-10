@@ -60,7 +60,7 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     SetObjectAnimation(0);
     attributeAnimationInstances_.Clear();
 
-    XMLElement elem = source.GetChild("objectAnimation");
+    XMLElement elem = source.GetChild("objectanimation");
     if (elem)
     {
         SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
@@ -70,7 +70,7 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         SetObjectAnimation(objectAnimation);
     }
 
-    elem = source.GetChild("attributeAnimation");
+    elem = source.GetChild("attributeanimation");
     while (elem)
     {
         String name = elem.GetAttribute("name");
@@ -78,7 +78,7 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         if (!attributeAnimation->LoadXML(elem))
             return false;
 
-        String wrapModeString = source.GetAttribute("wrapMode");
+        String wrapModeString = source.GetAttribute("wrapmode");
         WrapMode wrapMode = WM_LOOP;
         for (int i = 0; i <= WM_CLAMP; ++i)
         {
@@ -92,7 +92,7 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         float speed = elem.GetFloat("speed");
         SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
 
-        elem = elem.GetNext("attributeAnimation");
+        elem = elem.GetNext("attributeanimation");
     }
 
     return true;
@@ -106,7 +106,7 @@ bool Animatable::SaveXML(XMLElement& dest) const
     // Object animation without name
     if (objectAnimation_ && objectAnimation_->GetName().Empty())
     {
-        XMLElement elem = dest.CreateChild("objectAnimation");
+        XMLElement elem = dest.CreateChild("objectanimation");
         if (!objectAnimation_->SaveXML(elem))
             return false;
     }
@@ -118,12 +118,12 @@ bool Animatable::SaveXML(XMLElement& dest) const
             continue;
 
         const AttributeInfo& attr = i->second_->GetAttributeInfo();
-        XMLElement elem = dest.CreateChild("attributeAnimation");
+        XMLElement elem = dest.CreateChild("attributeanimation");
         elem.SetAttribute("name", attr.name_);
         if (!attributeAnimation->SaveXML(elem))
             return false;
 
-        elem.SetAttribute("wrapMode", wrapModeNames[i->second_->GetWrapMode()]);
+        elem.SetAttribute("wrapmode", wrapModeNames[i->second_->GetWrapMode()]);
         elem.SetFloat("speed", i->second_->GetSpeed());
     }
 

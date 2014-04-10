@@ -66,7 +66,7 @@ bool ObjectAnimation::Save(Serializer& dest) const
 {
     XMLFile xmlFile(context_);
 
-    XMLElement rootElem = xmlFile.CreateRoot("objectAnimation");
+    XMLElement rootElem = xmlFile.CreateRoot("objectanimation");
     if (!SaveXML(rootElem))
         return false;
 
@@ -78,7 +78,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
     attributeAnimations_.Clear();
 
     XMLElement animElem;
-    animElem = source.GetChild("attributeAnimation");
+    animElem = source.GetChild("attributeanimation");
     while (animElem)
     {
         String name = animElem.GetAttribute("name");
@@ -87,7 +87,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
         if (!animation->LoadXML(animElem))
             return false;
 
-        String wrapModeString = source.GetAttribute("wrapMode");
+        String wrapModeString = source.GetAttribute("wrapmode");
         WrapMode wrapMode = WM_LOOP;
         for (int i = 0; i <= WM_CLAMP; ++i)
         {
@@ -101,7 +101,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
         float speed = animElem.GetFloat("speed");
         AddAttributeAnimation(name, animation, wrapMode, speed);
 
-        animElem = animElem.GetNext("attributeAnimation");
+        animElem = animElem.GetNext("attributeanimation");
     }
 
     return true;
@@ -111,13 +111,13 @@ bool ObjectAnimation::SaveXML(XMLElement& dest) const
 {
     for (HashMap<String, SharedPtr<AttributeAnimation> >::ConstIterator i = attributeAnimations_.Begin(); i != attributeAnimations_.End(); ++i)
     {
-        XMLElement animElem = dest.CreateChild("attributeAnimation");
+        XMLElement animElem = dest.CreateChild("attributeanimation");
         animElem.SetAttribute("name", i->first_);
 
         if (!i->second_->SaveXML(animElem))
             return false;
 
-        animElem.SetAttribute("wrapMode", wrapModeNames[GetAttributeAnimationWrapMode(i->first_)]);
+        animElem.SetAttribute("wrapmode", wrapModeNames[GetAttributeAnimationWrapMode(i->first_)]);
         animElem.SetFloat("speed", GetAttributeAnimationSpeed(i->first_));
     }
 

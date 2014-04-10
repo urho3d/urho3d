@@ -64,7 +64,7 @@ bool AttributeAnimation::Save(Serializer& dest) const
 {
     XMLFile xmlFile(context_);
 
-    XMLElement rootElem = xmlFile.CreateRoot("attributeAnimation");
+    XMLElement rootElem = xmlFile.CreateRoot("attributeanimation");
     if (!SaveXML(rootElem))
         return false;
 
@@ -76,27 +76,27 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
 
-    SetValueType(Variant::GetTypeFromName(source.GetAttribute("valueType")));
+    SetValueType(Variant::GetTypeFromName(source.GetAttribute("valuetype")));
 
-    XMLElement keyFrameEleme = source.GetChild("keyFrame");
+    XMLElement keyFrameEleme = source.GetChild("keyframe");
     while (keyFrameEleme)
     {
         float time = keyFrameEleme.GetFloat("time");
         Variant value(valueType_, keyFrameEleme.GetAttribute("value"));
         SetKeyFrame(time, value);
 
-        keyFrameEleme = keyFrameEleme.GetNext("keyFrame");
+        keyFrameEleme = keyFrameEleme.GetNext("keyframe");
     }
 
-    XMLElement eventFrameElem = source.GetChild("eventFrame");
+    XMLElement eventFrameElem = source.GetChild("eventframe");
     while (eventFrameElem)
     {
         float time = eventFrameElem.GetFloat("time");
-        unsigned eventType = eventFrameElem.GetUInt("eventType");
-        VariantMap eventData = eventFrameElem.GetChild("eventData").GetVariantMap();
+        unsigned eventType = eventFrameElem.GetUInt("eventtype");
+        VariantMap eventData = eventFrameElem.GetChild("eventdata").GetVariantMap();
         
         SetEventFrame(time, StringHash(eventType), eventData);
-        eventFrameElem = eventFrameElem.GetNext("eventFrame");
+        eventFrameElem = eventFrameElem.GetNext("eventframe");
     }
 
     return true;
@@ -104,12 +104,12 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
-    dest.SetAttribute("valueType", Variant::GetTypeName(valueType_));
+    dest.SetAttribute("valuetype", Variant::GetTypeName(valueType_));
 
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {
         const AttributeKeyFrame& keyFrame = keyFrames_[i];
-        XMLElement keyFrameEleme = dest.CreateChild("keyFrame");
+        XMLElement keyFrameEleme = dest.CreateChild("keyframe");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
         keyFrameEleme.SetAttribute("value", keyFrame.value_.ToString());
     }
@@ -117,10 +117,10 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {
         const AttributeEventFrame& eventFrame = eventFrames_[i];
-        XMLElement eventFrameElem = dest.CreateChild("eventFrame");
+        XMLElement eventFrameElem = dest.CreateChild("eventframe");
         eventFrameElem.SetFloat("time", eventFrame.time_);
-        eventFrameElem.SetUInt("eventType", eventFrame.eventType_.Value());
-        eventFrameElem.CreateChild("eventData").SetVariantMap(eventFrame.eventData_);
+        eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
+        eventFrameElem.CreateChild("eventdata").SetVariantMap(eventFrame.eventData_);
     }
 
     return true;
