@@ -31,10 +31,11 @@
 namespace Urho3D
 {
 
-AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, float speed) :
+AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
     animatable_(animatable),
     attributeInfo_(attributeInfo),
     attributeAnimation_(attributeAnimation),
+    wrapMode_(wrapMode),
     speed_(speed),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
@@ -46,6 +47,7 @@ AttributeAnimationInstance::AttributeAnimationInstance(const AttributeAnimationI
     animatable_(other.animatable_),
     attributeInfo_(other.attributeInfo_),
     attributeAnimation_(other.attributeAnimation_),
+    wrapMode_(other.wrapMode_),
     speed_(other.speed_),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
@@ -68,7 +70,7 @@ bool AttributeAnimationInstance::Update(float timeStep)
         return true;
 
     bool finished = false;
-    float scaledTime = attributeAnimation_->CalculateScaledTime(currentTime_, finished);
+    float scaledTime = CalculateScaledTime(currentTime_, finished);
 
     for (unsigned i = 1; i < keyFrames.Size(); ++i)
     {
@@ -87,7 +89,7 @@ bool AttributeAnimationInstance::Update(float timeStep)
     if (attributeAnimation_->HasEventFrames())
     {
         Vector<const AttributeEventFrame*> eventFrames;
-        switch (attributeAnimation_->GetWrapMode())
+        switch (wrapMode_)
         {
         case WM_LOOP:
             if (lastScaledTime_ < scaledTime)
@@ -122,6 +124,29 @@ Animatable* AttributeAnimationInstance::GetAnimatable() const
 AttributeAnimation* AttributeAnimationInstance::GetAttributeAnimation() const
 {
     return attributeAnimation_;
+}
+
+float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& finished) const
+{
+    float beginTime = attributeAnimation_->GetBeginTime();
+    float endTime = attributeAnimation_->GetEndTime();
+
+    switch (wrapMode_)
+    {
+    case WM_LOOP:
+        {
+            float span = endTime - beginTime;
+            return beginTime + fmodf(currentTime - beginTime, span);
+        }
+
+    case WM_ONCE:
+        finished = (currentTime >= endTime);
+
+    case WM_CLAMP:
+        return Clamp(currentTime, beginTime, endTime);
+    }
+
+    return beginTime;
 }
 
 Variant AttributeAnimationInstance::Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const

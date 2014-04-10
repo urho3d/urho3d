@@ -31,17 +31,6 @@ namespace Urho3D
 class ObjectAnimation;
 class XMLElement;
 
-/// Animation wrap mode.
-enum WrapMode
-{
-    /// Loop mode.
-    WM_LOOP = 0,
-    /// Play once then remove.
-    WM_ONCE,
-    /// Clamp mode.
-    WM_CLAMP,
-};
-
 /// Attribute key frame
 struct AttributeKeyFrame
 {
@@ -74,7 +63,7 @@ public:
     virtual ~AttributeAnimation();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Save resource. Return true if successful.
@@ -86,8 +75,6 @@ public:
 
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
-    /// Set wrap mode.
-    void SetWrapMode(WrapMode warpMode);
     /// Set value type.
     void SetValueType(VariantType valueType);
     /// Set key frame.
@@ -97,8 +84,6 @@ public:
 
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
-    /// Return wrap mode.
-    WrapMode GetWrapMode() const { return wrapMode_; }
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
     /// Is interpolatable.
@@ -107,8 +92,6 @@ public:
     float GetBeginTime() const { return beginTime_; }
     /// Return end time.
     float GetEndTime() const { return endTime_; }
-    /// Calculate scaled time.
-    float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return all key frames.
     const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyFrames_; }
     /// Has event frames.
@@ -117,11 +100,8 @@ public:
     void GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const;
 
 protected:
-
     /// Object animation.
     WeakPtr<ObjectAnimation> objectAnimation_;
-    /// Wrap mode.
-    WrapMode wrapMode_;
     /// Value type.
     VariantType valueType_;
     /// Is interpolatable.

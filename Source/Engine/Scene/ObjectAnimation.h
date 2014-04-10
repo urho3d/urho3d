@@ -29,6 +29,17 @@ namespace Urho3D
 
 class AttributeAnimation;
 
+/// Animation wrap mode.
+enum WrapMode
+{
+    /// Loop mode.
+    WM_LOOP = 0,
+    /// Play once then remove.
+    WM_ONCE,
+    /// Clamp mode.
+    WM_CLAMP,
+};
+
 /// Object animation class.
 class URHO3D_API ObjectAnimation : public Resource
 {
@@ -52,7 +63,7 @@ public:
     bool SaveXML(XMLElement& dest) const;
 
     /// Add attribute animation.
-    void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed = 1.0f);
+    void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     /// Remove attribute animation.
     void RemoveAttributeAnimation(const String& name);
     /// Remove attribute animation.
@@ -60,6 +71,8 @@ public:
 
     /// Return attribute animation by name.
     AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    /// Return attribute animation wrap mode by name.
+    WrapMode GetAttributeAnimationWrapMode(const String& name) const;
     /// Return attribute animation speed by name.
     float GetAttributeAnimationSpeed(const String& name) const;
     /// Return all attribute animations.
@@ -68,6 +81,8 @@ public:
 private:
     /// Name to attribute animation mapping.
     HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations_;
+    /// Name to attribute animation wrap mode mapping.
+    HashMap<String, WrapMode> attributeAnimationWrapModes_;
     /// Name to attribute animation speed mapping.
     HashMap<String, float> attributeAnimationSpeeds_;
 };

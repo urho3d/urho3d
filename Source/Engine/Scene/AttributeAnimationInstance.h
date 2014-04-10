@@ -23,6 +23,7 @@
 #pragma once
 
 #include "RefCounted.h"
+#include "ObjectAnimation.h"
 
 namespace Urho3D
 {
@@ -36,7 +37,7 @@ class URHO3D_API AttributeAnimationInstance : public RefCounted
 {
 public:
     /// Construct.
-    AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, float speed);
+    AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed);
     /// Construct.
     AttributeAnimationInstance(const AttributeAnimationInstance& other);
     /// Destruct.
@@ -44,6 +45,8 @@ public:
 
     /// Update (if animaiton finished return true).
     bool Update(float timeStep);
+    /// Set wrap mode.
+    void SetWrapMode(WrapMode wrapMode) { wrapMode_ = wrapMode; }
     /// Set speed.
     void SetSpeed(float speed) { speed_ = speed; }
     /// Return animatable.
@@ -52,12 +55,16 @@ public:
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
     /// Return attribute animation.
     AttributeAnimation* GetAttributeAnimation() const;
+    /// Return wrap mode.
+    WrapMode GetWrapMode() const { return wrapMode_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
     /// Return current time.
     float GetCurrentTime() const { return currentTime_; }
 
 protected:
+    /// Calculate scaled time.
+    float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Interpolation.
     Variant Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const;
 
@@ -67,6 +74,8 @@ protected:
     const AttributeInfo& attributeInfo_;
     /// Attribute animation.
     SharedPtr<AttributeAnimation> attributeAnimation_;
+    /// Wrap mode.
+    WrapMode wrapMode_;
     /// Speed.
     float speed_;
     /// Current time.

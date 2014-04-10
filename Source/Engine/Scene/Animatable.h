@@ -24,6 +24,7 @@
 
 #include "HashSet.h"
 #include "Serializable.h"
+#include "ObjectAnimation.h"
 
 namespace Urho3D
 {
@@ -55,7 +56,9 @@ public:
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed = 1.0f);
+    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    /// Set attribute animation wrap mode.
+    void SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode);
     /// Set attribute animation speed.
     void SetAttributeAnimationSpeed(const String& name, float speed);
 
@@ -65,6 +68,8 @@ public:
     ObjectAnimation* GetObjectAnimation() const;
     /// Return attribute animation.
     AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    /// Return attribute animation wrap mode.
+    WrapMode GetAttributeAnimationWrapMode(const String& name) const;
     /// Return attribute animation speed.
     float GetAttributeAnimationSpeed(const String& name) const;
 

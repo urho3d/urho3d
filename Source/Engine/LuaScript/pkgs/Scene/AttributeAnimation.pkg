@@ -1,26 +1,16 @@
 $#include "AttributeAnimation.h"
 
-enum WrapMode
-{
-    WM_LOOP = 0,
-    WM_ONCE,
-    WM_CLAMP,
-};
-
 class AttributeAnimation : public Resource
 {
     AttributeAnimation();
     virtual ~AttributeAnimation();
     
-    void SetWrapMode(WrapMode wrapMode);
     void SetValueType(VariantType valueType);
     bool SetKeyFrame(float time, const Variant& value);
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
     
-    WrapMode GetWrapMode() const;
     VariantType GetValueType() const;
 
-    tolua_property__get_set WrapMode wrapMode;
     tolua_property__get_set VariantType valueType;
 };
 

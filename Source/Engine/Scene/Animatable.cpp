@@ -35,6 +35,8 @@
 namespace Urho3D
 {
 
+extern const char* wrapModeNames[];
+
 Animatable::Animatable(Context* context) :
     Serializable(context),
     animationEnabled_(true)
@@ -76,8 +78,19 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         if (!attributeAnimation->LoadXML(elem))
             return false;
 
+        String wrapModeString = source.GetAttribute("wrapMode");
+        WrapMode wrapMode = WM_LOOP;
+        for (int i = 0; i <= WM_CLAMP; ++i)
+        {
+            if (wrapModeString == wrapModeNames[i])
+            {
+                wrapMode = (WrapMode)i;
+                break;
+            }
+        }
+
         float speed = elem.GetFloat("speed");
-        SetAttributeAnimation(name, attributeAnimation, speed);
+        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
 
         elem = elem.GetNext("attributeAnimation");
     }
@@ -110,6 +123,7 @@ bool Animatable::SaveXML(XMLElement& dest) const
         if (!attributeAnimation->SaveXML(elem))
             return false;
 
+        elem.SetAttribute("wrapMode", wrapModeNames[i->second_->GetWrapMode()]);
         elem.SetFloat("speed", i->second_->GetSpeed());
     }
 
@@ -135,7 +149,7 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
         OnObjectAnimationAdded(objectAnimation_);
 }
 
-void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed)
+void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed)
 {
     AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
 
@@ -143,6 +157,7 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
     {
         if (currentInstance && attributeAnimation == currentInstance->GetAttributeAnimation())
         {
+            currentInstance->SetWrapMode(wrapMode);
             currentInstance->SetSpeed(speed);
             return;
         }
@@ -197,7 +212,7 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
             }
         }
 
-        attributeAnimationInstances_[name] = new AttributeAnimationInstance(this, *attributeInfo, attributeAnimation, speed);
+        attributeAnimationInstances_[name] = new AttributeAnimationInstance(this, *attributeInfo, attributeAnimation, wrapMode, speed);
 
         if (!currentInstance)
             OnAttributeAnimationAdded();
@@ -226,6 +241,13 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
     }
 }
 
+void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode)
+{
+    AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
+    if (currentInstance)
+        currentInstance->SetWrapMode(wrapMode);
+}
+
 void Animatable::SetAttributeAnimationSpeed(const String& name, float speed)
 {
     AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
@@ -242,6 +264,12 @@ AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
 {
     const AttributeAnimationInstance* instance = GetAttributeAnimationInstance(name);
     return instance ? instance->GetAttributeAnimation() : 0;
+}
+
+WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const
+{
+    const AttributeAnimationInstance* instance = GetAttributeAnimationInstance(name);
+    return instance ? instance->GetWrapMode() : WM_LOOP;
 }
 
 float Animatable::GetAttributeAnimationSpeed(const String& name) const
@@ -272,7 +300,7 @@ void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
     // Set all attribute animations from the object animation
     HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations = objectAnimation->GetAttributeAnimations();
     for (HashMap<String, SharedPtr<AttributeAnimation> >::Iterator i = attributeAnimations.Begin(); i != attributeAnimations.End(); ++i)
-        SetAttributeAnimation(i->first_, i->second_, objectAnimation->GetAttributeAnimationSpeed(i->first_));
+        SetAttributeAnimation(i->first_, i->second_, objectAnimation->GetAttributeAnimationWrapMode(i->first_), objectAnimation->GetAttributeAnimationSpeed(i->first_));
 }
 
 void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)

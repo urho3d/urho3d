@@ -33,17 +33,8 @@
 namespace Urho3D
 {
 
-const char* wrapModeNames[] = 
-{
-    "Loop",
-    "Once",
-    "Clamp",
-    0
-};
-
 AttributeAnimation::AttributeAnimation(Context* context) :
     Resource(context),
-    wrapMode_(WM_LOOP),
     valueType_(VAR_NONE),
     isInterpolatable_(false),
     beginTime_(M_INFINITY),
@@ -85,17 +76,6 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
 
-    String wrapModeString = source.GetAttribute("wrapMode");
-    wrapMode_ = WM_LOOP;
-    for (int i = 0; i <= WM_CLAMP; ++i)
-    {
-        if (wrapModeString == wrapModeNames[i])
-        {
-            wrapMode_ = (WrapMode)i;
-            break;
-        }
-    }
-
     SetValueType(Variant::GetTypeFromName(source.GetAttribute("valueType")));
 
     XMLElement keyFrameEleme = source.GetChild("keyFrame");
@@ -124,7 +104,6 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
-    dest.SetAttribute("wrapMode", wrapModeNames[wrapMode_]);
     dest.SetAttribute("valueType", Variant::GetTypeName(valueType_));
 
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
@@ -150,11 +129,6 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
 void AttributeAnimation::SetObjectAnimation(ObjectAnimation* objectAnimation)
 {
     objectAnimation_ = objectAnimation;
-}
-
-void AttributeAnimation::SetWrapMode(WrapMode wrapMode)
-{
-    wrapMode_ = wrapMode;
 }
 
 void AttributeAnimation::SetValueType(VariantType valueType)
@@ -228,26 +202,6 @@ void AttributeAnimation::SetEventFrame(float time, const StringHash& eventType, 
 ObjectAnimation* AttributeAnimation::GetObjectAnimation() const
 {
     return objectAnimation_;
-}
-
-float AttributeAnimation::CalculateScaledTime(float currentTime, bool& finished) const
-{
-    switch (wrapMode_)
-    {
-    case WM_LOOP:
-        {
-            float span = endTime_ - beginTime_;
-            return beginTime_ + fmodf(currentTime - beginTime_, span);
-        }
-
-    case WM_ONCE:
-        finished = (currentTime >= endTime_);
-
-    case WM_CLAMP:
-        return Clamp(currentTime, beginTime_, endTime_);
-    }
-
-    return beginTime_;
 }
 
 void AttributeAnimation::GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const

@@ -37,14 +37,7 @@ namespace Urho3D
 
 static void RegisterAttributeAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("WrapMode");
-    engine->RegisterEnumValue("WrapMode", "WM_LOOP", WM_LOOP);
-    engine->RegisterEnumValue("WrapMode", "WM_ONCE", WM_ONCE);
-    engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
-
     RegisterResource<AttributeAnimation>(engine, "AttributeAnimation");
-    engine->RegisterObjectMethod("AttributeAnimation", "void set_wrapMode(WrapMode)", asMETHOD(AttributeAnimation, SetWrapMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAnimation", "WrapMode get_wrapMode() const", asMETHOD(AttributeAnimation, GetWrapMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void set_valueType(VariantType)", asMETHOD(AttributeAnimation, SetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "VariantType get_valueType() const", asMETHOD(AttributeAnimation, GetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void SetKeyFrame(float, const Variant&)", asMETHOD(AttributeAnimation, SetKeyFrame), asCALL_THISCALL);
@@ -53,11 +46,17 @@ static void RegisterAttributeAnimation(asIScriptEngine* engine)
 
 static void RegisterObjectAnimation(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("WrapMode");
+    engine->RegisterEnumValue("WrapMode", "WM_LOOP", WM_LOOP);
+    engine->RegisterEnumValue("WrapMode", "WM_ONCE", WM_ONCE);
+    engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
+
     RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
-    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(AttributeAnimation@+)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (AttributeAnimation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
 }
 

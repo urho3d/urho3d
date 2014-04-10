@@ -31,6 +31,14 @@
 namespace Urho3D
 {
 
+const char* wrapModeNames[] = 
+{
+    "Loop",
+    "Once",
+    "Clamp",
+    0
+};
+
 ObjectAnimation::ObjectAnimation(Context* context) :
     Resource(context)
 {
@@ -74,13 +82,24 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
     while (animElem)
     {
         String name = animElem.GetAttribute("name");
-
+        
         SharedPtr<AttributeAnimation> animation(new AttributeAnimation(context_));
         if (!animation->LoadXML(animElem))
             return false;
 
+        String wrapModeString = source.GetAttribute("wrapMode");
+        WrapMode wrapMode = WM_LOOP;
+        for (int i = 0; i <= WM_CLAMP; ++i)
+        {
+            if (wrapModeString == wrapModeNames[i])
+            {
+                wrapMode = (WrapMode)i;
+                break;
+            }
+        }
+
         float speed = animElem.GetFloat("speed");
-        AddAttributeAnimation(name, animation, speed);
+        AddAttributeAnimation(name, animation, wrapMode, speed);
 
         animElem = animElem.GetNext("attributeAnimation");
     }
@@ -98,19 +117,21 @@ bool ObjectAnimation::SaveXML(XMLElement& dest) const
         if (!i->second_->SaveXML(animElem))
             return false;
 
+        animElem.SetAttribute("wrapMode", wrapModeNames[GetAttributeAnimationWrapMode(i->first_)]);
         animElem.SetFloat("speed", GetAttributeAnimationSpeed(i->first_));
     }
 
     return true;
 }
 
-void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed)
+void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed)
 {
     if (!attributeAnimation)
         return;
 
     attributeAnimation->SetObjectAnimation(this);
     attributeAnimations_[name] = attributeAnimation;
+    attributeAnimationWrapModes_[name] = wrapMode;
     attributeAnimationSpeeds_[name] = speed;
 }
 
@@ -138,7 +159,10 @@ void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnim
     }
 
     if (!name.Empty())
+    {
+        attributeAnimationWrapModes_.Erase(name);
         attributeAnimationSpeeds_.Erase(name);
+    }
 }
 
 AttributeAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) const
@@ -147,6 +171,14 @@ AttributeAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) c
     if (i != attributeAnimations_.End())
         return i->second_;
     return 0;
+}
+
+WrapMode ObjectAnimation::GetAttributeAnimationWrapMode(const String& name) const
+{
+    HashMap<String, WrapMode>::ConstIterator i = attributeAnimationWrapModes_.Find(name);
+    if (i != attributeAnimationWrapModes_.End())
+        return i->second_;
+    return WM_LOOP;
 }
 
 float ObjectAnimation::GetAttributeAnimationSpeed(const String& name) const
