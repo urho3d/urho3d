@@ -79,7 +79,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
         if (!animation->LoadXML(animElem))
             return false;
 
-        float speed = animElem.GetFloat("speed", 1.0f);
+        float speed = animElem.GetFloat("speed");
         AddAttributeAnimation(name, animation, speed);
 
         animElem = animElem.GetNext("attributeAnimation");

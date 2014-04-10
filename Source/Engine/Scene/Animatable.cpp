@@ -76,7 +76,7 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         if (!attributeAnimation->LoadXML(elem))
             return false;
 
-        float speed = elem.GetFloat("speed", 1.0f);
+        float speed = elem.GetFloat("speed");
         SetAttributeAnimation(name, attributeAnimation, speed);
 
         elem = elem.GetNext("attributeAnimation");
