@@ -42,8 +42,8 @@ public:
     /// Destruct.
     ~AttributeAnimationInstance();
 
-    /// Update.
-    void Update(float timeStep);
+    /// Update (if animaiton finished return true).
+    bool Update(float timeStep);
     /// Set speed.
     void SetSpeed(float speed) { speed_ = speed; }
     /// Return animatable.

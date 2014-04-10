@@ -37,14 +37,14 @@ namespace Urho3D
 
 static void RegisterAttributeAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("CycleMode");
-    engine->RegisterEnumValue("CycleMode", "CM_LOOP", CM_LOOP);
-    engine->RegisterEnumValue("CycleMode", "CM_CLAMP", CM_CLAMP);
-    engine->RegisterEnumValue("CycleMode", "CM_PINGPONG", CM_PINGPONG);
+    engine->RegisterEnum("WrapMode");
+    engine->RegisterEnumValue("WrapMode", "WM_LOOP", WM_LOOP);
+    engine->RegisterEnumValue("WrapMode", "WM_ONCE", WM_ONCE);
+    engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
 
     RegisterResource<AttributeAnimation>(engine, "AttributeAnimation");
-    engine->RegisterObjectMethod("AttributeAnimation", "void set_cycleMode(CycleMode)", asMETHOD(AttributeAnimation, SetCycleMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAnimation", "CycleMode get_cycleMode() const", asMETHOD(AttributeAnimation, GetCycleMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_wrapMode(WrapMode)", asMETHOD(AttributeAnimation, SetWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "WrapMode get_wrapMode() const", asMETHOD(AttributeAnimation, GetWrapMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void set_valueType(VariantType)", asMETHOD(AttributeAnimation, SetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "VariantType get_valueType() const", asMETHOD(AttributeAnimation, GetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void SetKeyFrame(float, const Variant&)", asMETHOD(AttributeAnimation, SetKeyFrame), asCALL_THISCALL);

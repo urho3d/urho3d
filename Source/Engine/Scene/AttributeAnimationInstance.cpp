@@ -56,18 +56,20 @@ AttributeAnimationInstance::~AttributeAnimationInstance()
 {
 }
 
-void AttributeAnimationInstance::Update(float timeStep)
+bool AttributeAnimationInstance::Update(float timeStep)
 {
     if (!attributeAnimation_)
-        return;
+        return true;
     
     currentTime_ += timeStep * speed_;
     
     const Vector<AttributeKeyFrame>& keyFrames = attributeAnimation_->GetKeyFrames();
     if (keyFrames.Size() < 2)
-        return;
+        return true;
 
-    float scaledTime = attributeAnimation_->CalculateScaledTime(currentTime_);
+    bool finished = false;
+    float scaledTime = attributeAnimation_->CalculateScaledTime(currentTime_, finished);
+
     for (unsigned i = 1; i < keyFrames.Size(); ++i)
     {
         const AttributeKeyFrame& currKeyFrame = keyFrames[i];
@@ -85,9 +87,9 @@ void AttributeAnimationInstance::Update(float timeStep)
     if (attributeAnimation_->HasEventFrames())
     {
         Vector<const AttributeEventFrame*> eventFrames;
-        switch (attributeAnimation_->GetCycleMode())
+        switch (attributeAnimation_->GetWrapMode())
         {
-        case CM_LOOP:
+        case WM_LOOP:
             if (lastScaledTime_ < scaledTime)
                 attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
             else
@@ -96,12 +98,10 @@ void AttributeAnimationInstance::Update(float timeStep)
                 attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), scaledTime, eventFrames);
             }
             break;
-        case CM_CLAMP:
-            attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-            break;
 
-        case CM_PINGPONG:
-            // Not implement
+        case WM_ONCE:
+        case WM_CLAMP:
+            attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
             break;
         }
 
@@ -110,6 +110,8 @@ void AttributeAnimationInstance::Update(float timeStep)
     }
 
     lastScaledTime_ = scaledTime;
+
+    return finished;
 }
 
 Animatable* AttributeAnimationInstance::GetAnimatable() const

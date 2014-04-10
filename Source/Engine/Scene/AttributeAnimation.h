@@ -31,15 +31,15 @@ namespace Urho3D
 class ObjectAnimation;
 class XMLElement;
 
-/// Cycle mode.
-enum CycleMode
+/// Animation wrap mode.
+enum WrapMode
 {
     /// Loop mode.
-    CM_LOOP = 0,
+    WM_LOOP = 0,
+    /// Play once then remove.
+    WM_ONCE,
     /// Clamp mode.
-    CM_CLAMP,
-    /// Pingpong Mode.
-    CM_PINGPONG,
+    WM_CLAMP,
 };
 
 /// Attribute key frame
@@ -86,8 +86,8 @@ public:
 
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
-    /// Set cycle mode.
-    void SetCycleMode(CycleMode cycleMode);
+    /// Set wrap mode.
+    void SetWrapMode(WrapMode warpMode);
     /// Set value type.
     void SetValueType(VariantType valueType);
     /// Set key frame.
@@ -97,8 +97,8 @@ public:
 
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
-    /// Return cycle mode.
-    CycleMode GetCycleMode() const { return cycleMode_; }
+    /// Return wrap mode.
+    WrapMode GetWrapMode() const { return wrapMode_; }
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
     /// Is interpolatable.
@@ -108,7 +108,7 @@ public:
     /// Return end time.
     float GetEndTime() const { return endTime_; }
     /// Calculate scaled time.
-    float CalculateScaledTime(float currentTime) const;
+    float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return all key frames.
     const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyFrames_; }
     /// Has event frames.
@@ -120,8 +120,8 @@ protected:
 
     /// Object animation.
     WeakPtr<ObjectAnimation> objectAnimation_;
-    /// Cycle mode.
-    CycleMode cycleMode_;
+    /// Wrap mode.
+    WrapMode wrapMode_;
     /// Value type.
     VariantType valueType_;
     /// Is interpolatable.

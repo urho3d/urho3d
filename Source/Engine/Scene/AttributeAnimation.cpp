@@ -33,17 +33,17 @@
 namespace Urho3D
 {
 
-const char* cycleModeNames[] = 
+const char* wrapModeNames[] = 
 {
     "Loop",
+    "Once",
     "Clamp",
-    "Pingpong",
     0
 };
 
 AttributeAnimation::AttributeAnimation(Context* context) :
     Resource(context),
-    cycleMode_(CM_LOOP),
+    wrapMode_(WM_LOOP),
     valueType_(VAR_NONE),
     isInterpolatable_(false),
     beginTime_(M_INFINITY),
@@ -85,13 +85,13 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
 
-    String cycleModeString = source.GetAttribute("cycleMode");
-    cycleMode_ = CM_LOOP;
-    for (int i = 0; i <= CM_PINGPONG; ++i)
+    String wrapModeString = source.GetAttribute("wrapMode");
+    wrapMode_ = WM_LOOP;
+    for (int i = 0; i <= WM_CLAMP; ++i)
     {
-        if (cycleModeString == cycleModeNames[i])
+        if (wrapModeString == wrapModeNames[i])
         {
-            cycleMode_ = (CycleMode)i;
+            wrapMode_ = (WrapMode)i;
             break;
         }
     }
@@ -124,7 +124,7 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
-    dest.SetAttribute("cycleMode", cycleModeNames[cycleMode_]);
+    dest.SetAttribute("wrapMode", wrapModeNames[wrapMode_]);
     dest.SetAttribute("valueType", Variant::GetTypeName(valueType_));
 
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
@@ -152,9 +152,9 @@ void AttributeAnimation::SetObjectAnimation(ObjectAnimation* objectAnimation)
     objectAnimation_ = objectAnimation;
 }
 
-void AttributeAnimation::SetCycleMode(CycleMode cycleMode)
+void AttributeAnimation::SetWrapMode(WrapMode wrapMode)
 {
-    cycleMode_ = cycleMode;
+    wrapMode_ = wrapMode;
 }
 
 void AttributeAnimation::SetValueType(VariantType valueType)
@@ -230,27 +230,21 @@ ObjectAnimation* AttributeAnimation::GetObjectAnimation() const
     return objectAnimation_;
 }
 
-float AttributeAnimation::CalculateScaledTime(float currentTime) const
+float AttributeAnimation::CalculateScaledTime(float currentTime, bool& finished) const
 {
-    switch (cycleMode_)
+    switch (wrapMode_)
     {
-    case CM_LOOP:
+    case WM_LOOP:
         {
             float span = endTime_ - beginTime_;
             return beginTime_ + fmodf(currentTime - beginTime_, span);
         }
 
-    case CM_CLAMP:
-        return Clamp(currentTime, beginTime_, endTime_);
+    case WM_ONCE:
+        finished = (currentTime >= endTime_);
 
-    case CM_PINGPONG:
-        {
-            float span = endTime_ - beginTime_;
-            float doubleSpan = span * 2.0f;
-            float fract = fmodf(currentTime - beginTime_, doubleSpan);
-            return (fract < span) ? beginTime_ + fract : beginTime_ + doubleSpan - fract;
-        }
-        break;
+    case WM_CLAMP:
+        return Clamp(currentTime, beginTime_, endTime_);
     }
 
     return beginTime_;

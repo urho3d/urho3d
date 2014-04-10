@@ -1,10 +1,10 @@
 $#include "AttributeAnimation.h"
 
-enum CycleMode
+enum WrapMode
 {
-    CM_LOOP = 0,
-    CM_CLAMP,
-    CM_PINGPONG,
+    WM_LOOP = 0,
+    WM_ONCE,
+    WM_CLAMP,
 };
 
 class AttributeAnimation : public Resource
@@ -12,15 +12,15 @@ class AttributeAnimation : public Resource
     AttributeAnimation();
     virtual ~AttributeAnimation();
     
-    void SetCycleMode(CycleMode cycleMode);
+    void SetWrapMode(WrapMode wrapMode);
     void SetValueType(VariantType valueType);
     bool SetKeyFrame(float time, const Variant& value);
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
     
-    CycleMode GetCycleMode() const;
+    WrapMode GetWrapMode() const;
     VariantType GetValueType() const;
 
-    tolua_property__get_set CycleMode cycleMode;
+    tolua_property__get_set WrapMode wrapMode;
     tolua_property__get_set VariantType valueType;
 };
 

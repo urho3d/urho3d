@@ -297,8 +297,15 @@ void Animatable::UpdateAttributeAnimations(float timeStep)
     if (!animationEnabled_)
         return;
 
+    Vector<String> finishedNames;
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
-        i->second_->Update(timeStep);
+    {
+        if (i->second_->Update(timeStep))
+            finishedNames.Push(i->second_->GetAttributeInfo().name_);
+    }
+
+    for (unsigned i = 0; i < finishedNames.Size(); ++i)
+        SetAttributeAnimation(finishedNames[i], 0);
 }
 
 bool Animatable::IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const
