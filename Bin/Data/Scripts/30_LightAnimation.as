@@ -56,11 +56,11 @@ void CreateScene()
 
     // Create light color animation
     AttributeAnimation@ colorAnimation = AttributeAnimation();
-    colorAnimation.SetKeyFrame(0.0f, Variant(Color(1.0f, 1.0f, 1.0f)));
-    colorAnimation.SetKeyFrame(1.0f, Variant(Color(1.0f, 0.0f, 0.0f)));
-    colorAnimation.SetKeyFrame(2.0f, Variant(Color(1.0f, 1.0f, 0.0f)));
-    colorAnimation.SetKeyFrame(3.0f, Variant(Color(0.0f, 1.0f, 0.0f)));
-    colorAnimation.SetKeyFrame(4.0f, Variant(Color(1.0f, 1.0f, 1.0f)));
+    colorAnimation.SetKeyFrame(0.0f, Variant(WHITE));
+    colorAnimation.SetKeyFrame(1.0f, Variant(RED));
+    colorAnimation.SetKeyFrame(2.0f, Variant(YELLOW));
+    colorAnimation.SetKeyFrame(3.0f, Variant(GREEN));
+    colorAnimation.SetKeyFrame(4.0f, Variant(WHITE));
     light.SetAttributeAnimation("Color", colorAnimation);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
