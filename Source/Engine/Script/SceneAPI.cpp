@@ -54,9 +54,11 @@ static void RegisterAttributeAnimation(asIScriptEngine* engine)
 static void RegisterObjectAnimation(asIScriptEngine* engine)
 {
     RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
-    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(AttributeAnimation@+)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (AttributeAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
 }
 
 static void RegisterSerializable(asIScriptEngine* engine)

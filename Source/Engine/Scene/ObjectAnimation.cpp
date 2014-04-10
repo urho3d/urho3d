@@ -31,7 +31,7 @@
 namespace Urho3D
 {
 
-ObjectAnimation::ObjectAnimation(Context* context) : 
+ObjectAnimation::ObjectAnimation(Context* context) :
     Resource(context)
 {
 }
@@ -68,7 +68,7 @@ bool ObjectAnimation::Save(Serializer& dest) const
 bool ObjectAnimation::LoadXML(const XMLElement& source)
 {
     attributeAnimations_.Clear();
-    
+
     XMLElement animElem;
     animElem = source.GetChild("attributeAnimation");
     while (animElem)
@@ -79,7 +79,8 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
         if (!animation->LoadXML(animElem))
             return false;
 
-        AddAttributeAnimation(name, animation);
+        float speed = animElem.GetFloat("speed", 1.0f);
+        AddAttributeAnimation(name, animation, speed);
 
         animElem = animElem.GetNext("attributeAnimation");
     }
@@ -96,18 +97,21 @@ bool ObjectAnimation::SaveXML(XMLElement& dest) const
 
         if (!i->second_->SaveXML(animElem))
             return false;
+
+        animElem.SetFloat("speed", GetAttributeAnimationSpeed(i->first_));
     }
 
     return true;
 }
 
-void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation)
+void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed)
 {
     if (!attributeAnimation)
         return;
 
     attributeAnimation->SetObjectAnimation(this);
     attributeAnimations_[name] = attributeAnimation;
+    attributeAnimationSpeeds_[name] = speed;
 }
 
 void ObjectAnimation::RemoveAttributeAnimation(const String& name)
@@ -120,15 +124,21 @@ void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnim
     if (!attributeAnimation)
         return;
 
+    String name;
+
     for (HashMap<String, SharedPtr<AttributeAnimation> >::Iterator i = attributeAnimations_.Begin(); i != attributeAnimations_.End(); ++i)
     {
         if (i->second_ == attributeAnimation)
         {
+            name = i->first_;
             attributeAnimation->SetObjectAnimation(0);
             attributeAnimations_.Erase(i);
-            return;
+            break;
         }
     }
+
+    if (!name.Empty())
+        attributeAnimationSpeeds_.Erase(name);
 }
 
 AttributeAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) const
@@ -137,6 +147,14 @@ AttributeAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) c
     if (i != attributeAnimations_.End())
         return i->second_;
     return 0;
+}
+
+float ObjectAnimation::GetAttributeAnimationSpeed(const String& name) const
+{
+    HashMap<String, float>::ConstIterator i = attributeAnimationSpeeds_.Find(name);
+    if (i != attributeAnimationSpeeds_.End())
+        return i->second_;
+    return 1.0f;
 }
 
 }

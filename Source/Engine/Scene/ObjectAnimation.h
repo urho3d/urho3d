@@ -52,7 +52,7 @@ public:
     bool SaveXML(XMLElement& dest) const;
 
     /// Add attribute animation.
-    void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation);
+    void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed = 1.0f);
     /// Remove attribute animation.
     void RemoveAttributeAnimation(const String& name);
     /// Remove attribute animation.
@@ -60,12 +60,16 @@ public:
 
     /// Return attribute animation by name.
     AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    /// Return attribute animation speed by name.
+    float GetAttributeAnimationSpeed(const String& name) const;
     /// Return all attribute animations.
     const HashMap<String, SharedPtr<AttributeAnimation> >& GetAttributeAnimations() const { return attributeAnimations_; }
 
 private:
     /// Name to attribute animation mapping.
     HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations_;
+    /// Name to attribute animation speed mapping.
+    HashMap<String, float> attributeAnimationSpeeds_;
 };
 
 }

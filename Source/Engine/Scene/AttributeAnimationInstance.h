@@ -36,7 +36,7 @@ class URHO3D_API AttributeAnimationInstance : public RefCounted
 {
 public:
     /// Construct.
-    AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation);
+    AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, float speed);
     /// Construct.
     AttributeAnimationInstance(const AttributeAnimationInstance& other);
     /// Destruct.
@@ -44,12 +44,16 @@ public:
 
     /// Update.
     void Update(float timeStep);
+    /// Set speed.
+    void SetSpeed(float speed) { speed_ = speed; }
     /// Return animatable.
     Animatable* GetAnimatable() const;
     /// Return attribute infomation.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
     /// Return attribute animation.
     AttributeAnimation* GetAttributeAnimation() const;
+    /// Return speed.
+    float GetSpeed() const { return speed_; }
     /// Return current time.
     float GetCurrentTime() const { return currentTime_; }
 
@@ -63,6 +67,8 @@ protected:
     const AttributeInfo& attributeInfo_;
     /// Attribute animation.
     SharedPtr<AttributeAnimation> attributeAnimation_;
+    /// Speed.
+    float speed_;
     /// Current time.
     float currentTime_;
     /// Last scaled time.

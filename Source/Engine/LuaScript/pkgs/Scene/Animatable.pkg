@@ -4,11 +4,13 @@ class Animatable : Serializable
 {
     void SetAnimationEnabled(bool enable);
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation);
+    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed = 1.0f);
+    void SetAttributeAnimationSpeed(const String& name, float speed);
 
     bool GetAnimationEnabled() const;
-    const ObjectAnimation* GetObjectAnimation() const;
-    const AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    ObjectAnimation* GetObjectAnimation() const;
+    AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    float GetAttributeAnimationSpeed(const String& name) const;
     
     tolua_property__get_set bool animationEnabled;
     tolua_property__get_set ObjectAnimation* objectAnimation;

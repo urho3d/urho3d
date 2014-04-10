@@ -456,9 +456,11 @@ template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void set_animationEnabled(bool)", asMETHODPR(T, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_animationEnabled() const", asMETHODPR(T, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(T, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(T, GetObjectAnimation, () const, const ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetAttributeAnimation(const String&in, AttributeAnimation@+)", asMETHODPR(T, SetAttributeAnimation, (const String&, AttributeAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(T, GetAttributeAnimation, (const String&) const, const AttributeAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(T, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimation(const String&in, AttributeAnimation@+, float speed=1.0f)", asMETHODPR(T, SetAttributeAnimation, (const String&, AttributeAnimation*, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(T, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(T, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(T, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Component.

@@ -76,7 +76,9 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         if (!attributeAnimation->LoadXML(elem))
             return false;
 
-        SetAttributeAnimation(name, attributeAnimation);
+        float speed = elem.GetFloat("speed", 1.0f);
+        SetAttributeAnimation(name, attributeAnimation, speed);
+
         elem = elem.GetNext("attributeAnimation");
     }
 
@@ -107,6 +109,8 @@ bool Animatable::SaveXML(XMLElement& dest) const
         elem.SetAttribute("name", attr.name_);
         if (!attributeAnimation->SaveXML(elem))
             return false;
+
+        elem.SetFloat("speed", i->second_->GetSpeed());
     }
 
     return true;
@@ -131,14 +135,17 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
         OnObjectAnimationAdded(objectAnimation_);
 }
 
-void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation)
+void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed)
 {
-    const AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
+    AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
 
     if (attributeAnimation)
     {
         if (currentInstance && attributeAnimation == currentInstance->GetAttributeAnimation())
+        {
+            currentInstance->SetSpeed(speed);
             return;
+        }
 
         // Get attribute info
         const AttributeInfo* attributeInfo = 0;
@@ -187,10 +194,10 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
                     animatedNetworkAttributes_.Insert(&(*i));
                     break;
                 }
-            }            
+            }
         }
 
-        attributeAnimationInstances_[name] = new AttributeAnimationInstance(this, *attributeInfo, attributeAnimation);
+        attributeAnimationInstances_[name] = new AttributeAnimationInstance(this, *attributeInfo, attributeAnimation, speed);
 
         if (!currentInstance)
             OnAttributeAnimationAdded();
@@ -211,7 +218,7 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
                     animatedNetworkAttributes_.Erase(&(*i));
                     break;
                 }
-            }            
+            }
         }
 
         attributeAnimationInstances_.Erase(name);
@@ -219,15 +226,28 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
     }
 }
 
-const ObjectAnimation* Animatable::GetObjectAnimation() const
+void Animatable::SetAttributeAnimationSpeed(const String& name, float speed)
+{
+    AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
+    if (currentInstance)
+        currentInstance->SetSpeed(speed);
+}
+
+ObjectAnimation* Animatable::GetObjectAnimation() const
 {
     return objectAnimation_;
 }
 
-const AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
+AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
 {
     const AttributeAnimationInstance* instance = GetAttributeAnimationInstance(name);
     return instance ? instance->GetAttributeAnimation() : 0;
+}
+
+float Animatable::GetAttributeAnimationSpeed(const String& name) const
+{
+    const AttributeAnimationInstance* instance = GetAttributeAnimationInstance(name);
+    return instance ? instance->GetSpeed() : 1.0f;
 }
 
 void Animatable::SetObjectAnimationAttr(ResourceRef value)
@@ -252,7 +272,7 @@ void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
     // Set all attribute animations from the object animation
     HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations = objectAnimation->GetAttributeAnimations();
     for (HashMap<String, SharedPtr<AttributeAnimation> >::Iterator i = attributeAnimations.Begin(); i != attributeAnimations.End(); ++i)
-        SetAttributeAnimation(i->first_, i->second_);
+        SetAttributeAnimation(i->first_, i->second_, objectAnimation->GetAttributeAnimationSpeed(i->first_));
 }
 
 void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
@@ -276,7 +296,7 @@ void Animatable::UpdateAttributeAnimations(float timeStep)
 {
     if (!animationEnabled_)
         return;
-    
+
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
         i->second_->Update(timeStep);
 }
@@ -286,7 +306,7 @@ bool Animatable::IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const
     return animatedNetworkAttributes_.Find(&attrInfo) != animatedNetworkAttributes_.End();
 }
 
-const AttributeAnimationInstance* Animatable::GetAttributeAnimationInstance(const String& name) const
+AttributeAnimationInstance* Animatable::GetAttributeAnimationInstance(const String& name) const
 {
     HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Find(name);
     if (i != attributeAnimationInstances_.End())

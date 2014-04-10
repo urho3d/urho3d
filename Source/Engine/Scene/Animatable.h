@@ -55,14 +55,18 @@ public:
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation);
+    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, float speed = 1.0f);
+    /// Set attribute animation speed.
+    void SetAttributeAnimationSpeed(const String& name, float speed);
 
     /// Return animation enabled.
     bool GetAnimationEnabled() const { return animationEnabled_; }
     /// Return object animation.
-    const ObjectAnimation* GetObjectAnimation() const;
+    ObjectAnimation* GetObjectAnimation() const;
     /// Return attribute animation.
-    const AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    /// Return attribute animation speed.
+    float GetAttributeAnimationSpeed(const String& name) const;
 
     /// Set object animation attribute.
     void SetObjectAnimationAttr(ResourceRef value);
@@ -83,7 +87,7 @@ protected:
     /// Is animated network attribute.
     bool IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const;
     /// Return attribute animation instance.
-    const AttributeAnimationInstance* GetAttributeAnimationInstance(const String& name) const;
+    AttributeAnimationInstance* GetAttributeAnimationInstance(const String& name) const;
 
     /// Animation enabled.
     bool animationEnabled_;

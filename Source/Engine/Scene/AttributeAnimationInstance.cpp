@@ -31,19 +31,22 @@
 namespace Urho3D
 {
 
-AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation) :
+AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, float speed) :
     animatable_(animatable),
     attributeInfo_(attributeInfo),
     attributeAnimation_(attributeAnimation),
+    speed_(speed),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
 {
+    speed_ = Max(0.0f, speed_);
 }
 
 AttributeAnimationInstance::AttributeAnimationInstance(const AttributeAnimationInstance& other) :
     animatable_(other.animatable_),
     attributeInfo_(other.attributeInfo_),
     attributeAnimation_(other.attributeAnimation_),
+    speed_(other.speed_),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
 {
@@ -58,7 +61,7 @@ void AttributeAnimationInstance::Update(float timeStep)
     if (!attributeAnimation_)
         return;
     
-    currentTime_ += timeStep;
+    currentTime_ += timeStep * speed_;
     
     const Vector<AttributeKeyFrame>& keyFrames = attributeAnimation_->GetKeyFrames();
     if (keyFrames.Size() < 2)
