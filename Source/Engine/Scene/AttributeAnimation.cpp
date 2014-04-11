@@ -35,8 +35,15 @@
 namespace Urho3D
 {
 
-    AttributeAnimation::AttributeAnimation(Context* context) :
-Resource(context),
+const char* interpMethodNames[] = 
+{
+    "Linear",
+    "Spline",
+    0
+};
+
+AttributeAnimation::AttributeAnimation(Context* context) :
+    Resource(context),
     interpolationMethod_(IM_LINEAR),
     splineTension_(0.5f),
     valueType_(VAR_NONE),
@@ -81,6 +88,21 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
 
+    String interpMethodString = source.GetAttribute("interpolationmethod");
+    InterpolationMethod method = IM_LINEAR;
+    for (int i = 0; i <= IM_SPLINE; ++i)
+    {
+        if (interpMethodString == interpMethodNames[i])
+        {
+            method = (InterpolationMethod)i;
+            break;
+        }
+    }
+
+    SetInterpolationMethod(method);
+    if (interpolationMethod_ == IM_SPLINE)
+        splineTension_ = source.GetFloat("splinetension");
+
     XMLElement keyFrameEleme = source.GetChild("keyframe");
     while (keyFrameEleme)
     {
@@ -107,6 +129,10 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
+    dest.SetAttribute("interpolationmethod", interpMethodNames[interpolationMethod_]);
+    if (interpolationMethod_ == IM_SPLINE)
+        dest.SetFloat("splinetension", splineTension_);
+
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {
         const AttributeKeyFrame& keyFrame = keyFrames_[i];
@@ -276,11 +302,9 @@ Variant AttributeAnimation::LinearInterpolation(unsigned index1, unsigned index2
     const AttributeKeyFrame& keyFrame2 = keyFrames_[index2];
 
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
-    return LinearInterpolation(keyFrame1.value_, keyFrame2.value_, t);
-}
+    const Variant& value1 = keyFrame1.value_;
+    const Variant& value2 = keyFrame2.value_;
 
-Variant AttributeAnimation::LinearInterpolation(const Variant& value1, const Variant& value2, float t) const
-{
     switch (valueType_)
     {
     case VAR_FLOAT:

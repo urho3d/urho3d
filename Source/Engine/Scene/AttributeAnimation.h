@@ -122,8 +122,6 @@ public:
 protected:
     /// Linear interpolation.
     Variant LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const;
-    /// Linear interpolation.
-    Variant LinearInterpolation(const Variant& value1, const Variant& value2, float t) const;
     /// Spline interpolation.
     Variant SplineInterpolation(unsigned index1, unsigned index2, float scaledTime);
     /// Update spline tangents.
