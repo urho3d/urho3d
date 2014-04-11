@@ -31,6 +31,8 @@
 #include "Log.h"
 #include "Thread.h"
 
+#include <SDL_filesystem.h>
+
 #include <cstdio>
 #include <cstring>
 
@@ -67,27 +69,54 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 namespace Urho3D
 {
 
-int DoSystemCommand(const String& commandLine, bool redirectStdOutToLog)
+int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
-    if (!redirectStdOutToLog)
+    if (!redirectToLog)
         return system(commandLine.CString());
+
+    // Get a platform-agnostic temporary file name for stderr redirection
+    String stderrFilename;
+    String adjustedCommandLine(commandLine);
+    char* prefPath = SDL_GetPrefPath("urho3d", "Urho3D");
+    if (prefPath)
+    {
+        stderrFilename = String(prefPath) + "command-stderr";
+        adjustedCommandLine += " 2>" + stderrFilename;
+        SDL_free(prefPath);
+    }
 
     #ifdef _MSC_VER
     #define popen _popen
     #define pclose _pclose
     #endif
 
-    // Use popen/pclose to capture the stdout of the command
-    FILE *file = popen(commandLine.CString(), "r");
+    // Use popen/pclose to capture the stdout and stderr of the command
+    FILE *file = popen(adjustedCommandLine.CString(), "r");
     if (!file)
         return -1;
+
+    // Capture the standard output stream
     char buffer[128];
     while (!feof(file))
     {
-        if (fgets(buffer, 128, file))
+        if (fgets(buffer, sizeof(buffer), file))
             LOGRAW(String(buffer));
     }
-    return pclose(file);
+    int exitCode = pclose(file);
+
+    // Capture the standard error stream
+    if (!stderrFilename.Empty())
+    {
+        SharedPtr<File> errFile(new File(context, stderrFilename, FILE_READ));
+        while (!errFile->IsEof())
+        {
+            unsigned numRead = errFile->Read(buffer, sizeof(buffer));
+            if (numRead)
+                Log::WriteRaw(String(buffer, numRead), true);
+        }
+    }
+
+    return exitCode;
 }
 
 int DoSystemRun(const String& fileName, const Vector<String>& arguments)
@@ -190,7 +219,7 @@ public:
     /// The function to run in the thread.
     virtual void ThreadFunction()
     {
-        exitCode_ = DoSystemCommand(commandLine_, false);
+        exitCode_ = DoSystemCommand(commandLine_, false, 0);
         completed_ = true;
     }
     
@@ -311,7 +340,7 @@ void FileSystem::SetExecuteConsoleCommands(bool enable)
 int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLog)
 {
     if (allowedPaths_.Empty())
-        return DoSystemCommand(commandLine, redirectStdOutToLog);
+        return DoSystemCommand(commandLine, redirectStdOutToLog, context_);
     else
     {
         LOGERROR("Executing an external command is not allowed");
