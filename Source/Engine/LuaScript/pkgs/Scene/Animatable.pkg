@@ -6,7 +6,7 @@ class Animatable : Serializable
 {
     void SetAnimationEnabled(bool enable);
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed = 1.0f);
+    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     void SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode);
     void SetAttributeAnimationSpeed(const String& name, float speed);
 

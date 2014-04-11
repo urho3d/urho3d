@@ -64,7 +64,7 @@ public:
     bool SaveXML(XMLElement& dest) const;
 
     /// Add attribute animation.
-    void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed = 1.0f);
+    void AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     /// Remove attribute animation.
     void RemoveAttributeAnimation(const String& name);
     /// Remove attribute animation.

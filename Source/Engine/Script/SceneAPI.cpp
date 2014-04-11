@@ -52,7 +52,7 @@ static void RegisterObjectAnimation(asIScriptEngine* engine)
     engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
 
     RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
-    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+, WrapMode wrapMode, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(AttributeAnimation@+)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (AttributeAnimation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
