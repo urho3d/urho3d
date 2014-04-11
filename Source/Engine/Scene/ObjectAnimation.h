@@ -28,19 +28,20 @@ namespace Urho3D
 {
 
 class AttributeAnimation;
+class AttributeAnimationInfo;
 
 /// Animation wrap mode.
 enum WrapMode
 {
     /// Loop mode.
     WM_LOOP = 0,
-    /// Play once then remove.
+    /// Play once, when animation finished it will be removed.
     WM_ONCE,
     /// Clamp mode.
     WM_CLAMP,
 };
 
-/// Object animation class.
+/// Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
 class URHO3D_API ObjectAnimation : public Resource
 {
     OBJECT(ObjectAnimation );
@@ -75,16 +76,15 @@ public:
     WrapMode GetAttributeAnimationWrapMode(const String& name) const;
     /// Return attribute animation speed by name.
     float GetAttributeAnimationSpeed(const String& name) const;
-    /// Return all attribute animations.
-    const HashMap<String, SharedPtr<AttributeAnimation> >& GetAttributeAnimations() const { return attributeAnimations_; }
+    /// Return all attribute animations infos.
+    const HashMap<String, SharedPtr<AttributeAnimationInfo> >& GetAttributeAnimationInfos() const { return attributeAnimationInfos_; }
 
 private:
-    /// Name to attribute animation mapping.
-    HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations_;
-    /// Name to attribute animation wrap mode mapping.
-    HashMap<String, WrapMode> attributeAnimationWrapModes_;
-    /// Name to attribute animation speed mapping.
-    HashMap<String, float> attributeAnimationSpeeds_;
+    /// Return attribute animation info by name.
+    AttributeAnimationInfo* GetAttributeAnimationInfo(const String& name) const;
+
+    /// Name to attribute animation info mapping.
+    HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInfos_;
 };
 
 }

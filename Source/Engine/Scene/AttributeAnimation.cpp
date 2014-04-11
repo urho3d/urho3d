@@ -76,13 +76,11 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
 
-    SetValueType(Variant::GetTypeFromName(source.GetAttribute("valuetype")));
-
     XMLElement keyFrameEleme = source.GetChild("keyframe");
     while (keyFrameEleme)
     {
         float time = keyFrameEleme.GetFloat("time");
-        Variant value(valueType_, keyFrameEleme.GetAttribute("value"));
+        Variant value = keyFrameEleme.GetVariant();
         SetKeyFrame(time, value);
 
         keyFrameEleme = keyFrameEleme.GetNext("keyframe");
@@ -104,14 +102,12 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
 
 bool AttributeAnimation::SaveXML(XMLElement& dest) const
 {
-    dest.SetAttribute("valuetype", Variant::GetTypeName(valueType_));
-
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {
         const AttributeKeyFrame& keyFrame = keyFrames_[i];
         XMLElement keyFrameEleme = dest.CreateChild("keyframe");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
-        keyFrameEleme.SetAttribute("value", keyFrame.value_.ToString());
+        keyFrameEleme.SetVariant(keyFrame.value_);
     }
 
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)

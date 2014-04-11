@@ -22,18 +22,15 @@
 
 #pragma once
 
-#include "RefCounted.h"
-#include "ObjectAnimation.h"
+#include "AttributeAnimationInfo.h"
 
 namespace Urho3D
 {
 
 class Animatable;
-class AttributeAnimation;
-struct AttributeKeyFrame;
 
-/// Attribute animation instance.
-class URHO3D_API AttributeAnimationInstance : public RefCounted
+/// Attribute animation instance, it include animation runtime information, when animation playing it will update the object's attribute value automatically.
+class URHO3D_API AttributeAnimationInstance : public AttributeAnimationInfo
 {
 public:
     /// Construct.
@@ -45,24 +42,15 @@ public:
 
     /// Update (if animaiton finished return true).
     bool Update(float timeStep);
-    /// Set wrap mode.
-    void SetWrapMode(WrapMode wrapMode) { wrapMode_ = wrapMode; }
-    /// Set speed.
-    void SetSpeed(float speed) { speed_ = speed; }
+
     /// Return animatable.
     Animatable* GetAnimatable() const;
     /// Return attribute infomation.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
-    /// Return attribute animation.
-    AttributeAnimation* GetAttributeAnimation() const;
-    /// Return wrap mode.
-    WrapMode GetWrapMode() const { return wrapMode_; }
-    /// Return speed.
-    float GetSpeed() const { return speed_; }
     /// Return current time.
     float GetCurrentTime() const { return currentTime_; }
 
-protected:
+private:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Interpolation.
@@ -72,12 +60,6 @@ protected:
     WeakPtr<Animatable> animatable_;
     /// Attribute information.
     const AttributeInfo& attributeInfo_;
-    /// Attribute animation.
-    SharedPtr<AttributeAnimation> attributeAnimation_;
-    /// Wrap mode.
-    WrapMode wrapMode_;
-    /// Speed.
-    float speed_;
     /// Current time.
     float currentTime_;
     /// Last scaled time.

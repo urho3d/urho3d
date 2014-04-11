@@ -32,23 +32,18 @@ namespace Urho3D
 {
 
 AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
+    AttributeAnimationInfo(attributeAnimation, wrapMode, speed),
     animatable_(animatable),
     attributeInfo_(attributeInfo),
-    attributeAnimation_(attributeAnimation),
-    wrapMode_(wrapMode),
-    speed_(speed),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
 {
-    speed_ = Max(0.0f, speed_);
 }
 
 AttributeAnimationInstance::AttributeAnimationInstance(const AttributeAnimationInstance& other) :
+    AttributeAnimationInfo(other),
     animatable_(other.animatable_),
     attributeInfo_(other.attributeInfo_),
-    attributeAnimation_(other.attributeAnimation_),
-    wrapMode_(other.wrapMode_),
-    speed_(other.speed_),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
 {
@@ -122,11 +117,6 @@ bool AttributeAnimationInstance::Update(float timeStep)
 Animatable* AttributeAnimationInstance::GetAnimatable() const
 {
     return animatable_;
-}
-
-AttributeAnimation* AttributeAnimationInstance::GetAttributeAnimation() const
-{
-    return attributeAnimation_;
 }
 
 float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& finished) const

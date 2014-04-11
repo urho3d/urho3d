@@ -298,9 +298,13 @@ void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
         return;
 
     // Set all attribute animations from the object animation
-    HashMap<String, SharedPtr<AttributeAnimation> > attributeAnimations = objectAnimation->GetAttributeAnimations();
-    for (HashMap<String, SharedPtr<AttributeAnimation> >::Iterator i = attributeAnimations.Begin(); i != attributeAnimations.End(); ++i)
-        SetAttributeAnimation(i->first_, i->second_, objectAnimation->GetAttributeAnimationWrapMode(i->first_), objectAnimation->GetAttributeAnimationSpeed(i->first_));
+    const HashMap<String, SharedPtr<AttributeAnimationInfo> >& attributeAnimationInfos = objectAnimation->GetAttributeAnimationInfos();
+    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos.Begin(); i != attributeAnimationInfos.End(); ++i)
+    {
+        const String& name = i->first_;
+        AttributeAnimationInfo* info = i->second_;
+        SetAttributeAnimation(name, info->GetAttributeAnimation(), info->GetWrapMode(), info->GetSpeed());
+    }
 }
 
 void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
