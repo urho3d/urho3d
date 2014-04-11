@@ -135,6 +135,8 @@ protected:
     WeakPtr<ObjectAnimation> objectAnimation_;
     /// Interpolation method.
     InterpolationMethod interpolationMethod_;
+    /// Spline tension.
+    float splineTension_;
     /// Value type.
     VariantType valueType_;
     /// Is interpolatable.
@@ -145,8 +147,6 @@ protected:
     float endTime_;
     /// Key frames.
     Vector<AttributeKeyFrame> keyFrames_;
-    /// Spline tension.
-    float splineTension_;
     /// Spline tangents.
     Vector<Variant> splineTangents_;
     /// Spline tangents dirty.

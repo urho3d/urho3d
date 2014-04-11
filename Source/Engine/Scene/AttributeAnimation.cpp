@@ -38,11 +38,11 @@ namespace Urho3D
     AttributeAnimation::AttributeAnimation(Context* context) :
 Resource(context),
     interpolationMethod_(IM_LINEAR),
+    splineTension_(0.5f),
     valueType_(VAR_NONE),
     isInterpolatable_(false),
     beginTime_(M_INFINITY),
     endTime_(-M_INFINITY),
-    splineTension_(0.5f),
     splineTangentsDirty_(false)
 {
 }
