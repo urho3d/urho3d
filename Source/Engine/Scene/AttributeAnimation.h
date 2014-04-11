@@ -33,6 +33,15 @@ class ObjectAnimation;
 class XMLElement;
 struct AttributeInfo;
 
+/// Interpolation method.
+enum InterpolationMethod
+{
+    /// Linear interpolation (default).
+    IM_LINEAR = 0,
+    /// Cardinal spline interpolation, default tension value is 0.5f. For more information please refer to http://cubic.org/docs/hermite.htm.
+    IM_SPLINE,
+};
+
 /// Attribute key frame
 struct AttributeKeyFrame
 {
@@ -77,6 +86,10 @@ public:
 
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
+    /// Set interpolation method.
+    void SetInterpolationMethod(InterpolationMethod method);
+    /// Set spline tension.
+    void SetSplineTension(float tension);
     /// Set value type.
     void SetValueType(VariantType valueType);
     
@@ -86,9 +99,13 @@ public:
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
 
     /// Return animation is valid.
-    bool IsValid() const { return keyFrames_.Size() > 1; }
+    bool IsValid() const;
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
+    /// Return interpolation method.
+    InterpolationMethod GetInterpolationMethod() const { return interpolationMethod_; }
+    /// Return spline tension.
+    float GetSplineTension() const { return splineTension_; }
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
     /// Return begin time.
@@ -96,7 +113,7 @@ public:
     /// Return end time.
     float GetEndTime() const { return endTime_; }
     /// Update object's attribute value.
-    void UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime) const;
+    void UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime);
     /// Has event frames.
     bool HasEventFrames() const { return eventFrames_.Size() != 0; }
     /// Return all event frames between time.
@@ -105,9 +122,19 @@ public:
 protected:
     /// Linear interpolation.
     Variant LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const;
+    /// Linear interpolation.
+    Variant LinearInterpolation(const Variant& value1, const Variant& value2, float t) const;
+    /// Spline interpolation.
+    Variant SplineInterpolation(unsigned index1, unsigned index2, float scaledTime);
+    /// Update spline tangents.
+    void UpdateSplineTangents();
+    /// Return (value1 - value2) * t.
+    Variant SubstractAndMultiply(const Variant& value1, const Variant& value2, float t) const;
 
     /// Object animation.
     WeakPtr<ObjectAnimation> objectAnimation_;
+    /// Interpolation method.
+    InterpolationMethod interpolationMethod_;
     /// Value type.
     VariantType valueType_;
     /// Is interpolatable.
@@ -118,6 +145,12 @@ protected:
     float endTime_;
     /// Key frames.
     Vector<AttributeKeyFrame> keyFrames_;
+    /// Spline tension.
+    float splineTension_;
+    /// Spline tangents.
+    Vector<Variant> splineTangents_;
+    /// Spline tangents dirty.
+    bool splineTangentsDirty_;
     /// Event frames.
     Vector<AttributeEventFrame> eventFrames_;
 };
