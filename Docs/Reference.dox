@@ -1865,13 +1865,15 @@ light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 On above code, we first create an AttributeAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
 
 Another way is load attribute animation from resource, here is a simple sample:
+\code
 AttributeAnimatio* colorAnimation = cache->GetResource<AttributeAnimation>("Scene/LightColorAnimation.xml");
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
+\endcode
 
 These are three kind of wrap mode for attribute animation:
-WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
-WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
-WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame’s value.
+- WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
+- WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
+- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame’s value.
 
 These is another argument call speed the animation play speed, the default value is 1.0f, user can change the value to control the animation play speed. User can also change animation’s wrap mode and speed on fly.
 
