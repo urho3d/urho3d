@@ -60,29 +60,14 @@ bool AttributeAnimationInstance::Update(float timeStep)
     
     currentTime_ += timeStep * speed_;
     
-    const Vector<AttributeKeyFrame>& keyFrames = attributeAnimation_->GetKeyFrames();
-    if (keyFrames.Size() < 2)
+    if (!attributeAnimation_->IsValid())
         return true;
 
     bool finished = false;
+    // Calculate scale time by wrap mode
     float scaledTime = CalculateScaledTime(currentTime_, finished);
 
-    unsigned index = 1;
-    for (; index < keyFrames.Size(); ++index)
-    {
-        const AttributeKeyFrame& currKeyFrame = keyFrames[index];
-        if (scaledTime < currKeyFrame.time_)
-            break;
-    }
-
-    const AttributeKeyFrame& prevKeyFrame = keyFrames[index - 1];
-    if (index >= keyFrames.Size() || !attributeAnimation_->IsInterpolatable())
-        animatable_->OnSetAttribute(attributeInfo_, prevKeyFrame.value_);
-    else
-    {
-        const AttributeKeyFrame& currKeyFrame = keyFrames[index];
-        animatable_->OnSetAttribute(attributeInfo_, Interpolation(prevKeyFrame, currKeyFrame, scaledTime));
-    }
+    attributeAnimation_->UpdateAttributeValue(animatable_, attributeInfo_, scaledTime);
 
     if (attributeAnimation_->HasEventFrames())
     {
@@ -142,29 +127,29 @@ float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& f
     return beginTime;
 }
 
-Variant AttributeAnimationInstance::Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const
-{
-    float factor = (scaledTime - prevKeyFrame.time_) / (currKeyFrame.time_ - prevKeyFrame.time_);
-
-    switch (attributeAnimation_->GetValueType())
-    {
-    case VAR_FLOAT:
-        return Lerp(prevKeyFrame.value_.GetFloat(), currKeyFrame.value_.GetFloat(), factor);
-    case VAR_VECTOR2:
-        return prevKeyFrame.value_.GetVector2().Lerp(currKeyFrame.value_.GetVector2(), factor);
-    case VAR_VECTOR3:
-        return prevKeyFrame.value_.GetVector3().Lerp(currKeyFrame.value_.GetVector3(), factor);
-    case VAR_VECTOR4:
-        return prevKeyFrame.value_.GetVector4().Lerp(currKeyFrame.value_.GetVector4(), factor);
-    case VAR_QUATERNION:
-        return prevKeyFrame.value_.GetQuaternion().Slerp(currKeyFrame.value_.GetQuaternion(), factor);
-    case VAR_COLOR:
-        return prevKeyFrame.value_.GetColor().Lerp(currKeyFrame.value_.GetColor(), factor);
-    }
-
-    LOGERROR("value type");
-
-    return Variant::EMPTY;
-}
+//Variant AttributeAnimationInstance::Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const
+//{
+//    float factor = (scaledTime - prevKeyFrame.time_) / (currKeyFrame.time_ - prevKeyFrame.time_);
+//
+//    switch (attributeAnimation_->GetValueType())
+//    {
+//    case VAR_FLOAT:
+//        return Lerp(prevKeyFrame.value_.GetFloat(), currKeyFrame.value_.GetFloat(), factor);
+//    case VAR_VECTOR2:
+//        return prevKeyFrame.value_.GetVector2().Lerp(currKeyFrame.value_.GetVector2(), factor);
+//    case VAR_VECTOR3:
+//        return prevKeyFrame.value_.GetVector3().Lerp(currKeyFrame.value_.GetVector3(), factor);
+//    case VAR_VECTOR4:
+//        return prevKeyFrame.value_.GetVector4().Lerp(currKeyFrame.value_.GetVector4(), factor);
+//    case VAR_QUATERNION:
+//        return prevKeyFrame.value_.GetQuaternion().Slerp(currKeyFrame.value_.GetQuaternion(), factor);
+//    case VAR_COLOR:
+//        return prevKeyFrame.value_.GetColor().Lerp(currKeyFrame.value_.GetColor(), factor);
+//    }
+//
+//    LOGERROR("value type");
+//
+//    return Variant::EMPTY;
+//}
 
 }

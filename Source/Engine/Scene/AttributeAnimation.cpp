@@ -21,10 +21,12 @@
 //
 
 #include "Precompiled.h"
+#include "Animatable.h"
 #include "AttributeAnimation.h"
 #include "Context.h"
-#include "ObjectAnimation.h"
 #include "Deserializer.h"
+#include "Log.h"
+#include "ObjectAnimation.h"
 #include "Serializer.h"
 #include "XMLFile.h"
 
@@ -133,9 +135,8 @@ void AttributeAnimation::SetValueType(VariantType valueType)
         return;
 
     valueType_ = valueType;
-
-    isInterpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || 
-        (valueType_ == VAR_VECTOR4) || (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
+    isInterpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) || 
+        (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR) || (valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2);
 
     keyFrames_.Clear();
     beginTime_ = M_INFINITY;
@@ -200,6 +201,21 @@ ObjectAnimation* AttributeAnimation::GetObjectAnimation() const
     return objectAnimation_;
 }
 
+void AttributeAnimation::UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime) const
+{
+    unsigned index = 1;
+    for (; index < keyFrames_.Size(); ++index)
+    {
+        if (scaledTime < keyFrames_[index].time_)
+            break;
+    }
+
+    if (index >= keyFrames_.Size() || !isInterpolatable_)
+        animatable->OnSetAttribute(attributeInfo, keyFrames_[index - 1].value_);
+    else
+        animatable->OnSetAttribute(attributeInfo, LinearInterpolation(index - 1, index, scaledTime));
+}
+
 void AttributeAnimation::GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const
 {
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
@@ -211,6 +227,47 @@ void AttributeAnimation::GetEventFrames(float beginTime, float endTime, Vector<c
         if (eventFrame.time_ >= beginTime)
             eventFrames.Push(&eventFrame);
     }
+}
+
+Variant AttributeAnimation::LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const
+{
+    const AttributeKeyFrame& keyFrame1 = keyFrames_[index1];
+    const AttributeKeyFrame& keyFrame2 = keyFrames_[index2];
+
+    float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
+
+    switch (valueType_)
+    {
+    case VAR_FLOAT:
+        return Lerp(keyFrame1.value_.GetFloat(), keyFrame2.value_.GetFloat(), t);
+    case VAR_VECTOR2:
+        return keyFrame1.value_.GetVector2().Lerp(keyFrame2.value_.GetVector2(), t);
+    case VAR_VECTOR3:
+        return keyFrame1.value_.GetVector3().Lerp(keyFrame2.value_.GetVector3(), t);
+    case VAR_VECTOR4:
+        return keyFrame1.value_.GetVector4().Lerp(keyFrame2.value_.GetVector4(), t);
+    case VAR_QUATERNION:
+        return keyFrame1.value_.GetQuaternion().Slerp(keyFrame2.value_.GetQuaternion(), t);
+    case VAR_COLOR:
+        return keyFrame1.value_.GetColor().Lerp(keyFrame2.value_.GetColor(), t);
+    case VAR_INTRECT:
+        {
+            float s = 1.0f - t;
+            const IntRect& r1 = keyFrame1.value_.GetIntRect();
+            const IntRect& r2 = keyFrame2.value_.GetIntRect();
+            return IntRect((int)(r1.left_ * s + r2.left_ * t), (int)(r1.top_ * s + r2.top_ * t), (int)(r1.right_ * s + r2.right_ * t), (int)(r1.bottom_ * s + r2.bottom_ * t));
+        }
+    case VAR_INTVECTOR2:
+        {
+            float s = 1.0f - t;
+            const IntVector2& v1 = keyFrame1.value_.GetIntVector2();
+            const IntVector2& v2 = keyFrame2.value_.GetIntVector2();
+            return IntVector2((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t));
+        }
+    }
+
+    LOGERROR("Invalid value type for linear interpolation");
+    return Variant::EMPTY;
 }
 
 }

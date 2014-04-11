@@ -28,8 +28,10 @@
 namespace Urho3D
 {
 
+class Animatable;
 class ObjectAnimation;
 class XMLElement;
+struct AttributeInfo;
 
 /// Attribute key frame
 struct AttributeKeyFrame
@@ -77,29 +79,33 @@ public:
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set value type.
     void SetValueType(VariantType valueType);
+    
     /// Set key frame.
     bool SetKeyFrame(float time, const Variant& value);
     /// Set event frame.
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
 
+    /// Return animation is valid.
+    bool IsValid() const { return keyFrames_.Size() > 1; }
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
     /// Return value type.
     VariantType GetValueType() const { return valueType_; }
-    /// Is interpolatable.
-    bool IsInterpolatable() const { return isInterpolatable_; }
     /// Return begin time.
     float GetBeginTime() const { return beginTime_; }
     /// Return end time.
     float GetEndTime() const { return endTime_; }
-    /// Return all key frames.
-    const Vector<AttributeKeyFrame>& GetKeyFrames() const { return keyFrames_; }
+    /// Update object's attribute value.
+    void UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime) const;
     /// Has event frames.
     bool HasEventFrames() const { return eventFrames_.Size() != 0; }
     /// Return all event frames between time.
     void GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const;
 
 protected:
+    /// Linear interpolation.
+    Variant LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const;
+
     /// Object animation.
     WeakPtr<ObjectAnimation> objectAnimation_;
     /// Value type.

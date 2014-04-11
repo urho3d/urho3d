@@ -54,7 +54,7 @@ private:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Interpolation.
-    Variant Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const;
+    // Variant Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const;
 
     /// Animatable.
     WeakPtr<Animatable> animatable_;
