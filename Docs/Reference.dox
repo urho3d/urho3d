@@ -1849,6 +1849,74 @@ When making your own work functions, observe that the following things are (at l
 - Requesting resources from ResourceCache
 - Executing script functions
 
+\page AttributeAnimation %Attribute animation
+Attribute animation is a new system for Urho3D, With it user can apply animation to object’s attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
+
+These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
+\code
+SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+
+light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+\endcode
+
+On above code, we first create an AttributeAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+
+Another way is load attribute animation from resource, here is a simple sample:
+AttributeAnimatio* colorAnimation = cache->GetResource<AttributeAnimation>("Scene/LightColorAnimation.xml");
+light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
+
+These are three kind of wrap mode for attribute animation:
+WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
+WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
+WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame’s value.
+
+These is another argument call speed the animation play speed, the default value is 1.0f, user can change the value to control the animation play speed. User can also change animation’s wrap mode and speed on fly.
+
+When user want to apply multi-attribute animation to an object, ObjectAnimation is for it. For example when user want to apply position and color animation for light, can use following code:
+\code
+// Create object animation.
+SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
+
+// Create position animation
+SharedPtr<AttributeAnimation> positionAnimation(new AttributeAnimation(context_));
+positionAnimation->SetKeyFrame(0.0f, Vector3::ZERO);
+positionAnimation->SetKeyFrame(1.0f, Vector3(1.0f, 1.0f, 1.0f));
+positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
+// Add position animation
+lightAnimation->AddAttributeAnimation("Position", positionAnimation, WM_LOOP); 
+
+// Create color animation
+SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+// Add color animation
+lightAnimation->AddAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+
+// Apply object animation to light
+light->SetObjectAnimation(lightAnimation);
+\endcode
+
+Also user can load object animation from file, like:
+\code
+ObjectAnimation * lightAnimation = cache->GetResource< ObjectAnimation >("Scene/LightAnimation.xml");
+light-> SetObjectAnimation (lightAnimation);
+\endcode
+
+Current attribute animation use linear interpolation for numeric value type (like float, Vector2, Vector3 etc), and these is no interpolation for non-numeric type (like int, bool).
+
+Attribute animation and object animation can be save to scene file, Someday if our editor support edit animation, we can create animation in editor and save it to scene file.
+
+\section AttributeAnimation_Classes Classes of attribute animation:
+- Animatable: Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
+- AttributeAnimation: Attribute animation class, include some key frame in it.
+- ObjectAnimation: Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
+- AttributeAnimationInfo: Attribute animation info, it include attribute animation, wrap mode and animation speed.
+- AttributeAnimationInstance: Attribute animation instance, it is derived from AttributeAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
+
 \page Tools Tools
 
 \section Tools_AssetImporter AssetImporter

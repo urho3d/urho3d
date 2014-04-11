@@ -37,6 +37,7 @@ For further reference, see:
 \ref Serialization "Serialization" <br>
 \ref Network "Networking" <br>
 \ref Multithreading "Multithreading" <br>
+\ref AttributeAnimation "Attribute Animation" <br>
 \ref Tools "Tools" <br>
 \ref Unicode "Unicode support" <br>
 \ref FileFormats "Custom file formats" <br>
