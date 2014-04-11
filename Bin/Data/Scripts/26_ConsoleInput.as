@@ -50,6 +50,8 @@ void Start()
 
     // Show the console by default, make it large
     console.numRows = graphics.height / 16;
+    console.numBufferedRows = 2 * console.numRows;
+    console.commandInterpreter = "ScriptEventInvoker";
     console.visible = true;
     
     // Show OS mouse cursor
@@ -67,7 +69,8 @@ void Start()
 
 void HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
-    HandleInput(eventData["Command"].GetString());
+    if (eventData["Id"].GetString() == "ScriptEventInvoker")
+        HandleInput(eventData["Command"].GetString());
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)

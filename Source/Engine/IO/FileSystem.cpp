@@ -24,6 +24,7 @@
 #include "ArrayPtr.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "EngineEvents.h"
 #include "File.h"
 #include "FileSystem.h"
 #include "IOEvents.h"
@@ -66,9 +67,27 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 namespace Urho3D
 {
 
-int DoSystemCommand(const String& commandLine)
+int DoSystemCommand(const String& commandLine, bool redirectStdOutToLog)
 {
-    return system(commandLine.CString());
+    if (!redirectStdOutToLog)
+        return system(commandLine.CString());
+
+    #ifdef _MSC_VER
+    #define popen _popen
+    #define pclose _pclose
+    #endif
+
+    // Use popen/pclose to capture the stdout of the command
+    FILE *file = popen(commandLine.CString(), "r");
+    if (!file)
+        return -1;
+    char buffer[128];
+    while (!feof(file))
+    {
+        if (fgets(buffer, 128, file))
+            LOGRAW(String(buffer));
+    }
+    return pclose(file);
 }
 
 int DoSystemRun(const String& fileName, const Vector<String>& arguments)
@@ -171,7 +190,7 @@ public:
     /// The function to run in the thread.
     virtual void ThreadFunction()
     {
-        exitCode_ = DoSystemCommand(commandLine_);
+        exitCode_ = DoSystemCommand(commandLine_, false);
         completed_ = true;
     }
     
@@ -209,9 +228,13 @@ private:
 
 FileSystem::FileSystem(Context* context) :
     Object(context),
-    nextAsyncExecID_(1)
+    nextAsyncExecID_(1),
+    executeConsoleCommands_(false)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(FileSystem, HandleBeginFrame));
+
+    // Subscribe to console commands
+    SetExecuteConsoleCommands(true);
 }
 
 FileSystem::~FileSystem()
@@ -273,10 +296,22 @@ bool FileSystem::CreateDir(const String& pathName)
     return success;
 }
 
-int FileSystem::SystemCommand(const String& commandLine)
+void FileSystem::SetExecuteConsoleCommands(bool enable)
+{
+    if (enable == executeConsoleCommands_)
+        return;
+
+    executeConsoleCommands_ = enable;
+    if (enable)
+        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(FileSystem, HandleConsoleCommand));
+    else
+        UnsubscribeFromEvent(E_CONSOLECOMMAND);
+}
+
+int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLog)
 {
     if (allowedPaths_.Empty())
-        return DoSystemCommand(commandLine);
+        return DoSystemCommand(commandLine, redirectStdOutToLog);
     else
     {
         LOGERROR("Executing an external command is not allowed");
@@ -740,6 +775,13 @@ void FileSystem::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
         else
             ++i;
     }
+}
+
+void FileSystem::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ConsoleCommand;
+    if (eventData[P_ID].GetString() == GetTypeName())
+        SystemCommand(eventData[P_COMMAND].GetString(), true);
 }
 
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension)

@@ -331,7 +331,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "uint GetLastModifiedTime(const String&in) const", asMETHOD(FileSystem, GetLastModifiedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "Array<String>@ ScanDir(const String&in, const String&in, uint, bool) const", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in)", asMETHOD(FileSystem, SystemCommand), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in, bool redirectStdOutToLog = false)", asMETHOD(FileSystem, SystemCommand), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRun), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("FileSystem", "uint SystemCommandAsync(const String&in)", asMETHOD(FileSystem, SystemCommandAsync), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "uint SystemRunAsync(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRunAsync), asCALL_CDECL_OBJLAST);
@@ -341,6 +341,8 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "bool Delete(const String&in)", asMETHOD(FileSystem, Delete), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_currentDir() const", asMETHOD(FileSystem, GetCurrentDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const String&in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "void set_executeConsoleCommands(bool)", asMETHOD(FileSystem, SetExecuteConsoleCommands), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool get_executeConsoleCommands() const", asMETHOD(FileSystem, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);

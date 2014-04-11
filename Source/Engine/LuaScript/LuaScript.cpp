@@ -67,7 +67,7 @@ namespace Urho3D
 LuaScript::LuaScript(Context* context) :
     Object(context),
     luaState_(0),
-    executeConsoleCommands_(true)
+    executeConsoleCommands_(false)
 {
     RegisterLuaScriptLibrary(context_);
 
@@ -108,7 +108,7 @@ LuaScript::LuaScript(Context* context) :
     SubscribeToEvent(E_POSTUPDATE, HANDLER(LuaScript, HandlePostUpdate));
 
     // Subscribe to console commands
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+    SetExecuteConsoleCommands(true);
     
     // Record the internally handled script functions so that UnsubscribeFromAllEvents doesn't destroy them
     internalEvents_.Push(E_POSTUPDATE);

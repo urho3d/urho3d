@@ -290,6 +290,7 @@ bool Console::PopulateInterpreter()
 void Console::HandleInterpreterSelected(StringHash eventType, VariantMap& eventData)
 {
     commandInterpreter_ = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
+    lineEdit_->SetFocus(true);
 }
 
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)

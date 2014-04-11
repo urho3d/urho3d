@@ -78,6 +78,8 @@ void ConsoleInput::Start()
     // subscriber for the console command event
     Console* console = GetSubsystem<Console>();
     console->SetNumRows(GetSubsystem<Graphics>()->GetHeight() / 16);
+    console->SetNumBufferedRows(2 * console->GetNumRows());
+    console->SetCommandInterpreter(GetTypeName());
     console->SetVisible(true);
     
     // Show OS mouse cursor
@@ -96,8 +98,8 @@ void ConsoleInput::Start()
 void ConsoleInput::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-    
-    HandleInput(eventData[P_COMMAND].GetString());
+    if (eventData[P_ID].GetString() == GetTypeName())
+        HandleInput(eventData[P_COMMAND].GetString());
 }
 
 void ConsoleInput::HandleUpdate(StringHash eventType, VariantMap& eventData)

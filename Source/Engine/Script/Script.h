@@ -67,7 +67,7 @@ public:
     void SetDefaultScriptFile(ScriptFile* file);
     /// Set immediate mode scene.
     void SetDefaultScene(Scene* scene);
-    /// Set whether to execute engine console commands as script code. Default true.
+    /// Set whether to execute engine console commands as script code.
     void SetExecuteConsoleCommands(bool enable);
     /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when URHO3D_LOGGING not defined.
     void DumpAPI(DumpMode mode= DOXYGEN);
@@ -121,7 +121,7 @@ private:
     HashMap<const char*, asIObjectType*> objectTypes_;
     /// Current script execution nesting level.
     unsigned scriptNestingLevel_;
-    /// Flag for executing engine console commands as script code.
+    /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
 };
 

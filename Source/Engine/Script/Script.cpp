@@ -153,7 +153,7 @@ Script::Script(Context* context) :
     scriptEngine_(0),
     immediateContext_(0),
     scriptNestingLevel_(0),
-    executeConsoleCommands_(true)
+    executeConsoleCommands_(false)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
@@ -199,7 +199,7 @@ Script::Script(Context* context) :
     RegisterEngineAPI(scriptEngine_);
 
     // Subscribe to console commands
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(Script, HandleConsoleCommand));
+    SetExecuteConsoleCommands(true);
 }
 
 Script::~Script()
