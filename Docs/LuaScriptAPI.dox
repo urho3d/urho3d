@@ -1806,7 +1806,8 @@ Methods:
 
 - bool SetCurrentDir(const String pathName)
 - bool CreateDir(const String pathName)
-- int SystemCommand(const String commandLine)
+- void SetExecuteConsoleCommands(bool enable)
+- int SystemCommand(const String commandLine, bool redirectStdOutToLog = false)
 - int SystemRun(const String fileName, const Vector<String>& arguments)
 - unsigned SystemCommandAsync(const String commandLine)
 - unsigned SystemRunAsync(const String fileName, const Vector<String>& arguments)
@@ -1816,6 +1817,7 @@ Methods:
 - bool Delete(const String fileName)
 - void RegisterPath(const String pathName)
 - String GetCurrentDir() const
+- bool GetExecuteConsoleCommands() const
 - bool HasRegisteredPaths() const
 - bool CheckAccess(const String pathName) const
 - unsigned GetLastModifiedTime(const String fileName) const

@@ -3970,7 +3970,7 @@ uint GetLastModifiedTime(const String&) const;
 bool Rename(const String&, const String&);
 Array<String> ScanDir(const String&, const String&, uint, bool) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-int SystemCommand(const String&);
+int SystemCommand(const String&, bool = false);
 uint SystemCommandAsync(const String&);
 bool SystemOpen(const String&, const String&);
 int SystemRun(const String&, Array<String>);
@@ -3982,6 +3982,7 @@ ShortStringHash baseType;
 /* readonly */
 String category;
 String currentDir;
+bool executeConsoleCommands;
 /* readonly */
 String programDir;
 /* readonly */

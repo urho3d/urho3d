@@ -3345,7 +3345,7 @@ Methods:
 - bool Rename(const String&, const String&)
 - String[]@ ScanDir(const String&, const String&, uint, bool) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- int SystemCommand(const String&)
+- int SystemCommand(const String&, bool = false)
 - uint SystemCommandAsync(const String&)
 - bool SystemOpen(const String&, const String&)
 - int SystemRun(const String&, String[]@)
@@ -3356,6 +3356,7 @@ Properties:
 - ShortStringHash baseType // readonly
 - String category // readonly
 - String currentDir
+- bool executeConsoleCommands
 - String programDir // readonly
 - int refs // readonly
 - ShortStringHash type // readonly
