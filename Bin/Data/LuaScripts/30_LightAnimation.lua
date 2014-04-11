@@ -65,7 +65,7 @@ function CreateScene()
     colorAnimation:SetKeyFrame(3.0, variant)
     variant:SetColor(Color.WHITE)
     colorAnimation:SetKeyFrame(4.0, variant)
-    light:SetAttributeAnimation("Color", colorAnimation)
+    light:SetAttributeAnimation("Color", colorAnimation, WM_LOOP)
 
     -- Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     -- quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains

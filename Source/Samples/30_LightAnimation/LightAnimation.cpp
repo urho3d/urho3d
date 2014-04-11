@@ -104,7 +104,7 @@ void LightAnimation::CreateScene()
     colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
     colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
     colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
-    light->SetAttributeAnimation("Color", colorAnimation);
+    light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains

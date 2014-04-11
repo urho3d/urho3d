@@ -56,7 +56,7 @@ public:
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed = 1.0f);
     /// Set attribute animation wrap mode.
     void SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode);
     /// Set attribute animation speed.
