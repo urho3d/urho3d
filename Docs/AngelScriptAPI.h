@@ -6258,6 +6258,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 Array<RigidBody2D> GetRigidBodies(const Rect&, uint = 0xffff);
 RigidBody2D GetRigidBody(const Vector2&, uint = 0xffff);
+RigidBody2D GetRigidBody(int, int, uint = 0xffff, Camera = 0);
 bool Load(File, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
