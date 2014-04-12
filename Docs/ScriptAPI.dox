@@ -10476,6 +10476,10 @@ Properties:
 
 ### TargetRotationChanged
 
+### AttributeAnimationUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
 ### ScenePostUpdate
 - %Scene : Scene pointer
 - %TimeStep : float
