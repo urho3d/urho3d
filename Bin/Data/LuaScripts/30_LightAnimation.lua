@@ -44,28 +44,34 @@ function CreateScene()
     planeObject.model = cache:GetResource("Model", "Models/Plane.mdl")
     planeObject.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
 
-    -- Create a directional light to the world so that we can see something. The light scene node's orientation controls the
-    -- light direction we will use the SetDirection() function which calculates the orientation from a forward direction vector.
-    -- The light will use default settings (white light, no shadows)
+    -- Create a point light to the world so that we can see something.
     local lightNode = scene_:CreateChild("DirectionalLight")
-    lightNode.direction = Vector3(0.6, -1.0, 0.8) -- The direction vector does not need to be normalized
     local light = lightNode:CreateComponent("Light")
-    light.lightType = LIGHT_DIRECTIONAL
+    light.lightType = LIGHT_POINT
+    light.range = 10.0
 
     -- Create light color animation
     local colorAnimation = AttributeAnimation:new()
-    local variant = Variant()
-    variant:SetColor(Color.WHITE)
-    colorAnimation:SetKeyFrame(0.0, variant)
-    variant:SetColor(Color.RED)
-    colorAnimation:SetKeyFrame(1.0, variant)
-    variant:SetColor(Color.YELLOW)
-    colorAnimation:SetKeyFrame(2.0, variant)
-    variant:SetColor(Color.GREEN)
-    colorAnimation:SetKeyFrame(3.0, variant)
-    variant:SetColor(Color.WHITE)
-    colorAnimation:SetKeyFrame(4.0, variant)
+    colorAnimation:SetKeyFrame(0.0, Variant(Color.WHITE))
+    colorAnimation:SetKeyFrame(1.0, Variant(Color.RED))
+    colorAnimation:SetKeyFrame(2.0, Variant(Color.YELLOW))
+    colorAnimation:SetKeyFrame(3.0, Variant(Color.GREEN))
+    colorAnimation:SetKeyFrame(4.0, Variant(Color.WHITE))
     light:SetAttributeAnimation("Color", colorAnimation)
+
+    -- Create light position animation
+    local positionAnimation = AttributeAnimation:new()
+    -- Use spline interpolation method
+    positionAnimation.interpolationMethod = IM_SPLINE
+    -- Set spline tension
+    positionAnimation.splineTension = 0.7
+    positionAnimation:SetKeyFrame(0.0, Variant(Vector3(-30.0, 5.0, -30.0)))
+    positionAnimation:SetKeyFrame(1.0, Variant(Vector3( 30.0, 5.0, -30.0)))
+    positionAnimation:SetKeyFrame(2.0, Variant(Vector3( 30.0, 5.0,  30.0)))
+    positionAnimation:SetKeyFrame(3.0, Variant(Vector3(-30.0, 5.0,  30.0)))
+    positionAnimation:SetKeyFrame(4.0, Variant(Vector3(-30.0, 5.0, -30.0)))
+    -- Set animation to node's world position
+    lightNode:SetAttributeAnimation("World Position", positionAnimation)
 
     -- Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     -- quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains

@@ -46,13 +46,11 @@ void CreateScene()
     planeObject.model = cache.GetResource("Model", "Models/Plane.mdl");
     planeObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
 
-    // Create a directional light to the world so that we can see something. The light scene node's orientation controls the
-    // light direction; we will use the SetDirection() function which calculates the orientation from a forward direction vector.
-    // The light will use default settings (white light, no shadows)
+    // Create a point light to the world so that we can see something.
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
-    lightNode.direction = Vector3(0.6f, -1.0f, 0.8f); // The direction vector does not need to be normalized
     Light@ light = lightNode.CreateComponent("Light");
-    light.lightType = LIGHT_DIRECTIONAL;
+    light.lightType = LIGHT_POINT;
+    light.range = 10.0f;
 
     // Create light color animation
     AttributeAnimation@ colorAnimation = AttributeAnimation();
@@ -62,6 +60,20 @@ void CreateScene()
     colorAnimation.SetKeyFrame(3.0f, Variant(GREEN));
     colorAnimation.SetKeyFrame(4.0f, Variant(WHITE));
     light.SetAttributeAnimation("Color", colorAnimation);
+
+    // Create light position animation
+    AttributeAnimation@ positionAnimation = AttributeAnimation();
+    // Use spline interpolation method
+    positionAnimation.interpolationMethod = IM_SPLINE;
+    // Set spline tension
+    positionAnimation.splineTension = 0.7f;
+    positionAnimation.SetKeyFrame(0.0f, Variant(Vector3(-30.0f, 5.0f, -30.0f)));
+    positionAnimation.SetKeyFrame(1.0f, Variant(Vector3( 30.0f, 5.0f, -30.0f)));
+    positionAnimation.SetKeyFrame(2.0f, Variant(Vector3( 30.0f, 5.0f,  30.0f)));
+    positionAnimation.SetKeyFrame(3.0f, Variant(Vector3(-30.0f, 5.0f,  30.0f)));
+    positionAnimation.SetKeyFrame(4.0f, Variant(Vector3(-30.0f, 5.0f, -30.0f)));
+    // Set animation to node's world position
+    lightNode.SetAttributeAnimation("World Position", positionAnimation);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
