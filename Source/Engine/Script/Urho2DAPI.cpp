@@ -268,7 +268,8 @@ static void RegisterPhysicsWorld2D(asIScriptEngine* engine)
     RegisterComponent<PhysicsWorld2D>(engine, "PhysicsWorld2D");
     engine->RegisterObjectMethod("PhysicsWorld2D", "Array<PhysicsRaycastResult2D>@ Raycast(const Vector2&, const Vector2&, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorld2DRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld2D", "PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorld2DRaycastSingle), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PhysicsWorld2D", "RigidBody2D@+ GetRigidBody(const Vector2&, uint collisionMask = 0xffff)", asMETHOD(PhysicsWorld2D, GetRigidBody), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld2D", "RigidBody2D@+ GetRigidBody(const Vector2&, uint collisionMask = 0xffff)", asMETHODPR(PhysicsWorld2D, GetRigidBody, (const Vector2&, unsigned), RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld2D", "RigidBody2D@+ GetRigidBody(int, int, uint collisionMask = 0xffff, Camera@+ = 0)", asMETHODPR(PhysicsWorld2D, GetRigidBody, (int, int, unsigned, Camera*), RigidBody2D*), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "Array<RigidBody2D@>@ GetRigidBodies(const Rect&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorld2DGetRigidBodies), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld2D", "void set_drawShape(bool)", asMETHOD(PhysicsWorld2D, SetDrawShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "bool get_drawShape() const", asMETHOD(PhysicsWorld2D, GetDrawShape), asCALL_THISCALL);

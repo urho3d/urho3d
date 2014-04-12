@@ -21,8 +21,11 @@
 //
 
 #include "Precompiled.h"
+#include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "Graphics.h"
+#include "Log.h"
 #include "PhysicsEvents2D.h"
 #include "PhysicsUtils2D.h"
 #include "PhysicsWorld2D.h"
@@ -520,6 +523,29 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
 
     world_->QueryAABB(&callback, b2Aabb);
     return callback.GetRigidBody();
+}
+
+RigidBody2D* PhysicsWorld2D::GetRigidBody(int mouseX, int mouseY, unsigned collisionMask, Camera* camera)
+{
+    if (!camera)
+    {
+        PODVector<Camera*> cameras;
+        GetScene()->GetComponents<Camera>(cameras, true);
+        if (!cameras.Empty())
+            camera = cameras[0];
+    }
+
+    if (!camera)
+    {
+        LOGWARNING("Could not find camera in scene");
+        return 0;
+    }
+
+    Graphics* graphics = GetSubsystem<Graphics>();
+    Vector3 screenPoint((float)mouseX / graphics->GetWidth(), (float)mouseY / graphics->GetHeight(), 0.0f);
+    Vector3 worldPoint = camera->ScreenToWorldPoint(screenPoint);
+
+    return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);    
 }
 
 // Aabb query callback class.
