@@ -46,6 +46,8 @@ static const unsigned AM_NODEID = 0x10;
 static const unsigned AM_COMPONENTID = 0x20;
 /// Attribute is a node ID vector where first element is the amount of nodes.
 static const unsigned AM_NODEIDVECTOR = 0x40;
+/// Attribute is for attribute animation only, for example Node's world position attribute.
+static const unsigned AM_ATTRANIMATION= 0x80 | AM_NOEDIT;
 
 class Serializable;
 

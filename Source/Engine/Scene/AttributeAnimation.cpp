@@ -89,12 +89,12 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     eventFrames_.Clear();
 
     String interpMethodString = source.GetAttribute("interpolationmethod");
-    InterpolationMethod method = IM_LINEAR;
+    InterpMethod method = IM_LINEAR;
     for (int i = 0; i <= IM_SPLINE; ++i)
     {
         if (interpMethodString == interpMethodNames[i])
         {
-            method = (InterpolationMethod)i;
+            method = (InterpMethod)i;
             break;
         }
     }
@@ -179,7 +179,7 @@ void AttributeAnimation::SetValueType(VariantType valueType)
     endTime_ = -M_INFINITY;
 }
 
-void AttributeAnimation::SetInterpolationMethod(InterpolationMethod method)
+void AttributeAnimation::SetInterpolationMethod(InterpMethod method)
 {
     if (method == interpolationMethod_)
         return;

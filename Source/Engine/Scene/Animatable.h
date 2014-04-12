@@ -78,6 +78,12 @@ public:
     /// Return object animation attribute.
     ResourceRef GetObjectAnimationAttr() const;
 
+    /// Dummy function for REF_ACCESSOR_ATTRIBUTE macro, do not call.
+    const Vector2& GetDummyVector2() const { return Vector2::ZERO; }
+    const Vector3& GetDummyVector3() const { return Vector3::ZERO; }
+    const Vector4& GetDummyVector4() const { return Vector4::ZERO; }
+    const Quaternion& GetDummyQuaternion() const { return Quaternion::IDENTITY; }
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded() = 0;

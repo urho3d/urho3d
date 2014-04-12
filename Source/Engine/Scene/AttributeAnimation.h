@@ -34,7 +34,7 @@ class XMLElement;
 struct AttributeInfo;
 
 /// Interpolation method.
-enum InterpolationMethod
+enum InterpMethod
 {
     /// Linear interpolation (default).
     IM_LINEAR = 0,
@@ -87,8 +87,8 @@ public:
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set interpolation method.
-    void SetInterpolationMethod(InterpolationMethod method);
-    /// Set spline tension.
+    void SetInterpolationMethod(InterpMethod method);
+    /// Set spline tension, should be between 0.0f and 1.0f, but this is not a must.
     void SetSplineTension(float tension);
     /// Set value type.
     void SetValueType(VariantType valueType);
@@ -103,7 +103,7 @@ public:
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
     /// Return interpolation method.
-    InterpolationMethod GetInterpolationMethod() const { return interpolationMethod_; }
+    InterpMethod GetInterpolationMethod() const { return interpolationMethod_; }
     /// Return spline tension.
     float GetSplineTension() const { return splineTension_; }
     /// Return value type.
@@ -132,7 +132,7 @@ protected:
     /// Object animation.
     WeakPtr<ObjectAnimation> objectAnimation_;
     /// Interpolation method.
-    InterpolationMethod interpolationMethod_;
+    InterpMethod interpolationMethod_;
     /// Spline tension.
     float splineTension_;
     /// Value type.
@@ -146,7 +146,7 @@ protected:
     /// Key frames.
     Vector<AttributeKeyFrame> keyFrames_;
     /// Spline tangents.
-    Vector<Variant> splineTangents_;
+    VariantVector splineTangents_;
     /// Spline tangents dirty.
     bool splineTangentsDirty_;
     /// Event frames.

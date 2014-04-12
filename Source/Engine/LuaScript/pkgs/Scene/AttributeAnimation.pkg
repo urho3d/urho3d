@@ -1,6 +1,6 @@
 $#include "AttributeAnimation.h"
 
-enum InterpolationMethod
+enum InterpMethod
 {
     IM_LINEAR = 0,
     IM_SPLINE,
@@ -11,17 +11,17 @@ class AttributeAnimation : public Resource
     AttributeAnimation();
     virtual ~AttributeAnimation();
     
-    void SetInterpolationMethod(InterpolationMethod method);
+    void SetInterpolationMethod(InterpMethod method);
     void SetSplineTension(float tension);
     void SetValueType(VariantType valueType);
     bool SetKeyFrame(float time, const Variant& value);
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
     
-    InterpolationMethod GetInterpolationMethod() const;
+    InterpMethod GetInterpolationMethod() const;
     float GetSplineTension() const;
     VariantType GetValueType() const;
 
-    tolua_property__get_set InterpolationMethod interpolationMethod;
+    tolua_property__get_set InterpMethod interpolationMethod;
     tolua_property__get_set float splineTension;
     tolua_property__get_set VariantType valueType;
 };

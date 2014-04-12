@@ -79,6 +79,13 @@ void Node::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+
+    // Attention, all get function are replaced with dummy function, because these get function not return reference type
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Direction", GetDummyVector3, SetDirection, Vector3, Vector3::ZERO, AM_ATTRANIMATION);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "World Position", GetDummyVector3, SetWorldPosition, Vector3, Vector3::ZERO, AM_ATTRANIMATION);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "World Rotation", GetDummyQuaternion, SetWorldRotation, Quaternion, Quaternion::IDENTITY, AM_ATTRANIMATION);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "World Direction", GetDummyVector3, SetWorldDirection, Vector3, Vector3::ZERO, AM_ATTRANIMATION);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "World Scale", GetDummyVector3, SetWorldScale, Vector3, Vector3::ZERO, AM_ATTRANIMATION);
 }
 
 void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

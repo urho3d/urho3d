@@ -37,13 +37,13 @@ namespace Urho3D
 
 static void RegisterAttributeAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("InterpolationMethod");
-    engine->RegisterEnumValue("InterpolationMethod", "IM_LINEAR", IM_LINEAR);
-    engine->RegisterEnumValue("InterpolationMethod", "IM_SPLINE", IM_SPLINE);
+    engine->RegisterEnum("InterpMethod");
+    engine->RegisterEnumValue("InterpMethod", "IM_LINEAR", IM_LINEAR);
+    engine->RegisterEnumValue("InterpMethod", "IM_SPLINE", IM_SPLINE);
 
     RegisterResource<AttributeAnimation>(engine, "AttributeAnimation");
-    engine->RegisterObjectMethod("AttributeAnimation", "void set_interpolationMethod(InterpolationMethod)", asMETHOD(AttributeAnimation, SetInterpolationMethod), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAnimation", "InterpolationMethod get_interpolationMethod() const", asMETHOD(AttributeAnimation, GetInterpolationMethod), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_interpolationMethod(InterpMethod)", asMETHOD(AttributeAnimation, SetInterpolationMethod), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "InterpMethod get_interpolationMethod() const", asMETHOD(AttributeAnimation, GetInterpolationMethod), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void set_splineTension(float)", asMETHOD(AttributeAnimation, SetSplineTension), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "float get_splineTension() const", asMETHOD(AttributeAnimation, GetSplineTension), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void set_valueType(VariantType)", asMETHOD(AttributeAnimation, SetValueType), asCALL_THISCALL);
