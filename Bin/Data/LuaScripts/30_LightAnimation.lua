@@ -70,8 +70,7 @@ function CreateScene()
     positionAnimation:SetKeyFrame(2.0, Variant(Vector3( 30.0, 5.0,  30.0)))
     positionAnimation:SetKeyFrame(3.0, Variant(Vector3(-30.0, 5.0,  30.0)))
     positionAnimation:SetKeyFrame(4.0, Variant(Vector3(-30.0, 5.0, -30.0)))
-    -- Set animation to node's world position
-    lightNode:SetAttributeAnimation("World Position", positionAnimation)
+    lightNode:SetAttributeAnimation("Position", positionAnimation)
 
     -- Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     -- quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains

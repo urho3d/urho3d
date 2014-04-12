@@ -115,8 +115,7 @@ void LightAnimation::CreateScene()
     positionAnimation->SetKeyFrame(2.0f, Vector3( 30.0f, 5.0f,  30.0f));
     positionAnimation->SetKeyFrame(3.0f, Vector3(-30.0f, 5.0f,  30.0f));
     positionAnimation->SetKeyFrame(4.0f, Vector3(-30.0f, 5.0f, -30.0f));
-    // Set animation to node's world position
-    lightNode->SetAttributeAnimation("World Position", positionAnimation);
+    lightNode->SetAttributeAnimation("Position", positionAnimation);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
