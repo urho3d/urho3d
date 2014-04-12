@@ -538,6 +538,9 @@ void Scene::Update(float timeStep)
     // Update variable timestep logic
     SendEvent(E_SCENEUPDATE, eventData);
 
+    // Update scene attribute animation.
+    SendEvent(E_ATTRIBUTEANIMATIONUPDATE, eventData);
+
     // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
     SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
 

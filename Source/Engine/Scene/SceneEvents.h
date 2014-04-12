@@ -65,6 +65,13 @@ EVENT(E_TARGETROTATION, TargetRotationChanged)
 {
 }
 
+/// Scene attribute animation update.
+EVENT(E_ATTRIBUTEANIMATIONUPDATE, AttributeAnimationUpdate)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_TIMESTEP, TimeStep);            // float
+}
+
 /// Variable timestep scene post-update.
 EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {

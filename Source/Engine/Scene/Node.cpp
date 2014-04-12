@@ -1454,13 +1454,13 @@ unsigned Node::GetNumPersistentComponents() const
 void Node::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInstances_.Size() == 1)
-        SubscribeToEvent(GetScene(), E_SCENEPOSTUPDATE, HANDLER(Node, HandleScenePostUpdate));        
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Node, HandleAttributeAnimationUpdate));        
 }
 
 void Node::OnAttributeAnimationRemoved()
 {
     if (attributeAnimationInstances_.Empty())
-        UnsubscribeFromEvent(GetScene(), E_SCENEPOSTUPDATE);
+        UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
 Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
@@ -1635,10 +1635,10 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
         componentWeak->SetNode(0);
 }
 
-void Node::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+void Node::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace ScenePostUpdate;
-    
+    using namespace AttributeAnimationUpdate;
+
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
 

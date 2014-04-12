@@ -404,8 +404,8 @@ private:
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     /// Remove a component from this node with the specified iterator.
     void RemoveComponent(Vector<SharedPtr<Component> >::Iterator i);
-    /// Handle scene post-update event.
-    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle attribute animation update event.
+    void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
 
     /// World-space transform matrix.
     mutable Matrix3x4 worldTransform_;

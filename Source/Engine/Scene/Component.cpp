@@ -202,13 +202,13 @@ void Component::MarkNetworkUpdate()
 void Component::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInstances_.Size() == 1)
-        SubscribeToEvent(GetScene(), E_SCENEPOSTUPDATE, HANDLER(Component, HandleScenePostUpdate));        
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Component, HandleAttributeAnimationUpdate));        
 }
 
 void Component::OnAttributeAnimationRemoved()
 {
     if (attributeAnimationInstances_.Empty())
-        UnsubscribeFromEvent(GetScene(), E_SCENEPOSTUPDATE);
+        UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
 void Component::SetID(unsigned id)
@@ -240,9 +240,9 @@ void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type)
         dest.Clear();
 }
 
-void Component::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+void Component::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace ScenePostUpdate;
+    using namespace AttributeAnimationUpdate;
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
