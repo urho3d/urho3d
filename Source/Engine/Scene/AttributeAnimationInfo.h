@@ -22,8 +22,8 @@
 
 #pragma once
 
+#include "AttributeAnimationDefs.h"
 #include "RefCounted.h"
-#include "ObjectAnimation.h"
 
 namespace Urho3D
 {

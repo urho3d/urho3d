@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "AttributeAnimationDefs.h"
 #include "Resource.h"
 
 namespace Urho3D
@@ -29,17 +30,6 @@ namespace Urho3D
 
 class AttributeAnimation;
 class AttributeAnimationInfo;
-
-/// Animation wrap mode.
-enum WrapMode
-{
-    /// Loop mode.
-    WM_LOOP = 0,
-    /// Play once, when animation finished it will be removed.
-    WM_ONCE,
-    /// Clamp mode.
-    WM_CLAMP,
-};
 
 /// Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
 class URHO3D_API ObjectAnimation : public Resource
