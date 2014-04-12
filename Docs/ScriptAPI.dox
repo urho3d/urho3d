@@ -410,9 +410,11 @@ Properties:
 
 - ShortStringHash baseType // readonly
 - String category // readonly
+- InterpMethod interpolationMethod
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
+- float splineTension
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -9326,6 +9328,12 @@ Properties:
 - HTTP_ERROR
 - HTTP_OPEN
 - HTTP_CLOSED
+
+
+### InterpMethod
+
+- IM_LINEAR
+- IM_SPLINE
 
 
 ### InterpolationMode

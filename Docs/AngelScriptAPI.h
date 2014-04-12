@@ -487,11 +487,13 @@ void SetKeyFrame(float, const Variant&);
 ShortStringHash baseType;
 /* readonly */
 String category;
+InterpMethod interpolationMethod;
 /* readonly */
 uint memoryUse;
 String name;
 /* readonly */
 int refs;
+float splineTension;
 /* readonly */
 ShortStringHash type;
 /* readonly */
@@ -11011,6 +11013,12 @@ HTTP_INITIALIZING,
 HTTP_ERROR,
 HTTP_OPEN,
 HTTP_CLOSED,
+};
+
+enum InterpMethod
+{
+IM_LINEAR,
+IM_SPLINE,
 };
 
 enum InterpolationMode

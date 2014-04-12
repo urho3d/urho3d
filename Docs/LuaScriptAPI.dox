@@ -240,14 +240,20 @@ Methods:
 - AttributeAnimation() (GC)
 - AttributeAnimation* new()
 - void delete()
+- void SetInterpolationMethod(InterpMethod method)
+- void SetSplineTension(float tension)
 - void SetValueType(VariantType valueType)
 - bool SetKeyFrame(float time, const Variant& value)
 - void SetEventFrame(float time, const StringHash& eventType)
 - void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
+- InterpMethod GetInterpolationMethod() const
+- float GetSplineTension() const
 - VariantType GetValueType() const
 
 Properties:
 
+- InterpMethod interpolationMethod
+- float splineTension
 - VariantType valueType
 
 ### Audio : Object
@@ -6059,6 +6065,11 @@ Properties:
 - int HTTP_ERROR
 - int HTTP_OPEN
 - int HTTP_CLOSED
+
+### InterpMethod
+
+- int IM_LINEAR
+- int IM_SPLINE
 
 ### InterpolationMode
 
