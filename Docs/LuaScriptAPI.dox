@@ -4408,6 +4408,7 @@ Methods:
 - Spline* new(InterpolationMode mode)
 - Spline(const Spline& rhs) (GC)
 - Spline* new(const Spline& rhs)
+- void delete()
 - bool operator==(const Spline& rhs) const
 - Variant GetPoint(float f) const
 - Variant GetKnot(unsigned index) const
