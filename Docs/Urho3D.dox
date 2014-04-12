@@ -46,6 +46,7 @@ For further reference, see:
 \ref ScriptAPI "Scripting API (generated)" <br>
 \ref LuaScriptAPI "Lua Scripting API (generated)" <br>
 \ref EventList "Event list (generated)" <br>
+\ref AttributeList "Attribute list (generated)" <br>
 
 For Urho3D related links and projects, see \ref ExternalLinks "External Links".
 

@@ -30,6 +30,10 @@
 #include "Script.h"
 #include "ScriptFile.h"
 
+#ifdef URHO3D_LUA
+#include "LuaScript.h"
+#endif
+
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -67,11 +71,23 @@ int main(int argc, char** argv)
     }
 
     SharedPtr<Context> context(new Context());
-
-    // Note: creating the Engine registers most subsystems which don't require engine initialization
     SharedPtr<Engine> engine(new Engine(context));
     context->RegisterSubsystem(new Script(context));
-
+    
+    // In API dumping mode initialize the engine and instantiate LuaScript system if available so that we
+    // can dump attributes from as many classes as possible
+    if (dumpApiMode)
+    {
+        VariantMap engineParameters;
+        engineParameters["Headless"] = true;
+        engineParameters["WorkerThreads"] = false;
+        engineParameters["LogName"] = String::EMPTY;
+        engine->Initialize(engineParameters);
+    #ifdef URHO3D_LUA
+        context->RegisterSubsystem(new LuaScript(context));
+    #endif
+    }
+    
     Log* log = context->GetSubsystem<Log>();
     // Register Log subsystem manually if compiled without logging support
     if (!log)
