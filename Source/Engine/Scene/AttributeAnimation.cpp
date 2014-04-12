@@ -407,8 +407,11 @@ void AttributeAnimation::UpdateSplineTangents()
     for (unsigned i = 1; i < size - 1; ++i)
         splineTangents_[i] = SubstractAndMultiply(keyFrames_[i + 1].value_, keyFrames_[i - 1].value_, splineTension_);
 
-    // Make end point's tangent zero
-    splineTangents_[0] = splineTangents_[size - 1] = SubstractAndMultiply(keyFrames_[0].value_, keyFrames_[0].value_, splineTension_);
+    // If spline is not closed, make end point's tangent zero
+    if (keyFrames_[0].value_ != keyFrames_[size - 1].value_)
+        splineTangents_[0] = splineTangents_[size - 1] = SubstractAndMultiply(keyFrames_[0].value_, keyFrames_[0].value_, splineTension_);
+    else 
+        splineTangents_[0] = splineTangents_[size - 1] = SubstractAndMultiply(keyFrames_[1].value_, keyFrames_[size - 2].value_, splineTension_);
 
     splineTangentsDirty_ = false;
 }
