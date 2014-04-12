@@ -10,6 +10,8 @@ class Spline
     Spline();
     Spline(InterpolationMode mode);
     Spline(const Spline& rhs);
+    // When export constructor, the destructor must export also. otherwise Lua will not collect the oject.
+    ~Spline();
     
     void operator = (const Spline& rhs);
     bool operator == (const Spline& rhs) const;
