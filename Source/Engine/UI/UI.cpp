@@ -888,16 +888,20 @@ UIElement* UI::GetFocusableElement(UIElement* element)
 
 void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
 {
-    if (cursor_)
+    // Prefer software cursor then OS-specific cursor
+    if (cursor_ && cursor_->IsVisible())
     {
         pos = cursor_->GetPosition();
-        visible = cursor_->IsVisible();
+        visible = true;
     }
     else
     {
         Input* input = GetSubsystem<Input>();
         pos = input->GetMousePosition();
         visible = input->IsMouseVisible();
+
+        if (!visible && cursor_)
+            pos = cursor_->GetPosition();
     }
 }
 
