@@ -6769,15 +6769,18 @@ Methods:
 
 Properties:
 
+- Variant[] attributeAnimations // readonly
 - ShortStringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
+- Variant[] speeds // readonly
 - ShortStringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
+- Variant[] wrapModes // readonly
 
 
 ### Octree

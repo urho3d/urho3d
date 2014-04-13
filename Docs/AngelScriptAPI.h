@@ -5718,6 +5718,8 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
+Array<Variant> attributeAnimations;
+/* readonly */
 ShortStringHash baseType;
 /* readonly */
 String category;
@@ -5727,6 +5729,8 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
+Array<Variant> speeds;
+/* readonly */
 ShortStringHash type;
 /* readonly */
 String typeName;
@@ -5734,6 +5738,8 @@ String typeName;
 uint useTimer;
 /* readonly */
 int weakRefs;
+/* readonly */
+Array<Variant> wrapModes;
 };
 
 class Octree
