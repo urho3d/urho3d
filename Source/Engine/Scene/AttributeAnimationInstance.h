@@ -35,16 +35,16 @@ class URHO3D_API AttributeAnimationInstance : public AttributeAnimationInfo
 public:
     /// Construct.
     AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed);
-    /// Construct.
+    /// Copy construct.
     AttributeAnimationInstance(const AttributeAnimationInstance& other);
     /// Destruct.
     ~AttributeAnimationInstance();
 
-    /// Update (if animaiton finished return true).
+    /// Update. Return true when the animation is finished.
     bool Update(float timeStep);
 
     /// Return animatable.
-    Animatable* GetAnimatable() const;
+    Animatable* GetAnimatable() const { return animatable_; }
     /// Return attribute infomation.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
     /// Return current time.
@@ -53,8 +53,6 @@ public:
 private:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
-    /// Interpolation.
-    // Variant Interpolation(const AttributeKeyFrame& prevKeyFrame, const AttributeKeyFrame& currKeyFrame, float scaledTime) const;
 
     /// Animatable.
     WeakPtr<Animatable> animatable_;

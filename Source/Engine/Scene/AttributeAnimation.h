@@ -42,7 +42,7 @@ enum InterpMethod
     IM_SPLINE,
 };
 
-/// Attribute key frame
+/// Attribute key frame.
 struct AttributeKeyFrame
 {
     /// Time.
@@ -101,7 +101,7 @@ public:
     /// Return animation is valid.
     bool IsValid() const;
     /// Return object animation.
-    ObjectAnimation* GetObjectAnimation() const;
+    ObjectAnimation* GetObjectAnimation() const { return objectAnimation_; }
     /// Return interpolation method.
     InterpMethod GetInterpolationMethod() const { return interpolationMethod_; }
     /// Return spline tension.
@@ -115,9 +115,9 @@ public:
     /// Update object's attribute value.
     void UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime);
     /// Has event frames.
-    bool HasEventFrames() const { return eventFrames_.Size() != 0; }
+    bool HasEventFrames() const { return !eventFrames_.Empty(); }
     /// Return all event frames between time.
-    void GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const;
+    void GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames) const;
 
 protected:
     /// Linear interpolation.
@@ -137,20 +137,20 @@ protected:
     float splineTension_;
     /// Value type.
     VariantType valueType_;
-    /// Is interpolatable.
-    bool isInterpolatable_;
+    /// Interpolatable flag.
+    bool interpolatable_;
     /// Begin time.
     float beginTime_;
     /// End time.
     float endTime_;
     /// Key frames.
-    Vector<AttributeKeyFrame> keyFrames_;
+    PODVector<AttributeKeyFrame> keyFrames_;
     /// Spline tangents.
     VariantVector splineTangents_;
     /// Spline tangents dirty.
     bool splineTangentsDirty_;
     /// Event frames.
-    Vector<AttributeEventFrame> eventFrames_;
+    PODVector<AttributeEventFrame> eventFrames_;
 };
 
 }

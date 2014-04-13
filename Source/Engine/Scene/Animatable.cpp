@@ -130,11 +130,6 @@ bool Animatable::SaveXML(XMLElement& dest) const
     return true;
 }
 
-void Animatable::SetAnimationEnabled(bool animationEnabled)
-{
-    animationEnabled_ = animationEnabled;
-}
-
 void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
 {
     if (objectAnimation == objectAnimation_)
@@ -200,17 +195,7 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
 
         // Add network attribute to set
         if (attributeInfo->mode_ & AM_NET)
-        {
-            const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
-            for (Vector<AttributeInfo>::ConstIterator i = networkAttributes->Begin(); i != networkAttributes->End(); ++i)
-            {
-                if (name == (*i).name_)
-                {
-                    animatedNetworkAttributes_.Insert(&(*i));
-                    break;
-                }
-            }
-        }
+            animatedNetworkAttributes_.Insert(attributeInfo);
 
         attributeAnimationInstances_[name] = new AttributeAnimationInstance(this, *attributeInfo, attributeAnimation, wrapMode, speed);
 
@@ -224,17 +209,7 @@ void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* a
 
         // Remove network attribute from set
         if (currentInstance->GetAttributeInfo().mode_ & AM_NET)
-        {
-            const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
-            for (Vector<AttributeInfo>::ConstIterator i = networkAttributes->Begin(); i != networkAttributes->End(); ++i)
-            {
-                if (name == (*i).name_)
-                {
-                    animatedNetworkAttributes_.Erase(&(*i));
-                    break;
-                }
-            }
-        }
+            animatedNetworkAttributes_.Erase(&currentInstance->GetAttributeInfo());
 
         attributeAnimationInstances_.Erase(name);
         OnAttributeAnimationRemoved();

@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-const char* wrapModeNames[] = 
+const char* wrapModeNames[] =
 {
     "Loop",
     "Once",
@@ -137,7 +137,12 @@ void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimati
 
 void ObjectAnimation::RemoveAttributeAnimation(const String& name)
 {
-    RemoveAttributeAnimation(GetAttributeAnimation(name));
+    HashMap<String, SharedPtr<AttributeAnimationInfo> >::Iterator i = attributeAnimationInfos_.Find(name);
+    if (i != attributeAnimationInfos_.End())
+    {
+        i->second_->GetAttributeAnimation()->SetObjectAnimation(0);
+        attributeAnimationInfos_.Erase(i);
+    }
 }
 
 void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnimation)

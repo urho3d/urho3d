@@ -52,7 +52,7 @@ public:
     virtual bool SaveXML(XMLElement& dest) const;
 
     /// Set animation enabled.
-    void SetAnimationEnabled(bool enable);
+    void SetAnimationEnabled(bool enable) { animationEnabled_ = enable; }
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.

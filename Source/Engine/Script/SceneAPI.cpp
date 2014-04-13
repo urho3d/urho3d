@@ -48,8 +48,8 @@ static void RegisterAttributeAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AttributeAnimation", "float get_splineTension() const", asMETHOD(AttributeAnimation, GetSplineTension), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "void set_valueType(VariantType)", asMETHOD(AttributeAnimation, SetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeAnimation", "VariantType get_valueType() const", asMETHOD(AttributeAnimation, GetValueType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAnimation", "void SetKeyFrame(float, const Variant&)", asMETHOD(AttributeAnimation, SetKeyFrame), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAnimation", "void SetEventFrame(float, const String&, const Variant&)", asMETHOD(AttributeAnimation, SetEventFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void SetKeyFrame(float, const Variant&in)", asMETHOD(AttributeAnimation, SetKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void SetEventFrame(float, const String&in, const Variant&in)", asMETHOD(AttributeAnimation, SetEventFrame), asCALL_THISCALL);
 }
 
 static void RegisterObjectAnimation(asIScriptEngine* engine)
@@ -60,12 +60,15 @@ static void RegisterObjectAnimation(asIScriptEngine* engine)
     engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
 
     RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
-    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&in, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(AttributeAnimation@+)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (AttributeAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ObjectAnimation", "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ObjectAnimation", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ObjectAnimation", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ObjectAnimation, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "float GetAttributeAnimationSpeed(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "Variant get_attributeAnimations(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "Variant get_wrapModes(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "Variant get_speeds(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationSpeed), asCALL_THISCALL);
 }
 
 static void RegisterSerializable(asIScriptEngine* engine)

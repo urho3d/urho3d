@@ -47,7 +47,7 @@ AttributeAnimation::AttributeAnimation(Context* context) :
     interpolationMethod_(IM_LINEAR),
     splineTension_(0.5f),
     valueType_(VAR_NONE),
-    isInterpolatable_(false),
+    interpolatable_(false),
     beginTime_(M_INFINITY),
     endTime_(-M_INFINITY),
     splineTangentsDirty_(false)
@@ -103,14 +103,14 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     if (interpolationMethod_ == IM_SPLINE)
         splineTension_ = source.GetFloat("splinetension");
 
-    XMLElement keyFrameEleme = source.GetChild("keyframe");
-    while (keyFrameEleme)
+    XMLElement keyFrameElem = source.GetChild("keyframe");
+    while (keyFrameElem)
     {
-        float time = keyFrameEleme.GetFloat("time");
-        Variant value = keyFrameEleme.GetVariant();
+        float time = keyFrameElem.GetFloat("time");
+        Variant value = keyFrameElem.GetVariant();
         SetKeyFrame(time, value);
 
-        keyFrameEleme = keyFrameEleme.GetNext("keyframe");
+        keyFrameElem = keyFrameElem.GetNext("keyframe");
     }
 
     XMLElement eventFrameElem = source.GetChild("eventframe");
@@ -153,30 +153,31 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
     return true;
 }
 
-void AttributeAnimation::SetObjectAnimation(ObjectAnimation* objectAnimation)
-{
-    objectAnimation_ = objectAnimation;
-}
-
 void AttributeAnimation::SetValueType(VariantType valueType)
 {
     if (valueType == valueType_)
         return;
 
     valueType_ = valueType;
-    isInterpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) || 
+    interpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) ||
         (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
 
     if ((valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2))
     {
-        isInterpolatable_ = true;
+        interpolatable_ = true;
         // Force linear interpolation for IntRect and IntVector2
         interpolationMethod_ = IM_LINEAR;
     }
 
     keyFrames_.Clear();
+    eventFrames_.Clear();
     beginTime_ = M_INFINITY;
     endTime_ = -M_INFINITY;
+}
+
+void AttributeAnimation::SetObjectAnimation(ObjectAnimation* objectAnimation)
+{
+    objectAnimation_ = objectAnimation;
 }
 
 void AttributeAnimation::SetInterpolationMethod(InterpMethod method)
@@ -205,19 +206,19 @@ bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
     else if (value.GetType() != valueType_)
         return false;
 
-    beginTime_ = Min(time, beginTime_);
-    endTime_ = Max(time, endTime_);
-
     AttributeKeyFrame keyFrame;
     keyFrame.time_ = time;
     keyFrame.value_ = value;
 
-    if (keyFrames_.Empty() || time >= keyFrames_.Back().time_)
+    if (keyFrames_.Empty() || time > keyFrames_.Back().time_)
         keyFrames_.Push(keyFrame);
     else
     {
         for (unsigned i = 0; i < keyFrames_.Size(); ++i)
         {
+            // Guard against interpolation error caused by division by error due to 0 delta time between two key frames
+            if (time == keyFrames_[i].time_)
+                return false;
             if (time < keyFrames_[i].time_)
             {
                 keyFrames_.Insert(i, keyFrame);
@@ -226,6 +227,8 @@ bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
         }
     }
 
+    beginTime_ = Min(time, beginTime_);
+    endTime_ = Max(time, endTime_);
     splineTangentsDirty_ = true;
 
     return true;
@@ -258,11 +261,6 @@ bool AttributeAnimation::IsValid() const
     return (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) || (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
 }
 
-ObjectAnimation* AttributeAnimation::GetObjectAnimation() const
-{
-    return objectAnimation_;
-}
-
 void AttributeAnimation::UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime)
 {
     unsigned index = 1;
@@ -272,7 +270,7 @@ void AttributeAnimation::UpdateAttributeValue(Animatable* animatable, const Attr
             break;
     }
 
-    if (index >= keyFrames_.Size() || !isInterpolatable_)
+    if (index >= keyFrames_.Size() || !interpolatable_)
         animatable->OnSetAttribute(attributeInfo, keyFrames_[index - 1].value_);
     else
     {
@@ -283,7 +281,7 @@ void AttributeAnimation::UpdateAttributeValue(Animatable* animatable, const Attr
     }
 }
 
-void AttributeAnimation::GetEventFrames(float beginTime, float endTime, Vector<const AttributeEventFrame*>& eventFrames) const
+void AttributeAnimation::GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames) const
 {
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {
@@ -340,10 +338,11 @@ Variant AttributeAnimation::LinearInterpolation(unsigned index1, unsigned index2
             const IntVector2& v2 = value2.GetIntVector2();
             return IntVector2((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t));
         }
-    }
 
-    LOGERROR("Invalid value type for linear interpolation");
-    return Variant::EMPTY;
+    default:
+        LOGERROR("Invalid value type for linear interpolation");
+        return Variant::EMPTY;
+    }
 }
 
 Variant AttributeAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime)
@@ -388,10 +387,11 @@ Variant AttributeAnimation::SplineInterpolation(unsigned index1, unsigned index2
 
     case VAR_COLOR:
         return v1.GetColor() * h1 + v2.GetColor() * h2 + t1.GetColor() * h3 + t2.GetColor() * h4;
-    }
 
-    LOGERROR("Invalid value type for spline interpolation");
-    return Variant::EMPTY;
+    default:
+        LOGERROR("Invalid value type for spline interpolation");
+        return Variant::EMPTY;
+    }
 }
 
 void AttributeAnimation::UpdateSplineTangents()
@@ -437,10 +437,11 @@ Variant AttributeAnimation::SubstractAndMultiply(const Variant& value1, const Va
 
     case VAR_COLOR:
         return (value1.GetColor() - value2.GetColor()) * t;
+
+    default:
+        LOGERROR("Invalid value type for spline interpolation's substract and multiply operation");
+        return Variant::EMPTY;
     }
-    
-    LOGERROR("Invalid value type for spline interpolation");
-    return Variant::EMPTY;
 }
 
 }

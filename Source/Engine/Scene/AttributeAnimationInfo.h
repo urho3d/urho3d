@@ -47,7 +47,7 @@ public:
     void SetSpeed(float speed) { speed_ = speed; }
 
     /// Return attribute animation.
-    AttributeAnimation* GetAttributeAnimation() const;
+    AttributeAnimation* GetAttributeAnimation() const { return attributeAnimation_; }
     /// Return wrap mode.
     WrapMode GetWrapMode() const { return wrapMode_; }
     /// Return speed.

@@ -48,9 +48,4 @@ AttributeAnimationInfo::~AttributeAnimationInfo()
 {
 }
 
-AttributeAnimation* AttributeAnimationInfo::GetAttributeAnimation() const
-{
-    return attributeAnimation_;
-}
-
 }
