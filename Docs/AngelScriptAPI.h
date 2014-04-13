@@ -4264,6 +4264,7 @@ int width;
 class Input
 {
 // Methods:
+uint AddScreenJoystick(bool = false, XMLFile = null, XMLFile = null);
 void CloseJoystick(uint);
 bool DetectJoysticks();
 int GetKeyFromName(const String&) const;
