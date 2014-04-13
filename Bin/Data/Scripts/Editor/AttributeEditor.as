@@ -120,6 +120,7 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
 {
     LineEdit@ attrEdit = LineEdit();
     parent.AddChild(attrEdit);
+    attrEdit.dragDropMode = DD_TARGET;
     attrEdit.style = "EditorAttributeEdit";
     attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
     attrEdit.vars["Index"] = index;
@@ -1063,6 +1064,11 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
     if (fileName.empty)
         return;
 
+    OpenResource(fileName);
+}
+
+void OpenResource(String fileName)
+{
     Array<String>@ resourceDirs = cache.resourceDirs;
     for (uint i = 0; i < resourceDirs.length; ++i)
     {

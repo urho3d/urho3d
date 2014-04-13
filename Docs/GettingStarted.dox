@@ -570,6 +570,7 @@ Ctrl+E          - Enable/disable node hierarchy or component
 Ctrl+U          - Unparent scene node
 Ctrl+H          - Open the scene hierarchy window
 Ctrl+I          - Open the attribute inspector window
+Ctrl+B          - Open the resource browser window
 Ctrl+P          - Toggle scene update on/off
 Ctrl+W          - Cycle through solid, wireframe and point rendering
 Ctrl+Z          - Undo
@@ -617,6 +618,9 @@ Components of same type can be multi-edited. Where attribute values differ, the 
 In addition to whole scenes, single scene nodes including all their components and child nodes can be loaded and saved (%File -> Load node, %File -> Save node as.) These can act as "prefabs" for speeding up scene construction. To save a node, it needs first to be selected in the hierarchy window.
 
 Primitive geometries (boxes, spheres, cylinders) can be instantiated from the Create menu. Note that these are just ordinary model files in the Bin/Data/Models directory; their Blender format source files are in the SourceAssets directory.
+
+Additionally a resource browser is available to access the contents of resource directories. Whenever the editor is opened or a scene is loaded the resource browser scans for resources. If at anytime the resources change the reload button can be pressed at the top-right of the resource browser and the resource browser will rescan. Two methods are provided to find resources. A tree view of the folders and a search bar. The search box utilizes a simple string substring of the filename. Resources can also be filtered by type by opening the filter panel which is toggled by the small filter icon.  There are lots of contextual options for each resource type such as dragging a resource into the hierarchy view, a LineEdit, or in the viewport.  A right click context menu on a resource in the browser will give additional options per resource type.
+
 
 \section EditorInstructions_Importing Importing
 

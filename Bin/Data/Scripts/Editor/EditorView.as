@@ -16,6 +16,7 @@ int  viewportBorderWidth = 4; // width of a viewport resize border
 IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
 bool mouseWheelCameraPosition = false;
+bool contextMenuActionWaitFrame = false;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -400,6 +401,7 @@ void CreateCamera()
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("UIMouseClick", "ViewMouseClick");
     SubscribeToEvent("MouseMove", "ViewMouseMove");
+    SubscribeToEvent("UIMouseClickEnd", "ViewMouseClickEnd");
     SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
     SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
     SubscribeToEvent("BeginViewRender", "HandleBeginViewRender");
@@ -1077,7 +1079,7 @@ void UpdateStats(float timeStep)
 
 void UpdateViewports(float timeStep)
 {
-    for(uint i = 0; i < viewports.length; i++)
+    for(uint i = 0; i < viewports.length; ++i)
     {
         ViewportContext@ viewportContext = viewports[i];
         viewportContext.Update(timeStep);
@@ -1358,7 +1360,8 @@ void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
 void ViewMouseMove()
 {
     // setting mouse position based on mouse position
-    if (ui.focusElement !is null || input.mouseButtonDown[MOUSEB_LEFT|MOUSEB_MIDDLE|MOUSEB_RIGHT])
+    if (ui.dragElement !is null) { }
+    else if (ui.focusElement !is null || input.mouseButtonDown[MOUSEB_LEFT|MOUSEB_MIDDLE|MOUSEB_RIGHT])
         return;
 
     IntVector2 pos = ui.cursor.position;
@@ -1382,6 +1385,28 @@ Ray GetActiveViewportCameraRay()
         float(ui.cursorPosition.x - view.left) / view.width,
         float(ui.cursorPosition.y - view.top) / view.height
     );
+}
+
+void ViewMouseClickEnd()
+{
+    // checks to close open popup windows
+    IntVector2 pos = ui.cursorPosition;
+    if (contextMenu !is null && contextMenu.enabled)
+    {
+        if (contextMenuActionWaitFrame)
+            contextMenuActionWaitFrame = false;
+        else
+        {
+            if (!contextMenu.IsInside(pos, true))
+                CloseContextMenu();
+        }
+    }
+    if (quickMenu !is null && quickMenu.enabled)
+    {
+        bool enabled = quickMenu.IsInside(pos, true);
+        quickMenu.enabled = enabled;
+        quickMenu.visible = enabled;
+    }
 }
 
 void ViewRaycast(bool mouseClick)
@@ -1619,6 +1644,57 @@ Vector3 SelectedNodesCenterPoint()
         return centerPoint;
 }
 
+Vector3 GetScreenCollision(IntVector2 pos)
+{
+    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
+    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
+
+    bool physicsFound = false;
+    if (editorScene.physicsWorld !is null)
+    {
+        if (!runUpdate)
+            editorScene.physicsWorld.UpdateCollisions();
+
+        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
+
+        if (result.body !is null)
+        {
+            physicsFound = true;
+            result.position;
+        }
+    }
+
+    if (editorScene.octree is null)
+        return res;
+
+    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
+        DRAWABLE_GEOMETRY, 0x7fffffff);
+
+    if (result.drawable !is null)
+    {
+        // take the closer of the results
+        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
+            return res;
+        else
+            return result.position;
+    }
+
+    return res;
+}
+
+Drawable@ GetDrawableAtMousePostion()
+{
+    IntVector2 pos = ui.cursorPosition;
+    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
+
+    if (editorScene.octree is null)
+        return null;
+
+    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY, 0x7fffffff);
+
+    return result.drawable;
+}
+
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Hide gizmo and grid from preview camera
@@ -1675,4 +1751,3 @@ void HandleEndViewRender(StringHash eventType, VariantMap& eventData)
         }
     }
 }
-

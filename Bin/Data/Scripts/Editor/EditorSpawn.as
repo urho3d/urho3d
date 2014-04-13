@@ -318,7 +318,7 @@ void SpawnObject()
         return;
     IntRect view = activeViewport.viewport.rect;
 
-    for (uint i = 0; i < spawnCount; i++)
+    for (uint i = 0; i < spawnCount; ++i)
     {
         Ray cameraRay = GetActiveViewportCameraRay();
 
