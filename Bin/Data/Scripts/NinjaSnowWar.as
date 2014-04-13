@@ -52,12 +52,8 @@ float powerupSpawnTimer = 0;
 uint clientNodeID = 0;
 int clientScore = 0;
 
+uint screenJoystickIndex = M_MAX_UNSIGNED;
 bool touchEnabled = false;
-int touchButtonSize = 96;
-int touchButtonBorder = 12;
-int moveTouchID = -1;
-int rotateTouchID = -1;
-int fireTouchID = -1;
 
 Array<Player> players;
 Array<HiscoreEntry> hiscores;
@@ -87,8 +83,6 @@ void Start()
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
-    SubscribeToEvent("TouchBegin", "HandleTouchBegin");
-    SubscribeToEvent("TouchEnd", "HandleTouchEnd");
 
     if (singlePlayer)
     {
@@ -126,10 +120,11 @@ void InitConsole()
         return;
 
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
+    ui.root.defaultStyle = uiStyle;
 
     Console@ console = engine.CreateConsole();
     console.defaultStyle = uiStyle;
-    console.numRows = 16;
+    console.background.opacity = 0.8;
 
     engine.CreateDebugHud();
     debugHud.defaultStyle = uiStyle;
@@ -165,7 +160,7 @@ void InitScene()
             dirLight.shadowIntensity = 0.333f;
         }
     }
-    
+
     // Precache shaders if possible
     if (!engine.headless && cache.Exists("NinjaSnowWarShaders.xml"))
         graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.xml"));
@@ -208,22 +203,7 @@ void InitNetworking()
 void InitTouchInput()
 {
     touchEnabled = true;
-
-    moveButton = BorderImage();
-    moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-    moveButton.imageRect = IntRect(0, 0, 96, 96);
-    moveButton.SetAlignment(HA_LEFT, VA_BOTTOM);
-    moveButton.SetPosition(touchButtonBorder, -touchButtonBorder);
-    moveButton.SetSize(touchButtonSize, touchButtonSize);
-    ui.root.AddChild(moveButton);
-
-    fireButton = BorderImage();
-    fireButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-    fireButton.imageRect = IntRect(96, 0, 192, 96);
-    fireButton.SetAlignment(HA_RIGHT, VA_BOTTOM);
-    fireButton.SetPosition(-touchButtonBorder, -touchButtonBorder);
-    fireButton.SetSize(touchButtonSize, touchButtonSize);
-    ui.root.AddChild(fireButton);
+    screenJoystickIndex = input.AddScreenJoystick();
 }
 
 void CreateCamera()
@@ -297,7 +277,11 @@ void CreateOverlays()
     healthBorder.AddChild(healthBar);
 
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+        // On mobile platform, enable touch by adding a screen joystick
         InitTouchInput();
+    else if (input.numJoysticks == 0)
+        // On desktop platform, do not detect touch when we already got a joystick
+        SubscribeToEvent("TouchBegin", "HandleTouchBegin");
 }
 
 void SetMessage(const String&in message)
@@ -421,7 +405,7 @@ void SpawnPlayer(Connection@ connection)
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
-    
+
     UpdateControls();
     CheckEndAndRestart();
 
@@ -476,31 +460,8 @@ void HandlePostRenderUpdate()
 void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
     // On some platforms like Windows the presence of touch input can only be detected dynamically
-    if (!touchEnabled)
-        InitTouchInput();
-
-    int touchID = eventData["TouchID"].GetInt();
-    IntVector2 pos(eventData["X"].GetInt(), eventData["Y"].GetInt());
-    UIElement@ element = ui.GetElementAt(pos, false);
-
-    if (element is moveButton)
-        moveTouchID = touchID;
-    else if (element is fireButton)
-        fireTouchID = touchID;
-    else
-        rotateTouchID = touchID;
-}
-
-void HandleTouchEnd(StringHash eventType, VariantMap& eventData)
-{
-    int touchID = eventData["TouchID"].GetInt();
-
-    if (touchID == moveTouchID)
-        moveTouchID = -1;
-    if (touchID == rotateTouchID)
-        rotateTouchID = -1;
-    if (touchID == fireTouchID)
-        fireTouchID = -1;
+    InitTouchInput();
+    UnsubscribeFromEvent("TouchBegin");
 }
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -913,35 +874,14 @@ void UpdateControls()
             for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState@ touch = input.touches[i];
-
-                if (touch.touchID == rotateTouchID)
-                {
-                    playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
-                    playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
-                }
-
-                if (touch.touchID == moveTouchID)
-                {
-                    int relX = touch.position.x - moveButton.screenPosition.x - touchButtonSize / 2;
-                    int relY = touch.position.y - moveButton.screenPosition.y - touchButtonSize / 2;
-                    if (relY < 0 && Abs(relX * 3 / 2) < Abs(relY))
-                        playerControls.Set(CTRL_UP, true);
-                    if (relY > 0 && Abs(relX * 3 / 2) < Abs(relY))
-                        playerControls.Set(CTRL_DOWN, true);
-                    if (relX < 0 && Abs(relY * 3 / 2) < Abs(relX))
-                        playerControls.Set(CTRL_LEFT, true);
-                    if (relX > 0 && Abs(relY * 3 / 2) < Abs(relX))
-                        playerControls.Set(CTRL_RIGHT, true);
-                }
+                playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
+                playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
             }
-
-            if (fireTouchID >= 0)
-                playerControls.Set(CTRL_FIRE, true);
         }
 
         if (input.numJoysticks > 0)
         {
-            JoystickState@ joystick = input.joysticks[0];
+            JoystickState@ joystick = input.joysticks[touchEnabled ? screenJoystickIndex : 0];
             if (joystick.numButtons > 0)
             {
                 if (joystick.buttonDown[0])
@@ -955,7 +895,6 @@ void UpdateControls()
                     if (joystick.buttonDown[5])
                         playerControls.Set(CTRL_FIRE, true);
                 }
-
                 if (joystick.numHats > 0)
                 {
                     if (joystick.hatPosition[0] & HAT_LEFT != 0)

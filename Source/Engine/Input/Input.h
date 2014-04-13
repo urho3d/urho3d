@@ -31,6 +31,8 @@ namespace Urho3D
 {
 
 class Graphics;
+class UIElement;
+class XMLFile;
 
 /// %Input state for a finger touch.
 struct TouchState
@@ -55,14 +57,16 @@ struct JoystickState
         joystick_(0), controller_(0)
     {
     }
-    
+    /// Destructor.
+    ~JoystickState();
+
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
     /// Return number of axes.
     unsigned GetNumAxes() const { return axes_.Size(); }
     /// Return number of hats.
     unsigned GetNumHats() const { return hats_.Size(); }
-    
+
     /// Check if a button is held down.
     bool GetButtonDown(unsigned index) const
     {
@@ -71,7 +75,7 @@ struct JoystickState
         else
             return false;
     }
-    
+
     /// Check if a button has been pressed on this frame.
     bool GetButtonPress(unsigned index) const
     {
@@ -80,7 +84,7 @@ struct JoystickState
         else
             return false;
     }
-    
+
     /// Return axis position.
     float GetAxisPosition(unsigned index) const
     {
@@ -89,7 +93,7 @@ struct JoystickState
         else
             return 0.0f;
     }
-    
+
     /// Return hat position.
     int GetHatPosition(unsigned index) const
     {
@@ -98,11 +102,13 @@ struct JoystickState
         else
             return HAT_CENTER;
     }
-    
+
     /// SDL joystick.
     SDL_Joystick* joystick_;
-    /// SDL game controller
+    /// SDL game controller.
     SDL_GameController* controller_;
+    /// UI element containing the screen joystick.
+    SharedPtr<UIElement> screenJoystick_;
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -119,13 +125,13 @@ struct JoystickState
 class URHO3D_API Input : public Object
 {
     OBJECT(Input);
-    
+
 public:
     /// Construct.
     Input(Context* context);
     /// Destruct.
     virtual ~Input();
-    
+
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
     /// Set whether ALT-ENTER fullscreen toggle is enabled.
@@ -138,9 +144,11 @@ public:
     void CloseJoystick(unsigned index);
     /// Redetect joysticks. Return true if successful.
     bool DetectJoysticks();
+    /// Add on-screen joystick. Return the joystick index number when successful or M_MAX_UNSIGNED when error. If layout file is not given, use the default screen joystick layout. If style file is not given, use the default style file from root UI element.
+    unsigned AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
-    
+
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;
     /// Return keycode from scancode.
@@ -203,7 +211,7 @@ public:
     bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
     bool IsMinimized() const;
-    
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
@@ -229,9 +237,11 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Handle mouse click begin and end event from the screen joystick(s), ignore event from others.
+    void HandleMouseClick(StringHash eventType, VariantMap& eventData);
     /// Handle SDL event.
     void HandleSDLEvent(void* sdlEvent);
-    
+
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Key down state.

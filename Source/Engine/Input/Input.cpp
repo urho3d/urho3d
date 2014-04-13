@@ -32,7 +32,11 @@
 #include "Mutex.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "StringUtils.h"
+#include "Text.h"
+#include "UI.h"
+#include "UIEvents.h"
 
 #include <cstring>
 
@@ -49,13 +53,24 @@
 namespace Urho3D
 {
 
-/// Convert SDL keycode if necessary
+const int SCREEN_JOYSTICK_START_INDEX = 1000;
+const ShortStringHash VAR_INJECT_AS_KEY_EVENTS("VAR_INJECT_AS_KEY_EVENTS");
+const ShortStringHash VAR_BUTTON_KEY_BINDING("VAR_BUTTON_KEY_BINDING");
+const ShortStringHash VAR_SCREEN_JOYSTICK_INDEX("VAR_SCREEN_JOYSTICK_INDEX");
+
+/// Convert SDL keycode if necessary.
 int ConvertSDLKeyCode(int keySym, int scanCode)
 {
     if (scanCode == SCANCODE_AC_BACK)
         return KEY_ESC;
     else
         return SDL_toupper(keySym);
+}
+
+JoystickState::~JoystickState()
+{
+    if (screenJoystick_)
+        screenJoystick_->Remove();
 }
 
 Input::Input(Context* context) :
@@ -229,11 +244,115 @@ bool Input::DetectJoysticks()
     return true;
 }
 
+unsigned Input::AddScreenJoystick(bool injectAsKeyEvents, XMLFile* layoutFile, XMLFile* styleFile)
+{
+    if (!graphics_)
+    {
+        LOGWARNING("Cannot add screen joystick in headless mode");
+        return M_MAX_UNSIGNED;
+    }
+
+    // If layout file is not given, use the default screen joystick layout
+    if (!layoutFile)
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        layoutFile = cache->GetResource<XMLFile>("UI/ScreenJoystick.xml");
+        if (!layoutFile)    // Error is already logged
+            return M_MAX_UNSIGNED;
+    }
+
+    UI* ui = GetSubsystem<UI>();
+    SharedPtr<UIElement> screenJoystick = ui->LoadLayout(layoutFile, styleFile);
+    if (!screenJoystick)     // Error is already logged
+        return M_MAX_UNSIGNED;
+
+    screenJoystick->SetSize(ui->GetRoot()->GetSize());
+    screenJoystick->SetVisible(false);      // Set to visible when it is "open" later
+    screenJoystick->SetVar(VAR_INJECT_AS_KEY_EVENTS, injectAsKeyEvents);
+    ui->GetRoot()->AddChild(screenJoystick);
+    unsigned index = joysticks_.Size();
+    joysticks_.Resize(index + 1);
+    JoystickState& state = joysticks_[index];
+    joystickIDMap_[SCREEN_JOYSTICK_START_INDEX + index] = index;
+    state.name_ = screenJoystick->GetName();
+    state.screenJoystick_ = screenJoystick;
+
+    unsigned numButtons = 0;
+    unsigned numAxes = 0;
+    unsigned numHats = 0;
+    const Vector<SharedPtr<UIElement> >& children = state.screenJoystick_->GetChildren();
+    for (Vector<SharedPtr<UIElement> >::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
+    {
+        UIElement* element = iter->Get();
+        String name = element->GetName();
+        if (name.StartsWith("Button"))
+        {
+            ++numButtons;
+
+            // Check whether the button has key binding
+            if (injectAsKeyEvents)
+            {
+                Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+                if (text)
+                {
+                    text->SetVisible(false);
+                    const String& key = text->GetText();
+                    if (key.Length() == 1)
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, key);
+                    else if (key == "SPACE")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_SPACE);
+                    else if (key == "LCTRL")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LCTRL);
+                    else if (key == "RCTRL")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RCTRL);
+                    else if (key == "LSHIFT")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LSHIFT);
+                    else if (key == "RSHIFT")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RSHIFT);
+                    else if (key == "LALT")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LALT);
+                    else if (key == "RALT")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RALT);
+                    else if (key == "TAB")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_TAB);
+                    else if (key == "RETURN")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RETURN);
+                    else if (key == "LEFT")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LEFT);
+                    else if (key == "RIGHT")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RIGHT);
+                    else if (key == "UP")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_UP);
+                    else if (key == "DOWN")
+                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_DOWN);
+                }
+            }
+        }
+        else if (name.StartsWith("Axis"))
+            ++numAxes;
+        else if (name.StartsWith("Hat"))
+            ++numHats;
+        element->SetVar(VAR_SCREEN_JOYSTICK_INDEX, index);
+    }
+
+    state.buttons_.Resize(numButtons);
+    state.buttonPress_.Resize(numButtons);
+    state.axes_.Resize(numAxes);
+    state.hats_.Resize(numHats);
+
+    // There could be potentially more than one screen joystick, however they all will be handled by a same handler
+    // So there is no harm to replace the old handler with the new handler in each call to SubscribeToEvent()
+    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(Input, HandleMouseClick));
+    SubscribeToEvent(E_UIMOUSECLICKEND, HANDLER(Input, HandleMouseClick));
+
+    return index;
+}
+
 void Input::SetScreenKeyboardVisible(bool enable)
 {
     if (!graphics_)
         return;
-    
+
     if (enable != IsScreenKeyboardVisible())
     {
         if (enable)
@@ -246,55 +365,71 @@ void Input::SetScreenKeyboardVisible(bool enable)
 bool Input::OpenJoystick(unsigned index)
 {
     if (index >= joysticks_.Size())
+    {
+        LOGERRORF("Joystick index #%d is out of bound.", index);
         return false;
+    }
 
     // Check if already opened
-    if (joysticks_[index].joystick_)
+    JoystickState& state = joysticks_[index];
+    if (joysticks_[index].joystick_ || (state.screenJoystick_ && state.screenJoystick_->IsVisible()))
         return true;
 
-    SDL_Joystick* joystick = SDL_JoystickOpen(index);
-    if (joystick)
+    if (state.screenJoystick_)
+        state.screenJoystick_->SetVisible(true);
+    else
     {
+        SDL_Joystick* joystick = SDL_JoystickOpen(index);
+        if (!joystick)
+        {
+            LOGERRORF("Cannot open joystick #%d (%s)", index, joysticks_[index].name_.CString());
+            return false;
+        }
+
         // Map SDL joystick index to internal index (which starts at 0)
         int sdl_joy_instance_id = SDL_JoystickInstanceID(joystick);
         joystickIDMap_[sdl_joy_instance_id] = index;
 
-        JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
         if (SDL_IsGameController(index))
             state.controller_ = SDL_GameControllerOpen(index);
-        
+
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
         state.buttonPress_.Resize(state.buttons_.Size());
         state.axes_.Resize(SDL_JoystickNumAxes(joystick));
         state.hats_.Resize(SDL_JoystickNumHats(joystick));
-        for (unsigned i = 0; i < state.buttons_.Size(); ++i)
-        {
-            state.buttons_[i] = false;
-            state.buttonPress_[i] = false;
-        }
-        for (unsigned i = 0; i < state.axes_.Size(); ++i)
-            state.axes_[i] = 0.0f;
-        for (unsigned i = 0; i < state.hats_.Size(); ++i)
-            state.hats_[i] = HAT_CENTER;
-
-        return true;
     }
-    else
-        return false;
+
+    for (unsigned i = 0; i < state.buttons_.Size(); ++i)
+    {
+        state.buttons_[i] = false;
+        state.buttonPress_[i] = false;
+    }
+    for (unsigned i = 0; i < state.axes_.Size(); ++i)
+        state.axes_[i] = 0.0f;
+    for (unsigned i = 0; i < state.hats_.Size(); ++i)
+        state.hats_[i] = HAT_CENTER;
+
+    return true;
 }
 
 void Input::CloseJoystick(unsigned index)
 {
-    if (index < joysticks_.Size() && joysticks_[index].joystick_)
+    if (index >= joysticks_.Size())
+        return;
+
+    JoystickState& state = joysticks_[index];
+    if (joysticks_[index].joystick_)
     {
-        JoystickState& state = joysticks_[index];
         SDL_JoystickClose(state.joystick_);
         state.joystick_ = 0;
+        state.controller_ = 0;
         state.buttons_.Clear();
         state.axes_.Clear();
         state.hats_.Clear();
     }
+    else if (state.screenJoystick_ && state.screenJoystick_->IsVisible())
+        state.screenJoystick_->SetVisible(false);
 }
 
 int Input::GetKeyFromName(const String& name) const
@@ -420,21 +555,20 @@ TouchState* Input::GetTouch(unsigned index) const
 
 const String& Input::GetJoystickName(unsigned index) const
 {
-    if (index < joysticks_.Size())
-        return joysticks_[index].name_;
-    else
-        return String::EMPTY;
+    return index < joysticks_.Size() ? joysticks_[index].name_ : String::EMPTY;
 }
 
 JoystickState* Input::GetJoystick(unsigned index)
 {
     if (index < joysticks_.Size())
     {
+        JoystickState& state = joysticks_[index];
+
         // If necessary, automatically open the joystick first
-        if (!joysticks_[index].joystick_)
+        if ((!state.joystick_ && !state.screenJoystick_) || (state.screenJoystick_ && !state.screenJoystick_->IsVisible()))
             OpenJoystick(index);
 
-        return const_cast<JoystickState*>(&joysticks_[index]);
+        return const_cast<JoystickState*>(&state);
     }
     else
         return 0;
@@ -641,7 +775,7 @@ void Input::SetKey(int key, int scancode, unsigned raw, bool newState)
     else
     {
         scancodeDown_.Erase(scancode);
-        
+
         if (!keyDown_.Erase(key))
             return;
     }
@@ -1040,6 +1174,100 @@ void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // Update input right at the beginning of the frame
     Update();
+}
+
+void Input::HandleMouseClick(StringHash eventType, VariantMap& eventData)
+{
+    using namespace UIMouseClickEnd;
+
+    // Only interested in events from screen joystick(s)
+    UIElement* element = static_cast<UIElement*>(eventData[eventType == E_UIMOUSECLICK ? P_ELEMENT : P_BEGINELEMENT].GetPtr());
+    if (!element)
+        return;
+    Variant variant = element->GetVar(VAR_SCREEN_JOYSTICK_INDEX);
+    if (variant.IsEmpty())
+        return;
+    unsigned index = variant.GetUInt();
+
+    int x = eventData[P_X].GetInt();
+    int y = eventData[P_Y].GetInt();
+
+    // Prepare a fake SDL event
+    SDL_Event evt;
+
+    const String& name = element->GetName();
+    if (name.StartsWith("Button"))
+    {
+        // Determine whether to inject a joystick event or keyboard event
+        if (joysticks_[index].screenJoystick_->GetVar(VAR_INJECT_AS_KEY_EVENTS).GetBool())
+        {
+            Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
+            if (variant.IsEmpty())
+                return;
+
+            evt.type = eventType == E_UIMOUSECLICK ? SDL_KEYDOWN : SDL_KEYUP;
+            evt.key.keysym.sym = variant.GetInt();
+            evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+        }
+        else
+        {
+            evt.type = eventType == E_UIMOUSECLICK ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
+            evt.jbutton.which = SCREEN_JOYSTICK_START_INDEX + index;
+            evt.jbutton.button = ToUInt(name.Substring(6));
+        }
+    }
+    else if (name.StartsWith("Hat"))
+    {
+        if (joysticks_[index].screenJoystick_->GetVar(VAR_INJECT_AS_KEY_EVENTS).GetBool())
+        {
+            evt.type = eventType == E_UIMOUSECLICK ? SDL_KEYDOWN : SDL_KEYUP;
+            IntVector2 relPosition = IntVector2(x, y) - element->GetScreenPosition() - element->GetSize() / 2;
+            if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
+            {
+                evt.key.keysym.sym = SDLK_w;
+                evt.key.keysym.scancode = SDL_SCANCODE_W;
+            }
+            else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
+            {
+                evt.key.keysym.sym = SDLK_s;
+                evt.key.keysym.scancode = SDL_SCANCODE_S;
+            }
+            else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+            {
+                evt.key.keysym.sym = SDLK_a;
+                evt.key.keysym.scancode = SDL_SCANCODE_A;
+            }
+            else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+            {
+                evt.key.keysym.sym = SDLK_d;
+                evt.key.keysym.scancode = SDL_SCANCODE_D;
+            }
+        }
+        else
+        {
+            evt.type = SDL_JOYHATMOTION;
+            evt.jaxis.which = SCREEN_JOYSTICK_START_INDEX + index;
+            evt.jhat.hat = ToUInt(name.Substring(3));
+            evt.jhat.value = HAT_CENTER;
+            if (eventType == E_UIMOUSECLICK)
+            {
+                IntVector2 relPosition = IntVector2(x, y) - element->GetScreenPosition() - element->GetSize() / 2;
+                if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
+                    evt.jhat.value |= HAT_UP;
+                if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
+                    evt.jhat.value |= HAT_DOWN;
+                if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+                    evt.jhat.value |= HAT_LEFT;
+                if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+                    evt.jhat.value |= HAT_RIGHT;
+            }
+        }
+    }
+    else
+        return;
+
+    // Handle the fake SDL event to turn it into Urho3D genuine event
+    HandleSDLEvent(&evt);
 }
 
 }

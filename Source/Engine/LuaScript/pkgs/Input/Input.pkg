@@ -1,4 +1,5 @@
 $#include "Input.h"
+$#include "UIElement.h"
 
 struct TouchState
 {
@@ -32,6 +33,7 @@ class Input : public Object
     bool OpenJoystick(unsigned index);
     void CloseJoystick(unsigned index);
     bool DetectJoysticks();
+    unsigned AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     void SetScreenKeyboardVisible(bool enable);
 
     int GetKeyFromName(const String name) const;
