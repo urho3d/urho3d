@@ -453,16 +453,16 @@ template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* 
     RegisterSerializable<T>(engine, className);
     RegisterSubclass<Animatable, T>(engine, "Animatable", className);
 
-    engine->RegisterObjectMethod(className, "void set_animationEnabled(bool)", asMETHOD(T, SetAnimationEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_animationEnabled() const", asMETHOD(T, GetAnimationEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_objectAnimation(ObjectAnimation@+)", asMETHOD(T, SetObjectAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "ObjectAnimation@+ get_objectAnimation() const", asMETHOD(T, GetObjectAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetAttributeAnimation(const String&in, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(T, SetAttributeAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHOD(T, GetAttributeAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHOD(T, SetAttributeAnimationWrapMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHOD(T, GetAttributeAnimationWrapMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetAttributeAnimationSpeed(const String&in, float)", asMETHOD(T, SetAttributeAnimationSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float GetAttributeAnimationSpeed(const String&in) const", asMETHOD(T, GetAttributeAnimationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_animationEnabled(bool)", asMETHODPR(T, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_animationEnabled() const", asMETHODPR(T, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(T, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(T, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimation(const String&in, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHODPR(T, SetAttributeAnimation, (const String&, AttributeAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(T, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(T, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(T, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(T, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(T, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Component.

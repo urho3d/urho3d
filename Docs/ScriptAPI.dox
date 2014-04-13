@@ -611,7 +611,7 @@ namespace Urho3D
 
 \page AttributeList Attribute list
 
-### %AnimatedModel
+### AnimatedModel
 - %Is %Enabled : bool
 - %Model : ResourceRef
 - %Material : ResourceRefList
@@ -630,7 +630,7 @@ namespace Urho3D
 - %Zone %Mask : int
 - %Animation %States : VariantVector
 
-### %AnimatedSprite2D
+### AnimatedSprite2D
 - %Speed : float
 - %Cycle %Mode : int
 - %Animation : ResourceRef
@@ -648,10 +648,10 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
-### %AnimationController
+### AnimationController
 - %Is %Enabled : bool
 
-### %BillboardSet
+### BillboardSet
 - %Is %Enabled : bool
 - %Material : ResourceRef
 - %Relative %Position : bool
@@ -670,7 +670,7 @@ namespace Urho3D
 - %Zone %Mask : int
 - %Billboards : VariantVector
 
-### %BorderImage
+### BorderImage
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -710,7 +710,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 
-### %Button
+### Button
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -754,7 +754,7 @@ namespace Urho3D
 - %Repeat %Delay : float
 - %Repeat %Rate : float
 
-### %Camera
+### Camera
 - %Is %Enabled : bool
 - %Near %Clip : float
 - %Far %Clip : float
@@ -774,7 +774,7 @@ namespace Urho3D
 - %Use %Reflection : bool
 - %Use %Clipping : bool
 
-### %CheckBox
+### CheckBox
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -816,7 +816,7 @@ namespace Urho3D
 - %Is %Checked : bool
 - %Checked %Image %Offset : IntVector2
 
-### %CollisionBox2D
+### CollisionBox2D
 - %Size : Vector2
 - %Center : Vector2
 - %Angle : float
@@ -828,7 +828,7 @@ namespace Urho3D
 - %Friction : float
 - %Restitution : float
 
-### %CollisionChain2D
+### CollisionChain2D
 - %Loop : bool
 - %Trigger : bool
 - %Category %Bits : int
@@ -838,7 +838,7 @@ namespace Urho3D
 - %Friction : float
 - %Restitution : float
 
-### %CollisionCircle2D
+### CollisionCircle2D
 - %Radius : float
 - %Center : Vector2
 - %Trigger : bool
@@ -849,7 +849,7 @@ namespace Urho3D
 - %Friction : float
 - %Restitution : float
 
-### %CollisionEdge2D
+### CollisionEdge2D
 - %Vertex 1 : Vector2
 - %Vertex 2 : Vector2
 - %Trigger : bool
@@ -860,7 +860,7 @@ namespace Urho3D
 - %Friction : float
 - %Restitution : float
 
-### %CollisionPolygon2D
+### CollisionPolygon2D
 - %Trigger : bool
 - %Category %Bits : int
 - %Mask %Bits : int
@@ -869,7 +869,7 @@ namespace Urho3D
 - %Friction : float
 - %Restitution : float
 
-### %CollisionShape
+### CollisionShape
 - %Is %Enabled : bool
 - %Shape %Type : int
 - %Size : Vector3
@@ -880,7 +880,7 @@ namespace Urho3D
 - %Collision %Margin : float
 - %CustomGeometry %NodeID : int
 
-### %Constraint
+### Constraint
 - %Is %Enabled : bool
 - %Constraint %Type : int
 - %Position : Vector3
@@ -894,24 +894,24 @@ namespace Urho3D
 - %CFM %Parameter : float
 - %Disable %Collision : bool
 
-### %ConstraintDistance2D
+### ConstraintDistance2D
 - %Owner %Body %Anchor : Vector2
 - %Other %Body %Anchor : Vector2
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
 
-### %ConstraintFriction2D
+### ConstraintFriction2D
 - %Anchor : Vector2
 - %Max %Force : float
 - %Max %Torque : float
 - %Collide %Connected : bool
 
-### %ConstraintGear2D
+### ConstraintGear2D
 - %Ratio : float
 - %Collide %Connected : bool
 
-### %ConstraintMotor2D
+### ConstraintMotor2D
 - %Linear %Offset : Vector2
 - %Angular %Offset : float
 - %Max %Force : float
@@ -919,14 +919,14 @@ namespace Urho3D
 - %Correction %Factor : float
 - %Collide %Connected : bool
 
-### %ConstraintMouse2D
+### ConstraintMouse2D
 - %Target : Vector2
 - %Max %Force : float
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
 
-### %ConstraintPrismatic2D
+### ConstraintPrismatic2D
 - %Anchor : Vector2
 - %Axis : Vector2
 - %Enable %Limit : bool
@@ -937,7 +937,7 @@ namespace Urho3D
 - %Motor %Speed : float
 - %Collide %Connected : bool
 
-### %ConstraintPulley2D
+### ConstraintPulley2D
 - %Owner %Body %Ground %Anchor : Vector2
 - %Other %Body %Ground %Anchor : Vector2
 - %Owner %Body %Anchor : Vector2
@@ -945,7 +945,7 @@ namespace Urho3D
 - %Ratio : float
 - %Collide %Connected : bool
 
-### %ConstraintRevolute2D
+### ConstraintRevolute2D
 - %Anchor : Vector2
 - %Enable %Limit : bool
 - %Lower %Angle : float
@@ -955,19 +955,19 @@ namespace Urho3D
 - %Max %Motor %Torque : float
 - %Collide %Connected : bool
 
-### %ConstraintRope2D
+### ConstraintRope2D
 - %Owner %Body %Anchor : Vector2
 - %Other %Body %Anchor : Vector2
 - %Max %Length : float
 - %Collide %Connected : bool
 
-### %ConstraintWeld2D
+### ConstraintWeld2D
 - %Anchor : Vector2
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
 
-### %ConstraintWheel2D
+### ConstraintWheel2D
 - %Anchor : Vector2
 - %Axis : Vector2
 - %Enable %Motor : bool
@@ -977,7 +977,7 @@ namespace Urho3D
 - %Damping %Ratio : float
 - %Collide %Connected : bool
 
-### %Cursor
+### Cursor
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1019,7 +1019,7 @@ namespace Urho3D
 - %Use %System %Shapes : bool
 - %Shapes : VariantVector
 
-### %CustomGeometry
+### CustomGeometry
 - %Is %Enabled : bool
 - %Materials : ResourceRefList
 - %Is %Occluder : bool
@@ -1034,7 +1034,7 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
-### %DecalSet
+### DecalSet
 - %Is %Enabled : bool
 - %Material : ResourceRef
 - %Max %Vertices : int
@@ -1047,7 +1047,7 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
-### %DropDownList
+### DropDownList
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1094,7 +1094,7 @@ namespace Urho3D
 - %Selection : int
 - %Resize %Popup : bool
 
-### %Light
+### Light
 - %Is %Enabled : bool
 - %Light %Type : int
 - %Color : Color
@@ -1128,7 +1128,7 @@ namespace Urho3D
 - %View %Mask : int
 - %Light %Mask : int
 
-### %LineEdit
+### LineEdit
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1174,7 +1174,7 @@ namespace Urho3D
 - %Cursor %Blink %Rate : float
 - %Echo %Character : int
 
-### %ListView
+### ListView
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1216,12 +1216,12 @@ namespace Urho3D
 - %Base %Indent : int
 - %Clear %Sel. %On %Defocus : bool
 
-### %LuaScriptInstance
+### LuaScriptInstance
 - %Is %Enabled : bool
 - %Script %File : ResourceRef
 - %Script %Object %Type : String
 
-### %Menu
+### Menu
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1266,11 +1266,11 @@ namespace Urho3D
 - %Repeat %Rate : float
 - %Popup %Offset : IntVector2
 
-### %Navigable
+### Navigable
 - %Is %Enabled : bool
 - %Recursive : bool
 
-### %NavigationMesh
+### NavigationMesh
 - %Tile %Size : int
 - %Cell %Size : float
 - %Cell %Height : float
@@ -1286,13 +1286,13 @@ namespace Urho3D
 - %Detail %Sample %Max %Error : float
 - %Bounding %Box %Padding : Vector3
 
-### %NetworkPriority
+### NetworkPriority
 - %Base %Priority : float
 - %Distance %Factor : float
 - %Minimum %Priority : float
 - %Always %Update %Owner : bool
 
-### %Node
+### Node
 - %Is %Enabled : bool
 - %Name : String
 - %Position : Vector3
@@ -1300,18 +1300,18 @@ namespace Urho3D
 - %Scale : Vector3
 - %Variables : VariantMap
 
-### %Octree
+### Octree
 - %Bounding %Box %Min : Vector3
 - %Bounding %Box %Max : Vector3
 - %Number %of %Levels : int
 
-### %OffMeshConnection
+### OffMeshConnection
 - %Is %Enabled : bool
 - %Endpoint %NodeID : int
 - %Radius : float
 - %Bidirectional : bool
 
-### %ParticleEmitter
+### ParticleEmitter
 - %Is %Enabled : bool
 - %Material : ResourceRef
 - %Max %Particles : int
@@ -1353,7 +1353,7 @@ namespace Urho3D
 - %Period %Timer : float
 - %Emission %Timer : float
 
-### %ParticleEmitter2D
+### ParticleEmitter2D
 - %Particle %Effect : ResourceRef
 - %Layer : int
 - %Order %in %Layer : int
@@ -1366,7 +1366,7 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
-### %PhysicsWorld
+### PhysicsWorld
 - %Gravity : Vector3
 - %Physics %FPS : int
 - %Solver %Iterations : int
@@ -1375,7 +1375,7 @@ namespace Urho3D
 - %Internal %Edge %Utility : bool
 - %Split %Impulse : bool
 
-### %PhysicsWorld2D
+### PhysicsWorld2D
 - %Draw %Shape : bool
 - %Draw %Joint : bool
 - %Draw %Aabb : bool
@@ -1390,7 +1390,7 @@ namespace Urho3D
 - %Velocity %Iterations : int
 - %Position %Iterations : int
 
-### %RigidBody
+### RigidBody
 - %Is %Enabled : bool
 - %Mass : float
 - %Friction : float
@@ -1416,7 +1416,7 @@ namespace Urho3D
 - %Is %Trigger : bool
 - %Gravity %Override : Vector3
 
-### %RigidBody2D
+### RigidBody2D
 - %Body %Type : int
 - %Mass : float
 - %Inertia : float
@@ -1432,7 +1432,7 @@ namespace Urho3D
 - %Linear %Velocity : Vector2
 - %Angular %Velocity : float
 
-### %Scene
+### Scene
 - %Name : String
 - %Time %Scale : float
 - %Smoothing %Constant : float
@@ -1440,12 +1440,12 @@ namespace Urho3D
 - %Elapsed %Time : float
 - %Variables : VariantMap
 
-### %ScriptInstance
+### ScriptInstance
 - %Is %Enabled : bool
 - %Script %File : ResourceRef
 - %Class %Name : String
 
-### %ScrollBar
+### ScrollBar
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1487,7 +1487,7 @@ namespace Urho3D
 - %Up %Image %Rect : IntRect
 - %Down %Image %Rect : IntRect
 
-### %ScrollView
+### ScrollView
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1524,7 +1524,7 @@ namespace Urho3D
 - %Page %Step : float
 - %Auto %Show/Hide %Scrollbars : bool
 
-### %Skybox
+### Skybox
 - %Is %Enabled : bool
 - %Model : ResourceRef
 - %Material : ResourceRefList
@@ -1541,7 +1541,7 @@ namespace Urho3D
 - %Zone %Mask : int
 - %Occlusion %LOD %Level : int
 
-### %Slider
+### Slider
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1585,10 +1585,10 @@ namespace Urho3D
 - %Value : float
 - %Repeat %Rate : float
 
-### %SoundListener
+### SoundListener
 - %Is %Enabled : bool
 
-### %SoundSource
+### SoundSource
 - %Is %Enabled : bool
 - %Sound : ResourceRef
 - %Sound %Type : int
@@ -1600,7 +1600,7 @@ namespace Urho3D
 - %Autoremove %on %Stop : bool
 - %Play %Position : int
 
-### %SoundSource3D
+### SoundSource3D
 - %Is %Enabled : bool
 - %Sound : ResourceRef
 - %Sound %Type : int
@@ -1615,13 +1615,13 @@ namespace Urho3D
 - %Outer %Angle : float
 - %Rolloff %Factor : float
 
-### %SplinePath
+### SplinePath
 - %Interpolation %Mode : int
 - %Speed : float
 - %Controlled : int
 - %Control %Points : VariantVector
 
-### %Sprite
+### Sprite
 - %Name : String
 - %Position : Vector2
 - %Size : IntVector2
@@ -1644,7 +1644,7 @@ namespace Urho3D
 - %Use %Derived %Opacity : bool
 - %Variables : VariantMap
 
-### %StaticModel
+### StaticModel
 - %Is %Enabled : bool
 - %Model : ResourceRef
 - %Material : ResourceRefList
@@ -1661,7 +1661,7 @@ namespace Urho3D
 - %Zone %Mask : int
 - %Occlusion %LOD %Level : int
 
-### %StaticModelGroup
+### StaticModelGroup
 - %Is %Enabled : bool
 - %Model : ResourceRef
 - %Material : ResourceRefList
@@ -1679,7 +1679,7 @@ namespace Urho3D
 - %Occlusion %LOD %Level : int
 - %Instance %Nodes : VariantVector
 
-### %StaticSprite2D
+### StaticSprite2D
 - %Flip X : bool
 - %Flip Y : bool
 - %Color : Color
@@ -1694,7 +1694,7 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
-### %Terrain
+### Terrain
 - %Is %Enabled : bool
 - %Height %Map : ResourceRef
 - %Material : ResourceRef
@@ -1713,7 +1713,7 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
-### %Text
+### Text
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1756,7 +1756,7 @@ namespace Urho3D
 - %Text %Effect : int
 - %Effect %Color : Color
 
-### %Text3D
+### Text3D
 - %Is %Enabled : bool
 - %Font : ResourceRef
 - %Material : ResourceRef
@@ -1780,7 +1780,7 @@ namespace Urho3D
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
-### %ToolTip
+### ToolTip
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1814,7 +1814,7 @@ namespace Urho3D
 - %Variables : VariantMap
 - %Delay : float
 
-### %UIElement
+### UIElement
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1847,7 +1847,7 @@ namespace Urho3D
 - %Indent %Spacing : int
 - %Variables : VariantMap
 
-### %View3D
+### View3D
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1897,7 +1897,7 @@ namespace Urho3D
 - %Modal %Frame %Size : IntVector2
 - %Auto %Update : bool
 
-### %Window
+### Window
 - %Name : String
 - %Position : IntVector2
 - %Size : IntVector2
@@ -1946,7 +1946,7 @@ namespace Urho3D
 - %Modal %Frame %Color : Color
 - %Modal %Frame %Size : IntVector2
 
-### %Zone
+### Zone
 - %Is %Enabled : bool
 - %Bounding %Box %Min : Vector3
 - %Bounding %Box %Max : Vector3

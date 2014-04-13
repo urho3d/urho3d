@@ -269,7 +269,7 @@ void Script::DumpAPI(DumpMode mode)
             if (!usableAttrs)
                 continue;
             
-            Log::WriteRaw("\n### %" + objectTypes[i] + "\n");
+            Log::WriteRaw("\n### " + objectTypes[i] + "\n");
             
             for (unsigned j = 0; j < attrs.Size(); ++j)
             {
