@@ -780,7 +780,7 @@ FontFace* Font::GetFaceBitmap(int pointSize)
         newFace->pointSize_ = infoElem.GetInt("size");
     
     XMLElement commonElem = root.GetChild("common");
-    newFace->rowHeight_ = commonElem.GetInt("lineheight");
+    newFace->rowHeight_ = commonElem.GetInt("lineHeight");
     unsigned pages = commonElem.GetInt("pages");
     newFace->textures_.Reserve(pages);
 
