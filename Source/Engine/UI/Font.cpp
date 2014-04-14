@@ -719,6 +719,8 @@ FontFace* Font::GetFaceFreeType(int pointSize)
     {
         newFace->hasKerning_ = true;
         
+        /*
+        // Would out of memory crash when use large font file, for example these are 29354 glyphs in msyh.ttf
         for (unsigned i = 0; i < numGlyphs; ++i)
         {
             for (unsigned j = 0; j < numGlyphs; ++j)
@@ -726,6 +728,61 @@ FontFace* Font::GetFaceFreeType(int pointSize)
                 FT_Vector vector;
                 FT_Get_Kerning(face, i, j, FT_KERNING_DEFAULT, &vector);
                 newFace->glyphs_[i].kerning_[j] = (short)(vector.x >> 6);
+            }
+        }
+        */
+
+        FT_ULong tag = FT_MAKE_TAG('k', 'e', 'r', 'n');
+        FT_ULong kerningTableSize = 0;
+        FT_Error error = FT_Load_Sfnt_Table(face, tag, 0, NULL, &kerningTableSize);
+        if (error)
+        {
+            LOGERROR("Could not get kerning table length");
+            return 0;
+        }
+
+        SharedArrayPtr<unsigned char> kerningTable(new unsigned char[kerningTableSize]);
+        error = FT_Load_Sfnt_Table(face, tag, 0, kerningTable, &kerningTableSize);
+        if (error)
+        {
+            LOGERROR("Could not load kerning table");
+            return 0;
+        }
+
+        // Convert big endian to little endian
+        for (unsigned i = 0; i < kerningTableSize; i += 2)
+            Swap(kerningTable[i], kerningTable[i + 1]);
+        MemoryBuffer deserializer(kerningTable, kerningTableSize);
+
+        unsigned short version = deserializer.ReadUShort();
+        if (version != 0)
+        {
+            LOGERROR("Version error");
+            return 0;
+        }
+
+        unsigned numKerningTables = deserializer.ReadUShort();
+        for (unsigned i = 0; i < numKerningTables; ++i)
+        {
+            unsigned short version = deserializer.ReadUShort();
+            unsigned short length = deserializer.ReadUShort();
+            unsigned short coverage = deserializer.ReadUShort();
+
+            if (version == 0 && coverage == 1)
+            {
+                unsigned numKerningPairs = deserializer.ReadUShort();
+                for (unsigned j = 0; j < numKerningPairs; ++j)
+                {
+                    unsigned leftIndex = deserializer.ReadUShort();
+                    unsigned rightIndex = deserializer.ReadUShort();
+                    short amount = (short)(deserializer.ReadShort() >> 6);
+                    newFace->glyphs_[leftIndex].kerning_[rightIndex] = amount;
+                }
+            }
+            else
+            {
+                LOGERROR("Version or coverage error");
+                return 0;
             }
         }
     }
