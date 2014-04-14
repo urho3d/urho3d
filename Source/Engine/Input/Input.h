@@ -47,6 +47,8 @@ struct TouchState
     IntVector2 delta_;
     /// Finger pressure.
     float pressure_;
+    /// Last touched UI element from screen joystick.
+    WeakPtr<UIElement> touchedElement_;
 };
 
 /// %Input state for a joystick.
@@ -57,8 +59,6 @@ struct JoystickState
         joystick_(0), controller_(0)
     {
     }
-    /// Destructor.
-    ~JoystickState();
 
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
@@ -144,8 +144,10 @@ public:
     void CloseJoystick(unsigned index);
     /// Redetect joysticks. Return true if successful.
     bool DetectJoysticks();
-    /// Add on-screen joystick. Return the joystick index number when successful or M_MAX_UNSIGNED when error. If layout file is not given, use the default screen joystick layout. If style file is not given, use the default style file from root UI element.
-    unsigned AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    /// Add screen joystick. Return the joystick index number when successful or M_MAX_UNSIGNED when error. If layout file is not given, use the default screen joystick layout. If style file is not given, use the default style file from root UI element.
+    unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    /// Remove screen joystick by index. Return true if successful.
+    bool RemoveScreenJoystick(unsigned index);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
 
@@ -237,8 +239,8 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
-    /// Handle mouse click begin and end event from the screen joystick(s), ignore event from others.
-    void HandleMouseClick(StringHash eventType, VariantMap& eventData);
+    /// Handle touch events from the controls of screen joystick(s).
+    void HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventData);
     /// Handle SDL event.
     void HandleSDLEvent(void* sdlEvent);
 

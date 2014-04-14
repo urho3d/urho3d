@@ -438,7 +438,8 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TouchState", "const IntVector2 lastPosition", offsetof(TouchState, lastPosition_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 delta", offsetof(TouchState, delta_));
     engine->RegisterObjectProperty("TouchState", "const float pressure", offsetof(TouchState, pressure_));
-    
+    engine->RegisterObjectProperty("TouchState", "const WeakHandle touchedElement", offsetof(TouchState, touchedElement_));
+
     engine->RegisterObjectType("JoystickState", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -450,12 +451,13 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JoystickState", "bool get_buttonPress(uint) const", asMETHOD(JoystickState, GetButtonPress), asCALL_THISCALL);
     engine->RegisterObjectMethod("JoystickState", "float get_axisPosition(uint) const", asMETHOD(JoystickState, GetAxisPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("JoystickState", "int get_hatPosition(uint) const", asMETHOD(JoystickState, GetHatPosition), asCALL_THISCALL);
-    
+
     RegisterObject<Input>(engine, "Input");
     engine->RegisterObjectMethod("Input", "bool OpenJoystick(uint)", asMETHOD(Input, OpenJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void CloseJoystick(uint)", asMETHOD(Input, CloseJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool DetectJoysticks()", asMETHOD(Input, DetectJoysticks), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "uint AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asMETHOD(Input, AddScreenJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint AddScreenJoystick(XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asMETHOD(Input, AddScreenJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool RemoveScreenJoystick(uint)", asMETHOD(Input, RemoveScreenJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int GetKeyFromName(const String&in) const", asMETHOD(Input, GetKeyFromName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int GetKeyFromScancode(int) const", asMETHOD(Input, GetKeyFromScancode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "String GetKeyName(int) const", asMETHOD(Input, GetKeyName), asCALL_THISCALL);

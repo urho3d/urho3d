@@ -53,6 +53,7 @@ uint clientNodeID = 0;
 int clientScore = 0;
 
 uint screenJoystickIndex = M_MAX_UNSIGNED;
+uint screenJoystickSettingsIndex = M_MAX_UNSIGNED;
 bool touchEnabled = false;
 
 Array<Player> players;
@@ -203,7 +204,7 @@ void InitNetworking()
 void InitTouchInput()
 {
     touchEnabled = true;
-    screenJoystickIndex = input.AddScreenJoystick();
+    screenJoystickIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystick_NinjaSnowWar.xml"));
 }
 
 void CreateCamera()
@@ -493,9 +494,17 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         gameScene.updateEnabled = !gameScene.updateEnabled;
         if (!gameScene.updateEnabled)
+        {
             SetMessage("PAUSED");
+            if (screenJoystickSettingsIndex == M_MAX_UNSIGNED)
+                screenJoystickSettingsIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
+            input.OpenJoystick(screenJoystickSettingsIndex);
+        }
         else
+        {
             SetMessage("");
+            input.CloseJoystick(screenJoystickSettingsIndex);
+        }
     }
 }
 
@@ -874,8 +883,12 @@ void UpdateControls()
             for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState@ touch = input.touches[i];
-                playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
-                playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
+                if (touch.touchedElement.Get() is null)
+                {
+                    // Touch on empty space
+                    playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
+                    playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
+                }
             }
         }
 

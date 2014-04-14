@@ -24,7 +24,6 @@
 
 #include "Application.h"
 
-
 namespace Urho3D
 {
 
@@ -58,6 +57,8 @@ public:
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
     virtual void Start();
 
+    /// Initialize touch input on mobile platform.
+    void InitTouchInput();
     /// Control logo visibility.
     void SetLogoVisible(bool enable);
 
@@ -74,6 +75,11 @@ private:
     void CreateConsoleAndDebugHud();
     /// Handle key down event to process key controls common to all samples.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+
+    unsigned screenJoystickIndex_;
+    unsigned screenJoystickSettingsIndex_;
+    bool touchEnabled_;
+    bool paused_;
 };
 
 #include "Sample.inl"

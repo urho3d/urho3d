@@ -8,6 +8,7 @@ struct TouchState
     IntVector2 lastPosition_ @ lastPosition;
     IntVector2 delta_ @ delta;
     float pressure_ @ pressure;
+    WeakPtr<UIElement> touchedElement_ @ touchedElement;
 };
 
 struct JoystickState
@@ -33,7 +34,8 @@ class Input : public Object
     bool OpenJoystick(unsigned index);
     void CloseJoystick(unsigned index);
     bool DetectJoysticks();
-    unsigned AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    bool RemoveScreenJoystick(unsigned index);
     void SetScreenKeyboardVisible(bool enable);
 
     int GetKeyFromName(const String name) const;

@@ -26,6 +26,7 @@
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Graphics.h"
+#include "Input.h"
 #include "InputEvents.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
@@ -36,7 +37,11 @@
 #include "XMLFile.h"
 
 Sample::Sample(Context* context) :
-    Application(context)
+    Application(context),
+    screenJoystickIndex_(M_MAX_UNSIGNED),
+    screenJoystickSettingsIndex_(M_MAX_UNSIGNED),
+    touchEnabled_(false),
+    paused_(false)
 {
 }
 
@@ -51,6 +56,9 @@ void Sample::Setup()
 
 void Sample::Start()
 {
+    // Initialize touch input on mobile platforms
+    InitTouchInput();
+
     // Create logo
     CreateLogo();
 
@@ -62,6 +70,19 @@ void Sample::Start()
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
+}
+
+void Sample::InitTouchInput()
+{
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+    {
+        touchEnabled_ = true;
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        Input* input = GetSubsystem<Input>();
+        screenJoystickIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystick_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+        input->OpenJoystick(screenJoystickIndex_);
+    }
 }
 
 void Sample::SetLogoVisible(bool enable)
@@ -125,6 +146,7 @@ void Sample::CreateConsoleAndDebugHud()
     // Create console
     Console* console = engine_->CreateConsole();
     console->SetDefaultStyle(xmlFile);
+    console->GetBackground()->SetOpacity(0.8f);
 
     // Create debug HUD.
     DebugHud* debugHud = engine_->CreateDebugHud();
@@ -160,8 +182,29 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         Renderer* renderer = GetSubsystem<Renderer>();
         
+        // Preferences / Pause
+        if (key == KEY_SELECT && touchEnabled_)
+        {
+            Input* input = GetSubsystem<Input>();
+            if (screenJoystickSettingsIndex_ == M_MAX_UNSIGNED)
+            {
+                ResourceCache* cache = GetSubsystem<ResourceCache>();
+                screenJoystickSettingsIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+                input->OpenJoystick(screenJoystickSettingsIndex_);
+                paused_ = true;
+            }
+            else
+            {
+                paused_ = !paused_;
+                if (paused_)
+                    input->OpenJoystick(screenJoystickSettingsIndex_);
+                else
+                    input->CloseJoystick(screenJoystickSettingsIndex_);
+            }
+        }
+
         // Texture quality
-        if (key == '1')
+        else if (key == '1')
         {
             int quality = renderer->GetTextureQuality();
             ++quality;
