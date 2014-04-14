@@ -465,7 +465,7 @@ bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs)
     
     // Common
     childElem = rootElem.CreateChild("common");
-    childElem.SetInt("lineheight", fontFace->rowHeight_);
+    childElem.SetInt("lineHeight", fontFace->rowHeight_);
     unsigned pages = fontFace->textures_.Size();
     childElem.SetInt("pages", pages);
 
