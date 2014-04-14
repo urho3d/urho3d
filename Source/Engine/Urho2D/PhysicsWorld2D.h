@@ -129,8 +129,8 @@ public:
     void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid body at point.
     RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Return rigid body at mouse point, if camera is 0, it will use first camera in scene. when viewport size was not equal to window size it may have problem.
-    RigidBody2D* GetRigidBody(int mouseX, int mouseY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0);
+    /// Return rigid body at screen point, if camera is 0, it will use first camera in scene. when viewport size was not equal to window size it may have problem.
+    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 

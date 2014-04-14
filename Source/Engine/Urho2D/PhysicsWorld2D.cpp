@@ -525,7 +525,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
     return callback.GetRigidBody();
 }
 
-RigidBody2D* PhysicsWorld2D::GetRigidBody(int mouseX, int mouseY, unsigned collisionMask, Camera* camera)
+RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask, Camera* camera)
 {
     if (!camera)
     {
@@ -542,7 +542,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(int mouseX, int mouseY, unsigned colli
     }
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    Vector3 screenPoint((float)mouseX / graphics->GetWidth(), (float)mouseY / graphics->GetHeight(), 0.0f);
+    Vector3 screenPoint((float)screenX / graphics->GetWidth(), (float)screenY / graphics->GetHeight(), 0.0f);
     Vector3 worldPoint = camera->ScreenToWorldPoint(screenPoint);
 
     return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);    
