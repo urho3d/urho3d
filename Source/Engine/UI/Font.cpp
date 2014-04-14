@@ -755,36 +755,38 @@ FontFace* Font::GetFaceFreeType(int pointSize)
         MemoryBuffer deserializer(kerningTable, kerningTableSize);
 
         unsigned short version = deserializer.ReadUShort();
-        if (version != 0)
+        if (version == 0)
         {
-            LOGERROR("Version error");
-            return 0;
-        }
-
-        unsigned numKerningTables = deserializer.ReadUShort();
-        for (unsigned i = 0; i < numKerningTables; ++i)
-        {
-            unsigned short version = deserializer.ReadUShort();
-            unsigned short length = deserializer.ReadUShort();
-            unsigned short coverage = deserializer.ReadUShort();
-
-            if (version == 0 && coverage == 1)
+            unsigned numKerningTables = deserializer.ReadUShort();
+            for (unsigned i = 0; i < numKerningTables; ++i)
             {
-                unsigned numKerningPairs = deserializer.ReadUShort();
-                for (unsigned j = 0; j < numKerningPairs; ++j)
+                unsigned short version = deserializer.ReadUShort();
+                unsigned short length = deserializer.ReadUShort();
+                unsigned short coverage = deserializer.ReadUShort();
+
+                if (version == 0 && coverage == 1)
                 {
-                    unsigned leftIndex = deserializer.ReadUShort();
-                    unsigned rightIndex = deserializer.ReadUShort();
-                    short amount = (short)(deserializer.ReadShort() >> 6);
-                    newFace->glyphs_[leftIndex].kerning_[rightIndex] = amount;
+                    unsigned numKerningPairs = deserializer.ReadUShort();
+                    // Skip searchRange, entrySelector & rangeShift
+                    deserializer.Seek(deserializer.GetPosition() + 3 * sizeof(unsigned short));
+                    
+                    for (unsigned j = 0; j < numKerningPairs; ++j)
+                    {
+                        unsigned leftIndex = deserializer.ReadUShort();
+                        unsigned rightIndex = deserializer.ReadUShort();
+                        short amount = (short)(deserializer.ReadShort() >> 6);
+                        if (leftIndex < numGlyphs && rightIndex < numGlyphs)
+                            newFace->glyphs_[leftIndex].kerning_[rightIndex] = amount;
+                        else
+                            LOGWARNING("Out of range glyph index in kerning information");
+                    }
                 }
-            }
-            else
-            {
-                LOGERROR("Version or coverage error");
-                return 0;
+                else
+                    LOGWARNING("Can not read kerning information: unsupported version or coverage");
             }
         }
+        else
+            LOGWARNING("Can not read kerning information: not version 0");
     }
     
     // Now try to pack into the smallest possible texture. If face does not fit into one texture, enable dynamic mode where
