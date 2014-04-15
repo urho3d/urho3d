@@ -718,20 +718,9 @@ FontFace* Font::GetFaceFreeType(int pointSize)
     if (FT_HAS_KERNING(face))
     {
         newFace->hasKerning_ = true;
-        
-        /*
-        // Would out of memory crash when use large font file, for example these are 29354 glyphs in msyh.ttf
-        for (unsigned i = 0; i < numGlyphs; ++i)
-        {
-            for (unsigned j = 0; j < numGlyphs; ++j)
-            {
-                FT_Vector vector;
-                FT_Get_Kerning(face, i, j, FT_KERNING_DEFAULT, &vector);
-                newFace->glyphs_[i].kerning_[j] = (short)(vector.x >> 6);
-            }
-        }
-        */
 
+        // Read kerning manually to be more efficient and avoid out of memory crash when use large font file, for example there
+        // are 29354 glyphs in msyh.ttf
         FT_ULong tag = FT_MAKE_TAG('k', 'e', 'r', 'n');
         FT_ULong kerningTableSize = 0;
         FT_Error error = FT_Load_Sfnt_Table(face, tag, 0, NULL, &kerningTableSize);
@@ -782,7 +771,10 @@ FontFace* Font::GetFaceFreeType(int pointSize)
                     }
                 }
                 else
-                    LOGWARNING("Can not read kerning information: unsupported version or coverage");
+                {
+                    // Kerning table contains information we do not support; skip and move to the next (length includes header)
+                    deserializer.Seek(deserializer.GetPosition() + length - 3 * sizeof(unsigned short));
+                }
             }
         }
         else
