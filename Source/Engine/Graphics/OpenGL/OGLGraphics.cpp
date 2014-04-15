@@ -350,7 +350,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+
+        if (externalWindow_)
+            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+        else
+            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         #endif
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
