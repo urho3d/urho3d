@@ -30,7 +30,9 @@
 namespace Urho3D
 {
 
+class Deserializer;
 class Graphics;
+class Serializer;
 class UIElement;
 class XMLFile;
 
@@ -150,6 +152,14 @@ public:
     bool RemoveScreenJoystick(unsigned index);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
+    /// Begin recording a touch gesture. Return true if successful. The E_GESTURERECORDED event (which contains the ID for the new gesture) will be sent when recording finishes.
+    bool RecordGesture();
+    /// Save all in-memory touch gestures. Return true if successful.
+    bool SaveGestures(Serializer& dest);
+    /// Save a specific in-memory touch gesture to a file. Return true if successful.
+    bool SaveGesture(Serializer& dest, unsigned gestureID);
+    /// Load touch gestures from a file. Return number of loaded gestures, or 0 on failure.
+    unsigned LoadGestures(Deserializer& source);
 
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;

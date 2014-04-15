@@ -33,6 +33,7 @@
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "RWOpsWrapper.h"
 #include "StringUtils.h"
 #include "Text.h"
 #include "UI.h"
@@ -427,11 +428,48 @@ void Input::SetScreenKeyboardVisible(bool enable)
     }
 }
 
+bool Input::RecordGesture()
+{
+    // If have no touch devices, fail
+    if (!SDL_GetNumTouchDevices())
+    {
+        LOGERROR("Can not record gesture: no touch devices");
+        return false;
+    }
+
+    return SDL_RecordGesture(-1) ? true : false;
+}
+
+bool Input::SaveGestures(Serializer& dest)
+{
+    RWOpsWrapper<Serializer> wrapper(dest);
+    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps()) ? true : false;
+}
+
+bool Input::SaveGesture(Serializer& dest, unsigned gestureID)
+{
+    RWOpsWrapper<Serializer> wrapper(dest);
+    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps()) ? true : false;
+}
+
+unsigned Input::LoadGestures(Deserializer& source)
+{
+    // If have no touch devices, fail
+    if (!SDL_GetNumTouchDevices())
+    {
+        LOGERROR("Can not load gestures: no touch devices");
+        return 0;
+    }
+
+    RWOpsWrapper<Deserializer> wrapper(source);
+    return SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
+}
+
 bool Input::OpenJoystick(unsigned index)
 {
     if (index >= joysticks_.Size())
     {
-        LOGERRORF("Joystick index #%d is out of bound", index);
+        LOGERRORF("Joystick index #%d is out of bounds", index);
         return false;
     }
 
@@ -1020,6 +1058,44 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_DY] = (int)(evt.tfinger.dy * graphics_->GetHeight());
             eventData[P_PRESSURE] = state.pressure_;
             SendEvent(E_TOUCHMOVE, eventData);
+        }
+        break;
+
+    case SDL_DOLLARRECORD:
+        {
+            using namespace GestureRecorded;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_GESTUREID] = (int)evt.dgesture.gestureId;
+            SendEvent(E_GESTURERECORDED, eventData);
+        }
+        break;
+
+    case SDL_DOLLARGESTURE:
+        {
+            using namespace GestureInput;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_GESTUREID] = (int)evt.dgesture.gestureId;
+            eventData[P_CENTERX] = (int)(evt.dgesture.x * graphics_->GetWidth());
+            eventData[P_CENTERY] = (int)(evt.dgesture.y * graphics_->GetHeight());
+            eventData[P_NUMFINGERS] = (int)evt.dgesture.numFingers;
+            eventData[P_ERROR] = evt.dgesture.error;
+            SendEvent(E_GESTUREINPUT, eventData);
+        }
+        break;
+
+    case SDL_MULTIGESTURE:
+        {
+            using namespace MultiGesture;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_CENTERX] = (int)(evt.mgesture.x * graphics_->GetWidth());
+            eventData[P_CENTERY] = (int)(evt.mgesture.y * graphics_->GetHeight());
+            eventData[P_NUMFINGERS] = (int)evt.mgesture.numFingers;
+            eventData[P_DTHETA] = M_RADTODEG * evt.mgesture.dTheta;
+            eventData[P_DDIST] = evt.mgesture.dDist;
+            SendEvent(E_MULTIGESTURE, eventData);
         }
         break;
 

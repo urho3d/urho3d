@@ -199,6 +199,32 @@ EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 
+/// A touch gesture finished recording.
+EVENT(E_GESTURERECORDED, GestureRecorded)
+{
+    PARAM(P_GESTUREID, GestureID);          // unsigned
+}
+
+/// A recognized touch gesture was input by the user.
+EVENT(E_GESTUREINPUT, GestureInput)
+{
+    PARAM(P_GESTUREID, GestureID);          // unsigned
+    PARAM(P_CENTERX, CenterX);              // int
+    PARAM(P_CENTERY, CenterY);              // int
+    PARAM(P_NUMFINGERS, NumFingers);        // int
+    PARAM(P_ERROR, Error);                  // float
+}
+
+/// Pinch/rotate multi-finger touch gesture motion update.
+EVENT(E_MULTIGESTURE, MultiGesture)
+{
+    PARAM(P_CENTERX, CenterX);              // int
+    PARAM(P_CENTERY, CenterY);              // int
+    PARAM(P_NUMFINGERS, NumFingers);        // int
+    PARAM(P_DTHETA, DTheta);                // float (degrees)
+    PARAM(P_DDIST, DDist);                  // float
+}
+
 static const int MOUSEB_LEFT = 1;
 static const int MOUSEB_MIDDLE = 2;
 static const int MOUSEB_RIGHT = 4;

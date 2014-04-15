@@ -428,6 +428,21 @@ static Input* GetInput()
     return GetScriptContext()->GetSubsystem<Input>();
 }
 
+static bool InputSaveGestures(File* file, Input* ptr)
+{
+    return file ? ptr->SaveGestures(*file) : false;
+}
+
+static bool InputSaveGesture(File* file, unsigned gestureID, Input* ptr)
+{
+    return file ? ptr->SaveGesture(*file, gestureID) : false;
+}
+
+static unsigned InputLoadGestures(File* file, Input* ptr)
+{
+    return file ? ptr->LoadGestures(*file) : 0;
+}
+
 static void RegisterInput(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("TouchState", 0, asOBJ_REF);
@@ -458,6 +473,10 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool DetectJoysticks()", asMETHOD(Input, DetectJoysticks), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "uint AddScreenJoystick(XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asMETHOD(Input, AddScreenJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool RemoveScreenJoystick(uint)", asMETHOD(Input, RemoveScreenJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool RecordGesture()", asMETHOD(Input, RecordGesture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool SaveGestures(File@+)", asFUNCTION(InputSaveGestures), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Input", "bool SaveGesture(File@+, uint)", asFUNCTION(InputSaveGesture), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Input", "uint LoadGestures(File@+)", asFUNCTION(InputLoadGestures), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Input", "int GetKeyFromName(const String&in) const", asMETHOD(Input, GetKeyFromName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int GetKeyFromScancode(int) const", asMETHOD(Input, GetKeyFromScancode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "String GetKeyName(int) const", asMETHOD(Input, GetKeyName), asCALL_THISCALL);
