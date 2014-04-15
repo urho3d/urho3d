@@ -241,7 +241,7 @@ void CreateOverlays()
     Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
 
     scoreText = Text();
-    scoreText.SetFont(font, 17);
+    scoreText.SetFont(font, 13);
     scoreText.SetAlignment(HA_LEFT, VA_TOP);
     scoreText.SetPosition(5, 5);
     scoreText.colors[C_BOTTOMLEFT] = Color(1, 1, 0.25);
@@ -249,7 +249,7 @@ void CreateOverlays()
     ui.root.AddChild(scoreText);
 
     @hiscoreText = Text();
-    hiscoreText.SetFont(font, 17);
+    hiscoreText.SetFont(font, 13);
     hiscoreText.SetAlignment(HA_RIGHT, VA_TOP);
     hiscoreText.SetPosition(-5, 5);
     hiscoreText.colors[C_BOTTOMLEFT] = Color(1, 1, 0.25);
@@ -257,7 +257,7 @@ void CreateOverlays()
     ui.root.AddChild(hiscoreText);
 
     @messageText = Text();
-    messageText.SetFont(font, 17);
+    messageText.SetFont(font, 13);
     messageText.SetAlignment(HA_CENTER, VA_CENTER);
     messageText.SetPosition(0, -height * 2);
     messageText.color = Color(1, 0, 0);
@@ -393,7 +393,7 @@ void SpawnPlayer(Connection@ connection)
         textNode.position = Vector3(0, 1.2, 0);
         Text3D@ text3D = textNode.CreateComponent("Text3D");
         Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
-        text3D.SetFont(font, 24);
+        text3D.SetFont(font, 19);
         text3D.color = Color(1, 1, 0);
         text3D.text = players[playerIndex].name;
         text3D.horizontalAlignment = HA_CENTER;
