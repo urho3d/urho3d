@@ -5542,7 +5542,7 @@ Properties:
 
 Methods:
 
-- uint AddScreenJoystick(bool = false, XMLFile@ = null, XMLFile@ = null)
+- uint AddScreenJoystick(XMLFile@ = null, XMLFile@ = null)
 - void CloseJoystick(uint)
 - bool DetectJoysticks()
 - int GetKeyFromName(const String&) const
@@ -5552,6 +5552,7 @@ Methods:
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
 - bool OpenJoystick(uint)
+- bool RemoveScreenJoystick(uint)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -10202,6 +10203,7 @@ Properties:
 - IntVector2 position
 - float pressure
 - int touchID
+- WeakHandle touchedElement
 
 
 ### UI

@@ -2044,7 +2044,8 @@ Methods:
 - bool OpenJoystick(unsigned index)
 - void CloseJoystick(unsigned index)
 - bool DetectJoysticks()
-- unsigned AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- bool RemoveScreenJoystick(unsigned index)
 - void SetScreenKeyboardVisible(bool enable)
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
@@ -4974,6 +4975,7 @@ Properties:
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
+- WeakPtr<UIElement> touchedElement
 
 ### UI : Object
 
