@@ -2047,6 +2047,13 @@ Methods:
 - unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - bool RemoveScreenJoystick(unsigned index)
 - void SetScreenKeyboardVisible(bool enable)
+- bool RecordGesture()
+- bool SaveGestures(File* dest)
+- bool SaveGesture(File* dest, unsigned gestureID)
+- unsigned LoadGestures(File* source)
+- bool SaveGestures(const String fileName)
+- bool SaveGesture(const String fileName, unsigned gestureID)
+- unsigned LoadGestures(const String fileName)
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const

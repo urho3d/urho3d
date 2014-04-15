@@ -4273,8 +4273,12 @@ String GetKeyName(int) const;
 int GetScancodeFromKey(int) const;
 int GetScancodeFromName(const String&) const;
 String GetScancodeName(int) const;
+uint LoadGestures(File);
 bool OpenJoystick(uint);
+bool RecordGesture();
 bool RemoveScreenJoystick(uint);
+bool SaveGesture(File, uint);
+bool SaveGestures(File);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
