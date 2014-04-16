@@ -389,7 +389,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             // If using the on-screen keyboard, defocus this element to hide it now
             if (GetSubsystem<UI>()->GetUseScreenKeyboard() && HasFocus())
                 SetFocus(false);
-            
+
             using namespace TextFinished;
 
             VariantMap& eventData = GetEventDataMap();
@@ -410,40 +410,37 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         UpdateCursor();
 }
 
-void LineEdit::OnChar(unsigned c, int buttons, int qualifiers)
+void LineEdit::OnTextInput(const String& text, int buttons, int qualifiers)
 {
     if (!editable_)
         return;
-    
+
     bool changed = false;
-    
+
     // If only CTRL is held down, do not edit
     if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
         return;
-        
+
     // Send char as an event to allow changing it
     using namespace CharEntry;
-    
+
     VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = this;
-    eventData[P_CHAR] = c;
+    eventData[P_TEXT] = text;
     eventData[P_BUTTONS] = buttons;
     eventData[P_QUALIFIERS] = qualifiers;
-    SendEvent(E_CHARENTRY, eventData);
-    c = eventData[P_CHAR].GetUInt();
-    
-    if (c >= 0x20 && (!maxLength_ || line_.LengthUTF8() < maxLength_))
-    {
-        String charStr;
-        charStr.AppendUTF8(c);
+    SendEvent(E_TEXTENTRY, eventData);
 
+    const String newText = eventData[P_TEXT].GetString().SubstringUTF8(0);
+    if (!newText.Empty() && (!maxLength_ || line_.LengthUTF8() + newText.LengthUTF8() <= maxLength_))
+    {
         if (!text_->GetSelectionLength())
         {
             if (cursorPosition_ == line_.LengthUTF8())
-                line_ += charStr;
+                line_ += newText;
             else
-                line_ = line_.SubstringUTF8(0, cursorPosition_) + charStr + line_.SubstringUTF8(cursorPosition_);
-            ++cursorPosition_;
+                line_ = line_.SubstringUTF8(0, cursorPosition_) + newText + line_.SubstringUTF8(cursorPosition_);
+            cursorPosition_ += newText.LengthUTF8();
         }
         else
         {
@@ -451,10 +448,10 @@ void LineEdit::OnChar(unsigned c, int buttons, int qualifiers)
             unsigned start = text_->GetSelectionStart();
             unsigned length = text_->GetSelectionLength();
             if (start + length < line_.LengthUTF8())
-                line_ = line_.SubstringUTF8(0, start) + charStr + line_.SubstringUTF8(start + length);
+                line_ = line_.SubstringUTF8(0, start) + newText + line_.SubstringUTF8(start + length);
             else
-                line_ = line_.SubstringUTF8(0, start) + charStr;
-            cursorPosition_ = start + 1;
+                line_ = line_.SubstringUTF8(0, start) + newText;
+            cursorPosition_ = start + newText.LengthUTF8();
         }
         changed = true;
     }
@@ -629,7 +626,7 @@ void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
         text_->SetSelection(0);
     }
     UpdateCursor();
-    
+
     if (GetSubsystem<UI>()->GetUseScreenKeyboard())
         GetSubsystem<Input>()->SetScreenKeyboardVisible(true);
 }
@@ -637,7 +634,7 @@ void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
 void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 {
     text_->ClearSelection();
-    
+
     if (GetSubsystem<UI>()->GetUseScreenKeyboard())
         GetSubsystem<Input>()->SetScreenKeyboardVisible(false);
 }

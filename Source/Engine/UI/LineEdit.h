@@ -61,8 +61,8 @@ public:
     virtual bool OnDragDropFinish(UIElement* source);
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    /// React to a key press translated to a character.
-    virtual void OnChar(unsigned c, int buttons, int qualifiers);
+    /// React to text input event.
+    virtual void OnTextInput(const String& text, int buttons, int qualifiers);
 
     /// Set text.
     void SetText(const String& text);
@@ -80,7 +80,7 @@ public:
     void SetTextSelectable(bool enable);
     /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
-    
+
     /// Return text.
     const String& GetText() const { return line_; }
     /// Return cursor position.
@@ -101,7 +101,7 @@ public:
     Text* GetTextElement() const { return text_; }
     /// Return cursor element.
     BorderImage* GetCursor() const { return cursor_; }
-    
+
 protected:
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;

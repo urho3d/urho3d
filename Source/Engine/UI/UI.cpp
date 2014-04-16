@@ -120,7 +120,7 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_TOUCHEND, HANDLER(UI, HandleTouchEnd));
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
-    SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
+    SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_DROPFILE, HANDLER(UI, HandleDropFile));
 
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -1393,16 +1393,16 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void UI::HandleChar(StringHash eventType, VariantMap& eventData)
+void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
-    using namespace Char;
+    using namespace TextInput;
 
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
 
     UIElement* element = focusElement_;
     if (element)
-        element->OnChar(eventData[P_CHAR].GetInt(), mouseButtons_, qualifiers_);
+        element->OnTextInput(eventData[P_TEXT].GetString(), mouseButtons_, qualifiers_);
 }
 
 void UI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

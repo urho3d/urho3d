@@ -949,14 +949,14 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned unicode = textInput_.AtUTF8(0);
             if (unicode)
             {
-                using namespace Char;
+                using namespace TextInput;
 
-                VariantMap keyEventData;
+                VariantMap textInputEventData;
 
-                keyEventData[P_CHAR] = unicode;
-                keyEventData[P_BUTTONS] = mouseButtonDown_;
-                keyEventData[P_QUALIFIERS] = GetQualifiers();
-                SendEvent(E_CHAR, keyEventData);
+                textInputEventData[P_TEXT] = textInput_;
+                textInputEventData[P_BUTTONS] = mouseButtonDown_;
+                textInputEventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_TEXTINPUT, textInputEventData);
             }
         }
         break;

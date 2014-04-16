@@ -87,10 +87,10 @@ EVENT(E_KEYUP, KeyUp)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Character typed on the keyboard.
-EVENT(E_CHAR, Char)
+/// Text input event.
+EVENT(E_TEXTINPUT, TextInput)
 {
-    PARAM(P_CHAR, Char);                    // int
+    PARAM(P_TEXT, Text);                    // String
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
