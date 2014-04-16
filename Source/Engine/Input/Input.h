@@ -146,9 +146,19 @@ public:
     void CloseJoystick(unsigned index);
     /// Redetect joysticks. Return true if successful.
     bool DetectJoysticks();
-    /// Add screen joystick. Return the joystick index number when successful or M_MAX_UNSIGNED when error. If layout file is not given, use the default screen joystick layout. If style file is not given, use the default style file from root UI element.
+    /// Add screen joystick.
+    /** Return the joystick index number when successful or M_MAX_UNSIGNED when error.
+     *  If layout file is not given, use the default screen joystick layout.
+     *  If style file is not given, use the default style file from root UI element.
+     *
+     *  This method should only be called in main thread.
+     */
     unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
-    /// Remove screen joystick by index. Return true if successful.
+    /// Remove screen joystick by index.
+    /** Return true if successful.
+     *
+     *  This method should only be called in main thread.
+     */
     bool RemoveScreenJoystick(unsigned index);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);

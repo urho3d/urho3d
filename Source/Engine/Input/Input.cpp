@@ -238,9 +238,46 @@ bool Input::DetectJoysticks()
     return true;
 }
 
+static void PopulateKeyBindingMap(HashMap<String, int> keyBindingMap)
+{
+    if (keyBindingMap.Empty())
+    {
+        keyBindingMap.Insert(MakePair<String, int>("SPACE", KEY_SPACE));
+        keyBindingMap.Insert(MakePair<String, int>("LCTRL", KEY_LCTRL));
+        keyBindingMap.Insert(MakePair<String, int>("RCTRL", KEY_RCTRL));
+        keyBindingMap.Insert(MakePair<String, int>("LSHIFT", KEY_LSHIFT));
+        keyBindingMap.Insert(MakePair<String, int>("RSHIFT", KEY_RSHIFT));
+        keyBindingMap.Insert(MakePair<String, int>("LALT", KEY_LALT));
+        keyBindingMap.Insert(MakePair<String, int>("RALT", KEY_RALT));
+        keyBindingMap.Insert(MakePair<String, int>("LGUI", KEY_LGUI));
+        keyBindingMap.Insert(MakePair<String, int>("RGUI", KEY_RGUI));
+        keyBindingMap.Insert(MakePair<String, int>("TAB", KEY_TAB));
+        keyBindingMap.Insert(MakePair<String, int>("RETURN", KEY_RETURN));
+        keyBindingMap.Insert(MakePair<String, int>("RETURN2", KEY_RETURN2));
+        keyBindingMap.Insert(MakePair<String, int>("ENTER", KEY_KP_ENTER));
+        keyBindingMap.Insert(MakePair<String, int>("SELECT", KEY_SELECT));
+        keyBindingMap.Insert(MakePair<String, int>("LEFT", KEY_LEFT));
+        keyBindingMap.Insert(MakePair<String, int>("RIGHT", KEY_RIGHT));
+        keyBindingMap.Insert(MakePair<String, int>("UP", KEY_UP));
+        keyBindingMap.Insert(MakePair<String, int>("DOWN", KEY_DOWN));
+        keyBindingMap.Insert(MakePair<String, int>("F1", KEY_F1));
+        keyBindingMap.Insert(MakePair<String, int>("F2", KEY_F2));
+        keyBindingMap.Insert(MakePair<String, int>("F3", KEY_F3));
+        keyBindingMap.Insert(MakePair<String, int>("F4", KEY_F4));
+        keyBindingMap.Insert(MakePair<String, int>("F5", KEY_F5));
+        keyBindingMap.Insert(MakePair<String, int>("F6", KEY_F6));
+        keyBindingMap.Insert(MakePair<String, int>("F7", KEY_F7));
+        keyBindingMap.Insert(MakePair<String, int>("F8", KEY_F8));
+        keyBindingMap.Insert(MakePair<String, int>("F9", KEY_F9));
+        keyBindingMap.Insert(MakePair<String, int>("F10", KEY_F10));
+        keyBindingMap.Insert(MakePair<String, int>("F11", KEY_F11));
+        keyBindingMap.Insert(MakePair<String, int>("F12", KEY_F12));
+    }
+}
+
 unsigned Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 {
-    static HashMap<String, int> keyBindings;
+    static HashMap<String, int> keyBindingMap;
 
     if (!graphics_)
     {
@@ -296,42 +333,10 @@ unsigned Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                     keyBinding = key[0];
                 else
                 {
-                    if (keyBindings.Empty())
-                    {
-                        keyBindings.Insert(MakePair<String, int>("SPACE", KEY_SPACE));
-                        keyBindings.Insert(MakePair<String, int>("LCTRL", KEY_LCTRL));
-                        keyBindings.Insert(MakePair<String, int>("RCTRL", KEY_RCTRL));
-                        keyBindings.Insert(MakePair<String, int>("LSHIFT", KEY_LSHIFT));
-                        keyBindings.Insert(MakePair<String, int>("RSHIFT", KEY_RSHIFT));
-                        keyBindings.Insert(MakePair<String, int>("LALT", KEY_LALT));
-                        keyBindings.Insert(MakePair<String, int>("RALT", KEY_RALT));
-                        keyBindings.Insert(MakePair<String, int>("LGUI", KEY_LGUI));
-                        keyBindings.Insert(MakePair<String, int>("RGUI", KEY_RGUI));
-                        keyBindings.Insert(MakePair<String, int>("TAB", KEY_TAB));
-                        keyBindings.Insert(MakePair<String, int>("RETURN", KEY_RETURN));
-                        keyBindings.Insert(MakePair<String, int>("RETURN2", KEY_RETURN2));
-                        keyBindings.Insert(MakePair<String, int>("ENTER", KEY_KP_ENTER));
-                        keyBindings.Insert(MakePair<String, int>("SELECT", KEY_SELECT));
-                        keyBindings.Insert(MakePair<String, int>("LEFT", KEY_LEFT));
-                        keyBindings.Insert(MakePair<String, int>("RIGHT", KEY_RIGHT));
-                        keyBindings.Insert(MakePair<String, int>("UP", KEY_UP));
-                        keyBindings.Insert(MakePair<String, int>("DOWN", KEY_DOWN));
-                        keyBindings.Insert(MakePair<String, int>("F1", KEY_F1));
-                        keyBindings.Insert(MakePair<String, int>("F2", KEY_F2));
-                        keyBindings.Insert(MakePair<String, int>("F3", KEY_F3));
-                        keyBindings.Insert(MakePair<String, int>("F4", KEY_F4));
-                        keyBindings.Insert(MakePair<String, int>("F5", KEY_F5));
-                        keyBindings.Insert(MakePair<String, int>("F6", KEY_F6));
-                        keyBindings.Insert(MakePair<String, int>("F7", KEY_F7));
-                        keyBindings.Insert(MakePair<String, int>("F8", KEY_F8));
-                        keyBindings.Insert(MakePair<String, int>("F9", KEY_F9));
-                        keyBindings.Insert(MakePair<String, int>("F10", KEY_F10));
-                        keyBindings.Insert(MakePair<String, int>("F11", KEY_F11));
-                        keyBindings.Insert(MakePair<String, int>("F12", KEY_F12));
-                    }
+                    PopulateKeyBindingMap(keyBindingMap);
 
-                    HashMap<String, int>::Iterator i = keyBindings.Find(key);
-                    if (i != keyBindings.End())
+                    HashMap<String, int>::Iterator i = keyBindingMap.Find(key);
+                    if (i != keyBindingMap.End())
                         keyBinding = i->second_;
                     else
                     {
@@ -360,10 +365,34 @@ unsigned Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             {
                 text->SetVisible(false);
                 String keyBinding = text->GetText();
-                if (keyBinding.Length() != 4)
+                if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
                 {
-                    LOGERRORF("%s has invalid key binding %s, fallback to WASD", name.CString(), keyBinding.CString());
-                    keyBinding = "WASD";
+                    // Attempt to split the text using ' ' as separator
+                    Vector<String>keyBindings(keyBinding.Split(' '));
+                    String mappedKeyBinding;
+                    if (keyBindings.Size() == 4)
+                    {
+                        PopulateKeyBindingMap(keyBindingMap);
+
+                        for (unsigned j = 0; j < 4; ++j)
+                        {
+                            HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
+                            if (i != keyBindingMap.End())
+                                mappedKeyBinding.Append(i->second_);
+                        }
+                    }
+                    if (mappedKeyBinding.Length() != 4)
+                    {
+                        LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                        keyBinding = "WSAD";
+                    }
+                    else
+                        keyBinding = mappedKeyBinding;
+                }
+                else if (keyBinding.Length() != 4)
+                {
+                    LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                    keyBinding = "WSAD";
                 }
 
                 element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
@@ -397,7 +426,7 @@ bool Input::RemoveScreenJoystick(unsigned index)
 {
     if (index >= joysticks_.Size())
     {
-        LOGERRORF("Joystick index #%d is out of bound", index);
+        LOGERRORF("Joystick index #%d is out of bounds", index);
         return false;
     }
 
@@ -437,19 +466,19 @@ bool Input::RecordGesture()
         return false;
     }
 
-    return SDL_RecordGesture(-1) ? true : false;
+    return SDL_RecordGesture(-1);
 }
 
 bool Input::SaveGestures(Serializer& dest)
 {
     RWOpsWrapper<Serializer> wrapper(dest);
-    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps()) ? true : false;
+    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps());
 }
 
 bool Input::SaveGesture(Serializer& dest, unsigned gestureID)
 {
     RWOpsWrapper<Serializer> wrapper(dest);
-    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps()) ? true : false;
+    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps());
 }
 
 unsigned Input::LoadGestures(Deserializer& source)
@@ -1404,9 +1433,9 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
                     evt.key.keysym.sym = keyBinding[0];
                 else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[2];
-                else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
                     evt.key.keysym.sym = keyBinding[1];
+                else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+                    evt.key.keysym.sym = keyBinding[2];
                 else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
                     evt.key.keysym.sym = keyBinding[3];
                 else
