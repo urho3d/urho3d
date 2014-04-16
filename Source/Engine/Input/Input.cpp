@@ -244,7 +244,7 @@ bool Input::DetectJoysticks()
     return true;
 }
 
-static void PopulateKeyBindingMap(HashMap<String, int> keyBindingMap)
+static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
 {
     if (keyBindingMap.Empty())
     {
