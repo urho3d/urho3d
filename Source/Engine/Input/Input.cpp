@@ -376,9 +376,16 @@ unsigned Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
                         for (unsigned j = 0; j < 4; ++j)
                         {
-                            HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
-                            if (i != keyBindingMap.End())
-                                mappedKeyBinding.Append(i->second_);
+                            if (keyBindings[j].Length() == 1)
+                                mappedKeyBinding.Append(keyBindings[j][0]);
+                            else
+                            {
+                                HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
+                                if (i != keyBindingMap.End())
+                                    mappedKeyBinding.Append(i->second_);
+                                else
+                                    break;
+                            }
                         }
                     }
                     if (mappedKeyBinding.Length() != 4)
