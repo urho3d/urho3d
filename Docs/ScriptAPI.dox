@@ -143,8 +143,8 @@ namespace Urho3D
 - %Buttons : int
 - %Qualifiers : int
 
-### Char
-- %Char : int
+### TextInput
+- %Text : String
 - %Buttons : int
 - %Qualifiers : int
 
@@ -513,7 +513,7 @@ namespace Urho3D
 
 ### CharEntry
 - %Element : UIElement pointer
-- %Char : int
+- %Text : String
 - %Buttons : int
 - %Qualifiers : int
 
