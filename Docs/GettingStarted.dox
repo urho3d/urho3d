@@ -574,6 +574,7 @@ F1              - Toggle console
 F2              - Toggle rendering debug geometry
 F3              - Toggle physics debug geometry
 F4              - Toggle octree debug geometry
+F11             - Captures a screenshot
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
