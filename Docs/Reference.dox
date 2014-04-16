@@ -1334,7 +1334,9 @@ The surface can also be configured to always update its viewports, or to only up
 
 \page Input %Input
 
-The Input subsystem provides keyboard, mouse, joystick and touch input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the operating system mouse cursor. It will be hidden by default, so the UI should be used to render a software cursor if necessary. For editor-like applications the operating system cursor can be made visible by calling \ref Input::SetMouseVisible "SetMouseVisible()".
+The Input subsystem provides keyboard, mouse, joystick and touch input both via a polled interface and events. This subsystem is also used for querying whether the application window has input focus or is minimized.
+
+The subsystem is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the operating system mouse cursor. It will be hidden by default, so the UI should be used to render a software cursor if necessary. For editor-like applications the operating system cursor can be made visible by calling \ref Input::SetMouseVisible "SetMouseVisible()".
 
 The input events include:
 
@@ -1344,13 +1346,7 @@ The input events include:
 - E_MOUSEWHEEL: the mouse wheel moved.
 - E_KEYUP: a key was released.
 - E_KEYDOWN: a key was pressed.
-- E_CHAR: translation of a keypress to Unicode charset for text entry. This is currently the only way to get translated key input.
-- E_TOUCHBEGIN: a finger touched the screen.
-- E_TOUCHEND: a finger was lifted from the screen.
-- E_TOUCHMOVE: a finger moved on the screen.
-- E_GESTURERECORDED : recording a touch gesture is complete. Triggered with \ref Input::RecordGesture "RecordGesture()"
-- E_GESTUREINPUT : a touch gesture was recognized.
-- E_MULTIGESTURE : a multi-finger pinch/rotation touch gesture is underway.
+- E_TEXTINPUT: a string of translated text input in UTF8 format. May contain a single character or several.
 - E_JOYSTICKBUTTONDOWN: a joystick button was pressed.
 - E_JOYSTICKBUTTONUP: a joystick button was released.
 - E_JOYSTICKAXISMOVE: a joystick axis was moved.
@@ -1358,22 +1354,46 @@ The input events include:
 - E_CONTROLLERBUTTONDOWN: a joystick button on an SDL controller was pressed.
 - E_CONTROLLERBUTTONUP: a joystick button on an SDL controller was released.
 - E_CONTROLLERAXISMOVE: a joystick axis on an SDL controller was moved.
+- E_TOUCHBEGIN: a finger touched the screen.
+- E_TOUCHEND: a finger was lifted from the screen.
+- E_TOUCHMOVE: a finger moved on the screen.
+- E_GESTURERECORDED : recording a touch gesture is complete.
+- E_GESTUREINPUT : a touch gesture was recognized.
+- E_MULTIGESTURE : a multi-finger pinch/rotation touch gesture is underway.
+- E_DROPFILE : a file was drag-dropped on the application window.
+- E_INPUTFOCUS : application input focus or window minimization state changed.
+- E_MOUSEVISIBLECHANGED : the visibility of the operating system mouse cursor was changed.
+- E_EXITREQUESTED : application exit was requested (eg. with the window close button.)
+
+\section InputKeyboard Keyboard and mouse input
 
 Key events include both the symbolic keycode ("Key") that depends on the keyboard layout, the layout- and operating system-independent SDL scancode ("Scancode"), and the true operating system-specific raw keycode ("Raw").
 
-The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
+The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down. To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
 
-To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
+Mouse motion since the last frame can be accessed with \ref Input::GetMouseMove() "GetMouseMove()". When the operating system mouse cursor is hidden, it will be kept centered to the application window to allow "endless" movement in any direction, for example for camera control. The cursor position within the window can be queried with \ref Input::GetMousePosition "GetMousePosition()", but that should only be used with a visible cursor (when no automatic centering is being done.)
 
-In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
+In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove, input.mousePosition.
+
+\section InputJoystick Joystick input
 
 To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
 
 If the joystick model is recognized by SDL you will also get the "controller" variety of events shown above, and the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them.
 
-From the input subsystem you can also query whether the application window has input focus, or is minimized.
+\section InputTouch Touch input
 
-On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as char events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
+On platforms where touch input is available, touch begin/end/move events will be sent, as well as multi-gesture events with pinch/rotation delta values when more than one finger is pressed down. The current finger touches can also be accessed via a polling API: \ref Input::GetNumTouches "GetNumTouches()" and \ref Input::GetTouch "GetTouch()".
+
+Touch gestures can be recorded using SDL's inbuilt $1 gesture recognition system. Use \ref Input::RecordGesture "RecordGesture()" to start recording. The following finger movements will be recorded until the finger is lifted, at which point the recording ends and the E_GESTURERECORDED event is sent with the hash ID of the new gesture. The current in-memory gesture(s) can be saved or loaded as binary data using the \ref Input::SaveGestures "SaveGestures()", \ref Input::SaveGesture "SaveGesture()", \ref Input::LoadGestures "LoadGestures()" functions.
+
+Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event will be sent. In addition to the ID of the best matched gesture, it contains the center position and an error metric (lower = better.)
+
+Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
+
+\section InputPlatformSpecific Platform-specific details
+
+On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as text input events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
 
 On Windows the user must first touch the screen once before touch input is activated. Trying to record or load touch gestures will fail before that.
 

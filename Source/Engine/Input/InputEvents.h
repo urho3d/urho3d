@@ -95,34 +95,6 @@ EVENT(E_TEXTINPUT, TextInput)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Finger pressed on the screen.
-EVENT(E_TOUCHBEGIN, TouchBegin)
-{
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_PRESSURE, Pressure);            // float
-}
-
-/// Finger released from the screen.
-EVENT(E_TOUCHEND, TouchEnd)
-{
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-}
-
-/// Finger moved on the screen.
-EVENT(E_TOUCHMOVE, TouchMove)
-{
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_DX, DX);                        // int
-    PARAM(P_DY, DY);                        // int
-    PARAM(P_PRESSURE, Pressure);            // float
-}
-
 /// Joystick button pressed.
 EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
 {
@@ -175,28 +147,32 @@ EVENT(E_CONTROLLERAXISMOVE, ControllerAxisMove)
     PARAM(P_POSITION, Position);            // float
 }
 
-/// A file was drag-dropped into the application window.
-EVENT(E_DROPFILE, DropFile)
+/// Finger pressed on the screen.
+EVENT(E_TOUCHBEGIN, TouchBegin)
 {
-    PARAM(P_FILENAME, FileName);            // String
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_PRESSURE, Pressure);            // float
 }
 
-/// Application input focus or minimization changed.
-EVENT(E_INPUTFOCUS, InputFocus)
+/// Finger released from the screen.
+EVENT(E_TOUCHEND, TouchEnd)
 {
-    PARAM(P_FOCUS, Focus);                  // bool
-    PARAM(P_MINIMIZED, Minimized);          // bool
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
 }
 
-/// OS mouse cursor visibility changed.
-EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
+/// Finger moved on the screen.
+EVENT(E_TOUCHMOVE, TouchMove)
 {
-    PARAM(P_VISIBLE, Visible);              // bool
-}
-
-/// Application exit requested.
-EVENT(E_EXITREQUESTED, ExitRequested)
-{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_DX, DX);                        // int
+    PARAM(P_DY, DY);                        // int
+    PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// A touch gesture finished recording.
@@ -223,6 +199,30 @@ EVENT(E_MULTIGESTURE, MultiGesture)
     PARAM(P_NUMFINGERS, NumFingers);        // int
     PARAM(P_DTHETA, DTheta);                // float (degrees)
     PARAM(P_DDIST, DDist);                  // float
+}
+
+/// A file was drag-dropped into the application window.
+EVENT(E_DROPFILE, DropFile)
+{
+    PARAM(P_FILENAME, FileName);            // String
+}
+
+/// Application input focus or minimization changed.
+EVENT(E_INPUTFOCUS, InputFocus)
+{
+    PARAM(P_FOCUS, Focus);                  // bool
+    PARAM(P_MINIMIZED, Minimized);          // bool
+}
+
+/// OS mouse cursor visibility changed.
+EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
+{
+    PARAM(P_VISIBLE, Visible);              // bool
+}
+
+/// Application exit requested.
+EVENT(E_EXITREQUESTED, ExitRequested)
+{
 }
 
 static const int MOUSEB_LEFT = 1;
