@@ -226,16 +226,16 @@ function HandleUpdate(eventType, eventData)
         local speed = timeStep * speedMultiplier
         
         if input:GetKeyDown(KEY_W) then
-            cameraNode:TranslateRelative(Vector3(0, 0, 10) * speed)
+            cameraNode:Translate(Vector3(0, 0, 10) * speed)
         end
         if input:GetKeyDown(KEY_S) then
-            cameraNode:TranslateRelative(Vector3(0, 0, -10) * speed)
+            cameraNode:Translate(Vector3(0, 0, -10) * speed)
         end
         if input:GetKeyDown(KEY_A) then
-            cameraNode:TranslateRelative(Vector3(-10, 0, 0) * speed)
+            cameraNode:Translate(Vector3(-10, 0, 0) * speed)
         end
         if input:GetKeyDown(KEY_D) then
-            cameraNode:TranslateRelative(Vector3(10, 0, 0) * speed)
+            cameraNode:Translate(Vector3(10, 0, 0) * speed)
         end
     end    
 end
