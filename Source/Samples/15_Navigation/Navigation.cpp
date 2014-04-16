@@ -52,8 +52,6 @@ DEFINE_APPLICATION_MAIN(Navigation)
 
 Navigation::Navigation(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
 }

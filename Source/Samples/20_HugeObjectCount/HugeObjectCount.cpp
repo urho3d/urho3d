@@ -46,8 +46,6 @@ DEFINE_APPLICATION_MAIN(HugeObjectCount)
 
 HugeObjectCount::HugeObjectCount(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     animate_(false),
     useGroups_(false)
 {

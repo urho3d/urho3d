@@ -78,20 +78,12 @@ private:
     /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Last calculated path.
     PODVector<Vector3> currentPath_;
     /// Path end position.
     Vector3 endPos_;
     /// Jack scene node.
     SharedPtr<Node> jackNode_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

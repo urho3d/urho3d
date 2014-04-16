@@ -48,9 +48,7 @@
 DEFINE_APPLICATION_MAIN(LuaIntegration)
 
 LuaIntegration::LuaIntegration(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
     // Instantiate and register the Lua script subsystem so that we can use the LuaScriptInstance component
     context_->RegisterSubsystem(new LuaScript(context_));

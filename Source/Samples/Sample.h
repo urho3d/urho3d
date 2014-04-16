@@ -27,6 +27,8 @@
 namespace Urho3D
 {
 
+class Node;
+class Scene;
 class Sprite;
 
 }
@@ -37,12 +39,13 @@ using namespace Urho3D;
 /// Sample class, as framework for all samples.
 ///    - Initialization of the Urho3D engine (in Application class)
 ///    - Modify engine parameters for windowed mode and to show the class name as title
-///    - Create Urho3D logo at screen;
-///    - Set custom window title and icon;
-///    - Create Console and Debug HUD, and use F1 and F2 key to toggle them;
-///    - Toggle rendering options from the keys 1-8;
+///    - Create Urho3D logo at screen
+///    - Set custom window title and icon
+///    - Create Console and Debug HUD, and use F1 and F2 key to toggle them
+///    - Toggle rendering options from the keys 1-8
 ///    - Take screenshot with key 9
-///    - Handle Esc key down to hide Console or exit application;
+///    - Handle Esc key down to hide Console or exit application
+///    - Init touch input on mobile platform using screen joystick
 class Sample : public Application
 {
     // Enable type information.
@@ -65,6 +68,14 @@ public:
 protected:
     /// Logo sprite.
     SharedPtr<Sprite> logoSprite_;
+    /// Scene.
+    SharedPtr<Scene> scene_;
+    /// Camera scene node.
+    SharedPtr<Node> cameraNode_;
+    /// Camera yaw angle.
+    float yaw_;
+    /// Camera pitch angle.
+    float pitch_;
 
 private:
     /// Create logo.
@@ -75,10 +86,16 @@ private:
     void CreateConsoleAndDebugHud();
     /// Handle key down event to process key controls common to all samples.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+    /// Handle scene update event to control camera's pitch and yaw for all samples.
+    void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
 
-    unsigned screenJoystickIndex_;
-    unsigned screenJoystickSettingsIndex_;
+    /// Flag to indicate whether touch input has been enabled.
     bool touchEnabled_;
+    /// Screen joystick index for navigational controls (mobile platforms only).
+    unsigned screenJoystickIndex_;
+    /// Screen joystick index for settings (mobile platforms only).
+    unsigned screenJoystickSettingsIndex_;
+    /// Pause flag.
     bool paused_;
 };
 

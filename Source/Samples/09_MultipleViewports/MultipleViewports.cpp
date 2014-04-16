@@ -50,8 +50,6 @@ DEFINE_APPLICATION_MAIN(MultipleViewports)
 
 MultipleViewports::MultipleViewports(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
 }

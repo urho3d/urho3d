@@ -48,8 +48,6 @@ DEFINE_APPLICATION_MAIN(Billboards)
 
 Billboards::Billboards(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
 }

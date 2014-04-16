@@ -65,9 +65,6 @@ private:
     void HandleSoundVolume(StringHash eventType, VariantMap& eventData);
     /// Handle music volume slider change.
     void HandleMusicVolume(StringHash eventType, VariantMap& eventData);
-    
-    /// Scene.
-    SharedPtr<Scene> scene_;
 };
 
 

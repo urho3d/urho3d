@@ -48,8 +48,9 @@ DEFINE_APPLICATION_MAIN(Urho2DPhysics)
 
 static const unsigned NUM_OBJECTS = 100;
 
-Urho2DPhysics::Urho2DPhysics(Context* context) : Sample(context)
-{    
+Urho2DPhysics::Urho2DPhysics(Context* context) :
+    Sample(context)
+{
 }
 
 void Urho2DPhysics::Start()

@@ -61,13 +61,4 @@ private:
     void MoveCamera(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
 };

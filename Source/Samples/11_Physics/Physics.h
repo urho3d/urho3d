@@ -67,14 +67,6 @@ private:
     /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

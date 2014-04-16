@@ -46,8 +46,9 @@ DEFINE_APPLICATION_MAIN(Urho2DPhysicsRope)
 
 static const unsigned NUM_OBJECTS = 10;
 
-Urho2DPhysicsRope::Urho2DPhysicsRope(Context* context) : Sample(context)
-{    
+Urho2DPhysicsRope::Urho2DPhysicsRope(Context* context) :
+    Sample(context)
+{
 }
 
 void Urho2DPhysicsRope::Start()

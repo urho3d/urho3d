@@ -44,9 +44,7 @@
 DEFINE_APPLICATION_MAIN(LightAnimation)
 
 LightAnimation::LightAnimation(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
 }
 

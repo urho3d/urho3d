@@ -50,8 +50,6 @@ DEFINE_APPLICATION_MAIN(SkeletalAnimation)
 
 SkeletalAnimation::SkeletalAnimation(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
     // Register an object factory for our custom Mover component so that we can create them to scene nodes
