@@ -148,25 +148,6 @@ namespace Urho3D
 - %Buttons : int
 - %Qualifiers : int
 
-### TouchBegin
-- %TouchID : int
-- %X : int
-- %Y : int
-- %Pressure : float
-
-### TouchEnd
-- %TouchID : int
-- %X : int
-- %Y : int
-
-### TouchMove
-- %TouchID : int
-- %X : int
-- %Y : int
-- %DX : int
-- %DY : int
-- %Pressure : float
-
 ### JoystickButtonDown
 - %Joystick : int
 - %Button : int
@@ -198,17 +179,24 @@ namespace Urho3D
 - %Button : int
 - %Position : float
 
-### DropFile
-- %FileName : String
+### TouchBegin
+- %TouchID : int
+- %X : int
+- %Y : int
+- %Pressure : float
 
-### InputFocus
-- %Focus : bool
-- %Minimized : bool
+### TouchEnd
+- %TouchID : int
+- %X : int
+- %Y : int
 
-### MouseVisibleChanged
-- %Visible : bool
-
-### ExitRequested
+### TouchMove
+- %TouchID : int
+- %X : int
+- %Y : int
+- %DX : int
+- %DY : int
+- %Pressure : float
 
 ### GestureRecorded
 - %GestureID : unsigned
@@ -226,6 +214,18 @@ namespace Urho3D
 - %NumFingers : int
 - %DTheta : float (degrees)
 - %DDist : float
+
+### DropFile
+- %FileName : String
+
+### InputFocus
+- %Focus : bool
+- %Minimized : bool
+
+### MouseVisibleChanged
+- %Visible : bool
+
+### ExitRequested
 
 ## %Network events
 
