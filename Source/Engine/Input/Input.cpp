@@ -156,7 +156,7 @@ void Input::Update()
             lastMousePosition_ = mousePosition;
         else
         {
-            // Recenter the mouse cursor manually
+            // Recenter the mouse cursor manually after move
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             if (mousePosition != center)
             {
@@ -211,7 +211,13 @@ void Input::SetMouseVisible(bool enable)
             }
 
             if (!mouseVisible_ && inputFocus_)
+            {
                 SDL_ShowCursor(SDL_FALSE);
+                // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+                SetMousePosition(center);
+                lastMousePosition_ = center;
+            }
             else
                 SDL_ShowCursor(SDL_TRUE);
         }

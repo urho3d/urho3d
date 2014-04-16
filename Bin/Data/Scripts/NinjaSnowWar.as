@@ -949,7 +949,7 @@ void UpdateControls()
 
         // For the triggered actions (fire & jump) check also for press, in case the FPS is low
         // and the key was already released
-        if ((console is null) || (!console.visible))
+        if (console is null || !console.visible)
         {
             if (input.keyDown['W'])
                 playerControls.Set(CTRL_UP, true);
@@ -963,16 +963,16 @@ void UpdateControls()
                 playerControls.Set(CTRL_FIRE, true);
             if (input.keyDown[' '] || input.keyPress[' '])
                 playerControls.Set(CTRL_JUMP, true);
+
+            if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
+                playerControls.Set(CTRL_FIRE, true);
+            if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
+                playerControls.Set(CTRL_JUMP, true);
+
+            playerControls.yaw += mouseSensitivity * input.mouseMoveX;
+            playerControls.pitch += mouseSensitivity * input.mouseMoveY;
+            playerControls.pitch = Clamp(playerControls.pitch, -60.0, 60.0);
         }
-
-        if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
-            playerControls.Set(CTRL_FIRE, true);
-        if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
-            playerControls.Set(CTRL_JUMP, true);
-
-        playerControls.yaw += mouseSensitivity * input.mouseMoveX;
-        playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-        playerControls.pitch = Clamp(playerControls.pitch, -60.0, 60.0);
 
         // In singleplayer, set controls directly on the player's ninja. In multiplayer, transmit to server
         if (singlePlayer)
@@ -1061,26 +1061,29 @@ void UpdateCamera()
 
 void UpdateFreelookCamera()
 {
-    float timeStep = time.timeStep;
-    float speedMultiplier = 1.0;
-    if (input.keyDown[KEY_LSHIFT])
-        speedMultiplier = 5.0;
-    if (input.keyDown[KEY_LCTRL])
-        speedMultiplier = 0.1;
+    if (console is null || !console.visible)
+    {
+        float timeStep = time.timeStep;
+        float speedMultiplier = 1.0;
+        if (input.keyDown[KEY_LSHIFT])
+            speedMultiplier = 5.0;
+        if (input.keyDown[KEY_LCTRL])
+            speedMultiplier = 0.1;
 
-    if (input.keyDown['W'])
-        gameCameraNode.Translate(Vector3(0, 0, 10) * timeStep * speedMultiplier);
-    if (input.keyDown['S'])
-        gameCameraNode.Translate(Vector3(0, 0, -10) * timeStep * speedMultiplier);
-    if (input.keyDown['A'])
-        gameCameraNode.Translate(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
-    if (input.keyDown['D'])
-        gameCameraNode.Translate(Vector3(10, 0, 0) * timeStep * speedMultiplier);
+        if (input.keyDown['W'])
+            gameCameraNode.Translate(Vector3(0, 0, 10) * timeStep * speedMultiplier);
+        if (input.keyDown['S'])
+            gameCameraNode.Translate(Vector3(0, 0, -10) * timeStep * speedMultiplier);
+        if (input.keyDown['A'])
+            gameCameraNode.Translate(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
+        if (input.keyDown['D'])
+            gameCameraNode.Translate(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
-    playerControls.yaw += mouseSensitivity * input.mouseMoveX;
-    playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-    playerControls.pitch = Clamp(playerControls.pitch, -90.0, 90.0);
-    gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
+        playerControls.yaw += mouseSensitivity * input.mouseMoveX;
+        playerControls.pitch += mouseSensitivity * input.mouseMoveY;
+        playerControls.pitch = Clamp(playerControls.pitch, -90.0, 90.0);
+        gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
+    }
 }
 
 void UpdateStatus()
