@@ -84,9 +84,7 @@ void Urho2DPhysics::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth();
-    float height = (float)graphics->GetHeight();
-    camera->SetOrthoSize(Vector2(width, height) * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
