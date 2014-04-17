@@ -92,6 +92,7 @@ void Urho3DPlayer::Setup()
             "-b <length>  Sound buffer length in milliseconds\n"
             "-r <freq>    Sound mixing frequency in Hz\n"
             "-p <paths>   Resource path(s) to use, separated by semicolons\n"
+            "-ap <paths>  Autoload resource path(s) to use, seperated by semicolons\n"
             "-log <level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'\n"
             "-ds <file>   Dump used shader variations to a file for precaching\n"
             "-mq <level>  Material quality level, default 2 (high)\n"
