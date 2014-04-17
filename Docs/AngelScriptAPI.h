@@ -5881,6 +5881,7 @@ class PackageFile
 {
 // Methods:
 bool Exists(const String&) const;
+Array<String> GetEntryNames() const;
 bool Open(const String&, uint = 0) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool compressed() const;
