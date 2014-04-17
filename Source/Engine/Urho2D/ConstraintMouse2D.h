@@ -40,7 +40,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set target
+    /// Set target.
     void SetTarget(const Vector2& target);
     /// Set max force.
     void SetMaxForce(float maxForce);
