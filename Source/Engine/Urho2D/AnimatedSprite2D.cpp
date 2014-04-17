@@ -37,7 +37,7 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
-const char* cycleModeNames[] = 
+const char* cycleModeNames[] =
 {
     "Loop",
     "Clamp",
@@ -127,7 +127,7 @@ Animation2D* AnimatedSprite2D::GetAnimation() const
 void AnimatedSprite2D::SetAnimationAttr(ResourceRef value)
 {
     materialUpdatePending_ = true;
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetAnimation(cache->GetResource<Animation2D>(value.name_));
 }
@@ -164,6 +164,8 @@ void AnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& e
     {
     case CM_LOOP:
         time = fmodf(animationTime_, animationTotalTime_);
+        if (time < 0.0f)
+            time += animationTotalTime_;
         break;
 
     case CM_CLAMP:

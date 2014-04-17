@@ -113,7 +113,7 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld2D::BeginContact(b2Contact* contact)
 {
-    // On receive begin contact when physics steping
+    // Only handle contact event when physics steping
     if (!physicsSteping_)
         return;
 
@@ -127,7 +127,7 @@ void PhysicsWorld2D::BeginContact(b2Contact* contact)
 
 void PhysicsWorld2D::EndContact(b2Contact* contact)
 {
-    // On receive begin contact when physics steping
+    // Only handle contact event when physics steping
     if (!physicsSteping_)
         return;
 

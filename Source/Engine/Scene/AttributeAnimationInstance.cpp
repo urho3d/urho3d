@@ -57,9 +57,9 @@ bool AttributeAnimationInstance::Update(float timeStep)
 {
     if (!attributeAnimation_)
         return true;
-    
+
     currentTime_ += timeStep * speed_;
-    
+
     if (!attributeAnimation_->IsValid())
         return true;
 
@@ -109,7 +109,10 @@ float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& f
     case WM_LOOP:
         {
             float span = endTime - beginTime;
-            return beginTime + fmodf(currentTime - beginTime, span);
+            float time = fmodf(currentTime - beginTime, span);
+            if (time < 0.0f)
+                time += span;
+            return beginTime + time;
         }
 
     case WM_ONCE:
