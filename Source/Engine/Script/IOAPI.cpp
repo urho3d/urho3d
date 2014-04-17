@@ -369,6 +369,11 @@ static PackageFile* ConstructAndOpenPackageFile(const String& fileName, unsigned
     return new PackageFile(GetScriptContext(), fileName, startOffset);
 }
 
+static const CScriptArray* PackageFileGetEntryNames(PackageFile* packageFile)
+{
+    return VectorToArray<String>(packageFile->GetEntryNames(), "Array<String>");
+}
+
 static void RegisterPackageFile(asIScriptEngine* engine)
 {
     RegisterObject<PackageFile>(engine, "PackageFile");
@@ -381,6 +386,7 @@ static void RegisterPackageFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHOD(PackageFile, GetTotalSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHOD(PackageFile, GetChecksum), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "bool compressed() const", asMETHOD(PackageFile, IsCompressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFileGetEntryNames), asCALL_CDECL_OBJLAST);
 }
 
 void RegisterIOAPI(asIScriptEngine* engine)
