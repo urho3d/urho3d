@@ -130,7 +130,8 @@ The full list of supported parameters, their datatypes and default values:
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "CoreData;Data".
-- ResourcePackages (string) A semicolon-separated list of resource paths to use. Default empty.
+- ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
+- AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Extra".
 - ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
 - WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
