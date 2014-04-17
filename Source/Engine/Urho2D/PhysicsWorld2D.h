@@ -175,6 +175,10 @@ protected:
 private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
+    /// Send begin contact events.
+    void SendBeginContactEvents();
+    /// Send end contact events.
+    void SendEndContactEvents();
 
     /// Box2D physics world.
     b2World* world_;
@@ -196,6 +200,30 @@ private:
     bool applyingTransforms_;
     /// Rigid bodies.
     Vector<WeakPtr<RigidBody2D> > rigidBodies_;
+
+    /// Contact info.
+    struct ContactInfo
+    {
+        /// Construct.
+        ContactInfo();
+        /// Construct.
+        ContactInfo(b2Contact* contract);
+        /// Copy construct.
+        ContactInfo(const ContactInfo& other);
+
+        /// Rigid body A.
+        SharedPtr<RigidBody2D> bodyA_;
+        /// Rigid body B.
+        SharedPtr<RigidBody2D> bodyB_;
+        /// Node A.
+        SharedPtr<Node> nodeA_;
+        /// Node B.
+        SharedPtr<Node> nodeB_;
+    };
+    /// Begin contact infos.
+    Vector<ContactInfo> beginContactInfos_;
+    /// End contact infos.
+    Vector<ContactInfo> endContactInfos_;
 };
 
 }

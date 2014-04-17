@@ -117,18 +117,7 @@ void PhysicsWorld2D::BeginContact(b2Contact* contact)
     if (!fixtureA || !fixtureB)
         return;
 
-    using namespace PhysicsBeginContact2D;
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = this;
-
-    RigidBody2D* rigidBodyA = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
-    RigidBody2D* rigidBodyB = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
-    eventData[P_BODYA] = rigidBodyA;
-    eventData[P_BODYB] = rigidBodyB;
-    eventData[P_NODEA] = rigidBodyA->GetNode();
-    eventData[P_NODEB] = rigidBodyB->GetNode();
-
-    SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
+    beginContactInfos_.Push(ContactInfo(contact));
 }
 
 void PhysicsWorld2D::EndContact(b2Contact* contact)
@@ -138,18 +127,7 @@ void PhysicsWorld2D::EndContact(b2Contact* contact)
     if (!fixtureA || !fixtureB)
         return;
 
-    using namespace PhysicsEndContact2D;
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = this;
-
-    RigidBody2D* rigidBodyA = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
-    RigidBody2D* rigidBodyB = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
-    eventData[P_BODYA] = rigidBodyA;
-    eventData[P_BODYB] = rigidBodyB;
-    eventData[P_NODEA] = rigidBodyA->GetNode();
-    eventData[P_NODEB] = rigidBodyB->GetNode();
-
-    SendEvent(E_PHYSICSENDCOLLISION2D, eventData);
+    endContactInfos_.Push(ContactInfo(contact));
 }
 
 void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -248,6 +226,9 @@ void PhysicsWorld2D::Update(float timeStep)
 
     for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
         rigidBodies_[i]->ApplyWorldTransform();
+
+    SendBeginContactEvents();
+    SendEndContactEvents();
 
     using namespace PhysicsPostStep2D;
     SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
@@ -630,6 +611,74 @@ void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap
 {
     using namespace SceneSubsystemUpdate;
     Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+void PhysicsWorld2D::SendBeginContactEvents()
+{
+    if (beginContactInfos_.Empty())
+        return;
+
+    using namespace PhysicsBeginContact2D;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WORLD] = this;
+
+    for (unsigned i = 0; i < beginContactInfos_.Size(); ++i)
+    {
+        ContactInfo& contactInfo = beginContactInfos_[i];
+        eventData[P_BODYA] = contactInfo.bodyA_.Get();
+        eventData[P_BODYB] = contactInfo.bodyB_.Get();
+        eventData[P_NODEA] = contactInfo.nodeA_.Get();
+        eventData[P_NODEB] = contactInfo.nodeB_.Get();
+
+        SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
+    }
+
+    beginContactInfos_.Clear();
+}
+
+void PhysicsWorld2D::SendEndContactEvents()
+{
+   if (endContactInfos_.Empty())
+        return;
+
+    using namespace PhysicsEndContact2D;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WORLD] = this;
+
+    for (unsigned i = 0; i < endContactInfos_.Size(); ++i)
+    {
+        ContactInfo& contactInfo = endContactInfos_[i];
+        eventData[P_BODYA] = contactInfo.bodyA_.Get();
+        eventData[P_BODYB] = contactInfo.bodyB_.Get();
+        eventData[P_NODEA] = contactInfo.nodeA_.Get();
+        eventData[P_NODEB] = contactInfo.nodeB_.Get();
+
+        SendEvent(E_PHYSICSENDCONTACT2D, eventData);
+    }
+
+    endContactInfos_.Clear();
+}
+
+PhysicsWorld2D::ContactInfo::ContactInfo()
+{
+}
+
+PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
+{
+    b2Fixture* fixtureA = contact->GetFixtureA();
+    b2Fixture* fixtureB = contact->GetFixtureB();
+    bodyA_ = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
+    bodyB_ = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
+    nodeA_ = bodyA_->GetNode();
+    nodeB_ = bodyB_->GetNode();
+}
+
+PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
+    bodyA_(other.bodyA_),
+    bodyB_(other.bodyB_),
+    nodeA_(other.nodeA_),
+    nodeB_(other.nodeB_)
+{
 }
 
 }
