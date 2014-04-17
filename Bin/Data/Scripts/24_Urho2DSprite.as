@@ -52,8 +52,8 @@ void CreateScene()
     if (sprite is null)
         return;
 
-    uint halfWidth = graphics.width * PIXEL_SIZE * 0.5f;
-    uint halfHeight = graphics.height * PIXEL_SIZE * 0.5f;
+    uint halfWidth = uint(graphics.width * PIXEL_SIZE * 0.5f);
+    uint halfHeight = uint(graphics.height * PIXEL_SIZE * 0.5f);
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
     // LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll
