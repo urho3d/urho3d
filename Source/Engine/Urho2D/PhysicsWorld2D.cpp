@@ -51,6 +51,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
     debugRenderer_(0),
+    physicsSteping_(false),
     applyingTransforms_(false)
 {
     // Set default debug draw flags
@@ -62,7 +63,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     world_->SetContactListener(this);
     // Set debug draw
     world_->SetDebugDraw(this);
-    
+
     world_->SetContinuousPhysics(true);
     world_->SetSubStepping(true);
 }
@@ -112,6 +113,10 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld2D::BeginContact(b2Contact* contact)
 {
+    // On receive begin contact when physics steping
+    if (!physicsSteping_)
+        return;
+
     b2Fixture* fixtureA = contact->GetFixtureA();
     b2Fixture* fixtureB = contact->GetFixtureB();
     if (!fixtureA || !fixtureB)
@@ -122,6 +127,10 @@ void PhysicsWorld2D::BeginContact(b2Contact* contact)
 
 void PhysicsWorld2D::EndContact(b2Contact* contact)
 {
+    // On receive begin contact when physics steping
+    if (!physicsSteping_)
+        return;
+
     b2Fixture* fixtureA = contact->GetFixtureA();
     b2Fixture* fixtureB = contact->GetFixtureB();
     if (!fixtureA || !fixtureB)
@@ -222,7 +231,9 @@ void PhysicsWorld2D::Update(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP2D, eventData);
 
+    physicsSteping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
+    physicsSteping_ = false;
 
     for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
         rigidBodies_[i]->ApplyWorldTransform();
@@ -352,18 +363,18 @@ public:
     // Construct.
     RayCastCallback(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, unsigned collisionMask) :
         results_(results),
-        startPoint_(startPoint), 
+        startPoint_(startPoint),
         collisionMask_(collisionMask)
     {
     }
-    
+
     // Called for each fixture found in the query.
     virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
     {
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -372,7 +383,7 @@ public:
         result.normal_ = ToVector2(normal);
         result.distance_ = (result.position_ - startPoint_).Length();
         result.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
-        
+
         results_.Push(result);
         return true;
     }
@@ -413,7 +424,7 @@ public:
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -468,7 +479,7 @@ public:
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -483,7 +494,7 @@ public:
 
     // Return rigid body.
     RigidBody2D* GetRigidBody() const { return rigidBody_; }
-    
+
 private:
     // Point.
     b2Vec2 point_;
@@ -526,7 +537,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned col
     Vector3 screenPoint((float)screenX / graphics->GetWidth(), (float)screenY / graphics->GetHeight(), 0.0f);
     Vector3 worldPoint = camera->ScreenToWorldPoint(screenPoint);
 
-    return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);    
+    return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);
 }
 
 // Aabb query callback class.
@@ -546,7 +557,7 @@ public:
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 

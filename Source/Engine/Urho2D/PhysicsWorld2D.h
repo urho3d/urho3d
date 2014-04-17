@@ -196,6 +196,8 @@ private:
     /// Debug draw depth test mode.
     bool debugDepthTest_;
 
+    /// Physics steping.
+    bool physicsSteping_;
     /// Applying transforms.
     bool applyingTransforms_;
     /// Rigid bodies.
