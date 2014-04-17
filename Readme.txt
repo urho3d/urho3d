@@ -44,6 +44,7 @@ Urho3D development, contributions and bugfixes by:
 - OvermindDL1
 - andmar1x
 - amadeus_osa
+- atship
 - mightyCelu
 - reattiva
 - skaiware

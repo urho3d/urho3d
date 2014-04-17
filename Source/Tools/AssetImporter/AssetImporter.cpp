@@ -115,7 +115,7 @@ bool emissiveAO_ = false;
 bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
-bool noExportTwice4IdenticalMeshes = true;
+bool checkUniqueModel_ = true;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
 
@@ -234,7 +234,7 @@ void Run(const Vector<String>& arguments)
             "-cm         Check and do not overwrite if material exists\n"
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
-            "-full       Export all meshes even if they are identical with each other (scene mode only)\n"
+            "-am         Export all meshes even if identical (scene mode only)\n"
         );
     }
     
@@ -361,8 +361,8 @@ void Run(const Vector<String>& arguments)
                 noOverwriteTexture_ = true;
             else if (argument == "ctn")
                 noOverwriteNewerTexture_ = true;
-            else if (argument == "full")
-                noExportTwice4IdenticalMeshes = false;
+            else if (argument == "am")
+                checkUniqueModel_ = false;
         }
     }
     
@@ -1189,16 +1189,18 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
         
         // Check if a model with identical mesh indices already exists. If yes, do not export twice
         bool unique = true;
-        if (noExportTwice4IdenticalMeshes)
-        for (unsigned i = 0; i < scene.models_.Size(); ++i)
+        if (checkUniqueModel_)
         {
-            if (scene.models_[i].meshIndices_ == model.meshIndices_)
+            for (unsigned i = 0; i < scene.models_.Size(); ++i)
             {
-                PrintLine("Added node " + FromAIString(node->mName));
-                scene.nodes_.Push(node);
-                scene.nodeModelIndices_.Push(i);
-                unique = false;
-                break;
+                if (scene.models_[i].meshIndices_ == model.meshIndices_)
+                {
+                    PrintLine("Added node " + FromAIString(node->mName));
+                    scene.nodes_.Push(node);
+                    scene.nodeModelIndices_.Push(i);
+                    unique = false;
+                    break;
+                }
             }
         }
         if (unique)
