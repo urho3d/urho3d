@@ -33,7 +33,8 @@ namespace Urho3D
 
 ConstraintMouse2D::ConstraintMouse2D(Context* context) :
     Constraint2D(context),
-    target_(Vector2::ZERO)
+    target_(Vector2::ZERO),
+    targetSetted_(false)
 {
 }
 
@@ -58,7 +59,7 @@ void ConstraintMouse2D::SetTarget(const Vector2& target)
         return;
 
     target_ = target;
-    if (joint_)
+    if (joint_ && targetSetted_)
     {
         b2MouseJoint* mouseJoint = (b2MouseJoint*)joint_;
         mouseJoint->SetTarget(ToB2Vec2(target_));
@@ -66,6 +67,8 @@ void ConstraintMouse2D::SetTarget(const Vector2& target)
         MarkNetworkUpdate();
         return;
     }
+
+    targetSetted_ = true;
 
     RecreateJoint();
     MarkNetworkUpdate();

@@ -66,6 +66,8 @@ private:
     b2MouseJointDef jointDef_; 
     /// Target.
     Vector2 target_;
+    /// Target setted.
+    bool targetSetted_;
 };
 
 }
