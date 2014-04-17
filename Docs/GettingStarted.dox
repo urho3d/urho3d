@@ -221,6 +221,7 @@ The engine can be configured using the following command line options.
 -b <length>  Sound buffer length in milliseconds
 -r <freq>    Sound mixing frequency in Hz
 -p <paths>   Resource path(s) to use, separated by semicolons
+-ap <paths>  Autoload resource path(s) to use, separated by semicolons
 -log <level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'
 -ds <file>   Dump used shader variations to a file for precaching
 -mq <level>  Material quality level, default 2 (high)
