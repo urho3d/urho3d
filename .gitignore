@@ -10,6 +10,7 @@ Bin/*
 Bin/*.app/
 Bin/*.app.dSYM/
 Bin/Data/LuaScripts/jit/
+Bin/Screenshots
 *-Bin/
 Lib/
 *-Lib/

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<element inherit="UI/ScreenJoystickSettings.xml">
+    <add sel="/element">
+        <attribute name="Position" value="0 18" />
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Octree</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button0']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="F4" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Debug</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button1']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="F3" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button2']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">HUD</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button2']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="F2" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button3']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Console</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button3']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="F1" />
+        </element>
+    </add>
+</element>

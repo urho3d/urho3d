@@ -47,9 +47,7 @@
 DEFINE_APPLICATION_MAIN(AngelScriptIntegration)
 
 AngelScriptIntegration::AngelScriptIntegration(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
     // Instantiate and register the AngelScript subsystem so that we can use the ScriptInstance component
     context_->RegisterSubsystem(new Script(context_));

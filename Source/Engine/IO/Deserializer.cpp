@@ -219,7 +219,7 @@ String Deserializer::ReadString()
 {
     String ret;
     
-    for (;;)
+    while (!IsEof())
     {
         char c = ReadByte();
         if (!c)

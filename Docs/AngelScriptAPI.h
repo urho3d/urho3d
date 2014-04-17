@@ -4264,7 +4264,7 @@ int width;
 class Input
 {
 // Methods:
-uint AddScreenJoystick(bool = false, XMLFile = null, XMLFile = null);
+uint AddScreenJoystick(XMLFile = null, XMLFile = null);
 void CloseJoystick(uint);
 bool DetectJoysticks();
 int GetKeyFromName(const String&) const;
@@ -4273,7 +4273,12 @@ String GetKeyName(int) const;
 int GetScancodeFromKey(int) const;
 int GetScancodeFromName(const String&) const;
 String GetScancodeName(int) const;
+uint LoadGestures(File);
 bool OpenJoystick(uint);
+bool RecordGesture();
+bool RemoveScreenJoystick(uint);
+bool SaveGesture(File, uint);
+bool SaveGestures(File);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
@@ -5876,6 +5881,7 @@ class PackageFile
 {
 // Methods:
 bool Exists(const String&) const;
+Array<String> GetEntryNames() const;
 bool Open(const String&, uint = 0) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool compressed() const;
@@ -9792,6 +9798,7 @@ IntVector2 lastPosition;
 IntVector2 position;
 float pressure;
 int touchID;
+WeakHandle touchedElement;
 };
 
 class UI

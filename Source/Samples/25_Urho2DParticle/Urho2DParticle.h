@@ -58,10 +58,6 @@ private:
     /// Handle mouse move event.
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Particle scene node.
     SharedPtr<Node> particleNode_;
 };

@@ -84,9 +84,7 @@ void Urho2DSprite::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth() * PIXEL_SIZE;
-    float height = (float)graphics->GetHeight() * PIXEL_SIZE;
-    camera->SetOrthoSize(Vector2(width, height));
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // Get sprite
@@ -94,8 +92,8 @@ void Urho2DSprite::CreateScene()
     if (!sprite)
         return;
 
-    float halfWidth = width * 0.5f;
-    float halfHeight = height * 0.5f;
+    float halfWidth = graphics->GetWidth() * 0.5f * PIXEL_SIZE;
+    float halfHeight = graphics->GetHeight() * 0.5f * PIXEL_SIZE;
 
     for (unsigned i = 0; i < NUM_SPRITES; ++i)
     {

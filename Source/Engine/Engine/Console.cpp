@@ -68,6 +68,7 @@ Console::Console(Context* context) :
     background_->SetEnabled(true);
     background_->SetVisible(false); // Hide by default
     background_->SetPriority(200); // Show on top of the debug HUD
+    background_->SetBringToBack(false);
     background_->SetLayout(LM_VERTICAL);
 
     rowContainer_ = background_->CreateChild<ListView>();
@@ -81,11 +82,17 @@ Console::Console(Context* context) :
     lineEdit_ = commandLine_->CreateChild<LineEdit>();
     lineEdit_->SetFocusMode(FM_FOCUSABLE);  // Do not allow defocus with ESC
 
+    closeButton_ = uiRoot->CreateChild<Button>();
+    closeButton_->SetVisible(false);
+    closeButton_->SetPriority(background_->GetPriority() + 1);  // Show on top of console's background
+    closeButton_->SetBringToBack(false);
+
     SetNumRows(DEFAULT_CONSOLE_ROWS);
 
     SubscribeToEvent(interpreters_, E_ITEMSELECTED, HANDLER(Console, HandleInterpreterSelected));
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
+    SubscribeToEvent(closeButton_, E_RELEASED, HANDLER(Console, HandleCloseButtonPressed));
     SubscribeToEvent(E_SCREENMODE, HANDLER(Console, HandleScreenMode));
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(Console, HandleLogMessage));
     SubscribeToEvent(E_POSTUPDATE, HANDLER(Console, HandlePostUpdate));
@@ -94,6 +101,7 @@ Console::Console(Context* context) :
 Console::~Console()
 {
     background_->Remove();
+    closeButton_->Remove();
 }
 
 void Console::SetDefaultStyle(XMLFile* style)
@@ -110,6 +118,7 @@ void Console::SetDefaultStyle(XMLFile* style)
     for (unsigned i = 0; i < interpreters_->GetNumItems(); ++i)
         interpreters_->GetItem(i)->SetStyle("ConsoleText");
     lineEdit_->SetStyle("ConsoleLineEdit");
+    closeButton_->SetStyle("CloseButton");
     
     UpdateElements();
 }
@@ -118,6 +127,7 @@ void Console::SetVisible(bool enable)
 {
     Input* input = GetSubsystem<Input>();
     background_->SetVisible(enable);
+    closeButton_->SetVisible(enable);
     if (enable)
     {
         // Check if we have receivers for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
@@ -356,6 +366,11 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         else
             lineEdit_->SetText(currentRow_);
     }
+}
+
+void Console::HandleCloseButtonPressed(StringHash eventType, VariantMap& eventData)
+{
+    SetVisible(false);
 }
 
 void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)

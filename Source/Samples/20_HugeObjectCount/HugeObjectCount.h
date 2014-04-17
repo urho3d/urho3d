@@ -66,16 +66,8 @@ private:
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Box scene nodes.
     Vector<SharedPtr<Node> > boxNodes_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
     /// Animation flag.
     bool animate_;
     /// Group optimization flag.

@@ -129,11 +129,6 @@ static void RegisterNode(asIScriptEngine* engine)
     RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
     engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Component, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(DebugRenderer, DrawDebugGeometry), asCALL_THISCALL);
-    
-    // Register Variant GetPtr() for Serializable, Node & Component. These are deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "Serializable@+ GetSerializable(const String&in binding = \"deprecated:GetSerializable\") const", asFUNCTION(GetVariantPtr<Serializable>), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "Node@+ GetNode(const String&in binding = \"deprecated:GetNode\") const", asFUNCTION(GetVariantPtr<Node>), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "Component@+ GetComponent(const String&in binding = \"deprecated:GetComponent\") const", asFUNCTION(GetVariantPtr<Component>), asCALL_CDECL_OBJLAST);
 }
 
 static bool SceneLoadXML(File* file, Scene* ptr)
@@ -293,9 +288,6 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ get_requiredPackageFiles() const", asFUNCTION(SceneGetRequiredPackageFiles), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Scene@+ get_scene() const", asMETHOD(Node, GetScene), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScriptContextScene), asCALL_CDECL);
-
-    // Register Variant GetPtr() for Scene. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "Scene@+ GetScene(const String&in binding = \"deprecated:GetScene\") const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
 
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);

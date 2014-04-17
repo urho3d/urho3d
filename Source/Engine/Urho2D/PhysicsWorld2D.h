@@ -129,8 +129,8 @@ public:
     void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid body at point.
     RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Return rigid body at mouse point, if camera is 0, it will use first camera in scene. when viewport size was not equal to window size it may have problem.
-    RigidBody2D* GetRigidBody(int mouseX, int mouseY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0);
+    /// Return rigid body at screen point, if camera is 0, it will use first camera in scene. when viewport size was not equal to window size it may have problem.
+    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 
@@ -175,6 +175,10 @@ protected:
 private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
+    /// Send begin contact events.
+    void SendBeginContactEvents();
+    /// Send end contact events.
+    void SendEndContactEvents();
 
     /// Box2D physics world.
     b2World* world_;
@@ -192,10 +196,36 @@ private:
     /// Debug draw depth test mode.
     bool debugDepthTest_;
 
+    /// Physics steping.
+    bool physicsSteping_;
     /// Applying transforms.
     bool applyingTransforms_;
     /// Rigid bodies.
     Vector<WeakPtr<RigidBody2D> > rigidBodies_;
+
+    /// Contact info.
+    struct ContactInfo
+    {
+        /// Construct.
+        ContactInfo();
+        /// Construct.
+        ContactInfo(b2Contact* contract);
+        /// Copy construct.
+        ContactInfo(const ContactInfo& other);
+
+        /// Rigid body A.
+        SharedPtr<RigidBody2D> bodyA_;
+        /// Rigid body B.
+        SharedPtr<RigidBody2D> bodyB_;
+        /// Node A.
+        SharedPtr<Node> nodeA_;
+        /// Node B.
+        SharedPtr<Node> nodeB_;
+    };
+    /// Begin contact infos.
+    Vector<ContactInfo> beginContactInfos_;
+    /// End contact infos.
+    Vector<ContactInfo> endContactInfos_;
 };
 
 }

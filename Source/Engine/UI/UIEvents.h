@@ -188,11 +188,11 @@ EVENT(E_MODALCHANGED, ModalChanged)
     PARAM(P_MODAL, Modal);                  // bool
 }
 
-/// Char entry into a LineEdit. The char can be modified in the event data.
-EVENT(E_CHARENTRY, CharEntry)
+/// Text entry into a LineEdit. The char can be modified in the event data.
+EVENT(E_TEXTENTRY, CharEntry)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_CHAR, Char);                    // int
+    PARAM(P_TEXT, Text);                    // String
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }

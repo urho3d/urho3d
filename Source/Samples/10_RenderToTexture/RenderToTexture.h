@@ -61,16 +61,8 @@ private:
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Scene in which the user moves.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Scene that is rendered to a texture.
     SharedPtr<Scene> rttScene_;
     /// Camera scene node in the render-to-texture scene.
     SharedPtr<Node> rttCameraNode_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
 };

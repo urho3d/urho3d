@@ -60,10 +60,6 @@ private:
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Sprite nodes.
     Vector<SharedPtr<Node> > spriteNodes_;
 };

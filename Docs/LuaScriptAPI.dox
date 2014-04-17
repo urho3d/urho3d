@@ -2044,8 +2044,16 @@ Methods:
 - bool OpenJoystick(unsigned index)
 - void CloseJoystick(unsigned index)
 - bool DetectJoysticks()
-- unsigned AddScreenJoystick(bool injectAsKeyEvents = false, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- bool RemoveScreenJoystick(unsigned index)
 - void SetScreenKeyboardVisible(bool enable)
+- bool RecordGesture()
+- bool SaveGestures(File* dest)
+- bool SaveGesture(File* dest, unsigned gestureID)
+- unsigned LoadGestures(File* source)
+- bool SaveGestures(const String fileName)
+- bool SaveGesture(const String fileName, unsigned gestureID)
+- unsigned LoadGestures(const String fileName)
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -3308,7 +3316,7 @@ Methods:
 - const PODVector<PhysicsRaycastResult2D>& Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
-- RigidBody2D* GetRigidBody(int mouseX, int mouseY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0)
+- RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
@@ -4974,6 +4982,7 @@ Properties:
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
+- WeakPtr<UIElement> touchedElement
 
 ### UI : Object
 
@@ -6316,8 +6325,15 @@ Properties:
 
 \section LuaScriptAPI_GlobalFunctions Global functions
 - float Abs(float value)
+- int Abs(int value)
+- float Acos(float x)
 - String AddTrailingSlash(const String pathName)
+- float Asin(float x)
+- float Atan(float x)
+- float Atan2(float y, float x)
 - float Clamp(float value, float min, float max)
+- int ClampInt(int value, int min, int max)
+- float Cos(float angle)
 - bool Equals(float lhs, float rhs)
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
@@ -6357,16 +6373,18 @@ Properties:
 - bool IsNaN(float value)
 - bool IsPowerOfTwo(unsigned value)
 - float Lerp(float lhs, float rhs, float t)
+- int Max(int lhs, int rhs)
 - float Max(float lhs, float rhs)
 - float Min(float lhs, float rhs)
+- int Min(int lhs, int rhs)
 - unsigned NextPowerOfTwo(unsigned value)
 - void OpenConsoleWindow()
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float range)
 - float Random()
 - float Random(float min, float max)
+- float Random(float range)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
@@ -6377,9 +6395,11 @@ Properties:
 - void SetExecuteConsoleCommands(bool enable)
 - void SetRandomSeed(unsigned seed)
 - float Sign(float value)
+- float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)
@@ -6598,6 +6618,7 @@ Properties:
 - float M_DEGTORAD
 - float M_DEGTORAD_2
 - float M_EPSILON
+- float M_HALF_PI
 - float M_INFINITY
 - float M_LARGE_EPSILON
 - float M_LARGE_VALUE

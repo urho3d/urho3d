@@ -21,22 +21,35 @@
 //
 
 #include "Application.h"
+#include "Camera.h"
 #include "Console.h"
+#include "CoreEvents.h"
 #include "DebugHud.h"
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Graphics.h"
+#include "Input.h"
 #include "InputEvents.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
+#include "Scene.h"
+#include "SceneEvents.h"
 #include "Sprite.h"
 #include "Texture2D.h"
 #include "Timer.h"
 #include "UI.h"
 #include "XMLFile.h"
 
+static const float TOUCH_SENSITIVITY = 2.0f;
+
 Sample::Sample(Context* context) :
-    Application(context)
+    Application(context),
+    yaw_(0.0f),
+    pitch_(0.0f),
+    touchEnabled_(false),
+    screenJoystickIndex_(M_MAX_UNSIGNED),
+    screenJoystickSettingsIndex_(M_MAX_UNSIGNED),
+    paused_(false)
 {
 }
 
@@ -51,6 +64,9 @@ void Sample::Setup()
 
 void Sample::Start()
 {
+    // Initialize touch input on mobile platforms
+    InitTouchInput();
+
     // Create logo
     CreateLogo();
 
@@ -62,6 +78,21 @@ void Sample::Start()
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
+    // Subscribe logic update event
+    SubscribeToEvent(E_SCENEUPDATE, HANDLER(Sample, HandleSceneUpdate));
+}
+
+void Sample::InitTouchInput()
+{
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+    {
+        touchEnabled_ = true;
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        Input* input = GetSubsystem<Input>();
+        screenJoystickIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystick_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+        input->OpenJoystick(screenJoystickIndex_);
+    }
 }
 
 void Sample::SetLogoVisible(bool enable)
@@ -125,6 +156,7 @@ void Sample::CreateConsoleAndDebugHud()
     // Create console
     Console* console = engine_->CreateConsole();
     console->SetDefaultStyle(xmlFile);
+    console->GetBackground()->SetOpacity(0.8f);
 
     // Create debug HUD.
     DebugHud* debugHud = engine_->CreateDebugHud();
@@ -160,8 +192,29 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         Renderer* renderer = GetSubsystem<Renderer>();
         
+        // Preferences / Pause
+        if (key == KEY_SELECT && touchEnabled_)
+        {
+            Input* input = GetSubsystem<Input>();
+            if (screenJoystickSettingsIndex_ == M_MAX_UNSIGNED)
+            {
+                ResourceCache* cache = GetSubsystem<ResourceCache>();
+                screenJoystickSettingsIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+                input->OpenJoystick(screenJoystickSettingsIndex_);
+                paused_ = true;
+            }
+            else
+            {
+                paused_ = !paused_;
+                if (paused_)
+                    input->OpenJoystick(screenJoystickSettingsIndex_);
+                else
+                    input->CloseJoystick(screenJoystickSettingsIndex_);
+            }
+        }
+
         // Texture quality
-        if (key == '1')
+        else if (key == '1')
         {
             int quality = renderer->GetTextureQuality();
             ++quality;
@@ -229,6 +282,32 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             // Here we save in the Data folder with date and time appended
             screenshot.SavePNG(GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Screenshot_" +
                 Time::GetTimeStamp().Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+        }
+    }
+}
+
+void Sample::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // Move the camera by touch, if the camera node is initialized by descendant sample class
+    if (touchEnabled_ && cameraNode_)
+    {
+        Input* input = GetSubsystem<Input>();
+        for (unsigned i = 0; i < input->GetNumTouches(); ++i)
+        {
+            TouchState* state = input->GetTouch(i);
+            if (!state->touchedElement_)    // Touch on empty space
+            {
+                Camera* camera = cameraNode_->GetComponent<Camera>();
+                if (!camera)
+                    return;
+
+                Graphics* graphics = GetSubsystem<Graphics>();
+                yaw_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.x_;
+                pitch_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.y_;
+
+                // Construct new orientation for the camera scene node from yaw and pitch; roll is fixed to zero
+                cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+            }
         }
     }
 }

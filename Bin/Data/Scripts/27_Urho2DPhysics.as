@@ -45,10 +45,7 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-
-    uint width = graphics.width * PIXEL_SIZE;
-    uint height = graphics.height * PIXEL_SIZE;
-    camera.SetOrthoSize(Vector2(width, height));
+    camera.orthoSize = graphics.height * PIXEL_SIZE;
 
     // Create 2D physics world component
     scene_.CreateComponent("PhysicsWorld2D");

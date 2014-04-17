@@ -49,7 +49,7 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera.orthoSize = graphics.height * PIXEL_SIZE;
 
     ParticleEffect2D@ particleEffect = cache.GetResource("ParticleEffect2D", "Urho2D/sun.pex");
     if (particleEffect is null)

@@ -33,10 +33,10 @@
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "RWOpsWrapper.h"
 #include "StringUtils.h"
 #include "Text.h"
 #include "UI.h"
-#include "UIEvents.h"
 
 #include <cstring>
 
@@ -54,8 +54,8 @@ namespace Urho3D
 {
 
 const int SCREEN_JOYSTICK_START_INDEX = 1000;
-const ShortStringHash VAR_INJECT_AS_KEY_EVENTS("VAR_INJECT_AS_KEY_EVENTS");
 const ShortStringHash VAR_BUTTON_KEY_BINDING("VAR_BUTTON_KEY_BINDING");
+const ShortStringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const ShortStringHash VAR_SCREEN_JOYSTICK_INDEX("VAR_SCREEN_JOYSTICK_INDEX");
 
 /// Convert SDL keycode if necessary.
@@ -65,12 +65,6 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return KEY_ESC;
     else
         return SDL_toupper(keySym);
-}
-
-JoystickState::~JoystickState()
-{
-    if (screenJoystick_)
-        screenJoystick_->Remove();
 }
 
 Input::Input(Context* context) :
@@ -162,7 +156,7 @@ void Input::Update()
             lastMousePosition_ = mousePosition;
         else
         {
-            // Recenter the mouse cursor manually
+            // Recenter the mouse cursor manually after move
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             if (mousePosition != center)
             {
@@ -217,7 +211,13 @@ void Input::SetMouseVisible(bool enable)
             }
 
             if (!mouseVisible_ && inputFocus_)
+            {
                 SDL_ShowCursor(SDL_FALSE);
+                // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+                SetMousePosition(center);
+                lastMousePosition_ = center;
+            }
             else
                 SDL_ShowCursor(SDL_TRUE);
         }
@@ -244,8 +244,47 @@ bool Input::DetectJoysticks()
     return true;
 }
 
-unsigned Input::AddScreenJoystick(bool injectAsKeyEvents, XMLFile* layoutFile, XMLFile* styleFile)
+static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
 {
+    if (keyBindingMap.Empty())
+    {
+        keyBindingMap.Insert(MakePair<String, int>("SPACE", KEY_SPACE));
+        keyBindingMap.Insert(MakePair<String, int>("LCTRL", KEY_LCTRL));
+        keyBindingMap.Insert(MakePair<String, int>("RCTRL", KEY_RCTRL));
+        keyBindingMap.Insert(MakePair<String, int>("LSHIFT", KEY_LSHIFT));
+        keyBindingMap.Insert(MakePair<String, int>("RSHIFT", KEY_RSHIFT));
+        keyBindingMap.Insert(MakePair<String, int>("LALT", KEY_LALT));
+        keyBindingMap.Insert(MakePair<String, int>("RALT", KEY_RALT));
+        keyBindingMap.Insert(MakePair<String, int>("LGUI", KEY_LGUI));
+        keyBindingMap.Insert(MakePair<String, int>("RGUI", KEY_RGUI));
+        keyBindingMap.Insert(MakePair<String, int>("TAB", KEY_TAB));
+        keyBindingMap.Insert(MakePair<String, int>("RETURN", KEY_RETURN));
+        keyBindingMap.Insert(MakePair<String, int>("RETURN2", KEY_RETURN2));
+        keyBindingMap.Insert(MakePair<String, int>("ENTER", KEY_KP_ENTER));
+        keyBindingMap.Insert(MakePair<String, int>("SELECT", KEY_SELECT));
+        keyBindingMap.Insert(MakePair<String, int>("LEFT", KEY_LEFT));
+        keyBindingMap.Insert(MakePair<String, int>("RIGHT", KEY_RIGHT));
+        keyBindingMap.Insert(MakePair<String, int>("UP", KEY_UP));
+        keyBindingMap.Insert(MakePair<String, int>("DOWN", KEY_DOWN));
+        keyBindingMap.Insert(MakePair<String, int>("F1", KEY_F1));
+        keyBindingMap.Insert(MakePair<String, int>("F2", KEY_F2));
+        keyBindingMap.Insert(MakePair<String, int>("F3", KEY_F3));
+        keyBindingMap.Insert(MakePair<String, int>("F4", KEY_F4));
+        keyBindingMap.Insert(MakePair<String, int>("F5", KEY_F5));
+        keyBindingMap.Insert(MakePair<String, int>("F6", KEY_F6));
+        keyBindingMap.Insert(MakePair<String, int>("F7", KEY_F7));
+        keyBindingMap.Insert(MakePair<String, int>("F8", KEY_F8));
+        keyBindingMap.Insert(MakePair<String, int>("F9", KEY_F9));
+        keyBindingMap.Insert(MakePair<String, int>("F10", KEY_F10));
+        keyBindingMap.Insert(MakePair<String, int>("F11", KEY_F11));
+        keyBindingMap.Insert(MakePair<String, int>("F12", KEY_F12));
+    }
+}
+
+unsigned Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
+{
+    static HashMap<String, int> keyBindingMap;
+
     if (!graphics_)
     {
         LOGWARNING("Cannot add screen joystick in headless mode");
@@ -267,9 +306,9 @@ unsigned Input::AddScreenJoystick(bool injectAsKeyEvents, XMLFile* layoutFile, X
         return M_MAX_UNSIGNED;
 
     screenJoystick->SetSize(ui->GetRoot()->GetSize());
-    screenJoystick->SetVisible(false);      // Set to visible when it is "open" later
-    screenJoystick->SetVar(VAR_INJECT_AS_KEY_EVENTS, injectAsKeyEvents);
+    screenJoystick->SetVisible(false);      // Set to visible when it is opened later
     ui->GetRoot()->AddChild(screenJoystick);
+
     unsigned index = joysticks_.Size();
     joysticks_.Resize(index + 1);
     JoystickState& state = joysticks_[index];
@@ -290,62 +329,131 @@ unsigned Input::AddScreenJoystick(bool injectAsKeyEvents, XMLFile* layoutFile, X
             ++numButtons;
 
             // Check whether the button has key binding
-            if (injectAsKeyEvents)
+            Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+            if (text)
             {
-                Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
-                if (text)
+                text->SetVisible(false);
+                const String& key = text->GetText();
+                int keyBinding;
+                if (key.Length() == 1)
+                    keyBinding = key[0];
+                else
                 {
-                    text->SetVisible(false);
-                    const String& key = text->GetText();
-                    if (key.Length() == 1)
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, key);
-                    else if (key == "SPACE")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_SPACE);
-                    else if (key == "LCTRL")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LCTRL);
-                    else if (key == "RCTRL")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RCTRL);
-                    else if (key == "LSHIFT")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LSHIFT);
-                    else if (key == "RSHIFT")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RSHIFT);
-                    else if (key == "LALT")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LALT);
-                    else if (key == "RALT")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RALT);
-                    else if (key == "TAB")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_TAB);
-                    else if (key == "RETURN")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RETURN);
-                    else if (key == "LEFT")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_LEFT);
-                    else if (key == "RIGHT")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_RIGHT);
-                    else if (key == "UP")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_UP);
-                    else if (key == "DOWN")
-                        element->SetVar(VAR_BUTTON_KEY_BINDING, KEY_DOWN);
+                    PopulateKeyBindingMap(keyBindingMap);
+
+                    HashMap<String, int>::Iterator i = keyBindingMap.Find(key);
+                    if (i != keyBindingMap.End())
+                        keyBinding = i->second_;
+                    else
+                    {
+                        LOGERRORF("Unsupported key binding: %s", key.CString());
+                        keyBinding = M_MAX_INT;
+                    }
                 }
+
+                if (keyBinding != M_MAX_INT)
+                    element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
             }
         }
         else if (name.StartsWith("Axis"))
+        {
             ++numAxes;
+
+            ///\todo Axis emulation for screen joystick is not fully supported yet.
+            LOGWARNING("Axis emulation for screen joystick is not fully supported yet");
+        }
         else if (name.StartsWith("Hat"))
+        {
             ++numHats;
+
+            Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+            if (text)
+            {
+                text->SetVisible(false);
+                String keyBinding = text->GetText();
+                if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
+                {
+                    // Attempt to split the text using ' ' as separator
+                    Vector<String>keyBindings(keyBinding.Split(' '));
+                    String mappedKeyBinding;
+                    if (keyBindings.Size() == 4)
+                    {
+                        PopulateKeyBindingMap(keyBindingMap);
+
+                        for (unsigned j = 0; j < 4; ++j)
+                        {
+                            if (keyBindings[j].Length() == 1)
+                                mappedKeyBinding.Append(keyBindings[j][0]);
+                            else
+                            {
+                                HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
+                                if (i != keyBindingMap.End())
+                                    mappedKeyBinding.Append(i->second_);
+                                else
+                                    break;
+                            }
+                        }
+                    }
+                    if (mappedKeyBinding.Length() != 4)
+                    {
+                        LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                        keyBinding = "WSAD";
+                    }
+                    else
+                        keyBinding = mappedKeyBinding;
+                }
+                else if (keyBinding.Length() != 4)
+                {
+                    LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                    keyBinding = "WSAD";
+                }
+
+                element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
+            }
+        }
+
         element->SetVar(VAR_SCREEN_JOYSTICK_INDEX, index);
     }
+
+    // Make sure all the children are non-focusable so they do not mistakenly to be considered as active UI input controls by application
+    PODVector<UIElement*> allChildren;
+    state.screenJoystick_->GetChildren(allChildren, true);
+    for (PODVector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
+        (*iter)->SetFocusMode(FM_NOTFOCUSABLE);
 
     state.buttons_.Resize(numButtons);
     state.buttonPress_.Resize(numButtons);
     state.axes_.Resize(numAxes);
     state.hats_.Resize(numHats);
 
-    // There could be potentially more than one screen joystick, however they all will be handled by a same handler
+    // There could be potentially more than one screen joystick, however they all will be handled by a same handler method
     // So there is no harm to replace the old handler with the new handler in each call to SubscribeToEvent()
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(Input, HandleMouseClick));
-    SubscribeToEvent(E_UIMOUSECLICKEND, HANDLER(Input, HandleMouseClick));
+    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Input, HandleScreenJoystickTouch));
+    SubscribeToEvent(E_TOUCHMOVE, HANDLER(Input, HandleScreenJoystickTouch));
+    SubscribeToEvent(E_TOUCHEND, HANDLER(Input, HandleScreenJoystickTouch));
 
     return index;
+}
+
+bool Input::RemoveScreenJoystick(unsigned index)
+{
+    if (index >= joysticks_.Size())
+    {
+        LOGERRORF("Joystick index #%d is out of bounds", index);
+        return false;
+    }
+
+    JoystickState& state = joysticks_[index];
+    if (!state.screenJoystick_)
+    {
+        LOGERRORF("Failed to remove joystick at index #%d which is not a screen joystick", index);
+        return false;
+    }
+
+    state.screenJoystick_->Remove();
+    joysticks_.Erase(index);
+
+    return true;
 }
 
 void Input::SetScreenKeyboardVisible(bool enable)
@@ -362,11 +470,48 @@ void Input::SetScreenKeyboardVisible(bool enable)
     }
 }
 
+bool Input::RecordGesture()
+{
+    // If have no touch devices, fail
+    if (!SDL_GetNumTouchDevices())
+    {
+        LOGERROR("Can not record gesture: no touch devices");
+        return false;
+    }
+
+    return SDL_RecordGesture(-1);
+}
+
+bool Input::SaveGestures(Serializer& dest)
+{
+    RWOpsWrapper<Serializer> wrapper(dest);
+    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps());
+}
+
+bool Input::SaveGesture(Serializer& dest, unsigned gestureID)
+{
+    RWOpsWrapper<Serializer> wrapper(dest);
+    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps());
+}
+
+unsigned Input::LoadGestures(Deserializer& source)
+{
+    // If have no touch devices, fail
+    if (!SDL_GetNumTouchDevices())
+    {
+        LOGERROR("Can not load gestures: no touch devices");
+        return 0;
+    }
+
+    RWOpsWrapper<Deserializer> wrapper(source);
+    return SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
+}
+
 bool Input::OpenJoystick(unsigned index)
 {
     if (index >= joysticks_.Size())
     {
-        LOGERRORF("Joystick index #%d is out of bound.", index);
+        LOGERRORF("Joystick index #%d is out of bounds", index);
         return false;
     }
 
@@ -464,12 +609,12 @@ String Input::GetScancodeName(int scancode) const
 
 bool Input::GetKeyDown(int key) const
 {
-    return keyDown_.Contains(key);
+    return keyDown_.Contains(SDL_toupper(key));
 }
 
 bool Input::GetKeyPress(int key) const
 {
-    return keyPress_.Contains(key);
+    return keyPress_.Contains(SDL_toupper(key));
 }
 
 bool Input::GetScancodeDown(int scancode) const
@@ -846,14 +991,14 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned unicode = textInput_.AtUTF8(0);
             if (unicode)
             {
-                using namespace Char;
+                using namespace TextInput;
 
-                VariantMap keyEventData;
+                VariantMap textInputEventData;
 
-                keyEventData[P_CHAR] = unicode;
-                keyEventData[P_BUTTONS] = mouseButtonDown_;
-                keyEventData[P_QUALIFIERS] = GetQualifiers();
-                SendEvent(E_CHAR, keyEventData);
+                textInputEventData[P_TEXT] = textInput_;
+                textInputEventData[P_BUTTONS] = mouseButtonDown_;
+                textInputEventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_TEXTINPUT, textInputEventData);
             }
         }
         break;
@@ -928,9 +1073,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_TOUCHID] = touchID;
             eventData[P_X] = state.position_.x_;
             eventData[P_Y] = state.position_.y_;
+            SendEvent(E_TOUCHEND, eventData);
 
             touches_.Erase(touchID);
-            SendEvent(E_TOUCHEND, eventData);
         }
         break;
 
@@ -955,6 +1100,44 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_DY] = (int)(evt.tfinger.dy * graphics_->GetHeight());
             eventData[P_PRESSURE] = state.pressure_;
             SendEvent(E_TOUCHMOVE, eventData);
+        }
+        break;
+
+    case SDL_DOLLARRECORD:
+        {
+            using namespace GestureRecorded;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_GESTUREID] = (int)evt.dgesture.gestureId;
+            SendEvent(E_GESTURERECORDED, eventData);
+        }
+        break;
+
+    case SDL_DOLLARGESTURE:
+        {
+            using namespace GestureInput;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_GESTUREID] = (int)evt.dgesture.gestureId;
+            eventData[P_CENTERX] = (int)(evt.dgesture.x * graphics_->GetWidth());
+            eventData[P_CENTERY] = (int)(evt.dgesture.y * graphics_->GetHeight());
+            eventData[P_NUMFINGERS] = (int)evt.dgesture.numFingers;
+            eventData[P_ERROR] = evt.dgesture.error;
+            SendEvent(E_GESTUREINPUT, eventData);
+        }
+        break;
+
+    case SDL_MULTIGESTURE:
+        {
+            using namespace MultiGesture;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_CENTERX] = (int)(evt.mgesture.x * graphics_->GetWidth());
+            eventData[P_CENTERY] = (int)(evt.mgesture.y * graphics_->GetHeight());
+            eventData[P_NUMFINGERS] = (int)evt.mgesture.numFingers;
+            eventData[P_DTHETA] = M_RADTODEG * evt.mgesture.dTheta;
+            eventData[P_DDIST] = evt.mgesture.dDist;
+            SendEvent(E_MULTIGESTURE, eventData);
         }
         break;
 
@@ -1176,12 +1359,14 @@ void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     Update();
 }
 
-void Input::HandleMouseClick(StringHash eventType, VariantMap& eventData)
+void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventData)
 {
-    using namespace UIMouseClickEnd;
+    using namespace TouchBegin;
 
     // Only interested in events from screen joystick(s)
-    UIElement* element = static_cast<UIElement*>(eventData[eventType == E_UIMOUSECLICK ? P_ELEMENT : P_BEGINELEMENT].GetPtr());
+    TouchState& state = touches_[eventData[P_TOUCHID].GetInt()];
+    IntVector2 position(state.position_.x_, state.position_.y_);
+    UIElement* element = eventType == E_TOUCHBEGIN ? GetSubsystem<UI>()->GetElementAt(position) : state.touchedElement_;
     if (!element)
         return;
     Variant variant = element->GetVar(VAR_SCREEN_JOYSTICK_INDEX);
@@ -1189,8 +1374,10 @@ void Input::HandleMouseClick(StringHash eventType, VariantMap& eventData)
         return;
     unsigned index = variant.GetUInt();
 
-    int x = eventData[P_X].GetInt();
-    int y = eventData[P_Y].GetInt();
+    if (eventType == E_TOUCHEND)
+        state.touchedElement_.Reset();
+    else
+        state.touchedElement_ = element;
 
     // Prepare a fake SDL event
     SDL_Event evt;
@@ -1198,60 +1385,36 @@ void Input::HandleMouseClick(StringHash eventType, VariantMap& eventData)
     const String& name = element->GetName();
     if (name.StartsWith("Button"))
     {
-        // Determine whether to inject a joystick event or keyboard event
-        if (joysticks_[index].screenJoystick_->GetVar(VAR_INJECT_AS_KEY_EVENTS).GetBool())
-        {
-            Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
-            if (variant.IsEmpty())
-                return;
+        if (eventType == E_TOUCHMOVE)
+            return;
 
-            evt.type = eventType == E_UIMOUSECLICK ? SDL_KEYDOWN : SDL_KEYUP;
-            evt.key.keysym.sym = variant.GetInt();
-            evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+        // Determine whether to inject a joystick event or keyboard event
+        Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        if (variant.IsEmpty())
+        {
+            evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
+            evt.jbutton.which = SCREEN_JOYSTICK_START_INDEX + index;
+            evt.jbutton.button = ToUInt(name.Substring(6));
         }
         else
         {
-            evt.type = eventType == E_UIMOUSECLICK ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
-            evt.jbutton.which = SCREEN_JOYSTICK_START_INDEX + index;
-            evt.jbutton.button = ToUInt(name.Substring(6));
+            evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
+            evt.key.keysym.sym = variant.GetInt();
+            evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
         }
     }
     else if (name.StartsWith("Hat"))
     {
-        if (joysticks_[index].screenJoystick_->GetVar(VAR_INJECT_AS_KEY_EVENTS).GetBool())
-        {
-            evt.type = eventType == E_UIMOUSECLICK ? SDL_KEYDOWN : SDL_KEYUP;
-            IntVector2 relPosition = IntVector2(x, y) - element->GetScreenPosition() - element->GetSize() / 2;
-            if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-            {
-                evt.key.keysym.sym = SDLK_w;
-                evt.key.keysym.scancode = SDL_SCANCODE_W;
-            }
-            else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-            {
-                evt.key.keysym.sym = SDLK_s;
-                evt.key.keysym.scancode = SDL_SCANCODE_S;
-            }
-            else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-            {
-                evt.key.keysym.sym = SDLK_a;
-                evt.key.keysym.scancode = SDL_SCANCODE_A;
-            }
-            else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-            {
-                evt.key.keysym.sym = SDLK_d;
-                evt.key.keysym.scancode = SDL_SCANCODE_D;
-            }
-        }
-        else
+        Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        if (variant.IsEmpty())
         {
             evt.type = SDL_JOYHATMOTION;
             evt.jaxis.which = SCREEN_JOYSTICK_START_INDEX + index;
             evt.jhat.hat = ToUInt(name.Substring(3));
             evt.jhat.value = HAT_CENTER;
-            if (eventType == E_UIMOUSECLICK)
+            if (eventType != E_TOUCHEND)
             {
-                IntVector2 relPosition = IntVector2(x, y) - element->GetScreenPosition() - element->GetSize() / 2;
+                IntVector2 relPosition = position - element->GetScreenPosition() - element->GetSize() / 2;
                 if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
                     evt.jhat.value |= HAT_UP;
                 if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
@@ -1260,6 +1423,55 @@ void Input::HandleMouseClick(StringHash eventType, VariantMap& eventData)
                     evt.jhat.value |= HAT_LEFT;
                 if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
                     evt.jhat.value |= HAT_RIGHT;
+            }
+        }
+        else
+        {
+            // Hat is binded by 4 keys, like 'WASD'
+            String keyBinding = variant.GetString();
+
+            if (eventType == E_TOUCHEND)
+            {
+                evt.type = SDL_KEYUP;
+                evt.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetInt();
+                if (!evt.key.keysym.sym)
+                    return;
+
+                element->SetVar(VAR_LAST_KEYSYM, 0);
+            }
+            else
+            {
+                evt.type = SDL_KEYDOWN;
+                IntVector2 relPosition = position - element->GetScreenPosition() - element->GetSize() / 2;
+                if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
+                    evt.key.keysym.sym = keyBinding[0];
+                else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
+                    evt.key.keysym.sym = keyBinding[1];
+                else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+                    evt.key.keysym.sym = keyBinding[2];
+                else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
+                    evt.key.keysym.sym = keyBinding[3];
+                else
+                    return;
+
+                if (eventType == E_TOUCHMOVE && evt.key.keysym.sym != element->GetVar(VAR_LAST_KEYSYM).GetInt())
+                {
+                    // Dragging past the directional boundary will cause an additional key up event for previous key symbol
+                    SDL_Event evt;
+                    evt.type = SDL_KEYUP;
+                    evt.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetInt();
+                    if (evt.key.keysym.sym)
+                    {
+                        evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+                        HandleSDLEvent(&evt);
+                    }
+
+                    element->SetVar(VAR_LAST_KEYSYM, 0);
+                }
+
+                evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+
+                element->SetVar(VAR_LAST_KEYSYM, evt.key.keysym.sym);
             }
         }
     }

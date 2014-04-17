@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Serializer.h"
@@ -76,7 +77,13 @@ bool SpriteSheet2D::Load(Deserializer& source)
     if (rootElem.GetName() == "spritesheet")
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        texture_ = cache->GetResource<Texture2D>(rootElem.GetAttribute("texture"));
+        String textureFileName = rootElem.GetAttribute("texture");
+        texture_ = cache->GetResource<Texture2D>(textureFileName);
+
+        // If texture not found, try get texture in current directory
+        if (!texture_)
+            texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
+
         if (!texture_)
         {
             LOGERROR("Cound not load texture");
@@ -88,7 +95,7 @@ bool SpriteSheet2D::Load(Deserializer& source)
         {
             String name = spriteElem.GetAttribute("name");
             IntRect rectangle = spriteElem.GetIntRect("rectangle");
-            
+
             Vector2 hotSpot(0.5f, 0.5f);
             if (spriteElem.HasAttribute("hotspot"))
                 hotSpot = spriteElem.GetVector2("hotspot");
@@ -101,8 +108,14 @@ bool SpriteSheet2D::Load(Deserializer& source)
     // Sparrow Starling texture atlas
     else if (rootElem.GetName() == "TextureAtlas")
     {    
+        String textureFileName = rootElem.GetAttribute("imagePath");
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        texture_ = cache->GetResource<Texture2D>(rootElem.GetAttribute("imagePath"));
+        texture_ = cache->GetResource<Texture2D>(textureFileName);
+
+        // If texture not found, try get texture in current directory
+        if (!texture_)
+            texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
+
         if (!texture_)
         {
             LOGERROR("Cound not load texture");
@@ -149,7 +162,7 @@ bool SpriteSheet2D::Save(Serializer& dest) const
 {
     if (!texture_)
         return false;
-    
+
     SharedPtr<XMLFile> xmlFile(new XMLFile(context_));    
     XMLElement rootElem = xmlFile->CreateRoot("spritesheet");
     rootElem.SetAttribute("texture", texture_->GetName());

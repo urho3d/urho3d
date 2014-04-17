@@ -221,6 +221,7 @@ The engine can be configured using the following command line options.
 -b <length>  Sound buffer length in milliseconds
 -r <freq>    Sound mixing frequency in Hz
 -p <paths>   Resource path(s) to use, separated by semicolons
+-ap <paths>  Autoload resource path(s) to use, separated by semicolons
 -log <level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'
 -ds <file>   Dump used shader variations to a file for precaching
 -mq <level>  Material quality level, default 2 (high)
@@ -530,6 +531,7 @@ Hint: to get some content to look at, run the Physics sample application (Bin/Da
 Left mouse      - Select nodes or drag the node transform gizmo. Hold Shift to
                   select components instead. Hold Ctrl to multiselect.
 Right mouse     - Hold down and move mouse to rotate camera
+Middle mouse    - Hold down orbits the camera around selected objects
 
 WSAD or arrows  - Move
 Shift+WSAD      - Move faster
@@ -574,6 +576,7 @@ F1              - Toggle console
 F2              - Toggle rendering debug geometry
 F3              - Toggle physics debug geometry
 F4              - Toggle octree debug geometry
+F11             - Captures a screenshot
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.

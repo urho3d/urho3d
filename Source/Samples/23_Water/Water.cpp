@@ -51,9 +51,7 @@
 DEFINE_APPLICATION_MAIN(Water)
 
 Water::Water(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
 }
 

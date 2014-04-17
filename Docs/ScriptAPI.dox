@@ -143,29 +143,10 @@ namespace Urho3D
 - %Buttons : int
 - %Qualifiers : int
 
-### Char
-- %Char : int
+### TextInput
+- %Text : String
 - %Buttons : int
 - %Qualifiers : int
-
-### TouchBegin
-- %TouchID : int
-- %X : int
-- %Y : int
-- %Pressure : float
-
-### TouchEnd
-- %TouchID : int
-- %X : int
-- %Y : int
-
-### TouchMove
-- %TouchID : int
-- %X : int
-- %Y : int
-- %DX : int
-- %DY : int
-- %Pressure : float
 
 ### JoystickButtonDown
 - %Joystick : int
@@ -197,6 +178,42 @@ namespace Urho3D
 - %Joystick : int
 - %Button : int
 - %Position : float
+
+### TouchBegin
+- %TouchID : int
+- %X : int
+- %Y : int
+- %Pressure : float
+
+### TouchEnd
+- %TouchID : int
+- %X : int
+- %Y : int
+
+### TouchMove
+- %TouchID : int
+- %X : int
+- %Y : int
+- %DX : int
+- %DY : int
+- %Pressure : float
+
+### GestureRecorded
+- %GestureID : unsigned
+
+### GestureInput
+- %GestureID : unsigned
+- %CenterX : int
+- %CenterY : int
+- %NumFingers : int
+- %Error : float
+
+### MultiGesture
+- %CenterX : int
+- %CenterY : int
+- %NumFingers : int
+- %DTheta : float (degrees)
+- %DDist : float
 
 ### DropFile
 - %FileName : String
@@ -496,7 +513,7 @@ namespace Urho3D
 
 ### CharEntry
 - %Element : UIElement pointer
-- %Char : int
+- %Text : String
 - %Buttons : int
 - %Qualifiers : int
 
@@ -5542,7 +5559,7 @@ Properties:
 
 Methods:
 
-- uint AddScreenJoystick(bool = false, XMLFile@ = null, XMLFile@ = null)
+- uint AddScreenJoystick(XMLFile@ = null, XMLFile@ = null)
 - void CloseJoystick(uint)
 - bool DetectJoysticks()
 - int GetKeyFromName(const String&) const
@@ -5551,7 +5568,12 @@ Methods:
 - int GetScancodeFromKey(int) const
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
+- uint LoadGestures(File@)
 - bool OpenJoystick(uint)
+- bool RecordGesture()
+- bool RemoveScreenJoystick(uint)
+- bool SaveGesture(File@, uint)
+- bool SaveGestures(File@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -6896,6 +6918,7 @@ Properties:
 Methods:
 
 - bool Exists(const String&) const
+- String[]@ GetEntryNames() const
 - bool Open(const String&, uint = 0) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool compressed() const
@@ -10202,6 +10225,7 @@ Properties:
 - IntVector2 position
 - float pressure
 - int touchID
+- WeakHandle touchedElement
 
 
 ### UI

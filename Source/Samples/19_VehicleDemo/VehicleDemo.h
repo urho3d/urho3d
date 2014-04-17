@@ -64,10 +64,6 @@ private:
     /// Handle application post-update. Update camera position after vehicle has moved.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// The controllable vehicle component.
     WeakPtr<Vehicle> vehicle_;
 };

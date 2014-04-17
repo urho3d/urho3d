@@ -44,6 +44,7 @@ String uiImportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
 String uiParticlePath = fileSystem.programDir + "Data/Particles";
 Array<String> uiRecentScenes;
+String screenshotDir = fileSystem.programDir + "Screenshots";
 
 bool uiFaded = false;
 float uiMinOpacity = 0.3;
@@ -1141,7 +1142,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
-
+    else if (key == KEY_F11)
+    {
+        Image@ screenshot = Image();
+        graphics.TakeScreenShot(screenshot);
+        if (!fileSystem.DirExists(screenshotDir))
+            fileSystem.CreateDir(screenshotDir);
+        screenshot.SavePNG(screenshotDir + "/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+    }   
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
         Vector3 pos = cameraNode.position;

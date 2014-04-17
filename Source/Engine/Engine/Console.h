@@ -27,6 +27,7 @@
 namespace Urho3D
 {
 
+class Button;
 class BorderImage;
 class DropDownList;
 class Engine;
@@ -105,6 +106,8 @@ private:
     void HandleTextFinished(StringHash eventType, VariantMap& eventData);
     /// Handle unhandled key on the line edit for scrolling the history.
     void HandleLineEditKey(StringHash eventType, VariantMap& eventData);
+    /// Handle close button being pressed.
+    void HandleCloseButtonPressed(StringHash eventType, VariantMap& eventData);
     /// Handle rendering window resize.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle a log message.
@@ -117,15 +120,17 @@ private:
     /// Background.
     SharedPtr<BorderImage> background_;
     /// Container for text rows.
-    SharedPtr<ListView> rowContainer_;
+    ListView* rowContainer_;
     /// Container for the command line.
-    SharedPtr<UIElement> commandLine_;
+    UIElement* commandLine_;
     /// Interpreter drop down list.
-    SharedPtr<DropDownList> interpreters_;
+    DropDownList* interpreters_;
+    /// Line edit.
+    LineEdit* lineEdit_;
+    /// Close button.
+    SharedPtr<Button> closeButton_;
     /// Last used command interpreter.
     String commandInterpreter_;
-    /// Line edit.
-    SharedPtr<LineEdit> lineEdit_;
     /// Command history.
     Vector<String> history_;
     /// Pending log message rows.

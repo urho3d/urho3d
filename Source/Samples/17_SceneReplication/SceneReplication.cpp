@@ -72,9 +72,7 @@ static const unsigned CTRL_RIGHT = 8;
 DEFINE_APPLICATION_MAIN(SceneReplication)
 
 SceneReplication::SceneReplication(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(1.0f)
+    Sample(context)
 {
 }
 

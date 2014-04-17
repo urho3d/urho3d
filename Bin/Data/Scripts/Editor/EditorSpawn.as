@@ -239,10 +239,11 @@ Vector3 RandomizeSpawnPosition(const Vector3&in position)
 
 void SpawnObject()
 {
-    if(spawnedObjectsNames.length == 0) return;
+    if (spawnedObjectsNames.length == 0)
+        return;
     IntRect view = activeViewport.viewport.rect;
-    
-    for(int i = 0;i<spawnCount;i++)
+
+    for (uint i = 0; i < spawnCount; i++)
     {
         IntVector2 pos = IntVector2(ui.cursorPosition.x, ui.cursorPosition.y);
         Ray cameraRay = camera.GetScreenRay(

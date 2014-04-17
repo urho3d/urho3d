@@ -87,40 +87,12 @@ EVENT(E_KEYUP, KeyUp)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Character typed on the keyboard.
-EVENT(E_CHAR, Char)
+/// Text input event.
+EVENT(E_TEXTINPUT, TextInput)
 {
-    PARAM(P_CHAR, Char);                    // int
+    PARAM(P_TEXT, Text);                    // String
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
-}
-
-/// Finger pressed on the screen.
-EVENT(E_TOUCHBEGIN, TouchBegin)
-{
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_PRESSURE, Pressure);            // float
-}
-
-/// Finger released from the screen.
-EVENT(E_TOUCHEND, TouchEnd)
-{
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-}
-
-/// Finger moved on the screen.
-EVENT(E_TOUCHMOVE, TouchMove)
-{
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_DX, DX);                        // int
-    PARAM(P_DY, DY);                        // int
-    PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// Joystick button pressed.
@@ -173,6 +145,60 @@ EVENT(E_CONTROLLERAXISMOVE, ControllerAxisMove)
     PARAM(P_JOYSTICK, Joystick);            // int
     PARAM(P_AXIS, Button);                  // int
     PARAM(P_POSITION, Position);            // float
+}
+
+/// Finger pressed on the screen.
+EVENT(E_TOUCHBEGIN, TouchBegin)
+{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_PRESSURE, Pressure);            // float
+}
+
+/// Finger released from the screen.
+EVENT(E_TOUCHEND, TouchEnd)
+{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+}
+
+/// Finger moved on the screen.
+EVENT(E_TOUCHMOVE, TouchMove)
+{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_DX, DX);                        // int
+    PARAM(P_DY, DY);                        // int
+    PARAM(P_PRESSURE, Pressure);            // float
+}
+
+/// A touch gesture finished recording.
+EVENT(E_GESTURERECORDED, GestureRecorded)
+{
+    PARAM(P_GESTUREID, GestureID);          // unsigned
+}
+
+/// A recognized touch gesture was input by the user.
+EVENT(E_GESTUREINPUT, GestureInput)
+{
+    PARAM(P_GESTUREID, GestureID);          // unsigned
+    PARAM(P_CENTERX, CenterX);              // int
+    PARAM(P_CENTERY, CenterY);              // int
+    PARAM(P_NUMFINGERS, NumFingers);        // int
+    PARAM(P_ERROR, Error);                  // float
+}
+
+/// Pinch/rotate multi-finger touch gesture motion update.
+EVENT(E_MULTIGESTURE, MultiGesture)
+{
+    PARAM(P_CENTERX, CenterX);              // int
+    PARAM(P_CENTERY, CenterY);              // int
+    PARAM(P_NUMFINGERS, NumFingers);        // int
+    PARAM(P_DTHETA, DTheta);                // float (degrees)
+    PARAM(P_DDIST, DDist);                  // float
 }
 
 /// A file was drag-dropped into the application window.
