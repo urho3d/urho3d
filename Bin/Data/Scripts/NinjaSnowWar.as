@@ -496,14 +496,24 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (!gameScene.updateEnabled)
         {
             SetMessage("PAUSED");
-            if (screenJoystickSettingsIndex == M_MAX_UNSIGNED)
-                screenJoystickSettingsIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
-            input.OpenJoystick(screenJoystickSettingsIndex);
+            
+            // Open the settings joystick only if the controls screen joystick was already open
+            if (screenJoystickIndex != M_MAX_UNSIGNED)
+            {
+                if (screenJoystickSettingsIndex == M_MAX_UNSIGNED)
+                    screenJoystickSettingsIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
+                input.OpenJoystick(screenJoystickSettingsIndex);
+            }
         }
         else
         {
             SetMessage("");
-            input.CloseJoystick(screenJoystickSettingsIndex);
+            if (screenJoystickSettingsIndex != M_MAX_UNSIGNED)
+            {
+                input.CloseJoystick(screenJoystickSettingsIndex);
+                input.RemoveScreenJoystick(screenJoystickSettingsIndex);
+                screenJoystickSettingsIndex = M_MAX_UNSIGNED;
+            }
         }
     }
 }
