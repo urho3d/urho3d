@@ -10044,30 +10044,6 @@ const VariantMap& GetVariantMap() const;
 const Vector2& GetVector2() const;
 const Vector3& GetVector3() const;
 const Vector4& GetVector4() const;
-/* deprecated */
-Camera GetCamera() const;
-/* deprecated */
-CollisionShape GetCollisionShape() const;
-/* deprecated */
-Component GetComponent() const;
-/* deprecated */
-Connection GetConnection() const;
-/* deprecated */
-Node GetNode() const;
-/* deprecated */
-PhysicsWorld GetPhysicsWorld() const;
-/* deprecated */
-RenderSurface GetRenderSurface() const;
-/* deprecated */
-RigidBody GetRigidBody() const;
-/* deprecated */
-Scene GetScene() const;
-/* deprecated */
-Serializable GetSerializable() const;
-/* deprecated */
-Texture GetTexture() const;
-/* deprecated */
-UIElement GetUIElement() const;
 
 // Properties:
 /* readonly */
