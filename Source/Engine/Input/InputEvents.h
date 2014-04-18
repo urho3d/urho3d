@@ -96,6 +96,18 @@ EVENT(E_TEXTINPUT, TextInput)
 }
 
 /// Joystick button pressed.
+EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+}
+
+/// Joystick button pressed.
+EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+}
+
+/// Joystick button pressed.
 EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
 {
     PARAM(P_JOYSTICK, Joystick);            // int

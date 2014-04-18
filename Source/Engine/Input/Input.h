@@ -107,6 +107,8 @@ struct JoystickState
 
     /// SDL joystick.
     SDL_Joystick* joystick_;
+	/// SDL joystick instance ID
+	SDL_JoystickID instanceID_;
     /// SDL game controller.
     SDL_GameController* controller_;
     /// UI element containing the screen joystick.
@@ -140,12 +142,8 @@ public:
     void SetToggleFullscreen(bool enable);
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
-    /// Open a joystick. Return true if successful.
-    bool OpenJoystick(unsigned index);
-    /// Close a joystick.
-    void CloseJoystick(unsigned index);
-    /// Redetect joysticks. Return true if successful.
-    bool DetectJoysticks();
+	/// Set whether the virtual joystick is visible.
+	void SetScreenJoystickVisible(SDL_JoystickID index, bool enable);
     /// Add screen joystick.
     /** Return the joystick index number when successful or M_MAX_UNSIGNED when error.
      *  If layout file is not given, use the default screen joystick layout.
@@ -153,7 +151,7 @@ public:
      *
      *  This method should only be called in main thread.
      */
-    unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     /// Remove screen joystick by index.
     /** Return true if successful.
      *
@@ -218,9 +216,9 @@ public:
     /// Return number of connected joysticks.
     unsigned GetNumJoysticks() const { return joysticks_.Size(); }
     /// Return joystick name by index.
-    const String& GetJoystickName(unsigned index) const;
+    const String& GetJoystickName(SDL_JoystickID index) const;
     /// Return joystick state by index. Automatically open if not opened yet.
-    JoystickState* GetJoystick(unsigned index);
+    JoystickState* GetJoystick(SDL_JoystickID index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether on-screen keyboard is supported.
@@ -237,6 +235,8 @@ public:
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
+	/// Open a joystick. Return -1 if no joystick.
+    SDL_JoystickID OpenJoystick(unsigned index);
     /// Setup internal joystick structures.
     void ResetJoysticks();
     /// Prepare input state for application gaining input focus.
@@ -279,7 +279,7 @@ private:
     /// String for text input.
     String textInput_;
     /// Opened joysticks.
-    Vector<JoystickState> joysticks_;
+    HashMap<SDL_JoystickID, JoystickState> joysticks_;
     /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state.
@@ -306,8 +306,6 @@ private:
     bool suppressNextMouseMove_;
     /// Initialized flag.
     bool initialized_;
-    /// Map SDL joystick ID to internal index.
-    HashMap<int, unsigned> joystickIDMap_;
 };
 
 }
