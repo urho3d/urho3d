@@ -468,9 +468,6 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JoystickState", "int get_hatPosition(uint) const", asMETHOD(JoystickState, GetHatPosition), asCALL_THISCALL);
 
     RegisterObject<Input>(engine, "Input");
-    engine->RegisterObjectMethod("Input", "bool OpenJoystick(uint)", asMETHOD(Input, OpenJoystick), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void CloseJoystick(uint)", asMETHOD(Input, CloseJoystick), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool DetectJoysticks()", asMETHOD(Input, DetectJoysticks), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "uint AddScreenJoystick(XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asMETHOD(Input, AddScreenJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool RemoveScreenJoystick(uint)", asMETHOD(Input, RemoveScreenJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool RecordGesture()", asMETHOD(Input, RecordGesture), asCALL_THISCALL);
