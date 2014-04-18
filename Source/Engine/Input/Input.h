@@ -214,7 +214,7 @@ public:
     /// Return number of connected joysticks.
     unsigned GetNumJoysticks() const { return joysticks_.Size(); }
     /// Return joystick name by index.
-    const String& GetJoystickName(SDL_JoystickID index);
+    const String& GetJoystickName(SDL_JoystickID index) const;
     /// Return joystick state by index. Automatically open if not opened yet.
     JoystickState* GetJoystick(SDL_JoystickID index);
     /// Return whether fullscreen toggle is enabled.

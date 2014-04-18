@@ -655,11 +655,13 @@ TouchState* Input::GetTouch(unsigned index) const
     return const_cast<TouchState*>(&i->second_);
 }
 
-const String& Input::GetJoystickName(SDL_JoystickID index)
+const String& Input::GetJoystickName(SDL_JoystickID index) const
 {
-	if (joysticks_.Contains(index))
-        return joysticks_[index].name_;
-    else
+	HashMap<SDL_JoystickID, JoystickState>::ConstIterator itr =	joysticks_.Find(index);
+
+	if(itr != joysticks_.End())
+		return itr->second_.name_;
+	else
         return String::EMPTY;
 }
 
