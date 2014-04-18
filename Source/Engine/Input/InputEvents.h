@@ -95,36 +95,36 @@ EVENT(E_TEXTINPUT, TextInput)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Joystick button pressed.
+/// Joystick connected.
 EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_JOYSTICKID, JoystickID);        // int
 }
 
-/// Joystick button pressed.
+/// Joystick disconnected.
 EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_JOYSTICKID, JoystickID);        // int
 }
 
 /// Joystick button pressed.
 EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_JOYSTICKID, JoystickID);        // int
     PARAM(P_BUTTON, Button);                // int
 }
 
 /// Joystick button released.
 EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_JOYSTICKID, JoystickID);        // int
     PARAM(P_BUTTON, Button);                // int
 }
 
 /// Joystick axis moved.
 EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_JOYSTICKID, JoystickID);        // int
     PARAM(P_AXIS, Button);                  // int
     PARAM(P_POSITION, Position);            // float
 }
@@ -132,31 +132,9 @@ EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
 /// Joystick POV hat moved.
 EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_JOYSTICKID, JoystickID);        // int
     PARAM(P_HAT, Button);                   // int
     PARAM(P_POSITION, Position);            // int
-}
-
-/// Controller button pressed.
-EVENT(E_CONTROLLERBUTTONDOWN, ControllerButtonDown)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_BUTTON, Button);                // int
-}
-
-/// Controller button released.
-EVENT(E_CONTROLLERBUTTONUP, ControllerButtonUp)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_BUTTON, Button);                // int
-}
-
-/// Controller axis moved.
-EVENT(E_CONTROLLERAXISMOVE, ControllerAxisMove)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_AXIS, Button);                  // int
-    PARAM(P_POSITION, Position);            // float
 }
 
 /// Finger pressed on the screen.

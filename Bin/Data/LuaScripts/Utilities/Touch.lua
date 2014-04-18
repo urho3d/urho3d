@@ -123,7 +123,7 @@ function updateTouches(controls) -- Called from HandleUpdate
 
     -- Gyroscope (emulated by SDL through a virtual joystick)
     if input.numJoysticks > 0 then -- numJoysticks = 1 on iOS & Android
-        local joystick = input:GetJoystick(0) -- JoystickState
+        local joystick = input:GetJoystickByIndex(0) -- JoystickState
         if joystick.numAxes >= 2 then
             if joystick:GetAxisPosition(0) < -GYROSCOPE_THRESHOLD then controls:Set(CTRL_LEFT, true) end
             if joystick:GetAxisPosition(0) > GYROSCOPE_THRESHOLD then controls:Set(CTRL_RIGHT, true) end

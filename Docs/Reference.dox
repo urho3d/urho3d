@@ -1348,13 +1348,12 @@ The input events include:
 - E_KEYUP: a key was released.
 - E_KEYDOWN: a key was pressed.
 - E_TEXTINPUT: a string of translated text input in UTF8 format. May contain a single character or several.
+- E_JOYSTICKCONNECTED: a joystick was plugged in.
+- E_JOYSTICKDISCONNECTED: a joystick was disconnected.
 - E_JOYSTICKBUTTONDOWN: a joystick button was pressed.
 - E_JOYSTICKBUTTONUP: a joystick button was released.
 - E_JOYSTICKAXISMOVE: a joystick axis was moved.
 - E_JOYSTICKHATMOVE: a joystick POV hat was moved.
-- E_CONTROLLERBUTTONDOWN: a joystick button on an SDL controller was pressed.
-- E_CONTROLLERBUTTONUP: a joystick button on an SDL controller was released.
-- E_CONTROLLERAXISMOVE: a joystick axis on an SDL controller was moved.
 - E_TOUCHBEGIN: a finger touched the screen.
 - E_TOUCHEND: a finger was lifted from the screen.
 - E_TOUCHMOVE: a finger moved on the screen.
@@ -1378,9 +1377,11 @@ In AngelScript, the polling API is accessed via properties: input.keyDown[], inp
 
 \section InputJoystick Joystick input
 
-To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
+Plugged in joysticks will begin sending input events automatically. Each joystick will be assigned a joystick ID which will be used in subsequent joystick events, as well as for retrieving the \ref JoystickState "joystick state". Use \ref Input::GetJoystick "GetJoystick()" to retrieve the joystick state by ID. In case you do not have the ID, you can also use \ref Input::GetJoystickByIndex() "GetJoystickByIndex()" which uses a zero-based index; see \ref Input::GetNumJoysticks "GetNumJoysticks()" for the number of currently connected joysticks. The ID, as well as the joystick name, can be looked up from the joystick state.
 
-If the joystick model is recognized by SDL you will also get the "controller" variety of events shown above, and the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them.
+If the joystick model is recognized by SDL as a game controller the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them. Use \ref JoystickState::IsController "IsController()" to distinguish between a game controller and an unrecognized joystick.
+
+On platforms that support the accelerometer, it will appear as a "virtual" joystick.
 
 \section InputTouch Touch input
 

@@ -176,7 +176,7 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
     // Gyroscope (emulated by SDL through a virtual joystick)
     if (input->GetNumJoysticks() > 0) // numJoysticks = 1 on iOS & Android
     {
-        JoystickState* joystick = input->GetJoystick(0);
+        JoystickState* joystick = input->GetJoystickByIndex(0);
         if (joystick->GetNumAxes() >= 2)
         {
             if (joystick->GetAxisPosition(0) < -GYROSCOPE_THRESHOLD)

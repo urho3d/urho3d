@@ -14,6 +14,10 @@ struct TouchState
 
 struct JoystickState
 {
+    const String name_ @ name;
+    const int joystickID_ @ joystickID;
+
+    bool IsController() const;
     unsigned GetNumButtons() const;
     unsigned GetNumAxes() const;
     unsigned GetNumHats() const;
@@ -23,6 +27,7 @@ struct JoystickState
     float GetAxisPosition(unsigned index) const;
     int GetHatPosition(unsigned index) const;
 
+    tolua_readonly tolua_property__is_set bool controller;
     tolua_readonly tolua_property__get_set unsigned numButtons;
     tolua_readonly tolua_property__get_set unsigned numAxes;
     tolua_readonly tolua_property__get_set unsigned numHats;
@@ -32,8 +37,9 @@ class Input : public Object
 {
     void SetToggleFullscreen(bool enable);
     void SetMouseVisible(bool enable);
-    unsigned AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
-    bool RemoveScreenJoystick(unsigned index);
+    int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    bool RemoveScreenJoystick(int id);
+    void SetScreenJoystickVisible(int id, bool enable);
     void SetScreenKeyboardVisible(bool enable);
     bool RecordGesture();
     tolua_outside bool InputSaveGestures @ SaveGestures(File* dest);
@@ -66,10 +72,11 @@ class Input : public Object
     unsigned GetNumTouches() const;
     TouchState* GetTouch(unsigned index) const;
     unsigned GetNumJoysticks() const;
-    const String GetJoystickName(unsigned index) const;
-    JoystickState* GetJoystick(unsigned index);
+    JoystickState* GetJoystick(int id);
+    JoystickState* GetJoystickByIndex(unsigned index);
     bool GetToggleFullscreen() const;
     bool GetScreenKeyboardSupport() const;
+    bool IsScreenJoystickVisible(int id) const;
     bool IsScreenKeyboardVisible() const;
     bool IsMouseVisible() const;
     bool HasFocus();
