@@ -148,36 +148,29 @@ namespace Urho3D
 - %Buttons : int
 - %Qualifiers : int
 
+### JoystickConnected
+- %JoystickID : int
+
+### JoystickDisconnected
+- %JoystickID : int
+
 ### JoystickButtonDown
-- %Joystick : int
+- %JoystickID : int
 - %Button : int
 
 ### JoystickButtonUp
-- %Joystick : int
+- %JoystickID : int
 - %Button : int
 
 ### JoystickAxisMove
-- %Joystick : int
+- %JoystickID : int
 - %Button : int
 - %Position : float
 
 ### JoystickHatMove
-- %Joystick : int
+- %JoystickID : int
 - %Button : int
 - %Position : int
-
-### ControllerButtonDown
-- %Joystick : int
-- %Button : int
-
-### ControllerButtonUp
-- %Joystick : int
-- %Button : int
-
-### ControllerAxisMove
-- %Joystick : int
-- %Button : int
-- %Position : float
 
 ### TouchBegin
 - %TouchID : int
@@ -5559,9 +5552,7 @@ Properties:
 
 Methods:
 
-- uint AddScreenJoystick(XMLFile@ = null, XMLFile@ = null)
-- void CloseJoystick(uint)
-- bool DetectJoysticks()
+- int AddScreenJoystick(XMLFile@ = null, XMLFile@ = null)
 - int GetKeyFromName(const String&) const
 - int GetKeyFromScancode(int) const
 - String GetKeyName(int) const
@@ -5569,9 +5560,8 @@ Methods:
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
 - uint LoadGestures(File@)
-- bool OpenJoystick(uint)
 - bool RecordGesture()
-- bool RemoveScreenJoystick(uint)
+- bool RemoveScreenJoystick(int)
 - bool SaveGesture(File@, uint)
 - bool SaveGestures(File@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -5581,8 +5571,8 @@ Properties:
 - ShortStringHash baseType // readonly
 - String category // readonly
 - bool focus // readonly
-- String[] joystickNames // readonly
 - JoystickState@[] joysticks // readonly
+- JoystickState@[] joysticksByIndex // readonly
 - bool[] keyDown // readonly
 - bool[] keyPress // readonly
 - bool minimized // readonly
@@ -5602,6 +5592,7 @@ Properties:
 - int refs // readonly
 - bool[] scancodeDown // readonly
 - bool[] scancodePress // readonly
+- bool[] screenJoystickVisible
 - bool screenKeyboardSupport // readonly
 - bool screenKeyboardVisible
 - bool toggleFullscreen
@@ -5649,7 +5640,9 @@ Properties:
 - float[] axisPosition // readonly
 - bool[] buttonDown // readonly
 - bool[] buttonPress // readonly
+- bool controller // readonly
 - int[] hatPosition // readonly
+- int joystickID
 - String name
 - uint numAxes // readonly
 - uint numButtons // readonly

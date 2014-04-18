@@ -4264,9 +4264,7 @@ int width;
 class Input
 {
 // Methods:
-uint AddScreenJoystick(XMLFile = null, XMLFile = null);
-void CloseJoystick(uint);
-bool DetectJoysticks();
+int AddScreenJoystick(XMLFile = null, XMLFile = null);
 int GetKeyFromName(const String&) const;
 int GetKeyFromScancode(int) const;
 String GetKeyName(int) const;
@@ -4274,9 +4272,8 @@ int GetScancodeFromKey(int) const;
 int GetScancodeFromName(const String&) const;
 String GetScancodeName(int) const;
 uint LoadGestures(File);
-bool OpenJoystick(uint);
 bool RecordGesture();
-bool RemoveScreenJoystick(uint);
+bool RemoveScreenJoystick(int);
 bool SaveGesture(File, uint);
 bool SaveGestures(File);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -4289,9 +4286,9 @@ String category;
 /* readonly */
 bool focus;
 /* readonly */
-Array<String> joystickNames;
-/* readonly */
 Array<JoystickState> joysticks;
+/* readonly */
+Array<JoystickState> joysticksByIndex;
 /* readonly */
 Array<bool> keyDown;
 /* readonly */
@@ -4329,6 +4326,7 @@ int refs;
 Array<bool> scancodeDown;
 /* readonly */
 Array<bool> scancodePress;
+Array<bool> screenJoystickVisible;
 /* readonly */
 bool screenKeyboardSupport;
 bool screenKeyboardVisible;
@@ -4386,7 +4384,10 @@ Array<bool> buttonDown;
 /* readonly */
 Array<bool> buttonPress;
 /* readonly */
+bool controller;
+/* readonly */
 Array<int> hatPosition;
+int joystickID;
 String name;
 /* readonly */
 uint numAxes;
