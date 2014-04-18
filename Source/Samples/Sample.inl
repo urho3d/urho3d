@@ -23,7 +23,6 @@
 #include "Application.h"
 #include "Camera.h"
 #include "Console.h"
-#include "CoreEvents.h"
 #include "DebugHud.h"
 #include "Engine.h"
 #include "FileSystem.h"
@@ -78,7 +77,7 @@ void Sample::Start()
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
-    // Subscribe logic update event
+    // Subscribe scene update event
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Sample, HandleSceneUpdate));
 }
 

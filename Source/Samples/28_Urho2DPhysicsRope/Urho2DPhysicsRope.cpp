@@ -152,7 +152,7 @@ void Urho2DPhysicsRope::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move, Use PageUp PageDown to zoom.");
+    instructionText->SetText("Use WASD keys and mouse/touch to move, Use PageUp PageDown to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center

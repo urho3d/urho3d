@@ -235,7 +235,7 @@ void CharacterDemo::CreateInstructions()
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
+        "Use WASD keys and mouse/touch to move\n"
         "Space to jump, F to toggle 1st/3rd person\n"
         "F5 to save scene, F7 to load"
     );
