@@ -142,6 +142,8 @@ public:
     void SetToggleFullscreen(bool enable);
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
+	/// Set whether the virtual joystick is visible.
+	void SetScreenJoystickVisible(SDL_JoystickID index, bool enable);
     /// Add screen joystick.
     /** Return the joystick index number when successful or M_MAX_UNSIGNED when error.
      *  If layout file is not given, use the default screen joystick layout.

@@ -231,6 +231,17 @@ void Input::SetMouseVisible(bool enable)
     #endif
 }
 
+void Input::SetScreenJoystickVisible(SDL_JoystickID index, bool enable)
+{
+	if(joysticks_.Contains(index))
+	{
+		JoystickState& state = joysticks_[index];
+
+		if (state.screenJoystick_)
+        state.screenJoystick_->SetVisible(enable);
+	}
+}
+
 void Input::SetToggleFullscreen(bool enable)
 {
     toggleFullscreen_ = enable;
