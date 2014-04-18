@@ -502,7 +502,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             {
                 if (screenJoystickSettingsIndex == M_MAX_UNSIGNED)
                     screenJoystickSettingsIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
-                input.OpenJoystick(screenJoystickSettingsIndex);
+                input.set_ScreenJoystickVisible(screenJoystickSettingsIndex, true);
             }
         }
         else
@@ -510,7 +510,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             SetMessage("");
             if (screenJoystickSettingsIndex != M_MAX_UNSIGNED)
             {
-                input.CloseJoystick(screenJoystickSettingsIndex);
+                input.set_ScreenJoystickVisible(screenJoystickSettingsIndex, false);
                 input.RemoveScreenJoystick(screenJoystickSettingsIndex);
                 screenJoystickSettingsIndex = M_MAX_UNSIGNED;
             }
