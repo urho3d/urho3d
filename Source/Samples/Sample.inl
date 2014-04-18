@@ -91,7 +91,7 @@ void Sample::InitTouchInput()
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         Input* input = GetSubsystem<Input>();
         screenJoystickIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystick_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
-        input->OpenJoystick(screenJoystickIndex_);
+        input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
     }
 }
 
