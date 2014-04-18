@@ -254,16 +254,16 @@ bool Engine::Initialize(const VariantMap& parameters)
         bool success = true;
         String autoloadFolder = autoloadFolders[i];
         String badResource;
-        if(fileSystem->DirExists(autoloadFolder))
+        if (fileSystem->DirExists(autoloadFolder))
         {
             Vector<String> folders;
             fileSystem->ScanDir(folders, autoloadFolder, "*", SCAN_DIRS, false);
-            for(unsigned y = 0; y < folders.Size(); ++y)
+            for (unsigned y = 0; y < folders.Size(); ++y)
             {
                 String folder = folders[y];
                 if (folder.StartsWith("."))
                     continue;
-                
+
                 String autoResourceDir = exePath + autoloadFolder + "/" + folder;
                 success = cache->AddResourceDir(autoResourceDir);
                 if (!success)
@@ -272,17 +272,17 @@ bool Engine::Initialize(const VariantMap& parameters)
                     break;
                 }
             }
-            
+
             if (success)
             {
                 Vector<String> paks;
                 fileSystem->ScanDir(paks, autoloadFolder, "*.pak", SCAN_FILES, false);
-                for(unsigned y = 0; y < paks.Size(); ++y)
+                for (unsigned y = 0; y < paks.Size(); ++y)
                 {
                     String pak = paks[y];
                     if (pak.StartsWith("."))
                         continue;
-                    
+
                     String autoResourcePak = exePath + autoloadFolder + "/" + pak;
                     SharedPtr<PackageFile> package(new PackageFile(context_));
                     if (package->Open(autoResourcePak))
@@ -296,8 +296,10 @@ bool Engine::Initialize(const VariantMap& parameters)
                 }
             }
         }
-        
-        if(!success)
+        else
+            LOGWARNING("Skipped autoload folder " + autoloadFolders[i] + " as it does not exist");
+
+        if (!success)
         {
             LOGERROR("Failed to add resource " + badResource + " in autoload folder " + autoloadFolders[i]);
             return false;
