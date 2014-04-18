@@ -90,7 +90,7 @@ void Sample::InitTouchInput()
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         Input* input = GetSubsystem<Input>();
         screenJoystickIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystick_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
-        input->OpenJoystick(screenJoystickIndex_);
+        input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
     }
 }
 
@@ -199,16 +199,16 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             {
                 ResourceCache* cache = GetSubsystem<ResourceCache>();
                 screenJoystickSettingsIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
-                input->OpenJoystick(screenJoystickSettingsIndex_);
-                paused_ = true;
+                input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
+				paused_ = true;
             }
             else
             {
                 paused_ = !paused_;
                 if (paused_)
-                    input->OpenJoystick(screenJoystickSettingsIndex_);
+                    input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, false);
                 else
-                    input->CloseJoystick(screenJoystickSettingsIndex_);
+                    input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
             }
         }
 
