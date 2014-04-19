@@ -1128,10 +1128,7 @@ void ListView::UpdateUIClickSubscription()
 {
     UnsubscribeFromEvent(E_UIMOUSECLICK);
     UnsubscribeFromEvent(E_UIMOUSECLICKEND);
-    if (selectOnClickEnd_)
-        SubscribeToEvent(E_UIMOUSECLICKEND, HANDLER(ListView, HandleUIMouseClick));
-    else
-        SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
+    SubscribeToEvent(selectOnClickEnd_ ? E_UIMOUSECLICKEND : E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
 }
 
 }

@@ -685,9 +685,8 @@ JoystickState* Input::GetJoystickByIndex(unsigned index)
     unsigned compare = 0;
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
     {
-        if (compare == index)
+        if (compare++ == index)
             return &(i->second_);
-        ++compare;
     }
     
     return 0;
@@ -702,13 +701,7 @@ JoystickState* Input::GetJoystick(SDL_JoystickID id)
 bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
 {
     HashMap<SDL_JoystickID, JoystickState>::ConstIterator i = joysticks_.Find(id);
-    if (i != joysticks_.End())
-    {
-        if (i->second_.screenJoystick_)
-            return i->second_.screenJoystick_->IsVisible();
-    }
-    
-    return false;
+    return i != joysticks_.End() && i->second_.screenJoystick_ && i->second_.screenJoystick_->IsVisible();
 }
 
 bool Input::GetScreenKeyboardSupport() const

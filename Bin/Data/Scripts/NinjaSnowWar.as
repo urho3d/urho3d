@@ -500,18 +500,20 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             // Open the settings joystick only if the controls screen joystick was already open
             if (screenJoystickID >= 0)
             {
+                // Lazy initialization
                 if (screenJoystickSettingsID < 0)
                     screenJoystickSettingsID = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
+                else
+                    input.screenJoystickVisible[screenJoystickSettingsID] = true;
             }
         }
         else
         {
             SetMessage("");
+
+            // Hide the settings joystick
             if (screenJoystickSettingsID >= 0)
-            {
-                input.RemoveScreenJoystick(screenJoystickSettingsID);
-                screenJoystickSettingsID = -1;
-            }
+                input.screenJoystickVisible[screenJoystickSettingsID] = false;
         }
     }
 }
