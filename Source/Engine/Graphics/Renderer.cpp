@@ -871,8 +871,10 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     
     SharedPtr<Texture2D> newShadowMap(new Texture2D(context_));
     int retries = 3;
+    unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
     
-    // OpenGL: create shadow map only. Color rendertarget is not needed
+    // OpenGL: create shadow map only in normal cases. Color rendertarget is only needed for a workaround
+    // of an OS X + Intel bug
     #ifdef URHO3D_OPENGL
     while (retries)
     {
@@ -888,13 +890,22 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
             newShadowMap->SetShadowCompare(true);
             #endif
+            if (dummyColorFormat)
+            {
+                // If no dummy color rendertarget for this size exists yet, create one now
+                if (!colorShadowMaps_.Contains(searchKey))
+                {
+                    colorShadowMaps_[searchKey] = new Texture2D(context_);
+                    colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
+                }
+                // Link the color rendertarget to the shadow map
+                newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
+            }
             break;
         }
     }
     #else
     // Direct3D9: create shadow map and dummy color rendertarget
-    unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
-    
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))

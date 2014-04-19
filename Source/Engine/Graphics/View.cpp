@@ -1445,7 +1445,7 @@ void View::ExecuteRenderPathCommands()
                 if (!lightQueues_.Empty())
                 {
                     PROFILE(RenderLights);
-                    
+
                     SetRenderTargets(command);
                     
                     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -1456,7 +1456,7 @@ void View::ExecuteRenderPathCommands()
                             RenderShadowMap(*i);
                             SetRenderTargets(command);
                         }
-                        
+
                         SetTextures(command);
                         graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
@@ -2771,10 +2771,12 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        graphics_->SetRenderTarget(i, (RenderSurface*)0);
     graphics_->SetDepthStencil(shadowMap);
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
     graphics_->Clear(CLEAR_DEPTH);
-    
+
     // Set shadow depth bias
     const BiasParameters& parameters = queue.light_->GetShadowBias();
     
