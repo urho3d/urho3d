@@ -47,9 +47,7 @@
 DEFINE_APPLICATION_MAIN(AngelScriptIntegration)
 
 AngelScriptIntegration::AngelScriptIntegration(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
     // Instantiate and register the AngelScript subsystem so that we can use the ScriptInstance component
     context_->RegisterSubsystem(new Script(context_));
@@ -136,7 +134,7 @@ void AngelScriptIntegration::CreateInstructions()
     
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move");
+    instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     
     // Position the text relative to the screen center

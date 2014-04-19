@@ -46,8 +46,9 @@ DEFINE_APPLICATION_MAIN(Urho2DPhysicsRope)
 
 static const unsigned NUM_OBJECTS = 10;
 
-Urho2DPhysicsRope::Urho2DPhysicsRope(Context* context) : Sample(context)
-{    
+Urho2DPhysicsRope::Urho2DPhysicsRope(Context* context) :
+    Sample(context)
+{
 }
 
 void Urho2DPhysicsRope::Start()
@@ -82,9 +83,7 @@ void Urho2DPhysicsRope::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth();
-    float height = (float)graphics->GetHeight();
-    camera->SetOrthoSize(Vector2(width, height) * 0.05f);
+    camera->SetOrthoSize((float)graphics->GetHeight() * 0.05f);
 
     // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
@@ -153,7 +152,7 @@ void Urho2DPhysicsRope::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move, Use PageUp PageDown to zoom.");
+    instructionText->SetText("Use WASD keys and mouse/touch to move, Use PageUp PageDown to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center

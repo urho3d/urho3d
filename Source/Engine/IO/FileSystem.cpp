@@ -24,11 +24,14 @@
 #include "ArrayPtr.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "EngineEvents.h"
 #include "File.h"
 #include "FileSystem.h"
 #include "IOEvents.h"
 #include "Log.h"
 #include "Thread.h"
+
+#include <SDL_filesystem.h>
 
 #include <cstdio>
 #include <cstring>
@@ -66,9 +69,54 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 namespace Urho3D
 {
 
-int DoSystemCommand(const String& commandLine)
+int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
-    return system(commandLine.CString());
+    if (!redirectToLog)
+        return system(commandLine.CString());
+
+    // Get a platform-agnostic temporary file name for stderr redirection
+    String stderrFilename;
+    String adjustedCommandLine(commandLine);
+    char* prefPath = SDL_GetPrefPath("urho3d", "Urho3D");
+    if (prefPath)
+    {
+        stderrFilename = String(prefPath) + "command-stderr";
+        adjustedCommandLine += " 2>" + stderrFilename;
+        SDL_free(prefPath);
+    }
+
+    #ifdef _MSC_VER
+    #define popen _popen
+    #define pclose _pclose
+    #endif
+
+    // Use popen/pclose to capture the stdout and stderr of the command
+    FILE *file = popen(adjustedCommandLine.CString(), "r");
+    if (!file)
+        return -1;
+
+    // Capture the standard output stream
+    char buffer[128];
+    while (!feof(file))
+    {
+        if (fgets(buffer, sizeof(buffer), file))
+            LOGRAW(String(buffer));
+    }
+    int exitCode = pclose(file);
+
+    // Capture the standard error stream
+    if (!stderrFilename.Empty())
+    {
+        SharedPtr<File> errFile(new File(context, stderrFilename, FILE_READ));
+        while (!errFile->IsEof())
+        {
+            unsigned numRead = errFile->Read(buffer, sizeof(buffer));
+            if (numRead)
+                Log::WriteRaw(String(buffer, numRead), true);
+        }
+    }
+
+    return exitCode;
 }
 
 int DoSystemRun(const String& fileName, const Vector<String>& arguments)
@@ -171,7 +219,7 @@ public:
     /// The function to run in the thread.
     virtual void ThreadFunction()
     {
-        exitCode_ = DoSystemCommand(commandLine_);
+        exitCode_ = DoSystemCommand(commandLine_, false, 0);
         completed_ = true;
     }
     
@@ -209,9 +257,13 @@ private:
 
 FileSystem::FileSystem(Context* context) :
     Object(context),
-    nextAsyncExecID_(1)
+    nextAsyncExecID_(1),
+    executeConsoleCommands_(false)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(FileSystem, HandleBeginFrame));
+
+    // Subscribe to console commands
+    SetExecuteConsoleCommands(true);
 }
 
 FileSystem::~FileSystem()
@@ -273,10 +325,22 @@ bool FileSystem::CreateDir(const String& pathName)
     return success;
 }
 
-int FileSystem::SystemCommand(const String& commandLine)
+void FileSystem::SetExecuteConsoleCommands(bool enable)
+{
+    if (enable == executeConsoleCommands_)
+        return;
+
+    executeConsoleCommands_ = enable;
+    if (enable)
+        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(FileSystem, HandleConsoleCommand));
+    else
+        UnsubscribeFromEvent(E_CONSOLECOMMAND);
+}
+
+int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLog)
 {
     if (allowedPaths_.Empty())
-        return DoSystemCommand(commandLine);
+        return DoSystemCommand(commandLine, redirectStdOutToLog, context_);
     else
     {
         LOGERROR("Executing an external command is not allowed");
@@ -740,6 +804,13 @@ void FileSystem::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
         else
             ++i;
     }
+}
+
+void FileSystem::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ConsoleCommand;
+    if (eventData[P_ID].GetString() == GetTypeName())
+        SystemCommand(eventData[P_COMMAND].GetString(), true);
 }
 
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension)

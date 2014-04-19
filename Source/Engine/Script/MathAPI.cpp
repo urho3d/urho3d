@@ -1149,6 +1149,17 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Color", "float g", offsetof(Color, g_));
     engine->RegisterObjectProperty("Color", "float b", offsetof(Color, b_));
     engine->RegisterObjectProperty("Color", "float a", offsetof(Color, a_));
+
+    engine->RegisterGlobalProperty("const Color WHITE", (void*)&Color::WHITE);
+    engine->RegisterGlobalProperty("const Color GRAY", (void*)&Color::GRAY);
+    engine->RegisterGlobalProperty("const Color BLACK", (void*)&Color::BLACK);
+    engine->RegisterGlobalProperty("const Color RED", (void*)&Color::RED);
+    engine->RegisterGlobalProperty("const Color GREEN", (void*)&Color::GREEN);
+    engine->RegisterGlobalProperty("const Color BLUE", (void*)&Color::BLUE);
+    engine->RegisterGlobalProperty("const Color CYAN", (void*)&Color::CYAN);
+    engine->RegisterGlobalProperty("const Color MAGENTA", (void*)&Color::MAGENTA);
+    engine->RegisterGlobalProperty("const Color YELLOW", (void*)&Color::YELLOW);
+    engine->RegisterGlobalProperty("const Color TRANSPARENT", (void*)&Color::TRANSPARENT);
 }
 
 void RegisterMathAPI(asIScriptEngine* engine)

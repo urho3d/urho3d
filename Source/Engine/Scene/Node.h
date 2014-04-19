@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Matrix3x4.h"
-#include "Serializable.h"
+#include "Animatable.h"
 #include "VectorBuffer.h"
 
 namespace Urho3D
@@ -52,7 +52,7 @@ enum TransformSpace
 };
 
 /// %Scene node that may contain components and child nodes.
-class URHO3D_API Node : public Serializable
+class URHO3D_API Node : public Animatable
 {
     OBJECT(Node);
     BASEOBJECT(Node);
@@ -83,7 +83,7 @@ public:
     virtual bool SaveDefaultAttributes() const { return true; }
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
-
+    
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest) const;
     /// Set name of the scene node. Names are not required to be unique.
@@ -379,6 +379,11 @@ public:
     unsigned GetNumPersistentComponents() const;
     
 protected:
+    /// Handle attribute animation added.
+    virtual void OnAttributeAnimationAdded();
+    /// Handle attribute animation removed.
+    virtual void OnAttributeAnimationRemoved();
+
     /// User variables.
     VariantMap vars_;
 
@@ -399,6 +404,8 @@ private:
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     /// Remove a component from this node with the specified iterator.
     void RemoveComponent(Vector<SharedPtr<Component> >::Iterator i);
+    /// Handle attribute animation update event.
+    void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
 
     /// World-space transform matrix.
     mutable Matrix3x4 worldTransform_;

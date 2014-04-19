@@ -111,9 +111,6 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Connection", "Controls controls", offsetof(Connection, controls_));
     engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
     
-    // Register Variant GetPtr() for Connection. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection(const String&in binding = \"deprecated:GetConnection\") const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
-    
     // Register SetOwner/GetOwner now
     engine->RegisterObjectMethod("Node", "void set_owner(Connection@+)", asMETHOD(Node, SetOwner), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "Connection@+ get_owner() const", asMETHOD(Node, GetOwner), asCALL_THISCALL);

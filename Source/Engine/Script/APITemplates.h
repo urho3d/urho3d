@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Addons.h"
+#include "Animatable.h"
 #include "BorderImage.h"
 #include "Context.h"
 #include "Drawable.h"
@@ -53,25 +54,6 @@ template <class T, class U> U* RefCast(T* t)
         return 0;
 
     return dynamic_cast<U*>(t);
-}
-
-/// Template function for returning a Variant pointer type cast to specific class.
-template <class T> T* GetVariantPtr(const String& binding, Variant* ptr)
-{
-    LOGWARNINGF("The %s API binding is deprecated, GetPtr() should be used instead.", binding.Substring(11).CString());
-
-    if (ptr->GetType() == VAR_PTR)
-        return dynamic_cast<T*>(ptr->GetPtr());
-    else if (ptr->GetType() == VAR_VOIDPTR)
-    {
-        // An attempt at type safety. Probably can not guarantee that this could not be made to invoke UDB
-        T* ptrA = static_cast<T*>(ptr->GetVoidPtr());
-        RefCounted* ptrB = static_cast<RefCounted*>(ptrA);
-        if (dynamic_cast<T*>(ptrB) == ptrA)
-            return ptrA;
-    }
-    
-    return 0;
 }
 
 /// Template function for Vector to array conversion.
@@ -446,10 +428,28 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     RegisterSubclass<Object, T>(engine, "Serializable", className);
 }
 
+/// Template function for registering a class derived from Animatable.
+template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* className)
+{
+    RegisterSerializable<T>(engine, className);
+    RegisterSubclass<Animatable, T>(engine, "Animatable", className);
+
+    engine->RegisterObjectMethod(className, "void set_animationEnabled(bool)", asMETHODPR(T, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_animationEnabled() const", asMETHODPR(T, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(T, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(T, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimation(const String&in, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHODPR(T, SetAttributeAnimation, (const String&, AttributeAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(T, GetAttributeAnimation, (const String&) const, AttributeAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(T, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(T, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(T, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(T, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+}
+
 /// Template function for registering a class derived from Component.
 template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className, bool nodeRegistered = true, bool debugRendererRegistered = true)
 {
-    RegisterSerializable<T>(engine, className);
+    RegisterAnimatable<T>(engine, className);
     RegisterSubclass<Component, T>(engine, "Component", className);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHODPR(T, Remove, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
@@ -589,7 +589,7 @@ static VariantMap& NodeGetVars(Node* ptr)
 /// Template function for registering a class derived from Node.
 template <class T> void RegisterNode(asIScriptEngine* engine, const char* className)
 {
-    RegisterSerializable<T>(engine, className);
+    RegisterAnimatable<T>(engine, className);
     RegisterSubclass<Node, T>(engine, "Node", className);
     engine->RegisterObjectMethod(className, "void SetScale(float)", asMETHODPR(T, SetScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
@@ -895,7 +895,7 @@ static XMLFile* UIElementGetDefaultStyle(UIElement* ptr)
 /// Template function for registering a class derived from UIElement.
 template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className, bool isSprite = false)
 {
-    RegisterSerializable<T>(engine, className);
+    RegisterAnimatable<T>(engine, className);
     RegisterObjectConstructor<T>(engine, className);
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);

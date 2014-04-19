@@ -72,7 +72,10 @@ Material* MaterialCache2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 Material* MaterialCache2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
 {
     Material* material = new Material(context_);
-    material->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
+    if (texture)
+        material->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
+    else
+        material->SetName(blendModeNames[blendMode]);
 
     Technique* tech = new Technique(context_);
     Pass* pass = tech->CreatePass(PASS_ALPHA);

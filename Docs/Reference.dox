@@ -130,7 +130,8 @@ The full list of supported parameters, their datatypes and default values:
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "CoreData;Data".
-- ResourcePackages (string) A semicolon-separated list of resource paths to use. Default empty.
+- ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
+- AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Extra".
 - ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
 - WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
@@ -1334,7 +1335,9 @@ The surface can also be configured to always update its viewports, or to only up
 
 \page Input %Input
 
-The Input subsystem provides keyboard, mouse, joystick and touch input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the operating system mouse cursor. It will be hidden by default, so the UI should be used to render a software cursor if necessary. For editor-like applications the operating system cursor can be made visible by calling \ref Input::SetMouseVisible "SetMouseVisible()".
+The Input subsystem provides keyboard, mouse, joystick and touch input both via a polled interface and events. This subsystem is also used for querying whether the application window has input focus or is minimized.
+
+The subsystem is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the operating system mouse cursor. It will be hidden by default, so the UI should be used to render a software cursor if necessary. For editor-like applications the operating system cursor can be made visible by calling \ref Input::SetMouseVisible "SetMouseVisible()".
 
 The input events include:
 
@@ -1344,33 +1347,57 @@ The input events include:
 - E_MOUSEWHEEL: the mouse wheel moved.
 - E_KEYUP: a key was released.
 - E_KEYDOWN: a key was pressed.
-- E_CHAR: translation of a keypress to Unicode charset for text entry. This is currently the only way to get translated key input.
-- E_TOUCHBEGIN: a finger touched the screen.
-- E_TOUCHEND: a finger was lifted from the screen.
-- E_TOUCHMOVE: a finger moved on the screen.
+- E_TEXTINPUT: a string of translated text input in UTF8 format. May contain a single character or several.
+- E_JOYSTICKCONNECTED: a joystick was plugged in.
+- E_JOYSTICKDISCONNECTED: a joystick was disconnected.
 - E_JOYSTICKBUTTONDOWN: a joystick button was pressed.
 - E_JOYSTICKBUTTONUP: a joystick button was released.
 - E_JOYSTICKAXISMOVE: a joystick axis was moved.
 - E_JOYSTICKHATMOVE: a joystick POV hat was moved.
-- E_CONTROLLERBUTTONDOWN: a joystick button on an SDL controller was pressed.
-- E_CONTROLLERBUTTONUP: a joystick button on an SDL controller was released.
-- E_CONTROLLERAXISMOVE: a joystick axis on an SDL controller was moved.
+- E_TOUCHBEGIN: a finger touched the screen.
+- E_TOUCHEND: a finger was lifted from the screen.
+- E_TOUCHMOVE: a finger moved on the screen.
+- E_GESTURERECORDED : recording a touch gesture is complete.
+- E_GESTUREINPUT : a touch gesture was recognized.
+- E_MULTIGESTURE : a multi-finger pinch/rotation touch gesture is underway.
+- E_DROPFILE : a file was drag-dropped on the application window.
+- E_INPUTFOCUS : application input focus or window minimization state changed.
+- E_MOUSEVISIBLECHANGED : the visibility of the operating system mouse cursor was changed.
+- E_EXITREQUESTED : application exit was requested (eg. with the window close button.)
+
+\section InputKeyboard Keyboard and mouse input
 
 Key events include both the symbolic keycode ("Key") that depends on the keyboard layout, the layout- and operating system-independent SDL scancode ("Scancode"), and the true operating system-specific raw keycode ("Raw").
 
-The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
+The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down. To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
 
-To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
+Mouse motion since the last frame can be accessed with \ref Input::GetMouseMove() "GetMouseMove()". When the operating system mouse cursor is hidden, it will be kept centered to the application window to allow "endless" movement in any direction, for example for camera control. The cursor position within the window can be queried with \ref Input::GetMousePosition "GetMousePosition()", but that should only be used with a visible cursor (when no automatic centering is being done.)
 
-In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
+In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove, input.mousePosition.
 
-To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
+\section InputJoystick Joystick input
 
-If the joystick model is recognized by SDL you will also get the "controller" variety of events shown above, and the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them.
+Plugged in joysticks will begin sending input events automatically. Each joystick will be assigned a joystick ID which will be used in subsequent joystick events, as well as for retrieving the \ref JoystickState "joystick state". Use \ref Input::GetJoystick "GetJoystick()" to retrieve the joystick state by ID. In case you do not have the ID, you can also use \ref Input::GetJoystickByIndex() "GetJoystickByIndex()" which uses a zero-based index; see \ref Input::GetNumJoysticks "GetNumJoysticks()" for the number of currently connected joysticks. The ID, as well as the joystick name, can be looked up from the joystick state.
 
-From the input subsystem you can also query whether the application window has input focus, or is minimized.
+If the joystick model is recognized by SDL as a game controller the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them. Use \ref JoystickState::IsController "IsController()" to distinguish between a game controller and an unrecognized joystick.
 
-On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as char events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
+On platforms that support the accelerometer, it will appear as a "virtual" joystick.
+
+\section InputTouch Touch input
+
+On platforms where touch input is available, touch begin/end/move events will be sent, as well as multi-gesture events with pinch/rotation delta values when more than one finger is pressed down. The current finger touches can also be accessed via a polling API: \ref Input::GetNumTouches "GetNumTouches()" and \ref Input::GetTouch "GetTouch()".
+
+Touch gestures can be recorded using SDL's inbuilt $1 gesture recognition system. Use \ref Input::RecordGesture "RecordGesture()" to start recording. The following finger movements will be recorded until the finger is lifted, at which point the recording ends and the E_GESTURERECORDED event is sent with the hash ID of the new gesture. The current in-memory gesture(s) can be saved or loaded as binary data using the \ref Input::SaveGestures "SaveGestures()", \ref Input::SaveGesture "SaveGesture()", \ref Input::LoadGestures "LoadGestures()" functions.
+
+Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event will be sent. In addition to the ID of the best matched gesture, it contains the center position and an error metric (lower = better.)
+
+Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
+
+\section InputPlatformSpecific Platform-specific details
+
+On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as text input events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
+
+On Windows the user must first touch the screen once before touch input is activated. Trying to record or load touch gestures will fail before that.
 
 \page Audio %Audio
 
@@ -1849,6 +1876,76 @@ When making your own work functions, observe that the following things are (at l
 - Requesting resources from ResourceCache
 - Executing script functions
 
+\page AttributeAnimation %Attribute animation
+Attribute animation is a new system for Urho3D, With it user can apply animation to object’s attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
+
+These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
+\code
+SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+
+light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+\endcode
+
+On above code, we first create an AttributeAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+
+Another way is load attribute animation from resource, here is a simple sample:
+\code
+AttributeAnimatio* colorAnimation = cache->GetResource<AttributeAnimation>("Scene/LightColorAnimation.xml");
+light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
+\endcode
+
+These are three kind of wrap mode for attribute animation:
+- WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
+- WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
+- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame’s value.
+
+These is another argument call speed the animation play speed, the default value is 1.0f, user can change the value to control the animation play speed. User can also change animation’s wrap mode and speed on fly.
+
+When user want to apply multi-attribute animation to an object, ObjectAnimation is for it. For example when user want to apply position and color animation for light, can use following code:
+\code
+// Create object animation.
+SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
+
+// Create position animation
+SharedPtr<AttributeAnimation> positionAnimation(new AttributeAnimation(context_));
+positionAnimation->SetKeyFrame(0.0f, Vector3::ZERO);
+positionAnimation->SetKeyFrame(1.0f, Vector3(1.0f, 1.0f, 1.0f));
+positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
+// Add position animation
+lightAnimation->AddAttributeAnimation("Position", positionAnimation, WM_LOOP); 
+
+// Create color animation
+SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+// Add color animation
+lightAnimation->AddAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+
+// Apply object animation to light
+light->SetObjectAnimation(lightAnimation);
+\endcode
+
+Also user can load object animation from file, like:
+\code
+ObjectAnimation * lightAnimation = cache->GetResource< ObjectAnimation >("Scene/LightAnimation.xml");
+light-> SetObjectAnimation (lightAnimation);
+\endcode
+
+Current attribute animation use linear interpolation for numeric value type (like float, Vector2, Vector3 etc), and these is no interpolation for non-numeric type (like int, bool).
+
+Attribute animation and object animation can be save to scene file, Someday if our editor support edit animation, we can create animation in editor and save it to scene file.
+
+\section AttributeAnimation_Classes Classes of attribute animation:
+- Animatable: Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
+- AttributeAnimation: Attribute animation class, include some key frame in it.
+- ObjectAnimation: Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
+- AttributeAnimationInfo: Attribute animation info, it include attribute animation, wrap mode and animation speed.
+- AttributeAnimationInstance: Attribute animation instance, it is derived from AttributeAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
+
 \page Tools Tools
 
 \section Tools_AssetImporter AssetImporter
@@ -1895,6 +1992,7 @@ Options:
 -cm         Check and do not overwrite if material exists
 -ct         Check and do not overwrite if texture exists
 -ctn        Check and do not overwrite if texture has newer timestamp
+-am         Export all meshes even if identical (scene mode only)
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
@@ -2178,7 +2276,7 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 When contributing code to the Urho3D project, there are a few things to check so that the process goes smoothly.
 
-First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be very sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
+First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
 Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2014 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
@@ -2196,13 +2294,13 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - \ref Network "Network replication" of a component's attributes must be triggered manually by calling MarkNetworkUpdate() in each setter function that modifies a network-replicated attribute. See the Camera class for a straightforward example.
 
-- Define \ref Events "events" where you anticipate that an external party might be interested in hooking to something happening. For example the editor implements showing and updating the scene hierarchy through events that the scene nodes send as they add/remove child nodes and components.
+- Define \ref Events "events" where you anticipate that an external party may want to hook up to something happening. For example the editor updates its scene hierarchy window by subscribing to the scene change events: child node added/removed, component added/removed.
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
 - When you add a new third-party library, insert its license statement to the License.txt in the root directory.
 
-- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs :)
+- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
 */
 
 }

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Serializable.h"
+#include "Animatable.h"
 
 namespace Urho3D
 {
@@ -34,7 +34,7 @@ class Scene;
 struct ComponentReplicationState;
 
 /// Base class for components. Components can be created to scene nodes.
-class URHO3D_API Component : public Serializable
+class URHO3D_API Component : public Animatable
 {
     OBJECT(Component);
     BASEOBJECT(Component);
@@ -95,6 +95,10 @@ public:
     void MarkNetworkUpdate();
     
 protected:
+    /// Handle attribute animation added.
+    virtual void OnAttributeAnimationAdded();
+    /// Handle attribute animation removed.
+    virtual void OnAttributeAnimationRemoved();
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node) {};
     /// Handle scene node transform dirtied.
@@ -105,6 +109,8 @@ protected:
     void SetID(unsigned id);
     /// Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
+    /// Handle scene attribute animation update event.
+    void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Scene node.
     Node* node_;

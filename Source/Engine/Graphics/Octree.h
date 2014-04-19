@@ -196,6 +196,9 @@ public:
     void DrawDebugGeometry(bool depthTest);
     
 private:
+    /// Handle render update in case of headless execution.
+    void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    
     /// Drawable objects that require update.
     PODVector<Drawable*> drawableUpdates_;
     /// Drawable objects that require reinsertion.

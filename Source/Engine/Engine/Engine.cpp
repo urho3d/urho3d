@@ -184,6 +184,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData;Data").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
+    Vector<String> autoloadFolders = GetParameter(parameters, "AutoloadPaths", "Extra").GetString().Split(';');
 
     for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
@@ -243,6 +244,64 @@ bool Engine::Initialize(const VariantMap& parameters)
         if (!success)
         {
             LOGERROR("Failed to add resource package " + resourcePackages[i]);
+            return false;
+        }
+    }
+    
+    // Add auto load folders
+    for (unsigned i = 0; i < autoloadFolders.Size(); ++i)
+    {
+        bool success = true;
+        String autoloadFolder = autoloadFolders[i];
+        String badResource;
+        if (fileSystem->DirExists(autoloadFolder))
+        {
+            Vector<String> folders;
+            fileSystem->ScanDir(folders, autoloadFolder, "*", SCAN_DIRS, false);
+            for (unsigned y = 0; y < folders.Size(); ++y)
+            {
+                String folder = folders[y];
+                if (folder.StartsWith("."))
+                    continue;
+
+                String autoResourceDir = exePath + autoloadFolder + "/" + folder;
+                success = cache->AddResourceDir(autoResourceDir);
+                if (!success)
+                {
+                    badResource = folder;
+                    break;
+                }
+            }
+
+            if (success)
+            {
+                Vector<String> paks;
+                fileSystem->ScanDir(paks, autoloadFolder, "*.pak", SCAN_FILES, false);
+                for (unsigned y = 0; y < paks.Size(); ++y)
+                {
+                    String pak = paks[y];
+                    if (pak.StartsWith("."))
+                        continue;
+
+                    String autoResourcePak = exePath + autoloadFolder + "/" + pak;
+                    SharedPtr<PackageFile> package(new PackageFile(context_));
+                    if (package->Open(autoResourcePak))
+                        cache->AddPackageFile(package);
+                    else
+                    {
+                        badResource = autoResourcePak;
+                        success = false;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+            LOGWARNING("Skipped autoload folder " + autoloadFolders[i] + " as it does not exist");
+
+        if (!success)
+        {
+            LOGERROR("Failed to add resource " + badResource + " in autoload folder " + autoloadFolders[i]);
             return false;
         }
     }
@@ -703,6 +762,11 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument == "p" && !value.Empty())
             {
                 ret["ResourcePaths"] = value;
+                ++i;
+            }
+            else if (argument == "ap" && !value.Empty())
+            {
+                ret["AutoloadPaths"] = value;
                 ++i;
             }
             else if (argument == "ds" && !value.Empty())

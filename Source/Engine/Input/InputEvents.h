@@ -87,12 +87,54 @@ EVENT(E_KEYUP, KeyUp)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Character typed on the keyboard.
-EVENT(E_CHAR, Char)
+/// Text input event.
+EVENT(E_TEXTINPUT, TextInput)
 {
-    PARAM(P_CHAR, Char);                    // int
+    PARAM(P_TEXT, Text);                    // String
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
+/// Joystick connected.
+EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
+{
+    PARAM(P_JOYSTICKID, JoystickID);        // int
+}
+
+/// Joystick disconnected.
+EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
+{
+    PARAM(P_JOYSTICKID, JoystickID);        // int
+}
+
+/// Joystick button pressed.
+EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
+{
+    PARAM(P_JOYSTICKID, JoystickID);        // int
+    PARAM(P_BUTTON, Button);                // int
+}
+
+/// Joystick button released.
+EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
+{
+    PARAM(P_JOYSTICKID, JoystickID);        // int
+    PARAM(P_BUTTON, Button);                // int
+}
+
+/// Joystick axis moved.
+EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
+{
+    PARAM(P_JOYSTICKID, JoystickID);        // int
+    PARAM(P_AXIS, Button);                  // int
+    PARAM(P_POSITION, Position);            // float
+}
+
+/// Joystick POV hat moved.
+EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
+{
+    PARAM(P_JOYSTICKID, JoystickID);        // int
+    PARAM(P_HAT, Button);                   // int
+    PARAM(P_POSITION, Position);            // int
 }
 
 /// Finger pressed on the screen.
@@ -123,56 +165,30 @@ EVENT(E_TOUCHMOVE, TouchMove)
     PARAM(P_PRESSURE, Pressure);            // float
 }
 
-/// Joystick button pressed.
-EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
+/// A touch gesture finished recording.
+EVENT(E_GESTURERECORDED, GestureRecorded)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_GESTUREID, GestureID);          // unsigned
 }
 
-/// Joystick button released.
-EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
+/// A recognized touch gesture was input by the user.
+EVENT(E_GESTUREINPUT, GestureInput)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_GESTUREID, GestureID);          // unsigned
+    PARAM(P_CENTERX, CenterX);              // int
+    PARAM(P_CENTERY, CenterY);              // int
+    PARAM(P_NUMFINGERS, NumFingers);        // int
+    PARAM(P_ERROR, Error);                  // float
 }
 
-/// Joystick axis moved.
-EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
+/// Pinch/rotate multi-finger touch gesture motion update.
+EVENT(E_MULTIGESTURE, MultiGesture)
 {
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_AXIS, Button);                  // int
-    PARAM(P_POSITION, Position);            // float
-}
-
-/// Joystick POV hat moved.
-EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_HAT, Button);                   // int
-    PARAM(P_POSITION, Position);            // int
-}
-
-/// Controller button pressed.
-EVENT(E_CONTROLLERBUTTONDOWN, ControllerButtonDown)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_BUTTON, Button);                // int
-}
-
-/// Controller button released.
-EVENT(E_CONTROLLERBUTTONUP, ControllerButtonUp)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_BUTTON, Button);                // int
-}
-
-/// Controller axis moved.
-EVENT(E_CONTROLLERAXISMOVE, ControllerAxisMove)
-{
-    PARAM(P_JOYSTICK, Joystick);            // int
-    PARAM(P_AXIS, Button);                  // int
-    PARAM(P_POSITION, Position);            // float
+    PARAM(P_CENTERX, CenterX);              // int
+    PARAM(P_CENTERY, CenterY);              // int
+    PARAM(P_NUMFINGERS, NumFingers);        // int
+    PARAM(P_DTHETA, DTheta);                // float (degrees)
+    PARAM(P_DDIST, DDist);                  // float
 }
 
 /// A file was drag-dropped into the application window.

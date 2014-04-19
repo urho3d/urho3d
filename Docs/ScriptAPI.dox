@@ -2,9 +2,2021 @@ namespace Urho3D
 {
 
 /**
+
+\page EventList Event list
+
+## %Core events
+
+### BeginFrame
+- %FrameNumber : unsigned
+- %TimeStep : float
+
+### Update
+- %TimeStep : float
+
+### PostUpdate
+- %TimeStep : float
+
+### RenderUpdate
+- %TimeStep : float
+
+### PostRenderUpdate
+- %TimeStep : float
+
+### EndFrame
+
+## %Engine events
+
+### ConsoleCommand
+- %Command : String
+- %Id : String
+
+## %Drawable events
+
+### BoneHierarchyCreated
+- %Node : Node pointer
+
+### AnimationTrigger
+- %Node : Node pointer
+- %Name : String
+- %Time : Float
+- %Data : User-defined data type
+
+### TerrainCreated
+- %Node : Node pointer
+
+## %Graphics events
+
+### WindowMessage
+- %Window : int
+- %Msg : int
+- %WParam : int
+- %LParam : int
+- %Handled : bool
+
+### ScreenMode
+- %Width : int
+- %Height : int
+- %Fullscreen : bool
+- %Resizable : bool
+- %Borderless : bool
+
+### GraphicsFeatures
+
+### RenderSurfaceUpdate
+
+### BeginRendering
+
+### EndRendering
+
+### BeginViewUpdate
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### EndViewUpdate
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### BeginViewRender
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### EndViewRender
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+## %IO events
+
+### LogMessage
+- %Message : String
+- %Level : int
+
+### AsyncExecFinished
+- %RequestID : unsigned
+- %ExitCode : int
+
+## %Input events
+
+### MouseButtonDown
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### MouseButtonUp
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### MouseMove
+- %X : int (only when mouse visible)
+- %Y : int (only when mouse visible)
+- %DX : int
+- %DY : int
+- %Buttons : int
+- %Qualifiers : int
+
+### MouseWheel
+- %Wheel : int
+- %Buttons : int
+- %Qualifiers : int
+
+### KeyDown
+- %Key : int
+- %Scancode : int
+- %Raw : uint
+- %Buttons : int
+- %Qualifiers : int
+- %Repeat : bool
+
+### KeyUp
+- %Key : int
+- %Scancode : int
+- %Raw : uint
+- %Buttons : int
+- %Qualifiers : int
+
+### TextInput
+- %Text : String
+- %Buttons : int
+- %Qualifiers : int
+
+### JoystickConnected
+- %JoystickID : int
+
+### JoystickDisconnected
+- %JoystickID : int
+
+### JoystickButtonDown
+- %JoystickID : int
+- %Button : int
+
+### JoystickButtonUp
+- %JoystickID : int
+- %Button : int
+
+### JoystickAxisMove
+- %JoystickID : int
+- %Button : int
+- %Position : float
+
+### JoystickHatMove
+- %JoystickID : int
+- %Button : int
+- %Position : int
+
+### TouchBegin
+- %TouchID : int
+- %X : int
+- %Y : int
+- %Pressure : float
+
+### TouchEnd
+- %TouchID : int
+- %X : int
+- %Y : int
+
+### TouchMove
+- %TouchID : int
+- %X : int
+- %Y : int
+- %DX : int
+- %DY : int
+- %Pressure : float
+
+### GestureRecorded
+- %GestureID : unsigned
+
+### GestureInput
+- %GestureID : unsigned
+- %CenterX : int
+- %CenterY : int
+- %NumFingers : int
+- %Error : float
+
+### MultiGesture
+- %CenterX : int
+- %CenterY : int
+- %NumFingers : int
+- %DTheta : float (degrees)
+- %DDist : float
+
+### DropFile
+- %FileName : String
+
+### InputFocus
+- %Focus : bool
+- %Minimized : bool
+
+### MouseVisibleChanged
+- %Visible : bool
+
+### ExitRequested
+
+## %Network events
+
+### ServerConnected
+
+### ServerDisconnected
+
+### ConnectFailed
+
+### ClientConnected
+- %Connection : Connection pointer
+
+### ClientDisconnected
+- %Connection : Connection pointer
+
+### ClientIdentity
+- %Connection : Connection pointer
+- %Allow : bool
+
+### ClientSceneLoaded
+- %Connection : Connection pointer
+
+### NetworkMessage
+- %Connection : Connection pointer
+- %MessageID : int
+- %Data : Buffer
+
+### NetworkUpdate
+
+### NetworkUpdateSent
+
+### NetworkSceneLoadFailed
+- %Connection : Connection pointer
+
+### RemoteEventData
+- %Connection : Connection pointer
+
+## %Physics events
+
+### PhysicsPreStep
+- %World : PhysicsWorld pointer
+- %TimeStep : float
+
+### PhysicsPostStep
+- %World : PhysicsWorld pointer
+- %TimeStep : float
+
+### PhysicsCollisionStart
+- %World : PhysicsWorld pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %BodyA : RigidBody pointer
+- %BodyB : RigidBody pointer
+- %Trigger : bool
+
+### PhysicsCollision
+- %World : PhysicsWorld pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %BodyA : RigidBody pointer
+- %BodyB : RigidBody pointer
+- %Trigger : bool
+
+### PhysicsCollisionEnd
+- %World : PhysicsWorld pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %BodyA : RigidBody pointer
+- %BodyB : RigidBody pointer
+- %Trigger : bool
+
+### NodeCollisionStart
+- %Body : RigidBody pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody pointer
+- %Trigger : bool
+
+### NodeCollision
+- %Body : RigidBody pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody pointer
+- %Trigger : bool
+
+### NodeCollisionEnd
+- %Body : RigidBody pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody pointer
+- %Trigger : bool
+
+## %Resource events
+
+### ReloadStarted
+
+### ReloadFinished
+
+### ReloadFailed
+
+### FileChanged
+- %FileName : String
+- %ResourceName : String
+
+### LoadFailed
+- %ResourceName : String
+
+### ResourceNotFound
+- %ResourceName : String
+
+### UnknownResourceType
+- %ResourceType : ShortStringHash
+
+## %Scene events
+
+### SceneUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### SceneSubsystemUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### UpdateSmoothing
+- %Constant : float
+- %SquaredSnapThreshold : float
+
+### SceneDrawableUpdateFinished
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### TargetPositionChanged
+
+### TargetRotationChanged
+
+### AttributeAnimationUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### ScenePostUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### AsyncLoadProgress
+- %Scene : Scene pointer
+- %Progress : float
+- %LoadedNodes : int
+- %TotalNodes : int
+
+### AsyncLoadFinished
+- %Scene : Scene pointer
+
+### NodeAdded
+- %Scene : Scene pointer
+- %Parent : Node pointer
+- %Node : Node pointer
+
+### NodeRemoved
+- %Scene : Scene pointer
+- %Parent : Node pointer
+- %Node : Node pointer
+
+### ComponentAdded
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Component : Component pointer
+
+### ComponentRemoved
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Component : Component pointer
+
+### NodeNameChanged
+- %Scene : Scene pointer
+- %Node : Node pointer
+
+### NodeEnabledChanged
+- %Scene : Scene pointer
+- %Node : Node pointer
+
+### ComponentEnabledChanged
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Component : Component pointer
+
+### TemporaryChanged
+- %Serializable : Serializable pointer
+
+## %UI events
+
+### UIMouseClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### UIMouseClickEnd
+- %Element : UIElement pointer
+- %BeginElement : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### UIMouseDoubleClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### DragDropTest
+- %Source : UIElement pointer
+- %Target : UIElement pointer
+- %Accept : bool
+
+### DragDropFinish
+- %Source : UIElement pointer
+- %Target : UIElement pointer
+- %Accept : bool
+
+### FocusChanged
+- %Element : UIElement pointer
+- %ClickedElement : UIElement pointer
+
+### NameChanged
+- %Element : UIElement pointer
+
+### Resized
+- %Element : UIElement pointer
+- %Width : int
+- %Height : int
+
+### Positioned
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+
+### VisibleChanged
+- %Element : UIElement pointer
+- %Visible : bool
+
+### Focused
+- %Element : UIElement pointer
+- %ByKey : bool
+
+### Defocused
+- %Element : UIElement pointer
+
+### LayoutUpdated
+- %Element : UIElement pointer
+
+### Pressed
+- %Element : UIElement pointer
+
+### Released
+- %Element : UIElement pointer
+
+### Toggled
+- %Element : UIElement pointer
+- %State : bool
+
+### SliderChanged
+- %Element : UIElement pointer
+- %Value : float
+
+### SliderPaged
+- %Element : UIElement pointer
+- %Offset : int
+- %Pressed : bool
+
+### ScrollBarChanged
+- %Element : UIElement pointer
+- %Value : float
+
+### ViewChanged
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+
+### ModalChanged
+- %Element : UIElement pointer
+- %Modal : bool
+
+### CharEntry
+- %Element : UIElement pointer
+- %Text : String
+- %Buttons : int
+- %Qualifiers : int
+
+### TextChanged
+- %Element : UIElement pointer
+- %Text : String
+
+### TextFinished
+- %Element : UIElement pointer
+- %Text : String
+
+### MenuSelected
+- %Element : UIElement pointer
+
+### ItemSelected
+- %Element : UIElement pointer
+- %Selection : int
+
+### ItemDeselected
+- %Element : UIElement pointer
+- %Selection : int
+
+### SelectionChanged
+- %Element : UIElement pointer
+
+### ItemClicked
+- %Element : UIElement pointer
+- %Item : UIElement pointer
+- %Selection : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### ItemDoubleClicked
+- %Element : UIElement pointer
+- %Item : UIElement pointer
+- %Selection : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### UnhandledKey
+- %Element : UIElement pointer
+- %Key : int
+- %Buttons : int
+- %Qualifiers : int
+
+### FileSelected
+- %FileName : String
+- %Filter : String
+- %Ok : bool
+
+### MessageACK
+- %Ok : bool
+
+### ElementAdded
+- %Root : UIElement pointer
+- %Parent : UIElement pointer
+- %Element : UIElement pointer
+
+### ElementRemoved
+- %Root : UIElement pointer
+- %Parent : UIElement pointer
+- %Element : UIElement pointer
+
+### HoverBegin
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### HoverEnd
+- %Element : UIElement pointer
+
+### DragBegin
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### DragMove
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### DragEnd
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### DragCancel
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### UIDropFile
+- %FileName : String
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int (only if element is non-null)
+- %ElementY : int (only if element is non-null)
+
+
+\page AttributeList Attribute list
+
+### AnimatedModel
+- %Is %Enabled : bool
+- %Model : ResourceRef
+- %Material : ResourceRefList
+- %Is %Occluder : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Update %When %Invisible : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %LOD %Bias : float
+- %Animation %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Animation %States : VariantVector
+
+### AnimatedSprite2D
+- %Speed : float
+- %Cycle %Mode : int
+- %Animation : ResourceRef
+- %Flip X : bool
+- %Flip Y : bool
+- %Color : Color
+- %Layer : int
+- %Order %in %Layer : int
+- %Sprite : ResourceRef
+- %Blend %Mode : int
+- %Material : ResourceRef
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+### AnimationController
+- %Is %Enabled : bool
+
+### BillboardSet
+- %Is %Enabled : bool
+- %Material : ResourceRef
+- %Relative %Position : bool
+- %Relative %Scale : bool
+- %Sort %By %Distance : bool
+- %Face %Camera : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %Animation %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Billboards : VariantVector
+
+### BorderImage
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+
+### Button
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Pressed %Image %Offset : IntVector2
+- %Pressed %Child %Offset : IntVector2
+- %Repeat %Delay : float
+- %Repeat %Rate : float
+
+### Camera
+- %Is %Enabled : bool
+- %Near %Clip : float
+- %Far %Clip : float
+- %FOV : float
+- %Aspect %Ratio : float
+- %Fill %Mode : int
+- %Auto %Aspect %Ratio : bool
+- %Orthographic : bool
+- %Orthographic %Size : float
+- %Zoom : float
+- %LOD %Bias : float
+- %View %Mask : int
+- %View %Override %Flags : int
+- %Projection %Offset : Vector2
+- %Reflection %Plane : Vector4
+- %Clip %Plane : Vector4
+- %Use %Reflection : bool
+- %Use %Clipping : bool
+
+### CheckBox
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Is %Checked : bool
+- %Checked %Image %Offset : IntVector2
+
+### CollisionBox2D
+- %Size : Vector2
+- %Center : Vector2
+- %Angle : float
+- %Trigger : bool
+- %Category %Bits : int
+- %Mask %Bits : int
+- %Group %Index : int
+- %Density : float
+- %Friction : float
+- %Restitution : float
+
+### CollisionChain2D
+- %Loop : bool
+- %Trigger : bool
+- %Category %Bits : int
+- %Mask %Bits : int
+- %Group %Index : int
+- %Density : float
+- %Friction : float
+- %Restitution : float
+
+### CollisionCircle2D
+- %Radius : float
+- %Center : Vector2
+- %Trigger : bool
+- %Category %Bits : int
+- %Mask %Bits : int
+- %Group %Index : int
+- %Density : float
+- %Friction : float
+- %Restitution : float
+
+### CollisionEdge2D
+- %Vertex 1 : Vector2
+- %Vertex 2 : Vector2
+- %Trigger : bool
+- %Category %Bits : int
+- %Mask %Bits : int
+- %Group %Index : int
+- %Density : float
+- %Friction : float
+- %Restitution : float
+
+### CollisionPolygon2D
+- %Trigger : bool
+- %Category %Bits : int
+- %Mask %Bits : int
+- %Group %Index : int
+- %Density : float
+- %Friction : float
+- %Restitution : float
+
+### CollisionShape
+- %Is %Enabled : bool
+- %Shape %Type : int
+- %Size : Vector3
+- %Offset %Position : Vector3
+- %Offset %Rotation : Quaternion
+- %Model : ResourceRef
+- %LOD %Level : int
+- %Collision %Margin : float
+- %CustomGeometry %NodeID : int
+
+### Constraint
+- %Is %Enabled : bool
+- %Constraint %Type : int
+- %Position : Vector3
+- %Rotation : Quaternion
+- %Other %Body %Position : Vector3
+- %Other %Body %Rotation : Quaternion
+- %Other %Body %NodeID : int
+- %High %Limit : Vector2
+- %Low %Limit : Vector2
+- %ERP %Parameter : float
+- %CFM %Parameter : float
+- %Disable %Collision : bool
+
+### ConstraintDistance2D
+- %Owner %Body %Anchor : Vector2
+- %Other %Body %Anchor : Vector2
+- %Frequency %Hz : float
+- %Damping %Ratio : float
+- %Collide %Connected : bool
+
+### ConstraintFriction2D
+- %Anchor : Vector2
+- %Max %Force : float
+- %Max %Torque : float
+- %Collide %Connected : bool
+
+### ConstraintGear2D
+- %Ratio : float
+- %Collide %Connected : bool
+
+### ConstraintMotor2D
+- %Linear %Offset : Vector2
+- %Angular %Offset : float
+- %Max %Force : float
+- %Max %Torque : float
+- %Correction %Factor : float
+- %Collide %Connected : bool
+
+### ConstraintMouse2D
+- %Target : Vector2
+- %Max %Force : float
+- %Frequency %Hz : float
+- %Damping %Ratio : float
+- %Collide %Connected : bool
+
+### ConstraintPrismatic2D
+- %Anchor : Vector2
+- %Axis : Vector2
+- %Enable %Limit : bool
+- %Lower %translation : float
+- %Upper %translation : float
+- %Enable %Motor : bool
+- %Max %Motor %Force : float
+- %Motor %Speed : float
+- %Collide %Connected : bool
+
+### ConstraintPulley2D
+- %Owner %Body %Ground %Anchor : Vector2
+- %Other %Body %Ground %Anchor : Vector2
+- %Owner %Body %Anchor : Vector2
+- %Other %Body %Anchor : Vector2
+- %Ratio : float
+- %Collide %Connected : bool
+
+### ConstraintRevolute2D
+- %Anchor : Vector2
+- %Enable %Limit : bool
+- %Lower %Angle : float
+- %Upper %Angle : float
+- %Enable %Motor : bool
+- %Motor %Speed : float
+- %Max %Motor %Torque : float
+- %Collide %Connected : bool
+
+### ConstraintRope2D
+- %Owner %Body %Anchor : Vector2
+- %Other %Body %Anchor : Vector2
+- %Max %Length : float
+- %Collide %Connected : bool
+
+### ConstraintWeld2D
+- %Anchor : Vector2
+- %Frequency %Hz : float
+- %Damping %Ratio : float
+- %Collide %Connected : bool
+
+### ConstraintWheel2D
+- %Anchor : Vector2
+- %Axis : Vector2
+- %Enable %Motor : bool
+- %Max %Motor %Torque : float
+- %Motor %Speed : float
+- %Frequency %Hz : float
+- %Damping %Ratio : float
+- %Collide %Connected : bool
+
+### Cursor
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Use %System %Shapes : bool
+- %Shapes : VariantVector
+
+### CustomGeometry
+- %Is %Enabled : bool
+- %Materials : ResourceRefList
+- %Is %Occluder : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+### DecalSet
+- %Is %Enabled : bool
+- %Material : ResourceRef
+- %Max %Vertices : int
+- %Max %Indices : int
+- %Can %Be %Occluded : bool
+- %Draw %Distance : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+### DropDownList
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Pressed %Image %Offset : IntVector2
+- %Pressed %Child %Offset : IntVector2
+- %Repeat %Delay : float
+- %Repeat %Rate : float
+- %Popup %Offset : IntVector2
+- %Selection : int
+- %Resize %Popup : bool
+
+### Light
+- %Is %Enabled : bool
+- %Light %Type : int
+- %Color : Color
+- %Specular %Intensity : float
+- %Brightness %Multiplier : float
+- %Range : float
+- %Spot %FOV : float
+- %Spot %Aspect %Ratio : float
+- %Attenuation %Texture : ResourceRef
+- %Light %Shape %Texture : ResourceRef
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Per %Vertex : bool
+- %Draw %Distance : float
+- %Fade %Distance : float
+- %Shadow %Distance : float
+- %Shadow %Fade %Distance : float
+- %Shadow %Intensity : float
+- %Shadow %Resolution : float
+- %Focus %To %Scene : bool
+- %Non-uniform %View : bool
+- %Auto-Reduce %Size : bool
+- %CSM %Splits : Vector4
+- %CSM %Fade %Start : float
+- %CSM %Bias %Auto %Adjust : float
+- %View %Size %Quantize : float
+- %View %Size %Minimum : float
+- %Depth %Constant %Bias : float
+- %Depth %Slope %Bias : float
+- %Near/Farclip %Ratio : float
+- %View %Mask : int
+- %Light %Mask : int
+
+### LineEdit
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Max %Length : int
+- %Is %Cursor %Movable : bool
+- %Is %Text %Selectable : bool
+- %Is %Text %Copyable : bool
+- %Cursor %Blink %Rate : float
+- %Echo %Character : int
+
+### ListView
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %View %Position : IntVector2
+- %Scroll %Step : float
+- %Page %Step : float
+- %Auto %Show/Hide %Scrollbars : bool
+- %Highlight %Mode : int
+- %Multiselect : bool
+- %Hierarchy %Mode : bool
+- %Base %Indent : int
+- %Clear %Sel. %On %Defocus : bool
+
+### LuaScriptInstance
+- %Is %Enabled : bool
+- %Script %File : ResourceRef
+- %Script %Object %Type : String
+
+### Menu
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Pressed %Image %Offset : IntVector2
+- %Pressed %Child %Offset : IntVector2
+- %Repeat %Delay : float
+- %Repeat %Rate : float
+- %Popup %Offset : IntVector2
+
+### Navigable
+- %Is %Enabled : bool
+- %Recursive : bool
+
+### NavigationMesh
+- %Tile %Size : int
+- %Cell %Size : float
+- %Cell %Height : float
+- %Agent %Height : float
+- %Agent %Radius : float
+- %Agent %Max %Climb : float
+- %Agent %Max %Slope : float
+- %Region %Min %Size : float
+- %Region %Merge %Size : float
+- %Edge %Max %Length : float
+- %Edge %Max %Error : float
+- %Detail %Sample %Distance : float
+- %Detail %Sample %Max %Error : float
+- %Bounding %Box %Padding : Vector3
+
+### NetworkPriority
+- %Base %Priority : float
+- %Distance %Factor : float
+- %Minimum %Priority : float
+- %Always %Update %Owner : bool
+
+### Node
+- %Is %Enabled : bool
+- %Name : String
+- %Position : Vector3
+- %Rotation : Quaternion
+- %Scale : Vector3
+- %Variables : VariantMap
+
+### Octree
+- %Bounding %Box %Min : Vector3
+- %Bounding %Box %Max : Vector3
+- %Number %of %Levels : int
+
+### OffMeshConnection
+- %Is %Enabled : bool
+- %Endpoint %NodeID : int
+- %Radius : float
+- %Bidirectional : bool
+
+### ParticleEmitter
+- %Is %Enabled : bool
+- %Material : ResourceRef
+- %Max %Particles : int
+- %Emission %Rate %Min : float
+- %Emission %Rate %Max : float
+- %Emitter %Type : int
+- %Emitter %Size : Vector3
+- %Active %Time : float
+- %Inactive %Time : float
+- %Is %Emitting : bool
+- %Update %When %Invisible : bool
+- %Relative %Position : bool
+- %Relative %Scale : bool
+- %Sort %By %Distance : bool
+- %Face %Camera : bool
+- %Time %To %Live %Min : float
+- %Time %To %Live %Max : float
+- %Particle %Size %Min : Vector2
+- %Particle %Size %Max : Vector2
+- %Direction %Min : Vector3
+- %Direction %Max : Vector3
+- %Velocity %Min : float
+- %Velocity %Max : float
+- %Rotation %Min : float
+- %Rotation %Max : float
+- %Rotation %Speed %Min : float
+- %Rotation %Speed %Max : float
+- %Constant %Force : Vector3
+- %Damping %Force : float
+- %Size %Add : float
+- %Size %Mul : float
+- %Particle %Colors : VariantVector
+- %UV %Animation : VariantVector
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %Animation %LOD %Bias : float
+- %Period %Timer : float
+- %Emission %Timer : float
+
+### ParticleEmitter2D
+- %Particle %Effect : ResourceRef
+- %Layer : int
+- %Order %in %Layer : int
+- %Sprite : ResourceRef
+- %Blend %Mode : int
+- %Material : ResourceRef
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+### PhysicsWorld
+- %Gravity : Vector3
+- %Physics %FPS : int
+- %Solver %Iterations : int
+- %Net %Max %Angular %Vel. : float
+- %Interpolation : bool
+- %Internal %Edge %Utility : bool
+- %Split %Impulse : bool
+
+### PhysicsWorld2D
+- %Draw %Shape : bool
+- %Draw %Joint : bool
+- %Draw %Aabb : bool
+- %Draw %Pair : bool
+- %Draw %CenterOfMass : bool
+- %Allow %Sleeping : bool
+- %Warm %Starting : bool
+- %Continuous %Physics : bool
+- %Sub %Stepping : bool
+- %Gravity : Vector2
+- %Auto %Clear %Forces : bool
+- %Velocity %Iterations : int
+- %Position %Iterations : int
+
+### RigidBody
+- %Is %Enabled : bool
+- %Mass : float
+- %Friction : float
+- %Anisotropic %Friction : Vector3
+- %Rolling %Friction : float
+- %Restitution : float
+- %Linear %Velocity : Vector3
+- %Angular %Velocity : Vector3
+- %Linear %Factor : Vector3
+- %Angular %Factor : Vector3
+- %Linear %Damping : float
+- %Angular %Damping : float
+- %Linear %Rest %Threshold : float
+- %Angular %Rest %Threshold : float
+- %Collision %Layer : int
+- %Collision %Mask : int
+- %Contact %Threshold : float
+- %CCD %Radius : float
+- %CCD %Motion %Threshold : float
+- %Collision %Event %Mode : int
+- %Use %Gravity : bool
+- %Is %Kinematic : bool
+- %Is %Trigger : bool
+- %Gravity %Override : Vector3
+
+### RigidBody2D
+- %Body %Type : int
+- %Mass : float
+- %Inertia : float
+- %Mass %Center : Vector2
+- %Use %Fixture %Mass : bool
+- %Linear %Damping : float
+- %Angular %Damping : float
+- %Allow %Sleep : bool
+- %Fixed %Rotation : bool
+- %Bullet : bool
+- %Gravity %Scale : float
+- %Awake : bool
+- %Linear %Velocity : Vector2
+- %Angular %Velocity : float
+
+### Scene
+- %Name : String
+- %Time %Scale : float
+- %Smoothing %Constant : float
+- %Snap %Threshold : float
+- %Elapsed %Time : float
+- %Variables : VariantMap
+
+### ScriptInstance
+- %Is %Enabled : bool
+- %Script %File : ResourceRef
+- %Class %Name : String
+
+### ScrollBar
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Orientation : int
+- %Range : float
+- %Value : float
+- %Scroll %Step : float
+- %Step %Factor : float
+- %Left %Image %Rect : IntRect
+- %Right %Image %Rect : IntRect
+- %Up %Image %Rect : IntRect
+- %Down %Image %Rect : IntRect
+
+### ScrollView
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %View %Position : IntVector2
+- %Scroll %Step : float
+- %Page %Step : float
+- %Auto %Show/Hide %Scrollbars : bool
+
+### Skybox
+- %Is %Enabled : bool
+- %Model : ResourceRef
+- %Material : ResourceRefList
+- %Is %Occluder : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Occlusion %LOD %Level : int
+
+### Slider
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Orientation : int
+- %Range : float
+- %Value : float
+- %Repeat %Rate : float
+
+### SoundListener
+- %Is %Enabled : bool
+
+### SoundSource
+- %Is %Enabled : bool
+- %Sound : ResourceRef
+- %Sound %Type : int
+- %Frequency : float
+- %Gain : float
+- %Attenuation : float
+- %Panning : float
+- %Is %Playing : bool
+- %Autoremove %on %Stop : bool
+- %Play %Position : int
+
+### SoundSource3D
+- %Is %Enabled : bool
+- %Sound : ResourceRef
+- %Sound %Type : int
+- %Frequency : float
+- %Gain : float
+- %Is %Playing : bool
+- %Autoremove %on %Stop : bool
+- %Play %Position : int
+- %Near %Distance : float
+- %Far %Distance : float
+- %Inner %Angle : float
+- %Outer %Angle : float
+- %Rolloff %Factor : float
+
+### SplinePath
+- %Interpolation %Mode : int
+- %Speed : float
+- %Controlled : int
+- %Control %Points : VariantVector
+
+### Sprite
+- %Name : String
+- %Position : Vector2
+- %Size : IntVector2
+- %Hotspot : IntVector2
+- %Scale : Vector2
+- %Rotation : float
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Blend %Mode : int
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Visible : bool
+- %Use %Derived %Opacity : bool
+- %Variables : VariantMap
+
+### StaticModel
+- %Is %Enabled : bool
+- %Model : ResourceRef
+- %Material : ResourceRefList
+- %Is %Occluder : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Occlusion %LOD %Level : int
+
+### StaticModelGroup
+- %Is %Enabled : bool
+- %Model : ResourceRef
+- %Material : ResourceRefList
+- %Is %Occluder : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Occlusion %LOD %Level : int
+- %Instance %Nodes : VariantVector
+
+### StaticSprite2D
+- %Flip X : bool
+- %Flip Y : bool
+- %Color : Color
+- %Layer : int
+- %Order %in %Layer : int
+- %Sprite : ResourceRef
+- %Blend %Mode : int
+- %Material : ResourceRef
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+### Terrain
+- %Is %Enabled : bool
+- %Height %Map : ResourceRef
+- %Material : ResourceRef
+- %Vertex %Spacing : Vector3
+- %Patch %Size : int
+- %Smooth %Height %Map : bool
+- %Is %Occluder : bool
+- %Can %Be %Occluded : bool
+- %Cast %Shadows : bool
+- %Draw %Distance : float
+- %Shadow %Distance : float
+- %LOD %Bias : float
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+### Text
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Font : ResourceRef
+- %Font %Size : int
+- %Text : String
+- %Text %Alignment : int
+- %Row %Spacing : float
+- %Word %Wrap : bool
+- %Selection %Color : Color
+- %Hover %Color : Color
+- %Text %Effect : int
+- %Effect %Color : Color
+
+### Text3D
+- %Is %Enabled : bool
+- %Font : ResourceRef
+- %Material : ResourceRef
+- %Font %Size : int
+- %Text : String
+- %Text %Alignment : int
+- %Row %Spacing : float
+- %Word %Wrap : bool
+- %Can %Be %Occluded : bool
+- %Face %Camera : bool
+- %Draw %Distance : float
+- %Width : int
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Text %Effect : int
+- %Effect %Color : Color
+- %Effect %Depth %Bias : float
+
+### ToolTip
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Delay : float
+
+### UIElement
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+
+### View3D
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Resize %Border : IntRect
+- %Is %Movable : bool
+- %Is %Resizable : bool
+- %Fixed %Width %Resizing : bool
+- %Fixed %Height %Resizing : bool
+- %Is %Modal : bool
+- %Modal %Shade %Color : Color
+- %Modal %Frame %Color : Color
+- %Modal %Frame %Size : IntVector2
+- %Auto %Update : bool
+
+### Window
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Resize %Border : IntRect
+- %Is %Movable : bool
+- %Is %Resizable : bool
+- %Fixed %Width %Resizing : bool
+- %Fixed %Height %Resizing : bool
+- %Is %Modal : bool
+- %Modal %Shade %Color : Color
+- %Modal %Frame %Color : Color
+- %Modal %Frame %Size : IntVector2
+
+### Zone
+- %Is %Enabled : bool
+- %Bounding %Box %Min : Vector3
+- %Bounding %Box %Max : Vector3
+- %Ambient %Color : Color
+- %Fog %Color : Color
+- %Fog %Start : float
+- %Fog %End : float
+- %Fog %Height : float
+- %Fog %Height %Scale : float
+- %Height %Fog %Mode : bool
+- %Override %Mode : bool
+- %Ambient %Gradient : bool
+- %Priority : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+
+
 \page ScriptAPI Scripting API
 
 \section ScriptAPI_Classes Classes
+
+### Animatable
+
+Methods:
+
+- void ApplyAttributes()
+- Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool Load(File@, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- ShortStringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 
 ### AnimatedModel
 
@@ -17,6 +2029,9 @@ Methods:
 - AnimationState@ GetAnimationState(Animation@) const
 - AnimationState@ GetAnimationState(uint) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetMorphWeight(uint) const
 - bool IsInView(Camera@) const
@@ -36,10 +2051,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetMorphWeight(uint, float)
 
 Properties:
 
+- bool animationEnabled
 - float animationLodBias
 - AnimationState@[] animationStates // readonly
 - Variant[] attributeDefaults // readonly
@@ -67,6 +2086,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numGeometries // readonly
 - uint numMorphs // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -91,6 +2111,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -103,11 +2126,15 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFlip(bool, bool)
 
 Properties:
 
 - Animation2D@ animation
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -132,6 +2159,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int orderInLayer
@@ -214,6 +2242,9 @@ Methods:
 - AnimationState@ GetAnimationState(StringHash) const
 - AnimationState@ GetAnimationState(const String&) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetAutoFade(const String&) const
 - float GetFadeTarget(const String&) const
@@ -238,6 +2269,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetAutoFade(const String&, float)
 - bool SetLayer(const String&, uint8)
 - bool SetLooped(const String&, bool)
@@ -252,6 +2286,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -262,6 +2297,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -333,6 +2369,32 @@ Properties:
 - uint length
 
 
+### AttributeAnimation
+
+Methods:
+
+- bool Load(File@)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetEventFrame(float, const String&, const Variant&)
+- void SetKeyFrame(float, const Variant&)
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- InterpMethod interpolationMethod
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- float splineTension
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- VariantType valueType
+- int weakRefs // readonly
+
+
 ### AttributeInfo
 
 Properties:
@@ -399,6 +2461,9 @@ Methods:
 - void Commit()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -411,9 +2476,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - float animationLodBias
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -436,6 +2505,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numBillboards
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -481,6 +2551,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -510,6 +2583,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -529,6 +2605,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -580,6 +2657,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -656,6 +2734,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -685,6 +2766,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -707,6 +2791,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -758,6 +2843,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -795,6 +2881,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistance(const Vector3&) const
 - float GetDistanceSquared(const Vector3&) const
@@ -811,11 +2900,15 @@ Methods:
 - Vector3 ScreenToWorldPoint(const Vector3&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetOrthoSize(const Vector2&)
 - Vector2 WorldToScreenPoint(const Vector3&) const
 
 Properties:
 
+- bool animationEnabled
 - float aspectRatio
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -837,6 +2930,7 @@ Properties:
 - float nearClip
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - float orthoSize
 - bool orthographic
 - Matrix4 projection // readonly
@@ -881,6 +2975,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -910,6 +3007,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCheckedOffset(int, int)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -930,6 +3030,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -983,6 +3084,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -1015,6 +3117,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1026,12 +3131,16 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCenter(float, float)
 - void SetSize(float, float)
 
 Properties:
 
 - float angle
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1051,6 +3160,7 @@ Properties:
 - Vector2 massCenter // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - float restitution
 - Vector2 size
@@ -1068,6 +3178,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
@@ -1080,12 +3193,16 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetVertex(uint, const Vector2&)
 - void SetVertices(Vector2[]@)
 - const Vector2& GetVertex(uint) const
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1105,6 +3222,7 @@ Properties:
 - Vector2 massCenter // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - float restitution
 - bool temporary
@@ -1122,6 +3240,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1133,10 +3254,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCenter(float, float)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1156,6 +3281,7 @@ Properties:
 - Vector2 massCenter // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - float radius
 - int refs // readonly
 - float restitution
@@ -1173,6 +3299,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1184,10 +3313,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetVertices(const Vector2&, const Vector2&)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1206,6 +3339,7 @@ Properties:
 - Vector2 massCenter // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - float restitution
 - bool temporary
@@ -1224,6 +3358,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
@@ -1236,12 +3373,16 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetVertex(uint, const Vector2&)
 - void SetVertices(Vector2[]@)
 - const Vector2& GetVertex(uint) const
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1260,6 +3401,7 @@ Properties:
 - Vector2 massCenter // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - float restitution
 - bool temporary
@@ -1277,6 +3419,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1288,6 +3433,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetBox(const Vector3&, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
 - void SetCapsule(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
 - void SetCone(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
@@ -1302,6 +3450,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1315,6 +3464,7 @@ Properties:
 - Model@ model
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
 - Quaternion rotation
@@ -1334,6 +3484,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1345,9 +3498,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1366,6 +3523,7 @@ Properties:
 - Vector2 massCenter // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - float restitution
 - bool temporary
@@ -1429,6 +3587,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1440,9 +3601,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1453,6 +3618,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -1499,6 +3665,7 @@ Properties:
 
 Methods:
 
+- void CopySelectedRows() const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void Toggle()
 - void UpdateElements()
@@ -1509,6 +3676,7 @@ Properties:
 - BorderImage@ background // readonly
 - ShortStringHash baseType // readonly
 - String category // readonly
+- String commandInterpreter
 - XMLFile@ defaultStyle
 - bool focusOnShow
 - uint historyPosition // readonly
@@ -1531,6 +3699,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1542,9 +3713,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1562,6 +3737,7 @@ Properties:
 - Vector2 lowLimit
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - Vector3 otherAxis // writeonly
 - RigidBody@ otherBody
 - Vector3 otherPosition
@@ -1584,6 +3760,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1595,9 +3774,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1609,6 +3792,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -1625,6 +3809,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1636,9 +3823,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1652,6 +3843,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - Vector2 otherBodyAnchor
 - RigidBody2D@ ownerBody // readonly
@@ -1670,6 +3862,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1681,10 +3876,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - Vector2 anchor
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1698,6 +3897,7 @@ Properties:
 - float maxTorque
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -1714,6 +3914,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1725,9 +3928,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1739,6 +3946,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - Constraint2D@ otherConstraint
 - RigidBody2D@ ownerBody // readonly
@@ -1758,6 +3966,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1769,10 +3980,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - float angularOffset
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1788,6 +4003,7 @@ Properties:
 - float maxTorque
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -1804,6 +4020,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1815,9 +4034,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1832,6 +4055,7 @@ Properties:
 - float maxForce
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -1849,6 +4073,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1860,10 +4087,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - Vector2 anchor
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1881,6 +4112,7 @@ Properties:
 - float motorSpeed
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -1898,6 +4130,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1909,9 +4144,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1923,6 +4162,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - Vector2 otherBodyAnchor
 - Vector2 otherBodyGroundAnchor
@@ -1944,6 +4184,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -1955,10 +4198,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - Vector2 anchor
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -1975,6 +4222,7 @@ Properties:
 - float motorSpeed
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -1992,6 +4240,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2003,9 +4254,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2018,6 +4273,7 @@ Properties:
 - float maxLength
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - Vector2 otherBodyAnchor
 - RigidBody2D@ ownerBody // readonly
@@ -2036,6 +4292,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2047,10 +4306,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - Vector2 anchor
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2064,6 +4327,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -2080,6 +4344,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2091,10 +4358,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - Vector2 anchor
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2112,6 +4383,7 @@ Properties:
 - float motorSpeed
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
@@ -2152,6 +4424,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -2181,6 +4456,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -2200,6 +4478,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2251,6 +4530,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -2293,6 +4573,9 @@ Methods:
 - void DefineVertex(const Vector3&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2305,9 +4588,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2328,6 +4615,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numGeometries
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -2388,6 +4676,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2399,9 +4690,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2412,6 +4707,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -2427,6 +4723,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2441,9 +4740,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2467,6 +4770,7 @@ Properties:
 - uint numDecals // readonly
 - uint numIndices // readonly
 - uint numVertices // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -2556,6 +4860,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2568,9 +4875,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2588,6 +4899,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -2609,6 +4921,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -2621,9 +4936,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2644,6 +4963,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int orderInLayer
@@ -2674,6 +4994,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -2709,6 +5032,9 @@ Methods:
 - void SetAccelerator(int, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -2734,6 +5060,7 @@ Properties:
 
 - int acceleratorKey // readonly
 - int acceleratorQualifiers // readonly
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2788,6 +5115,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numChildren // readonly
 - uint numItems // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - UIElement@ placeholder // readonly
@@ -2992,7 +5320,7 @@ Methods:
 - bool Rename(const String&, const String&)
 - String[]@ ScanDir(const String&, const String&, uint, bool) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- int SystemCommand(const String&)
+- int SystemCommand(const String&, bool = false)
 - uint SystemCommandAsync(const String&)
 - bool SystemOpen(const String&, const String&)
 - int SystemRun(const String&, String[]@)
@@ -3003,6 +5331,7 @@ Properties:
 - ShortStringHash baseType // readonly
 - String category // readonly
 - String currentDir
+- bool executeConsoleCommands
 - String programDir // readonly
 - int refs // readonly
 - ShortStringHash type // readonly
@@ -3223,15 +5552,18 @@ Properties:
 
 Methods:
 
-- void CloseJoystick(uint)
-- bool DetectJoysticks()
+- int AddScreenJoystick(XMLFile@ = null, XMLFile@ = null)
 - int GetKeyFromName(const String&) const
 - int GetKeyFromScancode(int) const
 - String GetKeyName(int) const
 - int GetScancodeFromKey(int) const
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
-- bool OpenJoystick(uint)
+- uint LoadGestures(File@)
+- bool RecordGesture()
+- bool RemoveScreenJoystick(int)
+- bool SaveGesture(File@, uint)
+- bool SaveGestures(File@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -3239,8 +5571,8 @@ Properties:
 - ShortStringHash baseType // readonly
 - String category // readonly
 - bool focus // readonly
-- String[] joystickNames // readonly
 - JoystickState@[] joysticks // readonly
+- JoystickState@[] joysticksByIndex // readonly
 - bool[] keyDown // readonly
 - bool[] keyPress // readonly
 - bool minimized // readonly
@@ -3260,6 +5592,7 @@ Properties:
 - int refs // readonly
 - bool[] scancodeDown // readonly
 - bool[] scancodePress // readonly
+- bool[] screenJoystickVisible
 - bool screenKeyboardSupport // readonly
 - bool screenKeyboardVisible
 - bool toggleFullscreen
@@ -3307,7 +5640,9 @@ Properties:
 - float[] axisPosition // readonly
 - bool[] buttonDown // readonly
 - bool[] buttonPress // readonly
+- bool controller // readonly
 - int[] hatPosition // readonly
+- int joystickID
 - String name
 - uint numAxes // readonly
 - uint numButtons // readonly
@@ -3321,6 +5656,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -3333,9 +5671,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - float aspectRatio
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -3364,6 +5706,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - int numShadowSplits // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - bool perVertex
@@ -3403,6 +5746,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3432,6 +5778,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3451,6 +5800,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -3508,6 +5858,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -3548,6 +5899,7 @@ Methods:
 - void BringToFront()
 - void ChangeSelection(int, bool)
 - void ClearSelection()
+- void CopySelectedItemsToClipboard()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -3556,6 +5908,9 @@ Methods:
 - uint FindChild(UIElement@) const
 - uint FindItem(UIElement@)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3593,6 +5948,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3615,6 +5973,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -3670,6 +6029,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numChildren // readonly
 - uint numItems // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - float pageStep
 - UIElement@ parent
@@ -3882,6 +6242,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3912,6 +6275,9 @@ Methods:
 - void SetAccelerator(int, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3937,6 +6303,7 @@ Properties:
 
 - int acceleratorKey // readonly
 - int acceleratorQualifiers // readonly
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -3988,6 +6355,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - UIElement@ popup
@@ -4073,6 +6441,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4084,9 +6455,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4097,6 +6472,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool recursive
 - int refs // readonly
 - bool temporary
@@ -4117,6 +6493,9 @@ Methods:
 - Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Vector3 GetRandomPoint()
@@ -4133,6 +6512,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -4140,6 +6522,7 @@ Properties:
 - float agentMaxClimb
 - float agentMaxSlope
 - float agentRadius
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4159,6 +6542,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - IntVector2 numTiles // readonly
+- ObjectAnimation@ objectAnimation
 - Vector3 padding
 - int refs // readonly
 - float regionMergeSize
@@ -4212,6 +6596,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4223,10 +6610,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - bool alwaysUpdateOwner
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4240,6 +6631,7 @@ Properties:
 - float minPriority
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -4259,6 +6651,9 @@ Methods:
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode = REPLICATED)
 - ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode = REPLICATED)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@ GetChild(const String&, bool = false) const
 - Node@[]@ GetChildren(bool = false) const
@@ -4298,6 +6693,9 @@ Methods:
 - void Scale(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetEnabled(bool, bool)
 - void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
@@ -4313,6 +6711,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4328,6 +6727,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numChildren // readonly
 - uint numComponents // readonly
+- ObjectAnimation@ objectAnimation
 - Connection@ owner
 - Node@ parent
 - Vector3 position
@@ -4369,6 +6769,36 @@ Properties:
 - int weakRefs // readonly
 
 
+### ObjectAnimation
+
+Methods:
+
+- void AddAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- bool Load(File@)
+- void RemoveAttributeAnimation(AttributeAnimation@)
+- void RemoveAttributeAnimation(const String&)
+- bool Save(File@) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- Variant[] attributeAnimations // readonly
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- Variant[] speeds // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- Variant[] wrapModes // readonly
+
+
 ### Octree
 
 Methods:
@@ -4378,6 +6808,9 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@[]@ GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
@@ -4396,10 +6829,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetSize(const BoundingBox&, uint)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4411,6 +6848,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numLevels // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -4426,6 +6864,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4437,9 +6878,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4452,6 +6897,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - float radius
 - int refs // readonly
 - bool temporary
@@ -4465,6 +6911,7 @@ Properties:
 Methods:
 
 - bool Exists(const String&) const
+- String[]@ GetEntryNames() const
 - bool Open(const String&, uint = 0) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool compressed() const
@@ -4511,6 +6958,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -4525,12 +6975,16 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetColor(const Color&)
 - void SetEmitting(bool, bool)
 
 Properties:
 
 - float activeTime
+- bool animationEnabled
 - float animationLodBias
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -4575,6 +7029,7 @@ Properties:
 - uint numColors
 - uint numParticles
 - uint numTextureFrames
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - Vector2 particleSize // writeonly
@@ -4609,6 +7064,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -4621,9 +7079,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4645,6 +7107,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int orderInLayer
@@ -4707,6 +7170,9 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
@@ -4724,12 +7190,16 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - PhysicsRaycastResult SphereCast(const Ray&, float, float = M_INFINITY, uint = 0xffff)
 - void Update(float)
 - void UpdateCollisions()
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4745,6 +7215,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - int numIterations
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool splitImpulse
 - bool temporary
@@ -4761,9 +7232,13 @@ Methods:
 - void DrawDebugGeometry() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - RigidBody2D@[]@ GetRigidBodies(const Rect&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
+- RigidBody2D@ GetRigidBody(int, int, uint = 0xffff, Camera@ = 0)
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -4776,10 +7251,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - bool allowSleeping
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -4798,6 +7277,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - uint positionIterations
 - int refs // readonly
 - bool subStepping
@@ -5206,6 +7686,9 @@ Methods:
 - void ApplyTorqueImpulse(const Vector3&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 - bool Load(File@, bool = false)
@@ -5220,6 +7703,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCollisionLayerAndMask(uint, uint)
 - void SetTransform(const Vector3&, const Quaternion&)
 
@@ -5230,6 +7716,7 @@ Properties:
 - Vector3 angularFactor
 - float angularRestThreshold
 - Vector3 angularVelocity
+- bool animationEnabled
 - Vector3 anisotropicFriction
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -5257,6 +7744,7 @@ Properties:
 - float mass
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
 - float restitution
@@ -5282,6 +7770,9 @@ Methods:
 - void ApplyTorque(float, bool)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -5293,11 +7784,15 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
 - bool allowSleep
 - float angularDamping
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -5318,6 +7813,7 @@ Properties:
 - Vector2 massCenter
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -5340,6 +7836,9 @@ Methods:
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode = REPLICATED)
 - ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode = REPLICATED)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@ GetChild(const String&, bool = false) const
 - Node@[]@ GetChildren(bool = false) const
@@ -5389,6 +7888,9 @@ Methods:
 - void Scale(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
@@ -5408,6 +7910,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - bool asyncLoading // readonly
 - float asyncProgress // readonly
 - Variant[] attributeDefaults // readonly
@@ -5428,6 +7931,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numChildren // readonly
 - uint numComponents // readonly
+- ObjectAnimation@ objectAnimation
 - Octree@ octree // readonly
 - Node@ parent
 - PhysicsWorld@ physicsWorld // readonly
@@ -5519,6 +8023,9 @@ Methods:
 - bool Execute(const String&)
 - bool Execute(const String&, const Variant[]@)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -5530,9 +8037,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -5545,6 +8056,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ScriptObject@ object // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - ScriptFile@ scriptFile
 - bool temporary
@@ -5570,6 +8082,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -5599,6 +8114,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -5618,6 +8136,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -5667,6 +8186,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - Orientation orientation
 - UIElement@ parent
@@ -5709,6 +8229,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -5738,6 +8261,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -5757,6 +8283,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -5805,6 +8332,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - float pageStep
 - UIElement@ parent
@@ -5935,6 +8463,9 @@ Methods:
 - void ApplyMaterialList(const String& = String ( ))
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -5947,9 +8478,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -5971,6 +8506,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numGeometries // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -6000,6 +8536,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -6029,6 +8568,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6048,6 +8590,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6100,6 +8643,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - Orientation orientation
 - UIElement@ parent
@@ -6136,6 +8680,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6147,10 +8694,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void Update(float, float)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6162,6 +8713,7 @@ Properties:
 - bool inProgress // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - Vector3 targetPosition
 - Quaternion targetRotation
@@ -6208,6 +8760,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6219,9 +8774,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6232,6 +8791,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
 - ShortStringHash type // readonly
@@ -6246,6 +8806,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6261,10 +8824,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void Stop()
 
 Properties:
 
+- bool animationEnabled
 - float attenuation // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -6279,6 +8846,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - float panning
 - bool playing // readonly
 - int refs // readonly
@@ -6298,6 +8866,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6314,11 +8885,15 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDistanceAttenuation(float, float, float)
 - void Stop()
 
 Properties:
 
+- bool animationEnabled
 - float attenuation // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -6336,6 +8911,7 @@ Properties:
 - float nearDistance
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - float outerAngle
 - float panning
 - bool playing // readonly
@@ -6403,6 +8979,9 @@ Methods:
 - void ClearControlPoints()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetPoint(float) const
 - bool Load(File@, bool = false)
@@ -6418,9 +8997,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6434,6 +9017,7 @@ Properties:
 - bool isFinished // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
 - float speed
@@ -6453,6 +9037,9 @@ Methods:
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -6479,6 +9066,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6498,6 +9088,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6521,6 +9112,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - Vector2 position
@@ -6601,6 +9193,9 @@ Methods:
 - void ApplyMaterialList(const String& = String ( ))
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
@@ -6615,9 +9210,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6639,6 +9238,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numGeometries // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - uint occlusionLodLevel
@@ -6663,6 +9263,9 @@ Methods:
 - void ApplyMaterialList(const String& = String ( ))
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -6677,9 +9280,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6703,6 +9310,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numGeometries // readonly
 - uint numInstanceNodes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - uint occlusionLodLevel
@@ -6726,6 +9334,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -6738,10 +9349,14 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFlip(bool, bool)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6765,6 +9380,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int orderInLayer
@@ -6891,6 +9507,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetHeight(const Vector3&) const
 - Vector3 GetNormal(const Vector3&) const
@@ -6905,9 +9524,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6927,6 +9550,7 @@ Properties:
 - uint numAttributes // readonly
 - IntVector2 numPatches // readonly
 - IntVector2 numVertices // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int patchSize
@@ -6951,6 +9575,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -6963,9 +9590,13 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -6983,6 +9614,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - int refs // readonly
@@ -7011,6 +9643,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7040,6 +9675,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -7060,6 +9698,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -7114,6 +9753,7 @@ Properties:
 - uint numChars // readonly
 - uint numChildren // readonly
 - uint numRows // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -7154,6 +9794,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -7167,11 +9810,15 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetFont(Font@, int)
 - bool SetFont(const String&, int)
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -7202,6 +9849,7 @@ Properties:
 - uint numAttributes // readonly
 - uint numChars // readonly
 - uint numRows // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - float opacity
@@ -7437,6 +10085,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7466,6 +10117,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -7483,6 +10137,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -7530,6 +10185,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -7562,6 +10218,7 @@ Properties:
 - IntVector2 position
 - float pressure
 - int touchID
+- WeakHandle touchedElement
 
 
 ### UI
@@ -7622,6 +10279,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7651,6 +10311,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -7668,6 +10331,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -7714,6 +10378,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -7747,23 +10412,11 @@ Methods:
 - void FromString(const String&, const String&)
 - bool GetBool() const
 - VectorBuffer GetBuffer() const
-- Camera@ GetCamera() const // deprecated
-- CollisionShape@ GetCollisionShape() const // deprecated
-- Component@ GetComponent() const // deprecated
-- Connection@ GetConnection() const // deprecated
 - float GetFloat() const
 - int GetInt() const
-- Node@ GetNode() const // deprecated
-- PhysicsWorld@ GetPhysicsWorld() const // deprecated
 - RefCounted@ GetPtr() const
-- RenderSurface@ GetRenderSurface() const // deprecated
-- RigidBody@ GetRigidBody() const // deprecated
-- Scene@ GetScene() const // deprecated
-- Serializable@ GetSerializable() const // deprecated
 - ShortStringHash GetShortStringHash() const
 - StringHash GetStringHash() const
-- Texture@ GetTexture() const // deprecated
-- UIElement@ GetUIElement() const // deprecated
 - uint GetUInt() const
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
@@ -7965,6 +10618,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7995,6 +10651,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8013,6 +10672,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -8070,6 +10730,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -8145,6 +10806,9 @@ Methods:
 - void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -8174,6 +10838,9 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8191,6 +10858,7 @@ Methods:
 
 Properties:
 
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -8244,6 +10912,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
 - IntVector2 position
@@ -8408,6 +11077,9 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
+- AttributeAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
@@ -8420,6 +11092,9 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, AttributeAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
 
 Properties:
 
@@ -8427,6 +11102,7 @@ Properties:
 - Color ambientEndColor // readonly
 - bool ambientGradient
 - Color ambientStartColor // readonly
+- bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -8451,6 +11127,7 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
 - bool override
@@ -8624,6 +11301,12 @@ Properties:
 - HTTP_ERROR
 - HTTP_OPEN
 - HTTP_CLOSED
+
+
+### InterpMethod
+
+- IM_LINEAR
+- IM_SPLINE
 
 
 ### InterpolationMode
@@ -8835,6 +11518,13 @@ Properties:
 - VA_CENTER
 - VA_BOTTOM
 
+
+### WrapMode
+
+- WM_LOOP
+- WM_ONCE
+- WM_CLAMP
+
 \section ScriptAPI_GlobalFunctions Global functions
 - float Abs(float)
 - float Acos(float)
@@ -8968,6 +11658,8 @@ Properties:
 - uint AM_NODEID
 - uint AM_NODEIDVECTOR
 - uint AM_NOEDIT
+- Color BLACK
+- Color BLUE
 - int CONTROLLER_AXIS_LEFTX
 - int CONTROLLER_AXIS_LEFTY
 - int CONTROLLER_AXIS_RIGHTX
@@ -8989,6 +11681,7 @@ Properties:
 - int CONTROLLER_BUTTON_START
 - int CONTROLLER_BUTTON_X
 - int CONTROLLER_BUTTON_Y
+- Color CYAN
 - uint DD_DISABLED
 - uint DD_SOURCE
 - uint DD_SOURCE_AND_TARGET
@@ -9006,6 +11699,8 @@ Properties:
 - uint DRAWABLE_ZONE
 - uint FIRST_LOCAL_ID
 - uint FIRST_REPLICATED_ID
+- Color GRAY
+- Color GREEN
 - int HAT_CENTER
 - int HAT_DOWN
 - int HAT_LEFT
@@ -9129,6 +11824,7 @@ Properties:
 - int LOG_INFO
 - int LOG_NONE
 - int LOG_WARNING
+- Color MAGENTA
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
 - int MOUSEB_RIGHT
@@ -9154,6 +11850,7 @@ Properties:
 - int QUAL_ANY
 - int QUAL_CTRL
 - int QUAL_SHIFT
+- Color RED
 - int SCANCODE_0
 - int SCANCODE_1
 - int SCANCODE_2
@@ -9406,611 +12103,13 @@ Properties:
 - int SHADOWQUALITY_HIGH_24BIT
 - int SHADOWQUALITY_LOW_16BIT
 - int SHADOWQUALITY_LOW_24BIT
+- Color TRANSPARENT
 - uint VO_DISABLE_OCCLUSION
 - uint VO_DISABLE_SHADOWS
 - uint VO_LOW_MATERIAL_QUALITY
 - uint VO_NONE
-
-\page EventList Event list
-
-## %Core events
-
-### BeginFrame
-- %FrameNumber : unsigned
-- %TimeStep : float
-
-### Update
-- %TimeStep : float
-
-### PostUpdate
-- %TimeStep : float
-
-### RenderUpdate
-- %TimeStep : float
-
-### PostRenderUpdate
-- %TimeStep : float
-
-### EndFrame
-
-## %Engine events
-
-### ConsoleCommand
-- %Command : String
-
-## %Drawable events
-
-### BoneHierarchyCreated
-- %Node : Node pointer
-
-### AnimationTrigger
-- %Node : Node pointer
-- %Name : String
-- %Time : Float
-- %Data : User-defined data type
-
-### TerrainCreated
-- %Node : Node pointer
-
-## %Graphics events
-
-### WindowMessage
-- %Window : int
-- %Msg : int
-- %WParam : int
-- %LParam : int
-- %Handled : bool
-
-### ScreenMode
-- %Width : int
-- %Height : int
-- %Fullscreen : bool
-- %Resizable : bool
-- %Borderless : bool
-
-### GraphicsFeatures
-
-### RenderSurfaceUpdate
-
-### BeginRendering
-
-### EndRendering
-
-### BeginViewUpdate
-- %Texture : Texture pointer
-- %Surface : RenderSurface pointer
-- %Scene : Scene pointer
-- %Camera : Camera pointer
-
-### EndViewUpdate
-- %Texture : Texture pointer
-- %Surface : RenderSurface pointer
-- %Scene : Scene pointer
-- %Camera : Camera pointer
-
-### BeginViewRender
-- %Texture : Texture pointer
-- %Surface : RenderSurface pointer
-- %Scene : Scene pointer
-- %Camera : Camera pointer
-
-### EndViewRender
-- %Texture : Texture pointer
-- %Surface : RenderSurface pointer
-- %Scene : Scene pointer
-- %Camera : Camera pointer
-
-## %IO events
-
-### LogMessage
-- %Message : String
-- %Level : int
-
-### AsyncExecFinished
-- %RequestID : unsigned
-- %ExitCode : int
-
-## %Input events
-
-### MouseButtonDown
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### MouseButtonUp
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### MouseMove
-- %X : int (only when mouse visible)
-- %Y : int (only when mouse visible)
-- %DX : int
-- %DY : int
-- %Buttons : int
-- %Qualifiers : int
-
-### MouseWheel
-- %Wheel : int
-- %Buttons : int
-- %Qualifiers : int
-
-### KeyDown
-- %Key : int
-- %Scancode : int
-- %Raw : uint
-- %Buttons : int
-- %Qualifiers : int
-- %Repeat : bool
-
-### KeyUp
-- %Key : int
-- %Scancode : int
-- %Raw : uint
-- %Buttons : int
-- %Qualifiers : int
-
-### Char
-- %Char : int
-- %Buttons : int
-- %Qualifiers : int
-
-### TouchBegin
-- %TouchID : int
-- %X : int
-- %Y : int
-- %Pressure : float
-
-### TouchEnd
-- %TouchID : int
-- %X : int
-- %Y : int
-
-### TouchMove
-- %TouchID : int
-- %X : int
-- %Y : int
-- %DX : int
-- %DY : int
-- %Pressure : float
-
-### JoystickButtonDown
-- %Joystick : int
-- %Button : int
-
-### JoystickButtonUp
-- %Joystick : int
-- %Button : int
-
-### JoystickAxisMove
-- %Joystick : int
-- %Button : int
-- %Position : float
-
-### JoystickHatMove
-- %Joystick : int
-- %Button : int
-- %Position : int
-
-### ControllerButtonDown
-- %Joystick : int
-- %Button : int
-
-### ControllerButtonUp
-- %Joystick : int
-- %Button : int
-
-### ControllerAxisMove
-- %Joystick : int
-- %Button : int
-- %Position : float
-
-### DropFile
-- %FileName : String
-
-### InputFocus
-- %Focus : bool
-- %Minimized : bool
-
-### MouseVisibleChanged
-- %Visible : bool
-
-### ExitRequested
-
-## %Network events
-
-### ServerConnected
-
-### ServerDisconnected
-
-### ConnectFailed
-
-### ClientConnected
-- %Connection : Connection pointer
-
-### ClientDisconnected
-- %Connection : Connection pointer
-
-### ClientIdentity
-- %Connection : Connection pointer
-- %Allow : bool
-
-### ClientSceneLoaded
-- %Connection : Connection pointer
-
-### NetworkMessage
-- %Connection : Connection pointer
-- %MessageID : int
-- %Data : Buffer
-
-### NetworkUpdate
-
-### NetworkUpdateSent
-
-### NetworkSceneLoadFailed
-- %Connection : Connection pointer
-
-### RemoteEventData
-- %Connection : Connection pointer
-
-## %Physics events
-
-### PhysicsPreStep
-- %World : PhysicsWorld pointer
-- %TimeStep : float
-
-### PhysicsPostStep
-- %World : PhysicsWorld pointer
-- %TimeStep : float
-
-### PhysicsCollisionStart
-- %World : PhysicsWorld pointer
-- %NodeA : Node pointer
-- %NodeB : Node pointer
-- %BodyA : RigidBody pointer
-- %BodyB : RigidBody pointer
-- %Trigger : bool
-
-### PhysicsCollision
-- %World : PhysicsWorld pointer
-- %NodeA : Node pointer
-- %NodeB : Node pointer
-- %BodyA : RigidBody pointer
-- %BodyB : RigidBody pointer
-- %Trigger : bool
-
-### PhysicsCollisionEnd
-- %World : PhysicsWorld pointer
-- %NodeA : Node pointer
-- %NodeB : Node pointer
-- %BodyA : RigidBody pointer
-- %BodyB : RigidBody pointer
-- %Trigger : bool
-
-### NodeCollisionStart
-- %Body : RigidBody pointer
-- %OtherNode : Node pointer
-- %OtherBody : RigidBody pointer
-- %Trigger : bool
-
-### NodeCollision
-- %Body : RigidBody pointer
-- %OtherNode : Node pointer
-- %OtherBody : RigidBody pointer
-- %Trigger : bool
-
-### NodeCollisionEnd
-- %Body : RigidBody pointer
-- %OtherNode : Node pointer
-- %OtherBody : RigidBody pointer
-- %Trigger : bool
-
-## %Resource events
-
-### ReloadStarted
-
-### ReloadFinished
-
-### ReloadFailed
-
-### FileChanged
-- %FileName : String
-- %ResourceName : String
-
-### LoadFailed
-- %ResourceName : String
-
-### ResourceNotFound
-- %ResourceName : String
-
-### UnknownResourceType
-- %ResourceType : ShortStringHash
-
-## %Scene events
-
-### SceneUpdate
-- %Scene : Scene pointer
-- %TimeStep : float
-
-### SceneSubsystemUpdate
-- %Scene : Scene pointer
-- %TimeStep : float
-
-### UpdateSmoothing
-- %Constant : float
-- %SquaredSnapThreshold : float
-
-### SceneDrawableUpdateFinished
-- %Scene : Scene pointer
-- %TimeStep : float
-
-### TargetPositionChanged
-
-### TargetRotationChanged
-
-### ScenePostUpdate
-- %Scene : Scene pointer
-- %TimeStep : float
-
-### AsyncLoadProgress
-- %Scene : Scene pointer
-- %Progress : float
-- %LoadedNodes : int
-- %TotalNodes : int
-
-### AsyncLoadFinished
-- %Scene : Scene pointer
-
-### NodeAdded
-- %Scene : Scene pointer
-- %Parent : Node pointer
-- %Node : Node pointer
-
-### NodeRemoved
-- %Scene : Scene pointer
-- %Parent : Node pointer
-- %Node : Node pointer
-
-### ComponentAdded
-- %Scene : Scene pointer
-- %Node : Node pointer
-- %Component : Component pointer
-
-### ComponentRemoved
-- %Scene : Scene pointer
-- %Node : Node pointer
-- %Component : Component pointer
-
-### NodeNameChanged
-- %Scene : Scene pointer
-- %Node : Node pointer
-
-### NodeEnabledChanged
-- %Scene : Scene pointer
-- %Node : Node pointer
-
-### ComponentEnabledChanged
-- %Scene : Scene pointer
-- %Node : Node pointer
-- %Component : Component pointer
-
-### TemporaryChanged
-- %Serializable : Serializable pointer
-
-## %UI events
-
-### UIMouseClick
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### UIMouseClickEnd
-- %Element : UIElement pointer
-- %BeginElement : UIElement pointer
-- %X : int
-- %Y : int
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### UIMouseDoubleClick
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### DragDropTest
-- %Source : UIElement pointer
-- %Target : UIElement pointer
-- %Accept : bool
-
-### DragDropFinish
-- %Source : UIElement pointer
-- %Target : UIElement pointer
-- %Accept : bool
-
-### FocusChanged
-- %Element : UIElement pointer
-- %ClickedElement : UIElement pointer
-
-### NameChanged
-- %Element : UIElement pointer
-
-### Resized
-- %Element : UIElement pointer
-- %Width : int
-- %Height : int
-
-### Positioned
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-
-### VisibleChanged
-- %Element : UIElement pointer
-- %Visible : bool
-
-### Focused
-- %Element : UIElement pointer
-- %ByKey : bool
-
-### Defocused
-- %Element : UIElement pointer
-
-### LayoutUpdated
-- %Element : UIElement pointer
-
-### Pressed
-- %Element : UIElement pointer
-
-### Released
-- %Element : UIElement pointer
-
-### Toggled
-- %Element : UIElement pointer
-- %State : bool
-
-### SliderChanged
-- %Element : UIElement pointer
-- %Value : float
-
-### SliderPaged
-- %Element : UIElement pointer
-- %Offset : int
-- %Pressed : bool
-
-### ScrollBarChanged
-- %Element : UIElement pointer
-- %Value : float
-
-### ViewChanged
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-
-### ModalChanged
-- %Element : UIElement pointer
-- %Modal : bool
-
-### CharEntry
-- %Element : UIElement pointer
-- %Char : int
-- %Buttons : int
-- %Qualifiers : int
-
-### TextChanged
-- %Element : UIElement pointer
-- %Text : String
-
-### TextFinished
-- %Element : UIElement pointer
-- %Text : String
-
-### MenuSelected
-- %Element : UIElement pointer
-
-### ItemSelected
-- %Element : UIElement pointer
-- %Selection : int
-
-### ItemDeselected
-- %Element : UIElement pointer
-- %Selection : int
-
-### SelectionChanged
-- %Element : UIElement pointer
-
-### ItemClicked
-- %Element : UIElement pointer
-- %Item : UIElement pointer
-- %Selection : int
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### ItemDoubleClicked
-- %Element : UIElement pointer
-- %Item : UIElement pointer
-- %Selection : int
-- %Button : int
-- %Buttons : int
-- %Qualifiers : int
-
-### UnhandledKey
-- %Element : UIElement pointer
-- %Key : int
-- %Buttons : int
-- %Qualifiers : int
-
-### FileSelected
-- %FileName : String
-- %Filter : String
-- %Ok : bool
-
-### MessageACK
-- %Ok : bool
-
-### ElementAdded
-- %Root : UIElement pointer
-- %Parent : UIElement pointer
-- %Element : UIElement pointer
-
-### ElementRemoved
-- %Root : UIElement pointer
-- %Parent : UIElement pointer
-- %Element : UIElement pointer
-
-### HoverBegin
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %ElementX : int
-- %ElementY : int
-
-### HoverEnd
-- %Element : UIElement pointer
-
-### DragBegin
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %ElementX : int
-- %ElementY : int
-
-### DragMove
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %ElementX : int
-- %ElementY : int
-
-### DragEnd
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %ElementX : int
-- %ElementY : int
-
-### DragCancel
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %ElementX : int
-- %ElementY : int
-
-### UIDropFile
-- %FileName : String
-- %Element : UIElement pointer
-- %X : int
-- %Y : int
-- %ElementX : int (only if element is non-null)
-- %ElementY : int (only if element is non-null)
-
+- Color WHITE
+- Color YELLOW
 */
 
 }

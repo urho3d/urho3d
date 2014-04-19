@@ -53,8 +53,6 @@ DEFINE_APPLICATION_MAIN(Ragdolls)
 
 Ragdolls::Ragdolls(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
     // Register an object factory for our custom CreateRagdoll component so that we can create them to scene nodes
@@ -182,7 +180,7 @@ void Ragdolls::CreateInstructions()
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
+        "Use WASD keys and mouse/touch to move\n"
         "LMB to spawn physics objects\n"
         "F5 to save scene, F7 to load\n"
         "Space to toggle physics debug geometry"

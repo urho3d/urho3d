@@ -1,10 +1,12 @@
 $#include "MathDefs.h"
 
 static const float M_PI;
+static const float M_HALF_PI;
 static const int M_MIN_INT;
 static const int M_MAX_INT;
 static const unsigned M_MIN_UNSIGNED;
 static const unsigned M_MAX_UNSIGNED;
+
 static const float M_EPSILON;
 static const float M_LARGE_EPSILON;
 static const float M_MIN_NEARCLIP;
@@ -22,22 +24,39 @@ enum Intersection
     INSIDE
 };
 
+bool Equals(float lhs, float rhs);
+bool IsNaN(float value);
 float Lerp(float lhs, float rhs, float t);
 float Min(float lhs, float rhs);
 float Max(float lhs, float rhs);
 float Abs(float value);
 float Sign(float value);
+
 float Clamp(float value, float min, float max);
 float SmoothStep(float lhs, float rhs, float t);
-bool Equals(float lhs, float rhs);
-bool IsNaN(float value);
-bool IsPowerOfTwo(unsigned value);
-unsigned NextPowerOfTwo(unsigned value);
-unsigned SDBMHash(unsigned hash, unsigned char c);
 
+float Sin(float angle);
+float Cos(float angle);
+float Tan(float angle);
+float Asin(float x);
+float Acos(float x);
+float Atan(float x);
+float Atan2(float y, float x);
+
+int Min(int lhs, int rhs);
+int Max(int lhs, int rhs);
+int Abs(int value);
+
+int Clamp @ ClampInt(int value, int min, int max);
+
+bool IsPowerOfTwo(unsigned value);
+
+unsigned NextPowerOfTwo(unsigned value);
+
+unsigned SDBMHash(unsigned hash, unsigned char c);
 float Random();
 float Random(float range);
 float Random(float min, float max);
-float RandomNormal(float meanValue, float variance);
 int Random @ RandomInt(int range);
 int Random @ RandomInt(int min, int max);
+float RandomNormal(float meanValue, float variance);

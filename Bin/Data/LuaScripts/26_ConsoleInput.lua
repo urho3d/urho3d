@@ -34,6 +34,9 @@ function Start()
     -- Execute the common startup for samples
     SampleStart()
     
+    -- Disable default execution of Lua from the console
+    SetExecuteConsoleCommands(false)
+
     -- Subscribe to console commands and the frame update
     SubscribeToEvent("ConsoleCommand", "HandleConsoleCommand")
     SubscribeToEvent("Update", "HandleUpdate")
@@ -46,13 +49,12 @@ function Start()
 
     -- Show the console by default, make it large
     console.numRows = graphics.height / 16
+    console.numBufferedRows = 2 * console.numRows;
+    console.commandInterpreter = "LuaScript";
     console.visible = true
     
     -- Show OS mouse cursor
     input.mouseVisible = true
-
-    -- Disable default execution of Lua from the console
-    SetExecuteConsoleCommands(false)
 
     -- Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow()
@@ -65,7 +67,9 @@ function Start()
 end
 
 function HandleConsoleCommand(eventType, eventData)
-    HandleInput(eventData:GetString("Command"))
+    if eventData:GetString("Id") == "LuaScript" then
+        HandleInput(eventData:GetString("Command"))
+    end
 end
 
 function HandleUpdate(eventType, eventData)

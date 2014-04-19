@@ -126,7 +126,7 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
                     sens = -1;
                 else
                     sens = 1;
-                cameraDistance_ += Abs(touch1->delta_.y_ - touch2->delta_.y_) * sens * TOUCH_SENSITIVITY / 50.0f;
+                cameraDistance_ += Abs(touch1->delta_.y_ - touch2->delta_.y_) * sens * TOUCH_SENSITIVITY_TODO / 50.0f;
                 cameraDistance_ = Clamp(cameraDistance_, CAMERA_MIN_DIST, CAMERA_MAX_DIST); // Restrict zoom range to [1;20]
             }
         }
@@ -148,8 +148,8 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
 
                 if (touch->touchID_ == rotateTouchID_)
                 {
-                    controls.yaw_ += TOUCH_SENSITIVITY * camera->GetFov() / (float)graphics->GetHeight() * touch->delta_.x_;
-                    controls.pitch_ += TOUCH_SENSITIVITY * camera->GetFov() / (float)graphics->GetHeight() * touch->delta_.y_;
+                    controls.yaw_ += TOUCH_SENSITIVITY_TODO * camera->GetFov() / (float)graphics->GetHeight() * touch->delta_.x_;
+                    controls.pitch_ += TOUCH_SENSITIVITY_TODO * camera->GetFov() / (float)graphics->GetHeight() * touch->delta_.y_;
                     controls.pitch_ = Clamp(controls.pitch_, -80.0f, 80.0f); // Limit pitch
                 }
 
@@ -176,7 +176,7 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
     // Gyroscope (emulated by SDL through a virtual joystick)
     if (input->GetNumJoysticks() > 0) // numJoysticks = 1 on iOS & Android
     {
-        JoystickState* joystick = input->GetJoystick(0);
+        JoystickState* joystick = input->GetJoystickByIndex(0);
         if (joystick->GetNumAxes() >= 2)
         {
             if (joystick->GetAxisPosition(0) < -GYROSCOPE_THRESHOLD)

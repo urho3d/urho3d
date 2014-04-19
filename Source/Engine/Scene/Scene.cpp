@@ -21,19 +21,21 @@
 //
 
 #include "Precompiled.h"
+#include "AttributeAnimation.h"
 #include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "File.h"
 #include "Log.h"
+#include "ObjectAnimation.h"
 #include "PackageFile.h"
 #include "Profiler.h"
 #include "ReplicationState.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
-#include "UnknownComponent.h"
 #include "SplinePath.h"
+#include "UnknownComponent.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
@@ -536,6 +538,9 @@ void Scene::Update(float timeStep)
     // Update variable timestep logic
     SendEvent(E_SCENEUPDATE, eventData);
 
+    // Update scene attribute animation.
+    SendEvent(E_ATTRIBUTEANIMATIONUPDATE, eventData);
+
     // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
     SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
 
@@ -960,6 +965,8 @@ void Scene::FinishSaving(Serializer* dest) const
 
 void RegisterSceneLibrary(Context* context)
 {
+    AttributeAnimation::RegisterObject(context);
+    ObjectAnimation::RegisterObject(context);
     Node::RegisterObject(context);
     Scene::RegisterObject(context);
     SmoothedTransform::RegisterObject(context);

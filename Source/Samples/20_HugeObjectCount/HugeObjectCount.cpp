@@ -46,8 +46,6 @@ DEFINE_APPLICATION_MAIN(HugeObjectCount)
 
 HugeObjectCount::HugeObjectCount(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     animate_(false),
     useGroups_(false)
 {
@@ -168,7 +166,7 @@ void HugeObjectCount::CreateInstructions()
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
+        "Use WASD keys and mouse/touch to move\n"
         "Space to toggle animation\n"
         "G to toggle object group optimization"
     );

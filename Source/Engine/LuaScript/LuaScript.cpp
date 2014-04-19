@@ -67,7 +67,7 @@ namespace Urho3D
 LuaScript::LuaScript(Context* context) :
     Object(context),
     luaState_(0),
-    executeConsoleCommands_(true)
+    executeConsoleCommands_(false)
 {
     RegisterLuaScriptLibrary(context_);
 
@@ -108,7 +108,7 @@ LuaScript::LuaScript(Context* context) :
     SubscribeToEvent(E_POSTUPDATE, HANDLER(LuaScript, HandlePostUpdate));
 
     // Subscribe to console commands
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+    SetExecuteConsoleCommands(true);
     
     // Record the internally handled script functions so that UnsubscribeFromAllEvents doesn't destroy them
     internalEvents_.Push(E_POSTUPDATE);
@@ -174,9 +174,7 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
     {
         LuaFunctionVector& functions = eventHandleFunctions_[eventType];
         
-        HashSet<Object*>* receivers = context_->GetEventReceivers(eventType);
-        if (!receivers || !receivers->Contains(this))
-            SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
+        SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
 
         if (!functions.Contains(function))
             functions.Push(function);
@@ -225,15 +223,12 @@ void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, co
     {
         LuaFunctionVector& functions = objectHandleFunctions_[object][eventType];
 
+        // Fix issue #256
         HashSet<Object*>* receivers = context_->GetEventReceivers(object, eventType);
-        if (!receivers || !receivers->Contains(this))
-        {
-            SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
-            
-            // Fix issue #256
-            if (!functions.Empty())
-                functions.Clear();
-        }
+        if ((!receivers || !receivers->Contains(this)) && !functions.Empty())
+            functions.Clear();
+
+        SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
 
         if (!functions.Contains(function))
             functions.Push(function);
@@ -277,7 +272,14 @@ void LuaScript::ScriptUnsubscribeFromEvents(void* sender)
 
 void LuaScript::SetExecuteConsoleCommands(bool enable)
 {
+    if (enable == executeConsoleCommands_)
+        return;
+
     executeConsoleCommands_ = enable;
+    if (enable)
+        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+    else
+        UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
 
 void LuaScript::RegisterLoader()
@@ -362,7 +364,7 @@ int LuaScript::Print(lua_State *L)
         lua_pop(L, 1);
     }
 
-    LOGRAW(string);
+    LOGRAW(string + "\n");
 
     return 0;
 }
@@ -443,8 +445,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-    
-    if (executeConsoleCommands_)
+    if (eventData[P_ID].GetString() == GetTypeName())
         ExecuteString(eventData[P_COMMAND].GetString());
 }
 

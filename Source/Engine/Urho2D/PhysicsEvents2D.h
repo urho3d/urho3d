@@ -52,7 +52,7 @@ EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
 }
 
 /// Physics end contract.
-EVENT(E_PHYSICSENDCOLLISION2D, PhysicsEndContact2D)
+EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer

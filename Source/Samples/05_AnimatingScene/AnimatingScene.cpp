@@ -45,9 +45,7 @@
 DEFINE_APPLICATION_MAIN(AnimatingScene)
 
 AnimatingScene::AnimatingScene(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
     // Register an object factory for our custom Rotator component so that we can create them to scene nodes
     context->RegisterFactory<Rotator>();
@@ -133,7 +131,7 @@ void AnimatingScene::CreateInstructions()
     
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move");
+    instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     
     // Position the text relative to the screen center

@@ -111,6 +111,9 @@ public:
         return i != networkAttributes_.End() ? &i->second_ : 0;
     }
 
+    /// Return all registered attributes.
+    const HashMap<ShortStringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
+
     /// Return event receivers for a sender and event type, or null if they do not exist.
     HashSet<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
     {

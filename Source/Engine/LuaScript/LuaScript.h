@@ -66,7 +66,7 @@ public:
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName = String::EMPTY);
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
-    /// Set whether to execute engine console commands as script code. Default true.
+    /// Set whether to execute engine console commands as script code.
     void SetExecuteConsoleCommands(bool enable);
 
     /// Return Lua state.
@@ -113,7 +113,7 @@ private:
     HashMap<Object*, HashMap<StringHash, LuaFunctionVector> > objectHandleFunctions_;
     /// Internally used events, which should not be unsubscribed from.
     PODVector<StringHash> internalEvents_;
-    /// Flag for executing engine console commands as script code.
+    /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
 };
 

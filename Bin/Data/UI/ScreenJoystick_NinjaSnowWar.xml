@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<element inherit="UI/ScreenJoystick.xml">
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Jump</replace>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Fire</replace>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button2']]/attribute[@name='Position']/@value">-12 36</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button2']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="P" />
+        </element>
+    </add>
+</element>

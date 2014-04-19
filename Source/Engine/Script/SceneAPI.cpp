@@ -22,7 +22,10 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "Animatable.h"
+#include "AttributeAnimation.h"
 #include "DebugRenderer.h"
+#include "ObjectAnimation.h"
 #include "PackageFile.h"
 #include "Scene.h"
 #include "SmoothedTransform.h"
@@ -31,6 +34,42 @@
 
 namespace Urho3D
 {
+
+static void RegisterAttributeAnimation(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("InterpMethod");
+    engine->RegisterEnumValue("InterpMethod", "IM_LINEAR", IM_LINEAR);
+    engine->RegisterEnumValue("InterpMethod", "IM_SPLINE", IM_SPLINE);
+
+    RegisterResource<AttributeAnimation>(engine, "AttributeAnimation");
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_interpolationMethod(InterpMethod)", asMETHOD(AttributeAnimation, SetInterpolationMethod), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "InterpMethod get_interpolationMethod() const", asMETHOD(AttributeAnimation, GetInterpolationMethod), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_splineTension(float)", asMETHOD(AttributeAnimation, SetSplineTension), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "float get_splineTension() const", asMETHOD(AttributeAnimation, GetSplineTension), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void set_valueType(VariantType)", asMETHOD(AttributeAnimation, SetValueType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "VariantType get_valueType() const", asMETHOD(AttributeAnimation, GetValueType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void SetKeyFrame(float, const Variant&in)", asMETHOD(AttributeAnimation, SetKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAnimation", "void SetEventFrame(float, const String&in, const Variant&in)", asMETHOD(AttributeAnimation, SetEventFrame), asCALL_THISCALL);
+}
+
+static void RegisterObjectAnimation(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("WrapMode");
+    engine->RegisterEnumValue("WrapMode", "WM_LOOP", WM_LOOP);
+    engine->RegisterEnumValue("WrapMode", "WM_ONCE", WM_ONCE);
+    engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
+
+    RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&in, AttributeAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(AttributeAnimation@+)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (AttributeAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "AttributeAnimation@+ GetAttributeAnimation(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "float GetAttributeAnimationSpeed(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "Variant get_attributeAnimations(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "Variant get_wrapModes(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "Variant get_speeds(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationSpeed), asCALL_THISCALL);
+}
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
@@ -44,6 +83,11 @@ static void RegisterSerializable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint AM_NODEIDVECTOR", (void*)&AM_NODEIDVECTOR);
     
     RegisterSerializable<Serializable>(engine, "Serializable");
+}
+
+static void RegisterAnimatable(asIScriptEngine* engine)
+{
+    RegisterAnimatable<Animatable>(engine, "Animatable");
 }
 
 static bool NodeSaveXML(File* file, Node* ptr)
@@ -85,11 +129,6 @@ static void RegisterNode(asIScriptEngine* engine)
     RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
     engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Component, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(DebugRenderer, DrawDebugGeometry), asCALL_THISCALL);
-    
-    // Register Variant GetPtr() for Serializable, Node & Component. These are deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "Serializable@+ GetSerializable(const String&in binding = \"deprecated:GetSerializable\") const", asFUNCTION(GetVariantPtr<Serializable>), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "Node@+ GetNode(const String&in binding = \"deprecated:GetNode\") const", asFUNCTION(GetVariantPtr<Node>), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "Component@+ GetComponent(const String&in binding = \"deprecated:GetComponent\") const", asFUNCTION(GetVariantPtr<Component>), asCALL_CDECL_OBJLAST);
 }
 
 static bool SceneLoadXML(File* file, Scene* ptr)
@@ -250,16 +289,16 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "Scene@+ get_scene() const", asMETHOD(Node, GetScene), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScriptContextScene), asCALL_CDECL);
 
-    // Register Variant GetPtr() for Scene. This is deprecated, GetPtr() should be used instead.
-    engine->RegisterObjectMethod("Variant", "Scene@+ GetScene(const String&in binding = \"deprecated:GetScene\") const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
-
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)
 {
+    RegisterAttributeAnimation(engine);
+    RegisterObjectAnimation(engine);
     RegisterSerializable(engine);
+    RegisterAnimatable(engine);
     RegisterNode(engine);
     RegisterSmoothedTransform(engine);
     RegisterSplinePath(engine);

@@ -53,8 +53,10 @@ public:
     bool SetCurrentDir(const String& pathName);
     /// Create a directory.
     bool CreateDir(const String& pathName);
+    /// Set whether to execute engine console commands as OS-specific system command.
+    void SetExecuteConsoleCommands(bool enable);
     /// Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined.
-    int SystemCommand(const String& commandLine);
+    int SystemCommand(const String& commandLine, bool redirectStdOutToLog = false);
     /// Run a specific program, block until it exits and return the exit code. Will fail if any allowed paths are defined.
     int SystemRun(const String& fileName, const Vector<String>& arguments);
     /// Run a program using the command interpreter asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
@@ -74,6 +76,8 @@ public:
     
     /// Return the absolute current working directory.
     String GetCurrentDir() const;
+    /// Return whether is executing engine console commands as OS-specific system command.
+    bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
     /// Return whether paths have been registered.
     bool HasRegisteredPaths() const { return allowedPaths_.Size() > 0; }
     /// Check if a path is allowed to be accessed. If no paths are registered, all are allowed.
@@ -96,6 +100,8 @@ private:
     void ScanDirInternal(Vector<String>& result, String path, const String& startPath, const String& filter, unsigned flags, bool recursive) const;
     /// Handle begin frame event to check for completed async executions.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Handle a console command event.
+    void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
     
     /// Allowed directories.
     HashSet<String> allowedPaths_;
@@ -105,6 +111,8 @@ private:
     List<AsyncExecRequest*> asyncExecQueue_;
     /// Next async execution ID.
     unsigned nextAsyncExecID_;
+    /// Flag for executing engine console commands as OS-specific system command. Default to true.
+    bool executeConsoleCommands_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.

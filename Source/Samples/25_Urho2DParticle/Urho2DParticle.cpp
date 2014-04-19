@@ -82,7 +82,7 @@ void Urho2DParticle::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize(Vector2((float)graphics->GetWidth(), (float)graphics->GetHeight()) * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     ParticleEffect2D* particleEffect = cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex");
@@ -109,7 +109,7 @@ void Urho2DParticle::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use mouse to move the particle.");
+    instructionText->SetText("Use mouse/touch to move the particle.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center

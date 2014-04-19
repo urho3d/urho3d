@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Serializer.h"
@@ -73,36 +74,48 @@ bool SpriteSheet2D::Load(Deserializer& source)
         return false;
     }
 
-    if (rootElem.GetName() == "SpriteSheet")
+    if (rootElem.GetName() == "spritesheet")
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        texture_ = cache->GetResource<Texture2D>(rootElem.GetAttribute("texture"));
+        String textureFileName = rootElem.GetAttribute("texture");
+        texture_ = cache->GetResource<Texture2D>(textureFileName);
+
+        // If texture not found, try get texture in current directory
+        if (!texture_)
+            texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
+
         if (!texture_)
         {
             LOGERROR("Cound not load texture");
             return false;
         }
 
-        XMLElement spriteElem = rootElem.GetChild("Sprite");
+        XMLElement spriteElem = rootElem.GetChild("sprite");
         while (spriteElem)
         {
             String name = spriteElem.GetAttribute("name");
             IntRect rectangle = spriteElem.GetIntRect("rectangle");
-            
+
             Vector2 hotSpot(0.5f, 0.5f);
-            if (spriteElem.HasAttribute("hotSpot"))
-                hotSpot = spriteElem.GetVector2("hotSpot");
+            if (spriteElem.HasAttribute("hotspot"))
+                hotSpot = spriteElem.GetVector2("hotspot");
 
             DefineSprite(name, rectangle, hotSpot);
 
-            spriteElem = spriteElem.GetNext("Sprite");
+            spriteElem = spriteElem.GetNext("sprite");
         }
     }
     // Sparrow Starling texture atlas
     else if (rootElem.GetName() == "TextureAtlas")
     {    
+        String textureFileName = rootElem.GetAttribute("imagePath");
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        texture_ = cache->GetResource<Texture2D>(rootElem.GetAttribute("imagePath"));
+        texture_ = cache->GetResource<Texture2D>(textureFileName);
+
+        // If texture not found, try get texture in current directory
+        if (!texture_)
+            texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
+
         if (!texture_)
         {
             LOGERROR("Cound not load texture");
@@ -149,18 +162,18 @@ bool SpriteSheet2D::Save(Serializer& dest) const
 {
     if (!texture_)
         return false;
-    
+
     SharedPtr<XMLFile> xmlFile(new XMLFile(context_));    
-    XMLElement rootElem = xmlFile->CreateRoot("SpriteSheet");
+    XMLElement rootElem = xmlFile->CreateRoot("spritesheet");
     rootElem.SetAttribute("texture", texture_->GetName());
 
     for (HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Begin(); i != spriteMapping_.End(); ++i)
     {
-        XMLElement spriteElem = rootElem.CreateChild("Sprite");
+        XMLElement spriteElem = rootElem.CreateChild("sprite");
         spriteElem.SetAttribute("name", i->first_);
         Sprite2D* sprite = i->second_;
         spriteElem.SetIntRect("rectangle", sprite->GetRectangle());
-        spriteElem.SetVector2("hotSpot", sprite->GetHotSpot());
+        spriteElem.SetVector2("hotspot", sprite->GetHotSpot());
     }
 
     return xmlFile->Save(dest);

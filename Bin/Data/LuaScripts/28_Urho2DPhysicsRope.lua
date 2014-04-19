@@ -42,11 +42,8 @@ function CreateScene()
     cameraNode.position = Vector3(0.0, 5.0, -10.0)
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
-
-    local width = graphics.width
-    local height = graphics.height
-    camera:SetOrthoSize(Vector2(width, height) * 0.05)
-
+    camera.orthoSize = graphics.height * 0.05
+    
     -- Create 2D physics world component
     local physicsWorld = scene_:CreateComponent("PhysicsWorld2D")
     physicsWorld.drawJoint = true

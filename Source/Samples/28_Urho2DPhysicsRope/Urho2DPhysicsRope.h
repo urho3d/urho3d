@@ -60,9 +60,4 @@ private:
     void SubscribeToEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
 };

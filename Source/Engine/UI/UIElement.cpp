@@ -22,9 +22,11 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "Cursor.h"
 #include "HashSet.h"
 #include "Log.h"
+#include "ObjectAnimation.h"
 #include "ResourceCache.h"
 #include "Sort.h"
 #include "UI.h"
@@ -108,7 +110,7 @@ template<> LayoutMode Variant::Get<LayoutMode>() const
 XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
 
 UIElement::UIElement(Context* context) :
-    Serializable(context),
+    Animatable(context),
     parent_(0),
     clipBorder_(IntRect::ZERO),
     priority_(0),
@@ -245,7 +247,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     }
 
     // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source, setInstanceDefault))
+    if (!Animatable::LoadXML(source, setInstanceDefault))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -350,7 +352,7 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Write attributes
-    if (!Serializable::SaveXML(dest))
+    if (!Animatable::SaveXML(dest))
         return false;
 
     // Write child elements
@@ -1580,6 +1582,18 @@ UIElement* UIElement::GetElementEventSender() const
     return element;
 }
 
+void UIElement::OnAttributeAnimationAdded()
+{
+    if (attributeAnimationInstances_.Size() == 1)
+        SubscribeToEvent(E_POSTUPDATE, HANDLER(UIElement, HandlePostUpdate));
+}
+
+void UIElement::OnAttributeAnimationRemoved()
+{
+    if (attributeAnimationInstances_.Empty())
+        UnsubscribeFromEvent(E_POSTUPDATE);
+}
+
 void UIElement::MarkDirty()
 {
     positionDirty_ = true;
@@ -1854,6 +1868,13 @@ void UIElement::VerifyChildAlignment()
         (*i)->SetHorizontalAlignment((*i)->GetHorizontalAlignment());
         (*i)->SetVerticalAlignment((*i)->GetVerticalAlignment());
     }
+}
+
+void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace PostUpdate;
+
+    UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

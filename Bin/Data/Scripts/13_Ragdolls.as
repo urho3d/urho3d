@@ -262,7 +262,7 @@ class CreateRagdoll : ScriptObject
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
     {
         // Get the other colliding body, make sure it is moving (has nonzero mass)
-        RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
+        RigidBody@ otherBody = eventData["OtherBody"].GetPtr();
 
         if (otherBody.mass > 0.0f)
         {

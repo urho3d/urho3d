@@ -6,6 +6,26 @@ namespace Urho3D
 
 \section LuaScriptAPI_Classes Classes
 
+### Animatable : Serializable
+
+Methods:
+
+- void SetAnimationEnabled(bool enable)
+- void SetObjectAnimation(ObjectAnimation* objectAnimation)
+- void SetAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
+- void SetAttributeAnimationWrapMode(const String name, WrapMode wrapMode)
+- void SetAttributeAnimationSpeed(const String name, float speed)
+- bool GetAnimationEnabled() const
+- ObjectAnimation* GetObjectAnimation() const
+- AttributeAnimation* GetAttributeAnimation(const String name) const
+- WrapMode GetAttributeAnimationWrapMode(const String name) const
+- float GetAttributeAnimationSpeed(const String name) const
+
+Properties:
+
+- bool animationEnabled
+- ObjectAnimation* objectAnimation
+
 ### AnimatedModel : StaticModel
 
 Methods:
@@ -212,6 +232,29 @@ Properties:
 - float time
 - float length (readonly)
 - char layer
+
+### AttributeAnimation : Resource
+
+Methods:
+
+- AttributeAnimation() (GC)
+- AttributeAnimation* new()
+- void delete()
+- void SetInterpolationMethod(InterpMethod method)
+- void SetSplineTension(float tension)
+- void SetValueType(VariantType valueType)
+- bool SetKeyFrame(float time, const Variant& value)
+- void SetEventFrame(float time, const StringHash& eventType)
+- void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
+- InterpMethod GetInterpolationMethod() const
+- float GetSplineTension() const
+- VariantType GetValueType() const
+
+Properties:
+
+- InterpMethod interpolationMethod
+- float splineTension
+- VariantType valueType
 
 ### Audio : Object
 
@@ -820,7 +863,7 @@ Properties:
 - Color color
 - float time
 
-### Component : Serializable
+### Component : Animatable
 
 Methods:
 
@@ -901,6 +944,7 @@ Methods:
 - void SetVisible(bool enable)
 - void Toggle()
 - void SetAutoVisibleOnError(bool enable)
+- void SetCommandInterpreter(const String interpreter)
 - void SetNumBufferedRows(unsigned rows)
 - void SetNumRows(unsigned rows)
 - void SetNumHistoryRows(unsigned rows)
@@ -911,8 +955,10 @@ Methods:
 - LineEdit* GetLineEdit() const
 - bool IsVisible() const
 - bool IsAutoVisibleOnError() const
+- const String GetCommandInterpreter() const
 - unsigned GetNumBufferedRows() const
 - unsigned GetNumRows() const
+- void CopySelectedRows() const
 - unsigned GetNumHistoryRows() const
 - unsigned GetHistoryPosition() const
 - const String GetHistoryRow(unsigned index) const
@@ -925,6 +971,7 @@ Properties:
 - LineEdit* lineEdit (readonly)
 - bool visible
 - bool autoVisibleOnError
+- String commandInterpreter
 - unsigned numBufferedRows
 - unsigned numRows
 - unsigned numHistoryRows
@@ -1765,7 +1812,8 @@ Methods:
 
 - bool SetCurrentDir(const String pathName)
 - bool CreateDir(const String pathName)
-- int SystemCommand(const String commandLine)
+- void SetExecuteConsoleCommands(bool enable)
+- int SystemCommand(const String commandLine, bool redirectStdOutToLog = false)
 - int SystemRun(const String fileName, const Vector<String>& arguments)
 - unsigned SystemCommandAsync(const String commandLine)
 - unsigned SystemRunAsync(const String fileName, const Vector<String>& arguments)
@@ -1775,6 +1823,7 @@ Methods:
 - bool Delete(const String fileName)
 - void RegisterPath(const String pathName)
 - String GetCurrentDir() const
+- bool GetExecuteConsoleCommands() const
 - bool HasRegisteredPaths() const
 - bool CheckAccess(const String pathName) const
 - unsigned GetLastModifiedTime(const String fileName) const
@@ -1992,10 +2041,17 @@ Methods:
 
 - void SetToggleFullscreen(bool enable)
 - void SetMouseVisible(bool enable)
-- bool OpenJoystick(unsigned index)
-- void CloseJoystick(unsigned index)
-- bool DetectJoysticks()
+- int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- bool RemoveScreenJoystick(int id)
+- void SetScreenJoystickVisible(int id, bool enable)
 - void SetScreenKeyboardVisible(bool enable)
+- bool RecordGesture()
+- bool SaveGestures(File* dest)
+- bool SaveGesture(File* dest, unsigned gestureID)
+- unsigned LoadGestures(File* source)
+- bool SaveGestures(const String fileName)
+- bool SaveGesture(const String fileName, unsigned gestureID)
+- unsigned LoadGestures(const String fileName)
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -2019,10 +2075,11 @@ Methods:
 - unsigned GetNumTouches() const
 - TouchState* GetTouch(unsigned index) const
 - unsigned GetNumJoysticks() const
-- const String GetJoystickName(unsigned index) const
-- JoystickState* GetJoystick(unsigned index)
+- JoystickState* GetJoystick(int id)
+- JoystickState* GetJoystickByIndex(unsigned index)
 - bool GetToggleFullscreen() const
 - bool GetScreenKeyboardSupport() const
+- bool IsScreenJoystickVisible(int id) const
 - bool IsScreenKeyboardVisible() const
 - bool IsMouseVisible() const
 - bool HasFocus()
@@ -2104,6 +2161,7 @@ Properties:
 
 Methods:
 
+- bool IsController() const
 - unsigned GetNumButtons() const
 - unsigned GetNumAxes() const
 - unsigned GetNumHats() const
@@ -2114,6 +2172,9 @@ Methods:
 
 Properties:
 
+- const String name
+- const int joystickID
+- bool controller (readonly)
 - unsigned numButtons (readonly)
 - unsigned numAxes (readonly)
 - unsigned numHats (readonly)
@@ -2261,6 +2322,7 @@ Methods:
 - unsigned FindItem(UIElement* item) const
 - unsigned GetSelection() const
 - const PODVector<unsigned>& GetSelections() const
+- void CopySelectedItemsToClipboard() const
 - UIElement* GetSelectedItem() const
 - const PODVector<UIElement*>& GetSelectedItems() const
 - bool IsSelected(unsigned index) const
@@ -2309,8 +2371,8 @@ Properties:
 Methods:
 
 - bool CreateObject(const String scriptObjectType)
-- bool CreateObject(const String scriptFileName, const String scriptObjectType)
-- void SetScriptFileName(const String scriptFileName)
+- bool CreateObject(LuaFile* scriptFile, const String scriptObjectType)
+- void SetScriptFile(LuaFile* scriptFile)
 - void SetScriptObjectType(const String scriptObjectType)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void UnsubscribeFromEvent(const String eventName)
@@ -2318,12 +2380,12 @@ Methods:
 - void SubscribeToEvent(void* sender, const String eventName, const String functionName)
 - void UnsubscribeFromEvent(void* sender, const String eventName)
 - void UnsubscribeFromEvents(void* sender)
-- const String GetScriptFileName() const
+- LuaFile* GetScriptFile() const
 - const String GetScriptObjectType() const
 
 Properties:
 
-- const String scriptFileName
+- const LuaFile* scriptFile
 - const String scriptObjectType
 
 ### Material : Resource
@@ -2754,7 +2816,7 @@ Properties:
 - float minPriority
 - bool alwaysUpdateOwner
 
-### Node : Serializable
+### Node : Animatable
 
 Methods:
 
@@ -2929,6 +2991,20 @@ Properties:
 - ShortStringHash baseType (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
+
+### ObjectAnimation : Resource
+
+Methods:
+
+- ObjectAnimation() (GC)
+- ObjectAnimation* new()
+- void delete()
+- void AddAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
+- void RemoveAttributeAnimation(const String name)
+- void RemoveAttributeAnimation(AttributeAnimation* attributeAnimation)
+- AttributeAnimation* GetAttributeAnimation(const String name) const
+- WrapMode GetAttributeAnimationWrapMode(const String name) const
+- float GetAttributeAnimationSpeed(const String name) const
 
 ### Octree : Component
 
@@ -3243,6 +3319,7 @@ Methods:
 - const PODVector<PhysicsRaycastResult2D>& Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
+- RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
@@ -4344,6 +4421,7 @@ Methods:
 - Spline* new(InterpolationMode mode)
 - Spline(const Spline& rhs) (GC)
 - Spline* new(const Spline& rhs)
+- void delete()
 - bool operator==(const Spline& rhs) const
 - Variant GetPoint(float f) const
 - Variant GetKnot(unsigned index) const
@@ -4907,6 +4985,7 @@ Properties:
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
+- WeakPtr<UIElement> touchedElement
 
 ### UI : Object
 
@@ -4979,7 +5058,7 @@ Properties:
 - bool forceAutoHint
 - bool modalElement (readonly)
 
-### UIElement : Serializable
+### UIElement : Animatable
 
 Methods:
 
@@ -6002,6 +6081,11 @@ Properties:
 - int HTTP_OPEN
 - int HTTP_CLOSED
 
+### InterpMethod
+
+- int IM_LINEAR
+- int IM_SPLINE
+
 ### InterpolationMode
 
 - int BEZIER_CURVE
@@ -6235,11 +6319,24 @@ Properties:
 - int DRAG_RESIZE_BOTTOMLEFT
 - int DRAG_RESIZE_LEFT
 
+### WrapMode
+
+- int WM_LOOP
+- int WM_ONCE
+- int WM_CLAMP
+
 
 \section LuaScriptAPI_GlobalFunctions Global functions
 - float Abs(float value)
+- int Abs(int value)
+- float Acos(float x)
 - String AddTrailingSlash(const String pathName)
+- float Asin(float x)
+- float Atan(float x)
+- float Atan2(float y, float x)
 - float Clamp(float value, float min, float max)
+- int ClampInt(int value, int min, int max)
+- float Cos(float angle)
 - bool Equals(float lhs, float rhs)
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
@@ -6279,16 +6376,18 @@ Properties:
 - bool IsNaN(float value)
 - bool IsPowerOfTwo(unsigned value)
 - float Lerp(float lhs, float rhs, float t)
+- int Max(int lhs, int rhs)
 - float Max(float lhs, float rhs)
 - float Min(float lhs, float rhs)
+- int Min(int lhs, int rhs)
 - unsigned NextPowerOfTwo(unsigned value)
 - void OpenConsoleWindow()
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float range)
 - float Random()
 - float Random(float min, float max)
+- float Random(float range)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
@@ -6299,9 +6398,11 @@ Properties:
 - void SetExecuteConsoleCommands(bool enable)
 - void SetRandomSeed(unsigned seed)
 - float Sign(float value)
+- float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)
@@ -6520,6 +6621,7 @@ Properties:
 - float M_DEGTORAD
 - float M_DEGTORAD_2
 - float M_EPSILON
+- float M_HALF_PI
 - float M_INFINITY
 - float M_LARGE_EPSILON
 - float M_LARGE_VALUE

@@ -66,7 +66,7 @@ bool Animation2D::Load(Deserializer& source)
 
     SetMemoryUse(source.GetSize());
 
-    XMLElement rootElem = xmlFile->GetRoot("Animation");
+    XMLElement rootElem = xmlFile->GetRoot("animation");
     if (!rootElem)
     {
         LOGERROR("Invalid animation");
@@ -75,7 +75,7 @@ bool Animation2D::Load(Deserializer& source)
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    XMLElement keyFrameElem = rootElem.GetChild("Frame");
+    XMLElement keyFrameElem = rootElem.GetChild("frame");
     if (!keyFrameElem)
     {
         LOGERROR("Could not found key frame");
@@ -112,7 +112,7 @@ bool Animation2D::Load(Deserializer& source)
         }
 
         frameSprites_.Push(sprite);
-        keyFrameElem = keyFrameElem.GetNext("Frame");
+        keyFrameElem = keyFrameElem.GetNext("frame");
     }
 
     return true;
@@ -121,12 +121,12 @@ bool Animation2D::Load(Deserializer& source)
 bool Animation2D::Save(Serializer& dest) const
 {
     XMLFile xmlFile(context_);
-    XMLElement rootElem = xmlFile.CreateRoot("Animation");
+    XMLElement rootElem = xmlFile.CreateRoot("animation");
     
     float endTime = 0.0f;
     for (unsigned i = 0; i < frameSprites_.Size(); ++i)
     {
-        XMLElement frameElem = rootElem.CreateChild("Frame");
+        XMLElement frameElem = rootElem.CreateChild("frame");
         frameElem.SetFloat("duration", frameEndTimes_[i] - endTime);
         endTime = frameEndTimes_[i];
 

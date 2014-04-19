@@ -50,8 +50,6 @@ DEFINE_APPLICATION_MAIN(MultipleViewports)
 
 MultipleViewports::MultipleViewports(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
 }
@@ -169,7 +167,7 @@ void MultipleViewports::CreateInstructions()
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
+        "Use WASD keys and mouse/touch to move\n"
         "B to toggle bloom, F to toggle FXAA\n"
         "Space to toggle debug geometry\n"
     );

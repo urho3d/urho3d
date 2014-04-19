@@ -27,12 +27,15 @@
 namespace Urho3D
 {
 
+class Button;
 class BorderImage;
+class DropDownList;
 class Engine;
 class Font;
 class LineEdit;
 class ListView;
 class Text;
+class UIElement;
 class XMLFile;
 
 /// %Console window with log history and command line prompt.
@@ -54,6 +57,8 @@ public:
     void Toggle();
     /// Automatically set console to visible when receiving an error log message.
     void SetAutoVisibleOnError(bool enable) { autoVisibleOnError_ = enable; }
+    /// Set the command interpreter.
+    void SetCommandInterpreter(const String& interpreter) { commandInterpreter_ = interpreter; }
     /// Set number of buffered rows.
     void SetNumBufferedRows(unsigned rows);
     /// Set number of displayed rows.
@@ -75,6 +80,8 @@ public:
     bool IsVisible() const;
     /// Return true when console is set to automatically visible when receiving an error log message.
     bool IsAutoVisibleOnError() const { return autoVisibleOnError_; }
+    /// Return the last used command interpreter.
+    const String& GetCommandInterpreter() const { return commandInterpreter_; }
     /// Return number of buffered rows.
     unsigned GetNumBufferedRows() const;
     /// Return number of displayed rows.
@@ -91,10 +98,16 @@ public:
     bool GetFocusOnShow() const { return focusOnShow_; }
 
 private:
+    /// Populate the command line interpreters that could handle the console command.
+    bool PopulateInterpreter();
+    /// Handle interpreter being selected on the drop down list.
+    void HandleInterpreterSelected(StringHash eventType, VariantMap& eventData);
     /// Handle enter pressed on the line edit.
     void HandleTextFinished(StringHash eventType, VariantMap& eventData);
     /// Handle unhandled key on the line edit for scrolling the history.
     void HandleLineEditKey(StringHash eventType, VariantMap& eventData);
+    /// Handle close button being pressed.
+    void HandleCloseButtonPressed(StringHash eventType, VariantMap& eventData);
     /// Handle rendering window resize.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle a log message.
@@ -107,9 +120,17 @@ private:
     /// Background.
     SharedPtr<BorderImage> background_;
     /// Container for text rows.
-    SharedPtr<ListView> rowContainer_;
+    ListView* rowContainer_;
+    /// Container for the command line.
+    UIElement* commandLine_;
+    /// Interpreter drop down list.
+    DropDownList* interpreters_;
     /// Line edit.
-    SharedPtr<LineEdit> lineEdit_;
+    LineEdit* lineEdit_;
+    /// Close button.
+    SharedPtr<Button> closeButton_;
+    /// Last used command interpreter.
+    String commandInterpreter_;
     /// Command history.
     Vector<String> history_;
     /// Pending log message rows.

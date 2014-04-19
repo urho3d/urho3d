@@ -35,6 +35,9 @@ void Start()
     // Execute the common startup for samples
     SampleStart();
     
+    // Disable default execution of AngelScript from the console
+    script.executeConsoleCommands = false;
+
     // Subscribe to console commands and the frame update
     SubscribeToEvent("ConsoleCommand", "HandleConsoleCommand");
     SubscribeToEvent("Update", "HandleUpdate");
@@ -47,13 +50,12 @@ void Start()
 
     // Show the console by default, make it large
     console.numRows = graphics.height / 16;
+    console.numBufferedRows = 2 * console.numRows;
+    console.commandInterpreter = "ScriptEventInvoker";
     console.visible = true;
     
     // Show OS mouse cursor
     input.mouseVisible = true;
-
-    // Disable default execution of AngelScript from the console
-    script.executeConsoleCommands = false;
 
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();
@@ -67,7 +69,8 @@ void Start()
 
 void HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
-    HandleInput(eventData["Command"].GetString());
+    if (eventData["Id"].GetString() == "ScriptEventInvoker")
+        HandleInput(eventData["Command"].GetString());
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)

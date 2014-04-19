@@ -2,18 +2,16 @@
 Rotator = ScriptObject()
 
 function Rotator:Start()
-    self.rotationSpeed = {0.0, 0.0, 0.0}
+    self.rotationSpeed = Vector3(0, 0, 0)
 end
 
 function Rotator:SetRotationSpeed(speed)
-    self.rotationSpeed[1] = speed.x;
-    self.rotationSpeed[2] = speed.y;
-    self.rotationSpeed[3] = speed.z;
+    self.rotationSpeed = Vector3(speed)
 end
 
 function Rotator:Update(timeStep)
-    local x = self.rotationSpeed[1] * timeStep
-    local y = self.rotationSpeed[2] * timeStep
-    local z = self.rotationSpeed[3] * timeStep
+    local x = self.rotationSpeed.x * timeStep
+    local y = self.rotationSpeed.y * timeStep
+    local z = self.rotationSpeed.z * timeStep
     self.node:RotateXYZ(x, y, z)
 end

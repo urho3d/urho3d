@@ -26,6 +26,7 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"
+#include "LuaFile.h"
 #include "LuaFunction.h"
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
@@ -47,9 +48,7 @@
 DEFINE_APPLICATION_MAIN(LuaIntegration)
 
 LuaIntegration::LuaIntegration(Context* context) :
-    Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f)
+    Sample(context)
 {
     // Instantiate and register the Lua script subsystem so that we can use the LuaScriptInstance component
     context_->RegisterSubsystem(new LuaScript(context_));
@@ -95,6 +94,10 @@ void LuaIntegration::CreateScene()
     zone->SetFogStart(10.0f);
     zone->SetFogEnd(100.0f);
     
+    LuaFile* scriptFile = cache->GetResource<LuaFile>("LuaScripts/Rotator.lua");
+    if (!scriptFile)
+        return;
+
     // Create randomly positioned and oriented box StaticModels in the scene
     const unsigned NUM_OBJECTS = 2000;
     for (unsigned i = 0; i < NUM_OBJECTS; ++i)
@@ -110,7 +113,7 @@ void LuaIntegration::CreateScene()
         // Add our custom Rotator script object (using the LuaScriptInstance C++ component to instantiate / store it) which will
         // rotate the scene node each frame, when the scene sends its update event
         LuaScriptInstance* instance = boxNode->CreateComponent<LuaScriptInstance>();
-        instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
+        instance->CreateObject(scriptFile, "Rotator");
         
         // Call the script object's "SetRotationSpeed" function.
         WeakPtr<LuaFunction> function = instance->GetScriptObjectFunction("SetRotationSpeed");
@@ -140,7 +143,7 @@ void LuaIntegration::CreateInstructions()
     
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move");
+    instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     
     // Position the text relative to the screen center

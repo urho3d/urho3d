@@ -52,12 +52,9 @@ float powerupSpawnTimer = 0;
 uint clientNodeID = 0;
 int clientScore = 0;
 
+int screenJoystickID = -1;
+int screenJoystickSettingsID = -1;
 bool touchEnabled = false;
-int touchButtonSize = 96;
-int touchButtonBorder = 12;
-int moveTouchID = -1;
-int rotateTouchID = -1;
-int fireTouchID = -1;
 
 Array<Player> players;
 Array<HiscoreEntry> hiscores;
@@ -87,8 +84,6 @@ void Start()
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
-    SubscribeToEvent("TouchBegin", "HandleTouchBegin");
-    SubscribeToEvent("TouchEnd", "HandleTouchEnd");
 
     if (singlePlayer)
     {
@@ -126,10 +121,11 @@ void InitConsole()
         return;
 
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
+    ui.root.defaultStyle = uiStyle;
 
     Console@ console = engine.CreateConsole();
     console.defaultStyle = uiStyle;
-    console.numRows = 16;
+    console.background.opacity = 0.8;
 
     engine.CreateDebugHud();
     debugHud.defaultStyle = uiStyle;
@@ -165,7 +161,7 @@ void InitScene()
             dirLight.shadowIntensity = 0.333f;
         }
     }
-    
+
     // Precache shaders if possible
     if (!engine.headless && cache.Exists("NinjaSnowWarShaders.xml"))
         graphics.PrecacheShaders(cache.GetFile("NinjaSnowWarShaders.xml"));
@@ -208,22 +204,7 @@ void InitNetworking()
 void InitTouchInput()
 {
     touchEnabled = true;
-
-    moveButton = BorderImage();
-    moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-    moveButton.imageRect = IntRect(0, 0, 96, 96);
-    moveButton.SetAlignment(HA_LEFT, VA_BOTTOM);
-    moveButton.SetPosition(touchButtonBorder, -touchButtonBorder);
-    moveButton.SetSize(touchButtonSize, touchButtonSize);
-    ui.root.AddChild(moveButton);
-
-    fireButton = BorderImage();
-    fireButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-    fireButton.imageRect = IntRect(96, 0, 192, 96);
-    fireButton.SetAlignment(HA_RIGHT, VA_BOTTOM);
-    fireButton.SetPosition(-touchButtonBorder, -touchButtonBorder);
-    fireButton.SetSize(touchButtonSize, touchButtonSize);
-    ui.root.AddChild(fireButton);
+    screenJoystickID = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystick_NinjaSnowWar.xml"));
 }
 
 void CreateCamera()
@@ -261,7 +242,7 @@ void CreateOverlays()
     Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
 
     scoreText = Text();
-    scoreText.SetFont(font, 17);
+    scoreText.SetFont(font, 13);
     scoreText.SetAlignment(HA_LEFT, VA_TOP);
     scoreText.SetPosition(5, 5);
     scoreText.colors[C_BOTTOMLEFT] = Color(1, 1, 0.25);
@@ -269,7 +250,7 @@ void CreateOverlays()
     ui.root.AddChild(scoreText);
 
     @hiscoreText = Text();
-    hiscoreText.SetFont(font, 17);
+    hiscoreText.SetFont(font, 13);
     hiscoreText.SetAlignment(HA_RIGHT, VA_TOP);
     hiscoreText.SetPosition(-5, 5);
     hiscoreText.colors[C_BOTTOMLEFT] = Color(1, 1, 0.25);
@@ -277,7 +258,7 @@ void CreateOverlays()
     ui.root.AddChild(hiscoreText);
 
     @messageText = Text();
-    messageText.SetFont(font, 17);
+    messageText.SetFont(font, 13);
     messageText.SetAlignment(HA_CENTER, VA_CENTER);
     messageText.SetPosition(0, -height * 2);
     messageText.color = Color(1, 0, 0);
@@ -297,7 +278,11 @@ void CreateOverlays()
     healthBorder.AddChild(healthBar);
 
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+        // On mobile platform, enable touch by adding a screen joystick
         InitTouchInput();
+    else if (input.numJoysticks == 0)
+        // On desktop platform, do not detect touch when we already got a joystick
+        SubscribeToEvent("TouchBegin", "HandleTouchBegin");
 }
 
 void SetMessage(const String&in message)
@@ -409,7 +394,7 @@ void SpawnPlayer(Connection@ connection)
         textNode.position = Vector3(0, 1.2, 0);
         Text3D@ text3D = textNode.CreateComponent("Text3D");
         Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
-        text3D.SetFont(font, 24);
+        text3D.SetFont(font, 19);
         text3D.color = Color(1, 1, 0);
         text3D.text = players[playerIndex].name;
         text3D.horizontalAlignment = HA_CENTER;
@@ -421,7 +406,7 @@ void SpawnPlayer(Connection@ connection)
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
-    
+
     UpdateControls();
     CheckEndAndRestart();
 
@@ -476,31 +461,8 @@ void HandlePostRenderUpdate()
 void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
     // On some platforms like Windows the presence of touch input can only be detected dynamically
-    if (!touchEnabled)
-        InitTouchInput();
-
-    int touchID = eventData["TouchID"].GetInt();
-    IntVector2 pos(eventData["X"].GetInt(), eventData["Y"].GetInt());
-    UIElement@ element = ui.GetElementAt(pos, false);
-
-    if (element is moveButton)
-        moveTouchID = touchID;
-    else if (element is fireButton)
-        fireTouchID = touchID;
-    else
-        rotateTouchID = touchID;
-}
-
-void HandleTouchEnd(StringHash eventType, VariantMap& eventData)
-{
-    int touchID = eventData["TouchID"].GetInt();
-
-    if (touchID == moveTouchID)
-        moveTouchID = -1;
-    if (touchID == rotateTouchID)
-        rotateTouchID = -1;
-    if (touchID == fireTouchID)
-        fireTouchID = -1;
+    InitTouchInput();
+    UnsubscribeFromEvent("TouchBegin");
 }
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -532,9 +494,25 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         gameScene.updateEnabled = !gameScene.updateEnabled;
         if (!gameScene.updateEnabled)
+        {
             SetMessage("PAUSED");
+            
+            // Open the settings joystick only if the controls screen joystick was already open
+            if (screenJoystickID >= 0)
+            {
+                if (screenJoystickSettingsID < 0)
+                    screenJoystickSettingsID = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
+            }
+        }
         else
+        {
             SetMessage("");
+            if (screenJoystickSettingsID >= 0)
+            {
+                input.RemoveScreenJoystick(screenJoystickSettingsID);
+                screenJoystickSettingsID = -1;
+            }
+        }
     }
 }
 
@@ -913,35 +891,18 @@ void UpdateControls()
             for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState@ touch = input.touches[i];
-
-                if (touch.touchID == rotateTouchID)
+                if (touch.touchedElement.Get() is null)
                 {
+                    // Touch on empty space
                     playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
                     playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
                 }
-
-                if (touch.touchID == moveTouchID)
-                {
-                    int relX = touch.position.x - moveButton.screenPosition.x - touchButtonSize / 2;
-                    int relY = touch.position.y - moveButton.screenPosition.y - touchButtonSize / 2;
-                    if (relY < 0 && Abs(relX * 3 / 2) < Abs(relY))
-                        playerControls.Set(CTRL_UP, true);
-                    if (relY > 0 && Abs(relX * 3 / 2) < Abs(relY))
-                        playerControls.Set(CTRL_DOWN, true);
-                    if (relX < 0 && Abs(relY * 3 / 2) < Abs(relX))
-                        playerControls.Set(CTRL_LEFT, true);
-                    if (relX > 0 && Abs(relY * 3 / 2) < Abs(relX))
-                        playerControls.Set(CTRL_RIGHT, true);
-                }
             }
-
-            if (fireTouchID >= 0)
-                playerControls.Set(CTRL_FIRE, true);
         }
 
         if (input.numJoysticks > 0)
         {
-            JoystickState@ joystick = input.joysticks[0];
+            JoystickState@ joystick = touchEnabled ? input.joysticks[screenJoystickID] : input.joysticksByIndex[0];
             if (joystick.numButtons > 0)
             {
                 if (joystick.buttonDown[0])
@@ -955,7 +916,6 @@ void UpdateControls()
                     if (joystick.buttonDown[5])
                         playerControls.Set(CTRL_FIRE, true);
                 }
-
                 if (joystick.numHats > 0)
                 {
                     if (joystick.hatPosition[0] & HAT_LEFT != 0)
@@ -980,8 +940,8 @@ void UpdateControls()
                 }
                 if (joystick.numAxes >= 4)
                 {
-                    float lookX = joystick.axisPosition[joystick.numAxes - 2];
-                    float lookY = joystick.axisPosition[joystick.numAxes - 1];
+                    float lookX = joystick.axisPosition[2];
+                    float lookY = joystick.axisPosition[3];
 
                     if (lookX < -joyLookDeadZone)
                         playerControls.yaw -= joySensitivity * lookX * lookX;
@@ -997,7 +957,7 @@ void UpdateControls()
 
         // For the triggered actions (fire & jump) check also for press, in case the FPS is low
         // and the key was already released
-        if ((console is null) || (!console.visible))
+        if (console is null || !console.visible)
         {
             if (input.keyDown['W'])
                 playerControls.Set(CTRL_UP, true);
@@ -1011,16 +971,16 @@ void UpdateControls()
                 playerControls.Set(CTRL_FIRE, true);
             if (input.keyDown[' '] || input.keyPress[' '])
                 playerControls.Set(CTRL_JUMP, true);
+
+            if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
+                playerControls.Set(CTRL_FIRE, true);
+            if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
+                playerControls.Set(CTRL_JUMP, true);
+
+            playerControls.yaw += mouseSensitivity * input.mouseMoveX;
+            playerControls.pitch += mouseSensitivity * input.mouseMoveY;
+            playerControls.pitch = Clamp(playerControls.pitch, -60.0, 60.0);
         }
-
-        if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
-            playerControls.Set(CTRL_FIRE, true);
-        if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
-            playerControls.Set(CTRL_JUMP, true);
-
-        playerControls.yaw += mouseSensitivity * input.mouseMoveX;
-        playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-        playerControls.pitch = Clamp(playerControls.pitch, -60.0, 60.0);
 
         // In singleplayer, set controls directly on the player's ninja. In multiplayer, transmit to server
         if (singlePlayer)
@@ -1109,26 +1069,29 @@ void UpdateCamera()
 
 void UpdateFreelookCamera()
 {
-    float timeStep = time.timeStep;
-    float speedMultiplier = 1.0;
-    if (input.keyDown[KEY_LSHIFT])
-        speedMultiplier = 5.0;
-    if (input.keyDown[KEY_LCTRL])
-        speedMultiplier = 0.1;
+    if (console is null || !console.visible)
+    {
+        float timeStep = time.timeStep;
+        float speedMultiplier = 1.0;
+        if (input.keyDown[KEY_LSHIFT])
+            speedMultiplier = 5.0;
+        if (input.keyDown[KEY_LCTRL])
+            speedMultiplier = 0.1;
 
-    if (input.keyDown['W'])
-        gameCameraNode.Translate(Vector3(0, 0, 10) * timeStep * speedMultiplier);
-    if (input.keyDown['S'])
-        gameCameraNode.Translate(Vector3(0, 0, -10) * timeStep * speedMultiplier);
-    if (input.keyDown['A'])
-        gameCameraNode.Translate(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
-    if (input.keyDown['D'])
-        gameCameraNode.Translate(Vector3(10, 0, 0) * timeStep * speedMultiplier);
+        if (input.keyDown['W'])
+            gameCameraNode.Translate(Vector3(0, 0, 10) * timeStep * speedMultiplier);
+        if (input.keyDown['S'])
+            gameCameraNode.Translate(Vector3(0, 0, -10) * timeStep * speedMultiplier);
+        if (input.keyDown['A'])
+            gameCameraNode.Translate(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
+        if (input.keyDown['D'])
+            gameCameraNode.Translate(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
-    playerControls.yaw += mouseSensitivity * input.mouseMoveX;
-    playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-    playerControls.pitch = Clamp(playerControls.pitch, -90.0, 90.0);
-    gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
+        playerControls.yaw += mouseSensitivity * input.mouseMoveX;
+        playerControls.pitch += mouseSensitivity * input.mouseMoveY;
+        playerControls.pitch = Clamp(playerControls.pitch, -90.0, 90.0);
+        gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
+    }
 }
 
 void UpdateStatus()

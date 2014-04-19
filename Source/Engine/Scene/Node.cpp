@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "ObjectAnimation.h"
 #include "Profiler.h"
 #include "ReplicationState.h"
 #include "Scene.h"
@@ -39,7 +40,7 @@ namespace Urho3D
 {
 
 Node::Node(Context* context) :
-    Serializable(context),
+    Animatable(context),
     worldTransform_(Matrix3x4::IDENTITY),
     dirty_(false),
     networkUpdate_(false),
@@ -82,7 +83,7 @@ void Node::RegisterObject(Context* context)
 
 void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    Animatable::OnSetAttribute(attr, src);
     MarkNetworkUpdate();
 }
 
@@ -112,7 +113,7 @@ bool Node::Save(Serializer& dest) const
         return false;
 
     // Write attributes
-    if (!Serializable::Save(dest))
+    if (!Animatable::Save(dest))
         return false;
 
     // Write components
@@ -172,7 +173,7 @@ bool Node::SaveXML(XMLElement& dest) const
         return false;
 
     // Write attributes
-    if (!Serializable::SaveXML(dest))
+    if (!Animatable::SaveXML(dest))
         return false;
 
     // Write components
@@ -1136,7 +1137,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
     RemoveAllComponents();
 
     // ID has been read at the parent level
-    if (!Serializable::Load(source))
+    if (!Animatable::Load(source))
         return false;
 
     unsigned numComponents = source.ReadVLE();
@@ -1179,7 +1180,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     RemoveAllChildren();
     RemoveAllComponents();
 
-    if (!Serializable::LoadXML(source))
+    if (!Animatable::LoadXML(source))
         return false;
 
     XMLElement compElem = source.GetChild("component");
@@ -1263,6 +1264,10 @@ void Node::PrepareNetworkUpdate()
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+
+        if (animationEnabled_ && IsAnimatedNetworkAttribute(attr))
+            continue;
+
         OnGetAttribute(attr, networkState_->currentValues_[i]);
 
         if (networkState_->currentValues_[i] != networkState_->previousValues_[i])
@@ -1439,6 +1444,18 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
+void Node::OnAttributeAnimationAdded()
+{
+    if (attributeAnimationInstances_.Size() == 1)
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Node, HandleAttributeAnimationUpdate));        
+}
+
+void Node::OnAttributeAnimationRemoved()
+{
+    if (attributeAnimationInstances_.Empty())
+        UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
+}
+
 Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
 {
     // First check if factory for type exists
@@ -1609,6 +1626,13 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     // If the component is still referenced elsewhere, reset its node pointer now
     if (componentWeak)
         componentWeak->SetNode(0);
+}
+
+void Node::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace AttributeAnimationUpdate;
+
+    UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

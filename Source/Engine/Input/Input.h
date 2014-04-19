@@ -30,7 +30,11 @@
 namespace Urho3D
 {
 
+class Deserializer;
 class Graphics;
+class Serializer;
+class UIElement;
+class XMLFile;
 
 /// %Input state for a finger touch.
 struct TouchState
@@ -45,6 +49,8 @@ struct TouchState
     IntVector2 delta_;
     /// Finger pressure.
     float pressure_;
+    /// Last touched UI element from screen joystick.
+    WeakPtr<UIElement> touchedElement_;
 };
 
 /// %Input state for a joystick.
@@ -55,54 +61,32 @@ struct JoystickState
         joystick_(0), controller_(0)
     {
     }
-    
+
+    /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
+    bool IsController() const { return controller_ != 0; }
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
     /// Return number of axes.
     unsigned GetNumAxes() const { return axes_.Size(); }
     /// Return number of hats.
     unsigned GetNumHats() const { return hats_.Size(); }
-    
     /// Check if a button is held down.
-    bool GetButtonDown(unsigned index) const
-    {
-        if (index < buttons_.Size())
-            return buttons_[index];
-        else
-            return false;
-    }
-    
+    bool GetButtonDown(unsigned index) const { return index < buttons_.Size() ? buttons_[index] : false; }
     /// Check if a button has been pressed on this frame.
-    bool GetButtonPress(unsigned index) const
-    {
-        if (index < buttons_.Size())
-            return buttonPress_[index];
-        else
-            return false;
-    }
-    
+    bool GetButtonPress(unsigned index) const { return index < buttonPress_.Size() ? buttonPress_[index] : false; }
     /// Return axis position.
-    float GetAxisPosition(unsigned index) const
-    {
-        if (index < axes_.Size())
-            return axes_[index];
-        else
-            return 0.0f;
-    }
-    
+    float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
     /// Return hat position.
-    int GetHatPosition(unsigned index) const
-    {
-        if (index < hats_.Size())
-            return hats_[index];
-        else
-            return HAT_CENTER;
-    }
+    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
     
     /// SDL joystick.
     SDL_Joystick* joystick_;
-    /// SDL game controller
+    /// SDL joystick instance ID.
+    SDL_JoystickID joystickID_;
+    /// SDL game controller.
     SDL_GameController* controller_;
+    /// UI element containing the screen joystick.
+    SharedPtr<UIElement> screenJoystick_;
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -119,28 +103,46 @@ struct JoystickState
 class URHO3D_API Input : public Object
 {
     OBJECT(Input);
-    
+
 public:
     /// Construct.
     Input(Context* context);
     /// Destruct.
     virtual ~Input();
-    
+
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
     /// Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
-    /// Open a joystick. Return true if successful.
-    bool OpenJoystick(unsigned index);
-    /// Close a joystick.
-    void CloseJoystick(unsigned index);
-    /// Redetect joysticks. Return true if successful.
-    bool DetectJoysticks();
+    /// Add screen joystick.
+    /** Return the joystick instance ID when successful or negative on error.
+     *  If layout file is not given, use the default screen joystick layout.
+     *  If style file is not given, use the default style file from root UI element.
+     *
+     *  This method should only be called in main thread.
+     */
+    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    /// Remove screen joystick by instance ID.
+    /** Return true if successful.
+     *
+     *  This method should only be called in main thread.
+     */
+    bool RemoveScreenJoystick(SDL_JoystickID id);
+    /// Set whether the virtual joystick is visible.
+    void SetScreenJoystickVisible(SDL_JoystickID id, bool enable);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
-    
+    /// Begin recording a touch gesture. Return true if successful. The E_GESTURERECORDED event (which contains the ID for the new gesture) will be sent when recording finishes.
+    bool RecordGesture();
+    /// Save all in-memory touch gestures. Return true if successful.
+    bool SaveGestures(Serializer& dest);
+    /// Save a specific in-memory touch gesture to a file. Return true if successful.
+    bool SaveGesture(Serializer& dest, unsigned gestureID);
+    /// Load touch gestures from a file. Return number of loaded gestures, or 0 on failure.
+    unsigned LoadGestures(Deserializer& source);
+
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;
     /// Return keycode from scancode.
@@ -187,12 +189,14 @@ public:
     TouchState* GetTouch(unsigned index) const;
     /// Return number of connected joysticks.
     unsigned GetNumJoysticks() const { return joysticks_.Size(); }
-    /// Return joystick name by index.
-    const String& GetJoystickName(unsigned index) const;
-    /// Return joystick state by index. Automatically open if not opened yet.
-    JoystickState* GetJoystick(unsigned index);
+    /// Return joystick state by ID, or null if does not exist.
+    JoystickState* GetJoystick(SDL_JoystickID id);
+    /// Return joystick state by index, or null if does not exist. 0 = first connected joystick.
+    JoystickState* GetJoystickByIndex(unsigned index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
+    /// Return whether a virtual joystick is visible.
+    bool IsScreenJoystickVisible(SDL_JoystickID id) const;
     /// Return whether on-screen keyboard is supported.
     bool GetScreenKeyboardSupport() const;
     /// Return whether on-screen keyboard is being shown.
@@ -203,10 +207,12 @@ public:
     bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
     bool IsMinimized() const;
-    
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
+    /// Open a joystick and return its ID. Return -1 if no joystick.
+    SDL_JoystickID OpenJoystick(unsigned index);
     /// Setup internal joystick structures.
     void ResetJoysticks();
     /// Prepare input state for application gaining input focus.
@@ -229,9 +235,11 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Handle touch events from the controls of screen joystick(s).
+    void HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventData);
     /// Handle SDL event.
     void HandleSDLEvent(void* sdlEvent);
-    
+
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Key down state.
@@ -247,7 +255,7 @@ private:
     /// String for text input.
     String textInput_;
     /// Opened joysticks.
-    Vector<JoystickState> joysticks_;
+    HashMap<SDL_JoystickID, JoystickState> joysticks_;
     /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state.
@@ -274,8 +282,6 @@ private:
     bool suppressNextMouseMove_;
     /// Initialized flag.
     bool initialized_;
-    /// Map SDL joystick ID to internal index.
-    HashMap<int, unsigned> joystickIDMap_;
 };
 
 }

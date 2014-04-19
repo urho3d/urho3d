@@ -1,0 +1,41 @@
+$#include "AttributeAnimation.h"
+
+enum InterpMethod
+{
+    IM_LINEAR = 0,
+    IM_SPLINE,
+};
+
+class AttributeAnimation : public Resource
+{
+    AttributeAnimation();
+    virtual ~AttributeAnimation();
+    
+    void SetInterpolationMethod(InterpMethod method);
+    void SetSplineTension(float tension);
+    void SetValueType(VariantType valueType);
+    bool SetKeyFrame(float time, const Variant& value);
+    void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
+    
+    InterpMethod GetInterpolationMethod() const;
+    float GetSplineTension() const;
+    VariantType GetValueType() const;
+
+    tolua_property__get_set InterpMethod interpolationMethod;
+    tolua_property__get_set float splineTension;
+    tolua_property__get_set VariantType valueType;
+};
+
+${
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_AttributeAnimation_new00
+static int tolua_SceneLuaAPI_AttributeAnimation_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<AttributeAnimation>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_AttributeAnimation_new00_local
+static int tolua_SceneLuaAPI_AttributeAnimation_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<AttributeAnimation>(tolua_S);
+}
+$}

@@ -71,6 +71,8 @@ public:
     unsigned GetChecksum() const { return checksum_; }
     /// Return whether the files are compressed.
     bool IsCompressed() const { return compressed_; }
+    /// Return list of entry names
+    const Vector<String> GetEntryNames() const { return entries_.Keys(); }
     
 private:
     /// File entries.

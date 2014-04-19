@@ -88,10 +88,6 @@ private:
     /// Handle remote event from server which tells our controlled object node ID.
     void HandleClientObjectID(StringHash eventType, VariantMap& eventData);
     
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Mapping from client connections to controllable objects.
     HashMap<Connection*, WeakPtr<Node> > serverObjects_;
     /// Button container element.
@@ -108,8 +104,4 @@ private:
     SharedPtr<Text> instructionsText_;
     /// ID of own controllable object (client only.)
     unsigned clientObjectID_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
 };

@@ -33,7 +33,7 @@ namespace Urho3D
 {
 
 Component::Component(Context* context) :
-    Serializable(context),
+    Animatable(context),
     node_(0),
     id_(0),
     networkUpdate_(false),
@@ -47,7 +47,7 @@ Component::~Component()
 
 void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    Animatable::OnSetAttribute(attr, src);
     MarkNetworkUpdate();
 }
 
@@ -60,7 +60,7 @@ bool Component::Save(Serializer& dest) const
         return false;
 
     // Write attributes
-    return Serializable::Save(dest);
+    return Animatable::Save(dest);
 }
 
 bool Component::SaveXML(XMLElement& dest) const
@@ -72,7 +72,7 @@ bool Component::SaveXML(XMLElement& dest) const
         return false;
 
     // Write attributes
-    return Serializable::SaveXML(dest);
+    return Animatable::SaveXML(dest);
 }
 
 void Component::SetEnabled(bool enable)
@@ -143,6 +143,10 @@ void Component::PrepareNetworkUpdate()
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+        
+        if (animationEnabled_ && IsAnimatedNetworkAttribute(attr))
+            continue;
+
         OnGetAttribute(attr, networkState_->currentValues_[i]);
 
         if (networkState_->currentValues_[i] != networkState_->previousValues_[i])
@@ -195,6 +199,18 @@ void Component::MarkNetworkUpdate()
     }
 }
 
+void Component::OnAttributeAnimationAdded()
+{
+    if (attributeAnimationInstances_.Size() == 1)
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Component, HandleAttributeAnimationUpdate));        
+}
+
+void Component::OnAttributeAnimationRemoved()
+{
+    if (attributeAnimationInstances_.Empty())
+        UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
+}
+
 void Component::SetID(unsigned id)
 {
     id_ = id;
@@ -224,4 +240,10 @@ void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type)
         dest.Clear();
 }
 
+void Component::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace AttributeAnimationUpdate;
+
+    UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+}
 }

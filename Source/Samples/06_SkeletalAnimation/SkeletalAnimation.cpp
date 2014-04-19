@@ -50,8 +50,6 @@ DEFINE_APPLICATION_MAIN(SkeletalAnimation)
 
 SkeletalAnimation::SkeletalAnimation(Context* context) :
     Sample(context),
-    yaw_(0.0f),
-    pitch_(0.0f),
     drawDebug_(false)
 {
     // Register an object factory for our custom Mover component so that we can create them to scene nodes
@@ -65,10 +63,10 @@ void SkeletalAnimation::Start()
 
     // Create the scene content
     CreateScene();
-    
+
     // Create the UI content
     CreateInstructions();
-    
+
     // Setup the viewport for displaying the scene
     SetupViewport();
 
@@ -79,21 +77,21 @@ void SkeletalAnimation::Start()
 void SkeletalAnimation::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     scene_ = new Scene(context_);
-    
+
     // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-    
+
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
     StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
@@ -102,7 +100,7 @@ void SkeletalAnimation::CreateScene()
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
     zone->SetFogStart(100.0f);
     zone->SetFogEnd(300.0f);
-    
+
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
@@ -112,13 +110,13 @@ void SkeletalAnimation::CreateScene()
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
-    
+
     // Create animated models
     const unsigned NUM_MODELS = 100;
     const float MODEL_MOVE_SPEED = 2.0f;
     const float MODEL_ROTATE_SPEED = 100.0f;
     const BoundingBox bounds(Vector3(-47.0f, 0.0f, -47.0f), Vector3(47.0f, 0.0f, 47.0f));
-    
+
     for (unsigned i = 0; i < NUM_MODELS; ++i)
     {
         Node* modelNode = scene_->CreateChild("Jack");
@@ -128,7 +126,7 @@ void SkeletalAnimation::CreateScene()
         modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
         modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
         modelObject->SetCastShadows(true);
-        
+
         // Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
         // animation, The alternative would be to use an AnimationController component which updates the animation automatically,
         // but we need to update the model's position manually in any case
@@ -141,17 +139,17 @@ void SkeletalAnimation::CreateScene()
             state->SetWeight(1.0f);
             state->SetLooped(true);
         }
-        
+
         // Create our custom Mover component that will move & animate the model during each frame's update
         Mover* mover = modelNode->CreateComponent<Mover>();
         mover->SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds);
     }
-    
+
     // Create the camera. Limit far clip distance to match the fog
     cameraNode_ = scene_->CreateChild("Camera");
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
-    
+
     // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 }
@@ -160,17 +158,17 @@ void SkeletalAnimation::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
-    
+
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
+        "Use WASD keys and mouse/touch to move\n"
         "Space to toggle debug geometry"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
     instructionText->SetTextAlignment(HA_CENTER);
-    
+
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
@@ -180,7 +178,7 @@ void SkeletalAnimation::CreateInstructions()
 void SkeletalAnimation::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
-    
+
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
@@ -190,7 +188,7 @@ void SkeletalAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(SkeletalAnimation, HandleUpdate));
-    
+
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, sent after Renderer subsystem is
     // done with defining the draw calls for the viewports (but before actually executing them.) We will request debug geometry
     // rendering during that event
@@ -202,23 +200,23 @@ void SkeletalAnimation::MoveCamera(float timeStep)
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
-    
+
     Input* input = GetSubsystem<Input>();
-    
+
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
-    
+
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     IntVector2 mouseMove = input->GetMouseMove();
     yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
     pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
     pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-    
+
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
-    
+
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
@@ -228,7 +226,7 @@ void SkeletalAnimation::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
-    
+
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
@@ -240,7 +238,7 @@ void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData
 
     // Take the frame time step, which is stored as a float
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
+
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }

@@ -37,6 +37,7 @@ For further reference, see:
 \ref Serialization "Serialization" <br>
 \ref Network "Networking" <br>
 \ref Multithreading "Multithreading" <br>
+\ref AttributeAnimation "Attribute Animation" <br>
 \ref Tools "Tools" <br>
 \ref Unicode "Unicode support" <br>
 \ref FileFormats "Custom file formats" <br>
@@ -45,6 +46,7 @@ For further reference, see:
 \ref ScriptAPI "Scripting API (generated)" <br>
 \ref LuaScriptAPI "Lua Scripting API (generated)" <br>
 \ref EventList "Event list (generated)" <br>
+\ref AttributeList "Attribute list (generated)" <br>
 
 For Urho3D related links and projects, see \ref ExternalLinks "External Links".
 
@@ -89,10 +91,12 @@ Urho3D development, contributions and bugfixes by:
 - OvermindDL1
 - andmar1x
 - amadeus_osa
+- atship
 - mightyCelu
 - reattiva
 - skaiware
 - szamq
+- thebluefish
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://www.horde3d.org/). Additional inspiration & research used:
 

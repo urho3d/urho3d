@@ -46,17 +46,14 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-
-    uint width = graphics.width * PIXEL_SIZE;
-    uint height = graphics.height * PIXEL_SIZE;
-    camera.SetOrthoSize(Vector2(width, height));
+    camera.orthoSize = graphics.height * PIXEL_SIZE;
 
     Sprite2D@ sprite = cache.GetResource("Sprite2D", "Urho2D/Aster.png");
     if (sprite is null)
         return;
 
-    uint halfWidth = width * 0.5f;
-    uint halfHeight = height * 0.5f;
+    uint halfWidth = uint(graphics.width * PIXEL_SIZE * 0.5f);
+    uint halfHeight = uint(graphics.height * PIXEL_SIZE * 0.5f);
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
     // LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll

@@ -8,6 +8,7 @@ Menu@ recentSceneMenu;
 Window@ mruScenesPopup;
 Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
+String consoleCommandInterpreter;
 
 const ShortStringHash UI_ELEMENT_TYPE("UIElement");
 const ShortStringHash WINDOW_TYPE("Window");
@@ -43,6 +44,7 @@ String uiImportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
 String uiParticlePath = fileSystem.programDir + "Data/Particles";
 Array<String> uiRecentScenes;
+String screenshotDir = fileSystem.programDir + "Screenshots";
 
 bool uiFaded = false;
 float uiMinOpacity = 0.3;
@@ -924,6 +926,7 @@ void CreateConsole()
 {
     Console@ console = engine.CreateConsole();
     console.defaultStyle = uiStyle;
+    console.commandInterpreter = consoleCommandInterpreter;
     console.numBufferedRows = 100;
     console.autoVisibleOnError = true;
 }
@@ -1139,7 +1142,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
-
+    else if (key == KEY_F11)
+    {
+        Image@ screenshot = Image();
+        graphics.TakeScreenShot(screenshot);
+        if (!fileSystem.DirExists(screenshotDir))
+            fileSystem.CreateDir(screenshotDir);
+        screenshot.SavePNG(screenshotDir + "/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+    }   
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
         Vector3 pos = cameraNode.position;

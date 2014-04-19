@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Serializable.h"
+#include "Animatable.h"
 #include "UIBatch.h"
 #include "Vector2.h"
 #include "XMLFile.h"
@@ -111,11 +111,11 @@ class Cursor;
 class ResourceCache;
 
 /// Base class for %UI elements.
-class URHO3D_API UIElement : public Serializable
+class URHO3D_API UIElement : public Animatable
 {
     OBJECT(UIElement);
     BASEOBJECT(UIElement);
-    
+
 public:
     /// Construct.
     UIElement(Context* context);
@@ -167,8 +167,8 @@ public:
     virtual void OnWheel(int delta, int buttons, int qualifiers) {}
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers) {}
-    /// React to a key press translated to a character.
-    virtual void OnChar(unsigned c, int buttons, int qualifiers) {}
+    /// React to text input event.
+    virtual void OnTextInput(const String& text, int buttons, int qualifiers) {}
     /// React to resize.
     virtual void OnResize() {}
     /// React to position change.
@@ -468,6 +468,10 @@ public:
     UIElement* GetElementEventSender() const;
 
 protected:
+    /// Handle attribute animation added.
+    virtual void OnAttributeAnimationAdded();
+    /// Handle attribute animation removed.
+    virtual void OnAttributeAnimationRemoved();
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.
@@ -557,6 +561,8 @@ private:
     void Detach();
     /// Verify that child elements have proper alignment for layout mode.
     void VerifyChildAlignment();
+    /// Handle logic post-update event.
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Size.
     IntVector2 size_;

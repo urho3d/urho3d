@@ -29,8 +29,9 @@ struct lua_State;
 namespace Urho3D
 {
 
-class LuaScript;
+class LuaFile;
 class LuaFunction;
+class LuaScript;
 
 /// Lua Script object methods.
 enum LuaScriptObjectMethod
@@ -63,6 +64,12 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Handle attribute read access.
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
+    /// Return attribute descriptions, or null if none defined.
+    virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -71,9 +78,9 @@ public:
     /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptObjectType);
     /// Create script object. Return true if successful.
-    bool CreateObject(const String& scriptFileName, const String& scriptObjectType);
-    /// Set script file name.
-    void SetScriptFileName(const String& scriptFileName);
+    bool CreateObject(LuaFile* scriptFile, const String& scriptObjectType);
+    /// Set script file.
+    void SetScriptFile(LuaFile* scriptFile);
     /// Set script object type.
     void SetScriptObjectType(const String& scriptObjectType);
     /// Set script file serialization attribute by calling a script function.
@@ -93,8 +100,8 @@ public:
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
 
-    /// Return script file name.
-    const String& GetScriptFileName() const { return scriptFileName_; }
+	/// Return script file.
+	LuaFile* GetScriptFile() const;
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
     /// Return script object ref.
@@ -104,13 +111,20 @@ public:
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
-    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName);
+    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName) const;
+
+	/// Set script file attribute.
+	void SetScriptFileAttr(ResourceRef value);
+	/// Return script file attribute.
+	ResourceRef GetScriptFileAttr() const;
 
 protected:
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 
 private:
+    /// Find script object attributes.
+    void GetScriptAttributes();
     /// Find script object method refs.
     void FindScriptObjectMethodRefs();
     /// Subscribe to script method events.
@@ -136,10 +150,12 @@ private:
     LuaScript* luaScript_;
     /// Lua state.
     lua_State* luaState_;
-    /// Script file name.
-    String scriptFileName_;
-    /// Script object type.
-    String scriptObjectType_;
+    /// Script file.
+	SharedPtr<LuaFile> scriptFile_;
+	/// Script object type.
+	String scriptObjectType_;
+	/// Attributes, including script object variables.
+    Vector<AttributeInfo> attributeInfos_;
     /// Script object ref.
     int scriptObjectRef_;
     /// Script object method.

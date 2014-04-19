@@ -95,7 +95,7 @@ public:
     void SetUseMutableGlyphs(bool enable);
     /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
     void SetForceAutoHint(bool enable);
-    
+
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
     /// Return root modal element.
@@ -190,8 +190,8 @@ private:
     void HandleTouchMove(StringHash eventType, VariantMap& eventData);
     /// Handle keypress event.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
-    /// Handle character event.
-    void HandleChar(StringHash eventType, VariantMap& eventData);
+    /// Handle text input event.
+    void HandleTextInput(StringHash eventType, VariantMap& eventData);
     /// Handle frame begin event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle logic post-update event.

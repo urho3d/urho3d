@@ -1,7 +1,8 @@
 $#include "File.h"
-$#include "Node.h"
+$#include "LuaFile.h"
 $#include "LuaScriptInstance.h"
-
+$#include "Node.h"
+$#include "ResourceCache.h"
 
 enum CreateMode
 {
@@ -16,7 +17,7 @@ enum TransformSpace
     TS_WORLD
 };
 
-class Node : public Serializable
+class Node : public Animatable
 {
     Node();
     virtual ~Node();
@@ -549,12 +550,20 @@ static int tolua_SceneLuaAPI_Node_CreateScriptObject01(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'NodeCreateScriptObject'", NULL);
 #endif
  {
+  ResourceCache* cache = self->GetSubsystem<ResourceCache>();
+  LuaFile* scriptFile = cache->GetResource<LuaFile>(fileName);
+  if (!scriptFile)
+  {
+    lua_pushnil(tolua_S);
+    return 1;
+  }
+
   LuaScriptInstance* instance = self->CreateComponent<LuaScriptInstance>();
   if (!instance)
     lua_pushnil(tolua_S);
   else
   {
-    instance->CreateObject(fileName, scriptObjectType);
+    instance->CreateObject(scriptFile, scriptObjectType);
     // Push script object to Lua stack.
     lua_rawgeti(tolua_S, LUA_REGISTRYINDEX, instance->GetScriptObjectRef());
   }

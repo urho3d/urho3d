@@ -21,8 +21,11 @@
 //
 
 #include "Precompiled.h"
+#include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "Graphics.h"
+#include "Log.h"
 #include "PhysicsEvents2D.h"
 #include "PhysicsUtils2D.h"
 #include "PhysicsWorld2D.h"
@@ -48,6 +51,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
     debugRenderer_(0),
+    physicsSteping_(false),
     applyingTransforms_(false)
 {
     // Set default debug draw flags
@@ -59,7 +63,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     world_->SetContactListener(this);
     // Set debug draw
     world_->SetDebugDraw(this);
-    
+
     world_->SetContinuousPhysics(true);
     world_->SetSubStepping(true);
 }
@@ -109,44 +113,30 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld2D::BeginContact(b2Contact* contact)
 {
+    // Only handle contact event when physics steping
+    if (!physicsSteping_)
+        return;
+
     b2Fixture* fixtureA = contact->GetFixtureA();
     b2Fixture* fixtureB = contact->GetFixtureB();
     if (!fixtureA || !fixtureB)
         return;
 
-    using namespace PhysicsBeginContact2D;
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = this;
-
-    RigidBody2D* rigidBodyA = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
-    RigidBody2D* rigidBodyB = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
-    eventData[P_BODYA] = rigidBodyA;
-    eventData[P_BODYB] = rigidBodyB;
-    eventData[P_NODEA] = rigidBodyA->GetNode();
-    eventData[P_NODEB] = rigidBodyB->GetNode();
-
-    SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
+    beginContactInfos_.Push(ContactInfo(contact));
 }
 
 void PhysicsWorld2D::EndContact(b2Contact* contact)
 {
+    // Only handle contact event when physics steping
+    if (!physicsSteping_)
+        return;
+
     b2Fixture* fixtureA = contact->GetFixtureA();
     b2Fixture* fixtureB = contact->GetFixtureB();
     if (!fixtureA || !fixtureB)
         return;
 
-    using namespace PhysicsEndContact2D;
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WORLD] = this;
-
-    RigidBody2D* rigidBodyA = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
-    RigidBody2D* rigidBodyB = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
-    eventData[P_BODYA] = rigidBodyA;
-    eventData[P_BODYB] = rigidBodyB;
-    eventData[P_NODEA] = rigidBodyA->GetNode();
-    eventData[P_NODEB] = rigidBodyB->GetNode();
-
-    SendEvent(E_PHYSICSENDCOLLISION2D, eventData);
+    endContactInfos_.Push(ContactInfo(contact));
 }
 
 void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -241,10 +231,15 @@ void PhysicsWorld2D::Update(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP2D, eventData);
 
+    physicsSteping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
+    physicsSteping_ = false;
 
     for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
         rigidBodies_[i]->ApplyWorldTransform();
+
+    SendBeginContactEvents();
+    SendEndContactEvents();
 
     using namespace PhysicsPostStep2D;
     SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
@@ -368,18 +363,18 @@ public:
     // Construct.
     RayCastCallback(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, unsigned collisionMask) :
         results_(results),
-        startPoint_(startPoint), 
+        startPoint_(startPoint),
         collisionMask_(collisionMask)
     {
     }
-    
+
     // Called for each fixture found in the query.
     virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
     {
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -388,7 +383,7 @@ public:
         result.normal_ = ToVector2(normal);
         result.distance_ = (result.position_ - startPoint_).Length();
         result.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
-        
+
         results_.Push(result);
         return true;
     }
@@ -429,7 +424,7 @@ public:
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -484,7 +479,7 @@ public:
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -499,7 +494,7 @@ public:
 
     // Return rigid body.
     RigidBody2D* GetRigidBody() const { return rigidBody_; }
-    
+
 private:
     // Point.
     b2Vec2 point_;
@@ -522,6 +517,29 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
     return callback.GetRigidBody();
 }
 
+RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask, Camera* camera)
+{
+    if (!camera)
+    {
+        PODVector<Camera*> cameras;
+        GetScene()->GetComponents<Camera>(cameras, true);
+        if (!cameras.Empty())
+            camera = cameras[0];
+    }
+
+    if (!camera)
+    {
+        LOGWARNING("Could not find camera in scene");
+        return 0;
+    }
+
+    Graphics* graphics = GetSubsystem<Graphics>();
+    Vector3 screenPoint((float)screenX / graphics->GetWidth(), (float)screenY / graphics->GetHeight(), 0.0f);
+    Vector3 worldPoint = camera->ScreenToWorldPoint(screenPoint);
+
+    return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);
+}
+
 // Aabb query callback class.
 class AabbQueryCallback : public b2QueryCallback
 {
@@ -539,7 +557,7 @@ public:
         // Ignore sensor
         if (fixture->IsSensor())
             return true;
-        
+
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
@@ -604,6 +622,74 @@ void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap
 {
     using namespace SceneSubsystemUpdate;
     Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+void PhysicsWorld2D::SendBeginContactEvents()
+{
+    if (beginContactInfos_.Empty())
+        return;
+
+    using namespace PhysicsBeginContact2D;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WORLD] = this;
+
+    for (unsigned i = 0; i < beginContactInfos_.Size(); ++i)
+    {
+        ContactInfo& contactInfo = beginContactInfos_[i];
+        eventData[P_BODYA] = contactInfo.bodyA_.Get();
+        eventData[P_BODYB] = contactInfo.bodyB_.Get();
+        eventData[P_NODEA] = contactInfo.nodeA_.Get();
+        eventData[P_NODEB] = contactInfo.nodeB_.Get();
+
+        SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
+    }
+
+    beginContactInfos_.Clear();
+}
+
+void PhysicsWorld2D::SendEndContactEvents()
+{
+   if (endContactInfos_.Empty())
+        return;
+
+    using namespace PhysicsEndContact2D;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WORLD] = this;
+
+    for (unsigned i = 0; i < endContactInfos_.Size(); ++i)
+    {
+        ContactInfo& contactInfo = endContactInfos_[i];
+        eventData[P_BODYA] = contactInfo.bodyA_.Get();
+        eventData[P_BODYB] = contactInfo.bodyB_.Get();
+        eventData[P_NODEA] = contactInfo.nodeA_.Get();
+        eventData[P_NODEB] = contactInfo.nodeB_.Get();
+
+        SendEvent(E_PHYSICSENDCONTACT2D, eventData);
+    }
+
+    endContactInfos_.Clear();
+}
+
+PhysicsWorld2D::ContactInfo::ContactInfo()
+{
+}
+
+PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
+{
+    b2Fixture* fixtureA = contact->GetFixtureA();
+    b2Fixture* fixtureB = contact->GetFixtureB();
+    bodyA_ = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
+    bodyB_ = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
+    nodeA_ = bodyA_->GetNode();
+    nodeB_ = bodyB_->GetNode();
+}
+
+PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
+    bodyA_(other.bodyA_),
+    bodyB_(other.bodyB_),
+    nodeA_(other.nodeA_),
+    nodeB_(other.nodeB_)
+{
 }
 
 }

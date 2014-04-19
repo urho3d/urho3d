@@ -40,7 +40,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set target
+    /// Set target.
     void SetTarget(const Vector2& target);
     /// Set max force.
     void SetMaxForce(float maxForce);
@@ -66,6 +66,8 @@ private:
     b2MouseJointDef jointDef_; 
     /// Target.
     Vector2 target_;
+    /// Target setted.
+    bool targetSetted_;
 };
 
 }
