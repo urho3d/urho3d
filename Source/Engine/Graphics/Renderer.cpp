@@ -873,9 +873,6 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     int retries = 3;
     unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
     
-    // OpenGL: create shadow map only in normal cases. Color rendertarget is only needed for a workaround
-    // of an OS X + Intel bug
-    #ifdef URHO3D_OPENGL
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
@@ -886,10 +883,19 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
         else
         {
+            #ifdef URHO3D_OPENGL
             #ifndef GL_ES_VERSION_2_0
+            // OpenGL (desktop): shadow compare mode needs to be specifically enabled for the shadow map
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
             newShadowMap->SetShadowCompare(true);
             #endif
+            #else
+            // Direct3D9: when shadow compare must be done manually, use nearest filtering so that the filtering of point lights
+            // and other shadowed lights matches
+            newShadowMap->SetFilterMode(graphics_->GetHardwareShadowSupport() ? FILTER_BILINEAR : FILTER_NEAREST);
+            #endif
+            // Create dummy color texture for the shadow map if necessary: Direct3D9, or OpenGL when working around an OS X +
+            // Intel driver bug
             if (dummyColorFormat)
             {
                 // If no dummy color rendertarget for this size exists yet, create one now
@@ -904,33 +910,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
             break;
         }
     }
-    #else
-    // Direct3D9: create shadow map and dummy color rendertarget
-    while (retries)
-    {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
-        {
-            width >>= 1;
-            height >>= 1;
-            --retries;
-        }
-        else
-        {
-            // When shadow compare must be done manually, use nearest filtering so that the filtering of point lights and other
-            // shadowed lights matches
-            newShadowMap->SetFilterMode(graphics_->GetHardwareShadowSupport() ? FILTER_BILINEAR : FILTER_NEAREST);
-            // If no dummy color rendertarget for this size exists yet, create one now
-            if (!colorShadowMaps_.Contains(searchKey))
-            {
-                colorShadowMaps_[searchKey] = new Texture2D(context_);
-                colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
-            }
-            // Link the color rendertarget to the shadow map
-            newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
-            break;
-        }
-    }
-    #endif
+    
     // If failed to set size, store a null pointer so that we will not retry
     if (!retries)
         newShadowMap.Reset();
