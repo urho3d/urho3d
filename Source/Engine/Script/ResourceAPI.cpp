@@ -166,6 +166,26 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "bool get_compressed() const", asMETHOD(Image, IsCompressed), asCALL_THISCALL);
 }
 
+static void ConstructJSONValue(JSONValue* ptr)
+{
+    new(ptr) JSONValue();
+}
+
+static void ConstructJSONValueCopy(const JSONValue& value, JSONValue* ptr)
+{
+    new(ptr) JSONValue(value);
+}
+
+static void DestructJSONValue(JSONValue* ptr)
+{
+    ptr->~JSONValue();
+}
+
+static CScriptArray* JSONValueGetChildNames(JSONValue* ptr)
+{
+    Vector<String> names = ptr->GetChildNames();
+    return VectorToArray<String>(names, "Array<String>");
+}
 
 static void RegisterJSONValue(asIScriptEngine* engine)
 {
@@ -175,6 +195,10 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterEnumValue("JSONValueType", "JSON_ARRAY", JSON_ARRAY);
 
     engine->RegisterObjectType("JSONValue", sizeof(JSONValue), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructJSONValue), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(const JSONValue&in)", asFUNCTION(ConstructJSONValueCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructJSONValue), asCALL_CDECL_OBJLAST);
+
     engine->RegisterObjectMethod("JSONValue", "bool get_isNull() const", asMETHOD(JSONValue, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_notNull() const", asMETHOD(JSONValue, NotNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONValue&in)", asMETHOD(JSONValue, operator =), asCALL_THISCALL);
@@ -201,7 +225,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "void SetVariant(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void SetVariantValue(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariantValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isObject() const", asMETHOD(JSONValue, IsObject), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "Vector<String> GetChildNames() const", asMETHOD(JSONValue, GetChildNames), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "Array<String>@ GetChildNames() const", asFUNCTION(JSONValueGetChildNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "int GetInt(const String&in) const", asMETHODPR(JSONValue, GetInt, (const String&) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool GetBool(const String&in) const", asMETHODPR(JSONValue, GetBool, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "float GetFloat(const String&in) const", asMETHODPR(JSONValue, GetFloat, (const String&) const, float), asCALL_THISCALL);
@@ -212,7 +236,6 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "Quaternion GetQuaternion(const String&in) const", asMETHODPR(JSONValue, GetQuaternion, (const String&) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "Color GetColor(const String&in) const", asMETHODPR(JSONValue, GetColor, (const String&) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "String GetString(const String&in) const", asMETHODPR(JSONValue, GetString, (const String&) const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "const char* GetCString(const String&in) const", asMETHODPR(JSONValue, GetCString, (const String&) const, const char*), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "ResourceRef GetResourceRef(const String&in) const", asMETHODPR(JSONValue, GetResourceRef, (const String&) const, ResourceRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "ResourceRefList GetResourceRefList(const String&in) const", asMETHODPR(JSONValue, GetResourceRefList, (const String&) const, ResourceRefList), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "IntRect GetIntRect(const String&in) const", asMETHODPR(JSONValue, GetIntRect, (const String&) const, IntRect), asCALL_THISCALL);
@@ -224,7 +247,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "Variant GetVariantValue(const String&in, VariantType type) const", asMETHODPR(JSONValue, GetVariantValue, (const String&, VariantType) const, Variant), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValue CreateChild(JSONValueType valueType = JSON_OBJECT)", asMETHODPR(JSONValue, CreateChild, (JSONValueType), JSONValue), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "JSONValue GetChild(unsigned index, JSONValueType valueType = JSON_ANY) const", asMETHODPR(JSONValue, GetChild, (unsigned, JSONValueType) const, JSONValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "JSONValue GetChild(uint, JSONValueType valueType = JSON_ANY) const", asMETHODPR(JSONValue, GetChild, (unsigned, JSONValueType) const, JSONValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void AddInt(int)", asMETHOD(JSONValue, AddInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void AddBool(bool)", asMETHOD(JSONValue, AddBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void AddFloat(float)", asMETHOD(JSONValue, AddFloat), asCALL_THISCALL);
@@ -256,7 +279,6 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "Quaternion GetQuaternion(uint) const", asMETHODPR(JSONValue, GetQuaternion, (unsigned) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "Color GetColor(uint) const", asMETHODPR(JSONValue, GetColor, (unsigned) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "String GetString(uint) const", asMETHODPR(JSONValue, GetString, (unsigned) const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "const char*uint(unsigned) const", asMETHODPR(JSONValue, GetCString, (unsigned) const, const char*), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "ResourceRef GetResourceRef(uint) const", asMETHODPR(JSONValue, GetResourceRef, (unsigned) const, ResourceRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "ResourceRefList GetResourceRefList(uint) const", asMETHODPR(JSONValue, GetResourceRefList, (unsigned) const, ResourceRefList), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "IntRect GetIntRect(uint) const", asMETHODPR(JSONValue, GetIntRect, (unsigned) const, IntRect), asCALL_THISCALL);
@@ -271,8 +293,8 @@ static void RegisterJSONValue(asIScriptEngine* engine)
 static void RegisterJSONFile(asIScriptEngine* engine)
 {
     RegisterResource<JSONFile>(engine, "JSONFile");
-    engine->RegisterObjectMethod("JSONFile", "XMLElement CreateRoot(JSONValueType valueType = JSON_ANY)", asMETHOD(JSONFile, CreateRoot), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONFile", "XMLElement GetRoot(JSONValueType valueType = JSON_ANY)", asMETHOD(JSONFile, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONFile", "JSONValue CreateRoot(JSONValueType valueType = JSON_ANY)", asMETHOD(JSONFile, CreateRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONFile", "JSONValue GetRoot(JSONValueType valueType = JSON_ANY)", asMETHOD(JSONFile, GetRoot), asCALL_THISCALL);
 }
 
 static void ConstructXMLElement(XMLElement* ptr)
