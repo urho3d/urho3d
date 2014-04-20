@@ -700,6 +700,7 @@ static void RegisterPlane(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Plane", "void Transform(const Matrix3&in)", asMETHODPR(Plane, Transform, (const Matrix3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "void Transform(const Matrix3x4&in)", asMETHODPR(Plane, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "void Transform(const Matrix4&in)", asMETHODPR(Plane, Transform, (const Matrix4&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "Vector3 Project(const Vector3&in) const", asMETHOD(Plane, Project), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "float Distance(const Vector3&in) const", asMETHOD(Plane, Distance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Vector3 Reflect(const Vector3&in) const", asMETHOD(Plane, Reflect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Plane Transformed(const Matrix3&in) const", asMETHODPR(Plane, Transformed, (const Matrix3&) const, Plane), asCALL_THISCALL);

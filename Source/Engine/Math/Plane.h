@@ -95,6 +95,8 @@ public:
     /// Transform with a 4x4 matrix.
     void Transform(const Matrix4& transform);
     
+    /// Project a point on the plane.
+    Vector3 Project(const Vector3& point) const { return point - normal_ * (normal_.DotProduct(point) + d_); }
     /// Return signed distance to a point.
     float Distance(const Vector3& point) const { return normal_.DotProduct(point) + d_; }
     /// Reflect a normalized direction vector.
@@ -109,7 +111,7 @@ public:
     Plane Transformed(const Matrix4& transform) const;
     /// Return as a vector.
     Vector4 ToVector4() const { return Vector4(normal_, d_); }
-
+    
     /// Plane normal.
     Vector3 normal_;
     /// Plane absolute normal.

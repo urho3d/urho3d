@@ -253,7 +253,6 @@ static const unsigned MAX_BUFFER_AGE = 1000;
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
-    quadDirLight_(new Light(context)),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -283,8 +282,6 @@ Renderer::Renderer(Context* context) :
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
-    
-    quadDirLight_->SetLightType(LIGHT_DIRECTIONAL);
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -786,6 +783,11 @@ Geometry* Renderer::GetLightGeometry(Light* light)
     }
     
     return 0;
+}
+
+Geometry* Renderer::GetQuadGeometry()
+{
+    return dirLightGeometry_;
 }
 
 Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)

@@ -1922,8 +1922,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
 
 void View::DrawFullscreenQuad(bool nearQuad)
 {
-    Light* quadDirLight = renderer_->GetQuadDirLight();
-    Geometry* geometry = renderer_->GetLightGeometry(quadDirLight);
+    Geometry* geometry = renderer_->GetQuadGeometry();
     
     Matrix3x4 model = Matrix3x4::IDENTITY;
     Matrix4 projection = Matrix4::IDENTITY;
