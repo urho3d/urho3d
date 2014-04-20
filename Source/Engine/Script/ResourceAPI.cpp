@@ -201,6 +201,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "void SetVariant(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void SetVariantValue(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariantValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isObject() const", asMETHOD(JSONValue, IsObject), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "Vector<String> GetChildNames() const", asMETHOD(JSONValue, GetChildNames), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "int GetInt(const String&in) const", asMETHODPR(JSONValue, GetInt, (const String&) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool GetBool(const String&in) const", asMETHODPR(JSONValue, GetBool, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "float GetFloat(const String&in) const", asMETHODPR(JSONValue, GetFloat, (const String&) const, float), asCALL_THISCALL);

@@ -276,6 +276,22 @@ bool JSONValue::IsObject() const
     return value_ && value_->IsObject();
 }
 
+Vector<String> JSONValue::GetChildNames() const
+{
+    Vector<String> ret;
+    if (!IsObject())
+        return ret;
+
+    for (Value::ConstMemberIterator i = value_->MemberBegin(); i != value_->MemberEnd(); ++i)
+    {
+        // Only reutrn name for child object and array
+        if (i->value.GetType() == kArrayType || i->value.GetType() == kObjectType)
+            ret.Push(i->name.GetString());
+    }
+
+    return ret;
+}
+
 int JSONValue::GetInt(const String& name) const
 {
     return GetMember(name).GetInt();
