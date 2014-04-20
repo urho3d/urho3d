@@ -6468,6 +6468,7 @@ void Define(const Vector3&, const Vector3&);
 void Define(const Vector3&, const Vector3&, const Vector3&);
 void Define(const Vector4&);
 float Distance(const Vector3&) const;
+Vector3 Project(const Vector3&) const;
 Vector3 Reflect(const Vector3&) const;
 Vector4 ToVector4() const;
 void Transform(const Matrix3&);

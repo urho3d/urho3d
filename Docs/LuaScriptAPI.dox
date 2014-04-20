@@ -3485,6 +3485,7 @@ Methods:
 - void Transform(const Matrix3& transform)
 - void Transform(const Matrix3x4& transform)
 - void Transform(const Matrix4& transform)
+- Vector3 Project(const Vector3& point) const
 - float Distance(const Vector3& point) const
 - Vector3 Reflect(const Vector3& direction) const
 - Matrix3x4 ReflectionMatrix() const
@@ -3817,14 +3818,9 @@ Methods:
 - unsigned GetNumShadowMaps(bool allViews = false) const
 - unsigned GetNumOccluders(bool allViews = false) const
 - Zone* GetDefaultZone() const
-- Light* GetQuadDirLight() const
 - Material* GetDefaultMaterial() const
 - Texture2D* GetDefaultLightRamp() const
 - Texture2D* GetDefaultLightSpot() const
-- TextureCube* GetFaceSelectCubeMap() const
-- TextureCube* GetIndirectionCubeMap() const
-- VertexBuffer* GetInstancingBuffer() const
-- const FrameInfo& GetFrameInfo()
 - void DrawDebugGeometry(bool depthTest)
 
 Properties:
