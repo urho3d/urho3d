@@ -1225,6 +1225,7 @@ namespace Urho3D
 - %Hierarchy %Mode : bool
 - %Base %Indent : int
 - %Clear %Sel. %On %Defocus : bool
+- %Select %On %Click %End : bool
 
 ### LuaScriptInstance
 - %Is %Enabled : bool
@@ -6159,6 +6160,7 @@ Properties:
 - bool scrollBarsAutoVisible
 - BorderImage@ scrollPanel // readonly
 - float scrollStep
+- bool selectOnClickEnd
 - bool selected
 - UIElement@ selectedItem // readonly
 - UIElement@[]@ selectedItems // readonly

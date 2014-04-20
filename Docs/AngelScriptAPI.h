@@ -4983,6 +4983,7 @@ bool scrollBarsAutoVisible;
 /* readonly */
 BorderImage scrollPanel;
 float scrollStep;
+bool selectOnClickEnd;
 bool selected;
 /* readonly */
 UIElement selectedItem;

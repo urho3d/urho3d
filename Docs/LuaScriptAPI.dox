@@ -2426,6 +2426,7 @@ Methods:
 - void SetHierarchyMode(bool enable)
 - void SetBaseIndent(int baseIndent)
 - void SetClearSelectionOnDefocus(bool enable)
+- void SetSelectOnClickEnd(bool enable)
 - void Expand(unsigned index, bool enable, bool recursive = false)
 - void ToggleExpand(unsigned index, bool recursive = false)
 - unsigned GetNumItems() const
@@ -2442,6 +2443,7 @@ Methods:
 - HighlightMode GetHighlightMode() const
 - bool GetMultiselect() const
 - bool GetClearSelectionOnDefocus() const
+- bool GetSelectOnClickEnd() const
 - bool GetHierarchyMode() const
 - int GetBaseIndent() const
 
@@ -2453,6 +2455,7 @@ Properties:
 - HighlightMode highlightMode
 - bool multiselect
 - bool clearSelectionOnDefocus
+- bool selectOnClickEnd
 - bool hierarchyMode
 - int baseIndent
 
