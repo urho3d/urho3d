@@ -32,30 +32,32 @@ class ListView : public ScrollView
     void SetHierarchyMode(bool enable);
     void SetBaseIndent(int baseIndent);
     void SetClearSelectionOnDefocus(bool enable);
+    void SetSelectOnClickEnd(bool enable);
 
     void Expand(unsigned index, bool enable, bool recursive = false);
     void ToggleExpand(unsigned index, bool recursive = false);
-    
+
     unsigned GetNumItems() const;
     UIElement* GetItem(unsigned index) const;
-    
+
     // PODVector<UIElement*> GetItems() const;
     tolua_outside const PODVector<UIElement*>& ListViewGetItems @ GetItems() const;
-    
+
     unsigned FindItem(UIElement* item) const;
     unsigned GetSelection() const;
     const PODVector<unsigned>& GetSelections() const;
     void CopySelectedItemsToClipboard() const;
     UIElement* GetSelectedItem() const;
-    
+
     // PODVector<UIElement*> GetSelectedItems() const;
     tolua_outside const PODVector<UIElement*>& ListViewGetSelectedItems @ GetSelectedItems() const;
-    
+
     bool IsSelected(unsigned index) const;
     bool IsExpanded(unsigned index) const;
     HighlightMode GetHighlightMode() const;
     bool GetMultiselect() const;
     bool GetClearSelectionOnDefocus() const;
+    bool GetSelectOnClickEnd() const;
     bool GetHierarchyMode() const;
     int GetBaseIndent() const;
 
@@ -65,6 +67,7 @@ class ListView : public ScrollView
     tolua_property__get_set HighlightMode highlightMode;
     tolua_property__get_set bool multiselect;
     tolua_property__get_set bool clearSelectionOnDefocus;
+    tolua_property__get_set bool selectOnClickEnd;
     tolua_property__get_set bool hierarchyMode;
     tolua_property__get_set int baseIndent;
 };

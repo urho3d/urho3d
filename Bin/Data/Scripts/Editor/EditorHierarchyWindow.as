@@ -15,6 +15,7 @@ const ShortStringHash TYPE_VAR("Type");
 const ShortStringHash NODE_ID_VAR("NodeID");
 const ShortStringHash COMPONENT_ID_VAR("ComponentID");
 const ShortStringHash UI_ELEMENT_ID_VAR("UIElementID");
+const ShortStringHash DRAGDROPCONTENT_VAR("DragDropContent");
 const ShortStringHash[] ID_VARS = { ShortStringHash(""), NODE_ID_VAR, COMPONENT_ID_VAR, UI_ELEMENT_ID_VAR };
 Color nodeTextColor(1.0f, 1.0f, 1.0f);
 Color componentTextColor(0.7f, 1.0f, 0.7f);
@@ -63,6 +64,9 @@ void CreateHierarchyWindow()
     hierarchyWindow.BringToFront();
 
     UpdateHierarchyItem(editorScene);
+
+    // Set selection to happen on click end, so that we can drag nodes to the inspector without resetting the inspector view
+    hierarchyList.selectOnClickEnd = true;
 
     // Set drag & drop target mode on the node list background, which is used to parent nodes back to the root node
     hierarchyList.contentElement.dragDropMode = DD_TARGET;
@@ -288,7 +292,8 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
     text.vars[COMPONENT_ID_VAR] = component.id;
     text.text = GetComponentTitle(component);
     text.color = componentTextColor;
-    text.dragDropMode = DD_SOURCE_AND_TARGET;
+    // Components currently act only as drag targets
+    text.dragDropMode = DD_TARGET;
 
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
@@ -314,6 +319,10 @@ void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
 
     text.vars[TYPE_VAR] = itemType;
     text.vars[ID_VARS[itemType]] = GetID(serializable, itemType);
+    
+    // Set node ID as drag and drop content for node ID editing
+    if (itemType == ITEM_NODE)
+        text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[NODE_ID_VAR].GetUInt());
 
     switch (itemType)
     {
@@ -805,7 +814,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 
                 for (uint i = 0; i < sourceNodes.length; ++i)
                     smg.AddInstanceNode(sourceNodes[i]);
-                    
+
                 action.Define(smg, attrIndex, oldIDs);
                 SaveEditAction(action);
                 SetSceneModified();
@@ -822,12 +831,12 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 
                 for (uint i = 0; i < sourceNodes.length; ++i)
                     spline.AddControlPoint(sourceNodes[i]);
-                    
+
                 action.Define(spline, attrIndex, oldIDs);
                 SaveEditAction(action);
                 SetSceneModified();
             }
-            
+
             // Drag a node to Constraint to make it the remote end of the constraint
             Constraint@ constraint = cast<Constraint>(targetComponent);
             RigidBody@ rigidBody = sourceNodes[0].GetComponent("RigidBody");
@@ -839,7 +848,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
                 Variant oldID = constraint.attributes[attrIndex];
 
                 constraint.otherBody = rigidBody;
-                
+
                 action.Define(constraint, attrIndex, oldID);
                 SaveEditAction(action);
                 SetSceneModified();
@@ -851,31 +860,45 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 {
     Array<Node@> nodeList;
+    
+    Node@ node = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
+    if (node !is null)
+        nodeList.Push(node);
 
-    // Handle multiple selected children from a ListView
+    // Handle additional selected children from a ListView
     if (source.parent !is null && source.parent.typeName == "HierarchyContainer")
     {
         ListView@ listView_ = cast<ListView>(source.parent.parent.parent);
-
         if (listView_ is null)
             return nodeList;
-
+        
+        bool sourceIsSelected = false;
         for (uint i = 0; i < listView_.selectedItems.length; i++)
         {
-            UIElement@ item_ = listView_.selectedItems[i];
-            if (item_.vars[TYPE_VAR] == ITEM_NODE)
+            if (listView_.selectedItems[i] is source)
             {
-                Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
-                if (node !is null)
-                    nodeList.Push(node);
+                sourceIsSelected = true;
+                break;
             }
         }
-    }
-    else
-    {
-        Node@ node = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
-        if (node !is null)
-            nodeList.Push(node);
+
+        if (sourceIsSelected)
+        {
+            for (uint i = 0; i < listView_.selectedItems.length; i++)
+            {
+                UIElement@ item_ = listView_.selectedItems[i];
+                // The source item is already added
+                if (item_ is source)
+                    continue;
+
+                if (item_.vars[TYPE_VAR] == ITEM_NODE)
+                {
+                    Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                    if (node !is null)
+                        nodeList.Push(node);
+                }
+            }
+        }
     }
 
     return nodeList;
@@ -895,7 +918,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         variant = target.GetVar(NODE_ID_VAR);
         if (!variant.empty)
             targetNode = editorScene.GetNode(variant.GetUInt());
-    
+
         if (sourceNode !is null && targetNode !is null)
         {
             itemType = ITEM_NODE;
@@ -918,7 +941,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         variant = target.GetVar(UI_ELEMENT_ID_VAR);
         if (!variant.empty)
             targetElement = GetUIElementByID(variant.GetUInt());
-  
+
         if (sourceElement !is null && targetElement !is null)
         {
             itemType = ITEM_UI_ELEMENT;
@@ -933,7 +956,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
     }
     else if (targetItemType == ITEM_COMPONENT)
     {
-        // Now only support dragging of nodes to StaticModelGroup or Constraint. Can be expanded to support others
+        // Now only support dragging of nodes to StaticModelGroup, SplinePath or Constraint. Can be expanded to support others
         Node@ sourceNode;
         Component@ targetComponent;
         Variant variant = source.GetVar(NODE_ID_VAR);

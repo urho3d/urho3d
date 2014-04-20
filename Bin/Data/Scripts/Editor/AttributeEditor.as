@@ -195,6 +195,9 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+        // If the attribute is a node ID, make it a drag/drop target
+        if (info.name.Contains("NodeID", false) || info.name.Contains("Node ID", false) || (info.mode & AM_NODEID) != 0)
+            attrEdit.dragDropMode = DD_TARGET;
     }
     else
     {
@@ -1221,10 +1224,10 @@ void InitVectorStructs()
         "   NodeID"
     };
     vectorStructs.Push(VectorStruct("StaticModelGroup", "Instance Nodes", staticModelGroupInstanceVariables, 1));
-    
+
     Array<String> splinePathInstanceVariables = {
         "Control Point Count",
-        "   Node ID"
+        "   NodeID"
     };
     vectorStructs.Push(VectorStruct("SplinePath", "Control Points", splinePathInstanceVariables, 1));
 }

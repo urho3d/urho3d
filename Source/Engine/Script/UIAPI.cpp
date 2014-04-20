@@ -313,6 +313,8 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "int get_baseIndent() const", asMETHOD(ListView, GetBaseIndent), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_clearSelectionOnDefocus(bool)", asMETHOD(ListView, SetClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool get_clearSelectionOnDefocus() const", asMETHOD(ListView, GetClearSelectionOnDefocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_selectOnClickEnd(bool)", asMETHOD(ListView, SetSelectOnClickEnd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool get_selectOnClickEnd() const", asMETHOD(ListView, GetSelectOnClickEnd), asCALL_THISCALL);
 }
 
 static void RegisterText(asIScriptEngine* engine)
