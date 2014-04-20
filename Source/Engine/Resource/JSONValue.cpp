@@ -38,9 +38,9 @@ const JSONValue JSONValue::EMPTY;
 
 static rapidjson::Type ToRapidJsonType(JSONValueType valueType)
 {
-    if (valueType == JVT_OBJECT)
+    if (valueType == JSON_OBJECT)
         return kObjectType;
-    else if (valueType == JVT_ARRAY)
+    else if (valueType == JSON_ARRAY)
         return kArrayType;
     return kNullType;
 }
@@ -96,9 +96,9 @@ JSONValue JSONValue::CreateChild(const String& name, JSONValueType valueType)
         return JSONValue::EMPTY;
 
     Value jsonValue;
-    if (valueType == JVT_OBJECT)
+    if (valueType == JSON_OBJECT)
         jsonValue.SetObject();
-    else if (valueType == JVT_ARRAY)
+    else if (valueType == JSON_ARRAY)
         jsonValue.SetArray();
 
     AddMember(name, jsonValue);
@@ -114,7 +114,7 @@ JSONValue JSONValue::GetChild(const String& name, JSONValueType valueType) const
         return JSONValue::EMPTY;
 
     Value& value = GetMember(name);
-    if (valueType != JVT_UNKNOWN && value.GetType() != ToRapidJsonType(valueType))
+    if (valueType != JSON_ANY && value.GetType() != ToRapidJsonType(valueType))
         return JSONValue::EMPTY;
 
     return JSONValue(file_, &value);
@@ -242,7 +242,7 @@ void JSONValue::SetMatrix4(const String& name, const Matrix4& value)
 void JSONValue::SetVariant(const String& name, const Variant& value)
 {
     // Create child object for variant
-    JSONValue child = CreateChild(name, JVT_OBJECT);
+    JSONValue child = CreateChild(name, JSON_OBJECT);
     // Set type
     child.SetString("type", value.GetTypeName());
     // Set value
@@ -409,7 +409,7 @@ Matrix4 JSONValue::GetMatrix4(const String& name) const
 Variant JSONValue::GetVariant(const String& name) const
 {
     // Get child for variant
-    JSONValue child = GetChild(name, JVT_OBJECT);
+    JSONValue child = GetChild(name, JSON_OBJECT);
     if (child.IsNull())
         return Variant::EMPTY;
 
@@ -453,95 +453,95 @@ JSONValue JSONValue::GetChild(unsigned index, JSONValueType valueType) const
         return JSONValue::EMPTY;
 
     const Value& value = (*value_)[(SizeType)index];
-    if (valueType != JVT_UNKNOWN && value.GetType() != ToRapidJsonType(valueType))
+    if (valueType != JSON_ANY && value.GetType() != ToRapidJsonType(valueType))
         return JSONValue::EMPTY;
 
     return JSONValue(file_, (Value*)&value);
 }
 
-void JSONValue::PushInt(int value)
+void JSONValue::AddInt(int value)
 {
     Value jsonValue;
     jsonValue.SetInt(value);
-    PushMember(jsonValue);
+    AddMember(jsonValue);
 }
 
-void JSONValue::PushBool(bool value)
+void JSONValue::AddBool(bool value)
 {
     Value jsonValue;
     jsonValue.SetBool(value);
-    PushMember(jsonValue);
+    AddMember(jsonValue);
 }
 
-void JSONValue::PushFloat(float value)
+void JSONValue::AddFloat(float value)
 {
     Value jsonValue;
     jsonValue.SetDouble((double)value);
-    PushMember(jsonValue);
+    AddMember(jsonValue);
 }
 
-void JSONValue::PushVector2(const Vector2& value)
+void JSONValue::AddVector2(const Vector2& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushVector3(const Vector3& value)
+void JSONValue::AddVector3(const Vector3& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushVector4(const Vector4& value)
+void JSONValue::AddVector4(const Vector4& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushVectorVariant(const Variant& value)
+void JSONValue::AddVectorVariant(const Variant& value)
 {
     VariantType type = value.GetType();
     if (type == VAR_FLOAT || type == VAR_VECTOR2 || type == VAR_VECTOR3 || type == VAR_VECTOR4 || type == VAR_MATRIX3 ||
         type == VAR_MATRIX3X4 || type == VAR_MATRIX4)
-        PushString(value.ToString());
+        AddString(value.ToString());
 }
 
-void JSONValue::PushQuaternion(const Quaternion& value)
+void JSONValue::AddQuaternion(const Quaternion& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushColor(const Color& value)
+void JSONValue::AddColor(const Color& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushString(const String& value)
+void JSONValue::AddString(const String& value)
 {
     Value jsonValue;
     jsonValue.SetString(value.CString(), value.Length(), file_->GetDocument()->GetAllocator());
-    PushMember(jsonValue);
+    AddMember(jsonValue);
 }
 
-void JSONValue::PushBuffer(const PODVector<unsigned char>& value)
+void JSONValue::AddBuffer(const PODVector<unsigned char>& value)
 {
     if (!value.Size())
-        PushString(String::EMPTY);
+        AddString(String::EMPTY);
     else
-        PushBuffer(&value[0], value.Size());
+        AddBuffer(&value[0], value.Size());
 }
 
-void JSONValue::PushBuffer(const void* data, unsigned size)
+void JSONValue::AddBuffer(const void* data, unsigned size)
 {
     String dataStr;
     BufferToString(dataStr, data, size);
-    PushString(dataStr);
+    AddString(dataStr);
 }
 
-void JSONValue::PushResourceRef(const ResourceRef& value)
+void JSONValue::AddResourceRef(const ResourceRef& value)
 {
     Context* context = file_->GetContext();
-    PushString(String(context->GetTypeName(value.type_)) + ";" + value.name_);
+    AddString(String(context->GetTypeName(value.type_)) + ";" + value.name_);
 }
 
-void JSONValue::PushResourceRefList(const ResourceRefList& value)
+void JSONValue::AddResourceRefList(const ResourceRefList& value)
 {
     Context* context = file_->GetContext();
     String str(context->GetTypeName(value.type_));
@@ -550,54 +550,54 @@ void JSONValue::PushResourceRefList(const ResourceRefList& value)
         str += ";";
         str += value.names_[i];
     }
-    PushString(str);
+    AddString(str);
 }
 
-void JSONValue::PushIntRect(const IntRect& value)
+void JSONValue::AddIntRect(const IntRect& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushIntVector2(const IntVector2& value)
+void JSONValue::AddIntVector2(const IntVector2& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushMatrix3(const Matrix3& value)
+void JSONValue::AddMatrix3(const Matrix3& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushMatrix3x4(const Matrix3x4& value)
+void JSONValue::AddMatrix3x4(const Matrix3x4& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushMatrix4(const Matrix4& value)
+void JSONValue::AddMatrix4(const Matrix4& value)
 {
-    PushString(value.ToString());
+    AddString(value.ToString());
 }
 
-void JSONValue::PushVariant(const Variant& value)
+void JSONValue::AddVariant(const Variant& value)
 {
     // Create child object for variant
-    JSONValue child = CreateChild(JVT_OBJECT);
+    JSONValue child = CreateChild(JSON_OBJECT);
     // Set type
     child.SetString("type", value.GetTypeName());
     // Set value
     child.SetVariantValue("value", value);
 }
 
-void JSONValue::PushVariantValue(const Variant& value)
+void JSONValue::AddVariantValue(const Variant& value)
 {
     switch (value.GetType())
     {
     case VAR_RESOURCEREF:
-        PushResourceRef(value.GetResourceRef());
+        AddResourceRef(value.GetResourceRef());
         break;
 
     case VAR_RESOURCEREFLIST:
-        PushResourceRefList(value.GetResourceRefList());
+        AddResourceRefList(value.GetResourceRefList());
         break;
 
     case VAR_VARIANTVECTOR:
@@ -606,7 +606,7 @@ void JSONValue::PushVariantValue(const Variant& value)
         break;
 
     default:
-        PushString(value.ToString());
+        AddString(value.ToString());
     }
 }
 
@@ -755,7 +755,7 @@ Matrix4 JSONValue::GetMatrix4(unsigned index) const
 Variant JSONValue::GetVariant(unsigned index) const
 {
     // Get child for variant
-    JSONValue child = GetChild(index, JVT_OBJECT);
+    JSONValue child = GetChild(index, JSON_OBJECT);
     if (child.IsNull())
         return Variant::EMPTY;
 
@@ -798,7 +798,7 @@ rapidjson::Value& JSONValue::GetMember(const String& name) const
     return (*value_)[name.CString()];
 }
 
-void JSONValue::PushMember(rapidjson::Value& jsonValue)
+void JSONValue::AddMember(rapidjson::Value& jsonValue)
 {
     assert(IsArray());
 

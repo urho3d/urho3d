@@ -44,12 +44,12 @@ class JSONFile;
 /// JSON value type.
 enum JSONValueType
 {
+    /// Any type (use type in JSON value).
+    JSON_ANY = 0,
     /// Object type (Hash Map).
-    JVT_OBJECT = 0,
+    JSON_OBJECT,
     /// Array type.
-    JVT_ARRAY,
-    /// Unknown type.
-    JVT_UNKNOWN,
+    JSON_ARRAY
 };
 
 /// JSON value class.
@@ -77,9 +77,9 @@ public:
 
     // JSON object value functions
     /// Create a child value.
-    JSONValue CreateChild(const String& name, JSONValueType valueType = JVT_OBJECT);
+    JSONValue CreateChild(const String& name, JSONValueType valueType = JSON_OBJECT);
     /// Return a child value by name. Return null if not exist.
-    JSONValue GetChild(const String& name, JSONValueType valueType = JVT_UNKNOWN) const;
+    JSONValue GetChild(const String& name, JSONValueType valueType = JSON_ANY) const;
     /// Set int.
     void SetInt(const String& name, int value);
     /// Set bool.
@@ -172,51 +172,51 @@ public:
 
     // JSON array value functions
     /// Create a child value in array.
-    JSONValue CreateChild(JSONValueType valueType = JVT_OBJECT);
+    JSONValue CreateChild(JSONValueType valueType = JSON_OBJECT);
     /// Remove a child value in array. Return null if not exist.
-    JSONValue GetChild(unsigned index, JSONValueType valueType = JVT_UNKNOWN) const;
-    /// Push int.
-    void PushInt(int value);
-    /// Push bool.
-    void PushBool(bool value);
-    /// Push float.
-    void PushFloat(float value);
-    /// Push vector2.
-    void PushVector2(const Vector2& value);
-    /// Push vector3.
-    void PushVector3(const Vector3& value);
-    /// Push vector4.
-    void PushVector4(const Vector4& value);
-    /// Push vector variant.
-    void PushVectorVariant(const Variant& value);
-    /// Push quaternion.
-    void PushQuaternion(const Quaternion& value);
-    /// Push color.
-    void PushColor(const Color& value);
-    /// Push string.
-    void PushString(const String& value);
-    /// Push buffer.
-    void PushBuffer(const PODVector<unsigned char>& value);
-    /// Push buffer.
-    void PushBuffer(const void* data, unsigned size);
-    /// Push resource ref.
-    void PushResourceRef(const ResourceRef& value);
-    /// Push resource ref list.
-    void PushResourceRefList(const ResourceRefList& value);
-    /// Push int rect.
-    void PushIntRect(const IntRect& value);
-    /// Push int vector2.
-    void PushIntVector2(const IntVector2& value);
-    /// Push matrix3.
-    void PushMatrix3(const Matrix3& value);
-    /// Push matrix3x4.
-    void PushMatrix3x4(const Matrix3x4& value);
-    /// Push matrix4.
-    void PushMatrix4(const Matrix4& value);
-    /// Push variant.
-    void PushVariant(const Variant& value);
-    /// Push variant value.
-    void PushVariantValue(const Variant& value);
+    JSONValue GetChild(unsigned index, JSONValueType valueType = JSON_ANY) const;
+    /// Add int.
+    void AddInt(int value);
+    /// Add bool.
+    void AddBool(bool value);
+    /// Add float.
+    void AddFloat(float value);
+    /// Add vector2.
+    void AddVector2(const Vector2& value);
+    /// Add vector3.
+    void AddVector3(const Vector3& value);
+    /// Add vector4.
+    void AddVector4(const Vector4& value);
+    /// Add vector variant.
+    void AddVectorVariant(const Variant& value);
+    /// Add quaternion.
+    void AddQuaternion(const Quaternion& value);
+    /// Add color.
+    void AddColor(const Color& value);
+    /// Add string.
+    void AddString(const String& value);
+    /// Add buffer.
+    void AddBuffer(const PODVector<unsigned char>& value);
+    /// Add buffer.
+    void AddBuffer(const void* data, unsigned size);
+    /// Add resource ref.
+    void AddResourceRef(const ResourceRef& value);
+    /// Add resource ref list.
+    void AddResourceRefList(const ResourceRefList& value);
+    /// Add int rect.
+    void AddIntRect(const IntRect& value);
+    /// Add int vector2.
+    void AddIntVector2(const IntVector2& value);
+    /// Add matrix3.
+    void AddMatrix3(const Matrix3& value);
+    /// Add matrix3x4.
+    void AddMatrix3x4(const Matrix3x4& value);
+    /// Add matrix4.
+    void AddMatrix4(const Matrix4& value);
+    /// Add variant.
+    void AddVariant(const Variant& value);
+    /// Add variant value.
+    void AddVariantValue(const Variant& value);
     /// Is array type.
     bool IsArray() const;
     /// Return array size.
@@ -274,8 +274,8 @@ private:
     void AddMember(const String& name, rapidjson::Value& jsonValue);
     /// Return JSON value by name for object type.
     rapidjson::Value& GetMember(const String& name) const;
-    /// Push JSON value to array type.
-    void PushMember(rapidjson::Value& jsonValue);
+    /// Add JSON value to array type.
+    void AddMember(rapidjson::Value& jsonValue);
     /// Return JSON value by index for array type.
     rapidjson::Value&  GetMember(unsigned index) const;
 

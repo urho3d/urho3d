@@ -98,7 +98,7 @@ bool JSONFile::Save(Serializer& dest) const
 
 JSONValue JSONFile::CreateRoot(JSONValueType valueType)
 {
-    if (valueType == JVT_OBJECT)
+    if (valueType == JSON_OBJECT)
         document_->SetObject();
     else
         document_->SetArray();
@@ -111,8 +111,8 @@ JSONValue JSONFile::GetRoot(JSONValueType valueType)
     if (!document_)
         return JSONValue::EMPTY;
 
-    if ((valueType == JVT_OBJECT && document_->GetType() != kObjectType) ||
-        (valueType == JVT_ARRAY && document_->GetType() != kArrayType))
+    if ((valueType == JSON_OBJECT && document_->GetType() != kObjectType) ||
+        (valueType == JSON_ARRAY && document_->GetType() != kArrayType))
     {
         LOGERROR("Invalid root value type");
         return JSONValue::EMPTY;

@@ -53,9 +53,9 @@ public:
     virtual bool Save(Serializer& dest) const;
 
     /// Clear the document and create a root value, default is object type.
-    JSONValue CreateRoot(JSONValueType valueType = JVT_OBJECT);
+    JSONValue CreateRoot(JSONValueType valueType = JSON_OBJECT);
     /// Return the root value with specific value type, Return null value if not found.
-    JSONValue GetRoot(JSONValueType valueType = JVT_UNKNOWN);
+    JSONValue GetRoot(JSONValueType valueType = JSON_ANY);
 
     /// Return rapidjson document.
     rapidjson::Document* GetDocument() const { return document_; }
