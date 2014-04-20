@@ -4373,6 +4373,133 @@ int x;
 int y;
 };
 
+class JSONFile
+{
+// Methods:
+JSONValue CreateRoot(JSONValueType = JSON_ANY);
+JSONValue GetRoot(JSONValueType = JSON_ANY);
+bool Load(File);
+bool Save(File) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+int refs;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
+class JSONValue
+{
+// Methods:
+void AddBool(bool);
+void AddColor(const Color&);
+void AddFloat(float);
+void AddInt(int);
+void AddIntRect(const IntRect&);
+void AddIntVector2(const IntVector2&);
+void AddMatrix3(const Matrix3&);
+void AddMatrix3x4(const Matrix3x4&);
+void AddMatrix4(const Matrix4&);
+void AddQuaternion(const Quaternion&);
+void AddResourceRef(const ResourceRef&);
+void AddResourceRefList(const ResourceRefList&);
+void AddString(const String);
+void AddVariant(const Variant&);
+void AddVariantValue(const Variant&);
+void AddVector2(const Vector2&);
+void AddVector3(const Vector3&);
+void AddVector4(const Vector4&);
+void AddVectorVariant(const Variant&);
+JSONValue CreateChild(JSONValueType = JSON_OBJECT);
+JSONValue CreateChild(const String&, JSONValueType = JSON_OBJECT);
+bool GetBool(const String&) const;
+bool GetBool(uint) const;
+JSONValue GetChild(const String&, JSONValueType = JSON_ANY) const;
+JSONValue GetChild(uint, JSONValueType = JSON_ANY) const;
+Array<String> GetChildNames() const;
+Color GetColor(const String&) const;
+Color GetColor(uint) const;
+float GetFloat(const String&) const;
+float GetFloat(uint) const;
+int GetInt(const String&) const;
+int GetInt(uint) const;
+IntRect GetIntRect(const String&) const;
+IntRect GetIntRect(uint) const;
+IntVector2 GetIntVector2(const String&) const;
+IntVector2 GetIntVector2(uint) const;
+Matrix3 GetMatrix3(const String&) const;
+Matrix3 GetMatrix3(uint) const;
+Matrix3x4 GetMatrix3x4(const String&) const;
+Matrix3x4 GetMatrix3x4(uint) const;
+Matrix4 GetMatrix4(const String&) const;
+Matrix4 GetMatrix4(uint) const;
+Quaternion GetQuaternion(const String&) const;
+Quaternion GetQuaternion(uint) const;
+ResourceRef GetResourceRef(const String&) const;
+ResourceRef GetResourceRef(uint) const;
+ResourceRefList GetResourceRefList(const String&) const;
+ResourceRefList GetResourceRefList(uint) const;
+String GetString(const String&) const;
+String GetString(uint) const;
+Variant GetVariant(const String&) const;
+Variant GetVariant(uint) const;
+Variant GetVariantValue(const String&, VariantType) const;
+Variant GetVariantValue(uint, VariantType) const;
+Vector2 GetVector2(const String&) const;
+Vector2 GetVector2(uint) const;
+Vector3 GetVector3(const String&) const;
+Vector3 GetVector3(uint) const;
+Vector4 GetVector4(const String&) const;
+Vector4 GetVector4(uint) const;
+Variant GetVectorVariant(const String&) const;
+Variant GetVectorVariant(uint) const;
+void SetBool(const String&, bool);
+void SetColor(const String&, const Color&);
+void SetFloat(const String&, float);
+void SetInt(const String&, int);
+void SetIntRect(const String&, const IntRect&);
+void SetIntVector2(const String&, const IntVector2&);
+void SetMatrix3(const String&, const Matrix3&);
+void SetMatrix3x4(const String&, const Matrix3x4&);
+void SetMatrix4(const String&, const Matrix4&);
+void SetQuaternion(const String&, const Quaternion&);
+void SetResourceRef(const String&, const ResourceRef&);
+void SetResourceRefList(const String&, const ResourceRefList&);
+void SetString(const String&, const String);
+void SetVariant(const String&, const Variant&);
+void SetVariantValue(const String&, const Variant&);
+void SetVector2(const String&, const Vector2&);
+void SetVector3(const String&, const Vector3&);
+void SetVector4(const String&, const Vector4&);
+void SetVectorVariant(const String&, const Variant&);
+
+// Properties:
+/* readonly */
+bool isArray;
+/* readonly */
+bool isNull;
+/* readonly */
+bool isObject;
+/* readonly */
+bool notNull;
+/* readonly */
+uint size;
+};
+
 class JoystickState
 {
 
@@ -11023,6 +11150,13 @@ enum Intersection
 OUTSIDE,
 INTERSECTS,
 INSIDE,
+};
+
+enum JSONValueType
+{
+JSON_ANY,
+JSON_OBJECT,
+JSON_ARRAY,
 };
 
 enum LayoutMode
