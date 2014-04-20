@@ -58,7 +58,9 @@ void Start()
     input.mouseVisible = true;
 
     // Open the operating system console window (for stdin / stdout) if not open yet
-    OpenConsoleWindow();
+    // Do not open in fullscreen, as this would cause constant device loss
+    if (!graphics.fullscreen)
+        OpenConsoleWindow();
 
     // Initialize game and print the welcome message
     StartGame();
