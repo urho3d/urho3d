@@ -22,16 +22,47 @@
 
 #pragma once
 
-#include "AnimationDefs.h"
 #include "HashSet.h"
 #include "Serializable.h"
+#include "ValueAnimationInfo.h"
 
 namespace Urho3D
 {
 
+class Animatable;
 class ValueAnimation;
-class AttributeAnimationInstance;
+class AttributeAnimationInfo;
 class ObjectAnimation;
+
+/// Attribute animation instance, it include animation runtime information, when animation playing it will update the object's attribute value automatically.
+class AttributeAnimationInfo : public ValueAnimationInfo
+{
+public:
+    /// Construct.
+    AttributeAnimationInfo(Animatable* animatable, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Copy construct.
+    AttributeAnimationInfo(const AttributeAnimationInfo& other);
+    /// Destruct.
+    ~AttributeAnimationInfo();
+
+    /// Update. Return true when the animation is finished.
+    bool Update(float timeStep);
+
+    /// Return animatable.
+    Animatable* GetAnimatable() const { return animatable_; }
+    /// Return attribute infomation.
+    const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
+
+private:
+    /// Animatable.
+    WeakPtr<Animatable> animatable_;
+    /// Attribute information.
+    const AttributeInfo& attributeInfo_;
+    /// Current time.
+    float currentTime_;
+    /// Last scaled time.
+    float lastScaledTime_;
+};
 
 /// Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
 class URHO3D_API Animatable : public Serializable
@@ -92,7 +123,7 @@ protected:
     /// Is animated network attribute.
     bool IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const;
     /// Return attribute animation instance.
-    AttributeAnimationInstance* GetAttributeAnimationInstance(const String& name) const;
+    AttributeAnimationInfo* GetAttributeAnimationInstance(const String& name) const;
 
     /// Animation enabled.
     bool animationEnabled_;
@@ -101,7 +132,7 @@ protected:
     /// Animated network attribute set.
     HashSet<const AttributeInfo*> animatedNetworkAttributes_;
     /// Attribute animation instances.
-    HashMap<String, SharedPtr<AttributeAnimationInstance> > attributeAnimationInstances_;
+    HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInstances_;
 };
 
 }

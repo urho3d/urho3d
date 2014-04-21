@@ -32,7 +32,7 @@ class ValueAnimation;
 struct VAnimEventFrame;
 
 /// Value animation info, it include animation, wrap mode and animation speed.
-class URHO3D_API ValueAnimationInfo : public RefCounted
+class ValueAnimationInfo : public RefCounted
 {
 public:
     /// Construct.

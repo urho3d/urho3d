@@ -26,13 +26,13 @@
 #include "Graphics.h"
 #include "Log.h"
 #include "Material.h"
-#include "MaterialShaderParameterAnimationInstance.h"
 #include "Matrix3x4.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
+#include "ValueAnimation.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -120,6 +120,59 @@ TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lod
 
 TechniqueEntry::~TechniqueEntry()
 {
+}
+
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
+    ValueAnimationInfo(attributeAnimation, wrapMode, speed),
+    material_(material),
+    name_(name),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
+{
+}
+
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other) :
+    ValueAnimationInfo(other),
+    material_(other.material_),
+    name_(other.name_),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
+{
+}
+
+ShaderParameterAnimationInfo::~ShaderParameterAnimationInfo()
+{
+}
+
+bool ShaderParameterAnimationInfo::Update(float timeStep)
+{
+    if (!animation_)
+        return true;
+
+    currentTime_ += timeStep * speed_;
+
+    if (!animation_->IsValid())
+        return true;
+
+    bool finished = false;
+
+    // Calculate scale time by wrap mode
+    float scaledTime = CalculateScaledTime(currentTime_, finished);
+
+    material_->SetShaderParameter(name_, animation_->GetAnimationValue(scaledTime));
+
+    if (animation_->HasEventFrames())
+    {
+        PODVector<const VAnimEventFrame*> eventFrames;
+        GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
+
+        for (unsigned i = 0; i < eventFrames.Size(); ++i)
+            material_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
+    }
+
+    lastScaledTime_ = scaledTime;
+
+    return finished;
 }
 
 Material::Material(Context* context) :
@@ -351,21 +404,21 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
     if (shaderParameters_.Find(name) == shaderParameters_.End())
         return;
 
-    materialShaderParameterAnimationInstances_[name] = new MaterialShaderParameterAnimationInstance(this, name, animation, wrapMode, speed);
+    shaderParameterAnimationInfos_[name] = new ShaderParameterAnimationInfo(this, name, animation, wrapMode, speed);
 }
 
 void Material::SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode)
 {
-    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
-    if (instance)
-        instance->SetWrapMode(wrapMode);
+    ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
+    if (info)
+        info->SetWrapMode(wrapMode);
 }
 
 void Material::SetShaderParameterAnimationSpeed(const String& name, float speed)
 {
-    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
-    if (instance)
-        instance->SetSpeed(speed);
+    ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
+    if (info)
+        info->SetSpeed(speed);
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -474,7 +527,7 @@ void Material::MarkForAuxView(unsigned frameNumber)
 
 void Material::UpdateShaderParameterAnimations()
 {
-    if (materialShaderParameterAnimationInstances_.Empty())
+    if (shaderParameterAnimationInfos_.Empty())
         return;
 
     Time* time = GetSubsystem<Time>();
@@ -485,7 +538,7 @@ void Material::UpdateShaderParameterAnimations()
     float timeStep = time->GetTimeStep();
 
     Vector<String> finishedNames;
-    for (HashMap<StringHash, SharedPtr<MaterialShaderParameterAnimationInstance> >::ConstIterator i = materialShaderParameterAnimationInstances_.Begin(); i != materialShaderParameterAnimationInstances_.End(); ++i)
+    for (HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Begin(); i != shaderParameterAnimationInfos_.End(); ++i)
     {
         if (i->second_->Update(timeStep))
             finishedNames.Push(i->second_->GetName());
@@ -525,19 +578,19 @@ const Variant& Material::GetShaderParameter(const String& name) const
 
 ValueAnimation* Material::GetShaderParameterAnimation(const String& name) const
 {
-    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    ShaderParameterAnimationInfo* instance = GetShaderParameterAnimationInfo(name);
     return instance == 0 ? 0 : instance->GetAnimation();
 }
 
 WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
 {
-    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    ShaderParameterAnimationInfo* instance = GetShaderParameterAnimationInfo(name);
     return instance == 0 ? WM_LOOP : instance->GetWrapMode();
 }
 
 float Material::GetShaderParameterAnimationSpeed(const String& name) const
 {
-    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    ShaderParameterAnimationInfo* instance = GetShaderParameterAnimationInfo(name);
     return instance == 0 ? 0 : instance->GetSpeed();
 }
 
@@ -606,10 +659,10 @@ void Material::RefreshMemoryUse()
     SetMemoryUse(memoryUse);
 }
 
-MaterialShaderParameterAnimationInstance* Material::GetMaterialShaderParameterAnimationInstance(const String& name) const
+ShaderParameterAnimationInfo* Material::GetShaderParameterAnimationInfo(const String& name) const
 {
-    HashMap<StringHash, SharedPtr<MaterialShaderParameterAnimationInstance> >::ConstIterator i = materialShaderParameterAnimationInstances_.Find(name);
-    if (i == materialShaderParameterAnimationInstances_.End())
+    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Find(name);
+    if (i == shaderParameterAnimationInfos_.End())
         return 0;
     return i->second_;
 }

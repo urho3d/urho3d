@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "AnimationDefs.h"
 #include "GraphicsDefs.h"
 #include "Light.h"
 #include "Resource.h"
+#include "ValueAnimationInfo.h"
 #include "Vector4.h"
 
 namespace Urho3D
 {
 
-class MaterialShaderParameterAnimationInstance;
+class Material;
 class Pass;
 class Technique;
 class Texture;
@@ -64,6 +64,36 @@ struct TechniqueEntry
     int qualityLevel_;
     /// LOD distance.
     float lodDistance_;
+};
+
+/// Material shader parameter animation instance.
+class ShaderParameterAnimationInfo : public ValueAnimationInfo
+{
+public:
+    /// Construct.
+    ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Copy construct.
+    ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other);
+    /// Destruct.
+    ~ShaderParameterAnimationInfo();
+
+    /// Update. Return true when the animation is finished.
+    bool Update(float timeStep);
+
+    /// Return material.
+    Material* GetMaterial() const { return material_; }
+    /// Return shader parameter name.
+    const String& GetName() const { return name_; }
+
+private:
+    /// Material.
+    WeakPtr<Material> material_;
+    /// Shader parameter name.
+    String name_;
+    /// Current time.
+    float currentTime_;
+    /// Last scaled time.
+    float lastScaledTime_;
 };
 
 /// Describes how to render 3D geometries.
@@ -174,8 +204,8 @@ private:
     void ResetToDefaults();
     /// Recalculate the memory used by the material.
     void RefreshMemoryUse();
-    /// Return shader parameter animation instance.
-    MaterialShaderParameterAnimationInstance* GetMaterialShaderParameterAnimationInstance(const String& name) const;
+    /// Return shader parameter animation info.
+    ShaderParameterAnimationInfo* GetShaderParameterAnimationInfo(const String& name) const;
 
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
@@ -184,7 +214,7 @@ private:
     /// %Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// %Shader parameters animation infos.
-    HashMap<StringHash, SharedPtr<MaterialShaderParameterAnimationInstance> > materialShaderParameterAnimationInstances_;
+    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> > shaderParameterAnimationInfos_;
     /// Normal culling mode.
     CullMode cullMode_;
     /// Culling mode for shadow rendering.
