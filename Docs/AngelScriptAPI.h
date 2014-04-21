@@ -5018,12 +5018,18 @@ class Material
 {
 // Methods:
 Material Clone(const String& = String ( )) const;
+ValueAnimation GetShaderParameterAnimation(const String&) const;
+float GetShaderParameterAnimationSpeed(const String&) const;
+WrapMode GetShaderParameterAnimationWrapMode(const String&) const;
 bool Load(File);
 bool Load(const XMLElement&);
 void RemoveShaderParameter(const String&);
 bool Save(File) const;
 bool Save(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetShaderParameterAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetShaderParameterAnimationSpeed(const String&, float);
+void SetShaderParameterAnimationWrapMode(const String&, WrapMode);
 void SetTechnique(uint, Technique, uint = 0, float = 0.0);
 void SetUVTransform(const Vector2&, float, const Vector2&);
 void SetUVTransform(const Vector2&, float, float);
