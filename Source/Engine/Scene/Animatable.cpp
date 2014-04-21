@@ -22,12 +22,12 @@
 
 #include "Precompiled.h"
 #include "Animatable.h"
-#include "AttributeAnimation.h"
 #include "AttributeAnimationInstance.h"
 #include "Context.h"
 #include "Log.h"
 #include "ObjectAnimation.h"
 #include "ResourceCache.h"
+#include "ValueAnimation.h"
 #include "XMLElement.h"
 
 #include "DebugNew.h"
@@ -74,7 +74,7 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     while (elem)
     {
         String name = elem.GetAttribute("name");
-        SharedPtr<AttributeAnimation> attributeAnimation(new AttributeAnimation(context_));
+        SharedPtr<ValueAnimation> attributeAnimation(new ValueAnimation(context_));
         if (!attributeAnimation->LoadXML(elem))
             return false;
 
@@ -113,7 +113,7 @@ bool Animatable::SaveXML(XMLElement& dest) const
 
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
     {
-        AttributeAnimation* attributeAnimation = i->second_->GetAttributeAnimation();
+        ValueAnimation* attributeAnimation = i->second_->GetAnimation();
         if (attributeAnimation->GetOwner())
             continue;
 
@@ -144,13 +144,13 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
         OnObjectAnimationAdded(objectAnimation_);
 }
 
-void Animatable::SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
 {
     AttributeAnimationInstance* currentInstance = GetAttributeAnimationInstance(name);
 
     if (attributeAnimation)
     {
-        if (currentInstance && attributeAnimation == currentInstance->GetAttributeAnimation())
+        if (currentInstance && attributeAnimation == currentInstance->GetAnimation())
         {
             currentInstance->SetWrapMode(wrapMode);
             currentInstance->SetSpeed(speed);
@@ -235,10 +235,10 @@ ObjectAnimation* Animatable::GetObjectAnimation() const
     return objectAnimation_;
 }
 
-AttributeAnimation* Animatable::GetAttributeAnimation(const String& name) const
+ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const
 {
     const AttributeAnimationInstance* instance = GetAttributeAnimationInstance(name);
-    return instance ? instance->GetAttributeAnimation() : 0;
+    return instance ? instance->GetAnimation() : 0;
 }
 
 WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const
@@ -273,12 +273,12 @@ void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
         return;
 
     // Set all attribute animations from the object animation
-    const HashMap<String, SharedPtr<AttributeAnimationInfo> >& attributeAnimationInfos = objectAnimation->GetAttributeAnimationInfos();
-    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos.Begin(); i != attributeAnimationInfos.End(); ++i)
+    const HashMap<String, SharedPtr<ValueAnimationInfo> >& attributeAnimationInfos = objectAnimation->GetAttributeAnimationInfos();
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos.Begin(); i != attributeAnimationInfos.End(); ++i)
     {
         const String& name = i->first_;
-        AttributeAnimationInfo* info = i->second_;
-        SetAttributeAnimation(name, info->GetAttributeAnimation(), info->GetWrapMode(), info->GetSpeed());
+        ValueAnimationInfo* info = i->second_;
+        SetAttributeAnimation(name, info->GetAnimation(), info->GetWrapMode(), info->GetSpeed());
     }
 }
 
@@ -291,7 +291,7 @@ void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
     Vector<String> names;
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::Iterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
     {
-        if (i->second_->GetAttributeAnimation()->GetOwner() == objectAnimation)
+        if (i->second_->GetAnimation()->GetOwner() == objectAnimation)
             names.Push(i->first_);
     }
 

@@ -21,7 +21,6 @@
 //
 
 #include "Precompiled.h"
-#include "AttributeAnimation.h"
 #include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
@@ -36,6 +35,7 @@
 #include "SmoothedTransform.h"
 #include "SplinePath.h"
 #include "UnknownComponent.h"
+#include "ValueAnimation.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
@@ -965,7 +965,7 @@ void Scene::FinishSaving(Serializer* dest) const
 
 void RegisterSceneLibrary(Context* context)
 {
-    AttributeAnimation::RegisterObject(context);
+    ValueAnimation::RegisterObject(context);
     ObjectAnimation::RegisterObject(context);
     Node::RegisterObject(context);
     Scene::RegisterObject(context);

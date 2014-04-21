@@ -22,17 +22,17 @@
 
 #include "Precompiled.h"
 #include "Animatable.h"
-#include "AttributeAnimation.h"
 #include "AttributeAnimationInstance.h"
 #include "Log.h"
+#include "ValueAnimation.h"
 
 #include "DebugNew.h"
 
 namespace Urho3D
 {
 
-AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    AttributeAnimationInfo(attributeAnimation, wrapMode, speed),
+AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
+    ValueAnimationInfo(attributeAnimation, wrapMode, speed),
     animatable_(animatable),
     attributeInfo_(attributeInfo),
     currentTime_(0.0f),
@@ -41,7 +41,7 @@ AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, c
 }
 
 AttributeAnimationInstance::AttributeAnimationInstance(const AttributeAnimationInstance& other) :
-    AttributeAnimationInfo(other),
+    ValueAnimationInfo(other),
     animatable_(other.animatable_),
     attributeInfo_(other.attributeInfo_),
     currentTime_(0.0f),
@@ -55,23 +55,23 @@ AttributeAnimationInstance::~AttributeAnimationInstance()
 
 bool AttributeAnimationInstance::Update(float timeStep)
 {
-    if (!attributeAnimation_)
+    if (!animation_)
         return true;
 
     currentTime_ += timeStep * speed_;
 
-    if (!attributeAnimation_->IsValid())
+    if (!animation_->IsValid())
         return true;
 
     bool finished = false;
     // Calculate scale time by wrap mode
     float scaledTime = CalculateScaledTime(currentTime_, finished);
 
-    attributeAnimation_->UpdateAttributeValue(animatable_, attributeInfo_, scaledTime);
+    animatable_->OnSetAttribute(attributeInfo_, animation_->GetAnimationValue(scaledTime));
 
-    if (attributeAnimation_->HasEventFrames())
+    if (animation_->HasEventFrames())
     {
-        PODVector<const AttributeEventFrame*> eventFrames;
+        PODVector<const VAnimEventFrame*> eventFrames;
         GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
 
         for (unsigned i = 0; i < eventFrames.Size(); ++i)

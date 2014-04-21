@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include "AttributeAnimationDefs.h"
+#include "AnimationDefs.h"
 #include "HashSet.h"
 #include "Serializable.h"
 
 namespace Urho3D
 {
 
-class AttributeAnimation;
+class ValueAnimation;
 class AttributeAnimationInstance;
 class ObjectAnimation;
 
@@ -56,7 +56,7 @@ public:
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     /// Set attribute animation wrap mode.
     void SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode);
     /// Set attribute animation speed.
@@ -67,7 +67,7 @@ public:
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
     /// Return attribute animation.
-    AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    ValueAnimation* GetAttributeAnimation(const String& name) const;
     /// Return attribute animation wrap mode.
     WrapMode GetAttributeAnimationWrapMode(const String& name) const;
     /// Return attribute animation speed.

@@ -22,12 +22,12 @@
 
 #include "Precompiled.h"
 #include "Animatable.h"
-#include "AttributeAnimation.h"
 #include "Context.h"
 #include "Deserializer.h"
 #include "Log.h"
 #include "ObjectAnimation.h"
 #include "Serializer.h"
+#include "ValueAnimation.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -42,7 +42,7 @@ const char* interpMethodNames[] =
     0
 };
 
-AttributeAnimation::AttributeAnimation(Context* context) :
+ValueAnimation::ValueAnimation(Context* context) :
     Resource(context),
     owner_(0),
     interpolationMethod_(IM_LINEAR),
@@ -55,16 +55,16 @@ AttributeAnimation::AttributeAnimation(Context* context) :
 {
 }
 
-AttributeAnimation::~AttributeAnimation()
+ValueAnimation::~ValueAnimation()
 {
 }
 
-void AttributeAnimation::RegisterObject(Context* context)
+void ValueAnimation::RegisterObject(Context* context)
 {
-    context->RegisterFactory<AttributeAnimation>();
+    context->RegisterFactory<ValueAnimation>();
 }
 
-bool AttributeAnimation::Load(Deserializer& source)
+bool ValueAnimation::Load(Deserializer& source)
 {
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))
@@ -73,18 +73,18 @@ bool AttributeAnimation::Load(Deserializer& source)
     return LoadXML(xmlFile.GetRoot());
 }
 
-bool AttributeAnimation::Save(Serializer& dest) const
+bool ValueAnimation::Save(Serializer& dest) const
 {
     XMLFile xmlFile(context_);
 
-    XMLElement rootElem = xmlFile.CreateRoot("attributeanimation");
+    XMLElement rootElem = xmlFile.CreateRoot("valueanimation");
     if (!SaveXML(rootElem))
         return false;
 
     return xmlFile.Save(dest);
 }
 
-bool AttributeAnimation::LoadXML(const XMLElement& source)
+bool ValueAnimation::LoadXML(const XMLElement& source)
 {
     valueType_ = VAR_NONE;
     eventFrames_.Clear();
@@ -128,7 +128,7 @@ bool AttributeAnimation::LoadXML(const XMLElement& source)
     return true;
 }
 
-bool AttributeAnimation::SaveXML(XMLElement& dest) const
+bool ValueAnimation::SaveXML(XMLElement& dest) const
 {
     dest.SetAttribute("interpolationmethod", interpMethodNames[interpolationMethod_]);
     if (interpolationMethod_ == IM_SPLINE)
@@ -136,7 +136,7 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
 
     for (unsigned i = 0; i < keyFrames_.Size(); ++i)
     {
-        const AttributeKeyFrame& keyFrame = keyFrames_[i];
+        const VAnimKeyFrame& keyFrame = keyFrames_[i];
         XMLElement keyFrameEleme = dest.CreateChild("keyframe");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
         keyFrameEleme.SetVariant(keyFrame.value_);
@@ -144,7 +144,7 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
 
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {
-        const AttributeEventFrame& eventFrame = eventFrames_[i];
+        const VAnimEventFrame& eventFrame = eventFrames_[i];
         XMLElement eventFrameElem = dest.CreateChild("eventframe");
         eventFrameElem.SetFloat("time", eventFrame.time_);
         eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
@@ -154,7 +154,7 @@ bool AttributeAnimation::SaveXML(XMLElement& dest) const
     return true;
 }
 
-void AttributeAnimation::SetValueType(VariantType valueType)
+void ValueAnimation::SetValueType(VariantType valueType)
 {
     if (valueType == valueType_)
         return;
@@ -176,12 +176,12 @@ void AttributeAnimation::SetValueType(VariantType valueType)
     endTime_ = -M_INFINITY;
 }
 
-void AttributeAnimation::SetOwner(void* owner)
+void ValueAnimation::SetOwner(void* owner)
 {
     owner_ = owner;
 }
 
-void AttributeAnimation::SetInterpolationMethod(InterpMethod method)
+void ValueAnimation::SetInterpolationMethod(InterpMethod method)
 {
     if (method == interpolationMethod_)
         return;
@@ -194,20 +194,20 @@ void AttributeAnimation::SetInterpolationMethod(InterpMethod method)
     splineTangentsDirty_ = true;
 }
 
-void AttributeAnimation::SetSplineTension(float tension)
+void ValueAnimation::SetSplineTension(float tension)
 {
     splineTension_ = tension;
     splineTangentsDirty_ = true;
 }
 
-bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
+bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
 {
     if (valueType_ == VAR_NONE)
         SetValueType(value.GetType());
     else if (value.GetType() != valueType_)
         return false;
 
-    AttributeKeyFrame keyFrame;
+    VAnimKeyFrame keyFrame;
     keyFrame.time_ = time;
     keyFrame.value_ = value;
 
@@ -235,9 +235,9 @@ bool AttributeAnimation::SetKeyFrame(float time, const Variant& value)
     return true;
 }
 
-void AttributeAnimation::SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
+void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
 {
-    AttributeEventFrame eventFrame;
+    VAnimEventFrame eventFrame;
     eventFrame.time_ = time;
     eventFrame.eventType_ = eventType;
     eventFrame.eventData_ = eventData;
@@ -257,12 +257,12 @@ void AttributeAnimation::SetEventFrame(float time, const StringHash& eventType, 
     }
 }
 
-bool AttributeAnimation::IsValid() const
+bool ValueAnimation::IsValid() const
 {
     return (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) || (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
 }
 
-void AttributeAnimation::UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime)
+Variant ValueAnimation::GetAnimationValue(float scaledTime)
 {
     unsigned index = 1;
     for (; index < keyFrames_.Size(); ++index)
@@ -272,21 +272,21 @@ void AttributeAnimation::UpdateAttributeValue(Animatable* animatable, const Attr
     }
 
     if (index >= keyFrames_.Size() || !interpolatable_)
-        animatable->OnSetAttribute(attributeInfo, keyFrames_[index - 1].value_);
+        return keyFrames_[index - 1].value_;
     else
     {
         if (interpolationMethod_ == IM_LINEAR)
-            animatable->OnSetAttribute(attributeInfo, LinearInterpolation(index - 1, index, scaledTime));
+            return LinearInterpolation(index - 1, index, scaledTime);
         else
-            animatable->OnSetAttribute(attributeInfo, SplineInterpolation(index - 1, index, scaledTime));
+            return SplineInterpolation(index - 1, index, scaledTime);
     }
 }
 
-void AttributeAnimation::GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames) const
+void ValueAnimation::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const
 {
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {
-        const AttributeEventFrame& eventFrame = eventFrames_[i];
+        const VAnimEventFrame& eventFrame = eventFrames_[i];
         if (eventFrame.time_ >= endTime)
             break;
 
@@ -295,10 +295,10 @@ void AttributeAnimation::GetEventFrames(float beginTime, float endTime, PODVecto
     }
 }
 
-Variant AttributeAnimation::LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const
+Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const
 {
-    const AttributeKeyFrame& keyFrame1 = keyFrames_[index1];
-    const AttributeKeyFrame& keyFrame2 = keyFrames_[index2];
+    const VAnimKeyFrame& keyFrame1 = keyFrames_[index1];
+    const VAnimKeyFrame& keyFrame2 = keyFrames_[index2];
 
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
     const Variant& value1 = keyFrame1.value_;
@@ -346,13 +346,13 @@ Variant AttributeAnimation::LinearInterpolation(unsigned index1, unsigned index2
     }
 }
 
-Variant AttributeAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime)
+Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime)
 {
     if (splineTangentsDirty_)
         UpdateSplineTangents();
 
-    const AttributeKeyFrame& keyFrame1 = keyFrames_[index1];
-    const AttributeKeyFrame& keyFrame2 = keyFrames_[index2];
+    const VAnimKeyFrame& keyFrame1 = keyFrames_[index1];
+    const VAnimKeyFrame& keyFrame2 = keyFrames_[index2];
 
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
 
@@ -395,7 +395,7 @@ Variant AttributeAnimation::SplineInterpolation(unsigned index1, unsigned index2
     }
 }
 
-void AttributeAnimation::UpdateSplineTangents()
+void ValueAnimation::UpdateSplineTangents()
 {
     splineTangents_.Clear();
 
@@ -417,7 +417,7 @@ void AttributeAnimation::UpdateSplineTangents()
     splineTangentsDirty_ = false;
 }
 
-Variant AttributeAnimation::SubstractAndMultiply(const Variant& value1, const Variant& value2, float t) const
+Variant ValueAnimation::SubstractAndMultiply(const Variant& value1, const Variant& value2, float t) const
 {
     switch (valueType_)
     {

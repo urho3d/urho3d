@@ -21,8 +21,8 @@
 //
 
 #include "Precompiled.h"
-#include "AttributeAnimation.h"
-#include "AttributeAnimationInfo.h"
+#include "ValueAnimation.h"
+#include "ValueAnimationInfo.h"
 #include "Log.h"
 
 #include "DebugNew.h"
@@ -30,29 +30,29 @@
 namespace Urho3D
 {
 
-AttributeAnimationInfo::AttributeAnimationInfo(AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    attributeAnimation_(attributeAnimation),
+ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) :
+    animation_(animation),
     wrapMode_(wrapMode),
     speed_(speed)
 {
     speed_ = Max(0.0f, speed_);
 }
 
-AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& other) :
-    attributeAnimation_(other.attributeAnimation_),
+ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) :
+    animation_(other.animation_),
     wrapMode_(other.wrapMode_),
     speed_(other.speed_)
 {
 }
 
-AttributeAnimationInfo::~AttributeAnimationInfo()
+ValueAnimationInfo::~ValueAnimationInfo()
 {
 }
 
-float AttributeAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
+float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
 {
-    float beginTime = attributeAnimation_->GetBeginTime();
-    float endTime = attributeAnimation_->GetEndTime();
+    float beginTime = animation_->GetBeginTime();
+    float endTime = animation_->GetEndTime();
 
     switch (wrapMode_)
     {
@@ -78,23 +78,23 @@ float AttributeAnimationInfo::CalculateScaledTime(float currentTime, bool& finis
     }
 }
 
-void AttributeAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames)
+void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames)
 {
     switch (wrapMode_)
     {
     case WM_LOOP:
         if (beginTime < endTime)
-            attributeAnimation_->GetEventFrames(beginTime, endTime, eventFrames);
+            animation_->GetEventFrames(beginTime, endTime, eventFrames);
         else
         {
-            attributeAnimation_->GetEventFrames(beginTime, attributeAnimation_->GetEndTime(), eventFrames);
-            attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), endTime, eventFrames);
+            animation_->GetEventFrames(beginTime, animation_->GetEndTime(), eventFrames);
+            animation_->GetEventFrames(animation_->GetBeginTime(), endTime, eventFrames);
         }
         break;
 
     case WM_ONCE:
     case WM_CLAMP:
-        attributeAnimation_->GetEventFrames(beginTime, endTime, eventFrames);
+        animation_->GetEventFrames(beginTime, endTime, eventFrames);
         break;
     }
 }

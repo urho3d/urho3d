@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "AttributeAnimation.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Engine.h"
@@ -37,6 +36,7 @@
 #include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
+#include "ValueAnimation.h"
 
 #include "DebugNew.h"
 #include "Animatable.h"
@@ -94,7 +94,7 @@ void LightAnimation::CreateScene()
     light->SetRange(10.0f);
 
     // Create light color animation
-    SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+    SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
     colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
     colorAnimation->SetKeyFrame(1.0f, Color::RED);
     colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
@@ -103,7 +103,7 @@ void LightAnimation::CreateScene()
     light->SetAttributeAnimation("Color", colorAnimation);
 
     // Create light position animation
-    SharedPtr<AttributeAnimation> positionAnimation(new AttributeAnimation(context_));
+    SharedPtr<ValueAnimation> positionAnimation(new ValueAnimation(context_));
     // Use spline interpolation method
     positionAnimation->SetInterpolationMethod(IM_SPLINE);
     // Set spline tension

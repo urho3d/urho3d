@@ -21,10 +21,10 @@
 //
 
 #include "Precompiled.h"
-#include "AttributeAnimation.h"
-#include "AttributeAnimationInfo.h"
 #include "Context.h"
 #include "ObjectAnimation.h"
+#include "ValueAnimation.h"
+#include "ValueAnimationInfo.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -84,7 +84,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
     {
         String name = animElem.GetAttribute("name");
         
-        SharedPtr<AttributeAnimation> animation(new AttributeAnimation(context_));
+        SharedPtr<ValueAnimation> animation(new ValueAnimation(context_));
         if (!animation->LoadXML(animElem))
             return false;
 
@@ -110,13 +110,13 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
 
 bool ObjectAnimation::SaveXML(XMLElement& dest) const
 {
-    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
     {
         XMLElement animElem = dest.CreateChild("attributeanimation");
         animElem.SetAttribute("name", i->first_);
 
-        const AttributeAnimationInfo* info = i->second_;
-        if (!info->GetAttributeAnimation()->SaveXML(animElem))
+        const ValueAnimationInfo* info = i->second_;
+        if (!info->GetAnimation()->SaveXML(animElem))
             return false;
 
         animElem.SetAttribute("wrapmode", wrapModeNames[info->GetWrapMode()]);
@@ -126,33 +126,33 @@ bool ObjectAnimation::SaveXML(XMLElement& dest) const
     return true;
 }
 
-void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+void ObjectAnimation::AddAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
 {
     if (!attributeAnimation)
         return;
 
     attributeAnimation->SetOwner(this);
-    attributeAnimationInfos_[name] = new AttributeAnimationInfo(attributeAnimation, wrapMode, speed);
+    attributeAnimationInfos_[name] = new ValueAnimationInfo(attributeAnimation, wrapMode, speed);
 }
 
 void ObjectAnimation::RemoveAttributeAnimation(const String& name)
 {
-    HashMap<String, SharedPtr<AttributeAnimationInfo> >::Iterator i = attributeAnimationInfos_.Find(name);
+    HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
     {
-        i->second_->GetAttributeAnimation()->SetOwner(0);
+        i->second_->GetAnimation()->SetOwner(0);
         attributeAnimationInfos_.Erase(i);
     }
 }
 
-void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnimation)
+void ObjectAnimation::RemoveAttributeAnimation(ValueAnimation* attributeAnimation)
 {
     if (!attributeAnimation)
         return;
 
-    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
     {
-        if (i->second_->GetAttributeAnimation() == attributeAnimation)
+        if (i->second_->GetAnimation() == attributeAnimation)
         {
             attributeAnimation->SetOwner(0);
             attributeAnimationInfos_.Erase(i);
@@ -161,27 +161,27 @@ void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnim
     }
 }
 
-AttributeAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) const
+ValueAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) const
 {
-    AttributeAnimationInfo* info = GetAttributeAnimationInfo(name);
-    return info ? info->GetAttributeAnimation() : 0;
+    ValueAnimationInfo* info = GetAttributeAnimationInfo(name);
+    return info ? info->GetAnimation() : 0;
 }
 
 WrapMode ObjectAnimation::GetAttributeAnimationWrapMode(const String& name) const
 {
-    AttributeAnimationInfo* info = GetAttributeAnimationInfo(name);
+    ValueAnimationInfo* info = GetAttributeAnimationInfo(name);
     return info ? info->GetWrapMode() : WM_LOOP;
 }
 
 float ObjectAnimation::GetAttributeAnimationSpeed(const String& name) const
 {
-    AttributeAnimationInfo* info = GetAttributeAnimationInfo(name);
+    ValueAnimationInfo* info = GetAttributeAnimationInfo(name);
     return info ? info->GetSpeed() : 1.0f;
 }
 
-AttributeAnimationInfo* ObjectAnimation::GetAttributeAnimationInfo(const String& name) const
+ValueAnimationInfo* ObjectAnimation::GetAttributeAnimationInfo(const String& name) const
 {
-    HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Find(name);
+    HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
         return i->second_;
     return 0;

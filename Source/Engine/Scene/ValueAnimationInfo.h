@@ -22,32 +22,33 @@
 
 #pragma once
 
-#include "AttributeAnimationDefs.h"
+#include "AnimationDefs.h"
 #include "RefCounted.h"
 
 namespace Urho3D
 {
 
-class AttributeAnimation;
+class ValueAnimation;
+struct VAnimEventFrame;
 
-/// Attribute animation info, it include attribute animation, wrap mode and animation speed.
-class URHO3D_API AttributeAnimationInfo : public RefCounted
+/// Value animation info, it include animation, wrap mode and animation speed.
+class URHO3D_API ValueAnimationInfo : public RefCounted
 {
 public:
     /// Construct.
-    AttributeAnimationInfo(AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed);
     /// Construct.
-    AttributeAnimationInfo(const AttributeAnimationInfo& other);
+    ValueAnimationInfo(const ValueAnimationInfo& other);
     /// Destruct.
-    ~AttributeAnimationInfo();
+    ~ValueAnimationInfo();
 
     /// Set wrap mode.
     void SetWrapMode(WrapMode wrapMode) { wrapMode_ = wrapMode; }
     /// Set speed.
     void SetSpeed(float speed) { speed_ = speed; }
 
-    /// Return attribute animation.
-    AttributeAnimation* GetAttributeAnimation() const { return attributeAnimation_; }
+    /// Return animation.
+    ValueAnimation* GetAnimation() const { return animation_; }
     /// Return wrap mode.
     WrapMode GetWrapMode() const { return wrapMode_; }
     /// Return speed.
@@ -57,10 +58,10 @@ protected:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return event frames.
-    void AttributeAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames);
+    void GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames);
 
     /// Attribute animation.
-    SharedPtr<AttributeAnimation> attributeAnimation_;
+    SharedPtr<ValueAnimation> animation_;
     /// Wrap mode.
     WrapMode wrapMode_;
     /// Animation speed.

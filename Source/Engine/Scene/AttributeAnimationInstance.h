@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "AttributeAnimationInfo.h"
+#include "ValueAnimationInfo.h"
 
 namespace Urho3D
 {
@@ -30,11 +30,11 @@ namespace Urho3D
 class Animatable;
 
 /// Attribute animation instance, it include animation runtime information, when animation playing it will update the object's attribute value automatically.
-class URHO3D_API AttributeAnimationInstance : public AttributeAnimationInfo
+class URHO3D_API AttributeAnimationInstance : public ValueAnimationInfo
 {
 public:
     /// Construct.
-    AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
     /// Copy construct.
     AttributeAnimationInstance(const AttributeAnimationInstance& other);
     /// Destruct.
