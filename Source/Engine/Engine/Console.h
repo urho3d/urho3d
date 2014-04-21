@@ -76,6 +76,8 @@ public:
     BorderImage* GetBackground() const { return background_; }
     /// Return the line edit element.
     LineEdit* GetLineEdit() const { return lineEdit_; }
+    /// Return the close butoon element.
+    Button* GetCloseButton() const { return closeButton_; }
     /// Return whether is visible.
     bool IsVisible() const;
     /// Return true when console is set to automatically visible when receiving an error log message.

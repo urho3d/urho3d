@@ -51,6 +51,16 @@ public:
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">"
+        "        <attribute name=\"Is Visible\" value=\"false\" />"
+        "    </add>"
+        "</patch>";
+    }
+
 private:
     /// Create and initialize a Window control.
     void InitWindow();
@@ -68,7 +78,7 @@ private:
     void HandleControlClicked(StringHash eventType, VariantMap& eventData);
     /// Handle close button pressed and released.
     void HandleClosePressed(StringHash eventType, VariantMap& eventData);
-    
+
     /// The Window.
     SharedPtr<Window> window_;
     /// The UI's root UIElement.

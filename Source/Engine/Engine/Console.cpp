@@ -118,6 +118,8 @@ void Console::SetDefaultStyle(XMLFile* style)
     for (unsigned i = 0; i < interpreters_->GetNumItems(); ++i)
         interpreters_->GetItem(i)->SetStyle("ConsoleText");
     lineEdit_->SetStyle("ConsoleLineEdit");
+
+    closeButton_->SetDefaultStyle(style);
     closeButton_->SetStyle("CloseButton");
     
     UpdateElements();

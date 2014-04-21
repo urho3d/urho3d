@@ -52,6 +52,7 @@ function Start()
     console.numBufferedRows = 2 * console.numRows;
     console.commandInterpreter = "LuaScript";
     console.visible = true
+    console.closeButton.visible = false;
     
     -- Show OS mouse cursor
     input.mouseVisible = true

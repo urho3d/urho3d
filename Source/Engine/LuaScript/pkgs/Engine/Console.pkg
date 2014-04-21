@@ -16,6 +16,7 @@ class Console : public Object
     XMLFile* GetDefaultStyle() const;
     BorderImage* GetBackground() const;
     LineEdit* GetLineEdit() const;
+    Button* GetCloseButton() const;
     bool IsVisible() const;
     bool IsAutoVisibleOnError() const;
     const String& GetCommandInterpreter() const;
@@ -30,6 +31,7 @@ class Console : public Object
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_readonly tolua_property__get_set BorderImage* background;
     tolua_readonly tolua_property__get_set LineEdit* lineEdit;
+    tolua_readonly tolua_property__get_set Button* closeButton;
     tolua_property__is_set bool visible;
     tolua_property__is_set bool autoVisibleOnError;
     tolua_property__get_set String commandInterpreter;

@@ -36,6 +36,8 @@ class Sprite;
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
+const float TOUCH_SENSITIVITY = 2.0f;
+
 /// Sample class, as framework for all samples.
 ///    - Initialization of the Urho3D engine (in Application class)
 ///    - Modify engine parameters for windowed mode and to show the class name as title
@@ -45,7 +47,7 @@ using namespace Urho3D;
 ///    - Toggle rendering options from the keys 1-8
 ///    - Take screenshot with key 9
 ///    - Handle Esc key down to hide Console or exit application
-///    - Init touch input on mobile platform using screen joystick
+///    - Init touch input on mobile platform using screen joysticks (patched for each individual sample)
 class Sample : public Application
 {
     // Enable type information.
@@ -60,12 +62,14 @@ public:
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
     virtual void Start();
 
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return String::EMPTY; }
     /// Initialize touch input on mobile platform.
     void InitTouchInput();
     /// Control logo visibility.
     void SetLogoVisible(bool enable);
 
-protected:
     /// Logo sprite.
     SharedPtr<Sprite> logoSprite_;
     /// Scene.
@@ -76,6 +80,8 @@ protected:
     float yaw_;
     /// Camera pitch angle.
     float pitch_;
+    /// Flag to indicate whether touch input has been enabled.
+    bool touchEnabled_;
 
 private:
     /// Create logo.
@@ -89,8 +95,6 @@ private:
     /// Handle scene update event to control camera's pitch and yaw for all samples.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Flag to indicate whether touch input has been enabled.
-    bool touchEnabled_;
     /// Screen joystick index for navigational controls (mobile platforms only).
     unsigned screenJoystickIndex_;
     /// Screen joystick index for settings (mobile platforms only).

@@ -80,7 +80,7 @@ void Urho2DPhysics::CreateScene()
     cameraNode_ = scene_->CreateChild("Camera");
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-    
+
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
@@ -89,7 +89,7 @@ void Urho2DPhysics::CreateScene()
 
     // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sprite2D* boxSprite = cache->GetResource<Sprite2D>("Urho2D/Box.png");
     Sprite2D* ballSprite = cache->GetResource<Sprite2D>("Urho2D/Ball.png");
@@ -98,10 +98,10 @@ void Urho2DPhysics::CreateScene()
     Node* groundNode = scene_->CreateChild("Ground");
     groundNode->SetPosition(Vector3(0.0f, -3.0f, 0.0f));
     groundNode->SetScale(Vector3(200.0f, 1.0f, 0.0f));
-    
+
     // Create 2D rigid body for gound
     RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
-    
+
     StaticSprite2D* groundSprite = groundNode->CreateComponent<StaticSprite2D>();
     groundSprite->SetSprite(boxSprite);
 
@@ -201,7 +201,7 @@ void Urho2DPhysics::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
-    
+
     if (input->GetKeyDown(KEY_PAGEUP))
     {
         Camera* camera = cameraNode_->GetComponent<Camera>();
@@ -219,6 +219,9 @@ void Urho2DPhysics::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Urho2DPhysics, HandleUpdate));
+
+    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
 void Urho2DPhysics::HandleUpdate(StringHash eventType, VariantMap& eventData)

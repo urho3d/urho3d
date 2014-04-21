@@ -64,16 +64,16 @@ void VehicleDemo::Start()
 {
     // Execute base class startup
     Sample::Start();
-    
+
     // Create static scene content
     CreateScene();
-    
+
     // Create the controllable vehicle
     CreateVehicle();
-    
+
     // Create the UI content
     CreateInstructions();
-    
+
     // Subscribe to necessary events
     SubscribeToEvents();
 }
@@ -81,20 +81,20 @@ void VehicleDemo::Start()
 void VehicleDemo::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     scene_ = new Scene(context_);
-    
+
     // Create scene subsystem components
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<PhysicsWorld>();
-    
+
     // Create camera and define viewport. We will be doing load / save, so it's convenient to create the camera outside the scene,
     // so that it won't be destroyed and recreated, and we don't have to redefine the viewport on load
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(500.0f);
     GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, scene_, camera));
-    
+
     // Create static scene content. First create a zone for ambient lighting and fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
@@ -103,7 +103,7 @@ void VehicleDemo::CreateScene()
     zone->SetFogStart(300.0f);
     zone->SetFogEnd(500.0f);
     zone->SetBoundingBox(BoundingBox(-2000.0f, 2000.0f));
-    
+
     // Create a directional light with cascaded shadow mapping
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.3f, -0.5f, 0.425f));
@@ -113,7 +113,7 @@ void VehicleDemo::CreateScene()
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     light->SetSpecularIntensity(0.5f);
-    
+
     // Create heightmap terrain with collision
     Node* terrainNode = scene_->CreateChild("Terrain");
     terrainNode->SetPosition(Vector3::ZERO);
@@ -126,12 +126,12 @@ void VehicleDemo::CreateScene()
     // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
     // terrain patches and other objects behind it
     terrain->SetOccluder(true);
-    
+
     RigidBody* body = terrainNode->CreateComponent<RigidBody>();
     body->SetCollisionLayer(2); // Use layer bitmask 2 for static geometry
     CollisionShape* shape = terrainNode->CreateComponent<CollisionShape>();
     shape->SetTerrain();
-    
+
     // Create 1000 mushrooms in the terrain. Always face outward along the terrain normal
     const unsigned NUM_MUSHROOMS = 1000;
     for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
@@ -147,7 +147,7 @@ void VehicleDemo::CreateScene()
         object->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         object->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
         object->SetCastShadows(true);
-        
+
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
         body->SetCollisionLayer(2);
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
@@ -161,7 +161,7 @@ void VehicleDemo::CreateVehicle()
 
     Node* vehicleNode = scene_->CreateChild("Vehicle");
     vehicleNode->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
-    
+
     // Create the vehicle logic component
     vehicle_ = vehicleNode->CreateComponent<Vehicle>();
     // Create the rendering and physics components
@@ -172,17 +172,17 @@ void VehicleDemo::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
-    
+
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys to drive, mouse to rotate camera\n"
+        "Use WASD keys to drive, mouse/touch to rotate camera\n"
         "F5 to save scene, F7 to load"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
     instructionText->SetTextAlignment(HA_CENTER);
-    
+
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
@@ -193,22 +193,25 @@ void VehicleDemo::SubscribeToEvents()
 {
     // Subscribe to Update event for setting the vehicle controls before physics simulation
     SubscribeToEvent(E_UPDATE, HANDLER(VehicleDemo, HandleUpdate));
-    
+
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent(E_POSTUPDATE, HANDLER(VehicleDemo, HandlePostUpdate));
+
+    // Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
+    UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
 void VehicleDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
-    
+
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     Input* input = GetSubsystem<Input>();
 
     if (vehicle_)
     {
         UI* ui = GetSubsystem<UI>();
-        
+
         // Get movement controls and assign them to the vehicle component. If UI has a focused element, clear controls
         if (!ui->GetFocusElement())
         {
@@ -216,10 +219,30 @@ void VehicleDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             vehicle_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
             vehicle_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
             vehicle_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
-        
-            // Add yaw & pitch from the mouse motion. Used only for the camera, does not affect motion
-            vehicle_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
-            vehicle_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
+
+            // Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
+            if (touchEnabled_)
+            {
+                for (unsigned i = 0; i < input->GetNumTouches(); ++i)
+                {
+                    TouchState* state = input->GetTouch(i);
+                    if (!state->touchedElement_)    // Touch on empty space
+                    {
+                        Camera* camera = cameraNode_->GetComponent<Camera>();
+                        if (!camera)
+                            return;
+
+                        Graphics* graphics = GetSubsystem<Graphics>();
+                        vehicle_->controls_.yaw_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.x_;
+                        vehicle_->controls_.pitch_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.y_;
+                    }
+                }
+            }
+            else
+            {
+                vehicle_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
+                vehicle_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
+            }
             // Limit pitch
             vehicle_->controls_.pitch_ = Clamp(vehicle_->controls_.pitch_, 0.0f, 80.0f);
 
@@ -250,14 +273,14 @@ void VehicleDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (!vehicle_)
         return;
-    
+
     Node* vehicleNode = vehicle_->GetNode();
-    
+
     // Physics update has completed. Position camera behind vehicle
     Quaternion dir(vehicleNode->GetRotation().YawAngle(), Vector3::UP);
     dir = dir * Quaternion(vehicle_->controls_.yaw_, Vector3::UP);
     dir = dir * Quaternion(vehicle_->controls_.pitch_, Vector3::RIGHT);
-    
+
     Vector3 cameraTargetPos = vehicleNode->GetPosition() - dir * Vector3(0.0f, 0.0f, CAMERA_DISTANCE);
     Vector3 cameraStartPos = vehicleNode->GetPosition();
 

@@ -52,6 +52,16 @@ public:
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">"
+        "        <attribute name=\"Is Visible\" value=\"false\" />"
+        "    </add>"
+        "</patch>";
+    }
+
 private:
     /// Construct the scene content.
     void CreateScene();
@@ -87,7 +97,7 @@ private:
     void HandleClientDisconnected(StringHash eventType, VariantMap& eventData);
     /// Handle remote event from server which tells our controlled object node ID.
     void HandleClientObjectID(StringHash eventType, VariantMap& eventData);
-    
+
     /// Mapping from client connections to controllable objects.
     HashMap<Connection*, WeakPtr<Node> > serverObjects_;
     /// Button container element.

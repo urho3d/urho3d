@@ -55,6 +55,7 @@ namespace Urho3D
 
 const int SCREEN_JOYSTICK_START_ID = 0x40000000;
 const ShortStringHash VAR_BUTTON_KEY_BINDING("VAR_BUTTON_KEY_BINDING");
+const ShortStringHash VAR_BUTTON_MOUSE_BUTTON_BINDING("VAR_BUTTON_MOUSE_BUTTON_BINDING");
 const ShortStringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const ShortStringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 
@@ -258,6 +259,8 @@ static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
         keyBindingMap.Insert(MakePair<String, int>("RIGHT", KEY_RIGHT));
         keyBindingMap.Insert(MakePair<String, int>("UP", KEY_UP));
         keyBindingMap.Insert(MakePair<String, int>("DOWN", KEY_DOWN));
+        keyBindingMap.Insert(MakePair<String, int>("PAGEUP", KEY_PAGEUP));
+        keyBindingMap.Insert(MakePair<String, int>("PAGEDOWN", KEY_PAGEDOWN));
         keyBindingMap.Insert(MakePair<String, int>("F1", KEY_F1));
         keyBindingMap.Insert(MakePair<String, int>("F2", KEY_F2));
         keyBindingMap.Insert(MakePair<String, int>("F3", KEY_F3));
@@ -273,9 +276,22 @@ static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
     }
 }
 
+static void PopulateMouseButtonBindingMap(HashMap<String, int>& mouseButtonBindingMap)
+{
+    if (mouseButtonBindingMap.Empty())
+    {
+        mouseButtonBindingMap.Insert(MakePair<String, int>("LEFT", SDL_BUTTON_LEFT));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("MIDDLE", SDL_BUTTON_MIDDLE));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("RIGHT", SDL_BUTTON_RIGHT));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("X1", SDL_BUTTON_X1));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("X2", SDL_BUTTON_X2));
+    }
+}
+
 SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 {
     static HashMap<String, int> keyBindingMap;
+    static HashMap<String, int> mouseButtonBindingMap;
 
     if (!graphics_)
     {
@@ -305,7 +321,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     SDL_JoystickID joystickID = SCREEN_JOYSTICK_START_ID;
     while (joysticks_.Contains(joystickID))
         ++joystickID;
-    
+
     JoystickState& state = joysticks_[joystickID];
     state.joystickID_ = joystickID;
     state.name_ = screenJoystick->GetName();
@@ -348,6 +364,21 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
                 if (keyBinding != M_MAX_INT)
                     element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
+            }
+
+            // Check whether the button has mouse binding
+            text = dynamic_cast<Text*>(element->GetChild("MouseButtonBinding", false));
+            if (text)
+            {
+                text->SetVisible(false);
+                const String& mouseButton = text->GetText();
+                PopulateMouseButtonBindingMap(mouseButtonBindingMap);
+
+                HashMap<String, int>::Iterator i = mouseButtonBindingMap.Find(mouseButton);
+                if (i != mouseButtonBindingMap.End())
+                    element->SetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING, i->second_);
+                else
+                    LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
             }
         }
         else if (name.StartsWith("Axis"))
@@ -437,7 +468,7 @@ bool Input::RemoveScreenJoystick(SDL_JoystickID id)
         LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
         return false;
     }
-    
+
     JoystickState& state = joysticks_[id];
     if (!state.screenJoystick_)
     {
@@ -533,7 +564,7 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
 
     state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
     state.axes_.Resize(SDL_JoystickNumAxes(joystick));
-    
+
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
     {
@@ -542,7 +573,7 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
         if (state.axes_.Size() < SDL_CONTROLLER_AXIS_MAX)
             state.axes_.Resize(SDL_CONTROLLER_AXIS_MAX);
     }
-    
+
     state.buttonPress_.Resize(state.buttons_.Size());
     state.hats_.Resize(SDL_JoystickNumHats(joystick));
 
@@ -688,7 +719,7 @@ JoystickState* Input::GetJoystickByIndex(unsigned index)
         if (compare++ == index)
             return &(i->second_);
     }
-    
+
     return 0;
 }
 
@@ -1159,7 +1190,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.jbutton.button;
             SDL_JoystickID joystickID = evt.jbutton.which;
             JoystickState& state = joysticks_[joystickID];
-            
+
             // Skip ordinary joystick event for a controller
             if (!state.controller_)
             {
@@ -1254,7 +1285,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.cbutton.button;
             SDL_JoystickID joystickID = evt.cbutton.which;
             JoystickState& state = joysticks_[joystickID];
-            
+
             VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICKID] = joystickID;
             eventData[P_BUTTON] = button;
@@ -1421,9 +1452,10 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         if (eventType == E_TOUCHMOVE)
             return;
 
-        // Determine whether to inject a joystick event or keyboard event
-        Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        if (variant.IsEmpty())
+        // Determine whether to inject a joystick event or keyboard/mouse event
+        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        Variant mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
+        if (keyBindingVar.IsEmpty() && mouseButtonBindingVar.IsEmpty())
         {
             evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
             evt.jbutton.which = joystickID;
@@ -1431,15 +1463,26 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         }
         else
         {
-            evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
-            evt.key.keysym.sym = variant.GetInt();
-            evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+            if (!keyBindingVar.IsEmpty())
+            {
+                evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
+                evt.key.keysym.sym = keyBindingVar.GetInt();
+                evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+            }
+            if (!mouseButtonBindingVar.IsEmpty())
+            {
+                // Mouse button are sent as extra events besides key events
+                SDL_Event evt;
+                evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
+                evt.button.button = mouseButtonBindingVar.GetInt();
+                HandleSDLEvent(&evt);
+            }
         }
     }
     else if (name.StartsWith("Hat"))
     {
-        Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        if (variant.IsEmpty())
+        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        if (keyBindingVar.IsEmpty())
         {
             evt.type = SDL_JOYHATMOTION;
             evt.jaxis.which = joystickID;
@@ -1461,7 +1504,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         else
         {
             // Hat is binded by 4 keys, like 'WASD'
-            String keyBinding = variant.GetString();
+            String keyBinding = keyBindingVar.GetString();
 
             if (eventType == E_TOUCHEND)
             {
