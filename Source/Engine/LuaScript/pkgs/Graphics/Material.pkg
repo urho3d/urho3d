@@ -1,6 +1,7 @@
 $#include "Material.h"
 
-enum CullMode{};
+enum CullMode {};
+enum WrapMode {};
 
 class Material : public Resource
 {
@@ -10,6 +11,9 @@ class Material : public Resource
     void SetNumTechniques(unsigned num);
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     void SetShaderParameter(const String name, const Variant& value);
+    void SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode);
+    void SetShaderParameterAnimationSpeed(const String& name, float speed);
     void SetTexture(TextureUnit unit, Texture* texture);
     void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat);
     void SetUVTransform(const Vector2& offset, float rotation, float repeat);
@@ -33,6 +37,9 @@ class Material : public Resource
     Pass* GetPass(unsigned index, const String passType) const;
     
     Texture* GetTexture(TextureUnit unit) const;
+    ValueAnimation* GetShaderParameterAnimation(const String& name) const;
+    WrapMode GetShaderParameterAnimationWrapMode(const String& name) const;
+    float GetShaderParameterAnimationSpeed(const String& name) const;
     
     CullMode GetCullMode() const;
     CullMode GetShadowCullMode() const;
