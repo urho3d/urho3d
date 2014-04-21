@@ -40,6 +40,8 @@
 namespace Urho3D
 {
 
+extern const char* wrapModeNames[];
+
 static const char* textureUnitNames[] =
 {
     "diffuse",
@@ -281,6 +283,34 @@ bool Material::Load(const XMLElement& source)
         parameterElem = parameterElem.GetNext("parameter");
     }
 
+    XMLElement parameterAnimationElem = source.GetChild("parameteranimation");
+    while (parameterAnimationElem)
+    {
+        String name = parameterAnimationElem.GetAttribute("name");
+        SharedPtr<ValueAnimation> animation(new ValueAnimation(context_));
+        if (!animation->LoadXML(parameterAnimationElem))
+        {
+            LOGERROR("Could not load parameter animation");
+            return false;
+        }
+
+        String wrapModeString = parameterAnimationElem.GetAttribute("wrapmode");
+        WrapMode wrapMode = WM_LOOP;
+        for (int i = 0; i <= WM_CLAMP; ++i)
+        {
+            if (wrapModeString == wrapModeNames[i])
+            {
+                wrapMode = (WrapMode)i;
+                break;
+            }
+        }
+
+        float speed = parameterAnimationElem.GetFloat("speed");
+        SetShaderParameterAnimation(name, animation, wrapMode, speed);
+
+        parameterAnimationElem = parameterAnimationElem.GetNext("parameteranimation");
+    }
+
     XMLElement cullElem = source.GetChild("cull");
     if (cullElem)
         SetCullMode((CullMode)GetStringListIndex(cullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
@@ -338,6 +368,19 @@ bool Material::Save(XMLElement& dest) const
         XMLElement parameterElem = dest.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
         parameterElem.SetVectorVariant("value", j->second_.value_);
+    }
+
+    // Write shader parameter animations
+    for (HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator j = shaderParameterAnimationInfos_.Begin(); j != shaderParameterAnimationInfos_.End(); ++j)
+    {
+        ShaderParameterAnimationInfo* info = j->second_;
+        XMLElement parameterAnimationElem = dest.CreateChild("parameteranimation");
+        parameterAnimationElem.SetString("name", info->GetName());
+        if (!info->GetAnimation()->SaveXML(parameterAnimationElem))
+            return false;
+
+        parameterAnimationElem.SetAttribute("wrapmode", wrapModeNames[info->GetWrapMode()]);
+        parameterAnimationElem.SetFloat("speed", info->GetSpeed());
     }
 
     // Write culling modes
