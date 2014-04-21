@@ -114,7 +114,7 @@ bool Animatable::SaveXML(XMLElement& dest) const
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::ConstIterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
     {
         AttributeAnimation* attributeAnimation = i->second_->GetAttributeAnimation();
-        if (attributeAnimation->GetObjectAnimation())
+        if (attributeAnimation->GetOwner())
             continue;
 
         const AttributeInfo& attr = i->second_->GetAttributeInfo();
@@ -291,7 +291,7 @@ void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
     Vector<String> names;
     for (HashMap<String, SharedPtr<AttributeAnimationInstance> >::Iterator i = attributeAnimationInstances_.Begin(); i != attributeAnimationInstances_.End(); ++i)
     {
-        if (i->second_->GetAttributeAnimation()->GetObjectAnimation() == objectAnimation)
+        if (i->second_->GetAttributeAnimation()->GetOwner() == objectAnimation)
             names.Push(i->first_);
     }
 

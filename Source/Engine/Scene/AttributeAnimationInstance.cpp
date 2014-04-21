@@ -72,23 +72,7 @@ bool AttributeAnimationInstance::Update(float timeStep)
     if (attributeAnimation_->HasEventFrames())
     {
         PODVector<const AttributeEventFrame*> eventFrames;
-        switch (wrapMode_)
-        {
-        case WM_LOOP:
-            if (lastScaledTime_ < scaledTime)
-                attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-            else
-            {
-                attributeAnimation_->GetEventFrames(lastScaledTime_, attributeAnimation_->GetEndTime(), eventFrames);
-                attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), scaledTime, eventFrames);
-            }
-            break;
-
-        case WM_ONCE:
-        case WM_CLAMP:
-            attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-            break;
-        }
+        GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
 
         for (unsigned i = 0; i < eventFrames.Size(); ++i)
             animatable_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
@@ -97,35 +81,6 @@ bool AttributeAnimationInstance::Update(float timeStep)
     lastScaledTime_ = scaledTime;
 
     return finished;
-}
-
-float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& finished) const
-{
-    float beginTime = attributeAnimation_->GetBeginTime();
-    float endTime = attributeAnimation_->GetEndTime();
-
-    switch (wrapMode_)
-    {
-    case WM_LOOP:
-        {
-            float span = endTime - beginTime;
-            float time = fmodf(currentTime - beginTime, span);
-            if (time < 0.0f)
-                time += span;
-            return beginTime + time;
-        }
-
-    case WM_ONCE:
-        finished = (currentTime >= endTime);
-        // Fallthrough
-
-    case WM_CLAMP:
-        return Clamp(currentTime, beginTime, endTime);
-
-    default:
-        LOGERROR("Unsupported attribute animation wrap mode");
-        return beginTime;
-    }
 }
 
 }

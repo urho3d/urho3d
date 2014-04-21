@@ -29,7 +29,6 @@ namespace Urho3D
 {
 
 class Animatable;
-class ObjectAnimation;
 class XMLElement;
 struct AttributeInfo;
 
@@ -84,8 +83,8 @@ public:
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
 
-    /// Set object animation.
-    void SetObjectAnimation(ObjectAnimation* objectAnimation);
+    /// Set owner.
+    void SetOwner(void* owner);
     /// Set interpolation method.
     void SetInterpolationMethod(InterpMethod method);
     /// Set spline tension, should be between 0.0f and 1.0f, but this is not a must.
@@ -100,8 +99,8 @@ public:
 
     /// Return animation is valid.
     bool IsValid() const;
-    /// Return object animation.
-    ObjectAnimation* GetObjectAnimation() const { return objectAnimation_; }
+    /// Return owner.
+    void* GetOwner() const { return owner_; }
     /// Return interpolation method.
     InterpMethod GetInterpolationMethod() const { return interpolationMethod_; }
     /// Return spline tension.
@@ -129,8 +128,8 @@ protected:
     /// Return (value1 - value2) * t.
     Variant SubstractAndMultiply(const Variant& value1, const Variant& value2, float t) const;
 
-    /// Object animation.
-    WeakPtr<ObjectAnimation> objectAnimation_;
+    /// Owner.
+    void* owner_;
     /// Interpolation method.
     InterpMethod interpolationMethod_;
     /// Spline tension.

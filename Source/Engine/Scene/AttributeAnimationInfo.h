@@ -54,6 +54,11 @@ public:
     float GetSpeed() const { return speed_; }
 
 protected:
+    /// Calculate scaled time.
+    float CalculateScaledTime(float currentTime, bool& finished) const;
+    /// Return event frames.
+    void AttributeAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames);
+
     /// Attribute animation.
     SharedPtr<AttributeAnimation> attributeAnimation_;
     /// Wrap mode.

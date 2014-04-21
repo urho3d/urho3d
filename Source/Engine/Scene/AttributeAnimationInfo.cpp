@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "AttributeAnimation.h"
 #include "AttributeAnimationInfo.h"
+#include "Log.h"
 
 #include "DebugNew.h"
 
@@ -46,6 +47,56 @@ AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& oth
 
 AttributeAnimationInfo::~AttributeAnimationInfo()
 {
+}
+
+float AttributeAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
+{
+    float beginTime = attributeAnimation_->GetBeginTime();
+    float endTime = attributeAnimation_->GetEndTime();
+
+    switch (wrapMode_)
+    {
+    case WM_LOOP:
+        {
+            float span = endTime - beginTime;
+            float time = fmodf(currentTime - beginTime, span);
+            if (time < 0.0f)
+                time += span;
+            return beginTime + time;
+        }
+
+    case WM_ONCE:
+        finished = (currentTime >= endTime);
+        // Fallthrough
+
+    case WM_CLAMP:
+        return Clamp(currentTime, beginTime, endTime);
+
+    default:
+        LOGERROR("Unsupported attribute animation wrap mode");
+        return beginTime;
+    }
+}
+
+void AttributeAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames)
+{
+    switch (wrapMode_)
+    {
+    case WM_LOOP:
+        if (beginTime < endTime)
+            attributeAnimation_->GetEventFrames(beginTime, endTime, eventFrames);
+        else
+        {
+            attributeAnimation_->GetEventFrames(beginTime, attributeAnimation_->GetEndTime(), eventFrames);
+            attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), endTime, eventFrames);
+        }
+        break;
+
+    case WM_ONCE:
+    case WM_CLAMP:
+        attributeAnimation_->GetEventFrames(beginTime, endTime, eventFrames);
+        break;
+    }
 }
 
 }

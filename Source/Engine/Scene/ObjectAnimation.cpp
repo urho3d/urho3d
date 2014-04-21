@@ -131,7 +131,7 @@ void ObjectAnimation::AddAttributeAnimation(const String& name, AttributeAnimati
     if (!attributeAnimation)
         return;
 
-    attributeAnimation->SetObjectAnimation(this);
+    attributeAnimation->SetOwner(this);
     attributeAnimationInfos_[name] = new AttributeAnimationInfo(attributeAnimation, wrapMode, speed);
 }
 
@@ -140,7 +140,7 @@ void ObjectAnimation::RemoveAttributeAnimation(const String& name)
     HashMap<String, SharedPtr<AttributeAnimationInfo> >::Iterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
     {
-        i->second_->GetAttributeAnimation()->SetObjectAnimation(0);
+        i->second_->GetAttributeAnimation()->SetOwner(0);
         attributeAnimationInfos_.Erase(i);
     }
 }
@@ -154,7 +154,7 @@ void ObjectAnimation::RemoveAttributeAnimation(AttributeAnimation* attributeAnim
     {
         if (i->second_->GetAttributeAnimation() == attributeAnimation)
         {
-            attributeAnimation->SetObjectAnimation(0);
+            attributeAnimation->SetOwner(0);
             attributeAnimationInfos_.Erase(i);
             return;
         }

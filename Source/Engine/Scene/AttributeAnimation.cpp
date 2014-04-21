@@ -44,6 +44,7 @@ const char* interpMethodNames[] =
 
 AttributeAnimation::AttributeAnimation(Context* context) :
     Resource(context),
+    owner_(0),
     interpolationMethod_(IM_LINEAR),
     splineTension_(0.5f),
     valueType_(VAR_NONE),
@@ -175,9 +176,9 @@ void AttributeAnimation::SetValueType(VariantType valueType)
     endTime_ = -M_INFINITY;
 }
 
-void AttributeAnimation::SetObjectAnimation(ObjectAnimation* objectAnimation)
+void AttributeAnimation::SetOwner(void* owner)
 {
-    objectAnimation_ = objectAnimation;
+    owner_ = owner;
 }
 
 void AttributeAnimation::SetInterpolationMethod(InterpMethod method)

@@ -51,9 +51,6 @@ public:
     float GetCurrentTime() const { return currentTime_; }
 
 private:
-    /// Calculate scaled time.
-    float CalculateScaledTime(float currentTime, bool& finished) const;
-
     /// Animatable.
     WeakPtr<Animatable> animatable_;
     /// Attribute information.
