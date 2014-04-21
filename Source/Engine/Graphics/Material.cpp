@@ -26,6 +26,7 @@
 #include "Graphics.h"
 #include "Log.h"
 #include "Material.h"
+#include "MaterialShaderParameterAnimationInstance.h"
 #include "Matrix3x4.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
@@ -68,7 +69,7 @@ static const char* cullModeNames[] =
 TextureUnit ParseTextureUnitName(String name)
 {
     name = name.ToLower().Trimmed();
-    
+
     TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
     if (unit == MAX_TEXTURE_UNITS)
     {
@@ -87,10 +88,10 @@ TextureUnit ParseTextureUnitName(String name)
         else if (name.Length() < 3)
             unit = (TextureUnit)Clamp(ToInt(name), 0, MAX_TEXTURE_UNITS);
     }
-    
+
     if (unit == MAX_TEXTURE_UNITS)
         LOGERROR("Unknown texture unit name " + name);
-    
+
     return unit;
 }
 
@@ -125,7 +126,8 @@ Material::Material(Context* context) :
     Resource(context),
     auxViewFrameNumber_(0),
     occlusion_(true),
-    specular_(false)
+    specular_(false),
+    frameNumber_(0)
 {
     ResetToDefaults();
 }
@@ -142,19 +144,19 @@ void Material::RegisterObject(Context* context)
 bool Material::Load(Deserializer& source)
 {
     PROFILE(LoadMaterial);
-    
+
     // In headless mode, do not actually load the material, just return success
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
-    
+
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
     {
         ResetToDefaults();
         return false;
     }
-    
+
     XMLElement rootElem = xml->GetRoot();
     return Load(rootElem);
 }
@@ -163,7 +165,7 @@ bool Material::Save(Serializer& dest) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement materialElem = xml->CreateRoot("material");
-    
+
     Save(materialElem);
     return xml->Save(dest);
 }
@@ -171,15 +173,15 @@ bool Material::Save(Serializer& dest) const
 bool Material::Load(const XMLElement& source)
 {
     ResetToDefaults();
-    
+
     if (source.IsNull())
     {
         LOGERROR("Can not load material from null XML element");
         return false;
     }
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     XMLElement techniqueElem = source.GetChild("technique");
     techniques_.Clear();
     while (techniqueElem)
@@ -197,9 +199,9 @@ bool Material::Load(const XMLElement& source)
         }
         techniqueElem = techniqueElem.GetNext("technique");
     }
-    
+
     SortTechniques();
-    
+
     XMLElement textureElem = source.GetChild("texture");
     while (textureElem)
     {
@@ -217,7 +219,7 @@ bool Material::Load(const XMLElement& source)
         }
         textureElem = textureElem.GetNext("texture");
     }
-    
+
     XMLElement parameterElem = source.GetChild("parameter");
     while (parameterElem)
     {
@@ -225,19 +227,19 @@ bool Material::Load(const XMLElement& source)
         SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
         parameterElem = parameterElem.GetNext("parameter");
     }
-    
+
     XMLElement cullElem = source.GetChild("cull");
     if (cullElem)
         SetCullMode((CullMode)GetStringListIndex(cullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
-    
+
     XMLElement shadowCullElem = source.GetChild("shadowcull");
     if (shadowCullElem)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
-    
+
     XMLElement depthBiasElem = source.GetChild("depthbias");
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
-    
+
     // Calculate memory use
     RefreshMemoryUse();
     CheckOcclusion();
@@ -251,20 +253,20 @@ bool Material::Save(XMLElement& dest) const
         LOGERROR("Can not save material to null XML element");
         return false;
     }
-    
+
     // Write techniques
     for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
         const TechniqueEntry& entry = techniques_[i];
         if (!entry.technique_)
             continue;
-        
+
         XMLElement techniqueElem = dest.CreateChild("technique");
         techniqueElem.SetString("name", entry.technique_->GetName());
         techniqueElem.SetInt("quality", entry.qualityLevel_);
         techniqueElem.SetFloat("loddistance", entry.lodDistance_);
     }
-    
+
     // Write texture units
     for (unsigned j = 0; j < MAX_MATERIAL_TEXTURE_UNITS; ++j)
     {
@@ -276,7 +278,7 @@ bool Material::Save(XMLElement& dest) const
             textureElem.SetString("name", texture->GetName());
         }
     }
-    
+
     // Write shader parameters
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
     {
@@ -284,19 +286,19 @@ bool Material::Save(XMLElement& dest) const
         parameterElem.SetString("name", j->second_.name_);
         parameterElem.SetVectorVariant("value", j->second_.value_);
     }
-    
+
     // Write culling modes
     XMLElement cullElem = dest.CreateChild("cull");
     cullElem.SetString("value", cullModeNames[cullMode_]);
-    
+
     XMLElement shadowCullElem = dest.CreateChild("shadowcull");
     shadowCullElem.SetString("value", cullModeNames[shadowCullMode_]);
-    
+
     // Write depth bias
     XMLElement depthBiasElem = dest.CreateChild("depthbias");
     depthBiasElem.SetFloat("constant", depthBias_.constantBias_);
     depthBiasElem.SetFloat("slopescaled", depthBias_.slopeScaledBias_);
-    
+
     return true;
 }
 
@@ -304,7 +306,7 @@ void Material::SetNumTechniques(unsigned num)
 {
     if (!num)
         return;
-    
+
     techniques_.Resize(num);
     RefreshMemoryUse();
 }
@@ -313,7 +315,7 @@ void Material::SetTechnique(unsigned index, Technique* tech, unsigned qualityLev
 {
     if (index >= techniques_.Size())
         return;
-    
+
     techniques_[index] = TechniqueEntry(tech, qualityLevel, lodDistance);
     CheckOcclusion();
 }
@@ -325,7 +327,7 @@ void Material::SetShaderParameter(const String& name, const Variant& value)
     newParam.value_ = value;
     StringHash nameHash(name);
     shaderParameters_[nameHash] = newParam;
-    
+
     if (nameHash == PSP_MATSPECCOLOR)
     {
         VariantType type = value.GetType();
@@ -340,8 +342,30 @@ void Material::SetShaderParameter(const String& name, const Variant& value)
             specular_ = vec.x_ > 0.0f || vec.y_ > 0.0f || vec.z_ > 0.0f;
         }
     }
-    
+
     RefreshMemoryUse();
+}
+
+void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode, float speed)
+{
+    if (shaderParameters_.Find(name) == shaderParameters_.End())
+        return;
+
+    materialShaderParameterAnimationInstances_[name] = new MaterialShaderParameterAnimationInstance(this, name, animation, wrapMode, speed);
+}
+
+void Material::SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode)
+{
+    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    if (instance)
+        instance->SetWrapMode(wrapMode);
+}
+
+void Material::SetShaderParameterAnimationSpeed(const String& name, float speed)
+{
+    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    if (instance)
+        instance->SetSpeed(speed);
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -357,7 +381,7 @@ void Material::SetUVTransform(const Vector2& offset, float rotation, const Vecto
     transform.m11_ = repeat.y_;
     transform.m03_ = -0.5f * transform.m00_ + 0.5f;
     transform.m13_ = -0.5f * transform.m11_ + 0.5f;
-    
+
     Matrix3x4 rotationMatrix(Matrix3x4::IDENTITY);
     rotationMatrix.m00_ = Cos(rotation);
     rotationMatrix.m01_ = Sin(rotation);
@@ -365,15 +389,15 @@ void Material::SetUVTransform(const Vector2& offset, float rotation, const Vecto
     rotationMatrix.m11_ = rotationMatrix.m00_;
     rotationMatrix.m03_ = 0.5f - 0.5f * (rotationMatrix.m00_ + rotationMatrix.m01_);
     rotationMatrix.m13_ = 0.5f - 0.5f * (rotationMatrix.m10_ + rotationMatrix.m11_);
-    
+
     transform = rotationMatrix * transform;
-    
+
     Matrix3x4 offsetMatrix = Matrix3x4::IDENTITY;
     offsetMatrix.m03_ = offset.x_;
     offsetMatrix.m13_ = offset.y_;
-    
+
     transform = offsetMatrix * transform;
-    
+
     SetShaderParameter("UOffset", Vector4(transform.m00_, transform.m01_, transform.m02_, transform.m03_));
     SetShaderParameter("VOffset", Vector4(transform.m10_, transform.m11_, transform.m12_, transform.m13_));
 }
@@ -406,7 +430,7 @@ void Material::RemoveShaderParameter(const String& name)
 
     if (nameHash == PSP_MATSPECCOLOR)
         specular_ = false;
-    
+
     RefreshMemoryUse();
 }
 
@@ -423,7 +447,7 @@ void Material::ReleaseShaders()
 SharedPtr<Material> Material::Clone(const String& cloneName) const
 {
     SharedPtr<Material> ret(new Material(context_));
-    
+
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
     ret->shaderParameters_ = shaderParameters_;
@@ -434,7 +458,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
     ret->RefreshMemoryUse();
-    
+
     return ret;
 }
 
@@ -446,6 +470,30 @@ void Material::SortTechniques()
 void Material::MarkForAuxView(unsigned frameNumber)
 {
     auxViewFrameNumber_ = frameNumber;
+}
+
+void Material::UpdateShaderParameterAnimations()
+{
+    if (materialShaderParameterAnimationInstances_.Empty())
+        return;
+
+    Time* time = GetSubsystem<Time>();
+    if (time->GetFrameNumber() == frameNumber_)
+        return;
+
+    frameNumber_ = time->GetFrameNumber();
+    float timeStep = time->GetTimeStep();
+
+    Vector<String> finishedNames;
+    for (HashMap<StringHash, SharedPtr<MaterialShaderParameterAnimationInstance> >::ConstIterator i = materialShaderParameterAnimationInstances_.Begin(); i != materialShaderParameterAnimationInstances_.End(); ++i)
+    {
+        if (i->second_->Update(timeStep))
+            finishedNames.Push(i->second_->GetName());
+    }
+
+    // Remove finished animation
+    for (unsigned i = 0; i < finishedNames.Size(); ++i)
+        SetShaderParameterAnimation(finishedNames[i], 0);
 }
 
 const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
@@ -473,6 +521,24 @@ const Variant& Material::GetShaderParameter(const String& name) const
 {
     HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(name);
     return i != shaderParameters_.End() ? i->second_.value_ : Variant::EMPTY;
+}
+
+ValueAnimation* Material::GetShaderParameterAnimation(const String& name) const
+{
+    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    return instance == 0 ? 0 : instance->GetAnimation();
+}
+
+WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
+{
+    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    return instance == 0 ? WM_LOOP : instance->GetWrapMode();
+}
+
+float Material::GetShaderParameterAnimationSpeed(const String& name) const
+{
+    MaterialShaderParameterAnimationInstance* instance = GetMaterialShaderParameterAnimationInstance(name);
+    return instance == 0 ? 0 : instance->GetSpeed();
 }
 
 String Material::GetTextureUnitName(TextureUnit unit)
@@ -509,35 +575,43 @@ void Material::ResetToDefaults()
 {
     SetNumTechniques(1);
     SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
-    
+
     for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         textures_[i] = 0;
-    
+
     shaderParameters_.Clear();
-    
+
     SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     SetShaderParameter("MatDiffColor", Vector4::ONE);
     SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-    
+
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
     depthBias_ = BiasParameters(0.0f, 0.0f);
-    
+
     RefreshMemoryUse();
 }
 
 void Material::RefreshMemoryUse()
 {
     unsigned memoryUse = sizeof(Material);
-    
+
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
     memoryUse += MAX_MATERIAL_TEXTURE_UNITS * sizeof(SharedPtr<Texture>);
     memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
-    
+
     SetMemoryUse(memoryUse);
+}
+
+MaterialShaderParameterAnimationInstance* Material::GetMaterialShaderParameterAnimationInstance(const String& name) const
+{
+    HashMap<StringHash, SharedPtr<MaterialShaderParameterAnimationInstance> >::ConstIterator i = materialShaderParameterAnimationInstances_.Find(name);
+    if (i == materialShaderParameterAnimationInstances_.End())
+        return 0;
+    return i->second_;
 }
 
 }
