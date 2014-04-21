@@ -3651,6 +3651,7 @@ Properties:
 - BorderImage@ background // readonly
 - ShortStringHash baseType // readonly
 - String category // readonly
+- Button@ closeButton // readonly
 - String commandInterpreter
 - XMLFile@ defaultStyle
 - bool focusOnShow

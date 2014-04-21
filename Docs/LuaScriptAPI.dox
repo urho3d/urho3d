@@ -930,6 +930,7 @@ Methods:
 - XMLFile* GetDefaultStyle() const
 - BorderImage* GetBackground() const
 - LineEdit* GetLineEdit() const
+- Button* GetCloseButton() const
 - bool IsVisible() const
 - bool IsAutoVisibleOnError() const
 - const String GetCommandInterpreter() const
@@ -946,6 +947,7 @@ Properties:
 - XMLFile* defaultStyle
 - BorderImage* background (readonly)
 - LineEdit* lineEdit (readonly)
+- Button* closeButton (readonly)
 - bool visible
 - bool autoVisibleOnError
 - String commandInterpreter

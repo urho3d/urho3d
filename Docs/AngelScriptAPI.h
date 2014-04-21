@@ -1981,6 +1981,8 @@ BorderImage background;
 ShortStringHash baseType;
 /* readonly */
 String category;
+/* readonly */
+Button closeButton;
 String commandInterpreter;
 XMLFile defaultStyle;
 bool focusOnShow;
