@@ -444,10 +444,33 @@ void Material::SetShaderParameter(const String& name, const Variant& value)
 
 void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode, float speed)
 {
-    if (shaderParameters_.Find(name) == shaderParameters_.End())
-        return;
+    ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
 
-    shaderParameterAnimationInfos_[name] = new ShaderParameterAnimationInfo(this, name, animation, wrapMode, speed);
+    if (animation)
+    {
+        if (info && info->GetAnimation() == animation)
+        {
+            info->SetWrapMode(wrapMode);
+            info->SetSpeed(speed);
+            return;
+        }
+
+        // Use shared ptr to avoid memory leak
+        SharedPtr<ValueAnimation> animationPtr(animation);
+
+        if (shaderParameters_.Find(name) == shaderParameters_.End())
+        {
+            LOGERROR(GetName() + " has no shader parameter: " + name);
+            return;
+        }
+
+        shaderParameterAnimationInfos_[name] = new ShaderParameterAnimationInfo(this, name, animationPtr, wrapMode, speed);
+    }
+    else
+    {
+        if (info)
+            shaderParameterAnimationInfos_.Erase(name);
+    }
 }
 
 void Material::SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode)
@@ -621,20 +644,20 @@ const Variant& Material::GetShaderParameter(const String& name) const
 
 ValueAnimation* Material::GetShaderParameterAnimation(const String& name) const
 {
-    ShaderParameterAnimationInfo* instance = GetShaderParameterAnimationInfo(name);
-    return instance == 0 ? 0 : instance->GetAnimation();
+    ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
+    return info == 0 ? 0 : info->GetAnimation();
 }
 
 WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
 {
-    ShaderParameterAnimationInfo* instance = GetShaderParameterAnimationInfo(name);
-    return instance == 0 ? WM_LOOP : instance->GetWrapMode();
+    ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
+    return info == 0 ? WM_LOOP : info->GetWrapMode();
 }
 
 float Material::GetShaderParameterAnimationSpeed(const String& name) const
 {
-    ShaderParameterAnimationInfo* instance = GetShaderParameterAnimationInfo(name);
-    return instance == 0 ? 0 : instance->GetSpeed();
+    ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
+    return info == 0 ? 0 : info->GetSpeed();
 }
 
 String Material::GetTextureUnitName(TextureUnit unit)

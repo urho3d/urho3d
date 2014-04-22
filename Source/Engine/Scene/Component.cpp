@@ -201,13 +201,13 @@ void Component::MarkNetworkUpdate()
 
 void Component::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInstances_.Size() == 1)
+    if (attributeAnimationInfos_.Size() == 1)
         SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Component, HandleAttributeAnimationUpdate));        
 }
 
 void Component::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInstances_.Empty())
+    if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 

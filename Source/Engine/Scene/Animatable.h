@@ -122,8 +122,8 @@ protected:
     void UpdateAttributeAnimations(float timeStep);
     /// Is animated network attribute.
     bool IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const;
-    /// Return attribute animation instance.
-    AttributeAnimationInfo* GetAttributeAnimationInstance(const String& name) const;
+    /// Return attribute animation info.
+    AttributeAnimationInfo* GetAttributeAnimationInfo(const String& name) const;
 
     /// Animation enabled.
     bool animationEnabled_;
@@ -131,8 +131,8 @@ protected:
     SharedPtr<ObjectAnimation> objectAnimation_;
     /// Animated network attribute set.
     HashSet<const AttributeInfo*> animatedNetworkAttributes_;
-    /// Attribute animation instances.
-    HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInstances_;
+    /// Attribute animation infos.
+    HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInfos_;
 };
 
 }

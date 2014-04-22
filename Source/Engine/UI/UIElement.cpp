@@ -1584,13 +1584,13 @@ UIElement* UIElement::GetElementEventSender() const
 
 void UIElement::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInstances_.Size() == 1)
+    if (attributeAnimationInfos_.Size() == 1)
         SubscribeToEvent(E_POSTUPDATE, HANDLER(UIElement, HandlePostUpdate));
 }
 
 void UIElement::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInstances_.Empty())
+    if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(E_POSTUPDATE);
 }
 

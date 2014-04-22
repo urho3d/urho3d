@@ -66,7 +66,7 @@ struct TechniqueEntry
     float lodDistance_;
 };
 
-/// Material shader parameter animation instance.
+/// Material shader parameter animation info.
 class ShaderParameterAnimationInfo : public ValueAnimationInfo
 {
 public:
