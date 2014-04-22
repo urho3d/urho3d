@@ -182,7 +182,7 @@ Material::Material(Context* context) :
     auxViewFrameNumber_(0),
     occlusion_(true),
     specular_(false),
-    frameNumber_(0)
+    animationFrameNumber_(0)
 {
     ResetToDefaults();
 }
@@ -463,13 +463,17 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
             LOGERROR(GetName() + " has no shader parameter: " + name);
             return;
         }
-
-        shaderParameterAnimationInfos_[name] = new ShaderParameterAnimationInfo(this, name, animationPtr, wrapMode, speed);
+        
+        StringHash nameHash(name);
+        shaderParameterAnimationInfos_[nameHash] = new ShaderParameterAnimationInfo(this, name, animationPtr, wrapMode, speed);
     }
     else
     {
         if (info)
-            shaderParameterAnimationInfos_.Erase(name);
+        {
+            StringHash nameHash(name);
+            shaderParameterAnimationInfos_.Erase(nameHash);
+        }
     }
 }
 
@@ -597,10 +601,10 @@ void Material::UpdateShaderParameterAnimations()
         return;
 
     Time* time = GetSubsystem<Time>();
-    if (time->GetFrameNumber() == frameNumber_)
+    if (time->GetFrameNumber() == animationFrameNumber_)
         return;
 
-    frameNumber_ = time->GetFrameNumber();
+    animationFrameNumber_ = time->GetFrameNumber();
     float timeStep = time->GetTimeStep();
 
     Vector<String> finishedNames;
@@ -727,7 +731,8 @@ void Material::RefreshMemoryUse()
 
 ShaderParameterAnimationInfo* Material::GetShaderParameterAnimationInfo(const String& name) const
 {
-    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Find(name);
+    StringHash nameHash(name);
+    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Find(nameHash);
     if (i == shaderParameterAnimationInfos_.End())
         return 0;
     return i->second_;

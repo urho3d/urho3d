@@ -227,9 +227,8 @@ private:
     bool occlusion_;
     /// Specular lighting flag.
     bool specular_;
-    /// Material update frame number.
-    unsigned frameNumber_;
-
+    /// Last animation update frame number.
+    unsigned animationFrameNumber_;
 };
 
 }
