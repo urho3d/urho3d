@@ -56,8 +56,8 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
         TouchState* touch1 = input->GetTouch(0);
         TouchState* touch2 = input->GetTouch(1);
 
-        // Check for zoom pattern (touches moving in opposite directions)
-        if ((touch1->delta_.y_ > 0 && touch2->delta_.y_ < 0) || (touch1->delta_.y_ < 0 && touch2->delta_.y_ > 0))
+        // Check for zoom pattern (touches moving in opposite directions and on empty space)
+        if (!touch1->touchedElement_ && !touch2->touchedElement_ && ((touch1->delta_.y_ > 0 && touch2->delta_.y_ < 0) || (touch1->delta_.y_ < 0 && touch2->delta_.y_ > 0)))
             zoom_ = true;
         else
             zoom_ = false;

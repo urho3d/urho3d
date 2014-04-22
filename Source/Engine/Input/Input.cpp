@@ -366,7 +366,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                     element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
             }
 
-            // Check whether the button has mouse binding
+            // Check whether the button has mouse button binding
             text = dynamic_cast<Text*>(element->GetChild("MouseButtonBinding", false));
             if (text)
             {
