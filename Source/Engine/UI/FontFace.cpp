@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Font.h"
 #include "FontFace.h"
+#include "Image.h"
 #include "Log.h"
 #include "Texture2D.h"
 
