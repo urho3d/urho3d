@@ -22,10 +22,12 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "File.h"
 #include "FileSystem.h"
 #include "Font.h"
 #include "FontFaceBitMap.h"
 #include "Graphics.h"
+#include "Image.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "ResourceCache.h"

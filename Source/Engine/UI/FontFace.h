@@ -30,6 +30,7 @@ namespace Urho3D
 {
 
 class Font;
+class Image;
 class Texture2D;
 
 /// Mutable font glyph description.

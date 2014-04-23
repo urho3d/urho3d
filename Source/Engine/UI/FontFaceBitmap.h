@@ -29,7 +29,6 @@ namespace Urho3D
 
 class Image;
 class Serializer;
-class Texture2D;
 
 /// Bitmap font face description.
 class URHO3D_API FontFaceBitMap : public FontFace

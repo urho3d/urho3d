@@ -26,12 +26,11 @@
 #include "Font.h"
 #include "FontFaceFreeType.h"
 #include "Graphics.h"
+#include "Image.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
-#include "ResourceCache.h"
 #include "Texture2D.h"
 #include "UI.h"
-#include "XMLFile.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
