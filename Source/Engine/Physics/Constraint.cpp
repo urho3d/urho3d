@@ -73,7 +73,7 @@ Constraint::Constraint(Context* context) :
 Constraint::~Constraint()
 {
     ReleaseConstraint();
-    
+
     if (physicsWorld_)
         physicsWorld_->RemoveConstraint(this);
 }
@@ -81,7 +81,7 @@ Constraint::~Constraint()
 void Constraint::RegisterObject(Context* context)
 {
     context->RegisterFactory<Constraint>(PHYSICS_CATEGORY);
-    
+
     ACCESSOR_ATTRIBUTE(Constraint, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
@@ -99,7 +99,7 @@ void Constraint::RegisterObject(Context* context)
 void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
-    
+
     if (!attr.accessor_)
     {
         // Convenience for editing static constraints: if not connected to another body, adjust world position to match local
@@ -111,7 +111,7 @@ void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
             btVector3 worldPos = ownBody * ToBtVector3(position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass());
             otherPosition_ = ToVector3(worldPos);
         }
-        
+
         // Certain attribute changes require recreation of the constraint
         if (attr.offset_ == offsetof(Constraint, constraintType_) || attr.offset_ == offsetof(Constraint, otherBodyNodeID_) ||
             attr.offset_ == offsetof(Constraint, disableCollision_))
@@ -127,9 +127,9 @@ void Constraint::ApplyAttributes()
     {
         if (otherBody_)
             otherBody_->RemoveConstraint(this);
-        
+
         otherBody_.Reset();
-        
+
         Scene* scene = GetScene();
         if (scene && otherBodyNodeID_)
         {
@@ -137,7 +137,7 @@ void Constraint::ApplyAttributes()
             if (otherNode)
                 otherBody_ = otherNode->GetComponent<RigidBody>();
         }
-        
+
         CreateConstraint();
     }
     else if (framesDirty_)
@@ -186,13 +186,13 @@ void Constraint::SetOtherBody(RigidBody* body)
     {
         if (otherBody_)
             otherBody_->RemoveConstraint(this);
-        
+
         otherBody_ = body;
-        
+
         // Update the connected body attribute
         Node* otherNode = otherBody_ ? otherBody_->GetNode() : 0;
         otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
-        
+
         CreateConstraint();
         MarkNetworkUpdate();
     }
@@ -226,7 +226,7 @@ void Constraint::SetAxis(const Vector3& axis)
     case CONSTRAINT_HINGE:
         rotation_ = Quaternion(Vector3::FORWARD, axis);
         break;
-        
+
     case CONSTRAINT_SLIDER:
     case CONSTRAINT_CONETWIST:
         rotation_ = Quaternion(Vector3::RIGHT, axis);
@@ -235,7 +235,7 @@ void Constraint::SetAxis(const Vector3& axis)
     default:
         break;
     }
-    
+
     ApplyFrames();
     MarkNetworkUpdate();
 }
@@ -268,16 +268,16 @@ void Constraint::SetOtherAxis(const Vector3& axis)
     case CONSTRAINT_HINGE:
         otherRotation_ = Quaternion(Vector3::FORWARD, axis);
         break;
-        
+
     case CONSTRAINT_SLIDER:
     case CONSTRAINT_CONETWIST:
         otherRotation_ = Quaternion(Vector3::RIGHT, axis);
         break;
-    
+
     default:
         break;
     }
-    
+
     ApplyFrames();
     MarkNetworkUpdate();
 }
@@ -326,7 +326,7 @@ void Constraint::SetLowLimit(const Vector2& limit)
 void Constraint::SetERP(float erp)
 {
     erp = Max(erp, 0.0f);
-    
+
     if (erp != erp_)
     {
         erp_ = erp;
@@ -338,7 +338,7 @@ void Constraint::SetERP(float erp)
 void Constraint::SetCFM(float cfm)
 {
     cfm = Max(cfm, 0.0f);
-    
+
     if (cfm != cfm_)
     {
         cfm_ = cfm;
@@ -376,10 +376,10 @@ void Constraint::ReleaseConstraint()
             ownBody_->RemoveConstraint(this);
         if (otherBody_)
             otherBody_->RemoveConstraint(this);
-        
+
         if (physicsWorld_)
             physicsWorld_->GetWorld()->removeConstraint(constraint_);
-        
+
         delete constraint_;
         constraint_ = 0;
     }
@@ -389,13 +389,13 @@ void Constraint::ApplyFrames()
 {
     if (!constraint_ || !node_ || (otherBody_ && !otherBody_->GetNode()))
         return;
-    
+
     cachedWorldScale_ = node_->GetWorldScale();
-    
+
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
     Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
         otherBody_->GetCenterOfMass() : otherPosition_;
-    
+
     switch (constraint_->getConstraintType())
     {
     case POINT2POINT_CONSTRAINT_TYPE:
@@ -405,7 +405,7 @@ void Constraint::ApplyFrames()
             pointConstraint->setPivotB(ToBtVector3(otherBodyScaledPosition));
         }
         break;
-        
+
     case HINGE_CONSTRAINT_TYPE:
         {
             btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
@@ -414,7 +414,7 @@ void Constraint::ApplyFrames()
             hingeConstraint->setFrames(ownFrame, otherFrame);
         }
         break;
-        
+
     case SLIDER_CONSTRAINT_TYPE:
         {
             btSliderConstraint* sliderConstraint = static_cast<btSliderConstraint*>(constraint_);
@@ -423,7 +423,7 @@ void Constraint::ApplyFrames()
             sliderConstraint->setFrames(ownFrame, otherFrame);
         }
         break;
-        
+
     case CONETWIST_CONSTRAINT_TYPE:
         {
             btConeTwistConstraint* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_);
@@ -447,8 +447,8 @@ void Constraint::OnNodeSet(Node* node)
         {
             if (scene == node)
                 LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-            
-            physicsWorld_ = scene->GetComponent<PhysicsWorld>();
+
+            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
             if (physicsWorld_)
                 physicsWorld_->AddConstraint(this);
             else
@@ -456,7 +456,7 @@ void Constraint::OnNodeSet(Node* node)
         }
         else
             LOGERROR("Node is detached from scene, can not create constraint");
-        
+
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();
     }
@@ -472,25 +472,25 @@ void Constraint::OnMarkedDirty(Node* node)
 void Constraint::CreateConstraint()
 {
     PROFILE(CreateConstraint);
-    
+
     cachedWorldScale_ = node_->GetWorldScale();
-    
+
     ReleaseConstraint();
-    
+
     ownBody_ = GetComponent<RigidBody>();
     btRigidBody* ownBody = ownBody_ ? ownBody_->GetBody() : 0;
     btRigidBody* otherBody = otherBody_ ? otherBody_->GetBody() : 0;
-    
+
     if (!physicsWorld_ || !ownBody)
         return;
-    
+
     if (!otherBody)
         otherBody = &btTypedConstraint::getFixedBody();
-    
+
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
     Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
         otherBody_->GetCenterOfMass() : otherPosition_;
-    
+
     switch (constraintType_)
     {
     case CONSTRAINT_POINT:
@@ -499,7 +499,7 @@ void Constraint::CreateConstraint()
                 ToBtVector3(otherBodyScaledPosition));
         }
         break;
-        
+
     case CONSTRAINT_HINGE:
         {
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
@@ -507,7 +507,7 @@ void Constraint::CreateConstraint()
             constraint_ = new btHingeConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
-        
+
     case CONSTRAINT_SLIDER:
         {
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
@@ -515,7 +515,7 @@ void Constraint::CreateConstraint()
             constraint_ = new btSliderConstraint(*ownBody, *otherBody, ownFrame, otherFrame, false);
         }
         break;
-        
+
     case CONSTRAINT_CONETWIST:
         {
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
@@ -523,11 +523,11 @@ void Constraint::CreateConstraint()
             constraint_ = new btConeTwistConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
-        
+
     default:
         break;
     }
-    
+
     if (constraint_)
     {
         constraint_->setUserConstraintPtr(this);
@@ -535,12 +535,12 @@ void Constraint::CreateConstraint()
         ownBody_->AddConstraint(this);
         if (otherBody_)
             otherBody_->AddConstraint(this);
-        
+
         ApplyLimits();
-        
+
         physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
     }
-    
+
     recreateConstraint_ = false;
     framesDirty_ = false;
 }
@@ -549,7 +549,7 @@ void Constraint::ApplyLimits()
 {
     if (!constraint_)
         return;
-    
+
     switch (constraint_->getConstraintType())
     {
     case HINGE_CONSTRAINT_TYPE:
@@ -558,7 +558,7 @@ void Constraint::ApplyLimits()
             hingeConstraint->setLimit(lowLimit_.x_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
         }
         break;
-        
+
     case SLIDER_CONSTRAINT_TYPE:
         {
             btSliderConstraint* sliderConstraint = static_cast<btSliderConstraint*>(constraint_);
@@ -568,18 +568,18 @@ void Constraint::ApplyLimits()
             sliderConstraint->setLowerAngLimit(lowLimit_.y_ * M_DEGTORAD);
         }
         break;
-        
+
     case CONETWIST_CONSTRAINT_TYPE:
         {
             btConeTwistConstraint* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_);
             coneTwistConstraint->setLimit(highLimit_.y_ * M_DEGTORAD, highLimit_.y_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
         }
         break;
-    
+
     default:
         break;
     }
-    
+
     if (erp_ != 0.0f)
         constraint_->setParam(BT_CONSTRAINT_STOP_ERP, erp_);
     if (cfm_ != 0.0f)

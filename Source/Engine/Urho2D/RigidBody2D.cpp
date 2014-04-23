@@ -100,7 +100,7 @@ void RigidBody2D::OnSetEnabled()
 
     if (body_)
         body_->SetActive(enabled);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -114,7 +114,7 @@ void RigidBody2D::SetBodyType(BodyType2D type)
 
     if (body_)
         body_->SetType(bodyType);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -187,7 +187,7 @@ void RigidBody2D::SetLinearDamping(float linearDamping)
 
     if (body_)
         body_->SetLinearDamping(linearDamping);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -200,7 +200,7 @@ void RigidBody2D::SetAngularDamping(float angularDamping)
 
     if (body_)
         body_->SetAngularDamping(angularDamping);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -213,7 +213,7 @@ void RigidBody2D::SetAllowSleep(bool allowSleep)
 
     if (body_)
         body_->SetSleepingAllowed(allowSleep);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -226,7 +226,7 @@ void RigidBody2D::SetFixedRotation(bool fixedRotation)
 
     if (body_)
         body_->SetFixedRotation(fixedRotation);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -239,7 +239,7 @@ void RigidBody2D::SetBullet(bool bullet)
 
     if (body_)
         body_->SetBullet(bullet);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -252,7 +252,7 @@ void RigidBody2D::SetGravityScale(float gravityScale)
 
     if (body_)
         body_->SetGravityScale(gravityScale);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -265,7 +265,7 @@ void RigidBody2D::SetAwake(bool awake)
 
     if (body_)
         body_->SetAwake(awake);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -279,7 +279,7 @@ void RigidBody2D::SetLinearVelocity(Vector2 linearVelocity)
 
     if (body_)
         body_->SetLinearVelocity(b2linearVelocity);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -292,7 +292,7 @@ void RigidBody2D::SetAngularVelocity(float angularVelocity)
 
     if (body_)
         body_->SetAngularVelocity(angularVelocity);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -348,7 +348,7 @@ void RigidBody2D::CreateBody()
 
     if (!useFixtureMass_)
         body_->SetMassData(&massData_);
-    
+
     for (unsigned i = 0; i < constraints_.Size(); ++i)
     {
             if (constraints_[i])
@@ -483,14 +483,14 @@ void RigidBody2D::OnNodeSet(Node* node)
     {
         node->AddListener(this);
         Scene* scene = GetScene();
-        physicsWorld_ = scene->GetComponent<PhysicsWorld2D>();
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
         if (physicsWorld_)
         {
             CreateBody();
             physicsWorld_->AddRigidBody(this);
         }
         else
-            LOGERROR("No physic world component in scene, can not create rigid body");
+            LOGERROR("No 2D physics world component in scene, can not create rigid body");
     }
 }
 
