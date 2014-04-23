@@ -36,6 +36,7 @@ class Input : public Object
 {
     void SetToggleFullscreen(bool enable);
     void SetMouseVisible(bool enable);
+    void SetMouseGrabbed(bool grab);
     int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     bool RemoveScreenJoystick(int id);
     void SetScreenJoystickVisible(int id, bool enable);
@@ -78,6 +79,7 @@ class Input : public Object
     bool IsScreenJoystickVisible(int id) const;
     bool IsScreenKeyboardVisible() const;
     bool IsMouseVisible() const;
+    bool IsMouseGrabbed() const;
     bool HasFocus();
     bool IsMinimized() const;
 
@@ -93,6 +95,7 @@ class Input : public Object
     tolua_readonly tolua_property__get_set bool screenKeyboardSupport;
     tolua_property__is_set bool screenKeyboardVisible;
     tolua_property__is_set bool mouseVisible;
+    tolua_property__is_set bool mouseGrabbed;
     tolua_readonly tolua_property__has_set bool focus;
     tolua_readonly tolua_property__is_set bool minimized;
 };

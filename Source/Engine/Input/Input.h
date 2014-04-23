@@ -78,7 +78,7 @@ struct JoystickState
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
     /// Return hat position.
     int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
-    
+
     /// SDL joystick.
     SDL_Joystick* joystick_;
     /// SDL joystick instance ID.
@@ -116,6 +116,8 @@ public:
     void SetToggleFullscreen(bool enable);
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
+    /// Set whether the mouse is currently being grabbed by an operation.
+    void SetMouseGrabbed(bool grab);
     /// Add screen joystick.
     /** Return the joystick instance ID when successful or negative on error.
      *  If layout file is not given, use the default screen joystick layout.
@@ -203,6 +205,8 @@ public:
     bool IsScreenKeyboardVisible() const;
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
+    /// Return whether the mouse is currently being grabbed by an operation.
+    bool IsMouseGrabbed() const { return mouseGrabbed_; }
     /// Return whether application window has input focus.
     bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
@@ -272,6 +276,8 @@ private:
     bool toggleFullscreen_;
     /// Operating system mouse cursor visible flag.
     bool mouseVisible_;
+    /// Flag to indicate the mouse is being grabbed by an operation. Subsystems like UI that uses mouse should temporarily ignore the mouse hover or click events.
+    bool mouseGrabbed_;
     /// Input focus flag.
     bool inputFocus_;
     /// Minimized flag.

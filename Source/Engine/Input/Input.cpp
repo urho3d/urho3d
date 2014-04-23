@@ -76,6 +76,7 @@ Input::Input(Context* context) :
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
+    mouseGrabbed_(false),
     inputFocus_(false),
     minimized_(false),
     focusedThisFrame_(false),
@@ -230,6 +231,11 @@ void Input::SetMouseVisible(bool enable)
         SendEvent(E_MOUSEVISIBLECHANGED, eventData);
     }
     #endif
+}
+
+void Input::SetMouseGrabbed(bool grab)
+{
+    mouseGrabbed_ = grab;
 }
 
 void Input::SetToggleFullscreen(bool enable)

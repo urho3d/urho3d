@@ -296,10 +296,6 @@ void UI::Update(float timeStep)
 
     PROFILE(UpdateUI);
 
-    IntVector2 cursorPos;
-    bool cursorVisible;
-    GetCursorPositionAndVisible(cursorPos, cursorVisible);
-
     // Expire hovers
     for (HashMap<WeakPtr<UIElement>, bool>::Iterator i = hoveredElements_.Begin(); i != hoveredElements_.End(); ++i)
         i->second_ = false;
@@ -322,11 +318,17 @@ void UI::Update(float timeStep)
     }
 
     // Mouse hover
-    if (!usingTouchInput_ && cursorVisible)
-        ProcessHover(cursorPos, mouseButtons_, qualifiers_, cursor_);
+    Input* input = GetSubsystem<Input>();
+    if (!input->IsMouseGrabbed())
+    {
+        IntVector2 cursorPos;
+        bool cursorVisible;
+        GetCursorPositionAndVisible(cursorPos, cursorVisible);
+        if (!usingTouchInput_ && cursorVisible)
+            ProcessHover(cursorPos, mouseButtons_, qualifiers_, cursor_);
+    }
 
     // Touch hover
-    Input* input = GetSubsystem<Input>();
     unsigned numTouches = input->GetNumTouches();
     for (unsigned i = 0; i < numTouches; ++i)
     {
@@ -1169,20 +1171,29 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    mouseButtons_ = eventData[MouseButtonDown::P_BUTTONS].GetInt();
-    qualifiers_ = eventData[MouseButtonDown::P_QUALIFIERS].GetInt();
+    Input* input = GetSubsystem<Input>();
+    if (input->IsMouseGrabbed())
+        return;
+
+    using namespace MouseButtonDown;
+
+    mouseButtons_ = eventData[P_BUTTONS].GetInt();
+    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     usingTouchInput_ = false;
 
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    ProcessClickBegin(cursorPos, eventData[MouseButtonDown::P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_,
-        cursorVisible);
+    ProcessClickBegin(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
+    Input* input = GetSubsystem<Input>();
+    if (input->IsMouseGrabbed())
+        return;
+
     using namespace MouseButtonUp;
 
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
@@ -1237,6 +1248,10 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
+    Input* input = GetSubsystem<Input>();
+    if (input->IsMouseGrabbed())
+        return;
+
     using namespace MouseWheel;
 
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
