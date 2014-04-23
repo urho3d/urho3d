@@ -22,14 +22,12 @@
 
 #include "Precompiled.h"
 #include "Context.h"
-#include "Deserializer.h"
 #include "FileSystem.h"
 #include "Font.h"
 #include "FontFace.h"
 #include "Graphics.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
-#include "Profiler.h"
 #include "ResourceCache.h"
 #include "Texture2D.h"
 #include "UI.h"
@@ -88,20 +86,12 @@ FontGlyph::FontGlyph() :
 
 FontFace::FontFace(Font* font) :
     font_(font),
-    face_(0),
-    hasKerning_(false),
-    bitmapSize_(0)
+    hasKerning_(false)
 {
 }
 
 FontFace::~FontFace()
 {
-    if (face_)
-    {
-        FT_Done_Face((FT_Face)face_);
-        face_ = 0;
-    }
-
     if (font_)
     {
         // When a face is unloaded, deduct the used texture data size from the parent font
@@ -110,10 +100,6 @@ FontFace::~FontFace()
             totalTextureSize += textures_[i]->GetWidth() * textures_[i]->GetHeight();
         font_->SetMemoryUse(font_->GetMemoryUse() - totalTextureSize);
     }
-
-    for (List<MutableGlyph*>::Iterator i = mutableGlyphs_.Begin(); i != mutableGlyphs_.End(); ++i)
-        delete *i;
-    mutableGlyphs_.Clear();
 }
 
 const FontGlyph* FontFace::GetGlyph(unsigned c)
@@ -122,18 +108,6 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
     if (i != glyphMapping_.End())
     {
         FontGlyph& glyph = glyphs_[i->second_];
-        // Render glyph if not yet resident in a page texture (FreeType mode only)
-        if (glyph.page_ == M_MAX_UNSIGNED)
-            RenderGlyph(i->second_);
-        // If mutable glyphs in use, move to the front of the list
-        if (mutableGlyphs_.Size() && glyph.iterator_ != mutableGlyphs_.End())
-        {
-            MutableGlyph* mutableGlyph = *glyph.iterator_;
-            mutableGlyphs_.Erase(glyph.iterator_);
-            mutableGlyphs_.PushFront(mutableGlyph);
-            glyph.iterator_ = mutableGlyphs_.Begin();
-        }
-
         glyph.used_ = true;
         return &glyph;
     }
@@ -179,157 +153,25 @@ bool FontFace::IsDataLost() const
     return false;
 }
 
-void FontFace::RenderGlyph(unsigned index)
-{
-    assert(font_ && face_);
-
-    FontGlyph& glyph = glyphs_[index];
-
-    // If glyph is empty, just set the current page
-    if (!glyph.width_ || !glyph.height_)
-    {
-        glyph.x_ = 0;
-        glyph.y_ = 0;
-        glyph.page_ = textures_.Size() - 1;
-        return;
-    }
-
-    int loadMode = font_->GetSubsystem<UI>()->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
-
-    if (!mutableGlyphs_.Size())
-    {
-        // Not using mutable glyphs: try to allocate from current page, reserve next page if fails
-        int x, y;
-        if (!allocator_.Allocate(glyph.width_ + 1, glyph.height_ + 1, x, y))
-        {
-            SetupNextTexture(textures_[0]->GetWidth(), textures_[0]->GetHeight());
-            // This always succeeds, as it is the first allocation of an empty page
-            allocator_.Allocate(glyph.width_ + 1, glyph.height_ + 1, x, y);
-        }
-
-        glyph.x_ = x;
-        glyph.y_ = y;
-        glyph.page_ = textures_.Size() - 1;
-
-        if (!bitmap_ || (int)bitmapSize_ < glyph.width_ * glyph.height_)
-        {
-            bitmapSize_ = glyph.width_ * glyph.height_;
-            bitmap_ = new unsigned char[bitmapSize_];
-        }
-
-        RenderGlyphBitmap(index, bitmap_.Get(), glyph.width_, loadMode);
-        textures_.Back()->SetData(0, glyph.x_, glyph.y_, glyph.width_, glyph.height_, bitmap_.Get());
-    }
-    else
-    {
-        // Using mutable glyphs: overwrite the least recently used glyph
-        List<MutableGlyph*>::Iterator it = --mutableGlyphs_.End();
-        MutableGlyph* mutableGlyph = *it;
-        if (mutableGlyph->glyphIndex_ != M_MAX_UNSIGNED)
-            glyphs_[mutableGlyph->glyphIndex_].page_ = M_MAX_UNSIGNED;
-        glyph.x_ = mutableGlyph->x_;
-        glyph.y_ = mutableGlyph->y_;
-        glyph.page_ = 0;
-        glyph.iterator_ = it;
-        mutableGlyph->glyphIndex_ = index;
-
-        if (!bitmap_)
-        {
-            bitmapSize_ = cellWidth_ * cellHeight_;
-            bitmap_ = new unsigned char[bitmapSize_];
-        }
-
-        // Clear the cell bitmap before rendering to ensure padding
-        memset(bitmap_.Get(), 0, cellWidth_ * cellHeight_);
-        RenderGlyphBitmap(index, bitmap_.Get(), cellWidth_, loadMode);
-        textures_[0]->SetData(0, glyph.x_, glyph.y_, cellWidth_, cellHeight_, bitmap_.Get());
-    }
-}
-
-void FontFace::RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch, int loadMode)
-{
-    const FontGlyph& glyph = glyphs_[index];
-    if (!glyph.width_ || !glyph.height_)
-        return;
-
-    FT_Face face = (FT_Face)face_;
-    FT_GlyphSlot slot = face->glyph;
-    FT_Load_Glyph(face, index, loadMode);
-    FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
-
-    if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
-    {
-        for (int y = 0; y < slot->bitmap.rows; ++y)
-        {
-            unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-            unsigned char* rowDest = dest + y * pitch;
-
-            for (int x = 0; x < slot->bitmap.width; ++x)
-                rowDest[x] = (src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0;
-        }
-    }
-    else
-    {
-        for (int y = 0; y < slot->bitmap.rows; ++y)
-        {
-            unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-            unsigned char* rowDest = dest + y * pitch;
-
-            for (int x = 0; x < slot->bitmap.width; ++x)
-                rowDest[x] = src[x];
-        }
-    }
-}
-
-void FontFace::SetupNextTexture(int width, int height)
-{
-    // If several dynamic textures are needed, use the maximum size to pack as many as possible to one texture
-    allocator_ = AreaAllocator(width, height);
-
-    SharedPtr<Texture2D> texture = font_->CreateFaceTexture();
-    texture->SetSize(width, height, Graphics::GetAlphaFormat());
-    SharedArrayPtr<unsigned char> emptyBitmap(new unsigned char[width * height]);
-    memset(emptyBitmap.Get(), 0, width * height);
-    texture->SetData(0, 0, 0, width, height, emptyBitmap.Get());
-
-    textures_.Push(texture);
-    font_->SetMemoryUse(font_->GetMemoryUse() + width * height);
-
-    LOGDEBUGF("Font face %s (%dpt) is using %d dynamic page textures of size %dx%d", GetFileName(font_->GetName()).CString(), pointSize_, textures_.Size(), width, height);
-}
-
-void FontFace::SetupMutableGlyphs(int textureWidth, int textureHeight, int maxWidth, int maxHeight)
-{
-    assert(mutableGlyphs_.Empty());
-
-    SetupNextTexture(textureWidth, textureHeight);
-
-    cellWidth_ = maxWidth + 1;
-    cellHeight_ = maxHeight + 1;
-
-    // Allocate as many mutable glyphs as possible
-    int x, y;
-    while (allocator_.Allocate(cellWidth_, cellHeight_, x, y))
-    {
-        MutableGlyph* glyph = new MutableGlyph();
-        glyph->x_ = x;
-        glyph->y_ = y;
-        mutableGlyphs_.Push(glyph);
-    }
-
-    LOGDEBUGF("Font face %s (%dpt) is using %d mutable glyphs", GetFileName(font_->GetName()).CString(), pointSize_, mutableGlyphs_.Size());
-}
-
-
 FontFaceFreeType::FontFaceFreeType(Font* font) :
-    FontFace(font)
+    FontFace(font),
+    face_(0),
+    bitmapSize_(0)
 {
 
 }
 
 FontFaceFreeType::~FontFaceFreeType()
 {
+    if (face_)
+    {
+        FT_Done_Face((FT_Face)face_);
+        face_ = 0;
+    }
 
+    for (List<MutableGlyph*>::Iterator i = mutableGlyphs_.Begin(); i != mutableGlyphs_.End(); ++i)
+        delete *i;
+    mutableGlyphs_.Clear();
 }
 
 bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
@@ -529,6 +371,31 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     return true;
 }
 
+const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
+{
+    HashMap<unsigned, unsigned>::ConstIterator i = glyphMapping_.Find(c);
+    if (i != glyphMapping_.End())
+    {
+        FontGlyph& glyph = glyphs_[i->second_];
+        // Render glyph if not yet resident in a page texture (FreeType mode only)
+        if (glyph.page_ == M_MAX_UNSIGNED)
+            RenderGlyph(i->second_);
+        // If mutable glyphs in use, move to the front of the list
+        if (mutableGlyphs_.Size() && glyph.iterator_ != mutableGlyphs_.End())
+        {
+            MutableGlyph* mutableGlyph = *glyph.iterator_;
+            mutableGlyphs_.Erase(glyph.iterator_);
+            mutableGlyphs_.PushFront(mutableGlyph);
+            glyph.iterator_ = mutableGlyphs_.Begin();
+        }
+
+        glyph.used_ = true;
+        return &glyph;
+    }
+    else
+        return 0;
+}
+
 bool FontFaceFreeType::RenderAllGlyphs(int maxWidth, int maxHeight)
 {
     assert(font_ && face_ && textures_.Empty());
@@ -589,6 +456,147 @@ bool FontFaceFreeType::RenderAllGlyphs(int maxWidth, int maxHeight)
 
     LOGDEBUGF("Font face %s (%dpt) uses a static page texture of size %dx%d", GetFileName(font_->GetName()).CString(), pointSize_, texture->GetWidth(), texture->GetHeight());
     return true;
+}
+
+void FontFaceFreeType::RenderGlyph(unsigned index)
+{
+    assert(font_ && face_);
+
+    FontGlyph& glyph = glyphs_[index];
+
+    // If glyph is empty, just set the current page
+    if (!glyph.width_ || !glyph.height_)
+    {
+        glyph.x_ = 0;
+        glyph.y_ = 0;
+        glyph.page_ = textures_.Size() - 1;
+        return;
+    }
+
+    int loadMode = font_->GetSubsystem<UI>()->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
+
+    if (!mutableGlyphs_.Size())
+    {
+        // Not using mutable glyphs: try to allocate from current page, reserve next page if fails
+        int x, y;
+        if (!allocator_.Allocate(glyph.width_ + 1, glyph.height_ + 1, x, y))
+        {
+            SetupNextTexture(textures_[0]->GetWidth(), textures_[0]->GetHeight());
+            // This always succeeds, as it is the first allocation of an empty page
+            allocator_.Allocate(glyph.width_ + 1, glyph.height_ + 1, x, y);
+        }
+
+        glyph.x_ = x;
+        glyph.y_ = y;
+        glyph.page_ = textures_.Size() - 1;
+
+        if (!bitmap_ || (int)bitmapSize_ < glyph.width_ * glyph.height_)
+        {
+            bitmapSize_ = glyph.width_ * glyph.height_;
+            bitmap_ = new unsigned char[bitmapSize_];
+        }
+
+        RenderGlyphBitmap(index, bitmap_.Get(), glyph.width_, loadMode);
+        textures_.Back()->SetData(0, glyph.x_, glyph.y_, glyph.width_, glyph.height_, bitmap_.Get());
+    }
+    else
+    {
+        // Using mutable glyphs: overwrite the least recently used glyph
+        List<MutableGlyph*>::Iterator it = --mutableGlyphs_.End();
+        MutableGlyph* mutableGlyph = *it;
+        if (mutableGlyph->glyphIndex_ != M_MAX_UNSIGNED)
+            glyphs_[mutableGlyph->glyphIndex_].page_ = M_MAX_UNSIGNED;
+        glyph.x_ = mutableGlyph->x_;
+        glyph.y_ = mutableGlyph->y_;
+        glyph.page_ = 0;
+        glyph.iterator_ = it;
+        mutableGlyph->glyphIndex_ = index;
+
+        if (!bitmap_)
+        {
+            bitmapSize_ = cellWidth_ * cellHeight_;
+            bitmap_ = new unsigned char[bitmapSize_];
+        }
+
+        // Clear the cell bitmap before rendering to ensure padding
+        memset(bitmap_.Get(), 0, cellWidth_ * cellHeight_);
+        RenderGlyphBitmap(index, bitmap_.Get(), cellWidth_, loadMode);
+        textures_[0]->SetData(0, glyph.x_, glyph.y_, cellWidth_, cellHeight_, bitmap_.Get());
+    }
+}
+
+void FontFaceFreeType::RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch, int loadMode)
+{
+    const FontGlyph& glyph = glyphs_[index];
+    if (!glyph.width_ || !glyph.height_)
+        return;
+
+    FT_Face face = (FT_Face)face_;
+    FT_GlyphSlot slot = face->glyph;
+    FT_Load_Glyph(face, index, loadMode);
+    FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
+
+    if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+    {
+        for (int y = 0; y < slot->bitmap.rows; ++y)
+        {
+            unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+            unsigned char* rowDest = dest + y * pitch;
+
+            for (int x = 0; x < slot->bitmap.width; ++x)
+                rowDest[x] = (src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0;
+        }
+    }
+    else
+    {
+        for (int y = 0; y < slot->bitmap.rows; ++y)
+        {
+            unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+            unsigned char* rowDest = dest + y * pitch;
+
+            for (int x = 0; x < slot->bitmap.width; ++x)
+                rowDest[x] = src[x];
+        }
+    }
+}
+
+void FontFaceFreeType::SetupNextTexture(int width, int height)
+{
+    // If several dynamic textures are needed, use the maximum size to pack as many as possible to one texture
+    allocator_ = AreaAllocator(width, height);
+
+    SharedPtr<Texture2D> texture = font_->CreateFaceTexture();
+    texture->SetSize(width, height, Graphics::GetAlphaFormat());
+    SharedArrayPtr<unsigned char> emptyBitmap(new unsigned char[width * height]);
+    memset(emptyBitmap.Get(), 0, width * height);
+    texture->SetData(0, 0, 0, width, height, emptyBitmap.Get());
+
+    textures_.Push(texture);
+    font_->SetMemoryUse(font_->GetMemoryUse() + width * height);
+
+    LOGDEBUGF("Font face %s (%dpt) is using %d dynamic page textures of size %dx%d", GetFileName(font_->GetName()).CString(), pointSize_, textures_.Size(), width, height);
+}
+
+void FontFaceFreeType::SetupMutableGlyphs(int textureWidth, int textureHeight, int maxWidth, int maxHeight)
+{
+    assert(mutableGlyphs_.Empty());
+
+    SetupNextTexture(textureWidth, textureHeight);
+
+    cellWidth_ = maxWidth + 1;
+    cellHeight_ = maxHeight + 1;
+
+    // Allocate as many mutable glyphs as possible
+    int x, y;
+    while (allocator_.Allocate(cellWidth_, cellHeight_, x, y))
+    {
+        MutableGlyph* glyph = new MutableGlyph();
+        glyph->x_ = x;
+        glyph->y_ = y;
+        mutableGlyphs_.Push(glyph);
+    }
+
+    LOGDEBUGF("Font face %s (%dpt) is using %d mutable glyphs", GetFileName(font_->GetName()).CString(), pointSize_, mutableGlyphs_.Size());
 }
 
 FontFaceBitMap::FontFaceBitMap(Font* font) :
