@@ -78,14 +78,6 @@ private:
     FontFace* GetFaceFreeType(int pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
     FontFace* GetFaceBitmap(int pointSize);
-    /// Convert graphics format to number of components.
-    unsigned ConvertFormatToNumComponents(unsigned format);
-    /// Pack used glyphs into smallest texture size and smallest number of texture.
-    SharedPtr<FontFace> Pack(FontFace* fontFace);
-    /// Save font face texture as image resource.
-    SharedPtr<Image> SaveFaceTexture(Texture2D* texture);
-    /// Save font face texture as image file.
-    bool SaveFaceTexture(Texture2D* texture, const String& fileName);
     
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;

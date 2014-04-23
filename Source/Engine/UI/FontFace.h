@@ -106,6 +106,12 @@ public:
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
     
 protected:
+    friend class FontFaceBitMap;
+    /// Create a texture for font rendering.
+    SharedPtr<Texture2D> CreateFaceTexture();
+    /// Load font face texture from image resource.
+    SharedPtr<Texture2D> LoadFaceTexture(SharedPtr<Image> image);
+
     /// Parent font.
     Font* font_;
     /// Glyphs.
@@ -179,6 +185,18 @@ public:
 
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    /// Load from existed font face, pack used glyphs into smallest texture size and smallest number of texture.
+    bool Load(FontFace* fontFace, bool usedGlyphs);
+    /// Save as a new bitmap font type in XML format. Return true if successful.
+    bool Save(Serializer& dest, int pontSize);
+
+private:
+    /// Convert graphics format to number of components.
+    unsigned ConvertFormatToNumComponents(unsigned format);
+    /// Save font face texture as image resource.
+    SharedPtr<Image> SaveFaceTexture(Texture2D* texture);
+    /// Save font face texture as image file.
+    bool SaveFaceTexture(Texture2D* texture, const String& fileName);
 };
 
 }
