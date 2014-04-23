@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 class Font;
-// class FreeTypeLibrary;
+class FreeTypeLibrary;
 // class Graphics;
 // class Image;
 class Texture2D;
@@ -90,8 +90,10 @@ public:
     /// Destruct.
     ~FontFace();
     
+    /// Load font face.
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    const FontGlyph* GetGlyph(unsigned c);
+    virtual const FontGlyph* GetGlyph(unsigned c);
     /// Return the kerning for a character and the next character.
     short GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
@@ -105,9 +107,7 @@ public:
     /// Return if font face uses mutable glyphs.
     bool HasMutableGlyphs() const { return !mutableGlyphs_.Empty(); }
     
-private:
-    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called by Font.
-    bool RenderAllGlyphs(int maxWidth, int maxHeight);
+protected:
     /// Render one glyph on demand into the current texture.
     void RenderGlyph(unsigned index);
     /// Render a glyph bitmap into a memory buffer.
@@ -145,6 +145,38 @@ private:
     SharedArrayPtr<unsigned char> bitmap_;
     /// Glyph rendering bitmap byte size.
     unsigned bitmapSize_;
+};
+
+/// Free type font face description.
+class URHO3D_API FontFaceFreeType : public FontFace
+{
+public:
+    /// Construct.
+    FontFaceFreeType(Font* font);
+    /// Destruct.
+    ~FontFaceFreeType();
+
+    /// Load font face.
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+
+private:
+    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called by Font.
+    bool RenderAllGlyphs(int maxWidth, int maxHeight);
+    /// FreeType library.
+    SharedPtr<FreeTypeLibrary> freeType_;
+};
+
+/// Bitmap font face description.
+class URHO3D_API FontFaceBitMap : public FontFace
+{
+public:
+    /// Construct.
+    FontFaceBitMap(Font* font);
+    /// Destruct.
+    ~FontFaceBitMap();
+
+    /// Load font face.
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
 };
 
 }

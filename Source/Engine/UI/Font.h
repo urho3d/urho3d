@@ -29,7 +29,6 @@ namespace Urho3D
 {
 
 class FontFace;
-class FreeTypeLibrary;
 // class Graphics;
 class Image;
 class Texture2D;
@@ -49,8 +48,10 @@ enum FONT_TYPE
 /// %Font resource.
 class URHO3D_API Font : public Resource
 {
+    friend class FontFaceFreeType;
+    friend class FontFaceBitmap;
     OBJECT(Font);
-    
+
 public:
     /// Construct.
     Font(Context* context);
@@ -86,8 +87,6 @@ private:
     /// Save font face texture as image file.
     bool SaveFaceTexture(Texture2D* texture, const String& fileName);
     
-    /// FreeType library.
-    SharedPtr<FreeTypeLibrary> freeType_;
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;
     /// Font data.
