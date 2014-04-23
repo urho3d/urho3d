@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Font.h"
+#include "FontFace.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
