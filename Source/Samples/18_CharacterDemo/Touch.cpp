@@ -26,7 +26,6 @@
 #include "Input.h"
 #include "Renderer.h"
 #include "Touch.h"
-#include "UIElement.h"
 
 const float TOUCH_SENSITIVITY = 5.0f;
 const float GYROSCOPE_THRESHOLD = 0.1f;

@@ -58,7 +58,7 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0), controller_(0)
+        joystick_(0), controller_(0), screenJoystick_(0)
     {
     }
 
@@ -86,7 +86,7 @@ struct JoystickState
     /// SDL game controller.
     SDL_GameController* controller_;
     /// UI element containing the screen joystick.
-    SharedPtr<UIElement> screenJoystick_;
+    UIElement* screenJoystick_;
     /// Joystick name.
     String name_;
     /// Button up/down state.
