@@ -29,7 +29,6 @@ namespace Urho3D
 {
 
 class FontFace;
-// class Graphics;
 class Image;
 class Texture2D;
 
@@ -68,10 +67,6 @@ public:
     
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
-    /// Create a texture for font rendering.
-    SharedPtr<Texture2D> CreateFaceTexture();
-    /// Load font face texture from image resource.
-    SharedPtr<Texture2D> LoadFaceTexture(SharedPtr<Image> image);
     
 private:
     /// Return font face using FreeTyp. Called internally. Return null on error.

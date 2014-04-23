@@ -30,7 +30,6 @@ namespace Urho3D
 {
 
 class Font;
-class FreeTypeLibrary;
 class Texture2D;
 
 /// Mutable font glyph description.
@@ -126,77 +125,6 @@ protected:
     int rowHeight_;
     /// Kerning flag.
     bool hasKerning_;
-};
-
-/// Free type font face description.
-class URHO3D_API FontFaceFreeType : public FontFace
-{
-public:
-    /// Construct.
-    FontFaceFreeType(Font* font);
-    /// Destruct.
-    ~FontFaceFreeType();
-
-    /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
-    /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    virtual const FontGlyph* GetGlyph(unsigned c);
-    /// Return if font face uses mutable glyphs.
-    virtual bool HasMutableGlyphs() const { return !mutableGlyphs_.Empty(); }
-
-private:
-    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called by Font.
-    bool RenderAllGlyphs(int maxWidth, int maxHeight);
-    /// Render one glyph on demand into the current texture.
-    void RenderGlyph(unsigned index);
-    /// Render a glyph bitmap into a memory buffer.
-    void RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch, int loadMode);
-    /// Setup next texture for dynamic glyph rendering.
-    void SetupNextTexture(int width, int height);
-    /// Setup mutable glyph rendering, in which glyphs form a regular-sized grid.
-    void SetupMutableGlyphs(int textureWidth, int textureHeight, int maxGlyphWidth, int maxGlyphHeight);
-
-    /// FreeType library.
-    SharedPtr<FreeTypeLibrary> freeType_;
-    /// FreeType face. Non-null after creation only in dynamic mode.
-    void* face_;
-    /// Mutable glyph list.
-    List<MutableGlyph*> mutableGlyphs_;
-    /// Mutable glyph cell width, including 1 pixel padding.
-    int cellWidth_;
-    /// Mutable glyph cell height, including 1 pixel padding.
-    int cellHeight_;
-    /// Glyph area allocator.
-    AreaAllocator allocator_;
-    /// Glyph rendering bitmap in dynamic mode.
-    SharedArrayPtr<unsigned char> bitmap_;
-    /// Glyph rendering bitmap byte size.
-    unsigned bitmapSize_;
-};
-
-/// Bitmap font face description.
-class URHO3D_API FontFaceBitMap : public FontFace
-{
-public:
-    /// Construct.
-    FontFaceBitMap(Font* font);
-    /// Destruct.
-    ~FontFaceBitMap();
-
-    /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
-    /// Load from existed font face, pack used glyphs into smallest texture size and smallest number of texture.
-    bool Load(FontFace* fontFace, bool usedGlyphs);
-    /// Save as a new bitmap font type in XML format. Return true if successful.
-    bool Save(Serializer& dest, int pontSize);
-
-private:
-    /// Convert graphics format to number of components.
-    unsigned ConvertFormatToNumComponents(unsigned format);
-    /// Save font face texture as image resource.
-    SharedPtr<Image> SaveFaceTexture(Texture2D* texture);
-    /// Save font face texture as image file.
-    bool SaveFaceTexture(Texture2D* texture, const String& fileName);
 };
 
 }

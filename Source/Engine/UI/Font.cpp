@@ -25,19 +25,15 @@
 #include "Deserializer.h"
 #include "FileSystem.h"
 #include "Font.h"
-#include "FontFace.h"
+#include "FontFaceBitMap.h"
+#include "FontFaceFreeType.h"
 #include "Graphics.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
-#include "Texture2D.h"
-#include "UI.h"
-#include "XMLFile.h"
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_TRUETYPE_TABLES_H
+// #include "Texture2D.h"
+// #include "UI.h"
 
 #include "DebugNew.h"
 
@@ -159,28 +155,6 @@ FontFace* Font::GetFace(int pointSize)
 void Font::ReleaseFaces()
 {
     faces_.Clear();
-}
-
-SharedPtr<Texture2D> Font::CreateFaceTexture()
-{
-    SharedPtr<Texture2D> texture(new Texture2D(context_));
-    texture->SetMipsToSkip(QUALITY_LOW, 0); // No quality reduction
-    texture->SetNumLevels(1); // No mipmaps
-    texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
-    texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
-    texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
-    return texture;
-}
-
-SharedPtr<Texture2D> Font::LoadFaceTexture(SharedPtr<Image> image)
-{
-    SharedPtr<Texture2D> texture = CreateFaceTexture();
-    if (!texture->Load(image, true))
-    {
-        LOGERROR("Could not load texture from image resource");
-        return SharedPtr<Texture2D>();
-    }
-    return texture;
 }
 
 FontFace* Font::GetFaceFreeType(int pointSize)
