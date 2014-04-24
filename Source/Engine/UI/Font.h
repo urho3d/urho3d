@@ -45,8 +45,6 @@ enum FONT_TYPE
 /// %Font resource.
 class URHO3D_API Font : public Resource
 {
-    friend class FontFaceFreeType;
-    friend class FontFaceBitmap;
     OBJECT(Font);
 
 public:
