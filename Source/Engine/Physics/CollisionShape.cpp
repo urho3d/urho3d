@@ -817,10 +817,7 @@ void CollisionShape::OnNodeSet(Node* node)
                 LOGWARNING(GetTypeName() + " should not be created to the root scene node");
 
             physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            if (physicsWorld_)
-                physicsWorld_->AddCollisionShape(this);
-            else
-                LOGERROR("No physics world component in scene, can not create collision shape");
+            physicsWorld_->AddCollisionShape(this);
         }
         else
             LOGERROR("Node is detached from scene, can not create collision shape");

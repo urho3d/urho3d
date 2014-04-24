@@ -449,10 +449,7 @@ void Constraint::OnNodeSet(Node* node)
                 LOGWARNING(GetTypeName() + " should not be created to the root scene node");
 
             physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            if (physicsWorld_)
-                physicsWorld_->AddConstraint(this);
-            else
-                LOGERROR("No physics world component in scene, can not create constraint");
+            physicsWorld_->AddConstraint(this);
         }
         else
             LOGERROR("Node is detached from scene, can not create constraint");

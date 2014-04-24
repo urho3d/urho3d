@@ -484,13 +484,9 @@ void RigidBody2D::OnNodeSet(Node* node)
         node->AddListener(this);
         Scene* scene = GetScene();
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
-        if (physicsWorld_)
-        {
-            CreateBody();
-            physicsWorld_->AddRigidBody(this);
-        }
-        else
-            LOGERROR("No 2D physics world component in scene, can not create rigid body");
+        
+        CreateBody();
+        physicsWorld_->AddRigidBody(this);
     }
 }
 
