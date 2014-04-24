@@ -4269,6 +4269,7 @@ bool minimized;
 Array<bool> mouseButtonDown;
 /* readonly */
 Array<bool> mouseButtonPress;
+bool mouseGrabbed;
 /* readonly */
 IntVector2 mouseMove;
 /* readonly */

@@ -2020,6 +2020,7 @@ Methods:
 
 - void SetToggleFullscreen(bool enable)
 - void SetMouseVisible(bool enable)
+- void SetMouseGrabbed(bool grab)
 - int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - bool RemoveScreenJoystick(int id)
 - void SetScreenJoystickVisible(int id, bool enable)
@@ -2061,6 +2062,7 @@ Methods:
 - bool IsScreenJoystickVisible(int id) const
 - bool IsScreenKeyboardVisible() const
 - bool IsMouseVisible() const
+- bool IsMouseGrabbed() const
 - bool HasFocus()
 - bool IsMinimized() const
 
@@ -2078,6 +2080,7 @@ Properties:
 - bool screenKeyboardSupport (readonly)
 - bool screenKeyboardVisible
 - bool mouseVisible
+- bool mouseGrabbed
 - bool focus (readonly)
 - bool minimized (readonly)
 

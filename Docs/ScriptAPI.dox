@@ -5554,6 +5554,7 @@ Properties:
 - bool minimized // readonly
 - bool[] mouseButtonDown // readonly
 - bool[] mouseButtonPress // readonly
+- bool mouseGrabbed
 - IntVector2 mouseMove // readonly
 - int mouseMoveWheel // readonly
 - int mouseMoveX // readonly
