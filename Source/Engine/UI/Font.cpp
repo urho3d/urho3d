@@ -25,7 +25,7 @@
 #include "Deserializer.h"
 #include "FileSystem.h"
 #include "Font.h"
-#include "FontFaceBitMap.h"
+#include "FontFaceBitmap.h"
 #include "FontFaceFreeType.h"
 #include "Graphics.h"
 #include "Profiler.h"
@@ -100,7 +100,7 @@ bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs)
 
     PROFILE(FontSaveXML);
 
-    SharedPtr<FontFaceBitMap> packedFontFace(new FontFaceBitMap(this));
+    SharedPtr<FontFaceBitmap> packedFontFace(new FontFaceBitmap(this));
     if (!packedFontFace->Load(fontFace, usedGlyphs))
         return false;
 
@@ -164,10 +164,10 @@ FontFace* Font::GetFaceFreeType(int pointSize)
 
 FontFace* Font::GetFaceBitmap(int pointSize)
 {
-    SharedPtr<FontFace> newFace(new FontFaceBitMap(this));
+    SharedPtr<FontFace> newFace(new FontFaceBitmap(this));
     if (!newFace->Load(&fontData_[0], fontDataSize_, pointSize))
         return 0;
-    
+
     faces_[pointSize] = newFace;
     return newFace;
 }

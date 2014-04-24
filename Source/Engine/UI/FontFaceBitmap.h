@@ -31,13 +31,13 @@ class Image;
 class Serializer;
 
 /// Bitmap font face description.
-class URHO3D_API FontFaceBitMap : public FontFace
+class URHO3D_API FontFaceBitmap : public FontFace
 {
 public:
     /// Construct.
-    FontFaceBitMap(Font* font);
+    FontFaceBitmap(Font* font);
     /// Destruct.
-    ~FontFaceBitMap();
+    ~FontFaceBitmap();
 
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);

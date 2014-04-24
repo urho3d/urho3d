@@ -25,7 +25,7 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Font.h"
-#include "FontFaceBitMap.h"
+#include "FontFaceBitmap.h"
 #include "Graphics.h"
 #include "Image.h"
 #include "Log.h"
@@ -40,16 +40,16 @@
 namespace Urho3D
 {
 
-FontFaceBitMap::FontFaceBitMap(Font* font) :
+FontFaceBitmap::FontFaceBitmap(Font* font) :
     FontFace(font)
 {
 }
 
-FontFaceBitMap::~FontFaceBitMap()
+FontFaceBitmap::~FontFaceBitmap()
 {
 }
 
-bool FontFaceBitMap::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
+bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
 {
     Context* context = font_->GetContext();
 
@@ -170,7 +170,7 @@ bool FontFaceBitMap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     return true;
 }
 
-bool FontFaceBitMap::Load(FontFace* fontFace, bool usedGlyphs)
+bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
 {
     Context* context = font_->GetContext();
     int maxTextureSize = font_->GetSubsystem<UI>()->GetMaxFontTextureSize();
@@ -276,7 +276,7 @@ bool FontFaceBitMap::Load(FontFace* fontFace, bool usedGlyphs)
     return true;
 }
 
-bool FontFaceBitMap::Save(Serializer& dest, int pointSize)
+bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
 {
     Context* context = font_->GetContext();
 
@@ -361,7 +361,7 @@ bool FontFaceBitMap::Save(Serializer& dest, int pointSize)
     return xml->Save(dest);
 }
 
-unsigned FontFaceBitMap::ConvertFormatToNumComponents(unsigned format)
+unsigned FontFaceBitmap::ConvertFormatToNumComponents(unsigned format)
 {
     if (format == Graphics::GetRGBAFormat())
         return 4;
@@ -374,7 +374,7 @@ unsigned FontFaceBitMap::ConvertFormatToNumComponents(unsigned format)
 }
 
 
-SharedPtr<Image> FontFaceBitMap::SaveFaceTexture(Texture2D* texture)
+SharedPtr<Image> FontFaceBitmap::SaveFaceTexture(Texture2D* texture)
 {
     Image* image = new Image(font_->GetContext());
     image->SetSize(texture->GetWidth(), texture->GetHeight(), ConvertFormatToNumComponents(texture->GetFormat()));
@@ -387,7 +387,7 @@ SharedPtr<Image> FontFaceBitMap::SaveFaceTexture(Texture2D* texture)
     return SharedPtr<Image>(image);
 }
 
-bool FontFaceBitMap::SaveFaceTexture(Texture2D* texture, const String& fileName)
+bool FontFaceBitmap::SaveFaceTexture(Texture2D* texture, const String& fileName)
 {
     SharedPtr<Image> image = SaveFaceTexture(texture);
     return image ? image->SavePNG(fileName) : false;

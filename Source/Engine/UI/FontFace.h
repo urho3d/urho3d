@@ -106,7 +106,7 @@ public:
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
     
 protected:
-    friend class FontFaceBitMap;
+    friend class FontFaceBitmap;
     /// Create a texture for font rendering.
     SharedPtr<Texture2D> CreateFaceTexture();
     /// Load font face texture from image resource.
