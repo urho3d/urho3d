@@ -301,6 +301,7 @@ Methods:
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
 - void SetFaceCamera(bool enable)
+- void SetFaceCameraAxes(const Vector3& axes)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -310,6 +311,7 @@ Methods:
 - bool IsScaled() const
 - bool IsSorted() const
 - bool GetFaceCamera() const
+- const Vector3& GetFaceCameraAxes() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -320,6 +322,7 @@ Properties:
 - bool scaled
 - bool sorted
 - bool faceCamera
+- Vector3& faceCameraAxes
 - float animationLodBias
 
 ### Bone
@@ -4920,6 +4923,7 @@ Methods:
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
 - void SetFaceCamera(bool enable)
+- void SetFaceCameraAxes(const Vector3& axes)
 - Font* GetFont() const
 - Material* GetMaterial() const
 - int GetFontSize() const
@@ -4942,6 +4946,7 @@ Methods:
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool GetFaceCamera() const
+- const Vector3& GetFaceCameraAxes() const
 
 Properties:
 
@@ -4964,6 +4969,7 @@ Properties:
 - unsigned numChars (readonly)
 - float opacity
 - bool faceCamera
+- Vector3& faceCameraAxes
 
 ### Texture : Resource
 

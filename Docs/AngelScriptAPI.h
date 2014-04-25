@@ -590,6 +590,7 @@ bool enabled;
 /* readonly */
 bool enabledEffective;
 bool faceCamera;
+Vector3 faceCameraAxes;
 /* readonly */
 uint id;
 /* readonly */
@@ -6100,6 +6101,8 @@ bool emitting;
 bool enabled;
 /* readonly */
 bool enabledEffective;
+bool faceCamera;
+Vector3 faceCameraAxes;
 /* readonly */
 uint id;
 /* readonly */
@@ -9414,6 +9417,7 @@ bool enabled;
 /* readonly */
 bool enabledEffective;
 bool faceCamera;
+Vector3 faceCameraAxes;
 /* readonly */
 Font font;
 /* readonly */

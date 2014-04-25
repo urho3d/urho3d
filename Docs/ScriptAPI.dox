@@ -667,9 +667,10 @@ namespace Urho3D
 - %Relative %Position : bool
 - %Relative %Scale : bool
 - %Sort %By %Distance : bool
-- %Face %Camera : bool
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
+- %Face %Camera : bool
+- %Face %Camera %Axes : Vector3
 - %Draw %Distance : float
 - %Shadow %Distance : float
 - %Animation %LOD %Bias : float
@@ -1338,6 +1339,7 @@ namespace Urho3D
 - %Relative %Scale : bool
 - %Sort %By %Distance : bool
 - %Face %Camera : bool
+- %Face %Camera %Axes : Vector3
 - %Time %To %Live %Min : float
 - %Time %To %Live %Max : float
 - %Particle %Size %Min : Vector2
@@ -1778,6 +1780,7 @@ namespace Urho3D
 - %Word %Wrap : bool
 - %Can %Be %Occluded : bool
 - %Face %Camera : bool
+- %Face %Camera %Axes : Vector3
 - %Draw %Distance : float
 - %Width : int
 - %Horiz %Alignment : int
@@ -2471,6 +2474,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - bool faceCamera
+- Vector3 faceCameraAxes
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -7105,6 +7109,8 @@ Properties:
 - bool emitting
 - bool enabled
 - bool enabledEffective // readonly
+- bool faceCamera
+- Vector3 faceCameraAxes
 - uint id // readonly
 - bool inView // readonly
 - float inactiveTime
@@ -9939,6 +9945,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - bool faceCamera
+- Vector3 faceCameraAxes
 - Font@ font // readonly
 - int fontSize // readonly
 - HorizontalAlignment horizontalAlignment
