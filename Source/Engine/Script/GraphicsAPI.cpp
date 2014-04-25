@@ -1012,6 +1012,8 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "bool get_scaled() const", asMETHOD(BillboardSet, IsScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_faceCamera(bool)", asMETHOD(BillboardSet, SetFaceCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "bool get_faceCamera() const", asMETHOD(BillboardSet, GetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraAxes(const Vector3&)", asMETHOD(BillboardSet, SetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const Vector3& get_faceCameraAxes() const", asMETHOD(BillboardSet, GetFaceCameraAxes), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHOD(BillboardSet, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHOD(BillboardSet, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHOD(BillboardSet, GetBillboard), asCALL_THISCALL);
@@ -1054,6 +1056,10 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_sorted() const", asMETHOD(ParticleEmitter, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_scaled(bool)", asMETHOD(ParticleEmitter, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCamera(bool)", asMETHOD(ParticleEmitter, SetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool get_faceCamera() const", asMETHOD(ParticleEmitter, GetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCameraAxes(const Vector3&)", asMETHOD(ParticleEmitter, SetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_faceCameraAxes() const", asMETHOD(ParticleEmitter, GetFaceCameraAxes), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_updateInvisible(bool)", asMETHOD(ParticleEmitter, SetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_updateInvisible() const", asMETHOD(ParticleEmitter, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);
