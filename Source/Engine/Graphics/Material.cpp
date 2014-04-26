@@ -124,21 +124,15 @@ TechniqueEntry::~TechniqueEntry()
 {
 }
 
-ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    ValueAnimationInfo(attributeAnimation, wrapMode, speed),
-    material_(material),
-    name_(name),
-    currentTime_(0.0f),
-    lastScaledTime_(0.0f)
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* target, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
+    ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
+    name_(name)
 {
 }
 
 ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other) :
     ValueAnimationInfo(other),
-    material_(other.material_),
-    name_(other.name_),
-    currentTime_(0.0f),
-    lastScaledTime_(0.0f)
+    name_(other.name_)
 {
 }
 
@@ -146,35 +140,9 @@ ShaderParameterAnimationInfo::~ShaderParameterAnimationInfo()
 {
 }
 
-bool ShaderParameterAnimationInfo::Update(float timeStep)
+void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 {
-    if (!animation_)
-        return true;
-
-    currentTime_ += timeStep * speed_;
-
-    if (!animation_->IsValid())
-        return true;
-
-    bool finished = false;
-
-    // Calculate scale time by wrap mode
-    float scaledTime = CalculateScaledTime(currentTime_, finished);
-
-    material_->SetShaderParameter(name_, animation_->GetAnimationValue(scaledTime));
-
-    if (animation_->HasEventFrames())
-    {
-        PODVector<const VAnimEventFrame*> eventFrames;
-        GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-
-        for (unsigned i = 0; i < eventFrames.Size(); ++i)
-            material_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
-    }
-
-    lastScaledTime_ = scaledTime;
-
-    return finished;
+    static_cast<Material*>(target_.Get())->SetShaderParameter(name_, newValue);
 }
 
 Material::Material(Context* context) :

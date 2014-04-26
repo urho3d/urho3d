@@ -36,21 +36,15 @@ namespace Urho3D
 
 extern const char* wrapModeNames[];
 
-AttributeAnimationInfo::AttributeAnimationInfo(Animatable* animatable, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    ValueAnimationInfo(attributeAnimation, wrapMode, speed),
-    animatable_(animatable),
-    attributeInfo_(attributeInfo),
-    currentTime_(0.0f),
-    lastScaledTime_(0.0f)
+AttributeAnimationInfo::AttributeAnimationInfo(Animatable* target, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
+    ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
+    attributeInfo_(attributeInfo)
 {
 }
 
 AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& other) :
     ValueAnimationInfo(other),
-    animatable_(other.animatable_),
-    attributeInfo_(other.attributeInfo_),
-    currentTime_(0.0f),
-    lastScaledTime_(0.0f)
+    attributeInfo_(other.attributeInfo_)
 {
 }
 
@@ -58,34 +52,9 @@ AttributeAnimationInfo::~AttributeAnimationInfo()
 {
 }
 
-bool AttributeAnimationInfo::Update(float timeStep)
+void AttributeAnimationInfo::ApplyValue(const Variant& newValue)
 {
-    if (!animation_)
-        return true;
-
-    currentTime_ += timeStep * speed_;
-
-    if (!animation_->IsValid())
-        return true;
-
-    bool finished = false;
-    // Calculate scale time by wrap mode
-    float scaledTime = CalculateScaledTime(currentTime_, finished);
-
-    animatable_->OnSetAttribute(attributeInfo_, animation_->GetAnimationValue(scaledTime));
-
-    if (animation_->HasEventFrames())
-    {
-        PODVector<const VAnimEventFrame*> eventFrames;
-        GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-
-        for (unsigned i = 0; i < eventFrames.Size(); ++i)
-            animatable_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
-    }
-
-    lastScaledTime_ = scaledTime;
-
-    return finished;
+    static_cast<Animatable*>(target_.Get())->OnSetAttribute(attributeInfo_, newValue);
 }
 
 Animatable::Animatable(Context* context) :

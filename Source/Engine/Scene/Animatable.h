@@ -34,7 +34,7 @@ class ValueAnimation;
 class AttributeAnimationInfo;
 class ObjectAnimation;
 
-/// Attribute animation instance, it include animation runtime information, when animation playing it will update the object's attribute value automatically.
+/// Attribute animation instance.
 class AttributeAnimationInfo : public ValueAnimationInfo
 {
 public:
@@ -45,23 +45,16 @@ public:
     /// Destruct.
     ~AttributeAnimationInfo();
 
-    /// Update. Return true when the animation is finished.
-    bool Update(float timeStep);
-
-    /// Return animatable.
-    Animatable* GetAnimatable() const { return animatable_; }
     /// Return attribute infomation.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
 
+protected:
+    /// Apply new animation value to the target object. Called by Update().
+    virtual void ApplyValue(const Variant& newValue);
+
 private:
-    /// Animatable.
-    WeakPtr<Animatable> animatable_;
     /// Attribute information.
     const AttributeInfo& attributeInfo_;
-    /// Current time.
-    float currentTime_;
-    /// Last scaled time.
-    float lastScaledTime_;
 };
 
 /// Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.

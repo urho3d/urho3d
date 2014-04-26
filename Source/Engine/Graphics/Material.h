@@ -66,7 +66,7 @@ struct TechniqueEntry
     float lodDistance_;
 };
 
-/// Material shader parameter animation info.
+/// Material's shader parameter animation instance.
 class ShaderParameterAnimationInfo : public ValueAnimationInfo
 {
 public:
@@ -77,23 +77,16 @@ public:
     /// Destruct.
     ~ShaderParameterAnimationInfo();
 
-    /// Update. Return true when the animation is finished.
-    bool Update(float timeStep);
-
-    /// Return material.
-    Material* GetMaterial() const { return material_; }
     /// Return shader parameter name.
     const String& GetName() const { return name_; }
 
+protected:
+    /// Apply new animation value to the target object. Called by Update().
+    virtual void ApplyValue(const Variant& newValue);
+    
 private:
-    /// Material.
-    WeakPtr<Material> material_;
     /// Shader parameter name.
     String name_;
-    /// Current time.
-    float currentTime_;
-    /// Last scaled time.
-    float lastScaledTime_;
 };
 
 /// Describes how to render 3D geometries.

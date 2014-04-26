@@ -33,20 +33,74 @@ namespace Urho3D
 ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) :
     animation_(animation),
     wrapMode_(wrapMode),
-    speed_(speed)
+    speed_(speed),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
+{
+    speed_ = Max(0.0f, speed_);
+}
+
+ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) :
+    target_(target),
+    animation_(animation),
+    wrapMode_(wrapMode),
+    speed_(speed),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
 {
     speed_ = Max(0.0f, speed_);
 }
 
 ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) :
+    target_(other.target_),
     animation_(other.animation_),
     wrapMode_(other.wrapMode_),
-    speed_(other.speed_)
+    speed_(other.speed_),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
 {
 }
 
 ValueAnimationInfo::~ValueAnimationInfo()
 {
+}
+
+bool ValueAnimationInfo::Update(float timeStep)
+{
+    if (!animation_ || !target_)
+        return true;
+
+    currentTime_ += timeStep * speed_;
+
+    if (!animation_->IsValid())
+        return true;
+
+    bool finished = false;
+
+    // Calculate scale time by wrap mode
+    float scaledTime = CalculateScaledTime(currentTime_, finished);
+
+    // Apply to the target object
+    ApplyValue(animation_->GetAnimationValue(scaledTime));
+
+    // Send keyframe event if necessary
+    if (animation_->HasEventFrames())
+    {
+        PODVector<const VAnimEventFrame*> eventFrames;
+        GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
+
+        for (unsigned i = 0; i < eventFrames.Size(); ++i)
+            target_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
+    }
+
+    lastScaledTime_ = scaledTime;
+
+    return finished;
+}
+
+Object* ValueAnimationInfo::GetTarget() const
+{
+    return target_;
 }
 
 float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
