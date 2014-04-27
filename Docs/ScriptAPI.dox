@@ -1995,6 +1995,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -2549,6 +2550,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -2732,6 +2734,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -2973,6 +2976,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -4423,6 +4427,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -4995,6 +5000,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
@@ -5864,6 +5870,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -6030,6 +6037,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
@@ -6367,6 +6375,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -6778,6 +6787,7 @@ Methods:
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD)
+- void MarkNetworkUpdate() const
 - void Pitch(float, TransformSpace = TS_LOCAL)
 - void Remove()
 - void RemoveAllChildren()
@@ -7975,6 +7985,7 @@ Methods:
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD)
+- void MarkNetworkUpdate() const
 - void Pitch(float, TransformSpace = TS_LOCAL)
 - void RegisterVar(const String&)
 - void Remove()
@@ -8210,6 +8221,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -8357,6 +8369,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -8480,6 +8493,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -8664,6 +8678,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -9163,6 +9178,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -9771,6 +9787,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -10214,6 +10231,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -10408,6 +10426,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
@@ -10773,6 +10792,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void QueueUpdate()
 - void Remove()
 - void RemoveAllChildren()
@@ -10961,6 +10981,7 @@ Methods:
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveChild(UIElement@, uint = 0)
