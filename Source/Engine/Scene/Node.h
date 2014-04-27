@@ -56,9 +56,9 @@ class URHO3D_API Node : public Animatable
 {
     OBJECT(Node);
     BASEOBJECT(Node);
-    
+
     friend class Connection;
-    
+
 public:
     /// Construct.
     Node(Context* context);
@@ -67,8 +67,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
@@ -81,9 +79,11 @@ public:
     virtual void ApplyAttributes();
     /// Return whether should save default-valued attributes into XML. Always save node transforms for readability, even if identity.
     virtual bool SaveDefaultAttributes() const { return true; }
+    /// Mark for attribute check on the next network update.
+    virtual void MarkNetworkUpdate();
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
-    
+
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest) const;
     /// Set name of the scene node. Names are not required to be unique.
@@ -222,7 +222,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldTransform_.Translation();
     }
 
@@ -231,7 +231,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldRotation_;
     }
 
@@ -240,7 +240,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldRotation_ * Vector3::FORWARD;
     }
 
@@ -249,7 +249,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldRotation_ * Vector3::UP;
     }
 
@@ -258,7 +258,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldRotation_ * Vector3::RIGHT;
     }
 
@@ -267,7 +267,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldTransform_.Scale();
     }
 
@@ -276,7 +276,7 @@ public:
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldTransform_;
     }
 
@@ -365,8 +365,6 @@ public:
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
     void CleanupConnection(Connection* connection);
-    /// Mark for attribute check on the next network update.
-    void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
@@ -377,13 +375,15 @@ public:
     unsigned GetNumPersistentChildren() const;
     /// Calculate number of non-temporary components.
     unsigned GetNumPersistentComponents() const;
-    
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved();
 
+    /// Network update queued flag.
+    bool networkUpdate_;
     /// User variables.
     VariantMap vars_;
 
@@ -411,8 +411,6 @@ private:
     mutable Matrix3x4 worldTransform_;
     /// World transform needs update flag.
     mutable bool dirty_;
-    /// Network update queued flag.
-    bool networkUpdate_;
     /// Enabled flag.
     bool enabled_;
     /// Parent scene node.

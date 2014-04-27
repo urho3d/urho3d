@@ -76,6 +76,8 @@ public:
     virtual bool Save(Serializer& dest) const;
     /// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Mark for attribute check on the next network update.
+    virtual void MarkNetworkUpdate();
     /// Add a replication state that is tracking this scene.
     virtual void AddReplicationState(NodeReplicationState* state);
 

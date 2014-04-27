@@ -137,6 +137,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         LOGERROR("Unsupported attribute type for OnSetAttribute()");
         return;
     }
+
+    // If it is a network attribute then mark it for next network update
+    if (attr.mode_ & AM_NET)
+        MarkNetworkUpdate();
 }
 
 void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
@@ -257,7 +261,7 @@ bool Serializable::Load(Deserializer& source, bool setInstanceDefault)
 
         Variant varValue = source.ReadVariant(attr.type_);
         OnSetAttribute(attr, varValue);
-        
+
         if (setInstanceDefault)
             SetInstanceDefault(attr.name_, varValue);
     }
@@ -506,12 +510,12 @@ void Serializable::SetTemporary(bool enable)
     if (enable != temporary_)
     {
         temporary_ = enable;
-        
+
         using namespace TemporaryChanged;
-        
+
         VariantMap& eventData = GetEventDataMap();
         eventData[P_SERIALIZABLE] = this;
-        
+
         SendEvent(E_TEMPORARYCHANGED, eventData);
     }
 }

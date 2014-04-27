@@ -81,7 +81,7 @@ Scene::~Scene()
     // the removal of child nodes' components
     RemoveAllComponents();
     RemoveAllChildren();
-    
+
     // Remove scene reference and owner from all nodes that still exist
     for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
         i->second_->ResetScene();
@@ -172,6 +172,15 @@ bool Scene::LoadXML(const XMLElement& source, bool setInstanceDefault)
     }
     else
         return false;
+}
+
+void Scene::MarkNetworkUpdate()
+{
+    if (!networkUpdate_)
+    {
+        MarkNetworkUpdate(this);
+        networkUpdate_ = true;
+    }
 }
 
 void Scene::AddReplicationState(NodeReplicationState* state)
@@ -380,10 +389,10 @@ Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const
 void Scene::Clear(bool clearReplicated, bool clearLocal)
 {
     StopAsyncLoading();
-    
+
     RemoveChildren(clearReplicated, clearLocal, true);
     RemoveComponents(clearReplicated, clearLocal);
-    
+
     // Only clear name etc. if clearing completely
     if (clearReplicated && clearLocal)
     {
@@ -392,7 +401,7 @@ void Scene::Clear(bool clearReplicated, bool clearLocal)
         fileName_.Clear();
         checksum_ = 0;
     }
-    
+
     // Reset ID generators
     if (clearReplicated)
     {
@@ -674,7 +683,7 @@ void Scene::NodeAdded(Node* node)
         LOGERROR("Moving a node from one scene to another is unsupported");
         oldScene->NodeRemoved(node);
     }
-    
+
     node->SetScene(this);
 
     // If the new node has an ID of zero (default), assign a replicated ID now
@@ -684,7 +693,7 @@ void Scene::NodeAdded(Node* node)
         id = GetFreeNodeID(REPLICATED);
         node->SetID(id);
     }
-    
+
     // If node with same ID exists, remove the scene reference from it and overwrite with the new node
     if (id < FIRST_LOCAL_ID)
     {
