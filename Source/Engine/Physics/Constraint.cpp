@@ -98,7 +98,7 @@ void Constraint::RegisterObject(Context* context)
 
 void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     if (!attr.accessor_)
     {

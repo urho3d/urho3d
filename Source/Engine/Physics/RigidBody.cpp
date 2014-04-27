@@ -132,7 +132,7 @@ void RigidBody::RegisterObject(Context* context)
 
 void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // Change of any non-accessor attribute requires the rigid body to be re-added to the physics world
     if (!attr.accessor_)

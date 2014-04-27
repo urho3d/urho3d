@@ -112,7 +112,7 @@ void Terrain::RegisterObject(Context* context)
 
 void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // Change of any non-accessor attribute requires recreation of the terrain
     if (!attr.accessor_)

@@ -369,7 +369,7 @@ void CollisionShape::RegisterObject(Context* context)
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // Change of any non-accessor attribute requires recreation of the collision shape
     if (!attr.accessor_)
