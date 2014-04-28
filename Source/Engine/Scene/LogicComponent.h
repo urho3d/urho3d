@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#pragma once
+
 #include "Component.h"
 
 namespace Urho3D
