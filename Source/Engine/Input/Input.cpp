@@ -545,14 +545,14 @@ void Input::SetTouchEmulation(bool enable)
 #if !defined(ANDROID) && !defined(IOS)
     if (enable != touchEmulation_)
     {
-        // Touch emulation needs the mouse visible
         if (enable)
         {
+            // Touch emulation needs the mouse visible
             if (!mouseVisible_)
                 SetMouseVisible(true);
             
             // Add a virtual touch device the first time we are enabling emulated touch
-            if (enable && !SDL_GetNumTouchDevices())
+            if (!SDL_GetNumTouchDevices())
                 SDL_AddTouch(0, "Emulated Touch");
         }
         else
