@@ -1071,7 +1071,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_MOUSEBUTTONDOWN:
         if (!touchEmulation_)
             SetMouseButton(1 << (evt.button.button - 1), true);
-        else if (touchEmulation_ && evt.button.button == 1)
+        else
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
@@ -1079,7 +1079,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             SDL_Event event;
             event.type = SDL_FINGERDOWN;
             event.tfinger.touchId = 0;
-            event.tfinger.fingerId = 0;
+            event.tfinger.fingerId = evt.button.button - 1;
             event.tfinger.pressure = 1.0f;
             event.tfinger.x = (float)x / (float)graphics_->GetWidth();
             event.tfinger.y = (float)y / (float)graphics_->GetHeight();
@@ -1092,7 +1092,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_MOUSEBUTTONUP:
         if (!touchEmulation_)
             SetMouseButton(1 << (evt.button.button - 1), false);
-        else if (touchEmulation_ && evt.button.button == 1)
+        else
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
@@ -1100,7 +1100,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             SDL_Event event;
             event.type = SDL_FINGERUP;
             event.tfinger.touchId = 0;
-            event.tfinger.fingerId = 0;
+            event.tfinger.fingerId = evt.button.button - 1;;
             event.tfinger.pressure = 0.0f;
             event.tfinger.x = (float)x / (float)graphics_->GetWidth();
             event.tfinger.y = (float)y / (float)graphics_->GetHeight();
@@ -1130,6 +1130,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_QUALIFIERS] = GetQualifiers();
             SendEvent(E_MOUSEMOVE, eventData);
         }
+        // Only the left mouse button "finger" moves along with the mouse movement
         else if (touchEmulation_ && touches_.Contains(0))
         {
             int x, y;

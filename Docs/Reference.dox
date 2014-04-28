@@ -1393,7 +1393,7 @@ Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event w
 
 Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
 
-Touch emulation can be used to test mobile applications on a desktop machine without a touch screen. See \ref Input::SetTouchEmulation "SetTouchEmulation()". When touch emulation is enabled, the left mouse button acts as the touch "finger", actual mouse events are no longer sent, and the operating system mouse cursor is forced visible.
+Touch emulation can be used to test mobile applications on a desktop machine without a touch screen. See \ref Input::SetTouchEmulation "SetTouchEmulation()". When touch emulation is enabled, actual mouse events are no longer sent and the operating system mouse cursor is forced visible. The left mouse button acts as a moving finger, while the rest of the mouse buttons act as stationary fingers for multi-finger gestures. For example pressing down both left and right mouse buttons, then dragging the mouse with the buttons still pressed would emulate a two-finger pinch zoom-in gesture.
 
 \section InputPlatformSpecific Platform-specific details
 
