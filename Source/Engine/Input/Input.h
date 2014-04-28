@@ -136,6 +136,8 @@ public:
     void SetScreenJoystickVisible(SDL_JoystickID id, bool enable);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
+    /// Set touch emulation by mouse. Only available on desktop platforms. When enabled, actual mouse events are no longer sent and the mouse cursor is forced visible.
+    void SetTouchEmulation(bool enable);
     /// Begin recording a touch gesture. Return true if successful. The E_GESTURERECORDED event (which contains the ID for the new gesture) will be sent when recording finishes.
     bool RecordGesture();
     /// Save all in-memory touch gestures. Return true if successful.
@@ -203,6 +205,8 @@ public:
     bool GetScreenKeyboardSupport() const;
     /// Return whether on-screen keyboard is being shown.
     bool IsScreenKeyboardVisible() const;
+    /// Return whether touch emulation is enabled.
+    bool GetTouchEmulation() const { return touchEmulation_; }
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether the mouse is currently being grabbed by an operation.
@@ -225,6 +229,8 @@ private:
     void LoseFocus();
     /// Clear input state.
     void ResetState();
+    /// Clear touch states and send touch end events.
+    void ClearTouches();
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
@@ -278,6 +284,8 @@ private:
     bool mouseVisible_;
     /// Flag to indicate the mouse is being grabbed by an operation. Subsystems like UI that uses mouse should temporarily ignore the mouse hover or click events.
     bool mouseGrabbed_;
+    /// Touch emulation mode flag.
+    bool touchEmulation_;
     /// Input focus flag.
     bool inputFocus_;
     /// Minimized flag.

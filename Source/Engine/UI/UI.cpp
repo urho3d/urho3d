@@ -319,7 +319,7 @@ void UI::Update(float timeStep)
 
     // Mouse hover
     Input* input = GetSubsystem<Input>();
-    if (!input->IsMouseGrabbed())
+    if (!input->IsMouseGrabbed() && !input->GetTouchEmulation())
     {
         IntVector2 cursorPos;
         bool cursorVisible;

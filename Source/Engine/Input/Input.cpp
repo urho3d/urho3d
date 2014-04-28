@@ -44,6 +44,8 @@
 
 #include "DebugNew.h"
 
+extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
+
 // Require a click inside window before re-hiding mouse cursor on OSX, otherwise dragging the window
 // can be incorrectly interpreted as mouse movement inside the window
 #if defined(__APPLE__) && !defined(IOS)
@@ -77,6 +79,7 @@ Input::Input(Context* context) :
     toggleFullscreen_(true),
     mouseVisible_(false),
     mouseGrabbed_(false),
+    touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
     focusedThisFrame_(false),
@@ -149,7 +152,7 @@ void Input::Update()
         return;
 
     // Check for relative mode mouse move
-    if (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS)))
+    if (!touchEmulation_ && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
     {
         IntVector2 mousePosition = GetMousePosition();
         mouseMove_ = mousePosition - lastMousePosition_;
@@ -197,6 +200,10 @@ void Input::Update()
 
 void Input::SetMouseVisible(bool enable)
 {
+    // In touch emulation mode only enabled mouse is allowed
+    if (touchEmulation_)
+        enable = true;
+    
     // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
     #ifndef RASPI
     if (enable != mouseVisible_)
@@ -511,6 +518,29 @@ void Input::SetScreenKeyboardVisible(bool enable)
         else
             SDL_StopTextInput();
     }
+}
+
+void Input::SetTouchEmulation(bool enable)
+{
+#if !defined(ANDROID) && !defined(IOS)
+    if (enable != touchEmulation_)
+    {
+        // Touch emulation needs the mouse visible
+        if (enable)
+        {
+            if (!mouseVisible_)
+                SetMouseVisible(true);
+            
+            // Add a virtual touch device the first time we are enabling emulated touch
+            if (enable && !SDL_GetNumTouchDevices())
+                SDL_AddTouch(0, "Emulated Touch");
+        }
+        else
+            ClearTouches();
+        
+        touchEmulation_ = enable;
+    }
+#endif
 }
 
 bool Input::RecordGesture()
@@ -842,13 +872,28 @@ void Input::ResetState()
     /// \todo Check if this is necessary
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
     {
+        for (unsigned j = 0; j < i->second_.axes_.Size(); ++j)
+            i->second_.axes_[j] = 0.0f;
         for (unsigned j = 0; j < i->second_.buttons_.Size(); ++j)
             i->second_.buttons_[j] = false;
         for (unsigned j = 0; j < i->second_.hats_.Size(); ++j)
             i->second_.hats_[j] = HAT_CENTER;
     }
 
-    // When clearing touch states, send the corresponding touch end events
+    ClearTouches();
+
+    // Use SetMouseButton() to reset the state so that mouse events will be sent properly
+    SetMouseButton(MOUSEB_LEFT, false);
+    SetMouseButton(MOUSEB_RIGHT, false);
+    SetMouseButton(MOUSEB_MIDDLE, false);
+
+    mouseMove_ = IntVector2::ZERO;
+    mouseMoveWheel_ = 0;
+    mouseButtonPress_ = 0;
+}
+
+void Input::ClearTouches()
+{
     for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
         TouchState& state = i->second_;
@@ -861,15 +906,8 @@ void Input::ResetState()
         eventData[P_Y] = state.position_.y_;
         SendEvent(E_TOUCHEND, eventData);
     }
-
-    // Use SetMouseButton() to reset the state so that mouse events will be sent properly
-    SetMouseButton(MOUSEB_LEFT, false);
-    SetMouseButton(MOUSEB_RIGHT, false);
-    SetMouseButton(MOUSEB_MIDDLE, false);
-
-    mouseMove_ = IntVector2::ZERO;
-    mouseMoveWheel_ = 0;
-    mouseButtonPress_ = 0;
+    
+    touches_.Clear();
 }
 
 void Input::SendInputFocusEvent()
@@ -1028,15 +1066,49 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEBUTTONDOWN:
-        SetMouseButton(1 << (evt.button.button - 1), true);
+        if (!touchEmulation_)
+            SetMouseButton(1 << (evt.button.button - 1), true);
+        else if (touchEmulation_ && evt.button.button == 1)
+        {
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            
+            SDL_Event event;
+            event.type = SDL_FINGERDOWN;
+            event.tfinger.touchId = 0;
+            event.tfinger.fingerId = 0;
+            event.tfinger.pressure = 1.0f;
+            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
+            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.dx = 0;
+            event.tfinger.dy = 0;
+            SDL_PushEvent(&event);
+        }
         break;
 
     case SDL_MOUSEBUTTONUP:
-        SetMouseButton(1 << (evt.button.button - 1), false);
+        if (!touchEmulation_)
+            SetMouseButton(1 << (evt.button.button - 1), false);
+        else if (touchEmulation_ && evt.button.button == 1)
+        {
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            
+            SDL_Event event;
+            event.type = SDL_FINGERUP;
+            event.tfinger.touchId = 0;
+            event.tfinger.fingerId = 0;
+            event.tfinger.pressure = 0.0f;
+            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
+            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.dx = 0;
+            event.tfinger.dy = 0;
+            SDL_PushEvent(&event);
+        }
         break;
 
     case SDL_MOUSEMOTION:
-        if (mouseVisible_)
+        if (mouseVisible_ && !touchEmulation_)
         {
             mouseMove_.x_ += evt.motion.xrel;
             mouseMove_.y_ += evt.motion.yrel;
@@ -1055,10 +1127,27 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_QUALIFIERS] = GetQualifiers();
             SendEvent(E_MOUSEMOVE, eventData);
         }
+        else if (touchEmulation_ && touches_.Contains(0))
+        {
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            
+            SDL_Event event;
+            event.type = SDL_FINGERMOTION;
+            event.tfinger.touchId = 0;
+            event.tfinger.fingerId = 0;
+            event.tfinger.pressure = 1.0f;
+            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
+            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.dx = (float)evt.motion.xrel / (float)graphics_->GetWidth();
+            event.tfinger.dy = (float)evt.motion.yrel / (float)graphics_->GetHeight();
+            SDL_PushEvent(&event);
+        }
         break;
 
     case SDL_MOUSEWHEEL:
-        SetMouseWheel(evt.wheel.y);
+        if (!touchEmulation_)
+            SetMouseWheel(evt.wheel.y);
         break;
 
     case SDL_FINGERDOWN:

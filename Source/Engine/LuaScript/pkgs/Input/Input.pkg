@@ -41,6 +41,7 @@ class Input : public Object
     bool RemoveScreenJoystick(int id);
     void SetScreenJoystickVisible(int id, bool enable);
     void SetScreenKeyboardVisible(bool enable);
+    void SetTouchEmulation(bool enable);
     bool RecordGesture();
     tolua_outside bool InputSaveGestures @ SaveGestures(File* dest);
     tolua_outside bool InputSaveGesture @ SaveGesture(File* dest, unsigned gestureID);
@@ -78,6 +79,7 @@ class Input : public Object
     bool GetScreenKeyboardSupport() const;
     bool IsScreenJoystickVisible(int id) const;
     bool IsScreenKeyboardVisible() const;
+    bool GetTouchEmulation() const;
     bool IsMouseVisible() const;
     bool IsMouseGrabbed() const;
     bool HasFocus();
@@ -94,6 +96,7 @@ class Input : public Object
     tolua_readonly tolua_property__get_set bool toggleFullscreen;
     tolua_readonly tolua_property__get_set bool screenKeyboardSupport;
     tolua_property__is_set bool screenKeyboardVisible;
+    tolua_property__get_set bool touchEmulation;
     tolua_property__is_set bool mouseVisible;
     tolua_property__is_set bool mouseGrabbed;
     tolua_readonly tolua_property__has_set bool focus;
