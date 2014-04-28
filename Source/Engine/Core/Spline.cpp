@@ -30,6 +30,7 @@ namespace Urho3D
 const char* interpolationModeNames[] =
 {
     "Bezier",
+    "Catmull-Rom",
     0
 };
 
@@ -74,6 +75,8 @@ Variant Spline::GetPoint(float f) const
     {
     case BEZIER_CURVE:
         return BezierInterpolation(knots_, f);
+    case CATMULL_ROM_CURVE:
+        return CatmullRomInterpolation(knots_, f);
 
     default:
         LOGERROR("Unsupported interpolation mode");
@@ -154,6 +157,33 @@ Variant Spline::BezierInterpolation(const Vector<Variant>& knots, float t) const
             }
         }
         return BezierInterpolation(interpolatedKnots, t);
+    }
+}
+
+Variant Spline::CatmullRomInterpolation(const Vector<Variant>& knots, float t) const
+{
+    if (knots.Size() <4)
+    {
+        return Variant::EMPTY;
+    }
+    else
+    {
+        int orginIndex;
+        orginIndex=t*(knots.Size()-3);
+        t=fmodf(t*(knots.Size()-3),1.f);
+        Vector3 ret;
+        Vector3 p0=knots[orginIndex].GetVector3();
+        Vector3 p1=knots[orginIndex+1].GetVector3();
+        Vector3 p2=knots[orginIndex+2].GetVector3();
+        Vector3 p3=knots[orginIndex+3].GetVector3();
+        float t2 = t * t;
+        float t3 = t2 * t;
+
+        ret=0.5f*((2.0f*p1)+(-p0+p2)*t+
+        (2.0f*p0-5.0f*p1+4*p2-p3)*t2+
+        (-p0+3.0f*p1-3.0f*p2+p3)*t3);
+
+        return Variant(ret);
     }
 }
 

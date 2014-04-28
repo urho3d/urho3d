@@ -33,7 +33,8 @@ namespace Urho3D
 
 enum InterpolationMode
 {
-    BEZIER_CURVE = 0
+    BEZIER_CURVE = 0,
+    CATMULL_ROM_CURVE
 };
 
 /// Spline class to get a point on it based off the interpolation mode.
@@ -94,6 +95,8 @@ public:
 private:
     /// Perform Bezier Interpolation on the Spline.
     Variant BezierInterpolation(const Vector<Variant>& knots, float t) const;
+    /// Perform Spline Interpolation on the Spline.
+    Variant CatmullRomInterpolation(const Vector<Variant>& knots, float t) const;
     /// LinearInterpolation between two Variants based on underlying type.
     Variant LinearInterpolation(const Variant& lhs, const Variant& rhs, float t) const;
 
