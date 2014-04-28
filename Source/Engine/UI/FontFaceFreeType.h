@@ -44,36 +44,26 @@ public:
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
     /// Return if font face uses mutable glyphs.
-    virtual bool HasMutableGlyphs() const { return !mutableGlyphs_.Empty(); }
+    virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
 
 private:
-    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called by Font.
-    bool RenderAllGlyphs(int maxWidth, int maxHeight);
-    /// Render one glyph on demand into the current texture.
-    void RenderGlyph(unsigned index);
-    /// Render a glyph bitmap into a memory buffer.
-    void RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch, int loadMode);
-    /// Setup next texture for dynamic glyph rendering.
-    void SetupNextTexture(int width, int height);
-    /// Setup mutable glyph rendering, in which glyphs form a regular-sized grid.
-    void SetupMutableGlyphs(int textureWidth, int textureHeight, int maxGlyphWidth, int maxGlyphHeight);
+    /// Check can load all glyph in one texture, return true and texture size if can load.
+    bool CanLoadAllGlyphs(unsigned numGlyphs, int loadMode, int& textureWidth, int& textureHeight) const;
+    /// Setup next texture.
+    bool SetupNextTexture(int textureWidth, int textureHeight);
+    /// Load char glyph.
+    bool LoadCharGlyph(unsigned charCode, Image* image = 0);
 
-    /// FreeType library.
+        /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
     /// FreeType face. Non-null after creation only in dynamic mode.
     void* face_;
-    /// Mutable glyph list.
-    List<MutableGlyph*> mutableGlyphs_;
-    /// Mutable glyph cell width, including 1 pixel padding.
-    int cellWidth_;
-    /// Mutable glyph cell height, including 1 pixel padding.
-    int cellHeight_;
+    /// Has mutable glyph.
+    bool hasMutableGlyph_;
+    /// Ascender.
+    int ascender_;
     /// Glyph area allocator.
     AreaAllocator allocator_;
-    /// Glyph rendering bitmap in dynamic mode.
-    SharedArrayPtr<unsigned char> bitmap_;
-    /// Glyph rendering bitmap byte size.
-    unsigned bitmapSize_;
 };
 
 }

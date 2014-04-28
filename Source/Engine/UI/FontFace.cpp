@@ -33,11 +33,6 @@
 namespace Urho3D
 {
 
-MutableGlyph::MutableGlyph() :
-    glyphIndex_(M_MAX_UNSIGNED)
-{
-}
-
 FontGlyph::FontGlyph() :
     used_(false),
     page_(M_MAX_UNSIGNED)
@@ -45,8 +40,7 @@ FontGlyph::FontGlyph() :
 }
 
 FontFace::FontFace(Font* font) :
-    font_(font),
-    hasKerning_(false)
+    font_(font)
 {
 }
 
@@ -64,10 +58,10 @@ FontFace::~FontFace()
 
 const FontGlyph* FontFace::GetGlyph(unsigned c)
 {
-    HashMap<unsigned, unsigned>::ConstIterator i = glyphMapping_.Find(c);
+    HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
     if (i != glyphMapping_.End())
     {
-        FontGlyph& glyph = glyphs_[i->second_];
+        FontGlyph& glyph = i->second_;
         glyph.used_ = true;
         return &glyph;
     }
@@ -77,30 +71,22 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
 
 short FontFace::GetKerning(unsigned c, unsigned d) const
 {
-    if (!hasKerning_)
+    if (kerningMapping_.Empty())
         return 0;
 
     if (c == '\n' || d == '\n')
         return 0;
 
-    unsigned leftIndex = 0;
-    unsigned rightIndex = 0;
-    HashMap<unsigned, unsigned>::ConstIterator leftIt = glyphMapping_.Find(c);
-    if (leftIt != glyphMapping_.End())
-        leftIndex = leftIt->second_;
-    else
-        return 0;
-    HashMap<unsigned, unsigned>::ConstIterator rightIt = glyphMapping_.Find(d);
-    if (rightIt != glyphMapping_.End())
-        rightIndex = rightIt->second_;
-    else
+    if (c > 0xffff || d > 0xffff)
         return 0;
 
-    HashMap<unsigned, unsigned>::ConstIterator kerningIt = glyphs_[leftIndex].kerning_.Find(rightIndex);
-    if (kerningIt != glyphs_[leftIndex].kerning_.End())
-        return kerningIt->second_;
-    else
-        return 0;
+    unsigned value = (c << 16) + d;
+
+    HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Find(value);
+    if (i != kerningMapping_.End())
+        return i->second_;
+
+    return 0;
 }
 
 bool FontFace::IsDataLost() const

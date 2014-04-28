@@ -33,26 +33,12 @@ class Font;
 class Image;
 class Texture2D;
 
-/// Mutable font glyph description.
-struct MutableGlyph
-{
-    /// Construct.
-    MutableGlyph();
-    
-    /// The actual glyph index that currently occupies this mutable slot. M_MAX_UNSIGNED if none.
-    unsigned glyphIndex_;
-    /// X position in texture.
-    short x_;
-    /// Y position in texture.
-    short y_;
-};
-
 /// %Font glyph description.
 struct FontGlyph
 {
     /// Construct.
     FontGlyph();
-    
+
     /// X position in texture.
     short x_;
     /// Y position in texture.
@@ -71,23 +57,19 @@ struct FontGlyph
     unsigned page_;
     /// Used flag.
     bool used_;
-    /// Kerning information.
-    HashMap<unsigned, unsigned> kerning_;
-    /// Mutable glyph list iterator.
-    List<MutableGlyph*>::Iterator iterator_;
 };
 
 /// %Font face description.
 class URHO3D_API FontFace : public RefCounted
 {
     friend class Font;
-    
+
 public:
     /// Construct.
     FontFace(Font* font);
     /// Destruct.
     ~FontFace();
-    
+
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
@@ -104,7 +86,7 @@ public:
     int GetRowHeight() const { return rowHeight_; }
     /// Return textures.
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
-    
+
 protected:
     friend class FontFaceBitmap;
     /// Create a texture for font rendering.
@@ -114,18 +96,16 @@ protected:
 
     /// Parent font.
     Font* font_;
-    /// Glyphs.
-    Vector<FontGlyph> glyphs_;
-    /// Glyph index mapping.
-    HashMap<unsigned, unsigned> glyphMapping_;
+    /// Glyph mapping.
+    HashMap<unsigned, FontGlyph> glyphMapping_;
+    /// Kerning mapping.
+    HashMap<unsigned, short> kerningMapping_;
     /// Glyph texture pages.
     Vector<SharedPtr<Texture2D> > textures_;
     /// Point size.
     int pointSize_;
     /// Row height.
     int rowHeight_;
-    /// Kerning flag.
-    bool hasKerning_;
 };
 
 }

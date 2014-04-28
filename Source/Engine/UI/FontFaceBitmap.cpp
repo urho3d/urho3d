@@ -119,13 +119,12 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
 
     XMLElement charsElem = root.GetChild("chars");
     int count = charsElem.GetInt("count");
-    glyphs_.Reserve(count);
-    unsigned index = 0;
 
     XMLElement charElem = charsElem.GetChild("char");
     while (!charElem.IsNull())
     {
         int id = charElem.GetInt("id");
+
         FontGlyph glyph;
         glyph.x_ = charElem.GetInt("x");
         glyph.y_ = charElem.GetInt("y");
@@ -135,30 +134,22 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         glyph.offsetY_ = charElem.GetInt("yoffset");
         glyph.advanceX_ = charElem.GetInt("xadvance");
         glyph.page_ = charElem.GetInt("page");
-        glyphs_.Push(glyph);
-        glyphMapping_[id] = index++;
+
+        glyphMapping_[id] = glyph;
 
         charElem = charElem.GetNext("char");
     }
 
     XMLElement kerningsElem = root.GetChild("kernings");
-    if (kerningsElem.IsNull())
-        hasKerning_ = false;
-    else
+    if (kerningsElem.NotNull())
     {
         XMLElement kerningElem = kerningsElem.GetChild("kerning");
         while (!kerningElem.IsNull())
         {
             int first = kerningElem.GetInt("first");
-            HashMap<unsigned, unsigned>::Iterator i = glyphMapping_.Find(first);
-            if (i != glyphMapping_.End())
-            {
-                int second = kerningElem.GetInt("second");
-                int amount = kerningElem.GetInt("amount");
-
-                FontGlyph& glyph = glyphs_[i->second_];
-                glyph.kerning_[second] = amount;
-            }
+            int second = kerningElem.GetInt("second");
+            unsigned value = (first << 16) + second;
+            kerningMapping_[value] = (short)kerningElem.GetInt("amount");
 
             kerningElem = kerningElem.GetNext("kerning");
         }
@@ -172,105 +163,94 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
 
 bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
 {
-    Context* context = font_->GetContext();
-    int maxTextureSize = font_->GetSubsystem<UI>()->GetMaxFontTextureSize();
+    if (this == fontFace)
+        return true;
 
-    // Clone properties
+    if (!usedGlyphs)
+    {
+        glyphMapping_ = fontFace->glyphMapping_;
+        kerningMapping_ = fontFace->kerningMapping_;
+        textures_ = fontFace->textures_;
+        pointSize_ = fontFace->pointSize_;
+        rowHeight_ = fontFace->rowHeight_;
+
+        return true;
+    }
+
     pointSize_ = fontFace->pointSize_;
     rowHeight_ = fontFace->rowHeight_;
-    hasKerning_ = fontFace->hasKerning_;
+
+    int numPages = 1;
+    int maxTextureSize = font_->GetSubsystem<UI>()->GetMaxFontTextureSize();
+    AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, maxTextureSize, maxTextureSize);
+
+    for (HashMap<unsigned, FontGlyph>::ConstIterator i = fontFace->glyphMapping_.Begin(); i != fontFace->glyphMapping_.End(); ++i)
+    {
+        FontGlyph fontGlyph = i->second_;
+        if (!fontGlyph.used_)
+            continue;
+
+        int x, y;
+        if (!allocator.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
+        {
+            ++numPages;
+
+            allocator = AreaAllocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, maxTextureSize, maxTextureSize);
+            if (!allocator.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
+                return false;
+        }
+
+        fontGlyph.x_ = x;
+        fontGlyph.y_ = y;
+        fontGlyph.page_ = numPages - 1;
+
+        glyphMapping_[i->first_] = fontGlyph;
+    }
 
     // Assume that format is the same for all textures and that bitmap font type may have more than one component
     unsigned components = ConvertFormatToNumComponents(fontFace->textures_[0]->GetFormat());
 
     // Save the existing textures as image resources
-    Vector<SharedPtr<Image> > images(fontFace->textures_.Size());
+    Vector<SharedPtr<Image> > oldImages;
     for (unsigned i = 0; i < fontFace->textures_.Size(); ++i)
-        images[i] = SaveFaceTexture(fontFace->textures_[i]);
+        oldImages.Push(SaveFaceTexture(fontFace->textures_[i]));
 
-    // Reallocate used glyphs to new texture(s)
-    unsigned page = 0;
-    unsigned index = 0;
-    unsigned startIndex = 0;
-    HashMap<unsigned, unsigned>::ConstIterator startIter = fontFace->glyphMapping_.Begin();
-    HashMap<unsigned, unsigned>::ConstIterator i;
-    while (startIter != fontFace->glyphMapping_.End())
+    Vector<SharedPtr<Image> > newImages(numPages);
+    for (int i = 0; i < numPages; ++i)
     {
-        AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, maxTextureSize, maxTextureSize);
-        for (i = startIter; i != fontFace->glyphMapping_.End(); ++i)
+        SharedPtr<Image> image(new Image(font_->GetContext()));
+
+        int width = maxTextureSize;
+        int height = maxTextureSize;
+        if (i == numPages - 1)
         {
-            FontGlyph glyph = fontFace->glyphs_[i->second_];
-            if (!glyph.used_)
-                continue;
-
-            if (glyph.width_ && glyph.height_)
-            {
-                int x, y;
-                // Reserve an empty border between glyphs for filtering
-                if (allocator.Allocate(glyph.width_ + 1, glyph.height_ + 1, x, y))
-                {
-                    glyph.x_ = x;
-                    glyph.y_ = y;
-                    glyph.page_ = page;
-                }
-                else
-                    break;
-            }
-
-            glyphs_.Push(glyph);
-            glyphMapping_[i->first_] = index++;
+            width = allocator.GetWidth();
+            height = allocator.GetHeight();
         }
 
-        int texWidth = allocator.GetWidth();
-        int texHeight = allocator.GetHeight();
+        image->SetSize(width, height, components);
+        memset(image->GetData(), 0, width * height * components);
 
-        // Create the image for rendering the fonts
-        SharedPtr<Image> image(new Image(context));
-        image->SetSize(texWidth, texHeight, components);
+        newImages.Push(image);
+    }
 
-        // First clear the whole image
-        unsigned char* imageData = image->GetData();
-        for (int y = 0; y < texHeight; ++y)
-        {
-            unsigned char* dest = imageData + components * texWidth * y;
-            memset(dest, 0, components * texWidth);
-        }
+    for (HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
+    {
+        FontGlyph& newGlyph = i->second_;
+        const FontGlyph& oldGlyph = fontFace->glyphMapping_[i->first_];
+        Blit(newImages[newGlyph.page_], newGlyph.x_, newGlyph.y_, newGlyph.width_, newGlyph.height_, oldImages[oldGlyph.page_], oldGlyph.x_, oldGlyph.y_, components);
+    }
 
-        // Then render the glyphs into new image
-        for (HashMap<unsigned, unsigned>::ConstIterator j = startIter; j != i; ++j)
-        {
-            FontGlyph glyph = fontFace->glyphs_[j->second_];
-            if (!glyph.used_)
-                continue;
+    textures_.Resize(newImages.Size());
+    for (unsigned i = 0; i < newImages.Size(); ++i)
+        textures_[i] = LoadFaceTexture(newImages[i]);
 
-            if (!glyph.width_ || !glyph.height_)
-            {
-                ++startIndex;
-                continue;
-            }
-
-            FontGlyph packedGlyph = glyphs_[startIndex++];
-
-            Image* image = images[glyph.page_];
-            unsigned char* source = image->GetData() + components * (image->GetWidth() * glyph.y_ + glyph.x_);
-            unsigned char* destination = imageData + components * (texWidth * packedGlyph.y_ + packedGlyph.x_);
-            for (int i = 0; i < glyph.height_; ++i)
-            {
-                memcpy(destination, source, components * glyph.width_);
-                source += components * image->GetWidth();
-                destination += components * texWidth;
-            }
-        }
-
-        // Finally load image into the texture
-        SharedPtr<Texture2D> texture = LoadFaceTexture(image);
-        if (!texture)
-            return false;
-        textures_.Push(texture);
-
-        ++page;
-        startIter = i;
-        assert(index == startIndex);
+    for (HashMap<unsigned, short>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
+    {
+        unsigned first = (i->first_) >> 16;
+        unsigned second = (i->first_) & 0xffff;
+        if (glyphMapping_.Find(first) != glyphMapping_.End() && glyphMapping_.Find(second) != glyphMapping_.End())
+            kerningMapping_[i->first_] = i->second_;
     }
 
     return true;
@@ -300,7 +280,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
     File* file = dynamic_cast<File*>(&dest);
     if (file)
         // If serialize to file, use the file's path
-            pathName = GetPath(file->GetName());
+        pathName = GetPath(file->GetName());
     else
         // Otherwise, use the font resource's path
         pathName = "Data/" + GetPath(font_->GetName());
@@ -320,18 +300,16 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
 
     // Chars and kernings
     XMLElement charsElem = rootElem.CreateChild("chars");
-    unsigned numGlyphs = glyphs_.Size();
+    unsigned numGlyphs = glyphMapping_.Size();
     charsElem.SetInt("count", numGlyphs);
-    XMLElement kerningsElem;
-    bool hasKerning = hasKerning_;
-    if (hasKerning)
-        kerningsElem = rootElem.CreateChild("kernings");
-    for (HashMap<unsigned, unsigned>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
+
+    for (HashMap<unsigned, FontGlyph>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
     {
         // Char
         XMLElement charElem = charsElem.CreateChild("char");
         charElem.SetInt("id", i->first_);
-        FontGlyph glyph = glyphs_[i->second_];
+
+        const FontGlyph& glyph = i->second_;
         charElem.SetInt("x", glyph.x_);
         charElem.SetInt("y", glyph.y_);
         charElem.SetInt("width", glyph.width_);
@@ -340,21 +318,17 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
         charElem.SetInt("yoffset", glyph.offsetY_);
         charElem.SetInt("xadvance", glyph.advanceX_);
         charElem.SetInt("page", glyph.page_);
+    }
 
-        // Kerning
-        if (hasKerning)
+    if (!kerningMapping_.Empty())
+    {
+        XMLElement kerningsElem = rootElem.CreateChild("kernings");
+        for (HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
-            for (HashMap<unsigned, unsigned>::ConstIterator j = glyph.kerning_.Begin(); j != glyph.kerning_.End(); ++j)
-            {
-                // To conserve space, only write when amount is non zero
-                if (j->second_ == 0)
-                    continue;
-
-                XMLElement kerningElem = kerningsElem.CreateChild("kerning");
-                kerningElem.SetInt("first", i->first_);
-                kerningElem.SetInt("second", j->first_);
-                kerningElem.SetInt("amount", j->second_);
-            }
+            XMLElement kerningElem = kerningsElem.CreateChild("kerning");
+            kerningElem.SetInt("first", i->first_ >> 16);
+            kerningElem.SetInt("second", i->first_ & 0xffff);
+            kerningElem.SetInt("amount", i->second_);
         }
     }
 
@@ -373,7 +347,6 @@ unsigned FontFaceBitmap::ConvertFormatToNumComponents(unsigned format)
         return 1;
 }
 
-
 SharedPtr<Image> FontFaceBitmap::SaveFaceTexture(Texture2D* texture)
 {
     Image* image = new Image(font_->GetContext());
@@ -391,6 +364,18 @@ bool FontFaceBitmap::SaveFaceTexture(Texture2D* texture, const String& fileName)
 {
     SharedPtr<Image> image = SaveFaceTexture(texture);
     return image ? image->SavePNG(fileName) : false;
+}
+
+void FontFaceBitmap::Blit(Image* dest, int x, int y, int width, int height, Image* source, int sourceX, int sourceY, int components)
+{
+    unsigned char* destData = dest->GetData() + (y * dest->GetWidth() + x) * components;
+    unsigned char* sourceData = source->GetData() + (sourceY * source->GetWidth() + sourceX) * components;
+    for (int i = 0; i < height; ++i)
+    {
+        memcpy(destData, sourceData, width * components);
+        destData += dest->GetWidth() * components;
+        sourceData += source->GetWidth() * components;
+    }
 }
 
 }
