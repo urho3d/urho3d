@@ -4309,6 +4309,7 @@ Array<bool> screenJoystickVisible;
 bool screenKeyboardSupport;
 bool screenKeyboardVisible;
 bool toggleFullscreen;
+bool touchEmulation;
 /* readonly */
 Array<TouchState> touches;
 /* readonly */

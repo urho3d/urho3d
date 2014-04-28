@@ -2028,6 +2028,7 @@ Methods:
 - bool RemoveScreenJoystick(int id)
 - void SetScreenJoystickVisible(int id, bool enable)
 - void SetScreenKeyboardVisible(bool enable)
+- void SetTouchEmulation(bool enable)
 - bool RecordGesture()
 - bool SaveGestures(File* dest)
 - bool SaveGesture(File* dest, unsigned gestureID)
@@ -2064,6 +2065,7 @@ Methods:
 - bool GetScreenKeyboardSupport() const
 - bool IsScreenJoystickVisible(int id) const
 - bool IsScreenKeyboardVisible() const
+- bool GetTouchEmulation() const
 - bool IsMouseVisible() const
 - bool IsMouseGrabbed() const
 - bool HasFocus()
@@ -2082,6 +2084,7 @@ Properties:
 - bool toggleFullscreen (readonly)
 - bool screenKeyboardSupport (readonly)
 - bool screenKeyboardVisible
+- bool touchEmulation
 - bool mouseVisible
 - bool mouseGrabbed
 - bool focus (readonly)

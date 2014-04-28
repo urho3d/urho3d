@@ -5583,6 +5583,7 @@ Properties:
 - bool screenKeyboardSupport // readonly
 - bool screenKeyboardVisible
 - bool toggleFullscreen
+- bool touchEmulation
 - TouchState@[] touches // readonly
 - ShortStringHash type // readonly
 - String typeName // readonly
