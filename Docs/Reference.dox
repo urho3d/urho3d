@@ -1393,6 +1393,8 @@ Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event w
 
 Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
 
+Touch emulation can be used to test mobile applications on a desktop machine without a touch screen. See \ref Input::SetTouchEmulation "SetTouchEmulation()". When touch emulation is enabled, the left mouse button acts as the touch "finger", actual mouse events are no longer sent, and the operating system mouse cursor is forced visible.
+
 \section InputPlatformSpecific Platform-specific details
 
 On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as text input events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
