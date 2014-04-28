@@ -62,6 +62,11 @@ struct JoystickState
     {
     }
 
+    /// Initialize the number of buttons, axes and hats and set them to neutral state.
+    void Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats);
+    /// Reset button, axis and hat states to neutral.
+    void Reset();
+
     /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
     bool IsController() const { return controller_ != 0; }
     /// Return number of buttons.
@@ -230,7 +235,7 @@ private:
     /// Clear input state.
     void ResetState();
     /// Clear touch states and send touch end events.
-    void ClearTouches();
+    void ResetTouches();
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.

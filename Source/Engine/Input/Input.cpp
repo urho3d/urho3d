@@ -70,6 +70,29 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
+void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
+{
+    buttons_.Resize(numButtons);
+    buttonPress_.Resize(numButtons);
+    axes_.Resize(numAxes);
+    hats_.Resize(numHats);
+    
+    Reset();
+}
+
+void JoystickState::Reset()
+{
+    for (unsigned i = 0; i < buttons_.Size(); ++i)
+    {
+        buttons_[i] = false;
+        buttonPress_[i] = false;
+    }
+    for (unsigned i = 0; i < axes_.Size(); ++i)
+        axes_[i] = 0.0f;
+    for (unsigned i = 0; i < hats_.Size(); ++i)
+        hats_[i] = HAT_CENTER;
+}
+
 Input::Input(Context* context) :
     Object(context),
     mouseButtonDown_(0),
@@ -460,10 +483,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     for (PODVector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
         (*iter)->SetFocusMode(FM_NOTFOCUSABLE);
 
-    state.buttons_.Resize(numButtons);
-    state.buttonPress_.Resize(numButtons);
-    state.axes_.Resize(numAxes);
-    state.hats_.Resize(numHats);
+    state.Initialize(numButtons, numAxes, numHats);
 
     // There could be potentially more than one screen joystick, however they all will be handled by a same handler method
     // So there is no harm to replace the old handler with the new handler in each call to SubscribeToEvent()
@@ -536,7 +556,7 @@ void Input::SetTouchEmulation(bool enable)
                 SDL_AddTouch(0, "Emulated Touch");
         }
         else
-            ClearTouches();
+            ResetTouches();
         
         touchEmulation_ = enable;
     }
@@ -597,31 +617,21 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     state.name_ = SDL_JoystickName(joystick);
     if (SDL_IsGameController(index))
        state.controller_ = SDL_GameControllerOpen(index);
-
-    state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
-    state.axes_.Resize(SDL_JoystickNumAxes(joystick));
-
+    
+    unsigned numButtons = SDL_JoystickNumButtons(joystick);
+    unsigned numAxes = SDL_JoystickNumAxes(joystick);
+    unsigned numHats = SDL_JoystickNumHats(joystick);
+    
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
     {
-        if (state.buttons_.Size() < SDL_CONTROLLER_BUTTON_MAX)
-            state.buttons_.Resize(SDL_CONTROLLER_BUTTON_MAX);
-        if (state.axes_.Size() < SDL_CONTROLLER_AXIS_MAX)
-            state.axes_.Resize(SDL_CONTROLLER_AXIS_MAX);
+        if (numButtons < SDL_CONTROLLER_BUTTON_MAX)
+            numButtons = SDL_CONTROLLER_BUTTON_MAX;
+        if (numAxes < SDL_CONTROLLER_AXIS_MAX)
+            numAxes = SDL_CONTROLLER_AXIS_MAX;
     }
-
-    state.buttonPress_.Resize(state.buttons_.Size());
-    state.hats_.Resize(SDL_JoystickNumHats(joystick));
-
-    for (unsigned i = 0; i < state.buttons_.Size(); ++i)
-    {
-        state.buttons_[i] = false;
-        state.buttonPress_[i] = false;
-    }
-    for (unsigned i = 0; i < state.axes_.Size(); ++i)
-        state.axes_[i] = 0.0f;
-    for (unsigned i = 0; i < state.hats_.Size(); ++i)
-        state.hats_[i] = HAT_CENTER;
+    
+    state.Initialize(numButtons, numAxes, numHats);
 
     return joystickID;
 }
@@ -869,18 +879,11 @@ void Input::ResetState()
     scancodeDown_.Clear();
     scancodePress_.Clear();
 
-    /// \todo Check if this is necessary
+    /// \todo Check if resetting joystick state on input focus loss is even necessary
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
-    {
-        for (unsigned j = 0; j < i->second_.axes_.Size(); ++j)
-            i->second_.axes_[j] = 0.0f;
-        for (unsigned j = 0; j < i->second_.buttons_.Size(); ++j)
-            i->second_.buttons_[j] = false;
-        for (unsigned j = 0; j < i->second_.hats_.Size(); ++j)
-            i->second_.hats_[j] = HAT_CENTER;
-    }
+        i->second_.Reset();
 
-    ClearTouches();
+    ResetTouches();
 
     // Use SetMouseButton() to reset the state so that mouse events will be sent properly
     SetMouseButton(MOUSEB_LEFT, false);
@@ -892,7 +895,7 @@ void Input::ResetState()
     mouseButtonPress_ = 0;
 }
 
-void Input::ClearTouches()
+void Input::ResetTouches()
 {
     for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
@@ -1564,9 +1567,10 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 evt.key.keysym.sym = keyBindingVar.GetInt();
                 evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
             }
-            if (!mouseButtonBindingVar.IsEmpty())
+            if (!mouseButtonBindingVar.IsEmpty() && !touchEmulation_)
             {
                 // Mouse button are sent as extra events besides key events
+                // Do not send mouse events in touch emulation mode, because those would in turn be re-interpreted as touch
                 SDL_Event evt;
                 evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
                 evt.button.button = mouseButtonBindingVar.GetInt();
