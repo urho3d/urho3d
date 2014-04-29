@@ -232,6 +232,8 @@ VariantVector Cursor::GetShapesAttr() const
 
 void Cursor::ApplyOSCursorShape()
 {
+    // Mobile platforms do not support applying OS cursor shapes: comment out to avoid log error messages
+#if !defined(ANDROID) && !defined(IOS)
     if (!osShapeDirty_ || !GetSubsystem<Input>()->IsMouseVisible() || GetSubsystem<UI>()->GetCursor() != this)
         return;
 
@@ -275,6 +277,7 @@ void Cursor::ApplyOSCursorShape()
         SDL_SetCursor(info.osCursor_);
     
     osShapeDirty_ = false;
+#endif
 }
 
 void Cursor::HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData)
