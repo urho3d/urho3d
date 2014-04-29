@@ -62,8 +62,12 @@ void Sample::Setup()
 
 void Sample::Start()
 {
-    // Initialize touch input on mobile platforms
-    InitTouchInput();
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+        // On mobile platform, enable touch by adding a screen joystick
+        InitTouchInput();
+    else if (GetSubsystem<Input>()->GetNumJoysticks() == 0)
+        // On desktop platform, do not detect touch when we already got a joystick
+        SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Sample, HandleTouchBegin));
 
     // Create logo
     CreateLogo();
@@ -82,27 +86,24 @@ void Sample::Start()
 
 void Sample::InitTouchInput()
 {
-    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
-    {
-        touchEnabled_ = true;
+    touchEnabled_ = true;
 
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        Input* input = GetSubsystem<Input>();
-        XMLFile* layout = cache->GetResource<XMLFile>("UI/ScreenJoystick_Samples.xml");
-        const String& patchString = GetScreenJoystickPatchString();
-        if (!patchString.Empty())
-        {
-            // Patch the screen joystick layout further on demand
-            VectorBuffer buffer;
-            buffer.WriteString(patchString);
-            buffer.Seek(0);
-            SharedPtr<XMLFile> patchFile(new XMLFile(context_));
-            if (patchFile->Load(buffer))
-                layout->Patch(patchFile);
-        }
-        screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
-        input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Input* input = GetSubsystem<Input>();
+    XMLFile* layout = cache->GetResource<XMLFile>("UI/ScreenJoystick_Samples.xml");
+    const String& patchString = GetScreenJoystickPatchString();
+    if (!patchString.Empty())
+    {
+        // Patch the screen joystick layout further on demand
+        VectorBuffer buffer;
+        buffer.WriteString(patchString);
+        buffer.Seek(0);
+        SharedPtr<XMLFile> patchFile(new XMLFile(context_));
+        if (patchFile->Load(buffer))
+            layout->Patch(patchFile);
     }
+    screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+    input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
 }
 
 void Sample::SetLogoVisible(bool enable)
@@ -325,4 +326,11 @@ void Sample::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
             }
         }
     }
+}
+
+void Sample::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+{
+    // On some platforms like Windows the presence of touch input can only be detected dynamically
+    InitTouchInput();
+    UnsubscribeFromEvent("TouchBegin");
 }

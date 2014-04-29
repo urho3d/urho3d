@@ -242,6 +242,7 @@ The engine can be configured using the following command line options.
 -nosound     Disable sound output
 -noip        Disable sound mixing interpolation
 -sm2         Force SM2.0 rendering
+-touch       Touch emulation on desktop platform
 \endverbatim
 
 \section Running_Xcode_AngelScript_Info Mac OS X specific - How to view/edit AngelScript within Xcode

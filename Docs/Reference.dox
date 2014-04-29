@@ -159,6 +159,7 @@ The full list of supported parameters, their datatypes and default values:
 - SoundMixRate (int) %Sound output frequency in Hz. Default 44100.
 - SoundStereo (bool) Stereo sound output mode. Default true.
 - SoundInterpolation (bool) Interpolated sound output mode to improve quality. Default true.
+- TouchEmulation (bool) %Touch emulation on desktop platform. Default false.
 
 \section MainLoop_Frame Main loop iteration
 
