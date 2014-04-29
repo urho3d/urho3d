@@ -6465,7 +6465,7 @@ Properties:
 
 \section LuaScriptAPI_GlobalFunctions Global functions
 - float Abs(float value)
-- int Abs(int value)
+- int AbsInt(int value)
 - float Acos(float x)
 - String AddTrailingSlash(const String pathName)
 - float Asin(float x)
@@ -6513,10 +6513,10 @@ Properties:
 - bool IsNaN(float value)
 - bool IsPowerOfTwo(unsigned value)
 - float Lerp(float lhs, float rhs, float t)
-- int Max(int lhs, int rhs)
 - float Max(float lhs, float rhs)
+- int MaxInt(int lhs, int rhs)
 - float Min(float lhs, float rhs)
-- int Min(int lhs, int rhs)
+- int MinInt(int lhs, int rhs)
 - unsigned NextPowerOfTwo(unsigned value)
 - void OpenConsoleWindow()
 - void PrintLine(const String str, bool error = false)
