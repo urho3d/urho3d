@@ -1100,7 +1100,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             SDL_Event event;
             event.type = SDL_FINGERUP;
             event.tfinger.touchId = 0;
-            event.tfinger.fingerId = evt.button.button - 1;;
+            event.tfinger.fingerId = evt.button.button - 1;
             event.tfinger.pressure = 0.0f;
             event.tfinger.x = (float)x / (float)graphics_->GetWidth();
             event.tfinger.y = (float)y / (float)graphics_->GetHeight();
