@@ -26,9 +26,11 @@ class Node : public Animatable
     void SetName(const String name);
     
     void SetPosition(const Vector3& position);
+    void SetPosition(const Vector2& position);
     tolua_outside void NodeSetPositionXYZ @ SetPositionXYZ(float x, float y, float z);
     
     void SetRotation(const Quaternion& rotation);
+    void SetRotation(float rotation);
     tolua_outside void NodeSetRotationXYZ @ SetRotationXYZ(float x, float y, float z);
     
     void SetDirection(const Vector3& direction);
@@ -36,16 +38,22 @@ class Node : public Animatable
     
     void SetScale(float scale);
     void SetScale(const Vector3& scale);
+    void SetScale(const Vector2& scale);
     tolua_outside void NodeSetScaleXYZ @ SetScaleXYZ(float x, float y, float z);
     
     void SetTransform(const Vector3& position, const Quaternion& rotation);
+    void SetTransform(const Vector2& position, float rotation);
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
+    void SetTransform(const Vector2& position, float rotation, float scale);
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    void SetTransform(const Vector2& position, float rotation, const Vector2& scale);
     
     void SetWorldPosition(const Vector3& position);
+    void SetWorldPosition(const Vector2& position);
     tolua_outside void NodeSetWorldPositionXYZ @ SetWorldPositionXYZ(float x, float y, float z);
     
     void SetWorldRotation(const Quaternion& rotation);
+    void SetWorldRotation(float rotation);
     tolua_outside void NodeSetWorldRotationXYZ @ SetWorldRotationXYZ(float x, float y, float z);
     
     void SetWorldDirection(const Vector3& direction);
@@ -53,19 +61,26 @@ class Node : public Animatable
     
     void SetWorldScale(float scale);
     void SetWorldScale(const Vector3& scale);
+    void SetWorldScale(const Vector2& scale);
     tolua_outside void NodeSetWorldScaleXYZ @ SetWorldScaleXYZ(float x, float y, float z);
 
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
+    void SetWorldTransform(const Vector2& position, float rotation);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
+    void SetWorldTransform(const Vector2& position, float rotation, float scale);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    void SetWorldTransform(const Vector2& position, float rotation, const Vector3& scale);
     
     void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
+    void Translate(const Vector2& delta, TransformSpace space = TS_LOCAL);
     tolua_outside void NodeTranslateXYZ @ TranslateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL);
 
     void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    void Rotate(float delta, TransformSpace space = TS_LOCAL);
     tolua_outside void NodeRotateXYZ @ RotateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL);
 
     void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    void RotateAround(const Vector2& point, float delta, TransformSpace space = TS_LOCAL);
     tolua_outside void NodeRotateAroundXYZ @ RotateAroundXYZ(float pX, float pY, float pZ, float dX, float dY, float dZ, TransformSpace space = TS_LOCAL);
 
     void Pitch(float angle, TransformSpace space = TS_LOCAL);
@@ -77,6 +92,7 @@ class Node : public Animatable
 
     void Scale(float scale);
     void Scale(const Vector3& scale);
+    void Scale(const Vector2& scale);
     tolua_outside void NodeScaleXYZ @ ScaleXYZ(float x, float y, float z);
     
     void SetEnabled(bool enable);
@@ -165,8 +181,10 @@ class Node : public Animatable
     const Matrix3x4& GetWorldTransform() const;
     Vector3 LocalToWorld(const Vector3& position) const;
     Vector3 LocalToWorld(const Vector4& vector) const;
+    Vector2 LocalToWorld(const Vector2& vector) const;
     Vector3 WorldToLocal(const Vector3& position) const;
     Vector3 WorldToLocal(const Vector4& vector) const;
+    Vector2 WorldToLocal(const Vector2& vector) const;
     bool IsDirty() const;
 
     unsigned GetNumChildren(bool recursive = false) const;

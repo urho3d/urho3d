@@ -881,6 +881,12 @@ Vector3 Node::LocalToWorld(const Vector4& vector) const
     return GetWorldTransform() * vector;
 }
 
+Vector2 Node::LocalToWorld(const Vector2& vector) const
+{
+    Vector3 result = LocalToWorld(Vector3(vector));
+    return Vector2(result.x_, result.y_);
+}
+
 Vector3 Node::WorldToLocal(const Vector3& position) const
 {
     return GetWorldTransform().Inverse() * position;
@@ -889,6 +895,12 @@ Vector3 Node::WorldToLocal(const Vector3& position) const
 Vector3 Node::WorldToLocal(const Vector4& vector) const
 {
     return GetWorldTransform().Inverse() * vector;
+}
+
+Vector2 Node::WorldToLocal(const Vector2& vector) const
+{
+    Vector3 result = WorldToLocal(Vector3(vector));
+    return Vector2(result.x_, result.y_);
 }
 
 unsigned Node::GetNumChildren(bool recursive) const
