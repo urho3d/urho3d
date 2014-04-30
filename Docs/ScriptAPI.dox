@@ -6785,6 +6785,7 @@ Methods:
 - bool HasComponent(const String&) const
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
+- Vector2 LocalToWorld(const Vector2&) const
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD)
@@ -6802,10 +6803,13 @@ Methods:
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
+- void Rotate(float, TransformSpace = TS_LOCAL)
+- void RotateAround(const Vector2&, float, TransformSpace = TS_LOCAL)
 - void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool SaveXML(File@)
 - bool SaveXML(XMLElement&) const
+- void Scale(const Vector2&)
 - void Scale(const Vector3&)
 - void Scale(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6814,14 +6818,28 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetEnabled(bool, bool)
+- void SetPosition(const Vector2&)
+- void SetRotation(float)
+- void SetScale(const Vector2&)
 - void SetScale(float)
+- void SetTransform(const Vector2&, float)
+- void SetTransform(const Vector2&, float, const Vector2&)
+- void SetTransform(const Vector2&, float, float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
+- void SetWorldPosition(const Vector2&)
+- void SetWorldRotation(float)
+- void SetWorldScale(const Vector2&)
+- void SetWorldTransform(const Vector2&, float)
+- void SetWorldTransform(const Vector2&, float, const Vector2&)
+- void SetWorldTransform(const Vector2&, float, float)
 - void SetWorldTransform(const Vector3&, const Quaternion&)
 - void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetWorldTransform(const Vector3&, const Quaternion&, float)
+- void Translate(const Vector2&, TransformSpace = TS_LOCAL)
 - void Translate(const Vector3&, TransformSpace = TS_LOCAL)
+- Vector2 WorldToLocal(const Vector2&) const
 - Vector3 WorldToLocal(const Vector3&) const
 - Vector3 WorldToLocal(const Vector4&) const
 - void Yaw(float, TransformSpace = TS_LOCAL)
@@ -7983,6 +8001,7 @@ Methods:
 - bool LoadAsyncXML(File@)
 - bool LoadXML(File@)
 - bool LoadXML(const XMLElement&, bool = false)
+- Vector2 LocalToWorld(const Vector2&) const
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD)
@@ -8001,10 +8020,13 @@ Methods:
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
+- void Rotate(float, TransformSpace = TS_LOCAL)
+- void RotateAround(const Vector2&, float, TransformSpace = TS_LOCAL)
 - void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool SaveXML(File@)
 - bool SaveXML(XMLElement&) const
+- void Scale(const Vector2&)
 - void Scale(const Vector3&)
 - void Scale(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -8012,19 +8034,33 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetPosition(const Vector2&)
+- void SetRotation(float)
+- void SetScale(const Vector2&)
 - void SetScale(float)
+- void SetTransform(const Vector2&, float)
+- void SetTransform(const Vector2&, float, const Vector2&)
+- void SetTransform(const Vector2&, float, float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
+- void SetWorldPosition(const Vector2&)
+- void SetWorldRotation(float)
+- void SetWorldScale(const Vector2&)
+- void SetWorldTransform(const Vector2&, float)
+- void SetWorldTransform(const Vector2&, float, const Vector2&)
+- void SetWorldTransform(const Vector2&, float, float)
 - void SetWorldTransform(const Vector3&, const Quaternion&)
 - void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetWorldTransform(const Vector3&, const Quaternion&, float)
 - void StopAsyncLoading()
 - const String& GetVarName(ShortStringHash) const
+- void Translate(const Vector2&, TransformSpace = TS_LOCAL)
 - void Translate(const Vector3&, TransformSpace = TS_LOCAL)
 - void UnregisterAllVars(const String&)
 - void UnregisterVar(const String&)
 - void Update(float)
+- Vector2 WorldToLocal(const Vector2&) const
 - Vector3 WorldToLocal(const Vector3&) const
 - Vector3 WorldToLocal(const Vector4&) const
 - void Yaw(float, TransformSpace = TS_LOCAL)
