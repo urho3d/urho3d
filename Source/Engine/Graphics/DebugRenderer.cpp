@@ -327,9 +327,8 @@ void DebugRenderer::Render()
         return;
 
     Graphics* graphics = GetSubsystem<Graphics>();
-
-    if (!graphics || graphics->IsDeviceLost())
-        return;
+    // Engine does not render when window is closed or device is lost
+    assert(graphics && graphics->IsInitialized() && !graphics->IsDeviceLost());
 
     PROFILE(RenderDebugGeometry);
 
