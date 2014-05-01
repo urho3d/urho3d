@@ -23,7 +23,6 @@
 #include "AnimatedModel.h"
 #include "AnimationController.h"
 #include "Camera.h"
-#include "Character.h"
 #include "CollisionShape.h"
 #include "Controls.h"
 #include "CoreEvents.h"
@@ -43,11 +42,12 @@
 #include "Scene.h"
 #include "StaticModel.h"
 #include "Text.h"
-#include "Touch.h"
 #include "UI.h"
 #include "Zone.h"
 
+#include "Character.h"
 #include "CharacterDemo.h"
+#include "Touch.h"
 
 #include "DebugNew.h"
 
@@ -70,7 +70,7 @@ void CharacterDemo::Start()
     // Execute base class startup
     Sample::Start();
     if (touchEnabled_)
-        touch_ = new Touch(context_);
+        touch_ = new Touch(context_, TOUCH_SENSITIVITY);
 
     // Create static scene content
     CreateScene();

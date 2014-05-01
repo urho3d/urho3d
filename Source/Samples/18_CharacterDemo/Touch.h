@@ -50,13 +50,15 @@ class Touch : public Object
 
 public:
     /// Construct.
-    Touch(Context* context);
+    Touch(Context* context, float touchSensitivity);
     /// Destruct.
     ~Touch();
 
     /// Update touch controls for the current frame.
     void UpdateTouches(Controls& controls);
 
+    /// Touch sensitivity.
+    float touchSensitivity_;
     /// Current camera zoom distance.
     float cameraDistance_;
     /// Zoom flag.
