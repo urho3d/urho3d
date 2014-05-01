@@ -20,18 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "Character.h"
 #include "Controls.h"
 #include "Graphics.h"
 #include "Input.h"
 #include "Renderer.h"
+
+#include "Character.h"
 #include "Touch.h"
 
-const float TOUCH_SENSITIVITY = 5.0f;
 const float GYROSCOPE_THRESHOLD = 0.1f;
 
-Touch::Touch(Context* context) :
+Touch::Touch(Context* context, float touchSensitivity) :
     Object(context),
+    touchSensitivity_(touchSensitivity),
     cameraDistance_(CAMERA_INITIAL_DIST),
     zoom_(false),
     useGyroscope_(false)
@@ -69,7 +70,7 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
                 sens = -1;
             else
                 sens = 1;
-            cameraDistance_ += Abs(touch1->delta_.y_ - touch2->delta_.y_) * sens * TOUCH_SENSITIVITY / 50.0f;
+            cameraDistance_ += Abs(touch1->delta_.y_ - touch2->delta_.y_) * sens * touchSensitivity_ / 50.0f;
             cameraDistance_ = Clamp(cameraDistance_, CAMERA_MIN_DIST, CAMERA_MAX_DIST); // Restrict zoom range to [1;20]
         }
     }
