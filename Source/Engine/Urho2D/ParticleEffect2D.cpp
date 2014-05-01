@@ -115,7 +115,11 @@ bool ParticleEffect2D::Load(Deserializer& source)
 
     String texture = rootElem.GetChild("texture").GetAttribute("name");
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
+    sprite_= cache->GetResource<Sprite2D>(texture, false);
+    // If sprite not found, try get in current directory
+    if (!sprite_)
+        sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
+
     if (!sprite_)
         return false;
 

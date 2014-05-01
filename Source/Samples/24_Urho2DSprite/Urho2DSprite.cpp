@@ -99,7 +99,7 @@ void Urho2DSprite::CreateScene()
     {
         SharedPtr<Node> spriteNode(scene_->CreateChild("StaticSprite2D"));
         spriteNode->SetPosition(Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0f));
-        
+
         StaticSprite2D* staticSprite = spriteNode->CreateComponent<StaticSprite2D>();
         // Set random color
         staticSprite->SetColor(Color(Random(1.0f), Random(1.0f), Random(1.0f), 1.0f));
@@ -124,7 +124,7 @@ void Urho2DSprite::CreateScene()
 
     SharedPtr<Node> spriteNode(scene_->CreateChild("AnimatedSprite2D"));
     spriteNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
-    
+
     AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
     // Set animation
     animatedSprite->SetAnimation(animation);
@@ -177,7 +177,7 @@ void Urho2DSprite::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
-    
+
     if (input->GetKeyDown(KEY_PAGEUP))
     {
         Camera* camera = cameraNode_->GetComponent<Camera>();
@@ -195,6 +195,9 @@ void Urho2DSprite::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Urho2DSprite, HandleUpdate));
+
+    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
 void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)

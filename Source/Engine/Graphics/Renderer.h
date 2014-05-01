@@ -270,8 +270,6 @@ public:
     unsigned GetNumOccluders(bool allViews = false) const;
     /// Return the default zone.
     Zone* GetDefaultZone() const { return defaultZone_; }
-    /// Return the directional light for fullscreen quad rendering.
-    Light* GetQuadDirLight() const { return quadDirLight_; }
     /// Return the default material.
     Material* GetDefaultMaterial() const { return defaultMaterial_; }
     /// Return the default range attenuation texture.
@@ -300,6 +298,8 @@ public:
     
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
+    /// Return quad geometry used in postprocessing.
+    Geometry* GetQuadGeometry();
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
@@ -373,8 +373,6 @@ private:
     SharedPtr<RenderPath> defaultRenderPath_;
     /// Default zone.
     SharedPtr<Zone> defaultZone_;
-    /// Directional light for drawing fullscreen quads.
-    SharedPtr<Light> quadDirLight_;
     /// Directional light quad geometry.
     SharedPtr<Geometry> dirLightGeometry_;
     /// Spot light volume geometry.

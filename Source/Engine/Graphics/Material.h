@@ -25,16 +25,19 @@
 #include "GraphicsDefs.h"
 #include "Light.h"
 #include "Resource.h"
+#include "ValueAnimationInfo.h"
 #include "Vector4.h"
 
 namespace Urho3D
 {
 
+class Material;
 class Pass;
 class Technique;
 class Texture;
 class Texture2D;
 class TextureCube;
+class ValueAnimationInfo;
 
 /// %Material's shader parameter definition.
 struct MaterialShaderParameter
@@ -54,7 +57,7 @@ struct TechniqueEntry
     TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance);
     /// Destruct.
     ~TechniqueEntry();
-    
+
     /// Technique.
     SharedPtr<Technique> technique_;
     /// Quality level.
@@ -63,11 +66,34 @@ struct TechniqueEntry
     float lodDistance_;
 };
 
+/// Material's shader parameter animation instance.
+class ShaderParameterAnimationInfo : public ValueAnimationInfo
+{
+public:
+    /// Construct.
+    ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Copy construct.
+    ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other);
+    /// Destruct.
+    ~ShaderParameterAnimationInfo();
+
+    /// Return shader parameter name.
+    const String& GetName() const { return name_; }
+
+protected:
+    /// Apply new animation value to the target object. Called by Update().
+    virtual void ApplyValue(const Variant& newValue);
+    
+private:
+    /// Shader parameter name.
+    String name_;
+};
+
 /// Describes how to render 3D geometries.
 class URHO3D_API Material : public Resource
 {
     OBJECT(Material);
-    
+
 public:
     /// Construct.
     Material(Context* context);
@@ -75,12 +101,12 @@ public:
     ~Material();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    
+
     /// Load from an XML element. Return true if successful.
     bool Load(const XMLElement& source);
     /// Save to an XML element. Return true if successful.
@@ -91,6 +117,12 @@ public:
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// Set shader parameter.
     void SetShaderParameter(const String& name, const Variant& value);
+    /// Set shader paramter animation.
+    void SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    /// Set shader paramter animation.
+    void SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode);
+    /// Set shader paramter animation.
+    void SetShaderParameterAnimationSpeed(const String& name, float speed);
     /// Set texture.
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform.
@@ -113,7 +145,9 @@ public:
     void SortTechniques();
     /// Mark material for auxiliary view rendering.
     void MarkForAuxView(unsigned frameNumber);
-    
+    /// Update shader parameter animations.
+    void UpdateShaderParameterAnimations();
+
     /// Return number of techniques.
     unsigned GetNumTechniques() const { return techniques_.Size(); }
     /// Return all techniques.
@@ -130,6 +164,12 @@ public:
     const SharedPtr<Texture>* GetTextures() const { return &textures_[0]; }
     /// Return shader parameter.
     const Variant& GetShaderParameter(const String& name) const;
+    /// Return shader parameter animation.
+    ValueAnimation* GetShaderParameterAnimation(const String& name) const;
+    /// Return shader parameter animation wrap mode.
+    WrapMode GetShaderParameterAnimationWrapMode(const String& name) const;
+    /// Return shader parameter animation speed.
+    float GetShaderParameterAnimationSpeed(const String& name) const;
     /// Return all shader parameters.
     const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
     /// Return normal culling mode.
@@ -144,12 +184,12 @@ public:
     bool GetOcclusion() const { return occlusion_; }
     /// Return whether should render specular.
     bool GetSpecular() const { return specular_; }
-    
+
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);
     /// Parse a shader parameter value from a string. Retunrs either a bool, a float, or a 2 to 4-component vector.
     static Variant ParseShaderParameterValue(const String& value);
-    
+
 private:
     /// Re-evaluate occlusion rendering.
     void CheckOcclusion();
@@ -157,13 +197,17 @@ private:
     void ResetToDefaults();
     /// Recalculate the memory used by the material.
     void RefreshMemoryUse();
-    
+    /// Return shader parameter animation info.
+    ShaderParameterAnimationInfo* GetShaderParameterAnimationInfo(const String& name) const;
+
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
     /// Textures.
     SharedPtr<Texture> textures_[MAX_MATERIAL_TEXTURE_UNITS];
     /// %Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
+    /// %Shader parameters animation infos.
+    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> > shaderParameterAnimationInfos_;
     /// Normal culling mode.
     CullMode cullMode_;
     /// Culling mode for shadow rendering.
@@ -176,6 +220,8 @@ private:
     bool occlusion_;
     /// Specular lighting flag.
     bool specular_;
+    /// Last animation update frame number.
+    unsigned animationFrameNumber_;
 };
 
 }

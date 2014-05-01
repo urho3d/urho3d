@@ -5,7 +5,9 @@ class Vector3
     Vector3();
     Vector3(const Vector3& vector);
     Vector3(const Vector2& vector, float z);
+    Vector3(const Vector2& vector);
     Vector3(float x, float y, float z);
+    Vector3(float x, float y);
     ~Vector3();
     
     bool operator == (const Vector3& rhs) const;

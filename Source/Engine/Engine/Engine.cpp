@@ -359,6 +359,10 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Init FPU state of main thread
     InitFPU();
 
+    // Initialize input
+    if (HasParameter(parameters, "TouchEmulation"))
+        GetSubsystem<Input>()->SetTouchEmulation(GetParameter(parameters, "TouchEmulation").GetBool());
+
     #ifdef URHO3D_TESTING
     if (HasParameter(parameters, "TimeOut"))
         timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
@@ -795,6 +799,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["TextureAnisotropy"] = ToInt(value);
                 ++i;
             }
+            else if (argument == "touch")
+                ret["TouchEmulation"] = true;
             #ifdef URHO3D_TESTING
             else if (argument == "timeout" && !value.Empty())
             {

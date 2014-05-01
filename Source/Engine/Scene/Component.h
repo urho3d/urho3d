@@ -38,34 +38,34 @@ class URHO3D_API Component : public Animatable
 {
     OBJECT(Component);
     BASEOBJECT(Component);
-    
+
     friend class Node;
     friend class Scene;
-    
+
 public:
     /// Construct.
     Component(Context* context);
     /// Destruct.
     virtual ~Component();
-    
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled() {}
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Mark for attribute check on the next network update.
+    virtual void MarkNetworkUpdate();
     /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) {};
-    
+
     /// Set enabled/disabled state.
     void SetEnabled(bool enable);
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    
+
     /// Return ID.
     unsigned GetID() const { return id_; }
     /// Return scene node.
@@ -84,16 +84,14 @@ public:
     template <class T> T* GetComponent() const;
     /// Template version of returning components in the same scene node by type.
     template <class T> void GetComponents(PODVector<T*>& dest) const;
-    
+
     /// Add a replication state that is tracking this component.
     void AddReplicationState(ComponentReplicationState* state);
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
     void CleanupConnection(Connection* connection);
-    /// Mark for attribute check on the next network update.
-    void MarkNetworkUpdate();
-    
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
@@ -111,7 +109,7 @@ protected:
     void SetNode(Node* node);
     /// Handle scene attribute animation update event.
     void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Scene node.
     Node* node_;
     /// Unique ID within the scene.

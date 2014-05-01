@@ -113,6 +113,7 @@ void Urho3DPlayer::Setup()
             "-nosound     Disable sound output\n"
             "-noip        Disable sound mixing interpolation\n"
             "-sm2         Force SM2.0 rendering\n"
+            "-touch       Touch emulation on desktop platform\n"
             #endif
         );
     }

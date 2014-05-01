@@ -41,9 +41,9 @@ namespace Urho3D
 
 Node::Node(Context* context) :
     Animatable(context),
+    networkUpdate_(false),
     worldTransform_(Matrix3x4::IDENTITY),
     dirty_(false),
-    networkUpdate_(false),
     enabled_(true),
     parent_(0),
     scene_(0),
@@ -79,12 +79,6 @@ void Node::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
-}
-
-void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Animatable::OnSetAttribute(attr, src);
-    MarkNetworkUpdate();
 }
 
 bool Node::Load(Deserializer& source, bool setInstanceDefault)
@@ -123,7 +117,7 @@ bool Node::Save(Serializer& dest) const
         Component* component = components_[i];
         if (component->IsTemporary())
             continue;
-        
+
         // Create a separate buffer to be able to skip failing components during deserialization
         VectorBuffer compBuffer;
         if (!component->Save(compBuffer))
@@ -139,7 +133,7 @@ bool Node::Save(Serializer& dest) const
         Node* node = children_[i];
         if (node->IsTemporary())
             continue;
-        
+
         if (!node->Save(dest))
             return false;
     }
@@ -182,7 +176,7 @@ bool Node::SaveXML(XMLElement& dest) const
         Component* component = components_[i];
         if (component->IsTemporary())
             continue;
-        
+
         XMLElement compElem = dest.CreateChild("component");
         if (!component->SaveXML(compElem))
             return false;
@@ -194,7 +188,7 @@ bool Node::SaveXML(XMLElement& dest) const
         Node* node = children_[i];
         if (node->IsTemporary())
             continue;
-        
+
         XMLElement childElem = dest.CreateChild("node");
         if (!node->SaveXML(childElem))
             return false;
@@ -210,6 +204,15 @@ void Node::ApplyAttributes()
 
     for (unsigned i = 0; i < children_.Size(); ++i)
         children_[i]->ApplyAttributes();
+}
+
+void Node::MarkNetworkUpdate()
+{
+    if (!networkUpdate_ && scene_ && id_ < FIRST_LOCAL_ID)
+    {
+        scene_->MarkNetworkUpdate(this);
+        networkUpdate_ = true;
+    }
 }
 
 void Node::AddReplicationState(NodeReplicationState* state)
@@ -365,18 +368,18 @@ void Node::Translate(const Vector3& delta, TransformSpace space)
         // Note: local space translation disregards local scale for scale-independent movement speed
         position_ += rotation_ * delta;
         break;
-        
+
     case TS_PARENT:
         position_ += delta;
         break;
-        
+
     case TS_WORLD:
         position_ += (parent_ == scene_ || !parent_) ? delta : parent_->GetWorldTransform().Inverse() * Vector4(delta, 0.0f);
         break;
     }
-    
+
     MarkDirty();
-    
+
     MarkNetworkUpdate();
 }
 
@@ -387,11 +390,11 @@ void Node::Rotate(const Quaternion& delta, TransformSpace space)
     case TS_LOCAL:
         rotation_ = (rotation_ * delta).Normalized();
         break;
-        
+
     case TS_PARENT:
         rotation_ = (delta * rotation_).Normalized();
         break;
-        
+
     case TS_WORLD:
         if (parent_ == scene_ || !parent_)
             rotation_ = (delta * rotation_).Normalized();
@@ -404,7 +407,7 @@ void Node::Rotate(const Quaternion& delta, TransformSpace space)
     }
 
     MarkDirty();
-    
+
     MarkNetworkUpdate();
 }
 
@@ -412,19 +415,19 @@ void Node::RotateAround(const Vector3& point, const Quaternion& delta, Transform
 {
     Vector3 parentSpacePoint;
     Quaternion oldRotation = rotation_;
-    
+
     switch (space)
     {
     case TS_LOCAL:
         parentSpacePoint = GetTransform() * point;
         rotation_ = (rotation_ * delta).Normalized();
         break;
-        
+
     case TS_PARENT:
         parentSpacePoint = point;
         rotation_ = (delta * rotation_).Normalized();
         break;
-        
+
     case TS_WORLD:
         if (parent_ == scene_ || !parent_)
         {
@@ -439,12 +442,12 @@ void Node::RotateAround(const Vector3& point, const Quaternion& delta, Transform
         }
         break;
     }
-    
+
     Vector3 oldRelativePos = oldRotation.Inverse() * (position_ - parentSpacePoint);
     position_ = rotation_ * oldRelativePos + parentSpacePoint;
 
     MarkDirty();
-    
+
     MarkNetworkUpdate();
 }
 
@@ -466,22 +469,22 @@ void Node::Roll(float angle, TransformSpace space)
 bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space)
 {
     Vector3 worldSpaceTarget;
-    
+
     switch (space)
     {
     case TS_LOCAL:
         worldSpaceTarget = GetWorldTransform() * target;
         break;
-        
+
     case TS_PARENT:
         worldSpaceTarget = (parent_ == scene_ || !parent_) ? target : parent_->GetWorldTransform() * target;
         break;
-        
+
     case TS_WORLD:
         worldSpaceTarget = target;
         break;
     }
-    
+
     Vector3 lookDir = target - GetWorldPosition();
     // Check if target is very close, in that case can not reliably calculate lookat direction
     if (lookDir.Equals(Vector3::ZERO))
@@ -490,7 +493,7 @@ bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space
     // Do nothing if setting look rotation failed
     if (!newRotation.FromLookRotation(lookDir, up))
         return false;
-    
+
     SetWorldRotation(newRotation);
     return true;
 }
@@ -678,26 +681,26 @@ void Node::RemoveAllChildren()
 void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
 {
     unsigned numRemoved = 0;
-    
+
     for (unsigned i = children_.Size() - 1; i < children_.Size(); --i)
     {
         bool remove = false;
         Node* childNode = children_[i];
-        
+
         if (recursive)
             childNode->RemoveChildren(removeReplicated, removeLocal, true);
         if (childNode->GetID() < FIRST_LOCAL_ID && removeReplicated)
             remove = true;
         else if (childNode->GetID() >= FIRST_LOCAL_ID && removeLocal)
             remove = true;
-        
+
         if (remove)
         {
             RemoveChild(children_.Begin() + i);
             ++numRemoved;
         }
     }
-    
+
     // Mark node dirty in all replication states
     if (numRemoved)
         MarkReplicationDirty();
@@ -764,24 +767,24 @@ void Node::RemoveAllComponents()
 void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
     unsigned numRemoved = 0;
-    
+
     for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
     {
         bool remove = false;
         Component* component = components_[i];
-        
+
         if (component->GetID() < FIRST_LOCAL_ID && removeReplicated)
             remove = true;
         else if (component->GetID() >= FIRST_LOCAL_ID && removeLocal)
             remove = true;
-        
+
         if (remove)
         {
             RemoveComponent(components_.Begin() + i);
             ++numRemoved;
         }
     }
-    
+
     // Mark node dirty in all replication states
     if (numRemoved)
         MarkReplicationDirty();
@@ -816,9 +819,9 @@ void Node::SetParent(Node* parent)
     if (parent)
     {
         Matrix3x4 oldWorldTransform = GetWorldTransform();
-        
+
         parent->AddChild(this);
-        
+
         if (parent != scene_)
         {
             Matrix3x4 newTransform = parent->GetWorldTransform().Inverse() * oldWorldTransform;
@@ -878,6 +881,12 @@ Vector3 Node::LocalToWorld(const Vector4& vector) const
     return GetWorldTransform() * vector;
 }
 
+Vector2 Node::LocalToWorld(const Vector2& vector) const
+{
+    Vector3 result = LocalToWorld(Vector3(vector));
+    return Vector2(result.x_, result.y_);
+}
+
 Vector3 Node::WorldToLocal(const Vector3& position) const
 {
     return GetWorldTransform().Inverse() * position;
@@ -886,6 +895,12 @@ Vector3 Node::WorldToLocal(const Vector3& position) const
 Vector3 Node::WorldToLocal(const Vector4& vector) const
 {
     return GetWorldTransform().Inverse() * vector;
+}
+
+Vector2 Node::WorldToLocal(const Vector2& vector) const
+{
+    Vector3 result = WorldToLocal(Vector3(vector));
+    return Vector2(result.x_, result.y_);
 }
 
 unsigned Node::GetNumChildren(bool recursive) const
@@ -1146,7 +1161,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash compType = compBuffer.ReadShortStringHash();
         unsigned compID = compBuffer.ReadUInt();
-        
+
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1334,15 +1349,6 @@ void Node::CleanupConnection(Connection* connection)
     }
 }
 
-void Node::MarkNetworkUpdate()
-{
-    if (!networkUpdate_ && scene_ && id_ < FIRST_LOCAL_ID)
-    {
-        scene_->MarkNetworkUpdate(this);
-        networkUpdate_ = true;
-    }
-}
-
 void Node::MarkReplicationDirty()
 {
     if (networkState_)
@@ -1421,38 +1427,38 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
 unsigned Node::GetNumPersistentChildren() const
 {
     unsigned ret = 0;
-    
+
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if (!(*i)->IsTemporary())
             ++ret;
     }
-    
+
     return ret;
 }
 
 unsigned Node::GetNumPersistentComponents() const
 {
     unsigned ret = 0;
-    
+
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if (!(*i)->IsTemporary())
             ++ret;
     }
-    
+
     return ret;
 }
 
 void Node::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInstances_.Size() == 1)
-        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Node, HandleAttributeAnimationUpdate));        
+    if (attributeAnimationInfos_.Size() == 1)
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Node, HandleAttributeAnimationUpdate));
 }
 
 void Node::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInstances_.Empty())
+    if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
@@ -1470,7 +1476,7 @@ Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash typ
             newComponent->SetType(type);
         else
             newComponent->SetTypeName(typeName);
-        
+
         AddComponent(newComponent, id, mode);
         return newComponent;
     }
@@ -1479,7 +1485,7 @@ Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash typ
 void Node::UpdateWorldTransform() const
 {
     Matrix3x4 transform = GetTransform();
-    
+
     // Assume the root node (scene) has identity transform
     if (parent_ == scene_ || !parent_)
     {
@@ -1491,7 +1497,7 @@ void Node::UpdateWorldTransform() const
         worldTransform_ = parent_->GetWorldTransform() * transform;
         worldRotation_ = parent_->GetWorldRotation() * rotation_;
     }
-    
+
     dirty_ = false;
 }
 
@@ -1570,7 +1576,7 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        Component* cloneComponent = cloneNode->SafeCreateComponent(component->GetTypeName(), component->GetType(), 
+        Component* cloneComponent = cloneNode->SafeCreateComponent(component->GetTypeName(), component->GetType(),
             (mode == REPLICATED && component->GetID() < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, 0);
         if (!cloneComponent)
         {

@@ -12,12 +12,12 @@ Methods:
 
 - void SetAnimationEnabled(bool enable)
 - void SetObjectAnimation(ObjectAnimation* objectAnimation)
-- void SetAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
+- void SetAttributeAnimation(const String name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void SetAttributeAnimationWrapMode(const String name, WrapMode wrapMode)
 - void SetAttributeAnimationSpeed(const String name, float speed)
 - bool GetAnimationEnabled() const
 - ObjectAnimation* GetObjectAnimation() const
-- AttributeAnimation* GetAttributeAnimation(const String name) const
+- ValueAnimation* GetAttributeAnimation(const String name) const
 - WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
 
@@ -233,29 +233,6 @@ Properties:
 - float length (readonly)
 - char layer
 
-### AttributeAnimation : Resource
-
-Methods:
-
-- AttributeAnimation() (GC)
-- AttributeAnimation* new()
-- void delete()
-- void SetInterpolationMethod(InterpMethod method)
-- void SetSplineTension(float tension)
-- void SetValueType(VariantType valueType)
-- bool SetKeyFrame(float time, const Variant& value)
-- void SetEventFrame(float time, const StringHash& eventType)
-- void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
-- InterpMethod GetInterpolationMethod() const
-- float GetSplineTension() const
-- VariantType GetValueType() const
-
-Properties:
-
-- InterpMethod interpolationMethod
-- float splineTension
-- VariantType valueType
-
 ### Audio : Object
 
 Methods:
@@ -324,6 +301,7 @@ Methods:
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
 - void SetFaceCamera(bool enable)
+- void SetFaceCameraAxes(const Vector3& axes)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -333,6 +311,7 @@ Methods:
 - bool IsScaled() const
 - bool IsSorted() const
 - bool GetFaceCamera() const
+- const Vector3& GetFaceCameraAxes() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -343,6 +322,7 @@ Properties:
 - bool scaled
 - bool sorted
 - bool faceCamera
+- Vector3& faceCameraAxes
 - float animationLodBias
 
 ### Bone
@@ -953,6 +933,7 @@ Methods:
 - XMLFile* GetDefaultStyle() const
 - BorderImage* GetBackground() const
 - LineEdit* GetLineEdit() const
+- Button* GetCloseButton() const
 - bool IsVisible() const
 - bool IsAutoVisibleOnError() const
 - const String GetCommandInterpreter() const
@@ -969,6 +950,7 @@ Properties:
 - XMLFile* defaultStyle
 - BorderImage* background (readonly)
 - LineEdit* lineEdit (readonly)
+- Button* closeButton (readonly)
 - bool visible
 - bool autoVisibleOnError
 - String commandInterpreter
@@ -2041,10 +2023,12 @@ Methods:
 
 - void SetToggleFullscreen(bool enable)
 - void SetMouseVisible(bool enable)
+- void SetMouseGrabbed(bool grab)
 - int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - bool RemoveScreenJoystick(int id)
 - void SetScreenJoystickVisible(int id, bool enable)
 - void SetScreenKeyboardVisible(bool enable)
+- void SetTouchEmulation(bool enable)
 - bool RecordGesture()
 - bool SaveGestures(File* dest)
 - bool SaveGesture(File* dest, unsigned gestureID)
@@ -2081,7 +2065,9 @@ Methods:
 - bool GetScreenKeyboardSupport() const
 - bool IsScreenJoystickVisible(int id) const
 - bool IsScreenKeyboardVisible() const
+- bool GetTouchEmulation() const
 - bool IsMouseVisible() const
+- bool IsMouseGrabbed() const
 - bool HasFocus()
 - bool IsMinimized() const
 
@@ -2098,7 +2084,9 @@ Properties:
 - bool toggleFullscreen (readonly)
 - bool screenKeyboardSupport (readonly)
 - bool screenKeyboardVisible
+- bool touchEmulation
 - bool mouseVisible
+- bool mouseGrabbed
 - bool focus (readonly)
 - bool minimized (readonly)
 
@@ -2155,6 +2143,118 @@ Properties:
 - int x
 - int y
 - const IntVector2 ZERO
+
+### JSONFile : Resource
+
+Methods:
+
+- JSONFile() (GC)
+- JSONFile* new()
+- void delete()
+- JSONValue CreateRoot(JSONValueType valueType = JSON_OBJECT)
+- JSONValue GetRoot(JSONValueType valueType = JSON_ANY)
+
+### JSONValue
+
+
+Methods:
+
+- bool IsNull() const
+- bool NotNull() const
+- bool operatorbool() const
+- JSONValue CreateChild(const String name, JSONValueType valueType = JSON_OBJECT)
+- JSONValue GetChild(const String name, JSONValueType valueType = JSON_ANY) const
+- void SetInt(const String name, int value)
+- void SetBool(const String name, bool value)
+- void SetFloat(const String name, float value)
+- void SetVector2(const String name, const Vector2& value)
+- void SetVector3(const String name, const Vector3& value)
+- void SetVector4(const String name, const Vector4& value)
+- void SetVectorVariant(const String name, const Variant& value)
+- void SetQuaternion(const String name, const Quaternion& value)
+- void SetColor(const String name, const Color& value)
+- void SetString(const String name, const String value)
+- void SetResourceRef(const String name, const ResourceRef& value)
+- void SetResourceRefList(const String name, const ResourceRefList& value)
+- void SetIntRect(const String name, const IntRect& value)
+- void SetIntVector2(const String name, const IntVector2& value)
+- void SetMatrix3(const String name, const Matrix3& value)
+- void SetMatrix3x4(const String name, const Matrix3x4& value)
+- void SetMatrix4(const String name, const Matrix4& value)
+- void SetVariant(const String name, const Variant& value)
+- void SetVariantValue(const String name, const Variant& value)
+- bool IsObject() const
+- Vector<String> GetChildNames() const
+- int GetInt(const String name) const
+- bool GetBool(const String name) const
+- float GetFloat(const String name) const
+- Vector2 GetVector2(const String name) const
+- Vector3 GetVector3(const String name) const
+- Vector4 GetVector4(const String name) const
+- Variant GetVectorVariant(const String name) const
+- Quaternion GetQuaternion(const String name) const
+- Color GetColor(const String name) const
+- String GetString(const String name) const
+- const char* GetCString(const String name) const
+- ResourceRef GetResourceRef(const String name) const
+- ResourceRefList GetResourceRefList(const String name) const
+- IntRect GetIntRect(const String name) const
+- IntVector2 GetIntVector2(const String name) const
+- Matrix3 GetMatrix3(const String name) const
+- Matrix3x4 GetMatrix3x4(const String name) const
+- Matrix4 GetMatrix4(const String name) const
+- Variant GetVariant(const String name) const
+- Variant GetVariantValue(const String name, VariantType type) const
+- JSONValue CreateChild(JSONValueType valueType = JSON_OBJECT)
+- JSONValue GetChild(unsigned index, JSONValueType valueType = JSON_ANY) const
+- void AddInt(int value)
+- void AddBool(bool value)
+- void AddFloat(float value)
+- void AddVector2(const Vector2& value)
+- void AddVector3(const Vector3& value)
+- void AddVector4(const Vector4& value)
+- void AddVectorVariant(const Variant& value)
+- void AddQuaternion(const Quaternion& value)
+- void AddColor(const Color& value)
+- void AddString(const String value)
+- void AddResourceRef(const ResourceRef& value)
+- void AddResourceRefList(const ResourceRefList& value)
+- void AddIntRect(const IntRect& value)
+- void AddIntVector2(const IntVector2& value)
+- void AddMatrix3(const Matrix3& value)
+- void AddMatrix3x4(const Matrix3x4& value)
+- void AddMatrix4(const Matrix4& value)
+- void AddVariant(const Variant& value)
+- void AddVariantValue(const Variant& value)
+- bool IsArray() const
+- unsigned GetSize() const
+- int GetInt(unsigned index) const
+- bool GetBool(unsigned index) const
+- float GetFloat(unsigned index) const
+- Vector2 GetVector2(unsigned index) const
+- Vector3 GetVector3(unsigned index) const
+- Vector4 GetVector4(unsigned index) const
+- Variant GetVectorVariant(unsigned index) const
+- Quaternion GetQuaternion(unsigned index) const
+- Color GetColor(unsigned index) const
+- String GetString(unsigned index) const
+- const char* GetCString(unsigned index) const
+- ResourceRef GetResourceRef(unsigned index) const
+- ResourceRefList GetResourceRefList(unsigned index) const
+- IntRect GetIntRect(unsigned index) const
+- IntVector2 GetIntVector2(unsigned index) const
+- Matrix3 GetMatrix3(unsigned index) const
+- Matrix3x4 GetMatrix3x4(unsigned index) const
+- Matrix4 GetMatrix4(unsigned index) const
+- Variant GetVariant(unsigned index) const
+- Variant GetVariantValue(unsigned index, VariantType type) const
+
+Properties:
+
+- const JSONValue EMPTY
+- bool null (readonly)
+- bool object (readonly)
+- bool array (readonly)
 
 ### JoystickState
 
@@ -2314,6 +2414,7 @@ Methods:
 - void SetHierarchyMode(bool enable)
 - void SetBaseIndent(int baseIndent)
 - void SetClearSelectionOnDefocus(bool enable)
+- void SetSelectOnClickEnd(bool enable)
 - void Expand(unsigned index, bool enable, bool recursive = false)
 - void ToggleExpand(unsigned index, bool recursive = false)
 - unsigned GetNumItems() const
@@ -2330,6 +2431,7 @@ Methods:
 - HighlightMode GetHighlightMode() const
 - bool GetMultiselect() const
 - bool GetClearSelectionOnDefocus() const
+- bool GetSelectOnClickEnd() const
 - bool GetHierarchyMode() const
 - int GetBaseIndent() const
 
@@ -2341,6 +2443,7 @@ Properties:
 - HighlightMode highlightMode
 - bool multiselect
 - bool clearSelectionOnDefocus
+- bool selectOnClickEnd
 - bool hierarchyMode
 - int baseIndent
 
@@ -2398,6 +2501,9 @@ Methods:
 - void SetNumTechniques(unsigned num)
 - void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f)
 - void SetShaderParameter(const String name, const Variant& value)
+- void SetShaderParameterAnimation(const String name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
+- void SetShaderParameterAnimationWrapMode(const String name, WrapMode wrapMode)
+- void SetShaderParameterAnimationSpeed(const String name, float speed)
 - void SetTexture(TextureUnit unit, Texture* texture)
 - void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat)
 - void SetUVTransform(const Vector2& offset, float rotation, float repeat)
@@ -2414,6 +2520,9 @@ Methods:
 - Pass* GetPass(unsigned index, StringHash passType) const
 - Pass* GetPass(unsigned index, const String passType) const
 - Texture* GetTexture(TextureUnit unit) const
+- ValueAnimation* GetShaderParameterAnimation(const String name) const
+- WrapMode GetShaderParameterAnimationWrapMode(const String name) const
+- float GetShaderParameterAnimationSpeed(const String name) const
 - CullMode GetCullMode() const
 - CullMode GetShadowCullMode() const
 - const BiasParameters& GetDepthBias() const
@@ -2826,44 +2935,47 @@ Methods:
 - bool SaveXML(File* dest) const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
-- void SetPositionXYZ(float x, float y, float z)
+- void SetPosition(const Vector2& position)
 - void SetRotation(const Quaternion& rotation)
-- void SetRotationXYZ(float x, float y, float z)
+- void SetRotation(float rotation)
 - void SetDirection(const Vector3& direction)
-- void SetDirectionXYZ(float x, float y, float z)
 - void SetScale(float scale)
 - void SetScale(const Vector3& scale)
-- void SetScaleXYZ(float x, float y, float z)
+- void SetScale(const Vector2& scale)
 - void SetTransform(const Vector3& position, const Quaternion& rotation)
+- void SetTransform(const Vector2& position, float rotation)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
+- void SetTransform(const Vector2& position, float rotation, float scale)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+- void SetTransform(const Vector2& position, float rotation, const Vector2& scale)
 - void SetWorldPosition(const Vector3& position)
-- void SetWorldPositionXYZ(float x, float y, float z)
+- void SetWorldPosition(const Vector2& position)
 - void SetWorldRotation(const Quaternion& rotation)
-- void SetWorldRotationXYZ(float x, float y, float z)
+- void SetWorldRotation(float rotation)
 - void SetWorldDirection(const Vector3& direction)
-- void SetWorldDirectionXYZ(float x, float y, float z)
 - void SetWorldScale(float scale)
 - void SetWorldScale(const Vector3& scale)
-- void SetWorldScaleXYZ(float x, float y, float z)
+- void SetWorldScale(const Vector2& scale)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation)
+- void SetWorldTransform(const Vector2& position, float rotation)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
+- void SetWorldTransform(const Vector2& position, float rotation, float scale)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+- void SetWorldTransform(const Vector2& position, float rotation, const Vector3& scale)
 - void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL)
-- void TranslateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL)
+- void Translate(const Vector2& delta, TransformSpace space = TS_LOCAL)
 - void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL)
-- void RotateXYZ(float x, float y, float z, TransformSpace space = TS_LOCAL)
+- void Rotate(float delta, TransformSpace space = TS_LOCAL)
 - void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL)
-- void RotateAroundXYZ(float pX, float pY, float pZ, float dX, float dY, float dZ, TransformSpace space = TS_LOCAL)
+- void RotateAround(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
 - void Pitch(float angle, TransformSpace space = TS_LOCAL)
 - void Yaw(float angle, TransformSpace space = TS_LOCAL)
 - void Roll(float angle, TransformSpace space = TS_LOCAL)
 - bool LookAt(const Vector3& target)
 - bool LookAt(const Vector3& target, const Vector3& upAxis, TransformSpace space = TS_WORLD)
-- bool LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f, TransformSpace space = TS_WORLD)
 - void Scale(float scale)
 - void Scale(const Vector3& scale)
-- void ScaleXYZ(float x, float y, float z)
+- void Scale(const Vector2& scale)
 - void SetEnabled(bool enable)
 - void SetEnabled(bool enable, bool recursive)
 - void SetOwner(Connection* owner)
@@ -2897,37 +3009,25 @@ Methods:
 - bool IsEnabled() const
 - Connection* GetOwner() const
 - const Vector3& GetPosition() const
-- void GetPositionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - const Quaternion& GetRotation() const
-- void GetRotationXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
-- void GetRotationWXYZ(float w = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetDirection() const
-- void GetDirectionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetUp() const
-- void GetUpXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetRight() const
-- void GetRightXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - const Vector3& GetScale() const
-- void GetScaleXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Matrix3x4 GetTransform() const
 - Vector3 GetWorldPosition() const
-- void GetWorldPositionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Quaternion GetWorldRotation() const
-- void GetWorldRotationXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
-- void GetWorldRotationWXYZ(float w = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldDirection() const
-- void GetWorldDirectionXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldUp() const
-- void GetWorldUpXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldRight() const
-- void GetWorldRightXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - Vector3 GetWorldScale() const
-- void GetWorldScaleXYZ(float x = 0.0f, float y = 0.0f, float z = 0.0f) const
 - const Matrix3x4& GetWorldTransform() const
 - Vector3 LocalToWorld(const Vector3& position) const
 - Vector3 LocalToWorld(const Vector4& vector) const
+- Vector2 LocalToWorld(const Vector2& vector) const
 - Vector3 WorldToLocal(const Vector3& position) const
 - Vector3 WorldToLocal(const Vector4& vector) const
+- Vector2 WorldToLocal(const Vector2& vector) const
 - bool IsDirty() const
 - unsigned GetNumChildren(bool recursive = false) const
 - Node* GetChild(const String name, bool recursive = false) const
@@ -2999,10 +3099,10 @@ Methods:
 - ObjectAnimation() (GC)
 - ObjectAnimation* new()
 - void delete()
-- void AddAttributeAnimation(const String name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
+- void AddAttributeAnimation(const String name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void RemoveAttributeAnimation(const String name)
-- void RemoveAttributeAnimation(AttributeAnimation* attributeAnimation)
-- AttributeAnimation* GetAttributeAnimation(const String name) const
+- void RemoveAttributeAnimation(ValueAnimation* attributeAnimation)
+- ValueAnimation* GetAttributeAnimation(const String name) const
 - WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
 
@@ -3373,6 +3473,7 @@ Methods:
 - void Transform(const Matrix3& transform)
 - void Transform(const Matrix3x4& transform)
 - void Transform(const Matrix4& transform)
+- Vector3 Project(const Vector3& point) const
 - float Distance(const Vector3& point) const
 - Vector3 Reflect(const Vector3& direction) const
 - Matrix3x4 ReflectionMatrix() const
@@ -3433,6 +3534,8 @@ Methods:
 - Quaternion* new(float w, float x, float y, float z)
 - Quaternion(float angle, const Vector3& axis) (GC)
 - Quaternion* new(float angle, const Vector3& axis)
+- Quaternion(float angle) (GC)
+- Quaternion* new(float angle)
 - Quaternion(float x, float y, float z) (GC)
 - Quaternion* new(float x, float y, float z)
 - Quaternion(const Vector3& start, const Vector3& end) (GC)
@@ -3705,14 +3808,9 @@ Methods:
 - unsigned GetNumShadowMaps(bool allViews = false) const
 - unsigned GetNumOccluders(bool allViews = false) const
 - Zone* GetDefaultZone() const
-- Light* GetQuadDirLight() const
 - Material* GetDefaultMaterial() const
 - Texture2D* GetDefaultLightRamp() const
 - Texture2D* GetDefaultLightSpot() const
-- TextureCube* GetFaceSelectCubeMap() const
-- TextureCube* GetIndirectionCubeMap() const
-- VertexBuffer* GetInstancingBuffer() const
-- const FrameInfo& GetFrameInfo()
 - void DrawDebugGeometry(bool depthTest)
 
 Properties:
@@ -4821,6 +4919,7 @@ Methods:
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
 - void SetFaceCamera(bool enable)
+- void SetFaceCameraAxes(const Vector3& axes)
 - Font* GetFont() const
 - Material* GetMaterial() const
 - int GetFontSize() const
@@ -4843,6 +4942,7 @@ Methods:
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool GetFaceCamera() const
+- const Vector3& GetFaceCameraAxes() const
 
 Properties:
 
@@ -4865,6 +4965,7 @@ Properties:
 - unsigned numChars (readonly)
 - float opacity
 - bool faceCamera
+- Vector3& faceCameraAxes
 
 ### Texture : Resource
 
@@ -5262,6 +5363,29 @@ Properties:
 - TraversalMode traversalMode
 - bool elementEventSender
 
+### ValueAnimation : Resource
+
+Methods:
+
+- ValueAnimation() (GC)
+- ValueAnimation* new()
+- void delete()
+- void SetInterpolationMethod(InterpMethod method)
+- void SetSplineTension(float tension)
+- void SetValueType(VariantType valueType)
+- bool SetKeyFrame(float time, const Variant& value)
+- void SetEventFrame(float time, const StringHash& eventType)
+- void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
+- InterpMethod GetInterpolationMethod() const
+- float GetSplineTension() const
+- VariantType GetValueType() const
+
+Properties:
+
+- InterpMethod interpolationMethod
+- float splineTension
+- VariantType valueType
+
 ### Variant
 
 
@@ -5498,8 +5622,12 @@ Methods:
 - Vector3* new(const Vector3& vector)
 - Vector3(const Vector2& vector, float z) (GC)
 - Vector3* new(const Vector2& vector, float z)
+- Vector3(const Vector2& vector) (GC)
+- Vector3* new(const Vector2& vector)
 - Vector3(float x, float y, float z) (GC)
 - Vector3* new(float x, float y, float z)
+- Vector3(float x, float y) (GC)
+- Vector3* new(float x, float y)
 - void delete()
 - bool operator==(const Vector3& rhs) const
 - Vector3 operator+(const Vector3& rhs) const
@@ -6096,6 +6224,12 @@ Properties:
 - int INTERSECTS
 - int INSIDE
 
+### JSONValueType
+
+- int JSON_ANY
+- int JSON_OBJECT
+- int JSON_ARRAY
+
 ### LayoutMode
 
 - int LM_FREE
@@ -6328,7 +6462,7 @@ Properties:
 
 \section LuaScriptAPI_GlobalFunctions Global functions
 - float Abs(float value)
-- int Abs(int value)
+- int AbsInt(int value)
 - float Acos(float x)
 - String AddTrailingSlash(const String pathName)
 - float Asin(float x)
@@ -6376,10 +6510,10 @@ Properties:
 - bool IsNaN(float value)
 - bool IsPowerOfTwo(unsigned value)
 - float Lerp(float lhs, float rhs, float t)
-- int Max(int lhs, int rhs)
 - float Max(float lhs, float rhs)
+- int MaxInt(int lhs, int rhs)
 - float Min(float lhs, float rhs)
-- int Min(int lhs, int rhs)
+- int MinInt(int lhs, int rhs)
 - unsigned NextPowerOfTwo(unsigned value)
 - void OpenConsoleWindow()
 - void PrintLine(const String str, bool error = false)

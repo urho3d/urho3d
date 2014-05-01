@@ -44,6 +44,8 @@
 
 #include "DebugNew.h"
 
+extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
+
 // Require a click inside window before re-hiding mouse cursor on OSX, otherwise dragging the window
 // can be incorrectly interpreted as mouse movement inside the window
 #if defined(__APPLE__) && !defined(IOS)
@@ -55,6 +57,7 @@ namespace Urho3D
 
 const int SCREEN_JOYSTICK_START_ID = 0x40000000;
 const ShortStringHash VAR_BUTTON_KEY_BINDING("VAR_BUTTON_KEY_BINDING");
+const ShortStringHash VAR_BUTTON_MOUSE_BUTTON_BINDING("VAR_BUTTON_MOUSE_BUTTON_BINDING");
 const ShortStringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const ShortStringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 
@@ -67,6 +70,29 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
+void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
+{
+    buttons_.Resize(numButtons);
+    buttonPress_.Resize(numButtons);
+    axes_.Resize(numAxes);
+    hats_.Resize(numHats);
+    
+    Reset();
+}
+
+void JoystickState::Reset()
+{
+    for (unsigned i = 0; i < buttons_.Size(); ++i)
+    {
+        buttons_[i] = false;
+        buttonPress_[i] = false;
+    }
+    for (unsigned i = 0; i < axes_.Size(); ++i)
+        axes_[i] = 0.0f;
+    for (unsigned i = 0; i < hats_.Size(); ++i)
+        hats_[i] = HAT_CENTER;
+}
+
 Input::Input(Context* context) :
     Object(context),
     mouseButtonDown_(0),
@@ -75,6 +101,8 @@ Input::Input(Context* context) :
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
+    mouseGrabbed_(false),
+    touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
     focusedThisFrame_(false),
@@ -147,7 +175,7 @@ void Input::Update()
         return;
 
     // Check for relative mode mouse move
-    if (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS)))
+    if (!touchEmulation_ && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
     {
         IntVector2 mousePosition = GetMousePosition();
         mouseMove_ = mousePosition - lastMousePosition_;
@@ -195,6 +223,10 @@ void Input::Update()
 
 void Input::SetMouseVisible(bool enable)
 {
+    // In touch emulation mode only enabled mouse is allowed
+    if (touchEmulation_)
+        enable = true;
+    
     // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
     #ifndef RASPI
     if (enable != mouseVisible_)
@@ -231,6 +263,11 @@ void Input::SetMouseVisible(bool enable)
     #endif
 }
 
+void Input::SetMouseGrabbed(bool grab)
+{
+    mouseGrabbed_ = grab;
+}
+
 void Input::SetToggleFullscreen(bool enable)
 {
     toggleFullscreen_ = enable;
@@ -258,6 +295,8 @@ static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
         keyBindingMap.Insert(MakePair<String, int>("RIGHT", KEY_RIGHT));
         keyBindingMap.Insert(MakePair<String, int>("UP", KEY_UP));
         keyBindingMap.Insert(MakePair<String, int>("DOWN", KEY_DOWN));
+        keyBindingMap.Insert(MakePair<String, int>("PAGEUP", KEY_PAGEUP));
+        keyBindingMap.Insert(MakePair<String, int>("PAGEDOWN", KEY_PAGEDOWN));
         keyBindingMap.Insert(MakePair<String, int>("F1", KEY_F1));
         keyBindingMap.Insert(MakePair<String, int>("F2", KEY_F2));
         keyBindingMap.Insert(MakePair<String, int>("F3", KEY_F3));
@@ -273,9 +312,22 @@ static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
     }
 }
 
+static void PopulateMouseButtonBindingMap(HashMap<String, int>& mouseButtonBindingMap)
+{
+    if (mouseButtonBindingMap.Empty())
+    {
+        mouseButtonBindingMap.Insert(MakePair<String, int>("LEFT", SDL_BUTTON_LEFT));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("MIDDLE", SDL_BUTTON_MIDDLE));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("RIGHT", SDL_BUTTON_RIGHT));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("X1", SDL_BUTTON_X1));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("X2", SDL_BUTTON_X2));
+    }
+}
+
 SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 {
     static HashMap<String, int> keyBindingMap;
+    static HashMap<String, int> mouseButtonBindingMap;
 
     if (!graphics_)
     {
@@ -305,7 +357,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     SDL_JoystickID joystickID = SCREEN_JOYSTICK_START_ID;
     while (joysticks_.Contains(joystickID))
         ++joystickID;
-    
+
     JoystickState& state = joysticks_[joystickID];
     state.joystickID_ = joystickID;
     state.name_ = screenJoystick->GetName();
@@ -348,6 +400,21 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
                 if (keyBinding != M_MAX_INT)
                     element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
+            }
+
+            // Check whether the button has mouse button binding
+            text = dynamic_cast<Text*>(element->GetChild("MouseButtonBinding", false));
+            if (text)
+            {
+                text->SetVisible(false);
+                const String& mouseButton = text->GetText();
+                PopulateMouseButtonBindingMap(mouseButtonBindingMap);
+
+                HashMap<String, int>::Iterator i = mouseButtonBindingMap.Find(mouseButton);
+                if (i != mouseButtonBindingMap.End())
+                    element->SetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING, i->second_);
+                else
+                    LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
             }
         }
         else if (name.StartsWith("Axis"))
@@ -416,10 +483,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     for (PODVector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
         (*iter)->SetFocusMode(FM_NOTFOCUSABLE);
 
-    state.buttons_.Resize(numButtons);
-    state.buttonPress_.Resize(numButtons);
-    state.axes_.Resize(numAxes);
-    state.hats_.Resize(numHats);
+    state.Initialize(numButtons, numAxes, numHats);
 
     // There could be potentially more than one screen joystick, however they all will be handled by a same handler method
     // So there is no harm to replace the old handler with the new handler in each call to SubscribeToEvent()
@@ -437,7 +501,7 @@ bool Input::RemoveScreenJoystick(SDL_JoystickID id)
         LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
         return false;
     }
-    
+
     JoystickState& state = joysticks_[id];
     if (!state.screenJoystick_)
     {
@@ -474,6 +538,29 @@ void Input::SetScreenKeyboardVisible(bool enable)
         else
             SDL_StopTextInput();
     }
+}
+
+void Input::SetTouchEmulation(bool enable)
+{
+#if !defined(ANDROID) && !defined(IOS)
+    if (enable != touchEmulation_)
+    {
+        if (enable)
+        {
+            // Touch emulation needs the mouse visible
+            if (!mouseVisible_)
+                SetMouseVisible(true);
+            
+            // Add a virtual touch device the first time we are enabling emulated touch
+            if (!SDL_GetNumTouchDevices())
+                SDL_AddTouch(0, "Emulated Touch");
+        }
+        else
+            ResetTouches();
+        
+        touchEmulation_ = enable;
+    }
+#endif
 }
 
 bool Input::RecordGesture()
@@ -530,31 +617,21 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     state.name_ = SDL_JoystickName(joystick);
     if (SDL_IsGameController(index))
        state.controller_ = SDL_GameControllerOpen(index);
-
-    state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
-    state.axes_.Resize(SDL_JoystickNumAxes(joystick));
+    
+    unsigned numButtons = SDL_JoystickNumButtons(joystick);
+    unsigned numAxes = SDL_JoystickNumAxes(joystick);
+    unsigned numHats = SDL_JoystickNumHats(joystick);
     
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
     {
-        if (state.buttons_.Size() < SDL_CONTROLLER_BUTTON_MAX)
-            state.buttons_.Resize(SDL_CONTROLLER_BUTTON_MAX);
-        if (state.axes_.Size() < SDL_CONTROLLER_AXIS_MAX)
-            state.axes_.Resize(SDL_CONTROLLER_AXIS_MAX);
+        if (numButtons < SDL_CONTROLLER_BUTTON_MAX)
+            numButtons = SDL_CONTROLLER_BUTTON_MAX;
+        if (numAxes < SDL_CONTROLLER_AXIS_MAX)
+            numAxes = SDL_CONTROLLER_AXIS_MAX;
     }
     
-    state.buttonPress_.Resize(state.buttons_.Size());
-    state.hats_.Resize(SDL_JoystickNumHats(joystick));
-
-    for (unsigned i = 0; i < state.buttons_.Size(); ++i)
-    {
-        state.buttons_[i] = false;
-        state.buttonPress_[i] = false;
-    }
-    for (unsigned i = 0; i < state.axes_.Size(); ++i)
-        state.axes_[i] = 0.0f;
-    for (unsigned i = 0; i < state.hats_.Size(); ++i)
-        state.hats_[i] = HAT_CENTER;
+    state.Initialize(numButtons, numAxes, numHats);
 
     return joystickID;
 }
@@ -685,11 +762,10 @@ JoystickState* Input::GetJoystickByIndex(unsigned index)
     unsigned compare = 0;
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
     {
-        if (compare == index)
+        if (compare++ == index)
             return &(i->second_);
-        ++compare;
     }
-    
+
     return 0;
 }
 
@@ -702,13 +778,7 @@ JoystickState* Input::GetJoystick(SDL_JoystickID id)
 bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
 {
     HashMap<SDL_JoystickID, JoystickState>::ConstIterator i = joysticks_.Find(id);
-    if (i != joysticks_.End())
-    {
-        if (i->second_.screenJoystick_)
-            return i->second_.screenJoystick_->IsVisible();
-    }
-    
-    return false;
+    return i != joysticks_.End() && i->second_.screenJoystick_ && i->second_.screenJoystick_->IsVisible();
 }
 
 bool Input::GetScreenKeyboardSupport() const
@@ -809,16 +879,24 @@ void Input::ResetState()
     scancodeDown_.Clear();
     scancodePress_.Clear();
 
-    /// \todo Check if this is necessary
+    /// \todo Check if resetting joystick state on input focus loss is even necessary
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
-    {
-        for (unsigned j = 0; j < i->second_.buttons_.Size(); ++j)
-            i->second_.buttons_[j] = false;
-        for (unsigned j = 0; j < i->second_.hats_.Size(); ++j)
-            i->second_.hats_[j] = HAT_CENTER;
-    }
+        i->second_.Reset();
 
-    // When clearing touch states, send the corresponding touch end events
+    ResetTouches();
+
+    // Use SetMouseButton() to reset the state so that mouse events will be sent properly
+    SetMouseButton(MOUSEB_LEFT, false);
+    SetMouseButton(MOUSEB_RIGHT, false);
+    SetMouseButton(MOUSEB_MIDDLE, false);
+
+    mouseMove_ = IntVector2::ZERO;
+    mouseMoveWheel_ = 0;
+    mouseButtonPress_ = 0;
+}
+
+void Input::ResetTouches()
+{
     for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
         TouchState& state = i->second_;
@@ -831,15 +909,8 @@ void Input::ResetState()
         eventData[P_Y] = state.position_.y_;
         SendEvent(E_TOUCHEND, eventData);
     }
-
-    // Use SetMouseButton() to reset the state so that mouse events will be sent properly
-    SetMouseButton(MOUSEB_LEFT, false);
-    SetMouseButton(MOUSEB_RIGHT, false);
-    SetMouseButton(MOUSEB_MIDDLE, false);
-
-    mouseMove_ = IntVector2::ZERO;
-    mouseMoveWheel_ = 0;
-    mouseButtonPress_ = 0;
+    
+    touches_.Clear();
 }
 
 void Input::SendInputFocusEvent()
@@ -998,15 +1069,49 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEBUTTONDOWN:
-        SetMouseButton(1 << (evt.button.button - 1), true);
+        if (!touchEmulation_)
+            SetMouseButton(1 << (evt.button.button - 1), true);
+        else
+        {
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            
+            SDL_Event event;
+            event.type = SDL_FINGERDOWN;
+            event.tfinger.touchId = 0;
+            event.tfinger.fingerId = evt.button.button - 1;
+            event.tfinger.pressure = 1.0f;
+            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
+            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.dx = 0;
+            event.tfinger.dy = 0;
+            SDL_PushEvent(&event);
+        }
         break;
 
     case SDL_MOUSEBUTTONUP:
-        SetMouseButton(1 << (evt.button.button - 1), false);
+        if (!touchEmulation_)
+            SetMouseButton(1 << (evt.button.button - 1), false);
+        else
+        {
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            
+            SDL_Event event;
+            event.type = SDL_FINGERUP;
+            event.tfinger.touchId = 0;
+            event.tfinger.fingerId = evt.button.button - 1;
+            event.tfinger.pressure = 0.0f;
+            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
+            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.dx = 0;
+            event.tfinger.dy = 0;
+            SDL_PushEvent(&event);
+        }
         break;
 
     case SDL_MOUSEMOTION:
-        if (mouseVisible_)
+        if (mouseVisible_ && !touchEmulation_)
         {
             mouseMove_.x_ += evt.motion.xrel;
             mouseMove_.y_ += evt.motion.yrel;
@@ -1025,10 +1130,28 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_QUALIFIERS] = GetQualifiers();
             SendEvent(E_MOUSEMOVE, eventData);
         }
+        // Only the left mouse button "finger" moves along with the mouse movement
+        else if (touchEmulation_ && touches_.Contains(0))
+        {
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            
+            SDL_Event event;
+            event.type = SDL_FINGERMOTION;
+            event.tfinger.touchId = 0;
+            event.tfinger.fingerId = 0;
+            event.tfinger.pressure = 1.0f;
+            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
+            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.dx = (float)evt.motion.xrel / (float)graphics_->GetWidth();
+            event.tfinger.dy = (float)evt.motion.yrel / (float)graphics_->GetHeight();
+            SDL_PushEvent(&event);
+        }
         break;
 
     case SDL_MOUSEWHEEL:
-        SetMouseWheel(evt.wheel.y);
+        if (!touchEmulation_)
+            SetMouseWheel(evt.wheel.y);
         break;
 
     case SDL_FINGERDOWN:
@@ -1166,7 +1289,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.jbutton.button;
             SDL_JoystickID joystickID = evt.jbutton.which;
             JoystickState& state = joysticks_[joystickID];
-            
+
             // Skip ordinary joystick event for a controller
             if (!state.controller_)
             {
@@ -1261,7 +1384,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.cbutton.button;
             SDL_JoystickID joystickID = evt.cbutton.which;
             JoystickState& state = joysticks_[joystickID];
-            
+
             VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICKID] = joystickID;
             eventData[P_BUTTON] = button;
@@ -1428,9 +1551,10 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         if (eventType == E_TOUCHMOVE)
             return;
 
-        // Determine whether to inject a joystick event or keyboard event
-        Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        if (variant.IsEmpty())
+        // Determine whether to inject a joystick event or keyboard/mouse event
+        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        Variant mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
+        if (keyBindingVar.IsEmpty() && mouseButtonBindingVar.IsEmpty())
         {
             evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
             evt.jbutton.which = joystickID;
@@ -1438,15 +1562,27 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         }
         else
         {
-            evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
-            evt.key.keysym.sym = variant.GetInt();
-            evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+            if (!keyBindingVar.IsEmpty())
+            {
+                evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
+                evt.key.keysym.sym = keyBindingVar.GetInt();
+                evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
+            }
+            if (!mouseButtonBindingVar.IsEmpty() && !touchEmulation_)
+            {
+                // Mouse button are sent as extra events besides key events
+                // Do not send mouse events in touch emulation mode, because those would in turn be re-interpreted as touch
+                SDL_Event evt;
+                evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
+                evt.button.button = mouseButtonBindingVar.GetInt();
+                HandleSDLEvent(&evt);
+            }
         }
     }
     else if (name.StartsWith("Hat"))
     {
-        Variant variant = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        if (variant.IsEmpty())
+        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        if (keyBindingVar.IsEmpty())
         {
             evt.type = SDL_JOYHATMOTION;
             evt.jaxis.which = joystickID;
@@ -1468,7 +1604,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         else
         {
             // Hat is binded by 4 keys, like 'WASD'
-            String keyBinding = variant.GetString();
+            String keyBinding = keyBindingVar.GetString();
 
             if (eventType == E_TOUCHEND)
             {

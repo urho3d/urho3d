@@ -77,7 +77,7 @@ ScriptInstance::~ScriptInstance()
 void ScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
-    
+
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
@@ -113,7 +113,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
 {
     AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
-    
+
     // Get ID's for node / component handle attributes
     if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
     {
@@ -171,9 +171,9 @@ void ScriptInstance::ApplyAttributes()
                 componentPtr->AddRef();
         }
     }
-    
+
     idAttributes_.Clear();
-    
+
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
 }
@@ -195,9 +195,9 @@ void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
 {
     if (scriptFile == scriptFile_ && scriptObject_)
         return;
-    
+
     ReleaseObject();
-    
+
     // Unsubscribe from the reload event of previous script file (if any), then subscribe to the new
     if (scriptFile_)
     {
@@ -209,9 +209,9 @@ void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
         SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(ScriptInstance, HandleScriptFileReload));
         SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(ScriptInstance, HandleScriptFileReloadFinished));
     }
-    
+
     scriptFile_ = scriptFile;
-    
+
     CreateObject();
     MarkNetworkUpdate();
 }
@@ -220,9 +220,9 @@ void ScriptInstance::SetClassName(const String& className)
 {
     if (className == className_ && scriptObject_)
         return;
-    
+
     ReleaseObject();
-    
+
     className_ = className;
     CreateObject();
     MarkNetworkUpdate();
@@ -232,7 +232,7 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
 {
     if (!scriptObject_)
         return false;
-    
+
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     return scriptFile_->Execute(scriptObject_, method, parameters);
 }
@@ -241,7 +241,7 @@ bool ScriptInstance::Execute(asIScriptFunction* method, const VariantVector& par
 {
     if (!method || !scriptObject_)
         return false;
-    
+
     return scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
@@ -249,14 +249,14 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
 {
     if (!scriptObject_)
         return;
-    
+
     DelayedCall call;
     call.period_ = call.delay_ = Max(delay, 0.0f);
     call.repeat_ = repeat;
     call.declaration_ = declaration;
     call.parameters_ = parameters;
     delayedCalls_.Push(call);
-    
+
     // Make sure we are registered to the scene update event, because delayed calls are executed there
     if (!subscribed_)
         UpdateEventSubscription();
@@ -282,7 +282,7 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
 {
     if (!scriptObject_)
         return;
-    
+
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
@@ -295,7 +295,7 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
             return;
         }
     }
-    
+
     SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
@@ -309,7 +309,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
         LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
-    
+
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
@@ -322,7 +322,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
             return;
         }
     }
-    
+
     SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
@@ -369,7 +369,7 @@ void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)
         i->declaration_ = buf.ReadString();
         i->parameters_ = buf.ReadVariantVector();
     }
-    
+
     if (scriptObject_ && delayedCalls_.Size() && !subscribed_)
         UpdateEventSubscription();
 }
@@ -453,7 +453,7 @@ void ScriptInstance::OnMarkedDirty(Node* node)
         scene->DelayedMarkedDirty(this);
         return;
     }
-    
+
     if (scriptObject_ && methods_[METHOD_TRANSFORMCHANGED])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_TRANSFORMCHANGED]);
 }
@@ -462,19 +462,19 @@ void ScriptInstance::CreateObject()
 {
     if (!scriptFile_ || className_.Empty())
         return;
-    
+
     PROFILE(CreateScriptObject);
-    
+
     scriptObject_ = scriptFile_->CreateObject(className_);
     if (scriptObject_)
     {
         // Map script object to script instance with userdata
         scriptObject_->SetUserData(this);
-        
+
         GetScriptMethods();
         GetScriptAttributes();
         UpdateEventSubscription();
-        
+
         if (methods_[METHOD_START])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
     }
@@ -488,7 +488,7 @@ void ScriptInstance::ReleaseObject()
     {
         if (methods_[METHOD_STOP])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_STOP]);
-        
+
         PODVector<StringHash> exceptions;
         exceptions.Push(E_RELOADSTARTED);
         exceptions.Push(E_RELOADFINISHED);
@@ -497,10 +497,10 @@ void ScriptInstance::ReleaseObject()
             node_->RemoveListener(this);
         subscribed_ = false;
         subscribedPostFixed_ = false;
-        
+
         ClearScriptMethods();
         ClearScriptAttributes();
-        
+
         scriptObject_->SetUserData(0);
         scriptObject_->Release();
         scriptObject_ = 0;
@@ -511,7 +511,7 @@ void ScriptInstance::ClearScriptMethods()
 {
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         methods_[i] = 0;
-    
+
     delayedCalls_.Clear();
 }
 
@@ -538,23 +538,23 @@ void ScriptInstance::GetScriptAttributes()
         const char* name;
         int typeId;
         bool isPrivate, isHandle;
-        
+
         scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate);
-        
+
         // Hide private variables or ones that begin with an underscore
         if (isPrivate || name[0] == '_')
             continue;
-        
+
         String typeName = engine->GetTypeDeclaration(typeId);
         isHandle = typeName.EndsWith("@");
         if (isHandle)
             typeName = typeName.Substring(0, typeName.Length() - 1);
-        
+
         AttributeInfo info;
         info.mode_ = AM_FILE;
         info.name_ = name;
         info.ptr_ = scriptObject_->GetAddressOfProperty(i);
-        
+
         if (!isHandle)
         {
             switch (typeId)
@@ -562,16 +562,16 @@ void ScriptInstance::GetScriptAttributes()
             case asTYPEID_BOOL:
                 info.type_ = VAR_BOOL;
                 break;
-                
+
             case asTYPEID_INT32:
             case asTYPEID_UINT32:
                 info.type_ = VAR_INT;
                 break;
-                
+
             case asTYPEID_FLOAT:
                 info.type_ = VAR_FLOAT;
                 break;
-                
+
             default:
                 info.type_ = Variant::GetTypeFromName(typeName);
                 break;
@@ -604,7 +604,7 @@ void ScriptInstance::GetScriptAttributes()
                 }
             }
         }
-        
+
         if (info.type_ != VAR_NONE)
             attributeInfos_.Push(info);
     }
@@ -618,9 +618,9 @@ void ScriptInstance::UpdateEventSubscription()
         LOGWARNING("Node is detached from scene, can not subscribe script object to update events");
         return;
     }
-    
+
     bool enabled = scriptObject_ && IsEnabledEffective();
-    
+
     if (enabled)
     {
         if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedCalls_.Size()))
@@ -628,30 +628,29 @@ void ScriptInstance::UpdateEventSubscription()
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
             subscribed_ = true;
         }
-        
+
         if (!subscribedPostFixed_)
         {
             if (methods_[METHOD_POSTUPDATE])
                 SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
-            
-            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
-            if (world)
+
+            if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
             {
-                if (methods_[METHOD_FIXEDUPDATE])
-                    SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
-                if (methods_[METHOD_FIXEDPOSTUPDATE])
-                    SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
-            }
-            else
-            {
-                if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
+                PhysicsWorld* world = scene->GetOrCreateComponent<PhysicsWorld>();
+                if (world)
+                {
+                    if (methods_[METHOD_FIXEDUPDATE])
+                        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
+                    if (methods_[METHOD_FIXEDPOSTUPDATE])
+                        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
+                }
+                else
                     LOGERROR("No physics world, can not subscribe script object to fixed update events");
             }
-            
-            
+
             subscribedPostFixed_ = true;
         }
-        
+
         if (methods_[METHOD_TRANSFORMCHANGED])
             node_->AddListener(this);
     }
@@ -662,21 +661,21 @@ void ScriptInstance::UpdateEventSubscription()
             UnsubscribeFromEvent(scene, E_SCENEUPDATE);
             subscribed_ = false;
         }
-        
+
         if (subscribedPostFixed_)
         {
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-            
+
             PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
             if (world)
             {
                 UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
                 UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
             }
-            
+
             subscribedPostFixed_ = false;
         }
-        
+
         if (methods_[METHOD_TRANSFORMCHANGED])
             node_->RemoveListener(this);
     }
@@ -686,17 +685,17 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
 {
     if (!scriptObject_)
         return;
-    
+
     using namespace SceneUpdate;
-    
+
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
+
     // Execute delayed calls
     for (unsigned i = 0; i < delayedCalls_.Size();)
     {
         DelayedCall& call = delayedCalls_[i];
         bool remove = false;
-        
+
         call.delay_ -= timeStep;
         if (call.delay_ <= 0.0f)
         {
@@ -704,23 +703,23 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
                 remove = true;
             else
                 call.delay_ += call.period_;
-            
+
             Execute(call.declaration_, call.parameters_);
         }
-        
+
         if (remove)
             delayedCalls_.Erase(i);
         else
             ++i;
     }
-    
+
     // Execute delayed start before first update
     if (methods_[METHOD_DELAYEDSTART])
     {
         scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
         methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
     }
-    
+
     if (methods_[METHOD_UPDATE])
     {
         VariantVector parameters;
@@ -733,9 +732,9 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 {
     if (!scriptObject_)
         return;
-    
+
     using namespace ScenePostUpdate;
-    
+
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
@@ -745,9 +744,9 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 {
     if (!scriptObject_)
         return;
-    
+
     using namespace PhysicsPreStep;
-    
+
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
@@ -757,9 +756,9 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
 {
     if (!scriptObject_)
         return;
-    
+
     using namespace PhysicsPostStep;
-    
+
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
@@ -769,16 +768,16 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
 {
     if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)
         return;
-    
+
     asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
-    
+
     VariantVector parameters;
     if (method->GetParamCount() > 0)
     {
         parameters.Push(Variant((void*)&eventType));
         parameters.Push(Variant((void*)&eventData));
     }
-    
+
     scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
@@ -823,7 +822,7 @@ Scene* GetScriptContextScene()
     // If null, try to get the default scene
     if (!scene)
         scene = GetScriptContext()->GetSubsystem<Script>()->GetDefaultScene();
-    
+
     return scene;
 }
 

@@ -59,17 +59,12 @@ class Renderer
     unsigned GetNumShadowMaps(bool allViews = false) const;
     unsigned GetNumOccluders(bool allViews = false) const;
     Zone* GetDefaultZone() const;
-    Light* GetQuadDirLight() const;
     Material* GetDefaultMaterial() const;
     Texture2D* GetDefaultLightRamp() const;
     Texture2D* GetDefaultLightSpot() const;
-    TextureCube* GetFaceSelectCubeMap() const;
-    TextureCube* GetIndirectionCubeMap() const;
-    VertexBuffer* GetInstancingBuffer() const;
-    const FrameInfo& GetFrameInfo();
-    
+
     void DrawDebugGeometry(bool depthTest);
-    
+
     tolua_property__get_set unsigned numViewports;
     tolua_property__get_set RenderPath* defaultRenderPath;
     tolua_property__get_set bool HDRRendering;

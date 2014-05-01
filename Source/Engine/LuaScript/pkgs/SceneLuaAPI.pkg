@@ -1,4 +1,4 @@
-$pfile "Scene/AttributeAnimation.pkg"
+$pfile "Scene/ValueAnimation.pkg"
 $pfile "Scene/ObjectAnimation.pkg"
 $pfile "Scene/Serializable.pkg"
 $pfile "Scene/Animatable.pkg"

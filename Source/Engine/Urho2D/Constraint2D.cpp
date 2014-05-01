@@ -87,7 +87,7 @@ void Constraint2D::ReleaseJoint()
 {
     if (!joint_)
         return;
-    
+
     if (physicsWorld_)
         physicsWorld_->GetWorld()->DestroyJoint(joint_);
 
@@ -128,12 +128,7 @@ void Constraint2D::OnNodeSet(Node* node)
     if (node)
     {
         Scene* scene = GetScene();
-        physicsWorld_ = scene->GetComponent<PhysicsWorld2D>();
-        if (!physicsWorld_)
-        {
-            LOGERROR("No physic world component in scene, can not create constraint");
-            return;
-        }
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
 
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)

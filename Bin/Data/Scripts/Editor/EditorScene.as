@@ -344,6 +344,7 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
         return null;
 
     Node@ newNode;
+    uint numSceneComponent = editorScene.numComponents;
 
     suppressSceneChanges = true;
 
@@ -365,7 +366,10 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
         SaveEditAction(action);
         SetSceneModified();
 
-        UpdateHierarchyItem(newNode);
+        if (numSceneComponent != editorScene.numComponents)
+            UpdateHierarchyItem(editorScene);
+        else
+            UpdateHierarchyItem(newNode);
     }
 
     return newNode;
@@ -406,7 +410,7 @@ void StopSceneUpdate()
     runUpdate = false;
     audio.Stop();
     toolBarDirty = true;
-    
+
     // If scene should revert on update stop, load saved data now
     if (revertOnPause && revertData !is null)
     {
@@ -417,7 +421,7 @@ void StopSceneUpdate()
         ClearEditActions();
         suppressSceneChanges = false;
     }
-    
+
     revertData = null;
 }
 
@@ -428,7 +432,7 @@ void StartSceneUpdate()
     // paused (similar to physics)
     audio.Play();
     toolBarDirty = true;
-    
+
     // Save scene data for reverting if enabled
     if (revertOnPause)
     {
@@ -914,7 +918,7 @@ bool LoadParticleData(const String&in fileName)
         if (emitter !is null)
             emitter.Load(xmlFile);
     }
-    
+
     return true;
 }
 

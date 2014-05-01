@@ -151,7 +151,7 @@ void Light::RegisterObject(Context* context)
 
 void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // Validate the bias, cascade & focus parameters
     if (attr.offset_ >= offsetof(Light, shadowBias_) && attr.offset_ < (offsetof(Light, shadowBias_) + sizeof(BiasParameters)))

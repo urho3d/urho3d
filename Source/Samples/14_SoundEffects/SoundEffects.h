@@ -48,6 +48,19 @@ public:
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button2']]\">"
+        "        <attribute name=\"Is Visible\" value=\"false\" />"
+        "    </add>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">"
+        "        <attribute name=\"Is Visible\" value=\"false\" />"
+        "    </add>"
+        "</patch>";
+    }
+
 private:
     /// Create the UI and subscribes to UI events.
     void CreateUI();

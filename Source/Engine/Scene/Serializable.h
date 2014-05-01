@@ -70,6 +70,8 @@ public:
     virtual void ApplyAttributes() {}
     /// Return whether should save default-valued attributes into XML. Default false.
     virtual bool SaveDefaultAttributes() const { return false; }
+    /// Mark for attribute check on the next network update.
+    virtual void MarkNetworkUpdate() {}
 
     /// Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);
@@ -118,7 +120,7 @@ private:
     void SetInstanceDefault(const String& name, const Variant& defaultValue);
     /// Get instance-level default value.
     Variant GetInstanceDefault(const String& name) const;
-    
+
     /// Attribute default value at each instance level.
     VariantMap* instanceDefaultValues_;
     /// Temporary flag.

@@ -112,7 +112,7 @@ void Terrain::RegisterObject(Context* context)
 
 void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // Change of any non-accessor attribute requires recreation of the terrain
     if (!attr.accessor_)
@@ -753,6 +753,17 @@ void Terrain::CreateIndexData()
     drawRanges_.Clear();
     unsigned row = patchSize_ + 1;
 
+    /* Build index data for each LOD level. Each LOD level except the lowest can stitch to the next lower LOD from the edges:
+       north, south, west, east, or any combination of them, requiring 16 different versions of each LOD level's index data
+    
+       Normal edge:     Stitched edge:
+       +----+----+      +---------+
+       |\   |\   |      |\       /|
+       | \  | \  |      | \     / |
+       |  \ |  \ |      |  \   /  |
+       |   \|   \|      |   \ /   |
+       +----+----+      +----+----+
+    */
     for (unsigned i = 0; i < numLodLevels_; ++i)
     {
         unsigned combinations = (i < numLodLevels_ - 1) ? 16 : 1;

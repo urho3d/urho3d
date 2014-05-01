@@ -43,10 +43,9 @@ float Acos(float x);
 float Atan(float x);
 float Atan2(float y, float x);
 
-int Min(int lhs, int rhs);
-int Max(int lhs, int rhs);
-int Abs(int value);
-
+int Min @ MinInt(int lhs, int rhs);
+int Max @ MaxInt(int lhs, int rhs);
+int Abs @ AbsInt(int value);
 int Clamp @ ClampInt(int value, int min, int max);
 
 bool IsPowerOfTwo(unsigned value);

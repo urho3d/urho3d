@@ -484,11 +484,15 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "String GetScancodeName(int) const", asMETHOD(Input, GetScancodeName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_mouseVisible(bool)", asMETHOD(Input, SetMouseVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_mouseVisible() const", asMETHOD(Input, IsMouseVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_mouseGrabbed(bool)", asMETHOD(Input, SetMouseGrabbed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_mouseGrabbed() const", asMETHOD(Input, IsMouseGrabbed), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_screenJoystickVisible(int, bool)", asMETHOD(Input, SetScreenJoystickVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_screenJoystickVisible(int)", asMETHOD(Input, IsScreenJoystickVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_screenKeyboardVisible(bool)", asMETHOD(Input, SetScreenKeyboardVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_screenKeyboardVisible() const", asMETHOD(Input, IsScreenKeyboardVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_screenKeyboardSupport() const", asMETHOD(Input, GetScreenKeyboardSupport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_touchEmulation(bool)", asMETHOD(Input, SetTouchEmulation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_touchEmulation() const", asMETHOD(Input, GetTouchEmulation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);

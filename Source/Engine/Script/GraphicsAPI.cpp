@@ -642,6 +642,12 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "const TechniqueEntry& get_techniqueEntries(uint) const", asFUNCTION(MaterialGetTechniqueEntry), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void SetShaderParameterAnimation(const String&in, ValueAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(Material, SetShaderParameterAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "ValueAnimation@+ GetShaderParameterAnimation(const String&in) const", asMETHOD(Material, GetShaderParameterAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void SetShaderParameterAnimationWrapMode(const String&in, WrapMode)", asMETHOD(Material, SetShaderParameterAnimationWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "WrapMode GetShaderParameterAnimationWrapMode(const String&in) const", asMETHOD(Material, GetShaderParameterAnimationWrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void SetShaderParameterAnimationSpeed(const String&in, float)", asMETHOD(Material, SetShaderParameterAnimationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "float GetShaderParameterAnimationSpeed(const String&in) const", asMETHOD(Material, GetShaderParameterAnimationSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Array<String>@ get_shaderParameterNames() const", asFUNCTION(MaterialGetShaderParameterNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_textures(uint) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
@@ -1006,6 +1012,8 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "bool get_scaled() const", asMETHOD(BillboardSet, IsScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_faceCamera(bool)", asMETHOD(BillboardSet, SetFaceCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "bool get_faceCamera() const", asMETHOD(BillboardSet, GetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraAxes(const Vector3&)", asMETHOD(BillboardSet, SetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const Vector3& get_faceCameraAxes() const", asMETHOD(BillboardSet, GetFaceCameraAxes), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHOD(BillboardSet, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHOD(BillboardSet, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHOD(BillboardSet, GetBillboard), asCALL_THISCALL);
@@ -1048,6 +1056,10 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_sorted() const", asMETHOD(ParticleEmitter, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_scaled(bool)", asMETHOD(ParticleEmitter, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCamera(bool)", asMETHOD(ParticleEmitter, SetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool get_faceCamera() const", asMETHOD(ParticleEmitter, GetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCameraAxes(const Vector3&)", asMETHOD(ParticleEmitter, SetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_faceCameraAxes() const", asMETHOD(ParticleEmitter, GetFaceCameraAxes), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_updateInvisible(bool)", asMETHOD(ParticleEmitter, SetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_updateInvisible() const", asMETHOD(ParticleEmitter, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);

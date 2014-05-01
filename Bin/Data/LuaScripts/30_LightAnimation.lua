@@ -51,7 +51,7 @@ function CreateScene()
     light.range = 10.0
 
     -- Create light color animation
-    local colorAnimation = AttributeAnimation:new()
+    local colorAnimation = ValueAnimation:new()
     colorAnimation:SetKeyFrame(0.0, Variant(Color.WHITE))
     colorAnimation:SetKeyFrame(1.0, Variant(Color.RED))
     colorAnimation:SetKeyFrame(2.0, Variant(Color.YELLOW))
@@ -60,7 +60,7 @@ function CreateScene()
     light:SetAttributeAnimation("Color", colorAnimation)
 
     -- Create light position animation
-    local positionAnimation = AttributeAnimation:new()
+    local positionAnimation = ValueAnimation:new()
     -- Use spline interpolation method
     positionAnimation.interpolationMethod = IM_SPLINE
     -- Set spline tension

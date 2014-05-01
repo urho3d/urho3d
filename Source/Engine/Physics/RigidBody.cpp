@@ -132,7 +132,7 @@ void RigidBody::RegisterObject(Context* context)
 
 void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // Change of any non-accessor attribute requires the rigid body to be re-added to the physics world
     if (!attr.accessor_)
@@ -233,7 +233,7 @@ void RigidBody::SetPosition(Vector3 position)
     {
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setOrigin(ToBtVector3(position + ToQuaternion(worldTrans.getRotation()) * centerOfMass_));
-        
+
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
@@ -273,7 +273,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
         worldTrans.setOrigin(ToBtVector3(position + rotation * centerOfMass_));
-        
+
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         interpTrans.setRotation(worldTrans.getRotation());
@@ -715,11 +715,11 @@ void RigidBody::UpdateMass()
 {
     if (!body_)
         return;
-    
+
     btTransform principal;
     principal.setRotation(btQuaternion::getIdentity());
     principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
-    
+
     // Calculate center of mass shift from all the collision shapes
     unsigned numShapes = compoundShape_->getNumChildShapes();
     if (numShapes)
@@ -730,11 +730,11 @@ void RigidBody::UpdateMass()
             // The actual mass does not matter, divide evenly between child shapes
             masses[i] = 1.0f;
         }
-        
+
         btVector3 inertia(0.0f, 0.0f, 0.0f);
         compoundShape_->calculatePrincipalAxisTransform(&masses[0], principal, inertia);
     }
-    
+
     // Add child shapes to shifted compound shape with adjusted offset
     while (shiftedCompoundShape_->getNumChildShapes())
         shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
@@ -744,7 +744,7 @@ void RigidBody::UpdateMass()
         adjusted.setOrigin(adjusted.getOrigin() - principal.getOrigin());
         shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
     }
-    
+
     // If shifted compound shape has only one child with no offset/rotation, use the child shape
     // directly as the rigid body collision shape for better collision detection performance
     bool useCompound = !numShapes || numShapes > 1;
@@ -756,7 +756,7 @@ void RigidBody::UpdateMass()
             useCompound = true;
     }
     body_->setCollisionShape(useCompound ? shiftedCompoundShape_ : shiftedCompoundShape_->getChildShape(0));
-    
+
     // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
     if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE &&
         physicsWorld_->GetInternalEdge())
@@ -768,14 +768,14 @@ void RigidBody::UpdateMass()
     Vector3 oldPosition = GetPosition();
     centerOfMass_ = ToVector3(principal.getOrigin());
     SetPosition(oldPosition);
-    
+
     // Calculate final inertia
     btVector3 localInertia(0.0f, 0.0f, 0.0f);
     if (mass_ > 0.0f)
         shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
     body_->setMassProps(mass_, localInertia);
     body_->updateInertiaTensor();
-    
+
     // Reapply constraint positions for new center of mass shift
     if (node_)
     {
@@ -897,17 +897,14 @@ void RigidBody::OnNodeSet(Node* node)
             if (scene == node)
                 LOGWARNING(GetTypeName() + " should not be created to the root scene node");
 
-            physicsWorld_ = scene->GetComponent<PhysicsWorld>();
-            if (physicsWorld_)
-                physicsWorld_->AddRigidBody(this);
-            else
-                LOGERROR("No physics world component in scene, can not create rigid body");
+            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+            physicsWorld_->AddRigidBody(this);
 
             AddBodyToWorld();
         }
         else
             LOGERROR("Node is detached from scene, can not create rigid body");
-        
+
         node->AddListener(this);
     }
 }
@@ -970,7 +967,7 @@ void RigidBody::AddBodyToWorld()
         flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
     body_->setCollisionFlags(flags);
     body_->forceActivationState(kinematic_ ? DISABLE_DEACTIVATION : ISLAND_SLEEPING);
-    
+
     if (!IsEnabledEffective())
         return;
 

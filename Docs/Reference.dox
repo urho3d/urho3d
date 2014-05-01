@@ -159,6 +159,7 @@ The full list of supported parameters, their datatypes and default values:
 - SoundMixRate (int) %Sound output frequency in Hz. Default 44100.
 - SoundStereo (bool) Stereo sound output mode. Default true.
 - SoundInterpolation (bool) Interpolated sound output mode to improve quality. Default true.
+- TouchEmulation (bool) %Touch emulation on desktop platform. Default false.
 
 \section MainLoop_Frame Main loop iteration
 
@@ -1393,6 +1394,8 @@ Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event w
 
 Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
 
+Touch emulation can be used to test mobile applications on a desktop machine without a touch screen. See \ref Input::SetTouchEmulation "SetTouchEmulation()". When touch emulation is enabled, actual mouse events are no longer sent and the operating system mouse cursor is forced visible. The left mouse button acts as a moving finger, while the rest of the mouse buttons act as stationary fingers for multi-finger gestures. For example pressing down both left and right mouse buttons, then dragging the mouse with the buttons still pressed would emulate a two-finger pinch zoom-in gesture.
+
 \section InputPlatformSpecific Platform-specific details
 
 On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as text input events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
@@ -1881,7 +1884,7 @@ Attribute animation is a new system for Urho3D, With it user can apply animation
 
 These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
 \code
-SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
@@ -1889,11 +1892,11 @@ colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
 \endcode
 
-On above code, we first create an AttributeAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+On above code, we first create an ValueAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
 
 Another way is load attribute animation from resource, here is a simple sample:
 \code
-AttributeAnimatio* colorAnimation = cache->GetResource<AttributeAnimation>("Scene/LightColorAnimation.xml");
+ValueAnimation* colorAnimation = cache->GetResource<ValueAnimation>("Scene/LightColorAnimation.xml");
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 \endcode
 
@@ -1910,7 +1913,7 @@ When user want to apply multi-attribute animation to an object, ObjectAnimation 
 SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
 
 // Create position animation
-SharedPtr<AttributeAnimation> positionAnimation(new AttributeAnimation(context_));
+SharedPtr<ValueAnimation> positionAnimation(new ValueAnimation(context_));
 positionAnimation->SetKeyFrame(0.0f, Vector3::ZERO);
 positionAnimation->SetKeyFrame(1.0f, Vector3(1.0f, 1.0f, 1.0f));
 positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
@@ -1918,7 +1921,7 @@ positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
 lightAnimation->AddAttributeAnimation("Position", positionAnimation, WM_LOOP); 
 
 // Create color animation
-SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
@@ -1931,7 +1934,7 @@ light->SetObjectAnimation(lightAnimation);
 
 Also user can load object animation from file, like:
 \code
-ObjectAnimation * lightAnimation = cache->GetResource< ObjectAnimation >("Scene/LightAnimation.xml");
+ObjectAnimation * lightAnimation = cache->GetResource<ObjectAnimation>("Scene/LightAnimation.xml");
 light-> SetObjectAnimation (lightAnimation);
 \endcode
 
@@ -1941,10 +1944,10 @@ Attribute animation and object animation can be save to scene file, Someday if o
 
 \section AttributeAnimation_Classes Classes of attribute animation:
 - Animatable: Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
-- AttributeAnimation: Attribute animation class, include some key frame in it.
+- ValueAnimation: Animation class, include some key frame in it.
 - ObjectAnimation: Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
-- AttributeAnimationInfo: Attribute animation info, it include attribute animation, wrap mode and animation speed.
-- AttributeAnimationInstance: Attribute animation instance, it is derived from AttributeAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
+- ValueAnimationInfo: Animation info, it include attribute animation, wrap mode and animation speed.
+- AttributeAnimationInstance: Attribute animation instance, it is derived from ValueAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
 
 \page Tools Tools
 

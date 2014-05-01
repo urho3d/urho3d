@@ -22,16 +22,40 @@
 
 #pragma once
 
-#include "AttributeAnimationDefs.h"
 #include "HashSet.h"
 #include "Serializable.h"
+#include "ValueAnimationInfo.h"
 
 namespace Urho3D
 {
 
-class AttributeAnimation;
-class AttributeAnimationInstance;
+class Animatable;
+class ValueAnimation;
+class AttributeAnimationInfo;
 class ObjectAnimation;
+
+/// Attribute animation instance.
+class AttributeAnimationInfo : public ValueAnimationInfo
+{
+public:
+    /// Construct.
+    AttributeAnimationInfo(Animatable* animatable, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Copy construct.
+    AttributeAnimationInfo(const AttributeAnimationInfo& other);
+    /// Destruct.
+    ~AttributeAnimationInfo();
+
+    /// Return attribute infomation.
+    const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
+
+protected:
+    /// Apply new animation value to the target object. Called by Update().
+    virtual void ApplyValue(const Variant& newValue);
+
+private:
+    /// Attribute information.
+    const AttributeInfo& attributeInfo_;
+};
 
 /// Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
 class URHO3D_API Animatable : public Serializable
@@ -56,7 +80,7 @@ public:
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
-    void SetAttributeAnimation(const String& name, AttributeAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     /// Set attribute animation wrap mode.
     void SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode);
     /// Set attribute animation speed.
@@ -67,7 +91,7 @@ public:
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
     /// Return attribute animation.
-    AttributeAnimation* GetAttributeAnimation(const String& name) const;
+    ValueAnimation* GetAttributeAnimation(const String& name) const;
     /// Return attribute animation wrap mode.
     WrapMode GetAttributeAnimationWrapMode(const String& name) const;
     /// Return attribute animation speed.
@@ -91,8 +115,8 @@ protected:
     void UpdateAttributeAnimations(float timeStep);
     /// Is animated network attribute.
     bool IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const;
-    /// Return attribute animation instance.
-    AttributeAnimationInstance* GetAttributeAnimationInstance(const String& name) const;
+    /// Return attribute animation info.
+    AttributeAnimationInfo* GetAttributeAnimationInfo(const String& name) const;
 
     /// Animation enabled.
     bool animationEnabled_;
@@ -100,8 +124,8 @@ protected:
     SharedPtr<ObjectAnimation> objectAnimation_;
     /// Animated network attribute set.
     HashSet<const AttributeInfo*> animatedNetworkAttributes_;
-    /// Attribute animation instances.
-    HashMap<String, SharedPtr<AttributeAnimationInstance> > attributeAnimationInstances_;
+    /// Attribute animation infos.
+    HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInfos_;
 };
 
 }

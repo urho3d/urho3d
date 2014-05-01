@@ -60,7 +60,7 @@ function CreateScene()
         -- Add our custom Rotator component which will rotate the scene node each frame, when the scene sends its update event.
         -- Simply set same rotation speed for all objects
         local rotator = boxNode:CreateScriptObject("Rotator")
-        rotator.rotationSpeed = Vector3(10.0, 20.0, 30.0)
+        rotator.rotationSpeed = { 10.0, 20.0, 30.0 }
     end
 
     -- Create a camera for the render-to-texture scene. Simply leave it at the world origin and let it observe the scene
@@ -222,10 +222,13 @@ end
 Rotator = ScriptObject()
 
 function Rotator:Start()
-    self.rotationSpeed = Vector3(0.0, 0.0, 0.0)
+    self.rotationSpeed = {0.0, 0.0, 0.0}
 end
 
 -- Update is called during the variable timestep scene update
 function Rotator:Update(timeStep)
-    self.node:RotateXYZ(self.rotationSpeed.x * timeStep, self.rotationSpeed.y * timeStep, self.rotationSpeed.z * timeStep)
+    local x = self.rotationSpeed[1] * timeStep
+    local y = self.rotationSpeed[2] * timeStep
+    local z = self.rotationSpeed[3] * timeStep
+    self.node:Rotate(Quaternion(x, y, z))
 end

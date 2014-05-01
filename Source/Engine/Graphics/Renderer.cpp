@@ -253,7 +253,6 @@ static const unsigned MAX_BUFFER_AGE = 1000;
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
-    quadDirLight_(new Light(context)),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -283,8 +282,6 @@ Renderer::Renderer(Context* context) :
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
-    
-    quadDirLight_->SetLightType(LIGHT_DIRECTIONAL);
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -788,6 +785,11 @@ Geometry* Renderer::GetLightGeometry(Light* light)
     return 0;
 }
 
+Geometry* Renderer::GetQuadGeometry()
+{
+    return dirLightGeometry_;
+}
+
 Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
 {
     LightType type = light->GetLightType();
@@ -871,28 +873,6 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     
     SharedPtr<Texture2D> newShadowMap(new Texture2D(context_));
     int retries = 3;
-    
-    // OpenGL: create shadow map only. Color rendertarget is not needed
-    #ifdef URHO3D_OPENGL
-    while (retries)
-    {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
-        {
-            width >>= 1;
-            height >>= 1;
-            --retries;
-        }
-        else
-        {
-            #ifndef GL_ES_VERSION_2_0
-            newShadowMap->SetFilterMode(FILTER_BILINEAR);
-            newShadowMap->SetShadowCompare(true);
-            #endif
-            break;
-        }
-    }
-    #else
-    // Direct3D9: create shadow map and dummy color rendertarget
     unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
     
     while (retries)
@@ -905,21 +885,34 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
         else
         {
-            // When shadow compare must be done manually, use nearest filtering so that the filtering of point lights and other
-            // shadowed lights matches
+            #ifdef URHO3D_OPENGL
+            #ifndef GL_ES_VERSION_2_0
+            // OpenGL (desktop): shadow compare mode needs to be specifically enabled for the shadow map
+            newShadowMap->SetFilterMode(FILTER_BILINEAR);
+            newShadowMap->SetShadowCompare(true);
+            #endif
+            #else
+            // Direct3D9: when shadow compare must be done manually, use nearest filtering so that the filtering of point lights
+            // and other shadowed lights matches
             newShadowMap->SetFilterMode(graphics_->GetHardwareShadowSupport() ? FILTER_BILINEAR : FILTER_NEAREST);
-            // If no dummy color rendertarget for this size exists yet, create one now
-            if (!colorShadowMaps_.Contains(searchKey))
+            #endif
+            // Create dummy color texture for the shadow map if necessary: Direct3D9, or OpenGL when working around an OS X +
+            // Intel driver bug
+            if (dummyColorFormat)
             {
-                colorShadowMaps_[searchKey] = new Texture2D(context_);
-                colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
+                // If no dummy color rendertarget for this size exists yet, create one now
+                if (!colorShadowMaps_.Contains(searchKey))
+                {
+                    colorShadowMaps_[searchKey] = new Texture2D(context_);
+                    colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
+                }
+                // Link the color rendertarget to the shadow map
+                newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
             }
-            // Link the color rendertarget to the shadow map
-            newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
             break;
         }
     }
-    #endif
+    
     // If failed to set size, store a null pointer so that we will not retry
     if (!retries)
         newShadowMap.Reset();

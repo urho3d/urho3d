@@ -60,7 +60,7 @@ void OffMeshConnection::RegisterObject(Context* context)
 
 void OffMeshConnection::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
     
     if (attr.offset_ == offsetof(OffMeshConnection, endPointID_))
         endPointDirty_ = true;

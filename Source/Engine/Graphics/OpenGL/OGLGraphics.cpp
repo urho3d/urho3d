@@ -205,6 +205,7 @@ Graphics::Graphics(Context* context_) :
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
+    dummyColorFormat_(0),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -2271,11 +2272,11 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     shaderPrograms_.Clear();
     
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
-#if defined(__APPLE__) && !defined(IOS)
+    #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
         SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
-#endif
-        
+    #endif
+
     if (impl_->context_)
     {
         // Do not log this message if we are exiting
@@ -2579,6 +2580,16 @@ void Graphics::CheckFeatureSupport(String& extensions)
         lightPrepassSupport_ = true;
     if (numSupportedRTs >= 4)
         deferredSupport_ = true;
+    
+    #if defined(__APPLE__) && !defined(IOS)
+    // On OS X check for an Intel driver and use shadow map RGBA dummy color textures, because mixing
+    // depth-only FBO rendering and backbuffer rendering will bug, resulting in a black screen in full
+    // screen mode, and incomplete shadow maps in windowed mode
+    String renderer((const char*)glGetString(GL_RENDERER));
+    if (renderer.Contains("Intel", false))
+        dummyColorFormat_ = GetRGBAFormat();
+    #endif
+    
     #else
     // Check for best supported depth renderbuffer format for GLES2
     if (CheckExtension(extensions, "GL_OES_depth24"))

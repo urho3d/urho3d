@@ -242,6 +242,7 @@ The engine can be configured using the following command line options.
 -nosound     Disable sound output
 -noip        Disable sound mixing interpolation
 -sm2         Force SM2.0 rendering
+-touch       Touch emulation on desktop platform
 \endverbatim
 
 \section Running_Xcode_AngelScript_Info Mac OS X specific - How to view/edit AngelScript within Xcode
@@ -341,11 +342,11 @@ The Source/ directory is where your project CMakeLists.txt and all your source c
 
 This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find Urho3D library in Urho3D project library output directory, specify an environment variable called "URHO3D_HOME" which points to a Urho3D project root directory that you want to use (if you have more than one).
 
-In your own project Source/ directory, create a new CMakeLists.txt file and add the following lines:
+In your own project Source/ directory, create a new CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
 # Set project name
-project (MySuperDuperGame)
+project (MyProjectName)
 
 # Set minimum version
 cmake_minimum_required (VERSION 2.8.6)
@@ -365,7 +366,7 @@ find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Define target name
-set (TARGET_NAME Main)
+set (TARGET_NAME MyExecutableName)
 
 # Define source files
 define_source_files ()

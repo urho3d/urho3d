@@ -51,9 +51,9 @@ function CreateScene()
     local NUM_OBJECTS = 2000
     for i = 1, NUM_OBJECTS do
         local boxNode = scene_:CreateChild("Box")
-        boxNode:SetPositionXYZ(Random(200.0) - 100.0, Random(200.0) - 100.0, Random(200.0) - 100.0)
+        boxNode.position = Vector3(Random(200.0) - 100.0, Random(200.0) - 100.0, Random(200.0) - 100.0)
         -- Orient using random pitch, yaw and roll Euler angles
-        boxNode:SetRotationXYZ(Random(360.0), Random(360.0), Random(360.0))
+        boxNode.rotation = Quaternion(Random(360.0), Random(360.0), Random(360.0))
         local boxObject = boxNode:CreateComponent("StaticModel")
         boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
         boxObject.material = cache:GetResource("Material", "Materials/Stone.xml")
@@ -117,7 +117,7 @@ function MoveCamera(timeStep)
     pitch = Clamp(pitch, -90.0, 90.0)
 
     -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode:SetRotationXYZ(pitch, yaw, 0.0)
+    cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     local delta = MOVE_SPEED * timeStep
@@ -148,8 +148,6 @@ function HandleUpdate(eventType, eventData)
     MoveCamera(timeStep)
 end
 
-
-
 -- Rotator script object class. Script objects to be added to a scene node must implement the empty ScriptObject interface
 Rotator = ScriptObject()
 
@@ -161,5 +159,5 @@ function Rotator:Update(timeStep)
     local x = self.rotationSpeed[1] * timeStep
     local y = self.rotationSpeed[2] * timeStep
     local z = self.rotationSpeed[3] * timeStep
-    self.node:RotateXYZ(x, y, z)
+    self.node:Rotate(Quaternion(x, y, z))
 end

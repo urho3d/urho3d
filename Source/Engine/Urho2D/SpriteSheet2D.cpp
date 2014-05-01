@@ -78,9 +78,8 @@ bool SpriteSheet2D::Load(Deserializer& source)
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         String textureFileName = rootElem.GetAttribute("texture");
-        texture_ = cache->GetResource<Texture2D>(textureFileName);
-
-        // If texture not found, try get texture in current directory
+        texture_ = cache->GetResource<Texture2D>(textureFileName, false);
+        // If texture not found, try get in current directory
         if (!texture_)
             texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
 
@@ -110,9 +109,8 @@ bool SpriteSheet2D::Load(Deserializer& source)
     {    
         String textureFileName = rootElem.GetAttribute("imagePath");
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        texture_ = cache->GetResource<Texture2D>(textureFileName);
-
-        // If texture not found, try get texture in current directory
+        texture_ = cache->GetResource<Texture2D>(textureFileName, false);
+        // If texture not found, try get in current directory
         if (!texture_)
             texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
 

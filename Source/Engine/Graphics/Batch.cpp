@@ -566,6 +566,9 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     {
         if (graphics->NeedParameterUpdate(SP_MATERIAL, material_))
         {
+            // Update shader parameter animations
+            material_->UpdateShaderParameterAnimations();
+
             const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
             for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
                 graphics->SetShaderParameter(i->first_, i->second_.value_);

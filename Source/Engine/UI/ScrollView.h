@@ -43,6 +43,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Perform UI element update.
+    virtual void Update(float timeStep);
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// React to mouse wheel.
@@ -115,6 +117,8 @@ protected:
     IntVector2 viewSize_;
     /// View offset attribute.
     IntVector2 viewPositionAttr_;
+    /// Accumulated touch scroll speed.
+    IntVector2 touchScrollSpeed_;
     /// Arrow key page step.
     float pageStep_;
     /// Automatically show/hide scrollbars flag.
@@ -131,6 +135,8 @@ private:
     void HandleScrollBarVisibleChanged(StringHash eventType, VariantMap& eventData);
     /// Handle content element resized.
     void HandleElementResized(StringHash eventType, VariantMap& eventData);
+    /// Handle touch move event for scrolling.
+    void HandleTouchMove(StringHash eventType, VariantMap& eventData);
 };
 
 }

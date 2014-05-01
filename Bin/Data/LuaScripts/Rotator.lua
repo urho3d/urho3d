@@ -13,5 +13,5 @@ function Rotator:Update(timeStep)
     local x = self.rotationSpeed.x * timeStep
     local y = self.rotationSpeed.y * timeStep
     local z = self.rotationSpeed.z * timeStep
-    self.node:RotateXYZ(x, y, z)
+    self.node:Rotate(Quaternion(x, y, z))
 end

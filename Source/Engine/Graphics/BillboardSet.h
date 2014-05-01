@@ -89,6 +89,8 @@ public:
     void SetSorted(bool enable);
     /// Set whether billboards face the camera automatically. Default true.
     void SetFaceCamera(bool enable);
+    /// Set on which coordinate axes the billboards face the camera. Default all axes (1,1,1). Negative axes imply facing away.
+    void SetFaceCameraAxes(const Vector3& axes);
     /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
     /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
@@ -110,6 +112,8 @@ public:
     bool IsSorted() const { return sorted_; }
     /// Return whether faces the camera automatically.
     bool GetFaceCamera() const { return faceCamera_; }
+    /// Return on which coordinate axes camera facing is done.
+    const Vector3& GetFaceCameraAxes() const { return faceCameraAxes_; }
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
     
@@ -134,6 +138,8 @@ protected:
     
     /// Billboards.
     PODVector<Billboard> billboards_;
+    /// Coordinate axes on which camera facing is done.
+    Vector3 faceCameraAxes_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.

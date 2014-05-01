@@ -27,6 +27,7 @@
 #include <SDL_joystick.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_keycode.h>
+#include <SDL_mouse.h>
 
 namespace Urho3D
 {
@@ -215,9 +216,11 @@ EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 
-static const int MOUSEB_LEFT = 1;
-static const int MOUSEB_MIDDLE = 2;
-static const int MOUSEB_RIGHT = 4;
+static const int MOUSEB_LEFT = SDL_BUTTON_LMASK;
+static const int MOUSEB_MIDDLE = SDL_BUTTON_MMASK;
+static const int MOUSEB_RIGHT = SDL_BUTTON_RMASK;
+static const int MOUSEB_X1 = SDL_BUTTON_X1MASK;
+static const int MOUSEB_X2 = SDL_BUTTON_X2MASK;
 
 static const int QUAL_SHIFT = 1;
 static const int QUAL_CTRL = 2;

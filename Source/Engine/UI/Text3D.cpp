@@ -50,6 +50,7 @@ Text3D::Text3D(Context* context) :
     text_(context),
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),
+    faceCameraAxes_(Vector3::ONE),
     faceCamera_(false),
     textDirty_(true),
     geometryDirty_(true)
@@ -75,6 +76,7 @@ void Text3D::RegisterObject(Context* context)
     ATTRIBUTE(Text3D, VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, false, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_VECTOR3, "Face Camera Axes", faceCameraAxes_, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_INT, "Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
@@ -105,7 +107,8 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
     
     if (faceCamera_)
     {
-        customWorldTransform_ = Matrix3x4(node_->GetWorldPosition(), frame.camera_->GetNode()->GetWorldRotation(), node_->GetWorldScale());
+        customWorldTransform_ = Matrix3x4(node_->GetWorldPosition(), frame.camera_->GetFaceCameraRotation(
+            node_->GetWorldRotation(), faceCameraAxes_), node_->GetWorldScale());
         worldBoundingBoxDirty_ = true;
     }
     
@@ -289,6 +292,11 @@ void Text3D::SetFaceCamera(bool enable)
         // Bounding box must be recalculated
         OnMarkedDirty(node_);
     }
+}
+
+void Text3D::SetFaceCameraAxes(const Vector3& axes)
+{
+    faceCameraAxes_ = axes;
 }
 
 Material* Text3D::GetMaterial() const
