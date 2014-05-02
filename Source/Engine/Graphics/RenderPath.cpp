@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
+#include "Log.h"
 #include "Material.h"
 #include "RenderPath.h"
 #include "StringUtils.h"
@@ -80,12 +81,14 @@ void RenderTargetInfo::Load(const XMLElement& element)
     }
     else if (element.HasAttribute("rtsizedivisor"))
     {
+        // Deprecated rtsizedivisor mode, acts the same as sizedivisor mode now
+        LOGWARNING("Deprecated rtsizedivisor mode used in rendertarget definition");
         size_ = element.GetVector2("rtsizedivisor");
         sizeMode_ = SIZE_VIEWPORTDIVISOR;
     }
     else if (element.HasAttribute("sizemultiplier"))
     {
-        size_ = element.GetVector2("rtsizedivisor");
+        size_ = element.GetVector2("sizemultiplier");
         sizeMode_ = SIZE_VIEWPORTMULTIPLIER;
     }
     
