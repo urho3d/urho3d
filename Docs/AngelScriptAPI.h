@@ -6715,7 +6715,7 @@ uint format;
 String name;
 bool persistent;
 bool sRGB;
-IntVector2 size;
+Vector2 size;
 RenderTargetSizeMode sizeMode;
 String tag;
 };
@@ -11298,8 +11298,8 @@ SURFACE_UPDATEALWAYS,
 enum RenderTargetSizeMode
 {
 SIZE_ABSOLUTE,
-SIZE_RENDERTARGETDIVISOR,
 SIZE_VIEWPORTDIVISOR,
+SIZE_VIEWPORTMULTIPLIER,
 };
 
 enum ShapeType
