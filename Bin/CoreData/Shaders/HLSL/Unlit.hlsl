@@ -76,13 +76,13 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #if defined(PREPASS)
         // Fill light pre-pass G-Buffer
         oColor = float4(0.5, 0.5, 0.5, 1.0);
-        oDepth = iDepth;
+        oDepth = iWorldPos.w;
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
         oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
         oAlbedo = float4(0.0, 0.0, 0.0, 0.0);
         oNormal = float4(0.5, 0.5, 0.5, 1.0);
-        oDepth = iDepth;
+        oDepth = iWorldPos.w;
     #else
         oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
     #endif
