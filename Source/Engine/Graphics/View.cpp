@@ -1769,10 +1769,36 @@ void View::AllocateScreenBuffers()
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
         needSubstitute = true;
-    // If viewport is smaller than whole texture/backbuffer in deferred rendering, need to reserve a buffer,
-    // as the G-buffer textures will be sized equal to the viewport
-    if (deferred_ && (viewSize_.x_ < rtSize_.x_ || viewSize_.y_ < rtSize_.y_))
-        needSubstitute = true;
+    // If viewport is smaller than whole texture/backbuffer in deferred rendering, need to reserve a buffer, as the G-buffer
+    // textures will be sized equal to the viewport
+    if (viewSize_.x_ < rtSize_.x_ || viewSize_.y_ < rtSize_.y_)
+    {
+        if (deferred_)
+            needSubstitute = true;
+        else
+        {
+            // Check also if using MRT without deferred rendering and rendering to the viewport and another texture
+            for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+            {
+                const RenderPathCommand& command = renderPath_->commands_[i];
+                if (!IsNecessary(command))
+                    continue;
+                if (command.outputNames_.Size() > 1)
+                {
+                    for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
+                    {
+                        if (!command.outputNames_[j].Compare("viewport", false))
+                        {
+                            needSubstitute = true;
+                            break;
+                        }
+                    }
+                }
+                if (needSubstitute)
+                    break;
+            }
+        }
+    }
     
     // Follow final rendertarget format, or use RGB to match the backbuffer format
     unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
