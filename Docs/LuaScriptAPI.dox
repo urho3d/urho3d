@@ -5912,6 +5912,7 @@ Methods:
 - bool RemoveAttribute(const String name = String::EMPTY)
 - bool SetValue(const String value)
 - bool SetAttribute(const String name, const String value)
+- bool SetAttribute(const String value)
 - bool SetBool(const String name, bool value)
 - bool SetBoundingBox(const BoundingBox& value)
 - bool SetColor(const String name, const Color& value)
@@ -5944,9 +5945,13 @@ Methods:
 - XMLElement GetParent() const
 - unsigned GetNumAttributes() const
 - bool HasAttribute(const String name) const
+- String GetValue() const
+- String GetAttribute(const String name = String::EMPTY) const
+- String GetAttributeLower(const String name) const
+- String GetAttributeUpper(const String name) const
+- Vector<String> GetAttributeNames() const
 - bool GetBool(const String name) const
 - BoundingBox GetBoundingBox() const
-- String GetValue() const
 - Color GetColor(const String name) const
 - float GetFloat(const String name) const
 - unsigned GetUInt(const String name) const
@@ -5974,8 +5979,8 @@ Properties:
 - const XMLElement EMPTY
 - bool null (readonly)
 - String name (readonly)
-- String value (readonly)
 - XMLElement parent (readonly)
+- String value (readonly)
 - unsigned numAttributes (readonly)
 - XMLFile* file (readonly)
 
