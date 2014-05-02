@@ -688,8 +688,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 {
-    if (!destination || !destination->GetRenderSurface() || destination->GetWidth() != width_ ||
-        destination->GetHeight() != height_)
+    if (!destination || !destination->GetRenderSurface())
         return false;
     
     PROFILE(ResolveToTexture);
@@ -709,10 +708,9 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     
     // Use Direct3D convention with the vertical coordinates ie. 0 is top
     SetTextureForUpdate(destination);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.left_, height_ - vpCopy.bottom_,
-        vpCopy.Width(), vpCopy.Height());
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.Width(), vpCopy.Height());
     SetTexture(0, 0);
-    
+
     return true;
 }
 

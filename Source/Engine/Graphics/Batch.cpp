@@ -220,29 +220,14 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         view->SetCameraShaderParameters(camera_, true, overrideView_);
     
     // Set viewport shader parameters
-    IntVector2 rtSize = graphics->GetRenderTargetDimensions();
     IntRect viewport = graphics->GetViewport();
-    unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
+    IntVector2 viewSize = IntVector2(viewport.Width(), viewport.Height());
+    unsigned viewportHash = viewSize.x_ | (viewSize.y_ << 16);
     
     if (graphics->NeedParameterUpdate(SP_VIEWPORT, reinterpret_cast<void*>(viewportHash)))
     {
-        float rtWidth = (float)rtSize.x_;
-        float rtHeight = (float)rtSize.y_;
-        float widthRange = 0.5f * viewport.Width() / rtWidth;
-        float heightRange = 0.5f * viewport.Height() / rtHeight;
-        
-        #ifdef URHO3D_OPENGL
-        Vector4 bufferUVOffset(((float)viewport.left_) / rtWidth + widthRange,
-            1.0f - (((float)viewport.top_) / rtHeight + heightRange), widthRange, heightRange);
-        #else
-        Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / rtWidth + widthRange,
-            (0.5f + (float)viewport.top_) / rtHeight + heightRange, widthRange, heightRange);
-        #endif
-        graphics->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-        
-        float sizeX = 1.0f / rtWidth;
-        float sizeY = 1.0f / rtHeight;
-        graphics->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
+        // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
+        view->SetGBufferShaderParameters(viewSize, IntRect(0, 0, viewSize.x_, viewSize.y_));
     }
     
     // Set model or skinning transforms

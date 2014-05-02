@@ -72,22 +72,27 @@ void RenderTargetInfo::Load(const XMLElement& element)
         persistent_ = element.GetBool("persistent");
     
     if (element.HasAttribute("size"))
-        size_ = element.GetIntVector2("size");
+        size_ = element.GetVector2("size");
     if (element.HasAttribute("sizedivisor"))
     {
-        size_ = element.GetIntVector2("sizedivisor");
+        size_ = element.GetVector2("sizedivisor");
         sizeMode_ = SIZE_VIEWPORTDIVISOR;
     }
-    if (element.HasAttribute("rtsizedivisor"))
+    else if (element.HasAttribute("rtsizedivisor"))
     {
-        size_ = element.GetIntVector2("rtsizedivisor");
-        sizeMode_ = SIZE_RENDERTARGETDIVISOR;
+        size_ = element.GetVector2("rtsizedivisor");
+        sizeMode_ = SIZE_VIEWPORTDIVISOR;
+    }
+    else if (element.HasAttribute("sizemultiplier"))
+    {
+        size_ = element.GetVector2("rtsizedivisor");
+        sizeMode_ = SIZE_VIEWPORTMULTIPLIER;
     }
     
     if (element.HasAttribute("width"))
-        size_.x_ = element.GetInt("width");
+        size_.x_ = element.GetFloat("width");
     if (element.HasAttribute("height"))
-        size_.y_ = element.GetInt("height");
+        size_.y_ = element.GetFloat("height");
 }
 
 void RenderPathCommand::Load(const XMLElement& element)

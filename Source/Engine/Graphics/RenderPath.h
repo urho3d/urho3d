@@ -56,8 +56,8 @@ enum RenderCommandSortMode
 enum RenderTargetSizeMode
 {
     SIZE_ABSOLUTE = 0,
-    SIZE_RENDERTARGETDIVISOR,
-    SIZE_VIEWPORTDIVISOR
+    SIZE_VIEWPORTDIVISOR,
+    SIZE_VIEWPORTMULTIPLIER
 };
 
 /// Rendertarget definition.
@@ -65,7 +65,7 @@ struct RenderTargetInfo
 {
     /// Construct.
     RenderTargetInfo() :
-        size_(IntVector2::ZERO),
+        size_(Vector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
         enabled_(true),
         filtered_(false),
@@ -83,8 +83,8 @@ struct RenderTargetInfo
     String tag_;
     /// Texture format.
     unsigned format_;
-    /// Size.
-    IntVector2 size_;
+    /// Absolute size or multiplier.
+    Vector2 size_;
     /// Size mode.
     RenderTargetSizeMode sizeMode_;
     /// Enabled flag.
