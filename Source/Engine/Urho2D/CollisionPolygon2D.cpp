@@ -83,6 +83,9 @@ void CollisionPolygon2D::ApplyNodeWorldScale()
 void CollisionPolygon2D::RecreateFixture()
 {
     ReleaseFixture();
+    
+    if (vertices_.Size() < 3)
+        return;
 
     PODVector<b2Vec2> b2Vertices;
     unsigned count = vertices_.Size();

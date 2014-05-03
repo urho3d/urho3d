@@ -201,13 +201,15 @@ template<> void* ToluaToPODVector<Vector2>(lua_State* L, int narg, void* def)
     static PODVector<Vector2> result;
     result.Clear();
 
+    tolua_Error tolua_err;
+
     int length = lua_objlen(L, narg);
     for (int i = 1; i <= length; ++i)
     {
         lua_pushinteger(L, i);
         lua_gettable(L, narg);
 
-        if (!lua_isnumber(L, -1))
+        if (!tolua_isusertype(L, -1, "Vector2", 0, &tolua_err))
         {
             lua_pop(L, 1);
             return 0;
