@@ -213,10 +213,6 @@ class ViewportContext
 
     void SetOrthographic(bool orthographic)
     {
-        // This doesn't work that great
-        /* if (orthographic) */
-        /*     camera.orthoSize = (cameraNode.position - GetScreenCollision(IntVector2(viewport.rect.width, viewport.rect.height))).length; */
-
         camera.orthographic = orthographic;
         UpdateSettingsUI();
     }
@@ -1376,6 +1372,15 @@ void ViewMouseClick()
     ViewRaycast(true);
 }
 
+Ray GetActiveViewportCameraRay()
+{
+    IntRect view = activeViewport.viewport.rect;
+    return camera.GetScreenRay(
+        float(ui.cursorPosition.x - view.left) / view.width,
+        float(ui.cursorPosition.y - view.top) / view.height
+    );
+}
+
 void ViewRaycast(bool mouseClick)
 {
     // Ignore if UI has modal element
@@ -1388,7 +1393,7 @@ void ViewRaycast(bool mouseClick)
 
     IntVector2 pos = ui.cursorPosition;
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
-    if(editMode==EDIT_SPAWN)
+    if (editMode == EDIT_SPAWN)
     {
         if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
             SpawnObject();
@@ -1400,7 +1405,6 @@ void ViewRaycast(bool mouseClick)
         return;
 
     DebugRenderer@ debug = editorScene.debugRenderer;
-
 
     if (pickMode == PICK_UI_ELEMENTS)
     {
@@ -1426,10 +1430,7 @@ void ViewRaycast(bool mouseClick)
     if (elementAtPos !is null)
         return;
 
-    IntRect view = activeViewport.viewport.rect;
-    Ray cameraRay = camera.GetScreenRay(
-        float(pos.x - view.left) / view.width,
-        float(pos.y - view.top) / view.height);
+    Ray cameraRay = GetActiveViewportCameraRay();
     Component@ selectedComponent;
 
     if (pickMode < PICK_RIGIDBODIES)
@@ -1613,44 +1614,6 @@ Vector3 SelectedNodesCenterPoint()
         return centerPoint / count;
     else
         return centerPoint;
-}
-
-Vector3 GetScreenCollision(IntVector2 pos)
-{
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
-    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
-
-    bool physicsFound = false;
-    if (editorScene.physicsWorld !is null)
-    {
-        if (!runUpdate)
-            editorScene.physicsWorld.UpdateCollisions();
-
-        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-
-        if (result.body !is null)
-        {
-            physicsFound = true;
-            result.position;
-        }
-    }
-
-    if (editorScene.octree is null)
-        return res;
-
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-        DRAWABLE_GEOMETRY, 0x7fffffff);
-
-    if (result.drawable !is null)
-    {
-        // take the closer of the results
-        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
-            return res;
-        else
-            return result.position;
-    }
-
-    return res;
 }
 
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)

@@ -329,7 +329,10 @@ void LoadNode(const String&in fileName)
     // Before instantiating, add object's resource path if necessary
     SetResourcePath(GetPath(fileName), true, true);
 
-    Vector3 position = GetNewNodePosition();
+    Ray cameraRay = camera.GetScreenRay(0.5, 0.5); // Get ray at view center
+    Vector3 position, normal;
+    GetSpawnPosition(cameraRay, newNodeDistance, position, normal, 0, true);
+
     Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, instantiateMode);
     if (newNode !is null)
     {
@@ -359,6 +362,17 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     if (newNode !is null)
     {
         newNode.scale = newNode.scale * scaleMod;
+        if (alignToAABBBottom)
+        {
+            Drawable@ drawable = GetFirstDrawable(newNode);
+            if (drawable !is null)
+            {
+                BoundingBox aabb = drawable.worldBoundingBox;
+                Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+                Vector3 offset = aabbBottomCenter - newNode.worldPosition;
+                newNode.worldPosition = newNode.worldPosition - offset;
+            }
+        }
 
         // Create an undo action for the load
         CreateNodeAction action;
@@ -945,8 +959,27 @@ void UpdateSceneMru(String filename)
 
     uiRecentScenes.Insert(0, filename);
 
-    for(uint i=uiRecentScenes.length-1;i>=maxRecentSceneCount;i--)
+    for (uint i = uiRecentScenes.length - 1; i >= maxRecentSceneCount; i--)
         uiRecentScenes.Erase(i);
 
     PopulateMruScenes();
+}
+
+Drawable@ GetFirstDrawable(Node@ node)
+{
+    Array<Node@> nodes = node.GetChildren(true);
+    nodes.Insert(0, node);
+
+    for (uint i = 0; i < nodes.length; ++i)
+    {
+        Array<Component@> components = nodes[i].GetComponents();
+        for (uint j = 0; j < components.length; ++j)
+        {
+            Drawable@ drawable = cast<Drawable>(components[j]);
+            if (drawable !is null)
+                return drawable;
+        }
+    }
+    
+    return null;
 }
