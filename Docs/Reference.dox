@@ -1644,85 +1644,105 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 
 
 \page Urho2D Urho2D
-In order to make 2D Game in Urho3D, Urho2D is provided. Urho2D include 2D graphics and 2D physics. The classes provide are:
+In order to make 2D games in Urho3D, Urho2D is provided. Urho2D includes 2D graphics and 2D physics. Provided classes are:
 
-- Sprite2D: a sprite is defined with texture and texture rectangle and hot spot.
-- SpriteSheet2D: a sprite sheet(texture atlas) include some sprites in it.
-- StaticSprite2D: a drawable component to display a sprite.
-- Animation2D: 2D animation with some frames, a frame include duration and a sprite.
-- AnimatedSprite2D : a drawable component to display an animation.
-- ParticleEffect2D: 2D particle model file.
-- ParticleEmitter2D: a 2D particle effect.
-- PhysicsWorld2D: implements 2D physics simulation. 2D physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
+\section Drawable_Components Drawable components
+- AnimatedSprite2D : used to display an Animation2D.
+- ParticleEmitter2D: used to display a ParticleEffect2D.
+- StaticSprite2D: used to display a Sprite2D.
+
+\section Resources Resources
+- Animation2D: a *.anm file defining a sequence of Sprite2D frames (retrieved from one or more Sprite2Ds/SpriteSheet2Ds) to play. For an example using a SpriteSheet2D, see Bin/Data/Urho2D/GoldIcon.anm
+- ParticleEffect2D: a *.xml file defining the behavior and texture of a 2D particle. For an example, see Bin/Data/Urho2D/greenspiral.pex
+- Sprite2D: an image defined with texture, texture rectangle and hot spot.
+- SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
+
+To create an Animation2D from multiple images:
+- Pack all your individual images into a texture atlas using tools like ShoeBox (http://renderhjs.net/shoebox/) or TexturePacker (http://www.codeandweb.com/texturepacker) or ....
+This will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
+- Create an Animation2D xml file from scratch or using ShoeBox.
+For an example, see rotating coin in example 24_Urho2DSprite and resources located in Bin/Data/Urho2D : GoldIcon.png is the texture atlas image, GoldIcon.xml is the external file storing sprites' coordinates and size and GoldIcon.anm is the Animation2D file.
+
+\section Physics Physics
+Physics in Urho2D uses Box2D. You can refer to Box2D manual at http://www.box2d.org/manual.html for full reference.
+- PhysicsWorld2D: implements 2D physics simulation. Mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+
+\section Rigid_Bodies_Components Rigid bodies components
 - RigidBody2D: a 2D physics object instance.
-- CollisionShape2D: base class for 2D physics collision shape. 
-- CollisionBox2D: defines 2D physics collision box.
-- CollisionCircle2D: defines 2D physics collision circle.
-- CollisionEdge2D: defines 2D physics collision edge.
-- CollisionChain2D: defines 2D physics collision chain.
-- CollisionPolygon2D: defines 2D physics collision polygon.
-- Constraint2D: base class for 2D physics constraint.
-- ConstraintDistance2D: define 2D physics distance constraint.
-- ConstraintFriction2D: define 2D physics friction constraint.
-- ConstraintGear2D: define 2D physics gear constraint.
-- ConstraintMotor2D: define 2D physics motor constraint.
-- ConstraintMouse2D: define 2D physics mouse constraint.
-- ConstraintPrismatic2D: define 2D physics prismatic constraint.
-- ConstraintPulley2D: define 2D physics pulley constraint.
-- ConstraintRevolute2D: define 2D physics revolute constraint.
-- ConstraintRope2D: define 2D physics rope constraint.
-- ConstraintWeld2D: define 2D physics weld constraint.
-- ConstraintWheel2D: define 2D physics wheel constraint.
+Available BodyType2Ds are: (SetBodyType)
+- BT_STATIC: A static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
+- BT_DYNAMIC: A dynamic body is fully simulated. They can be moved manually by the user, but normally they move according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
+- BT_KINEMATIC: A kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
+You should establish the body type at creation because changing the body type later is expensive.
 
-In order to use Urho2D, it is need set camera to orthographic mode first, it can be done with following code:
+\section Collision_Shapes_Components Collision shapes components
+Use DrawDebugGeometry() to display the shapes.
+- CollisionShape2D: base class for 2D physics collision shapes.
+- CollisionBox2D: defines 2D physics collision box.
+- CollisionCircle2D: defines 2D physics collision circle. Circle shapes have a position (SetCenter) and radius (SetRadius). Circles are solid, you cannot make a hollow circle using the circle shape.
+- CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments (SetVertex1 and SetVertex2 or SetVertices). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
+- CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (SetVertices) to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
+- CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (SetVertices). Polygons vertices are stored with a counter clockwise winding.
+
+\section Constraints_Components Constraints components
+Apply a constraint to a node (called 'ownerBody') and use SetOtherBody() to set the other node's body to be constrained to the ownerBody.
+Use SetCollideConnected() to switch collision between the bodies.
+Use SetDrawJoint(true) in combination with DrawDebugGeometry() to display the joints.
+See 29_Urho2DConstraints for detailed examples and to help selecting the appropriate constraint.
+- Constraint2D: base class for 2D physics constraints.
+- ConstraintDistance2D: define 2D physics distance constraint. The distance between two anchor points (SetOwnerBodyAnchor and SetOtherBodyAnchor) on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (SetFrequencyHz is below half of the timestep) and damping ratio (SetDampingRatio).
+- ConstraintFriction2D: This constraint is used for top-down friction. It provides 2D translational friction (SetMaxForce) and angular friction (SetMaxTorque).
+- ConstraintGear2D: define 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (SetOwnerConstraint and SetOtherConstraint). Like the pulley ratio, you can specify a gear ratio (SetRatio). However, in this case the gear ratio can be negative.
+- ConstraintMotor2D: define 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (SetLinearOffset) and rotation offsets (SetAngularOffset). You can set the maximum motor force (SetMaxForce) and torque (SetMaxTorque) that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
+- ConstraintMouse2D: define 2D physics mouse constraint. Used to manipulate bodies with the mouse. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (SetTarget) initially coincides with the body’s anchor point. The maximum force (SetMaxForce) is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (SetFrequencyHz) and damping ratio (SetDampingRatio) are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
+- ConstraintPrismatic2D: define 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (SetAxis). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
+- ConstraintPulley2D: define 2D physics pulley constraint. The pulley connects two bodies to ground (SetOwnerBodyGroundAnchor and SetOtherBodyGroundAnchor) and to each other (SetOwnerBodyAnchor and SetOtherBodyAnchor). As one body goes up, the other goes down. You can supply a ratio (SetRatio) that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
+- ConstraintRevolute2D: define 2D physics revolute constraint. define 2D physics friction constraint. This constraint forces two bodies to share a common hinge anchor point (SetAnchor). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (SetEnableLimit) forces the joint angle to remain between a lower (SetLowerAngle) and upper (SetUpperAngle) bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (SetEnableMotor) allows you to specify the constraint speed (the time derivative of the angle). The speed (SetMotorSpeed) can be negative or positive. When the maximum torque (SetMaxMotorTorque) is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
+- ConstraintRope2D: define 2D physics rope constraint. This constraint restricts the maximum distance (SetMaxLength) between two points (SetOwnerBodyAnchor and SetOtherBodyAnchor). This can be useful to prevent chains of bodies from stretching, even under high load.
+- ConstraintWeld2D: define 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
+- ConstraintWheel2D: define 2D physics wheel constraint. This constraint restricts a point on bodyB (SetAnchor) to a line on bodyA (SetAxis). It also provides a suspension spring.
+
+In order to use Urho2D we need to set camera to orthographic mode first; it can be done with following code:
 
 C++:
 \code
     // Create camera node
     Node* cameraNode = scene_->CreateChild("Camera");
-    // Set camera node's position
-    cameraNode->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
+    
     // Create camera
     Camera* camera = cameraNode->CreateComponent<Camera>();
     // Set camera orthographic
     camera->SetOrthographic(true);
-
     // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera->SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 \endcode 
 
 AngelScript:
 \code
     // Create camera node
     Node@ cameraNode = scene_.CreateChild("Camera");
-    // Set camera node's position
-    cameraNode.SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
+    
     // Create camera
     Camera@ camera = cameraNode.CreateComponent("Camera");
     // Set camera orthographic
     camera.orthographic = true;
-
     // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera.orthoSize = graphics.height * PIXEL_SIZE;
 \endcode 
 
 Lua:
 \code
     -- Create camera node
     cameraNode = scene_:CreateChild("Camera")
-    -- Set camera node's position
-    cameraNode.position = Vector3(0.0, 0.0, -10.0)
-
+    
     -- Create camera
     local camera = cameraNode:CreateComponent("Camera")
     -- Set camera orthographic
     camera.orthographic = true
-
     -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
+    camera.orthoSize = graphics.height * PIXEL_SIZE
 \endcode 
+
 
 \page Serialization Serialization
 
