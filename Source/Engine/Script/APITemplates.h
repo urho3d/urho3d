@@ -631,6 +631,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, uint id = 0)", asMETHODPR(T, CloneComponent, (Component*, unsigned), Component*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, CreateMode, uint id = 0)", asMETHODPR(T, CloneComponent, (Component*, CreateMode, unsigned), Component*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponent(Component@+)", asMETHODPR(T, RemoveComponent, (Component*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponent(const String&in)", asFUNCTION(NodeRemoveComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllComponents()", asMETHOD(T, RemoveAllComponents), asCALL_THISCALL);

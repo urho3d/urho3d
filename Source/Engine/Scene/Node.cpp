@@ -729,24 +729,30 @@ Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode, uns
         return CreateComponent(type, mode, id);
 }
 
-void Node::CloneComponent(Component* component, unsigned id)
+Component* Node::CloneComponent(Component* component, unsigned id)
 {
-    if(!component)
-        return;
-
-    CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
+    if (!component)
+    {
+        LOGERROR("Null source component given for CloneComponent");
+        return 0;
+    }
+    
+    return CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
 }
 
-void Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
+Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
 {
-    if(!component)
-        return;
+    if (!component)
+    {
+        LOGERROR("Null source component given for CloneComponent");
+        return 0;
+    }
 
     Component* cloneComponent = CreateComponent(component->GetType(), mode, 0);
     if (!cloneComponent)
     {
         LOGERROR("Could not clone component " + component->GetTypeName());
-        return;
+        return 0;
     }
 
     const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
@@ -759,6 +765,8 @@ void Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
                 cloneComponent->SetAttribute(j, component->GetAttribute(j));
         }
     }
+    
+    return cloneComponent;
 }
 
 void Node::RemoveComponent(Component* component)

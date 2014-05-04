@@ -192,10 +192,10 @@ public:
     Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Create a component to this node if it does not exist already.
     Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
-    /// Clone a component from another node.
-    void CloneComponent(Component* component, unsigned id = 0);
-    /// Clone a component from another node.
-    void CloneComponent(Component* component, CreateMode mode, unsigned id = 0);
+    /// Clone a component from another node using its create mode. Return the clone if successful or null on failure.
+    Component* CloneComponent(Component* component, unsigned id = 0);
+    /// Clone a component from another node and specify the create mode. Return the clone if successful or null on failure.
+    Component* CloneComponent(Component* component, CreateMode mode, unsigned id = 0);
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
