@@ -748,7 +748,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
         return 0;
     }
 
-    Component* cloneComponent = CreateComponent(component->GetType(), mode, 0);
+    Component* cloneComponent = SafeCreateComponent(component->GetTypeName(), component->GetType(), mode, 0);
     if (!cloneComponent)
     {
         LOGERROR("Could not clone component " + component->GetTypeName());
@@ -762,7 +762,11 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
         {
             const AttributeInfo& attr = compAttributes->At(j);
             if (attr.mode_ & AM_FILE)
-                cloneComponent->SetAttribute(j, component->GetAttribute(j));
+            {
+                Variant value;
+                component->OnGetAttribute(attr, value);
+                cloneComponent->OnSetAttribute(attr, value);
+            }
         }
     }
     
@@ -1612,32 +1616,21 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         const AttributeInfo& attr = attributes->At(j);
         // Do not copy network-only attributes, as they may have unintended side effects
         if (attr.mode_ & AM_FILE)
-            cloneNode->SetAttribute(j, GetAttribute(j));
+        {
+            Variant value;
+            OnGetAttribute(attr, value);
+            cloneNode->OnSetAttribute(attr, value);
+        }
     }
 
     // Clone components
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        Component* cloneComponent = cloneNode->SafeCreateComponent(component->GetTypeName(), component->GetType(),
+        Component* cloneComponent = cloneNode->CloneComponent(component,
             (mode == REPLICATED && component->GetID() < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, 0);
-        if (!cloneComponent)
-        {
-            LOGERROR("Could not clone component " + component->GetTypeName());
-            continue;
-        }
-        resolver.AddComponent(component->GetID(), cloneComponent);
-
-        const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
-        if (compAttributes)
-        {
-            for (unsigned j = 0; j < compAttributes->Size(); ++j)
-            {
-                const AttributeInfo& attr = compAttributes->At(j);
-                if (attr.mode_ & AM_FILE)
-                    cloneComponent->SetAttribute(j, component->GetAttribute(j));
-            }
-        }
+        if (cloneComponent)
+            resolver.AddComponent(component->GetID(), cloneComponent);
     }
 
     // Clone child nodes recursively
