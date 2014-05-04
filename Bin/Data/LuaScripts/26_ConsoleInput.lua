@@ -52,12 +52,16 @@ function Start()
     console.numBufferedRows = 2 * console.numRows;
     console.commandInterpreter = "LuaScript";
     console.visible = true
+    console.closeButton.visible = false;
     
     -- Show OS mouse cursor
     input.mouseVisible = true
 
     -- Open the operating system console window (for stdin / stdout) if not open yet
-    OpenConsoleWindow()
+    -- Do not open in fullscreen, as this would cause constant device loss
+    if not graphics.fullscreen then
+        OpenConsoleWindow()
+    end
 
     -- Initialize game and print the welcome message
     StartGame()

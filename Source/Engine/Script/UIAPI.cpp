@@ -313,6 +313,8 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "int get_baseIndent() const", asMETHOD(ListView, GetBaseIndent), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_clearSelectionOnDefocus(bool)", asMETHOD(ListView, SetClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool get_clearSelectionOnDefocus() const", asMETHOD(ListView, GetClearSelectionOnDefocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_selectOnClickEnd(bool)", asMETHOD(ListView, SetSelectOnClickEnd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool get_selectOnClickEnd() const", asMETHOD(ListView, GetSelectOnClickEnd), asCALL_THISCALL);
 }
 
 static void RegisterText(asIScriptEngine* engine)
@@ -392,6 +394,8 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "float get_opacity() const", asMETHOD(Text3D, GetOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_faceCamera(bool)", asMETHOD(Text3D, SetFaceCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "bool get_faceCamera() const", asMETHOD(Text3D, GetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_faceCameraAxes(const Vector3&)", asMETHOD(Text3D, SetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const Vector3& get_faceCameraAxes() const", asMETHOD(Text3D, GetFaceCameraAxes), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHOD(Text3D, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numChars() const", asMETHOD(Text3D, GetNumChars), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_rowWidths(uint) const", asMETHOD(Text3D, GetRowWidth), asCALL_THISCALL);

@@ -52,8 +52,8 @@ float powerupSpawnTimer = 0;
 uint clientNodeID = 0;
 int clientScore = 0;
 
-uint screenJoystickIndex = M_MAX_UNSIGNED;
-uint screenJoystickSettingsIndex = M_MAX_UNSIGNED;
+int screenJoystickID = -1;
+int screenJoystickSettingsID = -1;
 bool touchEnabled = false;
 
 Array<Player> players;
@@ -204,7 +204,7 @@ void InitNetworking()
 void InitTouchInput()
 {
     touchEnabled = true;
-    screenJoystickIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystick_NinjaSnowWar.xml"));
+    screenJoystickID = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystick_NinjaSnowWar.xml"));
 }
 
 void CreateCamera()
@@ -498,22 +498,22 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             SetMessage("PAUSED");
             
             // Open the settings joystick only if the controls screen joystick was already open
-            if (screenJoystickIndex != M_MAX_UNSIGNED)
+            if (screenJoystickID >= 0)
             {
-                if (screenJoystickSettingsIndex == M_MAX_UNSIGNED)
-                    screenJoystickSettingsIndex = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
-                input.set_ScreenJoystickVisible(screenJoystickSettingsIndex, true);
+                // Lazy initialization
+                if (screenJoystickSettingsID < 0)
+                    screenJoystickSettingsID = input.AddScreenJoystick(cache.GetResource("XMLFile", "UI/ScreenJoystickSettings_NinjaSnowWar.xml"));
+                else
+                    input.screenJoystickVisible[screenJoystickSettingsID] = true;
             }
         }
         else
         {
             SetMessage("");
-            if (screenJoystickSettingsIndex != M_MAX_UNSIGNED)
-            {
-                input.set_ScreenJoystickVisible(screenJoystickSettingsIndex, false);
-                input.RemoveScreenJoystick(screenJoystickSettingsIndex);
-                screenJoystickSettingsIndex = M_MAX_UNSIGNED;
-            }
+
+            // Hide the settings joystick
+            if (screenJoystickSettingsID >= 0)
+                input.screenJoystickVisible[screenJoystickSettingsID] = false;
         }
     }
 }
@@ -904,7 +904,7 @@ void UpdateControls()
 
         if (input.numJoysticks > 0)
         {
-            JoystickState@ joystick = input.joysticks[touchEnabled ? screenJoystickIndex : 0];
+            JoystickState@ joystick = touchEnabled ? input.joysticks[screenJoystickID] : input.joysticksByIndex[0];
             if (joystick.numButtons > 0)
             {
                 if (joystick.buttonDown[0])
@@ -942,8 +942,8 @@ void UpdateControls()
                 }
                 if (joystick.numAxes >= 4)
                 {
-                    float lookX = joystick.axisPosition[joystick.numAxes - 2];
-                    float lookY = joystick.axisPosition[joystick.numAxes - 1];
+                    float lookX = joystick.axisPosition[2];
+                    float lookY = joystick.axisPosition[3];
 
                     if (lookX < -joyLookDeadZone)
                         playerControls.yaw -= joySensitivity * lookX * lookX;

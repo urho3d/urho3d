@@ -26,6 +26,7 @@
 #include "FileSystem.h"
 #include "FileWatcher.h"
 #include "Image.h"
+#include "JSONFile.h"
 #include "Log.h"
 #include "PackageFile.h"
 #include "ResourceCache.h"
@@ -854,6 +855,7 @@ File* ResourceCache::SearchPackages(const String& nameIn)
 void RegisterResourceLibrary(Context* context)
 {
     Image::RegisterObject(context);
+    JSONFile::RegisterObject(context);
     XMLFile::RegisterObject(context);
 }
 

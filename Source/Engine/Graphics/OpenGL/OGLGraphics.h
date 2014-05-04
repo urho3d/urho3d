@@ -115,7 +115,7 @@ public:
     void EndFrame();
     /// Clear any or all of rendertarget, depth buffer and stencil buffer.
     void Clear(unsigned flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
-    /// Resolve multisampled backbuffer to a texture rendertarget.
+    /// Resolve multisampled backbuffer to a texture rendertarget. The texture's size should match the viewport size.
     bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
@@ -266,8 +266,8 @@ public:
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches drawn this frame.
     unsigned GetNumBatches() const { return numBatches_; }
-    /// Return dummy color texture format for shadow maps.
-    unsigned GetDummyColorFormat() const { return 0; }
+    /// Return dummy color texture format for shadow maps. 0 if not needed, may be nonzero on OS X to work around an Intel driver issue.
+    unsigned GetDummyColorFormat() const { return dummyColorFormat_; }
     /// Return shadow map depth texture format, or 0 if not supported.
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
@@ -503,6 +503,8 @@ private:
     Vector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
+    /// Shadow map dummy color texture format.
+    unsigned dummyColorFormat_;
     /// Shadow map depth texture format.
     unsigned shadowMapFormat_;
     /// Shadow map 24-bit depth texture format.

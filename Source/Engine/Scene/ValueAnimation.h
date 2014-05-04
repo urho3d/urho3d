@@ -28,10 +28,7 @@
 namespace Urho3D
 {
 
-class Animatable;
-class ObjectAnimation;
 class XMLElement;
-struct AttributeInfo;
 
 /// Interpolation method.
 enum InterpMethod
@@ -42,8 +39,8 @@ enum InterpMethod
     IM_SPLINE,
 };
 
-/// Attribute key frame.
-struct AttributeKeyFrame
+/// Value animation key frame.
+struct VAnimKeyFrame
 {
     /// Time.
     float time_;
@@ -51,8 +48,8 @@ struct AttributeKeyFrame
     Variant value_;
 };
 
-/// Attribute event frame.
-struct AttributeEventFrame
+/// Value animation event frame.
+struct VAnimEventFrame
 {
     /// Time.
     float time_;
@@ -62,16 +59,16 @@ struct AttributeEventFrame
     VariantMap eventData_;
 };
 
-/// Base class for attribute animation.
-class URHO3D_API AttributeAnimation : public Resource
+/// Value animation class.
+class URHO3D_API ValueAnimation : public Resource
 {
-    OBJECT(AttributeAnimation);
+    OBJECT(ValueAnimation);
 
 public:
     /// Construct.
-    AttributeAnimation(Context* context);
+    ValueAnimation(Context* context);
     /// Destruct.
-    virtual ~AttributeAnimation();
+    virtual ~ValueAnimation();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -84,8 +81,8 @@ public:
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
 
-    /// Set object animation.
-    void SetObjectAnimation(ObjectAnimation* objectAnimation);
+    /// Set owner.
+    void SetOwner(void* owner);
     /// Set interpolation method.
     void SetInterpolationMethod(InterpMethod method);
     /// Set spline tension, should be between 0.0f and 1.0f, but this is not a must.
@@ -100,8 +97,8 @@ public:
 
     /// Return animation is valid.
     bool IsValid() const;
-    /// Return object animation.
-    ObjectAnimation* GetObjectAnimation() const { return objectAnimation_; }
+    /// Return owner.
+    void* GetOwner() const { return owner_; }
     /// Return interpolation method.
     InterpMethod GetInterpolationMethod() const { return interpolationMethod_; }
     /// Return spline tension.
@@ -112,12 +109,12 @@ public:
     float GetBeginTime() const { return beginTime_; }
     /// Return end time.
     float GetEndTime() const { return endTime_; }
-    /// Update object's attribute value.
-    void UpdateAttributeValue(Animatable* animatable, const AttributeInfo& attributeInfo, float scaledTime);
+    /// Return animation value.
+    Variant GetAnimationValue(float scaledTime);
     /// Has event frames.
     bool HasEventFrames() const { return !eventFrames_.Empty(); }
     /// Return all event frames between time.
-    void GetEventFrames(float beginTime, float endTime, PODVector<const AttributeEventFrame*>& eventFrames) const;
+    void GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const;
 
 protected:
     /// Linear interpolation.
@@ -129,8 +126,8 @@ protected:
     /// Return (value1 - value2) * t.
     Variant SubstractAndMultiply(const Variant& value1, const Variant& value2, float t) const;
 
-    /// Object animation.
-    WeakPtr<ObjectAnimation> objectAnimation_;
+    /// Owner.
+    void* owner_;
     /// Interpolation method.
     InterpMethod interpolationMethod_;
     /// Spline tension.
@@ -144,13 +141,13 @@ protected:
     /// End time.
     float endTime_;
     /// Key frames.
-    PODVector<AttributeKeyFrame> keyFrames_;
+    PODVector<VAnimKeyFrame> keyFrames_;
     /// Spline tangents.
     VariantVector splineTangents_;
     /// Spline tangents dirty.
     bool splineTangentsDirty_;
     /// Event frames.
-    PODVector<AttributeEventFrame> eventFrames_;
+    PODVector<VAnimEventFrame> eventFrames_;
 };
 
 }

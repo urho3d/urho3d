@@ -146,7 +146,7 @@ class ViewportContext
 
         cameraPosText = Text();
         statusBar.AddChild(cameraPosText);
-        
+
         cameraPosText.SetFont(font, 11);
         cameraPosText.color = Color(1, 1, 0);
         cameraPosText.textEffect = TE_SHADOW;
@@ -210,13 +210,9 @@ class ViewportContext
     {
         SetOrthographic(!camera.orthographic);
     }
-    
+
     void SetOrthographic(bool orthographic)
     {
-        // This doesn't work that great
-        /* if (orthographic) */
-        /*     camera.orthoSize = (cameraNode.position - GetScreenCollision(IntVector2(viewport.rect.width, viewport.rect.height))).length; */
-
         camera.orthographic = orthographic;
         UpdateSettingsUI();
     }
@@ -249,7 +245,7 @@ class ViewportContext
     void OpenViewportSettingsWindow()
     {
         UpdateSettingsUI();
-        /* settingsWindow.position = */ 
+        /* settingsWindow.position = */
         settingsWindow.visible = true;
     }
 
@@ -394,7 +390,7 @@ void CreateCamera()
 {
     // Set the initial viewport rect
     viewportArea = IntRect(0, 0, graphics.width, graphics.height);
-    
+
     SetViewportMode(viewportMode);
     SetActiveViewport(viewports[0]);
 
@@ -418,7 +414,7 @@ void CreateViewportUI()
         viewportUI = UIElement();
         ui.root.AddChild(viewportUI);
     }
-        
+
     viewportUI.SetFixedSize(viewportArea.width, viewportArea.height);
     viewportUI.position = IntVector2(viewportArea.top, viewportArea.left);
     viewportUI.clipChildren = true;
@@ -618,7 +614,7 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
             viewports[i].cameraNode.rotation = cameraRotations[src];
         }
     }
-    
+
     ReacquireCameraYawPitch();
     UpdateViewParameters();
     UpdateCameraPreview();
@@ -1163,10 +1159,14 @@ void UpdateView(float timeStep)
                 cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
                 orbiting = true;
             }
-            
+
             FadeUI();
+            input.mouseGrabbed = true;
         }
     }
+    else
+        input.mouseGrabbed = false;
+
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
 
@@ -1372,15 +1372,28 @@ void ViewMouseClick()
     ViewRaycast(true);
 }
 
+Ray GetActiveViewportCameraRay()
+{
+    IntRect view = activeViewport.viewport.rect;
+    return camera.GetScreenRay(
+        float(ui.cursorPosition.x - view.left) / view.width,
+        float(ui.cursorPosition.y - view.top) / view.height
+    );
+}
+
 void ViewRaycast(bool mouseClick)
 {
     // Ignore if UI has modal element
     if (ui.HasModalElement())
         return;
 
+    // Ignore if mouse is grabbed by other operation
+    if (input.mouseGrabbed)
+        return;
+
     IntVector2 pos = ui.cursorPosition;
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
-    if(editMode==EDIT_SPAWN)
+    if (editMode == EDIT_SPAWN)
     {
         if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
             SpawnObject();
@@ -1393,7 +1406,6 @@ void ViewRaycast(bool mouseClick)
 
     DebugRenderer@ debug = editorScene.debugRenderer;
 
- 
     if (pickMode == PICK_UI_ELEMENTS)
     {
         bool leftClick = mouseClick && input.mouseButtonPress[MOUSEB_LEFT];
@@ -1418,10 +1430,7 @@ void ViewRaycast(bool mouseClick)
     if (elementAtPos !is null)
         return;
 
-    IntRect view = activeViewport.viewport.rect;
-    Ray cameraRay = camera.GetScreenRay(
-        float(pos.x - view.left) / view.width,
-        float(pos.y - view.top) / view.height);
+    Ray cameraRay = GetActiveViewportCameraRay();
     Component@ selectedComponent;
 
     if (pickMode < PICK_RIGIDBODIES)
@@ -1605,44 +1614,6 @@ Vector3 SelectedNodesCenterPoint()
         return centerPoint / count;
     else
         return centerPoint;
-}
-
-Vector3 GetScreenCollision(IntVector2 pos)
-{
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
-    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
-
-    bool physicsFound = false;
-    if (editorScene.physicsWorld !is null)
-    {
-        if (!runUpdate)
-            editorScene.physicsWorld.UpdateCollisions();
-
-        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-
-        if (result.body !is null)
-        {
-            physicsFound = true;
-            result.position;
-        }
-    }
-
-    if (editorScene.octree is null)
-        return res;
-
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-        DRAWABLE_GEOMETRY, 0x7fffffff);
-
-    if (result.drawable !is null)
-    {
-        // take the closer of the results
-        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
-            return res;
-        else
-            return result.position;
-    }
-
-    return res;
 }
 
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)

@@ -24,6 +24,7 @@
 #include "Animation2D.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Serializer.h"
@@ -95,7 +96,11 @@ bool Animation2D::Load(Deserializer& source)
             sprite = cache->GetResource<Sprite2D>(names[0]);
         else if (names.Size() == 2)
         {
-            SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(names[0]);
+            SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(names[0], false);
+            // If sprite sheet not found, try get in current directory
+            if (!spriteSheet)
+                spriteSheet = cache->GetResource<SpriteSheet2D>(GetParentPath(GetName()) + names[0]);
+
             if (!spriteSheet)
             {
                 LOGERROR("Could not get sprite speet");

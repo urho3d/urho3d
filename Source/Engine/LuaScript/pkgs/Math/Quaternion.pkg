@@ -6,6 +6,7 @@ class Quaternion
     Quaternion(const Quaternion& quat);
     Quaternion(float w, float x, float y, float z);
     Quaternion(float angle, const Vector3& axis);
+    Quaternion(float angle);
     Quaternion(float x, float y, float z);
     Quaternion(const Vector3& start, const Vector3& end);
     Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);

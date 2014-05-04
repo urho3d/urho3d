@@ -5,7 +5,7 @@ LineEdit@ randomRotationY;
 LineEdit@ randomRotationZ;
 LineEdit@ randomScaleMinEdit;
 LineEdit@ randomScaleMaxEdit;
-LineEdit@ NumberSpawnedObjectsEdit;
+LineEdit@ numberSpawnedObjectsEdit;
 LineEdit@ spawnRadiusEdit;
 LineEdit@ spawnCountEdit;
 
@@ -16,6 +16,7 @@ float randomScaleMax = 1;
 uint spawnCount = 1;
 float spawnRadius = 0;
 bool useNormal = true;
+bool alignToAABBBottom = true;
 
 uint numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
@@ -48,15 +49,17 @@ void CreateSpawnEditor()
     randomScaleMaxEdit.text = String(randomScaleMax);
     CheckBox@ useNormalToggle = spawnWindow.GetChild("UseNormal", true);
     useNormalToggle.checked = useNormal;
+    CheckBox@ alignToAABBBottomToggle = spawnWindow.GetChild("AlignToAABBBottom", true);
+    alignToAABBBottomToggle.checked = alignToAABBBottom;
 
-    NumberSpawnedObjectsEdit = spawnWindow.GetChild("NumberSpawnedObjects", true);
-    NumberSpawnedObjectsEdit.text = String(numberSpawnedObjects);
-    
+    numberSpawnedObjectsEdit = spawnWindow.GetChild("NumberSpawnedObjects", true);
+    numberSpawnedObjectsEdit.text = String(numberSpawnedObjects);
+
     spawnRadiusEdit = spawnWindow.GetChild("SpawnRadius", true);
     spawnCountEdit = spawnWindow.GetChild("SpawnCount", true);
     spawnRadiusEdit.text = String(spawnRadius);
     spawnCountEdit.text = String(spawnCount);
-    
+
     SubscribeToEvent(randomRotationX, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationY, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationZ, "TextChanged", "EditRandomRotation");
@@ -65,7 +68,8 @@ void CreateSpawnEditor()
     SubscribeToEvent(spawnRadiusEdit, "TextChanged", "EditSpawnRadius");
     SubscribeToEvent(spawnCountEdit, "TextChanged", "EditSpawnCount");
     SubscribeToEvent(useNormalToggle, "Toggled", "ToggleUseNormal");
-    SubscribeToEvent(NumberSpawnedObjectsEdit, "TextFinished", "UpdateNumberSpawnedObjects");
+    SubscribeToEvent(alignToAABBBottomToggle, "Toggled", "ToggleAlignToAABBBottom");
+    SubscribeToEvent(numberSpawnedObjectsEdit, "TextFinished", "UpdateNumberSpawnedObjects");
     SubscribeToEvent(spawnWindow.GetChild("SetSpawnMode", true), "Released", "SetSpawnMode");
     RefreshPickedObjects();
 }
@@ -113,6 +117,11 @@ void EditRandomScale(StringHash eventType, VariantMap& eventData)
 void ToggleUseNormal(StringHash eventType, VariantMap& eventData)
 {
     useNormal = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void ToggleAlignToAABBBottom(StringHash eventType, VariantMap& eventData)
+{
+    alignToAABBBottom = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
@@ -230,10 +239,76 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
     }
 }
 
-Vector3 RandomizeSpawnPosition(const Vector3&in position)
+bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out position, Vector3&out normal, float randomRadius = 0.0,
+    bool allowNoHit = true)
+{
+    if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
+    {
+        RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY,
+            0x7fffffff);
+        if (result.drawable !is null)
+        {
+            if (randomRadius > 0)
+            {
+                Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
+                basePosition.y += randomRadius;
+                result = editorScene.octree.RaycastSingle(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0,
+                    DRAWABLE_GEOMETRY, 0x7fffffff);
+                if (result.drawable !is null)
+                {
+                    position = result.position;
+                    normal = result.normal;
+                    return true;
+                }
+            }
+            else
+            {
+                position = result.position;
+                normal = result.normal;
+                return true;
+            }
+        }
+    }
+    else if (editorScene.physicsWorld !is null)
+    {
+        // If we are not running the actual physics update, refresh collisions before raycasting
+        if (!runUpdate)
+            editorScene.physicsWorld.UpdateCollisions();
+
+        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, maxDistance);
+
+        if (result.body !is null)
+        {
+            if (randomRadius > 0)
+            {
+                Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
+                basePosition.y += randomRadius;
+                result = editorScene.physicsWorld.RaycastSingle(Ray(basePosition, Vector3(0, -1, 0)), randomRadius * 2.0);
+                if (result.body !is null)
+                {
+                    position = result.position;
+                    normal = result.normal;
+                    return true;
+                }
+            }
+            else
+            {
+                position = result.position;
+                normal = result.normal;
+                return true;
+            }
+        }
+    }
+
+    position = cameraRay.origin + cameraRay.direction * maxDistance;
+    normal = Vector3(0, 1, 0);
+    return allowNoHit;
+}
+
+Vector3 RandomizeSpawnPosition(const Vector3&in position, float randomRadius)
 {
     float angle = Random() * 360.0;
-    float distance = Random() * spawnRadius;
+    float distance = Random() * randomRadius;
     return position + Quaternion(0, angle, 0) * Vector3(0, 0, distance);
 }
 
@@ -245,52 +320,10 @@ void SpawnObject()
 
     for (uint i = 0; i < spawnCount; i++)
     {
-        IntVector2 pos = IntVector2(ui.cursorPosition.x, ui.cursorPosition.y);
-        Ray cameraRay = camera.GetScreenRay(
-            float(pos.x - view.left) / view.width,
-            float(pos.y - view.top) / view.height);
+        Ray cameraRay = GetActiveViewportCameraRay();
 
-        if (pickMode < PICK_RIGIDBODIES)
-        {
-            if (editorScene.octree is null)
-                return;
-
-            RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-                pickModeDrawableFlags[pickMode], 0x7fffffff);
-
-            // Randomize in a circle around original hit position
-            if (spawnRadius > 0)
-            {
-                Vector3 position = RandomizeSpawnPosition(result.position);
-                position.y += spawnRadius;
-                result = editorScene.octree.RaycastSingle(Ray(position, Vector3(0, -1, 0)), RAY_TRIANGLE, spawnRadius * 2.0,
-                    pickModeDrawableFlags[pickMode], 0x7fffffff);
-            }
-
-            if (result.drawable !is null)
-                PlaceObject(result.position, result.normal);
-        }
-        else
-        {
-            if (editorScene.physicsWorld is null)
-                return;
-
-            // If we are not running the actual physics update, refresh collisions before raycasting
-            if (!runUpdate)
-                editorScene.physicsWorld.UpdateCollisions();
-
-            PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-
-            // Randomize in a circle around original hit position
-            if (spawnRadius > 0)
-            {
-                Vector3 position = RandomizeSpawnPosition(result.position);
-                position.y += spawnRadius;
-                result = editorScene.physicsWorld.RaycastSingle(Ray(position, Vector3(0, -1, 0)), spawnRadius * 2.0);
-            }
-
-            if (result.body !is null)
-                PlaceObject(result.position, result.normal);
-        }
+        Vector3 position, normal;
+        if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, spawnRadius, false))
+            PlaceObject(position, normal);
     }
 }

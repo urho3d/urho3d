@@ -53,7 +53,7 @@ void CreateScene()
     light.range = 10.0f;
 
     // Create light color animation
-    AttributeAnimation@ colorAnimation = AttributeAnimation();
+    ValueAnimation@ colorAnimation = ValueAnimation();
     colorAnimation.SetKeyFrame(0.0f, Variant(WHITE));
     colorAnimation.SetKeyFrame(1.0f, Variant(RED));
     colorAnimation.SetKeyFrame(2.0f, Variant(YELLOW));
@@ -62,7 +62,7 @@ void CreateScene()
     light.SetAttributeAnimation("Color", colorAnimation);
 
     // Create light position animation
-    AttributeAnimation@ positionAnimation = AttributeAnimation();
+    ValueAnimation@ positionAnimation = ValueAnimation();
     // Use spline interpolation method
     positionAnimation.interpolationMethod = IM_SPLINE;
     // Set spline tension

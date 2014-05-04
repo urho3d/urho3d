@@ -34,7 +34,7 @@ void Start()
 {
     // Execute the common startup for samples
     SampleStart();
-    
+
     // Disable default execution of AngelScript from the console
     script.executeConsoleCommands = false;
 
@@ -44,7 +44,7 @@ void Start()
 
     // Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleEscKeyDown");
-    
+
     // Hide logo to make room for the console
     SetLogoVisible(false);
 
@@ -53,12 +53,15 @@ void Start()
     console.numBufferedRows = 2 * console.numRows;
     console.commandInterpreter = "ScriptEventInvoker";
     console.visible = true;
-    
+    console.closeButton.visible = false;
+
     // Show OS mouse cursor
     input.mouseVisible = true;
 
     // Open the operating system console window (for stdin / stdout) if not open yet
-    OpenConsoleWindow();
+    // Do not open in fullscreen, as this would cause constant device loss
+    if (!graphics.fullscreen)
+        OpenConsoleWindow();
 
     // Initialize game and print the welcome message
     StartGame();
@@ -94,7 +97,7 @@ void StartGame()
           "objective is to survive as long as possible. Beware of hunger and the merciless\n"
           "predator cichlid Urho, who appears from time to time. Evading Urho is easier\n"
           "with an empty stomach. Type 'help' for available commands.");
-    
+
     gameOn = true;
     foodAvailable = false;
     eatenLastTurn = false;
@@ -108,7 +111,7 @@ void EndGame(const String&in message)
     Print(message);
     Print("Game over! You survived " + String(numTurns) + " turns.\n"
           "Do you want to play again (Y/N)?");
-    
+
     gameOn = false;
 }
 
@@ -127,10 +130,10 @@ void Advance()
         ++urhoThreat;
     if (urhoThreat == 0 && Random() < 0.2f)
         ++urhoThreat;
-    
+
     if (urhoThreat > 0)
         Print(urhoThreatLevels[urhoThreat - 1] + ".");
-    
+
     if ((numTurns & 3) == 0 && !eatenLastTurn)
     {
         ++hunger;
@@ -142,9 +145,9 @@ void Advance()
         else
             Print("You are " + hungerLevels[hunger] + ".");
     }
-    
+
     eatenLastTurn = false;
-    
+
     if (foodAvailable)
     {
         Print("The floating pieces of fish food are quickly eaten by other fish in the tank.");
@@ -155,7 +158,7 @@ void Advance()
         Print("The overhead dispenser drops pieces of delicious fish food to the water!");
         foodAvailable = true;
     }
-    
+
     ++numTurns;
 }
 
@@ -167,7 +170,7 @@ void HandleInput(const String&in input)
         Print("Empty input given!");
         return;
     }
-    
+
     if (inputLower == "quit" || inputLower == "exit")
         engine.Exit();
     else if (gameOn)
@@ -195,7 +198,7 @@ void HandleInput(const String&in input)
             }
             else
                 Print("There is no food available.");
-            
+
             Advance();
         }
         else if (inputLower == "wait")
@@ -218,7 +221,7 @@ void HandleInput(const String&in input)
             }
             else
                 Print("There is nothing to hide from.");
-            
+
             Advance();
         }
         else

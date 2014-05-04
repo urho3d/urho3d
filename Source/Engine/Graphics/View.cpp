@@ -448,7 +448,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     #ifdef URHO3D_OPENGL
     if (renderTarget_)
     {
-        viewRect_.bottom_ = rtSize_.y_ - viewRect_.top_;
+        viewRect_.bottom_ = rtHeight - viewRect_.top_;
         viewRect_.top_ = viewRect_.bottom_ - viewSize_.y_;
     }
     #endif
@@ -665,6 +665,27 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
         else
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
     }
+}
+
+void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect)
+{
+    float texWidth = (float)texSize.x_;
+    float texHeight = (float)texSize.y_;
+    float widthRange = 0.5f * viewRect.Width() / texWidth;
+    float heightRange = 0.5f * viewRect.Height() / texHeight;
+    
+    #ifdef URHO3D_OPENGL
+    Vector4 bufferUVOffset(((float)viewRect.left_) / texWidth + widthRange,
+        1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
+    #else
+    Vector4 bufferUVOffset((0.5f + (float)viewRect.left_) / texWidth + widthRange,
+        (0.5f + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
+    #endif
+    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    
+    float invSizeX = 1.0f / texWidth;
+    float invSizeY = 1.0f / texHeight;
+    graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(invSizeX, invSizeY, 0.0f, 0.0f));
 }
 
 void View::GetDrawables()
@@ -1445,7 +1466,7 @@ void View::ExecuteRenderPathCommands()
                 if (!lightQueues_.Empty())
                 {
                     PROFILE(RenderLights);
-                    
+
                     SetRenderTargets(command);
                     
                     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -1456,7 +1477,7 @@ void View::ExecuteRenderPathCommands()
                             RenderShadowMap(*i);
                             SetRenderTargets(command);
                         }
-                        
+
                         SetTextures(command);
                         graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
@@ -1531,7 +1552,6 @@ void View::ExecuteRenderPathCommands()
 void View::SetRenderTargets(RenderPathCommand& command)
 {
     unsigned index = 0;
-    IntRect viewPort = viewRect_;
     
     while (index < command.outputNames_.Size())
     {
@@ -1544,36 +1564,6 @@ void View::SetRenderTargets(RenderPathCommand& command)
             {
                 Texture2D* texture = renderTargets_[nameHash];
                 graphics_->SetRenderTarget(index, texture);
-                if (!index)
-                {
-                    // Determine viewport size from rendertarget info
-                    for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
-                    {
-                        const RenderTargetInfo& info = renderPath_->renderTargets_[i];
-                        if (!info.name_.Compare(command.outputNames_[index], false))
-                        {
-                            switch (info.sizeMode_)
-                            {
-                                // If absolute or a divided viewport size, use the full texture
-                            case SIZE_ABSOLUTE:
-                            case SIZE_VIEWPORTDIVISOR:
-                                viewPort = IntRect(0, 0, texture->GetWidth(), texture->GetHeight());
-                                break;
-                            
-                                // If a divided rendertarget size, retain the same viewport, but scaled
-                            case SIZE_RENDERTARGETDIVISOR:
-                                if (info.size_.x_ && info.size_.y_)
-                                {
-                                    viewPort = IntRect(viewRect_.left_ / info.size_.x_, viewRect_.top_ / info.size_.y_,
-                                        viewRect_.right_ / info.size_.x_, viewRect_.bottom_ / info.size_.y_);
-                                }
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-                
             }
             else
                 graphics_->SetRenderTarget(0, (RenderSurface*)0);
@@ -1587,6 +1577,12 @@ void View::SetRenderTargets(RenderPathCommand& command)
         graphics_->SetRenderTarget(index, (RenderSurface*)0);
         ++index;
     }
+    
+    // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
+    // viewport-sized, so they should use their full size as the viewport
+    IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
+    IntRect viewPort = (graphics_->GetRenderTarget(0) == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+        rtSizeNow.y_);
     
     graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
     graphics_->SetViewport(viewPort);
@@ -1665,22 +1661,10 @@ void View::RenderQuad(RenderPathCommand& command)
     SetGlobalShaderParameters();
     SetCameraShaderParameters(camera_, false, false);
     
-    /// \todo Refactor into a function to set the viewport parameters
-    float rtWidth = (float)rtSize_.x_;
-    float rtHeight = (float)rtSize_.y_;
-    float widthRange = 0.5f * viewSize_.x_ / rtWidth;
-    float heightRange = 0.5f * viewSize_.y_ / rtHeight;
-    
-    #ifdef URHO3D_OPENGL
-    Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
-        1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
-    #else
-    Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
-        (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
-    #endif
-    
-    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
+    // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
+    IntRect viewport = graphics_->GetViewport();
+    IntVector2 viewSize = IntVector2(viewport.Width(), viewport.Height());
+    SetGBufferShaderParameters(viewSize, IntRect(0, 0, viewSize.x_, viewSize.y_));
     
     // Set per-rendertarget inverse size / offset shader parameters as necessary
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
@@ -1698,11 +1682,11 @@ void View::RenderQuad(RenderPathCommand& command)
         float width = (float)renderTargets_[nameHash]->GetWidth();
         float height = (float)renderTargets_[nameHash]->GetHeight();
         
-        graphics_->SetShaderParameter(invSizeName, Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
+        graphics_->SetShaderParameter(invSizeName, Vector2(1.0f / width, 1.0f / height));
         #ifdef URHO3D_OPENGL
-        graphics_->SetShaderParameter(offsetsName, Vector4::ZERO);
+        graphics_->SetShaderParameter(offsetsName, Vector2::ZERO);
         #else
-        graphics_->SetShaderParameter(offsetsName, Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
+        graphics_->SetShaderParameter(offsetsName, Vector2(0.5f / width, 0.5f / height));
         #endif
     }
     
@@ -1785,6 +1769,36 @@ void View::AllocateScreenBuffers()
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
         needSubstitute = true;
+    // If viewport is smaller than whole texture/backbuffer in deferred rendering, need to reserve a buffer, as the G-buffer
+    // textures will be sized equal to the viewport
+    if (viewSize_.x_ < rtSize_.x_ || viewSize_.y_ < rtSize_.y_)
+    {
+        if (deferred_)
+            needSubstitute = true;
+        else
+        {
+            // Check also if using MRT without deferred rendering and rendering to the viewport and another texture
+            for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+            {
+                const RenderPathCommand& command = renderPath_->commands_[i];
+                if (!IsNecessary(command))
+                    continue;
+                if (command.outputNames_.Size() > 1)
+                {
+                    for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
+                    {
+                        if (!command.outputNames_[j].Compare("viewport", false))
+                        {
+                            needSubstitute = true;
+                            break;
+                        }
+                    }
+                }
+                if (needSubstitute)
+                    break;
+            }
+        }
+    }
     
     // Follow final rendertarget format, or use RGB to match the backbuffer format
     unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
@@ -1797,7 +1811,7 @@ void View::AllocateScreenBuffers()
         format = Graphics::GetRGBAFloat16Format();
         needSubstitute = true;
     }
-
+    
     #ifdef URHO3D_OPENGL
     if (deferred_ && !hdrRendering)
         format = Graphics::GetRGBAFormat();
@@ -1834,6 +1848,11 @@ void View::AllocateScreenBuffers()
         if (renderTarget_ && renderTarget_->GetParentTexture()->GetType() == TextureCube::GetTypeStatic())
             needSubstitute = true;
 
+        // If rendering to a texture, but the viewport is less than the whole texture, use a substitute to ensure
+        // postprocessing shaders will never read outside the viewport
+        if (renderTarget_ && (viewSize_.x_ < renderTarget_->GetWidth() || viewSize_.y_ < renderTarget_->GetHeight()))
+            needSubstitute = true;
+
         if (hasPingpong && !needSubstitute)
             ++numViewportTextures;
     }
@@ -1841,11 +1860,11 @@ void View::AllocateScreenBuffers()
     // Allocate screen buffers with filtering active in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    substituteRenderTarget_ = needSubstitute ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, 
+    substituteRenderTarget_ = needSubstitute ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, true, 
         sRGB)->GetRenderSurface() : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
-        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB) :
+        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, true, sRGB) :
             (Texture2D*)0;
     }
     // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
@@ -1859,23 +1878,26 @@ void View::AllocateScreenBuffers()
         if (!rtInfo.enabled_)
             continue;
         
-        unsigned width = rtInfo.size_.x_;
-        unsigned height = rtInfo.size_.y_;
+        float width = rtInfo.size_.x_;
+        float height = rtInfo.size_.y_;
         
         if (rtInfo.sizeMode_ == SIZE_VIEWPORTDIVISOR)
         {
-            width = viewSize_.x_ / (width ? width : 1);
-            height = viewSize_.y_ / (height ? height : 1);
+            width = (float)viewSize_.x_ / Max(width, M_EPSILON);
+            height = (float)viewSize_.y_ / Max(height, M_EPSILON);
         }
-        if (rtInfo.sizeMode_ == SIZE_RENDERTARGETDIVISOR)
+        else if (rtInfo.sizeMode_ == SIZE_VIEWPORTMULTIPLIER)
         {
-            width = rtSize_.x_ / (width ? width : 1);
-            height = rtSize_.y_ / (height ? height : 1);
+            width = (float)viewSize_.x_ * width;
+            height = (float)viewSize_.y_ * height;
         }
         
+        int intWidth = (int)(width + 0.5f);
+        int intHeight = (int)(height + 0.5f);
+        
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
-        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_,
-            rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
+        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.filtered_,
+            rtInfo.sRGB_, rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
     }
 }
 
@@ -1885,6 +1907,15 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
         return;
 
     PROFILE(BlitFramebuffer);
+    
+    // If blitting to the destination rendertarget, use the actual viewport. Intermediate textures on the other hand
+    // are always viewport-sized
+    IntVector2 srcSize(source->GetWidth(), source->GetHeight());
+    IntVector2 destSize = destination ? IntVector2(destination->GetWidth(), destination->GetHeight()) : IntVector2(
+        graphics_->GetWidth(), graphics_->GetHeight());
+    
+    IntRect srcRect = (source->GetRenderSurface() == renderTarget_) ? viewRect_ : IntRect(0, 0, srcSize.x_, srcSize.y_);
+    IntRect destRect = (destination == renderTarget_) ? viewRect_ : IntRect(0, 0, destSize.x_, destSize.y_);
     
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -1897,33 +1928,20 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
         graphics_->SetRenderTarget(i, (RenderSurface*)0);
     graphics_->SetDepthStencil(GetDepthStencil(destination));
-    graphics_->SetViewport(viewRect_);
+    graphics_->SetViewport(destRect);
     
     static const String shaderName("CopyFramebuffer");
     graphics_->SetShaders(graphics_->GetShader(VS, shaderName), graphics_->GetShader(PS, shaderName));
     
-    float rtWidth = (float)rtSize_.x_;
-    float rtHeight = (float)rtSize_.y_;
-    float widthRange = 0.5f * viewSize_.x_ / rtWidth;
-    float heightRange = 0.5f * viewSize_.y_ / rtHeight;
+    SetGBufferShaderParameters(srcSize, srcRect);
     
-    #ifdef URHO3D_OPENGL
-    Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
-        1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
-    #else
-    Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
-        (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
-    #endif
-    
-    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
     graphics_->SetTexture(TU_DIFFUSE, source);
     DrawFullscreenQuad(false);
 }
 
 void View::DrawFullscreenQuad(bool nearQuad)
 {
-    Light* quadDirLight = renderer_->GetQuadDirLight();
-    Geometry* geometry = renderer_->GetLightGeometry(quadDirLight);
+    Geometry* geometry = renderer_->GetQuadGeometry();
     
     Matrix3x4 model = Matrix3x4::IDENTITY;
     Matrix4 projection = Matrix4::IDENTITY;
@@ -2771,10 +2789,12 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        graphics_->SetRenderTarget(i, (RenderSurface*)0);
     graphics_->SetDepthStencil(shadowMap);
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
     graphics_->Clear(CLEAR_DEPTH);
-    
+
     // Set shadow depth bias
     const BiasParameters& parameters = queue.light_->GetShadowBias();
     

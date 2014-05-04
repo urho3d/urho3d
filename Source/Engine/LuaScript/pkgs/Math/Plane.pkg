@@ -17,6 +17,7 @@ class Plane
     void Transform(const Matrix3x4& transform);
     void Transform(const Matrix4& transform);
 
+    Vector3 Project(const Vector3& point) const;
     float Distance(const Vector3& point) const;
     Vector3 Reflect(const Vector3& direction) const;
     Matrix3x4 ReflectionMatrix() const;

@@ -24,4 +24,4 @@
 define_source_files (PARENT_SCOPE)
 
 # Define dependency libs
-set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/JO ../ThirdParty/PugiXml/src ../ThirdParty/STB PARENT_SCOPE)
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/JO ../ThirdParty/rapidjson/include ../ThirdParty/PugiXml/src ../ThirdParty/STB PARENT_SCOPE)

@@ -21,9 +21,8 @@
 //
 
 #include "Precompiled.h"
-#include "Animatable.h"
-#include "AttributeAnimation.h"
-#include "AttributeAnimationInstance.h"
+#include "ValueAnimation.h"
+#include "ValueAnimationInfo.h"
 #include "Log.h"
 
 #include "DebugNew.h"
@@ -31,67 +30,67 @@
 namespace Urho3D
 {
 
-AttributeAnimationInstance::AttributeAnimationInstance(Animatable* animatable, const AttributeInfo& attributeInfo, AttributeAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    AttributeAnimationInfo(attributeAnimation, wrapMode, speed),
-    animatable_(animatable),
-    attributeInfo_(attributeInfo),
+ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) :
+    animation_(animation),
+    wrapMode_(wrapMode),
+    speed_(speed),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
+{
+    speed_ = Max(0.0f, speed_);
+}
+
+ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) :
+    target_(target),
+    animation_(animation),
+    wrapMode_(wrapMode),
+    speed_(speed),
+    currentTime_(0.0f),
+    lastScaledTime_(0.0f)
+{
+    speed_ = Max(0.0f, speed_);
+}
+
+ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) :
+    target_(other.target_),
+    animation_(other.animation_),
+    wrapMode_(other.wrapMode_),
+    speed_(other.speed_),
     currentTime_(0.0f),
     lastScaledTime_(0.0f)
 {
 }
 
-AttributeAnimationInstance::AttributeAnimationInstance(const AttributeAnimationInstance& other) :
-    AttributeAnimationInfo(other),
-    animatable_(other.animatable_),
-    attributeInfo_(other.attributeInfo_),
-    currentTime_(0.0f),
-    lastScaledTime_(0.0f)
+ValueAnimationInfo::~ValueAnimationInfo()
 {
 }
 
-AttributeAnimationInstance::~AttributeAnimationInstance()
+bool ValueAnimationInfo::Update(float timeStep)
 {
-}
-
-bool AttributeAnimationInstance::Update(float timeStep)
-{
-    if (!attributeAnimation_)
+    if (!animation_ || !target_)
         return true;
 
     currentTime_ += timeStep * speed_;
 
-    if (!attributeAnimation_->IsValid())
+    if (!animation_->IsValid())
         return true;
 
     bool finished = false;
+
     // Calculate scale time by wrap mode
     float scaledTime = CalculateScaledTime(currentTime_, finished);
 
-    attributeAnimation_->UpdateAttributeValue(animatable_, attributeInfo_, scaledTime);
+    // Apply to the target object
+    ApplyValue(animation_->GetAnimationValue(scaledTime));
 
-    if (attributeAnimation_->HasEventFrames())
+    // Send keyframe event if necessary
+    if (animation_->HasEventFrames())
     {
-        PODVector<const AttributeEventFrame*> eventFrames;
-        switch (wrapMode_)
-        {
-        case WM_LOOP:
-            if (lastScaledTime_ < scaledTime)
-                attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-            else
-            {
-                attributeAnimation_->GetEventFrames(lastScaledTime_, attributeAnimation_->GetEndTime(), eventFrames);
-                attributeAnimation_->GetEventFrames(attributeAnimation_->GetBeginTime(), scaledTime, eventFrames);
-            }
-            break;
-
-        case WM_ONCE:
-        case WM_CLAMP:
-            attributeAnimation_->GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
-            break;
-        }
+        PODVector<const VAnimEventFrame*> eventFrames;
+        GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
 
         for (unsigned i = 0; i < eventFrames.Size(); ++i)
-            animatable_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
+            target_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
     }
 
     lastScaledTime_ = scaledTime;
@@ -99,10 +98,15 @@ bool AttributeAnimationInstance::Update(float timeStep)
     return finished;
 }
 
-float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& finished) const
+Object* ValueAnimationInfo::GetTarget() const
 {
-    float beginTime = attributeAnimation_->GetBeginTime();
-    float endTime = attributeAnimation_->GetEndTime();
+    return target_;
+}
+
+float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
+{
+    float beginTime = animation_->GetBeginTime();
+    float endTime = animation_->GetEndTime();
 
     switch (wrapMode_)
     {
@@ -125,6 +129,27 @@ float AttributeAnimationInstance::CalculateScaledTime(float currentTime, bool& f
     default:
         LOGERROR("Unsupported attribute animation wrap mode");
         return beginTime;
+    }
+}
+
+void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames)
+{
+    switch (wrapMode_)
+    {
+    case WM_LOOP:
+        if (beginTime < endTime)
+            animation_->GetEventFrames(beginTime, endTime, eventFrames);
+        else
+        {
+            animation_->GetEventFrames(beginTime, animation_->GetEndTime(), eventFrames);
+            animation_->GetEventFrames(animation_->GetBeginTime(), endTime, eventFrames);
+        }
+        break;
+
+    case WM_ONCE:
+    case WM_CLAMP:
+        animation_->GetEventFrames(beginTime, endTime, eventFrames);
+        break;
     }
 }
 

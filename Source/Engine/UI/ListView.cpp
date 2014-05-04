@@ -167,18 +167,20 @@ ListView::ListView(Context* context) :
     multiselect_(false),
     hierarchyMode_(true),    // Init to true here so that the setter below takes effect
     baseIndent_(0),
-    clearSelectionOnDefocus_(false)
+    clearSelectionOnDefocus_(false),
+    selectOnClickEnd_(false)
 {
     resizeContentWidth_ = true;
 
     // By default list view is set to non-hierarchy mode
     SetHierarchyMode(false);
 
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
     SubscribeToEvent(E_UIMOUSEDOUBLECLICK, HANDLER(ListView, HandleUIMouseDoubleClick));
     SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleItemFocusChanged));
     SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleFocusChanged));
     SubscribeToEvent(this, E_FOCUSED, HANDLER(ListView, HandleFocusChanged));
+    
+    UpdateUIClickSubscription();
 }
 
 ListView::~ListView()
@@ -196,6 +198,7 @@ void ListView::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_INT, "Base Indent", GetBaseIndent, SetBaseIndent, int, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Clear Sel. On Defocus", GetClearSelectionOnDefocus, SetClearSelectionOnDefocus, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Select On Click End", GetSelectOnClickEnd, SetSelectOnClickEnd, bool, false, AM_FILE);
 }
 
 void ListView::OnKey(int key, int buttons, int qualifiers)
@@ -728,6 +731,15 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
     }
 }
 
+void ListView::SetSelectOnClickEnd(bool enable)
+{
+    if (enable != selectOnClickEnd_)
+    {
+        selectOnClickEnd_ = enable;
+        UpdateUIClickSubscription();
+    }
+}
+
 void ListView::Expand(unsigned index, bool enable, bool recursive)
 {
     if (!hierarchyMode_)
@@ -975,6 +987,10 @@ void ListView::EnsureItemVisibility(UIElement* item)
 
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
+    // Disregard the click end if a drag is going on
+    if (selectOnClickEnd_ && GetSubsystem<UI>()->GetDragElement())
+        return;
+    
     int button = eventData[UIMouseClick::P_BUTTON].GetInt();
     int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
@@ -1106,6 +1122,13 @@ void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
         ClearSelection();
     else if (highlightMode_ == HM_FOCUS)
         UpdateSelectionEffect();
+}
+
+void ListView::UpdateUIClickSubscription()
+{
+    UnsubscribeFromEvent(E_UIMOUSECLICK);
+    UnsubscribeFromEvent(E_UIMOUSECLICKEND);
+    SubscribeToEvent(selectOnClickEnd_ ? E_UIMOUSECLICKEND : E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
 }
 
 }

@@ -1,6 +1,6 @@
 $#include "Camera.h"
 
-enum FillMode{};
+enum FillMode {};
 
 static const unsigned VO_NONE;
 static const unsigned VO_LOW_MATERIAL_QUALITY;

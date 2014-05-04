@@ -58,61 +58,40 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0), controller_(0)
+        joystick_(0), controller_(0), screenJoystick_(0)
     {
     }
 
+    /// Initialize the number of buttons, axes and hats and set them to neutral state.
+    void Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats);
+    /// Reset button, axis and hat states to neutral.
+    void Reset();
+
+    /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
+    bool IsController() const { return controller_ != 0; }
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
     /// Return number of axes.
     unsigned GetNumAxes() const { return axes_.Size(); }
     /// Return number of hats.
     unsigned GetNumHats() const { return hats_.Size(); }
-
     /// Check if a button is held down.
-    bool GetButtonDown(unsigned index) const
-    {
-        if (index < buttons_.Size())
-            return buttons_[index];
-        else
-            return false;
-    }
-
+    bool GetButtonDown(unsigned index) const { return index < buttons_.Size() ? buttons_[index] : false; }
     /// Check if a button has been pressed on this frame.
-    bool GetButtonPress(unsigned index) const
-    {
-        if (index < buttons_.Size())
-            return buttonPress_[index];
-        else
-            return false;
-    }
-
+    bool GetButtonPress(unsigned index) const { return index < buttonPress_.Size() ? buttonPress_[index] : false; }
     /// Return axis position.
-    float GetAxisPosition(unsigned index) const
-    {
-        if (index < axes_.Size())
-            return axes_[index];
-        else
-            return 0.0f;
-    }
-
+    float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
     /// Return hat position.
-    int GetHatPosition(unsigned index) const
-    {
-        if (index < hats_.Size())
-            return hats_[index];
-        else
-            return HAT_CENTER;
-    }
+    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
 
     /// SDL joystick.
     SDL_Joystick* joystick_;
-	/// SDL joystick instance ID
-	SDL_JoystickID instanceID_;
+    /// SDL joystick instance ID.
+    SDL_JoystickID joystickID_;
     /// SDL game controller.
     SDL_GameController* controller_;
     /// UI element containing the screen joystick.
-    SharedPtr<UIElement> screenJoystick_;
+    UIElement* screenJoystick_;
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -142,24 +121,28 @@ public:
     void SetToggleFullscreen(bool enable);
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
-	/// Set whether the virtual joystick is visible.
-	void SetScreenJoystickVisible(SDL_JoystickID index, bool enable);
+    /// Set whether the mouse is currently being grabbed by an operation.
+    void SetMouseGrabbed(bool grab);
     /// Add screen joystick.
-    /** Return the joystick index number when successful or M_MAX_UNSIGNED when error.
+    /** Return the joystick instance ID when successful or negative on error.
      *  If layout file is not given, use the default screen joystick layout.
      *  If style file is not given, use the default style file from root UI element.
      *
      *  This method should only be called in main thread.
      */
     SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
-    /// Remove screen joystick by index.
+    /// Remove screen joystick by instance ID.
     /** Return true if successful.
      *
      *  This method should only be called in main thread.
      */
-    bool RemoveScreenJoystick(unsigned index);
+    bool RemoveScreenJoystick(SDL_JoystickID id);
+    /// Set whether the virtual joystick is visible.
+    void SetScreenJoystickVisible(SDL_JoystickID id, bool enable);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
     void SetScreenKeyboardVisible(bool enable);
+    /// Set touch emulation by mouse. Only available on desktop platforms. When enabled, actual mouse events are no longer sent and the mouse cursor is forced visible.
+    void SetTouchEmulation(bool enable);
     /// Begin recording a touch gesture. Return true if successful. The E_GESTURERECORDED event (which contains the ID for the new gesture) will be sent when recording finishes.
     bool RecordGesture();
     /// Save all in-memory touch gestures. Return true if successful.
@@ -215,18 +198,24 @@ public:
     TouchState* GetTouch(unsigned index) const;
     /// Return number of connected joysticks.
     unsigned GetNumJoysticks() const { return joysticks_.Size(); }
-    /// Return joystick name by index.
-    const String& GetJoystickName(SDL_JoystickID index) const;
-    /// Return joystick state by index. Automatically open if not opened yet.
-    JoystickState* GetJoystick(SDL_JoystickID index);
+    /// Return joystick state by ID, or null if does not exist.
+    JoystickState* GetJoystick(SDL_JoystickID id);
+    /// Return joystick state by index, or null if does not exist. 0 = first connected joystick.
+    JoystickState* GetJoystickByIndex(unsigned index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
+    /// Return whether a virtual joystick is visible.
+    bool IsScreenJoystickVisible(SDL_JoystickID id) const;
     /// Return whether on-screen keyboard is supported.
     bool GetScreenKeyboardSupport() const;
     /// Return whether on-screen keyboard is being shown.
     bool IsScreenKeyboardVisible() const;
+    /// Return whether touch emulation is enabled.
+    bool GetTouchEmulation() const { return touchEmulation_; }
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
+    /// Return whether the mouse is currently being grabbed by an operation.
+    bool IsMouseGrabbed() const { return mouseGrabbed_; }
     /// Return whether application window has input focus.
     bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
@@ -235,7 +224,7 @@ public:
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
-	/// Open a joystick. Return -1 if no joystick.
+    /// Open a joystick and return its ID. Return -1 if no joystick.
     SDL_JoystickID OpenJoystick(unsigned index);
     /// Setup internal joystick structures.
     void ResetJoysticks();
@@ -245,6 +234,8 @@ private:
     void LoseFocus();
     /// Clear input state.
     void ResetState();
+    /// Clear touch states and send touch end events.
+    void ResetTouches();
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
@@ -296,6 +287,10 @@ private:
     bool toggleFullscreen_;
     /// Operating system mouse cursor visible flag.
     bool mouseVisible_;
+    /// Flag to indicate the mouse is being grabbed by an operation. Subsystems like UI that uses mouse should temporarily ignore the mouse hover or click events.
+    bool mouseGrabbed_;
+    /// Touch emulation mode flag.
+    bool touchEmulation_;
     /// Input focus flag.
     bool inputFocus_;
     /// Minimized flag.

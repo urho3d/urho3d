@@ -469,8 +469,11 @@ void AnimatedModel::RemoveAnimationState(unsigned index)
 
 void AnimatedModel::RemoveAllAnimationStates()
 {
-    animationStates_.Clear();
-    MarkAnimationDirty();
+    if (animationStates_.Size())
+    {
+        animationStates_.Clear();
+        MarkAnimationDirty();
+    }
 }
 
 void AnimatedModel::SetAnimationLodBias(float bias)
@@ -708,8 +711,6 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             }
         }
 
-        MarkAnimationDirty();
-
         using namespace BoneHierarchyCreated;
 
         VariantMap& eventData = GetEventDataMap();
@@ -791,7 +792,11 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
         }
     }
 
-    MarkAnimationOrderDirty();
+    if (animationStates_.Size())
+    {
+        MarkAnimationDirty();
+        MarkAnimationOrderDirty();
+    }
 }
 
 void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
@@ -919,8 +924,6 @@ void AnimatedModel::AssignBoneNodes()
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
     }
-
-    MarkAnimationDirty();
 }
 
 void AnimatedModel::RemoveRootBone()

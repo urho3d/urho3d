@@ -152,7 +152,7 @@ void Urho2DPhysicsRope::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move, Use PageUp PageDown to zoom.");
+    instructionText->SetText("Use WASD keys and mouse/touch to move, Use PageUp PageDown to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center
@@ -190,7 +190,7 @@ void Urho2DPhysicsRope::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
-    
+
     if (input->GetKeyDown(KEY_PAGEUP))
     {
         Camera* camera = cameraNode_->GetComponent<Camera>();
@@ -208,6 +208,9 @@ void Urho2DPhysicsRope::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Urho2DPhysicsRope, HandleUpdate));
+
+    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
 void Urho2DPhysicsRope::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -219,7 +222,7 @@ void Urho2DPhysicsRope::HandleUpdate(StringHash eventType, VariantMap& eventData
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-    
+
     PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
     physicsWorld->DrawDebugGeometry();
 }

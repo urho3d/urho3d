@@ -680,6 +680,13 @@ bool Graphics::BeginFrame()
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
+    else
+    {
+        // To prevent a loop of endless device loss and flicker, do not attempt to render when in fullscreen
+        // and the window is minimized
+        if (fullscreen_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED))
+            return false;
+    }
     
     // Check for lost device before rendering
     HRESULT hr = impl_->device_->TestCooperativeLevel();
@@ -701,18 +708,6 @@ bool Graphics::BeginFrame()
             ResetDevice();
             return false;
         }
-    }
-    
-    // If a query was issued on the previous frame, wait for it to finish before beginning the next
-    if (impl_->frameQuery_ && queryIssued_)
-    {
-        PROFILE(FlushGPU);
-        
-        while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
-        {
-        }
-        
-        queryIssued_ = false;
     }
     
     impl_->device_->BeginScene();
@@ -740,18 +735,35 @@ void Graphics::EndFrame()
     if (!IsInitialized())
         return;
     
-    PROFILE(Present);
-    
-    SendEvent(E_ENDRENDERING);
-    
-    impl_->device_->EndScene();
-    impl_->device_->Present(0, 0, 0, 0);
-    
-    // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to pre-render
-    if (impl_->frameQuery_ && flushGPU_)
     {
-        impl_->frameQuery_->Issue(D3DISSUE_END);
-        queryIssued_ = true;
+        PROFILE(Present);
+        
+        SendEvent(E_ENDRENDERING);
+        
+        impl_->device_->EndScene();
+        impl_->device_->Present(0, 0, 0, 0);
+    }
+    
+    // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to multiple frame buffering
+    // If a query was issued on the previous frame, first wait for it to finish
+    if (impl_->frameQuery_)
+    {
+        if (queryIssued_)
+        {
+            PROFILE(FlushGPU);
+            
+            while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
+            {
+            }
+            
+            queryIssued_ = false;
+        }
+        
+        if (flushGPU_)
+        {
+            impl_->frameQuery_->Issue(D3DISSUE_END);
+            queryIssued_ = true;
+        }
     }
     
     // Clean up too large scratch buffers
@@ -773,8 +785,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 {
-    if (!destination || !destination->GetRenderSurface() || destination->GetWidth() != width_ ||
-        destination->GetHeight() != height_)
+    if (!destination || !destination->GetRenderSurface())
         return false;
     
     PROFILE(ResolveToTexture);
@@ -791,8 +802,14 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     rect.right = Clamp(vpCopy.right_, 0, width_);
     rect.bottom = Clamp(vpCopy.bottom_, 0, height_);
     
+    RECT destRect;
+    destRect.left = 0;
+    destRect.top = 0;
+    destRect.right = destination->GetWidth();
+    destRect.bottom = destination->GetHeight();
+    
     return SUCCEEDED(impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
-        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &rect, D3DTEXF_NONE));
+        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE));
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)

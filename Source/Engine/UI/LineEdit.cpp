@@ -33,6 +33,8 @@
 namespace Urho3D
 {
 
+ShortStringHash VAR_DRAGDROPCONTENT("DragDropContent");
+
 extern const char* UI_CATEGORY;
 
 LineEdit::LineEdit(Context* context) :
@@ -168,6 +170,13 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
 {
     if (source && editable_)
     {
+        // If the UI element in question has a drag-and-drop content string defined, use it instead of element text
+        if (source->GetVars().Contains(VAR_DRAGDROPCONTENT))
+        {
+            SetText(source->GetVar(VAR_DRAGDROPCONTENT).GetString());
+            return true;
+        }
+        
         ShortStringHash sourceType = source->GetType();
         if (sourceType == LineEdit::GetTypeStatic())
         {

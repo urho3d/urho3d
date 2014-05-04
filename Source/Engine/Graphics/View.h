@@ -151,6 +151,8 @@ public:
     void SetGlobalShaderParameters();
     /// Set camera-specific shader parameters. Called by Batch and internally by View.
     void SetCameraShaderParameters(Camera* camera, bool setProjectionMatrix, bool overrideView);
+    /// Set G-buffer offset and inverse size shader parameters. Called by Batch and internally by View.
+    void SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect);
     
 private:
     /// Query the octree for drawable objects.
@@ -282,7 +284,7 @@ private:
     IntRect viewRect_;
     /// Viewport size.
     IntVector2 viewSize_;
-    /// Rendertarget size.
+    /// Destination rendertarget size.
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;

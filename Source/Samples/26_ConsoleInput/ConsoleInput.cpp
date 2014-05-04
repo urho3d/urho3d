@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Button.h"
 #include "Console.h"
 #include "CoreEvents.h"
 #include "Engine.h"
@@ -63,17 +64,17 @@ void ConsoleInput::Start()
 {
     // Execute base class startup
     Sample::Start();
-    
+
     // Subscribe to console commands and the frame update
     SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
     SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
-    
+
     // Hide logo to make room for the console
     SetLogoVisible(false);
-    
+
     // Show the console by default, make it large. Console will show the text edit field when there is at least one
     // subscriber for the console command event
     Console* console = GetSubsystem<Console>();
@@ -81,16 +82,17 @@ void ConsoleInput::Start()
     console->SetNumBufferedRows(2 * console->GetNumRows());
     console->SetCommandInterpreter(GetTypeName());
     console->SetVisible(true);
-    
+    console->GetCloseButton()->SetVisible(false);
+
     // Show OS mouse cursor
     GetSubsystem<Input>()->SetMouseVisible(true);
-    
+
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();
-    
+
     // Initialize game and print the welcome message
     StartGame();
-    
+
     // Randomize from system clock
     SetRandomSeed(Time::GetSystemTime());
 }
@@ -123,7 +125,7 @@ void ConsoleInput::StartGame()
           "objective is to survive as long as possible. Beware of hunger and the merciless\n"
           "predator cichlid Urho, who appears from time to time. Evading Urho is easier\n"
           "with an empty stomach. Type 'help' for available commands.");
-    
+
     gameOn_ = true;
     foodAvailable_ = false;
     eatenLastTurn_ = false;
@@ -137,7 +139,7 @@ void ConsoleInput::EndGame(const String& message)
     Print(message);
     Print("Game over! You survived " + String(numTurns_) + " turns.\n"
           "Do you want to play again (Y/N)?");
-    
+
     gameOn_ = false;
 }
 
@@ -156,10 +158,10 @@ void ConsoleInput::Advance()
         ++urhoThreat_;
     if (urhoThreat_ == 0 && Random() < 0.2f)
         ++urhoThreat_;
-    
+
     if (urhoThreat_ > 0)
         Print(urhoThreatLevels[urhoThreat_ - 1] + ".");
-    
+
     if ((numTurns_ & 3) == 0 && !eatenLastTurn_)
     {
         ++hunger_;
@@ -171,9 +173,9 @@ void ConsoleInput::Advance()
         else
             Print("You are " + hungerLevels[hunger_] + ".");
     }
-    
+
     eatenLastTurn_ = false;
-    
+
     if (foodAvailable_)
     {
         Print("The floating pieces of fish food are quickly eaten by other fish in the tank.");
@@ -184,7 +186,7 @@ void ConsoleInput::Advance()
         Print("The overhead dispenser drops pieces of delicious fish food to the water!");
         foodAvailable_ = true;
     }
-    
+
     ++numTurns_;
 }
 
@@ -196,7 +198,7 @@ void ConsoleInput::HandleInput(const String& input)
         Print("Empty input given!");
         return;
     }
-    
+
     if (inputLower == "quit" || inputLower == "exit")
         engine_->Exit();
     else if (gameOn_)
@@ -224,7 +226,7 @@ void ConsoleInput::HandleInput(const String& input)
             }
             else
                 Print("There is no food available.");
-            
+
             Advance();
         }
         else if (inputLower == "wait")
@@ -247,7 +249,7 @@ void ConsoleInput::HandleInput(const String& input)
             }
             else
                 Print("There is nothing to hide from.");
-            
+
             Advance();
         }
         else

@@ -159,6 +159,7 @@ The full list of supported parameters, their datatypes and default values:
 - SoundMixRate (int) %Sound output frequency in Hz. Default 44100.
 - SoundStereo (bool) Stereo sound output mode. Default true.
 - SoundInterpolation (bool) Interpolated sound output mode to improve quality. Default true.
+- TouchEmulation (bool) %Touch emulation on desktop platform. Default false.
 
 \section MainLoop_Frame Main loop iteration
 
@@ -750,7 +751,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
 
-Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D" library.
+Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D" sublibrary.
 
 \section Rendering_Optimizations Optimizations
 
@@ -1071,7 +1072,7 @@ Note that the used shader variations will vary with graphics settings, for examp
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
+A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
 
 The available commands are:
 
@@ -1089,7 +1090,7 @@ The render path XML definition looks like this:
 
 \code
 <renderpath>
-    <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
+    <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
         format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" persistent="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
@@ -1348,13 +1349,12 @@ The input events include:
 - E_KEYUP: a key was released.
 - E_KEYDOWN: a key was pressed.
 - E_TEXTINPUT: a string of translated text input in UTF8 format. May contain a single character or several.
+- E_JOYSTICKCONNECTED: a joystick was plugged in.
+- E_JOYSTICKDISCONNECTED: a joystick was disconnected.
 - E_JOYSTICKBUTTONDOWN: a joystick button was pressed.
 - E_JOYSTICKBUTTONUP: a joystick button was released.
 - E_JOYSTICKAXISMOVE: a joystick axis was moved.
 - E_JOYSTICKHATMOVE: a joystick POV hat was moved.
-- E_CONTROLLERBUTTONDOWN: a joystick button on an SDL controller was pressed.
-- E_CONTROLLERBUTTONUP: a joystick button on an SDL controller was released.
-- E_CONTROLLERAXISMOVE: a joystick axis on an SDL controller was moved.
 - E_TOUCHBEGIN: a finger touched the screen.
 - E_TOUCHEND: a finger was lifted from the screen.
 - E_TOUCHMOVE: a finger moved on the screen.
@@ -1378,9 +1378,11 @@ In AngelScript, the polling API is accessed via properties: input.keyDown[], inp
 
 \section InputJoystick Joystick input
 
-To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
+Plugged in joysticks will begin sending input events automatically. Each joystick will be assigned a joystick ID which will be used in subsequent joystick events, as well as for retrieving the \ref JoystickState "joystick state". Use \ref Input::GetJoystick "GetJoystick()" to retrieve the joystick state by ID. In case you do not have the ID, you can also use \ref Input::GetJoystickByIndex() "GetJoystickByIndex()" which uses a zero-based index; see \ref Input::GetNumJoysticks "GetNumJoysticks()" for the number of currently connected joysticks. The ID, as well as the joystick name, can be looked up from the joystick state.
 
-If the joystick model is recognized by SDL you will also get the "controller" variety of events shown above, and the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them.
+If the joystick model is recognized by SDL as a game controller the buttons and axes mappings utilize known constants such as CONTROLLER_BUTTON_A or CONTROLLER_AXIS_LEFTX without having to guess them. Use \ref JoystickState::IsController "IsController()" to distinguish between a game controller and an unrecognized joystick.
+
+On platforms that support the accelerometer, it will appear as a "virtual" joystick.
 
 \section InputTouch Touch input
 
@@ -1391,6 +1393,8 @@ Touch gestures can be recorded using SDL's inbuilt $1 gesture recognition system
 Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event will be sent. In addition to the ID of the best matched gesture, it contains the center position and an error metric (lower = better.)
 
 Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
+
+Touch emulation can be used to test mobile applications on a desktop machine without a touch screen. See \ref Input::SetTouchEmulation "SetTouchEmulation()". When touch emulation is enabled, actual mouse events are no longer sent and the operating system mouse cursor is forced visible. The left mouse button acts as a moving finger, while the rest of the mouse buttons act as stationary fingers for multi-finger gestures. For example pressing down both left and right mouse buttons, then dragging the mouse with the buttons still pressed would emulate a two-finger pinch zoom-in gesture.
 
 \section InputPlatformSpecific Platform-specific details
 
@@ -1640,85 +1644,105 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 
 
 \page Urho2D Urho2D
-In order to make 2D Game in Urho3D, Urho2D is provided. Urho2D include 2D graphics and 2D physics. The classes provide are:
+In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics. Provided classes are:
 
-- Sprite2D: a sprite is defined with texture and texture rectangle and hot spot.
-- SpriteSheet2D: a sprite sheet(texture atlas) include some sprites in it.
-- StaticSprite2D: a drawable component to display a sprite.
-- Animation2D: 2D animation with some frames, a frame include duration and a sprite.
-- AnimatedSprite2D : a drawable component to display an animation.
-- ParticleEffect2D: 2D particle model file.
-- ParticleEmitter2D: a 2D particle effect.
-- PhysicsWorld2D: implements 2D physics simulation. 2D physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
+\section Drawable_Components Drawable components
+- AnimatedSprite2D : used to display an Animation2D.
+- ParticleEmitter2D: used to display a ParticleEffect2D.
+- StaticSprite2D: used to display a Sprite2D.
+
+\section Resources Resources
+- Animation2D: a *.anm file defining a sequence of Sprite2D frames (retrieved from one or more Sprite2Ds/SpriteSheet2Ds) to play. For an example using a SpriteSheet2D, see Bin/Data/Urho2D/GoldIcon.anm
+- ParticleEffect2D: a *.xml file defining the behavior and texture of a 2D particle. For an example, see Bin/Data/Urho2D/greenspiral.pex
+- Sprite2D: an image defined with texture, texture rectangle and hot spot.
+- SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
+
+To create an Animation2D from multiple images:
+- Pack all your individual images into a texture atlas using tools like ShoeBox (http://renderhjs.net/shoebox/) or TexturePacker (http://www.codeandweb.com/texturepacker) or ....
+This will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
+- Create an Animation2D xml file from scratch or using ShoeBox.
+For an example, see rotating coin in example 24_Urho2DSprite and resources located in Bin/Data/Urho2D : GoldIcon.png is the texture atlas image, GoldIcon.xml is the external file storing sprites' coordinates and size and GoldIcon.anm is the Animation2D file.
+
+\section Urho2D_Physics Physics
+Physics in Urho2D uses Box2D. You can refer to Box2D manual at http://www.box2d.org/manual.html for full reference.
+- PhysicsWorld2D: implements 2D physics simulation. Mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+
+\section Urho2D_Rigidbodies_Components Rigid bodies components
 - RigidBody2D: a 2D physics object instance.
-- CollisionShape2D: base class for 2D physics collision shape. 
-- CollisionBox2D: defines 2D physics collision box.
-- CollisionCircle2D: defines 2D physics collision circle.
-- CollisionEdge2D: defines 2D physics collision edge.
-- CollisionChain2D: defines 2D physics collision chain.
-- CollisionPolygon2D: defines 2D physics collision polygon.
-- Constraint2D: base class for 2D physics constraint.
-- ConstraintDistance2D: define 2D physics distance constraint.
-- ConstraintFriction2D: define 2D physics friction constraint.
-- ConstraintGear2D: define 2D physics gear constraint.
-- ConstraintMotor2D: define 2D physics motor constraint.
-- ConstraintMouse2D: define 2D physics mouse constraint.
-- ConstraintPrismatic2D: define 2D physics prismatic constraint.
-- ConstraintPulley2D: define 2D physics pulley constraint.
-- ConstraintRevolute2D: define 2D physics revolute constraint.
-- ConstraintRope2D: define 2D physics rope constraint.
-- ConstraintWeld2D: define 2D physics weld constraint.
-- ConstraintWheel2D: define 2D physics wheel constraint.
+Available BodyType2Ds are: (SetBodyType)
+- BT_STATIC: A static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
+- BT_DYNAMIC: A dynamic body is fully simulated. They can be moved manually by the user, but normally they move according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
+- BT_KINEMATIC: A kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
+You should establish the body type at creation because changing the body type later is expensive.
 
-In order to use Urho2D, it is need set camera to orthographic mode first, it can be done with following code:
+\section Urho2D_Collision_Shapes_Components Collision shapes components
+Use DrawDebugGeometry() to display the shapes.
+- CollisionShape2D: base class for 2D physics collision shapes.
+- CollisionBox2D: defines 2D physics collision box.
+- CollisionCircle2D: defines 2D physics collision circle. Circle shapes have a position (SetCenter) and radius (SetRadius). Circles are solid, you cannot make a hollow circle using the circle shape.
+- CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments (SetVertex1 and SetVertex2 or SetVertices). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
+- CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (SetVertices) to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
+- CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (SetVertices). Polygons vertices are stored with a counter clockwise winding.
+
+\section Urho2D_Constraints_Components Constraints components
+Apply a constraint to a node (called 'ownerBody') and use SetOtherBody() to set the other node's body to be constrained to the ownerBody.
+Use SetCollideConnected() to switch collision between the bodies.
+Use SetDrawJoint(true) in combination with DrawDebugGeometry() to display the joints.
+See 29_Urho2DConstraints for detailed examples and to help selecting the appropriate constraint.
+- Constraint2D: base class for 2D physics constraints.
+- ConstraintDistance2D: define 2D physics distance constraint. The distance between two anchor points (SetOwnerBodyAnchor and SetOtherBodyAnchor) on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (SetFrequencyHz is below half of the timestep) and damping ratio (SetDampingRatio).
+- ConstraintFriction2D: This constraint is used for top-down friction. It provides 2D translational friction (SetMaxForce) and angular friction (SetMaxTorque).
+- ConstraintGear2D: define 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (SetOwnerConstraint and SetOtherConstraint). Like the pulley ratio, you can specify a gear ratio (SetRatio). However, in this case the gear ratio can be negative.
+- ConstraintMotor2D: define 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (SetLinearOffset) and rotation offsets (SetAngularOffset). You can set the maximum motor force (SetMaxForce) and torque (SetMaxTorque) that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
+- ConstraintMouse2D: define 2D physics mouse constraint. Used to manipulate bodies with the mouse. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (SetTarget) initially coincides with the body’s anchor point. The maximum force (SetMaxForce) is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (SetFrequencyHz) and damping ratio (SetDampingRatio) are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
+- ConstraintPrismatic2D: define 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (SetAxis). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
+- ConstraintPulley2D: define 2D physics pulley constraint. The pulley connects two bodies to ground (SetOwnerBodyGroundAnchor and SetOtherBodyGroundAnchor) and to each other (SetOwnerBodyAnchor and SetOtherBodyAnchor). As one body goes up, the other goes down. You can supply a ratio (SetRatio) that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
+- ConstraintRevolute2D: define 2D physics revolute constraint. define 2D physics friction constraint. This constraint forces two bodies to share a common hinge anchor point (SetAnchor). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (SetEnableLimit) forces the joint angle to remain between a lower (SetLowerAngle) and upper (SetUpperAngle) bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (SetEnableMotor) allows you to specify the constraint speed (the time derivative of the angle). The speed (SetMotorSpeed) can be negative or positive. When the maximum torque (SetMaxMotorTorque) is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
+- ConstraintRope2D: define 2D physics rope constraint. This constraint restricts the maximum distance (SetMaxLength) between two points (SetOwnerBodyAnchor and SetOtherBodyAnchor). This can be useful to prevent chains of bodies from stretching, even under high load.
+- ConstraintWeld2D: define 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
+- ConstraintWheel2D: define 2D physics wheel constraint. This constraint restricts a point on bodyB (SetAnchor) to a line on bodyA (SetAxis). It also provides a suspension spring.
+
+In order to use Urho2D we need to set camera to orthographic mode first; it can be done with following code:
 
 C++:
 \code
     // Create camera node
     Node* cameraNode = scene_->CreateChild("Camera");
-    // Set camera node's position
-    cameraNode->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
+    
     // Create camera
     Camera* camera = cameraNode->CreateComponent<Camera>();
     // Set camera orthographic
     camera->SetOrthographic(true);
-
     // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera->SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 \endcode 
 
 AngelScript:
 \code
     // Create camera node
     Node@ cameraNode = scene_.CreateChild("Camera");
-    // Set camera node's position
-    cameraNode.SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
+    
     // Create camera
     Camera@ camera = cameraNode.CreateComponent("Camera");
     // Set camera orthographic
     camera.orthographic = true;
-
     // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera.orthoSize = graphics.height * PIXEL_SIZE;
 \endcode 
 
 Lua:
 \code
     -- Create camera node
     cameraNode = scene_:CreateChild("Camera")
-    -- Set camera node's position
-    cameraNode.position = Vector3(0.0, 0.0, -10.0)
-
+    
     -- Create camera
     local camera = cameraNode:CreateComponent("Camera")
     -- Set camera orthographic
     camera.orthographic = true
-
     -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
+    camera.orthoSize = graphics.height * PIXEL_SIZE
 \endcode 
+
 
 \page Serialization Serialization
 
@@ -1880,7 +1904,7 @@ Attribute animation is a new system for Urho3D, With it user can apply animation
 
 These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
 \code
-SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
@@ -1888,11 +1912,11 @@ colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
 \endcode
 
-On above code, we first create an AttributeAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+On above code, we first create an ValueAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
 
 Another way is load attribute animation from resource, here is a simple sample:
 \code
-AttributeAnimatio* colorAnimation = cache->GetResource<AttributeAnimation>("Scene/LightColorAnimation.xml");
+ValueAnimation* colorAnimation = cache->GetResource<ValueAnimation>("Scene/LightColorAnimation.xml");
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 \endcode
 
@@ -1909,7 +1933,7 @@ When user want to apply multi-attribute animation to an object, ObjectAnimation 
 SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
 
 // Create position animation
-SharedPtr<AttributeAnimation> positionAnimation(new AttributeAnimation(context_));
+SharedPtr<ValueAnimation> positionAnimation(new ValueAnimation(context_));
 positionAnimation->SetKeyFrame(0.0f, Vector3::ZERO);
 positionAnimation->SetKeyFrame(1.0f, Vector3(1.0f, 1.0f, 1.0f));
 positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
@@ -1917,7 +1941,7 @@ positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
 lightAnimation->AddAttributeAnimation("Position", positionAnimation, WM_LOOP); 
 
 // Create color animation
-SharedPtr<AttributeAnimation> colorAnimation(new AttributeAnimation(context_));
+SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
@@ -1930,7 +1954,7 @@ light->SetObjectAnimation(lightAnimation);
 
 Also user can load object animation from file, like:
 \code
-ObjectAnimation * lightAnimation = cache->GetResource< ObjectAnimation >("Scene/LightAnimation.xml");
+ObjectAnimation * lightAnimation = cache->GetResource<ObjectAnimation>("Scene/LightAnimation.xml");
 light-> SetObjectAnimation (lightAnimation);
 \endcode
 
@@ -1940,10 +1964,10 @@ Attribute animation and object animation can be save to scene file, Someday if o
 
 \section AttributeAnimation_Classes Classes of attribute animation:
 - Animatable: Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
-- AttributeAnimation: Attribute animation class, include some key frame in it.
+- ValueAnimation: Animation class, include some key frame in it.
 - ObjectAnimation: Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
-- AttributeAnimationInfo: Attribute animation info, it include attribute animation, wrap mode and animation speed.
-- AttributeAnimationInstance: Attribute animation instance, it is derived from AttributeAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
+- ValueAnimationInfo: Animation info, it include attribute animation, wrap mode and animation speed.
+- AttributeAnimationInstance: Attribute animation instance, it is derived from ValueAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
 
 \page Tools Tools
 

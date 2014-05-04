@@ -89,7 +89,7 @@ void Zone::RegisterObject(Context* context)
 
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Component::OnSetAttribute(attr, src);
+    Serializable::OnSetAttribute(attr, src);
 
     // If bounding box or priority changes, dirty the drawable as applicable
     if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||

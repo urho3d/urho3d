@@ -185,7 +185,7 @@ void LogicComponent::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
     using namespace PhysicsPostStep;
     
     // Execute user-defined fixed post-update function
-    FixedUpdate(eventData[P_TIMESTEP].GetFloat());
+    FixedPostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

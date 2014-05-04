@@ -144,7 +144,7 @@ void UpdateTouches(Controls& controls) // Called from HandleUpdate
     // Gyroscope (emulated by SDL through a virtual joystick)
     if (input.numJoysticks > 0) // numJoysticks = 1 on iOS & Android
     {
-        JoystickState@ joystick = input.joysticks[0];
+        JoystickState@ joystick = input.joysticksByIndex[0];
         if (joystick.numAxes >= 2)
         {
             if (joystick.axisPosition[0] < -GYROSCOPE_THRESHOLD)

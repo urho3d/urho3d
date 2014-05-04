@@ -447,7 +447,11 @@ unsigned File::GetChecksum()
 {
     if (offset_ || checksum_)
         return checksum_;
+    #ifdef ANDROID
+    if ((!handle_ && !assetHandle_) || mode_ == FILE_WRITE)
+    #else
     if (!handle_ || mode_ == FILE_WRITE)
+    #endif
         return 0;
 
     PROFILE(CalculateFileChecksum);

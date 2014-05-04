@@ -72,6 +72,12 @@ public:
     {
         FromAngleAxis(angle, axis);
     }
+
+    /// Construct from an angle (in degrees, for Urho2D).
+    Quaternion(float angle)
+    {
+        FromAngleAxis(angle, Vector3::FORWARD);
+    }
     
     /// Construct from Euler angles (in degrees.)
     Quaternion(float x, float y, float z)

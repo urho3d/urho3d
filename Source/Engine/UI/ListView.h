@@ -94,6 +94,8 @@ public:
     void SetBaseIndent(int baseIndent);
     /// Enable clearing of selection on defocus.
     void SetClearSelectionOnDefocus(bool enable);
+    /// Enable reacting to click end instead of click start for item selection. Default false.
+    void SetSelectOnClickEnd(bool enable);
 
     /// Expand item at index. Only has effect in hierarchy mode.
     void Expand(unsigned index, bool enable, bool recursive = false);
@@ -128,6 +130,8 @@ public:
     bool GetMultiselect() const { return multiselect_; }
     /// Return whether selection is cleared on defocus.
     bool GetClearSelectionOnDefocus() const { return clearSelectionOnDefocus_; }
+    /// Return whether reacts to click end instead of click start for item selection.
+    bool GetSelectOnClickEnd() const { return selectOnClickEnd_; }
     /// Return whether hierarchy mode enabled.
     bool GetHierarchyMode() const { return hierarchyMode_; }
     /// Return base indent.
@@ -157,6 +161,8 @@ protected:
     SharedPtr<UIElement> overlayContainer_;
     /// Clear selection on defocus flag.
     bool clearSelectionOnDefocus_;
+    /// React to click end instead of click start flag.
+    bool selectOnClickEnd_;
 
 private:
     /// Handle global UI mouseclick to check for selection change.
@@ -167,6 +173,8 @@ private:
     void HandleItemFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle focus changed.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
+    /// Update subscription to UI click events
+    void UpdateUIClickSubscription();
 };
 
 }

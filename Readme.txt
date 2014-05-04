@@ -91,6 +91,7 @@ Urho3D uses the following third-party libraries:
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
+- rapidjson 0.11 (https://code.google.com/p/rapidjson/)
 - Recast/Detour (https://github.com/memononen/recastnavigation/)
 - SDL 2.0.3 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
@@ -379,12 +380,12 @@ generator.
 Library build
 -------------
 
-As of v1.31 (to be released), the build process first builds the Urho3D library
-target (either static or shared). The library is then linked against by other
-targets like tools and samples that reference Urho3D as one of the external
-libraries. The Urho3D library type is defaulted to static, so the build process
-would generate standalone executables as previous releases. The Urho3D library
-type can be changed using "URHO3D_LIB_TYPE" build option.
+As of v1.31, the build process first builds the Urho3D library target (either
+static or shared). The library is then linked against by other targets like
+tools and samples that reference Urho3D as one of the external libraries. The
+Urho3D library type is defaulted to static, so the build process would generate
+standalone executables as previous releases. The Urho3D library type can be
+changed using "URHO3D_LIB_TYPE" build option.
 
 To install the Urho3D library (or should we call it SDK), use the usual
 'make install' command when using Makefile. There is an equivalent command in

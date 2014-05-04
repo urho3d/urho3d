@@ -31,12 +31,14 @@ task :sync do
   system "cwb=`git symbolic-ref -q --short HEAD || git rev-parse --short HEAD`; export cwb && git fetch upstream && git checkout master && git pull && git merge -m 'Sync at #{Time.now.localtime}.' upstream/master && git push && git checkout $cwb"
 end
 
-# Usage: rake scaffolding dir=/path/to/new/project/root
+# Usage: rake scaffolding dir=/path/to/new/project/root [project=your-project-name] [target=your-target-name]
 desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
-  abort 'Usage: rake scaffolding dir=/path/to/new/project/root' unless ENV['dir']
+  abort 'Usage: rake scaffolding dir=/path/to/new/project/root [project=your-project-name] [target=your-target-name]' unless ENV['dir']
   abs_path = ENV['dir'][0, 1] == '/' ? ENV['dir'] : "#{Dir.pwd}/#{ENV['dir']}"
-  scaffolding abs_path
+  project = ENV['project'] || 'Scaffolding'
+  target = ENV['target'] || 'Main'
+  scaffolding(abs_path, project, target)
   abs_path = Pathname.new(abs_path).realpath
   puts "\nNew project created in #{abs_path}\n\n"
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'URHO3D_INSTALL_PREFIX' environment variable"
@@ -169,10 +171,10 @@ EOF" or abort 'Failed to create release directory remotely'
   end
 end
 
-def scaffolding(dir)
+def scaffolding(dir, project = 'Scaffolding', target = 'Main')
   system "bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\" && cat <<EOF >#{dir}/Source/CMakeLists.txt
 # Set project name
-project (Scaffolding)
+project (#{project})
 
 # Set minimum version
 cmake_minimum_required (VERSION 2.8.6)
@@ -196,7 +198,7 @@ find_package (Urho3D REQUIRED)
 include_directories (\\${URHO3D_INCLUDE_DIRS})
 
 # Define target name
-set (TARGET_NAME Main)
+set (TARGET_NAME #{target})
 
 # Define source files
 define_source_files ()

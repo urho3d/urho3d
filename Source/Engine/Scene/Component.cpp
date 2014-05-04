@@ -45,12 +45,6 @@ Component::~Component()
 {
 }
 
-void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Animatable::OnSetAttribute(attr, src);
-    MarkNetworkUpdate();
-}
-
 bool Component::Save(Serializer& dest) const
 {
     // Write type and ID
@@ -73,6 +67,19 @@ bool Component::SaveXML(XMLElement& dest) const
 
     // Write attributes
     return Animatable::SaveXML(dest);
+}
+
+void Component::MarkNetworkUpdate()
+{
+    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
+    {
+        Scene* scene = GetScene();
+        if (scene)
+        {
+            scene->MarkNetworkUpdate(this);
+            networkUpdate_ = true;
+        }
+    }
 }
 
 void Component::SetEnabled(bool enable)
@@ -143,7 +150,7 @@ void Component::PrepareNetworkUpdate()
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        
+
         if (animationEnabled_ && IsAnimatedNetworkAttribute(attr))
             continue;
 
@@ -186,28 +193,15 @@ void Component::CleanupConnection(Connection* connection)
     }
 }
 
-void Component::MarkNetworkUpdate()
-{
-    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
-    {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            scene->MarkNetworkUpdate(this);
-            networkUpdate_ = true;
-        }
-    }
-}
-
 void Component::OnAttributeAnimationAdded()
 {
-    if (attributeAnimationInstances_.Size() == 1)
-        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Component, HandleAttributeAnimationUpdate));        
+    if (attributeAnimationInfos_.Size() == 1)
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Component, HandleAttributeAnimationUpdate));
 }
 
 void Component::OnAttributeAnimationRemoved()
 {
-    if (attributeAnimationInstances_.Empty())
+    if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 

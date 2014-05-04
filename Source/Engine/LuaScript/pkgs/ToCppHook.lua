@@ -97,6 +97,10 @@ function post_output_hook(package)
     WRITE(result)
 end
 
+_push_functions['Component'] = "ToluaPushObject"
+_push_functions['Resource'] = "ToluaPushObject"
+_push_functions['UIElement'] = "ToluaPushObject"
+
 -- Is Urho3D Vector type.
 function urho3d_is_vector(t)
     return t:find("Vector<") ~= nil
