@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Object.h"
 #include "Ptr.h"
 #include "tolua++.h"
 #include "ToluaUtils.h"
@@ -341,4 +342,9 @@ template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* da
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<RayQueryResult>*)data), "RayQueryResult");
+}
+
+void ToluaPushObject(lua_State*L, void* data, const char* type)
+{
+    tolua_pushusertype(L, data, data ? static_cast<Object*>(data)->GetTypeName().CString() : type);
 }

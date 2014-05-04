@@ -131,3 +131,6 @@ template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data
 template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* type);
+/// Push Object to Lua.
+void ToluaPushObject(lua_State*L, void* data, const char* type);
+
