@@ -729,6 +729,38 @@ Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode, uns
         return CreateComponent(type, mode, id);
 }
 
+void Node::CloneComponent(Component* component, unsigned id)
+{
+    if(!component)
+        return;
+
+    CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
+}
+
+void Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
+{
+    if(!component)
+        return;
+
+    Component* cloneComponent = CreateComponent(component->GetType(), mode, 0);
+    if (!cloneComponent)
+    {
+        LOGERROR("Could not clone component " + component->GetTypeName());
+        return;
+    }
+
+    const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
+    if (compAttributes)
+    {
+        for (unsigned j = 0; j < compAttributes->Size(); ++j)
+        {
+            const AttributeInfo& attr = compAttributes->At(j);
+            if (attr.mode_ & AM_FILE)
+                cloneComponent->SetAttribute(j, component->GetAttribute(j));
+        }
+    }
+}
+
 void Node::RemoveComponent(Component* component)
 {
     for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
@@ -1401,6 +1433,9 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     }
     else
         component->SetID(id);
+
+    if(component->GetNode())
+        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
 
     component->SetNode(this);
     component->OnMarkedDirty(this);
