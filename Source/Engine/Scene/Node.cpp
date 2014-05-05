@@ -760,7 +760,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
     
     if (compAttributes)
     {
-        for (unsigned i = 0; i < compAttributes->Size(); ++i)
+        for (unsigned i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
         {
             const AttributeInfo& attr = compAttributes->At(i);
             const AttributeInfo& cloneAttr = cloneAttributes->At(i);
