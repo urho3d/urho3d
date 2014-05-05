@@ -358,6 +358,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+        #else
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
         #endif
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
