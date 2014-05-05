@@ -8216,10 +8216,10 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
-- ScriptObject@ object // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - ScriptFile@ scriptFile
+- ScriptObject@ scriptObject // readonly
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly

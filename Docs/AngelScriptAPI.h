@@ -7368,12 +7368,12 @@ uint id;
 Node node;
 /* readonly */
 uint numAttributes;
-/* readonly */
-ScriptObject object;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
 ScriptFile scriptFile;
+/* readonly */
+ScriptObject scriptObject;
 bool temporary;
 /* readonly */
 ShortStringHash type;
