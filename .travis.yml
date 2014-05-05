@@ -61,7 +61,7 @@ install:
     - bash -c "( [ $LINUX ] || [ $RPI ] ) && [ $PACKAGE_UPLOAD ]" && sudo apt-get install -q -y rpm || true
     - bash -c "[ $ANDROID ] && [ $PACKAGE_UPLOAD ]" && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-19.0.3,android-19,system-image,extra-android-support || true
     - bash -e /etc/init.d/xvfb start
-script: rake travis_ci
+script: travis_wait rake travis_ci
 after_success:
     - bash -c "[ $SITE_UPDATE_ON_MASTER_COMMIT ]" && rake travis_ci_site_update && rake travis_ci_rebase
     - bash -c "[ $PACKAGE_UPLOAD ]" && rake travis_ci_package_upload
