@@ -756,18 +756,21 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
     }
 
     const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
+    const Vector<AttributeInfo>* cloneAttributes = cloneComponent->GetAttributes();
+    
     if (compAttributes)
     {
         for (unsigned i = 0; i < compAttributes->Size(); ++i)
         {
             const AttributeInfo& attr = compAttributes->At(i);
+            const AttributeInfo& cloneAttr = cloneAttributes->At(i);
             if (attr.mode_ & AM_FILE)
             {
                 Variant value;
                 component->OnGetAttribute(attr, value);
                 // Note: when eg. a ScriptInstance component is cloned, its script object attributes are unique and therefore we
-                // can not simply refer to the source component's AttributeInfo, but must go through the clone's SetAttribute()
-                cloneComponent->SetAttribute(i, value);
+                // can not simply refer to the source component's AttributeInfo
+                cloneComponent->OnSetAttribute(cloneAttr, value);
             }
         }
         cloneComponent->ApplyAttributes();
