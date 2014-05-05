@@ -768,6 +768,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
                 cloneComponent->OnSetAttribute(attr, value);
             }
         }
+        cloneComponent->ApplyAttributes();
     }
     
     return cloneComponent;
