@@ -4194,6 +4194,7 @@ Color GetPixel(int, int) const;
 Color GetPixel(int, int, int) const;
 Color GetPixelBilinear(float, float) const;
 Color GetPixelTrilinear(float, float, float) const;
+Image GetSubimage(const IntRect&) const;
 bool Load(File);
 bool LoadColorLUT(File);
 void Resize(int, int);

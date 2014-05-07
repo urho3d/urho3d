@@ -2006,6 +2006,7 @@ Methods:
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
 - CompressedLevel GetCompressedLevel(unsigned index) const
+- Image* GetSubimage(const IntRect& rect) const
 
 Properties:
 
