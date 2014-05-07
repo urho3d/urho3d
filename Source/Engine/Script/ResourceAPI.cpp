@@ -164,6 +164,7 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "int get_depth() const", asMETHOD(Image, GetDepth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_components() const", asMETHOD(Image, GetComponents), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool get_compressed() const", asMETHOD(Image, IsCompressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHOD(Image, GetSubimage), asCALL_THISCALL);
 }
 
 static void ConstructJSONValue(JSONValue* ptr)
