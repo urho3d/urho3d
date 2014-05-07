@@ -6762,6 +6762,8 @@ Methods:
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
 - void ApplyAttributes()
 - Node@ Clone(CreateMode = REPLICATED)
+- Component@ CloneComponent(Component@, CreateMode, uint = 0)
+- Component@ CloneComponent(Component@, uint = 0)
 - Node@ CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0)
 - Component@ CreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode = REPLICATED)
@@ -7969,6 +7971,8 @@ Methods:
 - void ApplyAttributes()
 - void Clear(bool = true, bool = true)
 - void ClearRequiredPackageFiles()
+- Component@ CloneComponent(Component@, CreateMode, uint = 0)
+- Component@ CloneComponent(Component@, uint = 0)
 - Node@ CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0)
 - Component@ CreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode = REPLICATED)
@@ -8212,10 +8216,10 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
-- ScriptObject@ object // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - ScriptFile@ scriptFile
+- ScriptObject@ scriptObject // readonly
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly

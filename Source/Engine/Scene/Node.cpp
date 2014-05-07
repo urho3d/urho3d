@@ -729,6 +729,56 @@ Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode, uns
         return CreateComponent(type, mode, id);
 }
 
+Component* Node::CloneComponent(Component* component, unsigned id)
+{
+    if (!component)
+    {
+        LOGERROR("Null source component given for CloneComponent");
+        return 0;
+    }
+    
+    return CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
+}
+
+Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
+{
+    if (!component)
+    {
+        LOGERROR("Null source component given for CloneComponent");
+        return 0;
+    }
+
+    Component* cloneComponent = SafeCreateComponent(component->GetTypeName(), component->GetType(), mode, 0);
+    if (!cloneComponent)
+    {
+        LOGERROR("Could not clone component " + component->GetTypeName());
+        return 0;
+    }
+
+    const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
+    const Vector<AttributeInfo>* cloneAttributes = cloneComponent->GetAttributes();
+    
+    if (compAttributes)
+    {
+        for (unsigned i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
+        {
+            const AttributeInfo& attr = compAttributes->At(i);
+            const AttributeInfo& cloneAttr = cloneAttributes->At(i);
+            if (attr.mode_ & AM_FILE)
+            {
+                Variant value;
+                component->OnGetAttribute(attr, value);
+                // Note: when eg. a ScriptInstance component is cloned, its script object attributes are unique and therefore we
+                // can not simply refer to the source component's AttributeInfo
+                cloneComponent->OnSetAttribute(cloneAttr, value);
+            }
+        }
+        cloneComponent->ApplyAttributes();
+    }
+    
+    return cloneComponent;
+}
+
 void Node::RemoveComponent(Component* component)
 {
     for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
@@ -1402,6 +1452,9 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     else
         component->SetID(id);
 
+    if(component->GetNode())
+        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
+
     component->SetNode(this);
     component->OnMarkedDirty(this);
 
@@ -1569,32 +1622,21 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         const AttributeInfo& attr = attributes->At(j);
         // Do not copy network-only attributes, as they may have unintended side effects
         if (attr.mode_ & AM_FILE)
-            cloneNode->SetAttribute(j, GetAttribute(j));
+        {
+            Variant value;
+            OnGetAttribute(attr, value);
+            cloneNode->OnSetAttribute(attr, value);
+        }
     }
 
     // Clone components
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        Component* cloneComponent = cloneNode->SafeCreateComponent(component->GetTypeName(), component->GetType(),
+        Component* cloneComponent = cloneNode->CloneComponent(component,
             (mode == REPLICATED && component->GetID() < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, 0);
-        if (!cloneComponent)
-        {
-            LOGERROR("Could not clone component " + component->GetTypeName());
-            continue;
-        }
-        resolver.AddComponent(component->GetID(), cloneComponent);
-
-        const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
-        if (compAttributes)
-        {
-            for (unsigned j = 0; j < compAttributes->Size(); ++j)
-            {
-                const AttributeInfo& attr = compAttributes->At(j);
-                if (attr.mode_ & AM_FILE)
-                    cloneComponent->SetAttribute(j, component->GetAttribute(j));
-            }
-        }
+        if (cloneComponent)
+            resolver.AddComponent(component->GetID(), cloneComponent);
     }
 
     // Clone child nodes recursively

@@ -102,7 +102,9 @@ class Node : public Animatable
     
     // template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0);
-    
+    Component* CloneComponent(Component* component, unsigned id = 0);
+    Component* CloneComponent(Component* component, CreateMode mode, unsigned id = 0);
+
     int CreateScriptObject(const String scriptObjectType);
     int CreateScriptObject(const String fileName, const String scriptObjectType);
     

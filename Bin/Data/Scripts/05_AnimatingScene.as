@@ -69,7 +69,7 @@ void CreateScene()
         ScriptInstance@ instance = boxNode.CreateComponent("ScriptInstance");
         instance.CreateObject(scriptFile, "Rotator");
         // Retrieve the created script object and set its rotation speed member variable
-        Rotator@ rotator = cast<Rotator>(instance.object);
+        Rotator@ rotator = cast<Rotator>(instance.scriptObject);
         rotator.rotationSpeed = Vector3(10.0f, 20.0f, 30.0f);
     }
 

@@ -5676,6 +5676,8 @@ class Node
 void AddChild(Node, uint = M_MAX_UNSIGNED);
 void ApplyAttributes();
 Node Clone(CreateMode = REPLICATED);
+Component CloneComponent(Component, CreateMode, uint = 0);
+Component CloneComponent(Component, uint = 0);
 Node CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0);
 Component CreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
 ScriptObject CreateScriptObject(ScriptFile, const String&, CreateMode = REPLICATED);
@@ -7073,6 +7075,8 @@ void AddRequiredPackageFile(PackageFile);
 void ApplyAttributes();
 void Clear(bool = true, bool = true);
 void ClearRequiredPackageFiles();
+Component CloneComponent(Component, CreateMode, uint = 0);
+Component CloneComponent(Component, uint = 0);
 Node CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0);
 Component CreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
 ScriptObject CreateScriptObject(ScriptFile, const String&, CreateMode = REPLICATED);
@@ -7364,12 +7368,12 @@ uint id;
 Node node;
 /* readonly */
 uint numAttributes;
-/* readonly */
-ScriptObject object;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
 ScriptFile scriptFile;
+/* readonly */
+ScriptObject scriptObject;
 bool temporary;
 /* readonly */
 ShortStringHash type;
