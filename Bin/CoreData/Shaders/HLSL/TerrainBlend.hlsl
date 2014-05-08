@@ -33,6 +33,7 @@ void VS(float4 iPos : POSITION,
     out float2 oTexCoord : TEXCOORD0,
     out float3 oNormal : TEXCOORD1,
     out float4 oWorldPos : TEXCOORD2,
+    out float2 oDetailTexCoord : TEXCOORD3,
     #ifdef PERPIXEL
         #ifdef SHADOW
             out float4 oShadowPos[NUMCASCADES] : TEXCOORD4,
@@ -54,15 +55,8 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
-
-    #if defined(NORMALMAP)
-        float3 tangent = GetWorldTangent(modelMatrix);
-        float3 bitangent = cross(tangent, oNormal) * iTangent.w;
-        oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
-        oTangent = float4(tangent, bitangent.z);
-    #else
-        oTexCoord = GetTexCoord(iTexCoord);
-    #endif
+    oTexCoord = GetTexCoord(iTexCoord);
+    oDetailTexCoord = cDetailTiling * oTexCoord;
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
@@ -97,6 +91,7 @@ void VS(float4 iPos : POSITION,
 void PS(float2 iTexCoord : TEXCOORD0,
     float3 iNormal : TEXCOORD1,
     float4 iWorldPos : TEXCOORD2,
+    float2 iDetailTexCoord : TEXCOORD3,
     #ifdef PERPIXEL
         #ifdef SHADOW
             float4 iShadowPos[NUMCASCADES] : TEXCOORD4,
@@ -125,9 +120,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
     float3 weights = tex2D(sWeightMap0, iTexCoord).rgb;
     float sumWeights = weights.r + weights.g + weights.b;
     weights /= sumWeights;
-    float2 detailTexCoord = cDetailTiling * iTexCoord;
-    float4 diffColor = cMatDiffColor * (weights.r * tex2D(sDetailMap1, detailTexCoord) +
-        weights.g * tex2D(sDetailMap2, detailTexCoord) + weights.b * tex2D(sDetailMap3, detailTexCoord));
+    float4 diffColor = cMatDiffColor * (
+        weights.r * tex2D(sDetailMap1, iDetailTexCoord) +
+        weights.g * tex2D(sDetailMap2, iDetailTexCoord) +
+        weights.b * tex2D(sDetailMap3, iDetailTexCoord)
+    );
 
     // Get material specular albedo
     float3 specColor = cMatSpecColor.rgb;

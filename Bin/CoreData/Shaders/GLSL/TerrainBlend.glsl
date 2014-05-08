@@ -6,6 +6,7 @@
 #include "Fog.glsl"
 
 varying vec2 vTexCoord;
+varying vec2 vDetailTexCoord;
 varying vec3 vNormal;
 varying vec4 vWorldPos;
 #ifdef PERPIXEL
@@ -29,13 +30,12 @@ varying vec4 vWorldPos;
     #endif
 #endif
 
-#ifdef COMPILEPS
 uniform sampler2D sWeightMap0;
 uniform sampler2D sDetailMap1;
 uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
+
 uniform vec2 cDetailTiling;
-#endif
 
 void VS()
 {
@@ -45,6 +45,7 @@ void VS()
     vNormal = GetWorldNormal(modelMatrix);
     vWorldPos = vec4(worldPos, GetDepth(gl_Position));
     vTexCoord = GetTexCoord(iTexCoord);
+    vDetailTexCoord = cDetailTiling * vTexCoord;
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
@@ -94,9 +95,11 @@ void PS()
     vec3 weights = texture2D(sWeightMap0, vTexCoord).rgb;
     float sumWeights = weights.r + weights.g + weights.b;
     weights /= sumWeights;
-    vec2 detailTexCoord = cDetailTiling * vTexCoord;
-    vec4 diffColor = cMatDiffColor * (weights.r * texture2D(sDetailMap1, detailTexCoord) +
-        weights.g * texture2D(sDetailMap2, detailTexCoord) + weights.b * texture2D(sDetailMap3, detailTexCoord));
+    vec4 diffColor = cMatDiffColor * (
+        weights.r * texture2D(sDetailMap1, vDetailTexCoord) +
+        weights.g * texture2D(sDetailMap2, vDetailTexCoord) + 
+        weights.b * texture2D(sDetailMap3, vDetailTexCoord)
+    );
 
     // Get material specular albedo
     vec3 specColor = cMatSpecColor.rgb;
