@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "CheckBox.h"
+#include "Console.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "Cursor.h"
@@ -288,6 +289,12 @@ void UI::Clear()
     rootModalElement_->RemoveAllChildren();
     if (cursor_)
         rootElement_->AddChild(cursor_);
+    Console* console = GetSubsystem<Console>();
+    if (console)
+    {
+        rootElement_->AddChild(console->GetBackground());
+        rootElement_->AddChild(console->GetCloseButton());
+    }
 }
 
 void UI::Update(float timeStep)
