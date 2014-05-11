@@ -147,6 +147,7 @@ void Console::SetVisible(bool enable)
     }
     else
     {
+        rowContainer_->SetFocus(false);
         interpreters_->SetFocus(false);
         lineEdit_->SetFocus(false);
 
