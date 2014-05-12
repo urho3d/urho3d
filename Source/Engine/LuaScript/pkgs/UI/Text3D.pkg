@@ -25,8 +25,7 @@ class Text3D : public Drawable
     void SetColor(const Color& color);
     void SetColor(Corner corner, const Color& color);
     void SetOpacity(float opacity);
-    void SetFaceCamera(bool enable);
-    void SetFaceCameraAxes(const Vector3& axes);
+    void SetFaceCameraMode(FaceCameraMode mode);
     
     Font* GetFont() const;
     Material* GetMaterial() const;
@@ -49,8 +48,7 @@ class Text3D : public Drawable
     IntVector2 GetCharSize(unsigned index);
     const Color& GetColor(Corner corner) const;
     float GetOpacity() const;
-    bool GetFaceCamera() const;
-    const Vector3& GetFaceCameraAxes() const;
+    FaceCameraMode GetFaceCameraMode() const;
     
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
@@ -70,8 +68,7 @@ class Text3D : public Drawable
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
     tolua_property__get_set float opacity;
-    tolua_property__get_set bool faceCamera;
-    tolua_property__get_set Vector3& faceCameraAxes;
+    tolua_property__get_set FaceCameraMode faceCameraMode;
 };
 
 ${

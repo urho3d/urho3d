@@ -988,6 +988,13 @@ static void RegisterAnimationController(asIScriptEngine* engine)
 
 static void RegisterBillboardSet(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("FaceCameraMode");
+    engine->RegisterEnumValue("FaceCameraMode", "FC_NONE", FC_NONE);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_XYZ", FC_ROTATE_XYZ);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_Y", FC_ROTATE_Y);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_XYZ", FC_LOOKAT_XYZ);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_Y", FC_LOOKAT_Y);
+    
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -1010,10 +1017,8 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "bool get_sorted() const", asMETHOD(BillboardSet, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_scaled(bool)", asMETHOD(BillboardSet, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "bool get_scaled() const", asMETHOD(BillboardSet, IsScaled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_faceCamera(bool)", asMETHOD(BillboardSet, SetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_faceCamera() const", asMETHOD(BillboardSet, GetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraAxes(const Vector3&)", asMETHOD(BillboardSet, SetFaceCameraAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const Vector3& get_faceCameraAxes() const", asMETHOD(BillboardSet, GetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(BillboardSet, SetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "FaceCameraMode get_faceCameraMode() const", asMETHOD(BillboardSet, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHOD(BillboardSet, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHOD(BillboardSet, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHOD(BillboardSet, GetBillboard), asCALL_THISCALL);
@@ -1056,10 +1061,8 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_sorted() const", asMETHOD(ParticleEmitter, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_scaled(bool)", asMETHOD(ParticleEmitter, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCamera(bool)", asMETHOD(ParticleEmitter, SetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "bool get_faceCamera() const", asMETHOD(ParticleEmitter, GetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCameraAxes(const Vector3&)", asMETHOD(ParticleEmitter, SetFaceCameraAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_faceCameraAxes() const", asMETHOD(ParticleEmitter, GetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(ParticleEmitter, SetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "FaceCameraMode get_faceCameraMode() const", asMETHOD(ParticleEmitter, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_updateInvisible(bool)", asMETHOD(ParticleEmitter, SetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_updateInvisible() const", asMETHOD(ParticleEmitter, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);

@@ -399,7 +399,7 @@ void SpawnPlayer(Connection@ connection)
         text3D.text = players[playerIndex].name;
         text3D.horizontalAlignment = HA_CENTER;
         text3D.verticalAlignment = VA_CENTER;
-        text3D.faceCamera = true;
+        text3D.faceCameraMode = FC_ROTATE_XYZ;
     }
 }
 

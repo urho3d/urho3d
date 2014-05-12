@@ -88,10 +88,8 @@ public:
     void SetColor(Corner corner, const Color& color);
     /// Set opacity.
     void SetOpacity(float opacity);
-    /// Set whether to face the camera automatically.
-    void SetFaceCamera(bool enable);
-    /// Set on which axes the text faces the camera. Default all axes (1,1,1). Negative axes imply facing away.
-    void SetFaceCameraAxes(const Vector3& axes);
+    /// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
+    void SetFaceCameraMode(FaceCameraMode mode);
     
     /// Return font.
     Font* GetFont() const;
@@ -135,10 +133,8 @@ public:
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
-    /// Return whether faces the camera automatically.
-    bool GetFaceCamera() const { return faceCamera_; }
-    /// Return on which coordinate axes camera facing is done.
-    const Vector3& GetFaceCameraAxes() const { return faceCameraAxes_; }
+    /// Return how the text rotates in relation to the camera.
+    FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
     
     /// Set font attribute.
     void SetFontAttr(ResourceRef value);
@@ -181,10 +177,8 @@ private:
     PODVector<float> uiVertexData_;
     /// Custom world transform for facing the camera automatically.
     Matrix3x4 customWorldTransform_;
-    /// Coordinate axes on which camera facing is done.
-    Vector3 faceCameraAxes_;
-    /// Face camera flag.
-    bool faceCamera_;
+    /// Text rotation mode in relation to the camera.
+    FaceCameraMode faceCameraMode_;
     /// Text needs update flag.
     bool textDirty_;
     /// Geometry dirty flag.
