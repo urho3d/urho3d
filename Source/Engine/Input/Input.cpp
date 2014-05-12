@@ -70,6 +70,11 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
+UIElement* TouchState::GetTouchedElement()
+{
+    return touchedElement_.Get();
+}
+
 void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
 {
     buttons_.Resize(numButtons);

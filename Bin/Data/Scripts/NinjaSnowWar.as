@@ -893,7 +893,7 @@ void UpdateControls()
             for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState@ touch = input.touches[i];
-                if (touch.touchedElement.Get() is null)
+                if (touch.touchedElement is null)
                 {
                     // Touch on empty space
                     playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;

@@ -39,6 +39,9 @@ class XMLFile;
 /// %Input state for a finger touch.
 struct TouchState
 {
+    /// Return last touched UI element, used by scripting integration.
+    UIElement* GetTouchedElement();
+    
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.

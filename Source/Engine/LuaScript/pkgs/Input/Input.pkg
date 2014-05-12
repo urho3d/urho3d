@@ -3,12 +3,15 @@ $#include "Input.h"
 
 struct TouchState
 {
+    UIElement* GetTouchedElement();
+
     int touchID_ @ touchID;
     IntVector2 position_ @ position;
     IntVector2 lastPosition_ @ lastPosition;
     IntVector2 delta_ @ delta;
     float pressure_ @ pressure;
-    WeakPtr<UIElement> touchedElement_ @ touchedElement;
+
+    tolua_readonly tolua_property__get_set UIElement* touchedElement;
 };
 
 struct JoystickState

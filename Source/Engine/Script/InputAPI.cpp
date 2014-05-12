@@ -453,7 +453,6 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TouchState", "const IntVector2 lastPosition", offsetof(TouchState, lastPosition_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 delta", offsetof(TouchState, delta_));
     engine->RegisterObjectProperty("TouchState", "const float pressure", offsetof(TouchState, pressure_));
-    engine->RegisterObjectProperty("TouchState", "const WeakHandle touchedElement", offsetof(TouchState, touchedElement_));
 
     engine->RegisterObjectType("JoystickState", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
