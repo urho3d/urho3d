@@ -10388,7 +10388,7 @@ Properties:
 - IntVector2 position
 - float pressure
 - int touchID
-- WeakHandle touchedElement
+- UIElement@ touchedElement // readonly
 
 
 ### UI

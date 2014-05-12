@@ -9969,7 +9969,8 @@ IntVector2 lastPosition;
 IntVector2 position;
 float pressure;
 int touchID;
-WeakHandle touchedElement;
+/* readonly */
+UIElement touchedElement;
 };
 
 class UI

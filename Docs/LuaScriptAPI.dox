@@ -5082,6 +5082,10 @@ Properties:
 ### TouchState
 
 
+Methods:
+
+- UIElement* GetTouchedElement()
+
 Properties:
 
 - int touchID
@@ -5089,7 +5093,7 @@ Properties:
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
-- WeakPtr<UIElement> touchedElement
+- UIElement* touchedElement (readonly)
 
 ### UI : Object
 
