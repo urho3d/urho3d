@@ -590,8 +590,7 @@ float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
-bool faceCamera;
-Vector3 faceCameraAxes;
+FaceCameraMode faceCameraMode;
 /* readonly */
 uint id;
 /* readonly */
@@ -6133,8 +6132,7 @@ bool emitting;
 bool enabled;
 /* readonly */
 bool enabledEffective;
-bool faceCamera;
-Vector3 faceCameraAxes;
+FaceCameraMode faceCameraMode;
 /* readonly */
 uint id;
 /* readonly */
@@ -9475,8 +9473,7 @@ float effectDepthBias;
 bool enabled;
 /* readonly */
 bool enabledEffective;
-bool faceCamera;
-Vector3 faceCameraAxes;
+FaceCameraMode faceCameraMode;
 /* readonly */
 Font font;
 /* readonly */
@@ -11167,6 +11164,15 @@ enum EmitterType2D
 {
 EMITTER_TYPE_GRAVITY,
 EMITTER_TYPE_RADIAL,
+};
+
+enum FaceCameraMode
+{
+FC_NONE,
+FC_ROTATE_XYZ,
+FC_ROTATE_Y,
+FC_LOOKAT_XYZ,
+FC_LOOKAT_Y,
 };
 
 enum FileMode

@@ -300,8 +300,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
-- void SetFaceCamera(bool enable)
-- void SetFaceCameraAxes(const Vector3& axes)
+- void SetFaceCameraMode(FaceCameraMode mode)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -310,8 +309,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
-- bool GetFaceCamera() const
-- const Vector3& GetFaceCameraAxes() const
+- FaceCameraMode GetFaceCameraMode() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -321,8 +319,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
-- bool faceCamera
-- Vector3& faceCameraAxes
+- FaceCameraMode faceCameraMode
 - float animationLodBias
 
 ### Bone
@@ -4921,8 +4918,7 @@ Methods:
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
-- void SetFaceCamera(bool enable)
-- void SetFaceCameraAxes(const Vector3& axes)
+- void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
 - int GetFontSize() const
@@ -4944,8 +4940,7 @@ Methods:
 - IntVector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
-- bool GetFaceCamera() const
-- const Vector3& GetFaceCameraAxes() const
+- FaceCameraMode GetFaceCameraMode() const
 
 Properties:
 
@@ -4967,8 +4962,7 @@ Properties:
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
-- bool faceCamera
-- Vector3& faceCameraAxes
+- FaceCameraMode faceCameraMode
 
 ### Texture : Resource
 
@@ -6164,6 +6158,14 @@ Properties:
 
 - int EMITTER_TYPE_GRAVITY
 - int EMITTER_TYPE_RADIAL
+
+### FaceCameraMode
+
+- int FC_NONE
+- int FC_ROTATE_XYZ
+- int FC_ROTATE_Y
+- int FC_LOOKAT_XYZ
+- int FC_LOOKAT_Y
 
 ### FileMode
 
