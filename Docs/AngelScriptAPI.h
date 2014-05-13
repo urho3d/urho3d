@@ -4346,6 +4346,8 @@ String GetScancodeName(int) const;
 uint LoadGestures(File);
 uint LoadGestures(VectorBuffer&);
 bool RecordGesture();
+void RemoveAllGestures();
+bool RemoveGesture(uint);
 bool RemoveScreenJoystick(int);
 bool SaveGesture(File, uint);
 bool SaveGesture(VectorBuffer&, uint);

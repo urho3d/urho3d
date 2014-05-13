@@ -2034,6 +2034,8 @@ Methods:
 - bool SaveGestures(const String fileName)
 - bool SaveGesture(const String fileName, unsigned gestureID)
 - unsigned LoadGestures(const String fileName)
+- bool RemoveGesture(unsigned gestureID)
+- void RemoveAllGestures()
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
