@@ -52,6 +52,8 @@ class Input : public Object
     tolua_outside bool InputSaveGestures @ SaveGestures(const String fileName);
     tolua_outside bool InputSaveGesture @ SaveGesture(const String fileName, unsigned gestureID);
     tolua_outside unsigned InputLoadGestures @ LoadGestures(const String fileName);
+    bool RemoveGesture(unsigned gestureID);
+    void RemoveAllGestures();
 
     int GetKeyFromName(const String name) const;
     int GetKeyFromScancode(int scancode) const;

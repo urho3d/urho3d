@@ -605,6 +605,16 @@ unsigned Input::LoadGestures(Deserializer& source)
     return SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
 }
 
+bool Input::RemoveGesture(unsigned gestureID)
+{
+    return SDL_RemoveDollarTemplate(gestureID);
+}
+
+void Input::RemoveAllGestures()
+{
+    SDL_RemoveAllDollarTemplates();
+}
+
 SDL_JoystickID Input::OpenJoystick(unsigned index)
 {
     SDL_Joystick* joystick = SDL_JoystickOpen(index);

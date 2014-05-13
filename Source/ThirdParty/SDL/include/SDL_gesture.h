@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /**
  *  \file SDL_gesture.h
  *
@@ -75,6 +77,10 @@ extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_R
  */
 extern DECLSPEC int SDLCALL SDL_LoadDollarTemplates(SDL_TouchID touchId, SDL_RWops *src);
 
+
+// Urho3d: added functions
+extern DECLSPEC int SDLCALL SDL_RemoveDollarTemplate(SDL_GestureID gestureId);
+extern DECLSPEC void SDLCALL SDL_RemoveAllDollarTemplates(void);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
