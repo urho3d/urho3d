@@ -6,12 +6,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -19,10 +13,10 @@ void Start()
 
     // Create the scene content
     CreateScene();
-    
+
     // Create the UI content
     CreateInstructions();
-    
+
     // Setup the viewport for displaying the scene
     SetupViewport();
 
@@ -33,7 +27,7 @@ void Start()
 void CreateScene()
 {
     scene_ = Scene();
-    
+
     // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_.CreateComponent("Octree");
@@ -168,7 +162,7 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = 
+    instructionText.text =
         "Use WASD keys and mouse to move\n"
         "Space to toggle debug geometry";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
@@ -278,3 +272,16 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
     if (drawDebug)
         renderer.DrawDebugGeometry(true);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

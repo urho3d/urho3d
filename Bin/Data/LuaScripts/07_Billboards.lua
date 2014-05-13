@@ -6,12 +6,8 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
 local lightNodes = {}
 local billboardNodes = {}
-local yaw = 0.0
-local pitch = 0.0
 local drawDebug = false
 
 function Start()
@@ -20,7 +16,7 @@ function Start()
 
     -- Create the scene content
     CreateScene()
-    
+
     -- Create the UI content
     CreateInstructions()
 
@@ -111,7 +107,7 @@ function CreateScene()
 
         -- After modifying the billboards, they need to be "commited" so that the BillboardSet updates its internals
         billboardObject:Commit()
-        
+
         table.insert(billboardNodes, smokeNode)
     end
 
@@ -148,7 +144,7 @@ function CreateScene()
         -- The spot lights will not have anything near them, so move the near plane of the shadow camera farther
         -- for better shadow depth resolution
         light.shadowNearFarRatio = 0.01
-        
+
         table.insert(lightNodes, lightNode)
     end
 
@@ -269,4 +265,19 @@ function HandlePostRenderUpdate(eventType, eventData)
     if drawDebug then
         renderer:DrawDebugGeometry(true)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

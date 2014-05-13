@@ -7,11 +7,7 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
 local boxNodes = {}
-local yaw = 0.0
-local pitch = 0.0
 local animate = false
 local useGroups = false
 
@@ -51,13 +47,12 @@ function CreateScene()
     zone.fogColor = Color(0.2, 0.2, 0.2)
     zone.fogStart = 200.0
     zone.fogEnd = 300.0
-    
+
     -- Create a directional light
     local lightNode = scene_:CreateChild("DirectionalLight")
     lightNode.direction = Vector3(-0.6, -1.0, -0.8) -- The direction vector does not need to be normalized
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
-
 
     if not useGroups then
         light.color = Color(0.7, 0.35, 0.0)
@@ -74,8 +69,8 @@ function CreateScene()
             end
         end
     else
-        light.color = Color(0.6, 0.6, 0.6);
-        light.specularIntensity = 1.5;
+        light.color = Color(0.6, 0.6, 0.6)
+        light.specularIntensity = 1.5
 
         -- Create StaticModelGroups in the scene
         local lastGroup = nil
@@ -91,11 +86,11 @@ function CreateScene()
                     lastGroup.model = cache:GetResource("Model", "Models/Box.mdl")
                 end
 
-                local boxNode = scene_:CreateChild("Box");
+                local boxNode = scene_:CreateChild("Box")
                 boxNode.position = Vector3(x * 0.3, 0.0, y * 0.3)
                 boxNode:SetScale(0.25)
                 table.insert(boxNodes, boxNode)
-                lastGroup:AddInstanceNode(boxNode);
+                lastGroup:AddInstanceNode(boxNode)
             end
         end
     end
@@ -118,7 +113,7 @@ function CreateInstructions()
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER
-    
+
     -- Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER
     instructionText.verticalAlignment = VA_CENTER
@@ -197,9 +192,32 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
-    
+
     -- Animate scene if enabled
     if animate then
         AnimateObjects(timeStep)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Group</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"G\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Animation</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

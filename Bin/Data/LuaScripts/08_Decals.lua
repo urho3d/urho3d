@@ -7,12 +7,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -93,7 +87,7 @@ function CreateScene()
             boxObject.occluder = true
         end
     end
-    
+
     -- Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_:CreateChild("Camera")
     local camera = cameraNode:CreateComponent("Camera")
@@ -112,7 +106,7 @@ function CreateUI()
     ui.cursor = cursor
     -- Set starting position of the cursor at the rendering window center
     cursor:SetPosition(graphics.width / 2, graphics.height / 2)
-    
+
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text =
@@ -153,7 +147,7 @@ function MoveCamera(timeStep)
     if ui.focusElement ~= nil then
         return
     end
-    
+
     -- Movement speed as world units per second
     local MOVE_SPEED = 20.0
     -- Mouse sensitivity as degrees per pixel
@@ -252,4 +246,27 @@ function HandlePostRenderUpdate(eventType, eventData)
     if drawDebug then
         renderer:DrawDebugGeometry(false)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Paint</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"LEFT\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

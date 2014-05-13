@@ -29,7 +29,7 @@ void Start()
 
     // Create the user interface
     CreateUI();
-    
+
     // Subscribe to UI and network events
     SubscribeToEvents();
 }
@@ -50,10 +50,10 @@ void CreateUI()
     buttonContainer.SetFixedSize(graphics.width, 20);
     buttonContainer.SetPosition(0, graphics.height - 20);
     buttonContainer.layoutMode = LM_HORIZONTAL;
-    
+
     textEdit = buttonContainer.CreateChild("LineEdit");
     textEdit.SetStyleAuto();
-    
+
     sendButton = CreateButton("Send", 70);
     connectButton = CreateButton("Connect", 90);
     disconnectButton = CreateButton("Disconnect", 100);
@@ -78,7 +78,7 @@ void SubscribeToEvents()
 
     // Subscribe to log messages so that we can pipe them to the chat window
     SubscribeToEvent("LogMessage", "HandleLogMessage");
-    
+
     // Subscribe to network events
     SubscribeToEvent("NetworkMessage", "HandleNetworkMessage");
     SubscribeToEvent("ServerConnected", "HandleConnectionStatus");
@@ -89,7 +89,7 @@ void SubscribeToEvents()
 Button@ CreateButton(const String&in text, int width)
 {
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
-    
+
     Button@ button = buttonContainer.CreateChild("Button");
     button.SetStyleAuto();
     button.SetFixedWidth(width);
@@ -98,7 +98,7 @@ Button@ CreateButton(const String&in text, int width)
     buttonText.SetFont(font, 12);
     buttonText.SetAlignment(HA_CENTER, VA_CENTER);
     buttonText.text = text;
-    
+
     return button;
 }
 
@@ -111,7 +111,7 @@ void ShowChatText(const String& row)
     String allRows;
     for (uint i = 0; i < chatHistory.length; ++i)
         allRows += chatHistory[i] + "\n";
-    
+
     chatHistoryText.text = allRows;
 }
 
@@ -119,7 +119,7 @@ void UpdateButtons()
 {
     Connection@ serverConnection = network.serverConnection;
     bool serverRunning = network.serverRunning;
-    
+
     // Show and hide buttons so that eg. Connect and Disconnect are never shown at the same time
     sendButton.visible = serverConnection !is null;
     connectButton.visible = serverConnection is null && !serverRunning;
@@ -139,7 +139,7 @@ void HandleSend(StringHash eventType, VariantMap& eventData)
         return; // Do not send an empty message
 
     Connection@ serverConnection = network.serverConnection;
-    
+
     if (serverConnection !is null)
     {
         // A VectorBuffer object is convenient for constructing a message to send
@@ -159,12 +159,12 @@ void HandleConnect(StringHash eventType, VariantMap& eventData)
         address = "localhost"; // Use localhost to connect if nothing else specified
     // Empty the text edit after reading the address to connect to
     textEdit.text = "";
-    
+
     // Connect to server, do not specify a client scene as we are not using scene replication, just messages.
     // At connect time we could also send identity parameters (such as username) in a VariantMap, but in this
     // case we skip it for simplicity
     network.Connect(address, CHAT_SERVER_PORT, null);
-    
+
     UpdateButtons();
 }
 
@@ -177,7 +177,7 @@ void HandleDisconnect(StringHash eventType, VariantMap& eventData)
     // Or if we were running a server, stop it
     else if (network.serverRunning)
         network.StopServer();
-    
+
     UpdateButtons();
 }
 
@@ -195,21 +195,21 @@ void HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
     {
         VectorBuffer msg = eventData["Data"].GetBuffer();
         String text = msg.ReadString();
-        
+
         // If we are the server, prepend the sender's IP address and port and echo to everyone
         // If we are a client, just display the message
         if (network.serverRunning)
         {
             Connection@ sender = eventData["Connection"].GetPtr();
-            
+
             text = sender.ToString() + " " + text;
-            
+
             VectorBuffer sendMsg;
             sendMsg.WriteString(text);
             // Broadcast as in-order and reliable
             network.BroadcastMessage(MSG_CHAT, true, true, sendMsg);
         }
-        
+
         ShowChatText(text);
     }
 }
@@ -218,3 +218,14 @@ void HandleConnectionStatus(StringHash eventType, VariantMap& eventData)
 {
     UpdateButtons();
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button2']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "</patch>";

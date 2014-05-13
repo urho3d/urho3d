@@ -6,12 +6,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -41,7 +35,7 @@ void CreateScene()
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("PhysicsWorld");
     scene_.CreateComponent("DebugRenderer");
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -50,7 +44,7 @@ void CreateScene()
     zone.fogColor = Color(0.5f, 0.5f, 0.7f);
     zone.fogStart = 100.0f;
     zone.fogEnd = 300.0f;
-    
+
     // Create a directional light to the world. Enable cascaded shadows on it
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
     lightNode.direction = Vector3(0.6f, -1.0f, 0.8f);
@@ -98,7 +92,7 @@ void CreateScene()
             shape.SetTriangleMesh(mushroomObject.model);
         }
     }
-    
+
     {
         // Create a large amount of falling physics objects
         const uint NUM_OBJECTS = 1000;
@@ -121,7 +115,7 @@ void CreateScene()
             shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
         }
     }
-    
+
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load / save
     cameraNode = Node();
@@ -260,3 +254,24 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
     if (drawDebug)
         scene_.physicsWorld.DrawDebugGeometry(true);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Spawn</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "            <attribute name=\"Text\" value=\"LEFT\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";
