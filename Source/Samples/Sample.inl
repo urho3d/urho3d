@@ -95,11 +95,8 @@ void Sample::InitTouchInput()
     if (!patchString.Empty())
     {
         // Patch the screen joystick layout further on demand
-        VectorBuffer buffer;
-        buffer.WriteString(patchString);
-        buffer.Seek(0);
         SharedPtr<XMLFile> patchFile(new XMLFile(context_));
-        if (patchFile->Load(buffer))
+        if (patchFile->FromString(patchString))
             layout->Patch(patchFile);
     }
     screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));

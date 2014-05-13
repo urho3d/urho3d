@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Deserializer.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Serializer.h"
@@ -144,6 +145,15 @@ XMLElement XMLFile::CreateRoot(const String& name)
     document_->reset();
     pugi::xml_node root = document_->append_child(name.CString());
     return XMLElement(this, root.internal_object());
+}
+
+bool XMLFile::FromString(const String& source)
+{
+    if (source.Empty())
+        return false;
+    
+    MemoryBuffer buffer(source.CString(), source.Length());
+    return Load(buffer);
 }
 
 XMLElement XMLFile::GetRoot(const String& name)

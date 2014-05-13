@@ -5,9 +5,10 @@ class XMLFile : public Resource
     XMLFile();
     ~XMLFile();
 
+    bool FromString(const String source);
     XMLElement CreateRoot(const String name = String::EMPTY);
     XMLElement GetRoot(const String name = String::EMPTY);
-            
+
     void Patch(XMLFile* patchFile);
     void Patch(XMLElement patchElement);
 };
