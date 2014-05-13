@@ -11143,6 +11143,7 @@ class XMLFile
 {
 // Methods:
 XMLElement CreateRoot(const String&);
+bool FromString(const String&);
 XMLElement GetRoot(const String& = String ( ));
 bool Load(File);
 bool Load(VectorBuffer&);

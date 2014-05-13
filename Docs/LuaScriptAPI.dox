@@ -5992,6 +5992,7 @@ Methods:
 - XMLFile() (GC)
 - XMLFile* new()
 - void delete()
+- bool FromString(const String source)
 - XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
 - void Patch(XMLFile* patchFile)
