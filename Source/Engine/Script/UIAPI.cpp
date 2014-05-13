@@ -46,6 +46,11 @@
 namespace Urho3D
 {
 
+static bool FontSaveXMLVectorBuffer(VectorBuffer& buffer, int pointSize, bool usedGlyphs, Font* ptr)
+{
+    return ptr->SaveXML(buffer, pointSize, usedGlyphs);
+}
+
 static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, Font* ptr)
 {
     if (fileName.Empty())
@@ -59,6 +64,7 @@ static void RegisterFont(asIScriptEngine* engine)
 {
     RegisterResource<Font>(engine, "Font");
     engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool arg2 = false)", asMETHOD(Font, SaveXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool arg2 = false)", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool arg2 = false)", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
 }
 
@@ -586,6 +592,14 @@ static UIElement* UILoadLayoutFromFile(File* file, UI* ptr)
         return 0;
 }
 
+static UIElement* UILoadLayoutFromVectorBuffer(VectorBuffer& buffer, UI* ptr)
+{
+    SharedPtr<UIElement> root = ptr->LoadLayout(buffer);
+    if (root)
+        root->AddRef();
+    return root.Get();
+}
+
 static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, UI* ptr)
 {
     if (file)
@@ -597,6 +611,14 @@ static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, 
     }
     else
         return 0;
+}
+
+static UIElement* UILoadLayoutFromVectorBufferWithStyle(VectorBuffer& buffer, XMLFile* styleFile, UI* ptr)
+{
+    SharedPtr<UIElement> root = ptr->LoadLayout(buffer, styleFile);
+    if (root)
+        root->AddRef();
+    return root.Get();
 }
 
 static UIElement* UILoadLayout(XMLFile* file, UI* ptr)
@@ -620,6 +642,11 @@ static bool UISaveLayout(File* file, UIElement* element, UI* ptr)
     return file && ptr->SaveLayout(*file, element);
 }
 
+static bool UISaveLayoutVectorBuffer(VectorBuffer& buffer, UIElement* element, UI* ptr)
+{
+    return ptr->SaveLayout(buffer, element);
+}
+
 static void UISetFocusElement(UIElement* element, UI* ptr)
 {
     ptr->SetFocusElement(element);
@@ -632,9 +659,12 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void DebugDraw(UIElement@+)", asMETHOD(UI, DebugDraw), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(File@+)", asFUNCTION(UILoadLayoutFromFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(File@+, XMLFile@+)", asFUNCTION(UILoadLayoutFromFileWithStyle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(VectorBuffer&)", asFUNCTION(UILoadLayoutFromVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(VectorBuffer&, XMLFile@+)", asFUNCTION(UILoadLayoutFromVectorBufferWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+, XMLFile@+)", asFUNCTION(UILoadLayoutWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "bool SaveLayout(File@+, UIElement@+)", asFUNCTION(UISaveLayout), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "bool SaveLayout(VectorBuffer&, UIElement@+)", asFUNCTION(UISaveLayoutVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "void SetFocusElement(UIElement@+, bool byKey = false)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);

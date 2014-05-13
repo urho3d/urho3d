@@ -390,18 +390,22 @@ static const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Seriali
 
 static bool SerializableLoad(File* file, bool setInstanceDefault, Serializable* ptr)
 {
-    if (file)
-        return ptr->Load(*file, setInstanceDefault);
-    else
-        return false;
+    return file && ptr->Load(*file, setInstanceDefault);
+}
+
+static bool SerializableLoadVectorBuffer(VectorBuffer& buffer, bool setInstanceDefault, Serializable* ptr)
+{
+    return ptr->Load(buffer, setInstanceDefault);
 }
 
 static bool SerializableSave(File* file, Serializable* ptr)
 {
-    if (file)
-        return ptr->Save(*file);
-    else
-        return false;
+    return file && ptr->Save(*file);
+}
+
+static bool SerializableSaveVectorBuffer(VectorBuffer& buffer, Serializable* ptr)
+{
+    return ptr->Save(buffer);
 }
 
 /// Template function for registering a class derived from Serializable.
@@ -409,7 +413,9 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
 {
     RegisterObject<T>(engine, className);
     engine->RegisterObjectMethod(className, "bool Load(File@+, bool setInstanceDefault = false)", asFUNCTION(SerializableLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&, bool setInstanceDefault = false)", asFUNCTION(SerializableLoadVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(SerializableSave), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(SerializableSaveVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&, bool setInstanceDefault = false)", asMETHODPR(T, LoadXML, (const XMLElement&, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", asMETHODPR(T, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
@@ -692,9 +698,19 @@ static bool ResourceLoad(File* file, XMLFile* ptr)
     return file && ptr->Load(*file);
 }
 
+static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, XMLFile* ptr)
+{
+    return ptr->Load(buffer);
+}
+
 static bool ResourceSave(File* file, XMLFile* ptr)
 {
     return file && ptr->Save(*file);
+}
+
+static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, XMLFile* ptr)
+{
+    return ptr->Save(buffer);
 }
 
 /// Template function for registering a class derived from Resource.
@@ -709,7 +725,9 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
         RegisterNamedObjectConstructor<T>(engine, className);
     }
     engine->RegisterObjectMethod(className, "bool Load(File@+)", asFUNCTION(ResourceLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&)", asFUNCTION(ResourceLoadVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(ResourceSave), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(ResourceSaveVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_name(const String&in) const", asMETHODPR(T, SetName, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHODPR(T, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_memoryUse() const", asMETHODPR(T, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
@@ -826,6 +844,11 @@ static bool UIElementLoadXML(File* file, UIElement* ptr)
     return file && ptr->LoadXML(*file);
 }
 
+static bool UIElementLoadXMLVectorBuffer(VectorBuffer& buffer, UIElement* ptr)
+{
+    return ptr->LoadXML(buffer);
+}
+
 static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 {
     if (file)
@@ -851,6 +874,11 @@ static bool UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* 
 static bool UIElementSaveXML(File* file, UIElement* ptr)
 {
     return file && ptr->SaveXML(*file);
+}
+
+static bool UIElementSaveXMLVectorBuffer(VectorBuffer& buffer, UIElement* ptr)
+{
+    return ptr->SaveXML(buffer);
 }
 
 static UIElement* UIElementCreateChild(const String& typeName, const String& name, unsigned index, UIElement* ptr)
@@ -921,10 +949,12 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool LoadXML(VectorBuffer&)", asFUNCTIONPR(UIElementLoadXMLVectorBuffer, (VectorBuffer&, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadChildXML(const XMLElement&in, XMLFile@+ arg1 = null, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadChildXML(XMLFile@+, XMLFile@+ arg1 = null)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&)", asFUNCTION(UIElementSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetStyle(const String&in, XMLFile@+ arg1 = null)", asMETHODPR(T, SetStyle, (const String&, XMLFile*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetStyleAuto(XMLFile@+ arg0 = null)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);

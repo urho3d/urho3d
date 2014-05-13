@@ -1991,11 +1991,13 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -2038,6 +2040,7 @@ Methods:
 - float GetMorphWeight(uint) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2050,6 +2053,7 @@ Methods:
 - void ResetMorphWeights()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -2119,12 +2123,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -2185,9 +2191,11 @@ Methods:
 
 - void AddTrigger(float, bool, const Variant&)
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - void RemoveAllTriggers()
 - void RemoveTrigger(uint)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -2215,7 +2223,9 @@ Methods:
 - Sprite@ GetFrameSprite(uint) const
 - Sprite@ GetFrameSpriteByTime(float) const
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -2260,6 +2270,7 @@ Methods:
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - bool Play(const String&, uint8, bool, float = 0.0f)
@@ -2268,6 +2279,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -2443,12 +2455,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -2540,9 +2554,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2554,7 +2570,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -2724,9 +2742,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2738,7 +2758,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -2868,12 +2890,14 @@ Methods:
 - Ray GetScreenRay(float, float) const
 - Frustum GetSplitFrustum(float, float) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - Vector3 ScreenToWorldPoint(const Vector3&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -2966,9 +2990,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -2980,7 +3006,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -3101,12 +3129,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3163,12 +3193,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3224,12 +3256,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3283,12 +3317,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3343,12 +3379,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3403,12 +3441,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3468,12 +3508,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3571,12 +3613,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3684,12 +3728,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3745,12 +3791,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3794,12 +3842,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3847,12 +3897,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3899,12 +3951,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -3951,12 +4005,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4005,12 +4061,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4058,12 +4116,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4115,12 +4175,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4169,12 +4231,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4225,12 +4289,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4277,12 +4343,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4329,12 +4397,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4417,9 +4487,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -4431,7 +4503,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -4560,12 +4634,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4662,12 +4738,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4710,6 +4788,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4718,6 +4797,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4847,12 +4927,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4908,12 +4990,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -4990,9 +5074,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -5007,7 +5093,9 @@ Methods:
 - void RemoveItem(uint)
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -5338,8 +5426,11 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@, int, bool = false)
+- bool SaveXML(VectorBuffer&, int, bool = false)
 - bool SaveXML(const String&, int, bool = false)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
@@ -5388,6 +5479,7 @@ Methods:
 - void Maximize()
 - void Minimize()
 - void PrecacheShaders(File@)
+- void PrecacheShaders(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
 - bool SetMode(int, int, bool, bool, bool, bool, bool, int)
@@ -5500,9 +5592,12 @@ Methods:
 - Color GetPixelTrilinear(float, float, float) const
 - Image@ GetSubimage(const IntRect&) const
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool LoadColorLUT(File@)
+- bool LoadColorLUT(VectorBuffer&)
 - void Resize(int, int)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SaveBMP(const String&) const
 - void SaveJPG(const String&, int) const
 - void SavePNG(const String&) const
@@ -5543,10 +5638,13 @@ Methods:
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
 - uint LoadGestures(File@)
+- uint LoadGestures(VectorBuffer&)
 - bool RecordGesture()
 - bool RemoveScreenJoystick(int)
 - bool SaveGesture(File@, uint)
+- bool SaveGesture(VectorBuffer&, uint)
 - bool SaveGestures(File@)
+- bool SaveGestures(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -5625,7 +5723,9 @@ Methods:
 - JSONValue CreateRoot(JSONValueType = JSON_ANY)
 - JSONValue GetRoot(JSONValueType = JSON_ANY)
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -5765,12 +5865,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -5862,9 +5964,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -5876,7 +5980,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6029,9 +6135,11 @@ Methods:
 - bool IsInsideCombined(IntVector2, bool)
 - bool IsSelected(uint) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6047,7 +6155,9 @@ Methods:
 - void RemoveSelection(uint)
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6205,9 +6315,11 @@ Methods:
 - float GetShaderParameterAnimationSpeed(const String&) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String&) const
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Load(const XMLElement&)
 - void RemoveShaderParameter(const String&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool Save(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetShaderParameterAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
@@ -6367,9 +6479,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -6381,7 +6495,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6526,7 +6642,9 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -6559,12 +6677,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -6614,6 +6734,7 @@ Methods:
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), uint = 3)
@@ -6622,6 +6743,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -6714,12 +6836,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -6783,6 +6907,7 @@ Methods:
 - ScriptObject@ GetScriptObject(const String&) const
 - bool HasComponent(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - Vector2 LocalToWorld(const Vector2&) const
 - Vector3 LocalToWorld(const Vector3&) const
@@ -6806,7 +6931,9 @@ Methods:
 - void RotateAround(const Vector2&, float, TransformSpace = TS_LOCAL)
 - void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - void Scale(const Vector2&)
 - void Scale(const Vector3&)
@@ -6912,9 +7039,11 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - void RemoveAttributeAnimation(ValueAnimation@)
 - void RemoveAttributeAnimation(const String&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -6951,6 +7080,7 @@ Methods:
 - Node@[]@ GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
@@ -6960,6 +7090,7 @@ Methods:
 - void RemoveManualDrawable(Drawable@)
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7003,12 +7134,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7069,7 +7202,9 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -7098,6 +7233,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool Load(XMLFile@)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
@@ -7105,6 +7241,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool Save(XMLFile@)
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -7205,12 +7342,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7313,6 +7452,7 @@ Methods:
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float = M_INFINITY, uint = 0xffff)
@@ -7322,6 +7462,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7375,6 +7516,7 @@ Methods:
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(int, int, uint = 0xffff, Camera@ = 0)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult2D[]@ Raycast(const Vector2&, const Vector2&, uint = 0xffff)
@@ -7383,6 +7525,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7725,7 +7868,9 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -7828,6 +7973,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void ReAddBodyToWorld()
@@ -7836,6 +7982,7 @@ Methods:
 - void ResetForces()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7911,12 +8058,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -7993,13 +8142,17 @@ Methods:
 - ScriptObject@ GetScriptObject(const String&) const
 - bool HasComponent(const String&) const
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateXML(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadAsync(File@)
 - bool LoadAsyncXML(File@)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(const XMLElement&, bool = false)
 - Vector2 LocalToWorld(const Vector2&) const
 - Vector3 LocalToWorld(const Vector3&) const
@@ -8024,7 +8177,9 @@ Methods:
 - void RotateAround(const Vector2&, float, TransformSpace = TS_LOCAL)
 - void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - void Scale(const Vector2&)
 - void Scale(const Vector3&)
@@ -8150,7 +8305,9 @@ Methods:
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - bool Execute(const String&, const Variant[]@)
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -8185,12 +8342,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -8252,9 +8411,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -8266,7 +8427,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -8400,9 +8563,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -8414,7 +8579,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -8529,11 +8696,13 @@ Methods:
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -8629,12 +8798,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -8709,9 +8880,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -8723,7 +8896,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -8846,12 +9021,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -8891,7 +9068,9 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -8926,12 +9105,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -8972,6 +9153,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
@@ -8982,6 +9164,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9032,6 +9215,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
@@ -9042,6 +9226,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
@@ -9146,6 +9331,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - Vector3 GetPoint(float) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Move(float)
@@ -9155,6 +9341,7 @@ Methods:
 - void Reset()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9209,9 +9396,11 @@ Methods:
 - uint GetNumChildren(bool) const
 - void InsertChild(uint, UIElement@)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -9223,7 +9412,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
@@ -9303,7 +9494,9 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -9329,7 +9522,9 @@ Methods:
 - void DefineSprite(const String&, const IntRect&, const Vector2&)
 - Sprite2D@ GetSprite(const String&)
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void UpdateSprite(const String&, const IntRect&, const Vector2&)
 
@@ -9363,12 +9558,14 @@ Methods:
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9431,6 +9628,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -9439,6 +9637,7 @@ Methods:
 - void RemoveInstanceNode(Node@)
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9502,12 +9701,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9634,8 +9835,10 @@ Methods:
 - Pass@ CreatePass(StringHash)
 - bool HasPass(StringHash) const
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - void RemovePass(StringHash)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -9677,12 +9880,14 @@ Methods:
 - Vector3 GetNormal(const Vector3&) const
 - TerrainPatch@ GetPatch(int, int) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9743,12 +9948,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -9818,9 +10025,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -9832,7 +10041,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -9963,12 +10174,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
@@ -10043,7 +10256,9 @@ Methods:
 
 - void ClearDataLost()
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetNumLevels(uint)
 
@@ -10082,7 +10297,9 @@ Methods:
 - void ClearDataLost()
 - bool Load(File@)
 - bool Load(Image@, bool = false)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetNumLevels(uint)
 - bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
@@ -10123,7 +10340,9 @@ Methods:
 - void ClearDataLost()
 - bool Load(File@)
 - bool Load(Image@, bool = false)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetNumLevels(uint)
 - bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
@@ -10164,7 +10383,9 @@ Methods:
 - void ClearDataLost()
 - bool Load(CubeMapFace, Image@, bool = false)
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetNumLevels(uint)
 - bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC)
@@ -10261,9 +10482,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -10275,7 +10498,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -10396,9 +10621,12 @@ Methods:
 - bool HasModalElement() const
 - UIElement@ LoadLayout(File@)
 - UIElement@ LoadLayout(File@, XMLFile@)
+- UIElement@ LoadLayout(VectorBuffer&)
+- UIElement@ LoadLayout(VectorBuffer&, XMLFile@)
 - UIElement@ LoadLayout(XMLFile@)
 - UIElement@ LoadLayout(XMLFile@, XMLFile@)
 - bool SaveLayout(File@, UIElement@)
+- bool SaveLayout(VectorBuffer&, UIElement@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetFocusElement(UIElement@, bool = false)
 
@@ -10456,9 +10684,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -10470,7 +10700,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -10572,7 +10804,9 @@ Properties:
 Methods:
 
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetEventFrame(float, const String&, const Variant&)
 - void SetKeyFrame(float, const Variant&)
@@ -10822,9 +11056,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -10837,7 +11073,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -11011,9 +11249,11 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
 - bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
 - bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -11025,7 +11265,9 @@ Methods:
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(File@)
+- bool SaveXML(VectorBuffer&)
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -11214,9 +11456,11 @@ Methods:
 - XMLElement CreateRoot(const String&)
 - XMLElement GetRoot(const String& = String ( ))
 - bool Load(File@)
+- bool Load(VectorBuffer&)
 - void Patch(XMLElement)
 - void Patch(XMLFile@)
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -11276,12 +11520,14 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
+- bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
