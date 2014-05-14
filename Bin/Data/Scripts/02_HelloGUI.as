@@ -32,7 +32,7 @@ void Start()
 
     // Create and add some controls to the Window
     InitControls();
-    
+
     // Create a draggable Fish
     CreateDraggableFish();
 }
@@ -176,3 +176,11 @@ void HandleControlClicked(StringHash eventType, VariantMap& eventData)
     // Update the Window's title text
     windowTitle.text = "Hello " + name + "!";
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "</patch>";

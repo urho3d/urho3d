@@ -1,13 +1,8 @@
-/// Light animation example.
-/// This sample is base on StaticScene, and it demonstrates:
-///     - Usage of attribute animation for light color animation
+// Light animation example.
+// This sample is base on StaticScene, and it demonstrates:
+//     - Usage of attribute animation for light color animation
 
 #include "Scripts/Utilities/Sample.as"
-
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
 
 void Start()
 {
@@ -169,3 +164,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions = "";

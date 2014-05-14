@@ -5,10 +5,29 @@
 --    - Toggle rendering options from the keys 1-8
 --    - Take screenshots with key 9
 --    - Handle Esc key down to hide Console or exit application
+--    - Init touch input on mobile platform using screen joysticks (patched for each individual sample)
 
 local logoSprite = nil
+scene_ = nil -- Scene
+screenJoystickIndex = M_MAX_UNSIGNED -- Screen joystick index for navigational controls (mobile platforms only)
+screenJoystickSettingsIndex = M_MAX_UNSIGNED -- Screen joystick index for settings (mobile platforms only)
+touchEnabled = false -- Flag to indicate whether touch input has been enabled
+paused = false -- Pause flag
+drawDebug = false -- Draw debug geometry flag
+cameraNode = nil -- Camera scene node
+yaw = 0 -- Camera yaw angle
+pitch = 0 -- Camera pitch angle
+TOUCH_SENSITIVITY = 2
 
 function SampleStart()
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" or input.touchEmulation then
+        -- On mobile platform, enable touch by adding a screen joystick
+        InitTouchInput()
+    elseif input:GetNumJoysticks() == 0 then
+        -- On desktop platform, do not detect touch when we already got a joystick
+        SubscribeToEvent("TouchBegin", "HandleTouchBegin")
+    end
+
     -- Create logo
     CreateLogo()
 
@@ -20,6 +39,22 @@ function SampleStart()
 
     -- Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleKeyDown")
+
+    -- Subscribe scene update event
+    SubscribeToEvent("SceneUpdate", "HandleSceneUpdate")
+end
+
+function InitTouchInput()
+    touchEnabled = true
+    local layout = cache:GetResource("XMLFile", "UI/ScreenJoystick_Samples.xml")
+    local patchString = GetScreenJoystickPatchString()
+    if patchString ~= "" then
+        -- Patch the screen joystick layout further on demand
+        local patchFile = XMLFile()
+        if patchFile:FromString(patchString) then layout:Patch(patchFile) end
+    end
+    screenJoystickIndex = input:AddScreenJoystick(layout, cache:GetResource("XMLFile", "UI/DefaultStyle.xml"))
+    input:SetScreenJoystickVisible(screenJoystickSettingsIndex, true)
 end
 
 function SetLogoVisible(enable)
@@ -34,31 +69,31 @@ function CreateLogo()
     if logoTexture == nil then
         return
     end
-    
+
     -- Create logo sprite and add to the UI layout
     logoSprite = ui.root:CreateChild("Sprite")
-    
+
     -- Set logo sprite texture
     logoSprite:SetTexture(logoTexture)
-    
+
     local textureWidth = logoTexture.width
     local textureHeight = logoTexture.height
-    
+
     -- Set logo sprite scale
     logoSprite:SetScale(256 / textureWidth)
-    
+
     -- Set logo sprite size
     logoSprite:SetSize(textureWidth, textureHeight)
-    
+
     -- Set logo sprite hot spot
     logoSprite.hotSpot = IntVector2(0, textureHeight)
-    
+
     -- Set logo sprite alignment
     logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
-    
+
     -- Make logo not fully opaque to show the scene underneath
     logoSprite.opacity = 0.75
-    
+
     -- Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite.priority = -100
 end
@@ -75,11 +110,12 @@ function CreateConsoleAndDebugHud()
     if uiStyle == nil then
         return
     end
-    
+
     -- Create console
     engine:CreateConsole()
     console.defaultStyle = uiStyle
-    
+    console.background.opacity = 0.8
+
     -- Create debug HUD
     engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
@@ -103,8 +139,18 @@ function HandleKeyDown(eventType, eventData)
     end
 
     if ui.focusElement == nil then
+        -- Preferences / Pause
+        if key == KEY_SELECT and touchEnabled then
+            paused = not paused
+            if screenJoystickSettingsIndex == M_MAX_UNSIGNED then
+                -- Lazy initialization
+                screenJoystickSettingsIndex = input:AddScreenJoystick(cache:GetResource("XMLFile", "UI/ScreenJoystickSettings_Samples.xml"), cache:GetResource("XMLFile", "UI/DefaultStyle.xml"))
+            else
+                input:SetScreenJoystickVisible(screenJoystickSettingsIndex, paused)
+            end
+
         -- Texture quality
-        if key == KEY_1 then
+        elseif key == KEY_1 then
             local quality = renderer.textureQuality
             quality = quality + 1
             if quality > QUALITY_HIGH then
@@ -160,7 +206,7 @@ function HandleKeyDown(eventType, eventData)
         -- Instancing
         elseif key == KEY_8 then
             renderer.dynamicInstancing = not renderer.dynamicInstancing
-        
+
         -- Take screenshot
         elseif key == KEY_9 then
             local screenshot = Image()
@@ -171,4 +217,40 @@ function HandleKeyDown(eventType, eventData)
             screenshot:SavePNG(fileSystem:GetProgramDir() .. "Data/Screenshot_" .. timeStamp .. ".png")
         end
     end
+end
+
+function HandleSceneUpdate(eventType, eventData)
+    -- Move the camera by touch, if the camera node is initialized by descendant sample class
+    if touchEnabled and cameraNode then
+        for i=0, input:GetNumTouches()-1 do
+            local state = input:GetTouch(i)
+            if not state.touchedElement then -- Touch on empty space
+                if state.delta.x or state.delta.y then
+                    local camera = cameraNode:GetComponent("Camera")
+                    if not camera then return end
+
+                    yaw = yaw + TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.x
+                    pitch = pitch + TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.y
+
+                    -- Construct new orientation for the camera scene node from yaw and pitch; roll is fixed to zero
+                    cameraNode:SetRotation(Quaternion(pitch, yaw, 0))
+                else
+                    -- Move the cursor to the touch position
+                    local cursor = ui:GetCursor()
+                    if cursor and cursor:IsVisible() then cursor:SetPosition(state.position) end
+                end
+            end
+        end
+    end
+end
+
+function HandleTouchBegin(eventType, eventData)
+    -- On some platforms like Windows the presence of touch input can only be detected dynamically
+    InitTouchInput()
+    UnsubscribeFromEvent("TouchBegin")
+end
+
+-- Create empty XML patch instructions for screen joystick layout if none defined
+function GetScreenJoystickPatchString()
+    return ""
 end

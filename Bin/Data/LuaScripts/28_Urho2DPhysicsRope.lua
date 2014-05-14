@@ -3,10 +3,8 @@
 --     - Create revolute constraint
 --     - Create roop constraint
 --     - Displaying physics debug geometry
-require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
+require "LuaScripts/Utilities/Sample"
 
 function Start()
     -- Execute the common startup for samples
@@ -43,7 +41,7 @@ function CreateScene()
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
     camera.orthoSize = graphics.height * 0.05
-    
+
     -- Create 2D physics world component
     local physicsWorld = scene_:CreateComponent("PhysicsWorld2D")
     physicsWorld.drawJoint = true
@@ -157,6 +155,9 @@ end
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
+
+    -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -167,6 +168,29 @@ function HandleUpdate(eventType, eventData)
     MoveCamera(timeStep)
 
     local physicsWorld = scene_:GetComponent("PhysicsWorld2D")
-    physicsWorld:DrawDebugGeometry();
+    physicsWorld:DrawDebugGeometry()
 
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom In</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"PAGEUP\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom Out</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"PAGEDOWN\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

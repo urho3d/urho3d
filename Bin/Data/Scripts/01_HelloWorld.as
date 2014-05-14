@@ -10,7 +10,7 @@ void Start()
 {
     // Execute the common startup for samples
     SampleStart();
-    
+
     // Create "Hello World" Text
     CreateText();
 
@@ -49,3 +49,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Do nothing for now, could be extended to eg. animate the display
 }
 
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "</patch>";

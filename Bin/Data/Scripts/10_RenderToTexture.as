@@ -5,12 +5,8 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
 Scene@ rttScene_;
-Node@ cameraNode;
 Node@ rttCameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
 
 void Start()
 {
@@ -77,7 +73,7 @@ void CreateScene()
         light.lightType = LIGHT_POINT;
         light.range = 30.0f;
     }
-    
+
     {
         // Create the scene in which we move around
         scene_ = Scene();
@@ -224,7 +220,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
     float timeStep = eventData["TimeStep"].GetFloat();
-    
+
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }
@@ -240,3 +236,6 @@ class Rotator : ScriptObject
         node.Rotate(Quaternion(rotationSpeed.x * timeStep, rotationSpeed.y * timeStep, rotationSpeed.z * timeStep));
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions = "";

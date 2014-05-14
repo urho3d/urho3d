@@ -7,12 +7,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -40,7 +34,7 @@ function CreateScene()
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("PhysicsWorld")
     scene_:CreateComponent("DebugRenderer")
-    
+
     -- Create a Zone component for ambient lighting & fog control
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
@@ -59,7 +53,7 @@ function CreateScene()
     light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
-    
+
     -- Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
     -- illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
     -- generate the necessary 3D texture coordinates for cube mapping
@@ -85,7 +79,7 @@ function CreateScene()
     -- Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
     -- rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
     shape:SetBox(Vector3(1.0, 1.0, 1.0))
-    
+
     -- Create a pyramid of movable physics objects
     for y = 0, 7 do
         for x = -y, y do
@@ -182,12 +176,12 @@ function MoveCamera(timeStep)
     if input:GetKeyDown(KEY_D) then
         cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
-    
+
     -- "Shoot" a physics object with left mousebutton
     if input:GetMouseButtonPress(MOUSEB_LEFT) then
         SpawnObject()
     end
-    
+
     -- Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
     -- directory
     if input:GetKeyPress(KEY_F5) then
@@ -243,4 +237,27 @@ function HandlePostRenderUpdate(eventType, eventData)
     if drawDebug then
         scene_:GetComponent("PhysicsWorld"):DrawDebugGeometry(true)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Spawn</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"LEFT\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

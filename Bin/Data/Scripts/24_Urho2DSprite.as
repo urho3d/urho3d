@@ -6,8 +6,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
 Array<Node@> spriteNodes;
 
 void Start()
@@ -65,7 +63,7 @@ void CreateScene()
     {
         Node@ spriteNode = scene_.CreateChild("StaticSprite2D");
         spriteNode.position = Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0f);
-        
+
         StaticSprite2D@ staticSprite = spriteNode.CreateComponent("StaticSprite2D");
         // Set color
         staticSprite.color = Color(Random(1.0f), Random(1.0f), Random(1.0f), 1.0f);
@@ -73,7 +71,7 @@ void CreateScene()
         staticSprite.blendMode = BLEND_ALPHA;
         // Set sprite
         staticSprite.sprite = sprite;
-        
+
         spriteNode.vars["MoveSpeed"] = Vector3(Random(-2.0f, 2.0f), Random(-2.0f, 2.0f), 0.0f);
         spriteNode.vars["RotateSpeed"] = Random(-90.0f, 90.0f);
 
@@ -123,7 +121,7 @@ void MoveCamera(float timeStep)
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 4.0f;
-    
+
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown['W'])
         cameraNode.Translate(Vector3(0.0f, 1.0f, 0.0f) * MOVE_SPEED * timeStep);
@@ -139,7 +137,7 @@ void MoveCamera(float timeStep)
         Camera@ camera = cameraNode.GetComponent("Camera");
         camera.zoom = camera.zoom * 1.01f;
     }
-    
+
     if (input.keyDown[KEY_PAGEDOWN])
     {
         Camera@ camera = cameraNode.GetComponent("Camera");
@@ -151,6 +149,9 @@ void SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
+
+    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate");
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -171,7 +172,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         Vector3 moveSpeed = spriteNode.vars["MoveSpeed"].GetVector3();
         Vector3 newPosition = spriteNode.position + moveSpeed * timeStep;
-        
+
         if (newPosition.x < -halfWidth || newPosition.x > halfWidth)
         {
             newPosition.x = spriteNode.position.x;
@@ -191,3 +192,23 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 }
 
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom In</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"PAGEUP\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom Out</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"PAGEDOWN\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

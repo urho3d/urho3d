@@ -6,11 +6,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -164,3 +159,6 @@ class Rotator : ScriptObject
         node.Rotate(Quaternion(rotationSpeed.x * timeStep, rotationSpeed.y * timeStep, rotationSpeed.z * timeStep));
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions = "";

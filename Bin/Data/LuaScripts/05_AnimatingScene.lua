@@ -6,11 +6,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -59,9 +54,9 @@ function CreateScene()
         boxObject.material = cache:GetResource("Material", "Materials/Stone.xml")
 
         -- Add the Rotator script object which will rotate the scene node each frame, when the scene sends its update event.
-        -- This requires the C++ component LuaScriptInstance in the scene node, which acts as a container. We need to tell the 
+        -- This requires the C++ component LuaScriptInstance in the scene node, which acts as a container. We need to tell the
         -- class name to instantiate the object
-        
+
 
         local object = boxNode:CreateScriptObject("Rotator")
         object.rotationSpeed = {10.0, 20.0, 30.0}

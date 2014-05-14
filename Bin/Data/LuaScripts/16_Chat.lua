@@ -28,7 +28,7 @@ function Start()
 
     -- Create the user interface
     CreateUI()
-    
+
     -- Subscribe to UI and network events
     SubscribeToEvents()
 end
@@ -48,22 +48,22 @@ function CreateUI()
     buttonContainer:SetFixedSize(graphics.width, 20)
     buttonContainer:SetPosition(0, graphics.height - 20)
     buttonContainer.layoutMode = LM_HORIZONTAL
-    
+
     textEdit = buttonContainer:CreateChild("LineEdit")
     textEdit:SetStyleAuto()
-    
+
     sendButton = CreateButton("Send", 70)
     connectButton = CreateButton("Connect", 90)
     disconnectButton = CreateButton("Disconnect", 100)
     startServerButton = CreateButton("Start Server", 110)
 
     UpdateButtons()
-    
+
     local size = (graphics.height - 20) / chatHistoryText.rowHeight
     for i = 1, size do
         table.insert(chatHistory, "")
     end
-    
+
     -- No viewports or scene is defined. However, the default zone's fog color controls the fill color
     renderer.defaultZone.fogColor = Color(0.0, 0.0, 0.1)
 end
@@ -78,7 +78,7 @@ function SubscribeToEvents()
 
     -- Subscribe to log messages so that we can pipe them to the chat window
     SubscribeToEvent("LogMessage", "HandleLogMessage")
-    
+
     -- Subscribe to network events
     SubscribeToEvent("NetworkMessage", "HandleNetworkMessage")
     SubscribeToEvent("ServerConnected", "HandleConnectionStatus")
@@ -88,7 +88,7 @@ end
 
 function CreateButton(text, width)
     local font = cache:GetResource("Font", "Fonts/Anonymous Pro.ttf")
-    
+
     local button = buttonContainer:CreateChild("Button")
     button:SetStyleAuto()
     button:SetFixedWidth(width)
@@ -97,14 +97,14 @@ function CreateButton(text, width)
     buttonText:SetFont(font, 12)
     buttonText:SetAlignment(HA_CENTER, VA_CENTER)
     buttonText.text = text
-    
+
     return button
 end
 
 function ShowChatText(row)
     table.remove(chatHistory, 1)
     table.insert(chatHistory, row)
-    
+
     -- Concatenate all the rows in history
     local allRows = ""
     for i, r in ipairs(chatHistory) do
@@ -116,7 +116,7 @@ end
 function UpdateButtons()
     local serverConnection = network.serverConnection
     local serverRunning = network.serverRunning
-    
+
     -- Show and hide buttons so that eg. Connect and Disconnect are never shown at the same time
     sendButton.visible = serverConnection ~= nil
     connectButton.visible = (serverConnection == nil) and (not serverRunning)
@@ -151,15 +151,15 @@ function HandleConnect(eventType, eventData)
     if address == "" then
         address = "localhost" -- Use localhost to connect if nothing else specified
     end
-        
+
     -- Empty the text edit after reading the address to connect to
     textEdit.text = ""
-    
+
     -- Connect to server, do not specify a client scene as we are not using scene replication, just messages.
     -- At connect time we could also send identity parameters (such as username) in a VariantMap, but in this
     -- case we skip it for simplicity
     network:Connect(address, CHAT_SERVER_PORT, nil)
-    
+
     UpdateButtons()
 end
 
@@ -174,13 +174,13 @@ function HandleDisconnect(eventType, eventData)
             network:StopServer()
         end
     end
-    
+
     UpdateButtons()
 end
 
 function HandleStartServer(eventType, eventData)
     network:StartServer(CHAT_SERVER_PORT)
-    
+
     UpdateButtons()
 end
 
@@ -205,4 +205,17 @@ end
 
 function HandleConnectionStatus(eventType, eventData)
     UpdateButtons()
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button2']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "</patch>"
 end
