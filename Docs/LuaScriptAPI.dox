@@ -6639,6 +6639,7 @@ Properties:
 - unsigned DRAWABLE_ANY
 - unsigned DRAWABLE_GEOMETRY
 - unsigned DRAWABLE_LIGHT
+- unsigned DRAWABLE_PROXYGEOMETRY
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID
