@@ -4,11 +4,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -61,11 +56,11 @@ function CreateScene()
     local mushroomMat = cache:GetResource("Material", "Materials/Mushroom.xml")
     -- Apply shader parameter animation to material
     local specColorAnimation = ValueAnimation:new()
-    specColorAnimation:SetKeyFrame(0.0, Variant(Color(0.1, 0.1, 0.1, 16.0)));
-    specColorAnimation:SetKeyFrame(1.0, Variant(Color(1.0, 0.0, 0.0, 2.0)));
-    specColorAnimation:SetKeyFrame(2.0, Variant(Color(1.0, 1.0, 0.0, 2.0)));
-    specColorAnimation:SetKeyFrame(3.0, Variant(Color(0.1, 0.1, 0.1, 16.0)));
-    mushroomMat:SetShaderParameterAnimation("MatSpecColor", specColorAnimation);
+    specColorAnimation:SetKeyFrame(0.0, Variant(Color(0.1, 0.1, 0.1, 16.0)))
+    specColorAnimation:SetKeyFrame(1.0, Variant(Color(1.0, 0.0, 0.0, 2.0)))
+    specColorAnimation:SetKeyFrame(2.0, Variant(Color(1.0, 1.0, 0.0, 2.0)))
+    specColorAnimation:SetKeyFrame(3.0, Variant(Color(0.1, 0.1, 0.1, 16.0)))
+    mushroomMat:SetShaderParameterAnimation("MatSpecColor", specColorAnimation)
 
     local NUM_OBJECTS = 200
     for i = 1, NUM_OBJECTS do

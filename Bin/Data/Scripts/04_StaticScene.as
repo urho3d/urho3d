@@ -3,13 +3,9 @@
 //     - Creating a 3D scene with static content
 //     - Displaying the scene using the Renderer subsystem
 //     - Handling keyboard and mouse input to move a freelook camera
+//     - Applying a material shader to animate vegetation (simulate wind)
 
 #include "Scripts/Utilities/Sample.as"
-
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
 
 void Start()
 {
@@ -71,7 +67,7 @@ void CreateScene()
         mushroomNode.SetScale(0.5f + Random(2.0f));
         StaticModel@ mushroomObject = mushroomNode.CreateComponent("StaticModel");
         mushroomObject.model = cache.GetResource("Model", "Models/Mushroom.mdl");
-        mushroomObject.material = cache.GetResource("Material", "Materials/Mushroom.xml");
+        mushroomObject.material = cache.GetResource("Material", "Materials/MushroomWind.xml"); // Apply Vegetation Windy shader
     }
 
     // Create a scene node for the camera, which we will move around
@@ -151,3 +147,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions = "";

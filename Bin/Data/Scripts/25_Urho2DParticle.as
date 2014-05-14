@@ -6,8 +6,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
 Node@ particleNode;
 
 void Start()
@@ -92,7 +90,13 @@ void SetupViewport()
 
 void SubscribeToEvents()
 {
+    // Subscribe HandleMouseMove() function for tracking mouse/touch move events
     SubscribeToEvent("MouseMove", "HandleMouseMove");
+    if (touchEnabled)
+        SubscribeToEvent("TouchMove", "HandleMouseMove");
+
+    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate");
 }
 
 void HandleMouseMove(StringHash eventType, VariantMap& eventData)
@@ -106,3 +110,10 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
     }
 }
 
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "</patch>";

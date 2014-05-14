@@ -5,12 +5,8 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
 local rttScene_ = nil
-local cameraNode = nil
 local rttCameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
 
 function Start()
     -- Execute the common startup for samples
@@ -67,7 +63,7 @@ function CreateScene()
     rttCameraNode = rttScene_:CreateChild("Camera")
     local camera = rttCameraNode:CreateComponent("Camera")
     camera.farClip = 100.0
-    
+
     -- Create a point light to the camera scene node
     local light = rttCameraNode:CreateComponent("Light")
     light.lightType = LIGHT_POINT
@@ -94,7 +90,7 @@ function CreateScene()
     light.lightType = LIGHT_DIRECTIONAL
     light.color = Color(0.2, 0.2, 0.2)
     light.specularIntensity = 1.0
-    
+
     -- Create a "floor" consisting of several tiles
     for y = -5, 5 do
         for x = -5, 5 do
@@ -127,7 +123,7 @@ function CreateScene()
     local renderTexture = Texture2D:new()
     renderTexture:SetSize(1024, 768, Graphics:GetRGBFormat(), TEXTURE_RENDERTARGET)
     renderTexture.filterMode = FILTER_BILINEAR
-    
+
     -- Create a new material from scratch, use the diffuse unlit technique, assign the render texture
     -- as its diffuse texture, then assign the material to the screen plane object
     local renderMaterial = Material:new()
@@ -186,7 +182,7 @@ function MoveCamera(timeStep)
     yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
     pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
     pitch = Clamp(pitch, -90.0, 90.0)
-    
+
     -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
@@ -213,7 +209,7 @@ end
 function HandleUpdate(eventType, eventData)
     -- Take the frame time step, which is stored as a float
     local timeStep = eventData:GetFloat("TimeStep")
-    
+
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
 end

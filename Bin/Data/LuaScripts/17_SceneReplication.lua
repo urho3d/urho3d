@@ -16,8 +16,6 @@ local CTRL_BACK = 2
 local CTRL_LEFT = 4
 local CTRL_RIGHT = 8
 
-local scene_ = nil
-local cameraNode = nil
 local instructionsText = nil
 local buttonContainer = nil
 local textEdit = nil
@@ -25,8 +23,6 @@ local connectButton = nil
 local disconnectButton = nil
 local startServerButton = nil
 local clients = {}
-local yaw = 0.0
-local pitch = 1.0
 local clientObjectID = 0
 
 function Start()
@@ -391,4 +387,14 @@ end
 
 function HandleClientObjectID(eventType, eventData)
     clientObjectID = eventData:GetUInt("ID")
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "</patch>"
 end

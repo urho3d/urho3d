@@ -5,9 +5,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -46,7 +43,7 @@ function CreateScene()
 
     -- Create 2D physics world component
     scene_:CreateComponent("PhysicsWorld2D")
-    
+
     local boxSprite = cache:GetResource("Sprite2D", "Urho2D/Box.png")
     local ballSprite = cache:GetResource("Sprite2D", "Urho2D/Ball.png")
 
@@ -54,7 +51,7 @@ function CreateScene()
     local groundNode = scene_:CreateChild("Ground")
     groundNode.position = Vector3(0.0, -3.0, 0.0)
     groundNode.scale = Vector3(200.0, 1.0, 0.0)
-    
+
     -- Create 2D rigid body for gound
     local groundBody = groundNode:CreateComponent("RigidBody2D")
 
@@ -67,7 +64,7 @@ function CreateScene()
     groundShape.size = Vector2(0.32, 0.32)
     -- Set friction
     groundShape.friction = 0.5
-    
+
     local NUM_OBJECTS = 100
     for i = 1, NUM_OBJECTS do
         local node  = scene_:CreateChild("RigidBody")
@@ -158,6 +155,9 @@ end
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
+
+    -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -166,4 +166,27 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom In</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"PAGEUP\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom Out</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"PAGEDOWN\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

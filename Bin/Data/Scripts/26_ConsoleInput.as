@@ -238,3 +238,14 @@ void HandleInput(const String&in input)
             Print("Please answer 'y' or 'n'.");
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button2']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "</patch>";

@@ -6,8 +6,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
 local particleNode = nil
 
 function Start()
@@ -87,7 +85,12 @@ function SetupViewport()
 end
 
 function SubscribeToEvents()
+    -- Subscribe HandleMouseMove() function for tracking mouse/touch move events
     SubscribeToEvent("MouseMove", "HandleMouseMove")
+    if touchEnabled then SubscribeToEvent("TouchMove", "HandleMouseMove") end
+
+    -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleMouseMove(eventType, eventData)
@@ -97,4 +100,14 @@ function HandleMouseMove(eventType, eventData)
         local camera = cameraNode:GetComponent("Camera")
         particleNode.position = camera:ScreenToWorldPoint(Vector3(x / graphics.width, y / graphics.height, 10.0))
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "</patch>"
 end

@@ -7,11 +7,7 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
 Array<Node@> boxNodes;
-float yaw = 0.0f;
-float pitch = 0.0f;
 bool animate = false;
 bool useGroups = false;
 
@@ -207,11 +203,32 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         useGroups = !useGroups;
         CreateScene();
     }
-    
+
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-    
+
     // Animate scene if enabled
     if (animate)
         AnimateObjects(timeStep);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Group</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"G\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Animation</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";
