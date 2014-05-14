@@ -3,6 +3,7 @@ $#include "Drawable.h"
 static const unsigned DRAWABLE_GEOMETRY;
 static const unsigned DRAWABLE_LIGHT;
 static const unsigned DRAWABLE_ZONE;
+static const unsigned DRAWABLE_PROXYGEOMETRY;
 static const unsigned DRAWABLE_ANY;
 static const unsigned DEFAULT_VIEWMASK;
 static const unsigned DEFAULT_LIGHTMASK;

@@ -43,7 +43,7 @@ namespace Urho3D
 {
 
 DrawableProxy2D::DrawableProxy2D(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DRAWABLE_PROXYGEOMETRY),
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
     orderDirty_(true),

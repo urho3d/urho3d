@@ -47,7 +47,7 @@ const float PIXEL_SIZE = 0.01f;
 extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :
-    Drawable(context, DRAWABLE_2D),
+    Drawable(context, DRAWABLE_GEOMETRY),
     layer_(0),
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),

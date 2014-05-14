@@ -703,6 +703,7 @@ static void RegisterDrawable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("uint DRAWABLE_GEOMETRY", (void*)&DRAWABLE_GEOMETRY);
     engine->RegisterGlobalProperty("uint DRAWABLE_LIGHT", (void*)&DRAWABLE_LIGHT);
     engine->RegisterGlobalProperty("uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
+    engine->RegisterGlobalProperty("uint DRAWABLE_PROXYGEOMETRY", (void*)&DRAWABLE_PROXYGEOMETRY);
     engine->RegisterGlobalProperty("uint DRAWABLE_ANY", (void*)&DRAWABLE_ANY);
     engine->RegisterGlobalProperty("uint DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
     engine->RegisterGlobalProperty("uint DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);

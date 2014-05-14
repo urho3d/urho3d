@@ -108,8 +108,8 @@ public:
             Drawable* drawable = *start++;
             unsigned char flags = drawable->GetDrawableFlags();
             
-            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && (drawable->GetViewMask() &
-                viewMask_))
+            if ((flags == DRAWABLE_ZONE || ((flags == DRAWABLE_GEOMETRY || flags == DRAWABLE_PROXYGEOMETRY) &&
+                drawable->IsOccluder())) && (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
@@ -198,7 +198,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             drawable->MarkInView(view->frame_);
             
             // For geometries, find zone, clear lights and calculate view space Z range
-            if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
+            if (drawable->GetDrawableFlags() & (DRAWABLE_GEOMETRY | DRAWABLE_PROXYGEOMETRY))
             {
                 Zone* drawableZone = drawable->GetZone();
                 if (!cameraZoneOverride && (drawable->IsZoneDirty() || !drawableZone || (drawableZone->GetViewMask() &
@@ -765,13 +765,13 @@ void View::GetDrawables()
     if (occlusionBuffer_)
     {
         OccludedFrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), occlusionBuffer_, DRAWABLE_GEOMETRY |
-            DRAWABLE_LIGHT, camera_->GetViewMask());
+            DRAWABLE_PROXYGEOMETRY | DRAWABLE_LIGHT, camera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     else
     {
-        FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT,
-            camera_->GetViewMask());
+        FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_PROXYGEOMETRY |
+            DRAWABLE_LIGHT, camera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     
@@ -2067,7 +2067,8 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         
     case LIGHT_SPOT:
         {
-            FrustumOctreeQuery octreeQuery(tempDrawables, light->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask());
+            FrustumOctreeQuery octreeQuery(tempDrawables, light->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_PROXYGEOMETRY,
+                camera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
             {
@@ -2080,7 +2081,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     case LIGHT_POINT:
         {
             SphereOctreeQuery octreeQuery(tempDrawables, Sphere(light->GetNode()->GetWorldPosition(), light->GetRange()),
-                DRAWABLE_GEOMETRY, camera_->GetViewMask());
+                DRAWABLE_GEOMETRY | DRAWABLE_PROXYGEOMETRY, camera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
             {
@@ -2122,7 +2123,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
                 continue;
         
             // Reuse lit geometry query for all except directional lights
-            ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
+            ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY | DRAWABLE_PROXYGEOMETRY,
                 camera_->GetViewMask());
             octree_->GetDrawables(query);
         }
