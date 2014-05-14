@@ -399,7 +399,7 @@ void SpawnPlayer(Connection@ connection)
         text3D.text = players[playerIndex].name;
         text3D.horizontalAlignment = HA_CENTER;
         text3D.verticalAlignment = VA_CENTER;
-        text3D.faceCameraMode = FC_ROTATE_XYZ;
+        text3D.faceCamera = true;
     }
 }
 
@@ -893,7 +893,7 @@ void UpdateControls()
             for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState@ touch = input.touches[i];
-                if (touch.touchedElement is null)
+                if (touch.touchedElement.Get() is null)
                 {
                     // Touch on empty space
                     playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;

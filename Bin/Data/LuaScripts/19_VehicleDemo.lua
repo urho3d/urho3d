@@ -2,6 +2,7 @@
 -- This sample demonstrates:
 --     - Creating a heightmap terrain with collision
 --     - Constructing a physical vehicle with rigid bodies for the hull and the wheels, joined with constraints
+--     - Saving and loading the variables of a script object, including node & component references
 
 require "LuaScripts/Utilities/Sample"
 
@@ -16,15 +17,13 @@ local ENGINE_POWER = 10.0
 local DOWN_FORCE = 10.0
 local MAX_WHEEL_ANGLE = 22.5
 
-local scene_ = nil
-local cameraNode = nil
 local vehicleNode = nil
 
 function Start()
 
     -- Execute the common startup for samples
     SampleStart()
-    
+
     -- Create static scene content
     CreateScene()
 
@@ -49,9 +48,9 @@ function CreateScene()
     cameraNode = Node()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 500.0
-    
+
     renderer:SetViewport(0, Viewport:new(scene_, camera))
-    
+
     -- Create static scene content. First create a zone for ambient lighting and fog control
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
@@ -83,7 +82,7 @@ function CreateScene()
     -- The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
     -- terrain patches and other objects behind it
     terrain.occluder = true
-    
+
     local body = terrainNode:CreateComponent("RigidBody")
     body.collisionLayer = 2 -- Use layer bitmask 2 for static geometry
     local shape = terrainNode:CreateComponent("CollisionShape")
@@ -103,7 +102,7 @@ function CreateScene()
         object.model = cache:GetResource("Model", "Models/Mushroom.mdl")
         object.material = cache:GetResource("Material", "Materials/Mushroom.xml")
         object.castShadows = true
-        
+
         local body = objectNode:CreateComponent("RigidBody")
         body.collisionLayer = 2
         local shape = objectNode:CreateComponent("CollisionShape")
@@ -114,7 +113,7 @@ end
 function CreateVehicle()
     vehicleNode = scene_:CreateChild("Vehicle")
     vehicleNode.position = Vector3(0.0, 5.0, 0.0)
-    
+
     -- Create the vehicle logic script object
     local vehicle = vehicleNode:CreateScriptObject("Vehicle")
     -- Create the rendering and physics components
@@ -124,7 +123,7 @@ end
 function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
-    instructionText.text = "Use WASD keys to drive, mouse to rotate camera\n"..
+    instructionText.text = "Use WASD keys to drive, mouse/touch to rotate camera\n"..
         "F5 to save scene, F7 to load"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
@@ -142,6 +141,9 @@ function SubscribeToEvents()
 
     -- Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate")
+
+    -- Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
+    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -161,9 +163,22 @@ function HandleUpdate(eventType, eventData)
         vehicle.controls:Set(CTRL_LEFT, input:GetKeyDown(KEY_A))
         vehicle.controls:Set(CTRL_RIGHT, input:GetKeyDown(KEY_D))
 
-        -- Add yaw & pitch from the mouse motion. Used only for the camera, does not affect motion
-        vehicle.controls.yaw = vehicle.controls.yaw + input.mouseMoveX * YAW_SENSITIVITY
-        vehicle.controls.pitch = vehicle.controls.pitch + input.mouseMoveY * YAW_SENSITIVITY
+        -- Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
+        if touchEnabled then
+            for i=0, input.numTouches - 1 do
+                local state = input:GetTouch(i)
+                if not state.touchedElement then -- Touch on empty space
+                    local camera = cameraNode:GetComponent("Camera")
+                    if not camera then return end
+
+                    vehicle.controls.yaw = vehicle.controls.yaw + TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.x
+                    vehicle.controls.pitch = vehicle.controls.pitch + TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.y
+                end
+            end
+        else
+            vehicle.controls.yaw = vehicle.controls.yaw + input.mouseMoveX * YAW_SENSITIVITY
+            vehicle.controls.pitch = vehicle.controls.pitch + input.mouseMoveY * YAW_SENSITIVITY
+        end
         -- Limit pitch
         vehicle.controls.pitch = Clamp(vehicle.controls.pitch, 0.0, 80.0)
 
@@ -187,7 +202,7 @@ function HandlePostUpdate(eventType, eventData)
     if vehicleNode == nil then
         return
     end
-    
+
     local vehicle = vehicleNode:GetScriptObject()
     if vehicle == nil then
         return
@@ -197,7 +212,7 @@ function HandlePostUpdate(eventType, eventData)
     local dir = Quaternion(vehicleNode.rotation:YawAngle(), Vector3(0.0, 1.0, 0.0))
     dir = dir * Quaternion(vehicle.controls.yaw, Vector3(0.0, 1.0, 0.0))
     dir = dir * Quaternion(vehicle.controls.pitch, Vector3(1.0, 0.0, 0.0))
-    
+
     local cameraTargetPos = vehicleNode.position - dir * Vector3(0.0, 0.0, CAMERA_DISTANCE)
     local cameraStartPos = vehicleNode.position
     -- Raycast camera against static objects (physics collision mask 2)
@@ -244,13 +259,13 @@ function Vehicle:Init()
     local hullObject = node:CreateComponent("StaticModel")
     self.hullBody = node:CreateComponent("RigidBody")
     local hullShape = node:CreateComponent("CollisionShape")
-    
+
     node.scale = Vector3(1.5, 1.0, 3.0)
     hullObject.model = cache:GetResource("Model", "Models/Box.mdl")
     hullObject.material = cache:GetResource("Material", "Materials/Stone.xml")
     hullObject.castShadows = true
     hullShape:SetBox(Vector3(1.0, 1.0, 1.0))
-    
+
     self.hullBody.mass = 4.0
     self.hullBody.linearDamping = 0.2 -- Some air resistance
     self.hullBody.angularDamping = 0.5
@@ -268,12 +283,12 @@ function Vehicle:PostInit()
     self.frontRight = scene_:GetChild("FrontRight")
     self.rearLeft = scene_:GetChild("RearLeft")
     self.rearRight = scene_:GetChild("RearRight")
-    
+
     self.frontLeftAxis = self.frontLeft:GetComponent("Constraint")
     self.frontRightAxis = self.frontRight:GetComponent("Constraint")
-    
+
     self.hullBody = self.node:GetComponent("RigidBody")
-    
+
     self.frontLeftBody = self.frontLeft:GetComponent("RigidBody")
     self.frontRightBody = self.frontRight:GetComponent("RigidBody")
     self.rearLeftBody = self.rearLeft:GetComponent("RigidBody")
@@ -311,13 +326,13 @@ function Vehicle:InitWheel(name, offset)
     wheelConstraint.otherBody = node:GetComponent("RigidBody")
     wheelConstraint.worldPosition = wheelNode.worldPosition -- Set constraint's both ends at wheel's location
     wheelConstraint.axis = Vector3(0.0, 1.0, 0.0) -- Wheel rotates around its local Y-axis
-    
+
     if offset.x >= 0.0 then -- Wheel's hull axis points either left or right
         wheelConstraint.otherAxis = Vector3(1.0, 0.0, 0.0)
     else
         wheelConstraint.otherAxis = Vector3(-1.0, 0.0, 0.0)
     end
-    
+
     wheelConstraint.lowLimit = Vector2(-180.0, 0.0) -- Let the wheel rotate freely around the axis
     wheelConstraint.highLimit = Vector2(180.0, 0.0)
     wheelConstraint.disableCollision = true -- Let the wheel intersect the vehicle hull
@@ -341,7 +356,7 @@ function Vehicle:FixedUpdate(timeStep)
     if self.controls:IsDown(CTRL_BACK) then
         accelerator = -0.5
     end
-    
+
     -- When steering, wake up the wheel rigidbodies so that their orientation is updated
     if newSteering ~= 0.0 then
         self.frontLeftBody:Activate()

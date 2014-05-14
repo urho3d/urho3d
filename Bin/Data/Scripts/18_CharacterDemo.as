@@ -22,8 +22,8 @@ const float BRAKE_FORCE = 0.2f;
 const float JUMP_FORCE = 7.0f;
 const float YAW_SENSITIVITY = 0.1f;
 const float INAIR_THRESHOLD_TIME = 0.1f;
+bool firstPerson = false; // First person camera flag
 
-Scene@ scene_;
 Node@ characterNode;
 
 void Start()
@@ -39,13 +39,6 @@ void Start()
 
     // Create the UI content
     CreateInstructions();
-
-    // Activate mobile stuff when appropriate
-    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
-    {
-        SetLogoVisible(false);
-        InitTouchInput();
-    }
 
     // Subscribe to necessary events
     SubscribeToEvents();
@@ -203,9 +196,8 @@ void SubscribeToEvents()
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate");
 
-    // Subscribe to mobile touch events
-    if (touchEnabled)
-        SubscribeToTouchEvents();
+    // Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
+    UnsubscribeFromEvent("SceneUpdate");
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -220,48 +212,70 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Clear previous controls
     character.controls.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
 
+    // Update controls using touch utility
     if (touchEnabled)
-    {
-        // Update controls using touch (mobile)
         UpdateTouches(character.controls);
-    }
-    else
+
+    // Update controls using keys (desktop)
+    if (ui.focusElement is null)
     {
-        // Update controls using keys (desktop)
-        if (ui.focusElement is null)
+        if (touchEnabled || !useGyroscope)
         {
             character.controls.Set(CTRL_FORWARD, input.keyDown['W']);
             character.controls.Set(CTRL_BACK, input.keyDown['S']);
             character.controls.Set(CTRL_LEFT, input.keyDown['A']);
             character.controls.Set(CTRL_RIGHT, input.keyDown['D']);
-            character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
+        }
+        character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
 
-            // Add character yaw & pitch from the mouse motion
+        // Add character yaw & pitch from the mouse motion or touch input
+        if (touchEnabled)
+        {
+            for (uint i = 0; i < input.numTouches; ++i)
+            {
+                TouchState@ state = input.touches[i];
+                if (state.touchedElement is null) // Touch on empty space
+                {
+                    Camera@ camera = cameraNode.GetComponent("Camera");
+                    if (camera is null)
+                        return;
+
+                    character.controls.yaw += TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.x;
+                    character.controls.pitch += TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.y;
+                }
+            }
+        }
+        else
+        {
             character.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
             character.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
-            // Limit pitch
-            character.controls.pitch = Clamp(character.controls.pitch, -80.0f, 80.0f);
+        }
+        // Limit pitch
+        character.controls.pitch = Clamp(character.controls.pitch, -80.0f, 80.0f);
 
-            // Switch between 1st and 3rd person
-            if (input.keyPress['F'])
-                firstPerson = newFirstPerson = !firstPerson;
+        // Switch between 1st and 3rd person
+        if (input.keyPress['F'])
+            firstPerson = !firstPerson;
 
-            // Check for loading / saving the scene
-            if (input.keyPress[KEY_F5])
-            {
-                File saveFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
-                scene_.SaveXML(saveFile);
-            }
-            if (input.keyPress[KEY_F7])
-            {
-                File loadFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_READ);
-                scene_.LoadXML(loadFile);
-                // After loading we have to reacquire the character scene node, as it has been recreated
-                // Simply find by name as there's only one of them
-                characterNode = scene_.GetChild("Jack", true);
-                if (characterNode is null)
-                    return;
-            }
+        // Turn on/off gyroscope on mobile platform
+        if (input.keyPress['G'])
+            useGyroscope = !useGyroscope;
+
+        // Check for loading / saving the scene
+        if (input.keyPress[KEY_F5])
+        {
+            File saveFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
+            scene_.SaveXML(saveFile);
+        }
+        if (input.keyPress[KEY_F7])
+        {
+            File loadFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_READ);
+            scene_.LoadXML(loadFile);
+            // After loading we have to reacquire the character scene node, as it has been recreated
+            // Simply find by name as there's only one of them
+            characterNode = scene_.GetChild("Jack", true);
+            if (characterNode is null)
+                return;
         }
     }
 
@@ -370,13 +384,13 @@ class Character : ScriptObject
             }
         }
     }
-    
+
     void FixedUpdate(float timeStep)
     {
         /// \todo Could cache the components for faster access instead of finding them each frame
         RigidBody@ body = node.GetComponent("RigidBody");
         AnimationController@ animCtrl = node.GetComponent("AnimationController");
-        
+
         // Update the in air timer. Reset if grounded
         if (!onGround)
             inAirTimer += timeStep;
@@ -384,14 +398,14 @@ class Character : ScriptObject
             inAirTimer = 0.0f;
         // When character has been in air less than 1/10 second, it's still interpreted as being on ground
         bool softGrounded = inAirTimer < INAIR_THRESHOLD_TIME;
-        
+
         // Update movement & animation
         Quaternion rot = node.rotation;
         Vector3 moveDir(0.0f, 0.0f, 0.0f);
         Vector3 velocity = body.linearVelocity;
         // Velocity on the XZ plane
         Vector3 planeVelocity(velocity.x, 0.0f, velocity.z);
-        
+
         if (controls.IsDown(CTRL_FORWARD))
             moveDir += Vector3(0.0f, 0.0f, 1.0f);
         if (controls.IsDown(CTRL_BACK))
@@ -400,20 +414,20 @@ class Character : ScriptObject
             moveDir += Vector3(-1.0f, 0.0f, 0.0f);
         if (controls.IsDown(CTRL_RIGHT))
             moveDir += Vector3(1.0f, 0.0f, 0.0f);
-        
+
         // Normalize move vector so that diagonal strafing is not faster
         if (moveDir.lengthSquared > 0.0f)
             moveDir.Normalize();
-        
+
         // If in air, allow control, but slower than when on ground
         body.ApplyImpulse(rot * moveDir * (softGrounded ? MOVE_FORCE : INAIR_MOVE_FORCE));
-        
+
         if (softGrounded)
         {
             // When on ground, apply a braking force to limit maximum ground velocity
             Vector3 brakeForce = -planeVelocity * BRAKE_FORCE;
             body.ApplyImpulse(brakeForce);
-            
+
             // Jump. Must release jump control inbetween jumps
             if (controls.IsDown(CTRL_JUMP))
             {
@@ -426,7 +440,7 @@ class Character : ScriptObject
             else
                 okToJump = true;
         }
-        
+
         // Play walk animation if moving on ground, otherwise fade it out
         if (softGrounded && !moveDir.Equals(Vector3(0.0f, 0.0f, 0.0f)))
             animCtrl.PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2f);
@@ -439,3 +453,48 @@ class Character : ScriptObject
         onGround = false;
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element\">" +
+        "        <element type=\"Button\">" +
+        "            <attribute name=\"Name\" value=\"Button3\" />" +
+        "            <attribute name=\"Position\" value=\"-120 -120\" />" +
+        "            <attribute name=\"Size\" value=\"96 96\" />" +
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" +
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" +
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" +
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" +
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" +
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"Label\" />" +
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" +
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" +
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" +
+        "                <attribute name=\"Text\" value=\"Gyroscope\" />" +
+        "            </element>" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "                <attribute name=\"Text\" value=\"G\" />" +
+        "            </element>" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">1st/3rd</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"F\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Jump</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

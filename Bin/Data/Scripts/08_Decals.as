@@ -7,12 +7,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -20,10 +14,10 @@ void Start()
 
     // Create the scene content
     CreateScene();
-    
+
     // Create the UI content
     CreateUI();
-    
+
     // Setup the viewport for displaying the scene
     SetupViewport();
 
@@ -39,14 +33,14 @@ void CreateScene()
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("DebugRenderer");
-    
+
     // Create scene node & StaticModel component for showing a static plane
     Node@ planeNode = scene_.CreateChild("Plane");
     planeNode.scale = Vector3(100.0f, 1.0f, 100.0f);
     StaticModel@ planeObject = planeNode.CreateComponent("StaticModel");
     planeObject.model = cache.GetResource("Model", "Models/Plane.mdl");
     planeObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -96,7 +90,7 @@ void CreateScene()
         if (size >= 3.0f)
             boxObject.occluder = true;
     }
-    
+
     // Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_.CreateChild("Camera");
     Camera@ camera = cameraNode.CreateComponent("Camera");
@@ -116,7 +110,7 @@ void CreateUI()
     ui.cursor = cursor;
     // Set starting position of the cursor at the rendering window center
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
-    
+
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
     instructionText.text =
@@ -159,12 +153,12 @@ void MoveCamera(float timeStep)
     // Do not move if the UI has a focused element (the console)
     if (ui.focusElement !is null)
         return;
-    
+
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
-    
+
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     // Only move the camera when the cursor is hidden
     if (!ui.cursor.visible)
@@ -259,3 +253,24 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
     if (drawDebug)
         renderer.DrawDebugGeometry(false);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Paint</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "            <attribute name=\"Text\" value=\"LEFT\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

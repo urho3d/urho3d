@@ -7,12 +7,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -40,7 +34,7 @@ function CreateScene()
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("PhysicsWorld")
     scene_:CreateComponent("DebugRenderer")
-    
+
     -- Create a Zone component for ambient lighting & fog control
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
@@ -49,7 +43,7 @@ function CreateScene()
     zone.fogColor = Color(0.5, 0.5, 0.7)
     zone.fogStart = 100.0
     zone.fogEnd = 300.0
-    
+
     -- Create a directional light to the world. Enable cascaded shadows on it
     local lightNode = scene_:CreateChild("DirectionalLight")
     lightNode.direction = Vector3(0.6, -1.0, 0.8)
@@ -59,7 +53,7 @@ function CreateScene()
     light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
-    
+
     if true then
         -- Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y
         local floorNode = scene_:CreateChild("Floor")
@@ -257,4 +251,27 @@ function HandlePostRenderUpdate(eventType, eventData)
     if drawDebug then
         scene_:GetComponent("PhysicsWorld"):DrawDebugGeometry(true)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Spawn</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"LEFT\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

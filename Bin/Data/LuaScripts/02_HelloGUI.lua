@@ -11,12 +11,6 @@
 require "LuaScripts/Utilities/Sample"
 
 local window = nil
-
-local cache = GetCache()
-local engine = GetEngine()
-local input = GetInput()
-local ui = GetUI()
-
 local dragBeginPosition = IntVector2(0, 0)
 
 function Start()
@@ -110,7 +104,7 @@ function InitWindow()
 
     -- Subscribe to buttonClose release (following a 'press') events
     SubscribeToEvent(buttonClose, "Released", "HandleClosePressed")
-    
+
     -- Subscribe also to all UI mouse clicks just to see where we have clicked
     SubscribeToEvent("UIMouseClick", "HandleControlClicked")
 end
@@ -175,4 +169,14 @@ function HandleControlClicked(eventType, eventData)
 
     -- Update the Window's title text
     windowTitle.text = "Hello " .. name .. "!"
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "</patch>"
 end

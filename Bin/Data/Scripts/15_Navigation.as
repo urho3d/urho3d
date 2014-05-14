@@ -9,13 +9,8 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
 Vector3 endPos;
 Array<Vector3> currentPath;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
 Node@ jackNode;
 
 void Start()
@@ -25,10 +20,10 @@ void Start()
 
     // Create the scene content
     CreateScene();
-    
+
     // Create the UI content
     CreateUI();
-    
+
     // Setup the viewport for displaying the scene
     SetupViewport();
 
@@ -44,14 +39,14 @@ void CreateScene()
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("DebugRenderer");
-    
+
     // Create scene node & StaticModel component for showing a static plane
     Node@ planeNode = scene_.CreateChild("Plane");
     planeNode.scale = Vector3(100.0f, 1.0f, 100.0f);
     StaticModel@ planeObject = planeNode.CreateComponent("StaticModel");
     planeObject.model = cache.GetResource("Model", "Models/Plane.mdl");
     planeObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -113,12 +108,12 @@ void CreateScene()
     // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     // it will use renderable geometry instead
     navMesh.Build();
-    
+
     // Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_.CreateChild("Camera");
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 300.0f;
-    
+
     // Set an initial position for the camera scene node above the plane
     cameraNode.position = Vector3(0.0f, 5.0f, 0.0f);
 }
@@ -133,7 +128,7 @@ void CreateUI()
     ui.cursor = cursor;
     // Set starting position of the cursor at the rendering window center
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
-    
+
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
     instructionText.text =
@@ -325,7 +320,7 @@ void FollowPath(float timeStep)
         float distance = (jackNode.position - nextWaypoint).length;
         if (move > distance)
             move = distance;
-        
+
         jackNode.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
         jackNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * move);
 
@@ -375,3 +370,74 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
         }
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element\">" +
+        "        <element type=\"Button\">" +
+        "            <attribute name=\"Name\" value=\"Button3\" />" +
+        "            <attribute name=\"Position\" value=\"-120 -120\" />" +
+        "            <attribute name=\"Size\" value=\"96 96\" />" +
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" +
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" +
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" +
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" +
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" +
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"Label\" />" +
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" +
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" +
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" +
+        "                <attribute name=\"Text\" value=\"Teleport\" />" +
+        "            </element>" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "                <attribute name=\"Text\" value=\"LSHIFT\" />" +
+        "            </element>" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "                <attribute name=\"Text\" value=\"LEFT\" />" +
+        "            </element>" +
+        "        </element>" +
+        "        <element type=\"Button\">" +
+        "            <attribute name=\"Name\" value=\"Button4\" />" +
+        "            <attribute name=\"Position\" value=\"-120 -12\" />" +
+        "            <attribute name=\"Size\" value=\"96 96\" />" +
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" +
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" +
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" +
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" +
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" +
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"Label\" />" +
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" +
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" +
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" +
+        "                <attribute name=\"Text\" value=\"Obstacles\" />" +
+        "            </element>" +
+        "            <element type=\"Text\">" +
+        "                <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "                <attribute name=\"Text\" value=\"MIDDLE\" />" +
+        "            </element>" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Set</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "            <attribute name=\"Text\" value=\"LEFT\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";
