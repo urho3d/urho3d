@@ -6,12 +6,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -41,7 +35,7 @@ void CreateScene()
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("PhysicsWorld");
     scene_.CreateComponent("DebugRenderer");
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -50,7 +44,7 @@ void CreateScene()
     zone.fogColor = Color(0.5f, 0.5f, 0.7f);
     zone.fogStart = 100.0f;
     zone.fogEnd = 300.0f;
-    
+
     // Create a directional light to the world. Enable cascaded shadows on it
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
     lightNode.direction = Vector3(0.6f, -1.0f, 0.8f);
@@ -60,7 +54,7 @@ void CreateScene()
     light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
-    
+
     {
         // Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y
         Node@ floorNode = scene_.CreateChild("Floor");
@@ -80,7 +74,7 @@ void CreateScene()
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
         shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
     }
-    
+
     // Create animated models
     for (int z = -1; z <= 1; ++z)
     {
@@ -107,7 +101,7 @@ void CreateScene()
             // Create the capsule shape with an offset so that it is correctly aligned with the model, which
             // has its origin at the feet
             shape.SetCapsule(0.7f, 2.0f, Vector3(0.0f, 1.0f, 0.0f));
-            
+
             // Create a custom script object that reacts to collisions and creates the ragdoll
             modelNode.CreateScriptObject(scriptFile, "CreateRagdoll");
         }
@@ -226,9 +220,9 @@ void SpawnObject()
     body.rollingFriction = 0.15f;
     CollisionShape@ shape = boxNode.CreateComponent("CollisionShape");
     shape.SetSphere(1.0f);
-    
+
     const float OBJECT_VELOCITY = 10.0f;
-    
+
     // Set initial velocity for the RigidBody based on camera forward vector. Add also a slight up component
     // to overcome gravity better
     body.linearVelocity = cameraNode.rotation * Vector3(0.0f, 0.25f, 1.0f) * OBJECT_VELOCITY;
@@ -269,7 +263,7 @@ class CreateRagdoll : ScriptObject
             // We do not need the physics components in the AnimatedModel's root scene node anymore
             node.RemoveComponent("RigidBody");
             node.RemoveComponent("CollisionShape");
-            
+
             // Create RigidBody & CollisionShape components to bones
             CreateRagdollBone("Bip01_Pelvis", SHAPE_BOX, Vector3(0.3f, 0.2f, 0.25f), Vector3(0.0f, 0.0f, 0.0f),
                 Quaternion(0.0f, 0.0f, 0.0f));
@@ -297,23 +291,23 @@ class CreateRagdoll : ScriptObject
             // Create Constraints between bones
             CreateRagdollConstraint("Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0.0f, 0.0f, -1.0f),
                 Vector3(0.0f, 0.0f, 1.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0.0f, 0.0f, -1.0f), 
+            CreateRagdollConstraint("Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0.0f, 0.0f, -1.0f),
                 Vector3(0.0f, 0.0f, 1.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f), 
+            CreateRagdollConstraint("Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
                 Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f), 
+            CreateRagdollConstraint("Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
                 Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, 1.0f), 
+            CreateRagdollConstraint("Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, 1.0f),
                 Vector3(0.0f, 0.0f, 1.0f), Vector2(45.0f, 0.0f), Vector2(-10.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(-1.0f, 0.0f, 0.0f), 
+            CreateRagdollConstraint("Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(-1.0f, 0.0f, 0.0f),
                 Vector3(-1.0f, 0.0f, 0.0f), Vector2(0.0f, 30.0f), Vector2(0.0f, 0.0f));
             CreateRagdollConstraint("Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0.0f, -1.0f, 0.0f),
                 Vector3(0.0f, 1.0f, 0.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f), false);
-            CreateRagdollConstraint("Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0.0f, -1.0f, 0.0f), 
+            CreateRagdollConstraint("Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0.0f, -1.0f, 0.0f),
                 Vector3(0.0f, 1.0f, 0.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f), false);
-            CreateRagdollConstraint("Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f), 
+            CreateRagdollConstraint("Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
                 Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f), 
+            CreateRagdollConstraint("Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
                 Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
 
             // Disable keyframe animation from all bones so that they will not interfere with the ragdoll
@@ -321,13 +315,13 @@ class CreateRagdoll : ScriptObject
             Skeleton@ skeleton = model.skeleton;
             for (uint i = 0; i < skeleton.numBones; ++i)
                 skeleton.bones[i].animated = false;
-            
+
             // Finally remove self (the ScriptInstance which holds this script object) from the scene node. Note that this must
             // be the last operation performed in the function
             self.Remove();
         }
     }
-    
+
     void CreateRagdollBone(const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position,
         const Quaternion&in rotation)
     {
@@ -338,7 +332,7 @@ class CreateRagdoll : ScriptObject
             log.Warning("Could not find bone " + boneName + " for creating ragdoll physics components");
             return;
         }
-        
+
         RigidBody@ body = boneNode.CreateComponent("RigidBody");
         // Set mass to make movable
         body.mass = 1.0f;
@@ -348,7 +342,7 @@ class CreateRagdoll : ScriptObject
         // Set rest thresholds to ensure the ragdoll rigid bodies come to rest to not consume CPU endlessly
         body.linearRestThreshold = 1.5f;
         body.angularRestThreshold = 2.5f;
-    
+
         CollisionShape@ shape = boneNode.CreateComponent("CollisionShape");
         // We use either a box or a capsule shape for all of the bones
         if (type == SHAPE_BOX)
@@ -356,7 +350,7 @@ class CreateRagdoll : ScriptObject
         else
             shape.SetCapsule(size.x, size.y, position, rotation);
     }
-    
+
     void CreateRagdollConstraint(const String&in boneName, const String&in parentName, ConstraintType type,
         const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit,
         bool disableCollision = true)
@@ -373,7 +367,7 @@ class CreateRagdoll : ScriptObject
             log.Warning("Could not find bone " + parentName + " for creating ragdoll constraint");
             return;
         }
-        
+
         Constraint@ constraint = boneNode.CreateComponent("Constraint");
         constraint.constraintType = type;
         // Most of the constraints in the ragdoll will work better when the connected bodies don't collide against each other
@@ -389,3 +383,24 @@ class CreateRagdoll : ScriptObject
         constraint.lowLimit = lowLimit;
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Spawn</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "            <attribute name=\"Text\" value=\"LEFT\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

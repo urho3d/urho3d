@@ -17,15 +17,13 @@ const float ENGINE_POWER = 10.0f;
 const float DOWN_FORCE = 10.0f;
 const float MAX_WHEEL_ANGLE = 22.5f;
 
-Scene@ scene_;
-Node@ cameraNode;
 Node@ vehicleNode;
 
 void Start()
 {
     // Execute the common startup for samples
     SampleStart();
-    
+
     // Create static scene content
     CreateScene();
 
@@ -52,7 +50,7 @@ void CreateScene()
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 500.0f;
     renderer.viewports[0] = Viewport(scene_, camera);
-    
+
     // Create static scene content. First create a zone for ambient lighting and fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -84,7 +82,7 @@ void CreateScene()
     // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
     // terrain patches and other objects behind it
     terrain.occluder = true;
-    
+
     RigidBody@ body = terrainNode.CreateComponent("RigidBody");
     body.collisionLayer = 2; // Use layer bitmask 2 for static geometry
     CollisionShape@ shape = terrainNode.CreateComponent("CollisionShape");
@@ -105,7 +103,7 @@ void CreateScene()
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
         object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
         object.castShadows = true;
-        
+
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         body.collisionLayer = 2;
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
@@ -128,7 +126,7 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Use WASD keys to drive, mouse to rotate camera\n"
+    instructionText.text = "Use WASD keys to drive, mouse/touch to rotate camera\n"
         "F5 to save scene, F7 to load";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
@@ -147,6 +145,9 @@ void SubscribeToEvents()
 
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate");
+
+    // Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
+    UnsubscribeFromEvent("SceneUpdate");
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -167,8 +168,27 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         vehicle.controls.Set(CTRL_RIGHT, input.keyDown['D']);
 
         // Add yaw & pitch from the mouse motion. Used only for the camera, does not affect motion
-        vehicle.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
-        vehicle.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
+        if (touchEnabled)
+        {
+            for (uint i = 0; i < input.numTouches; ++i)
+            {
+                TouchState@ state = input.touches[i];
+                if (state.touchedElement is null) // Touch on empty space
+                {
+                    Camera@ camera = cameraNode.GetComponent("Camera");
+                    if (camera is null)
+                        return;
+
+                    vehicle.controls.yaw += TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.x;
+                    vehicle.controls.pitch += TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.y;
+                }
+            }
+        }
+        else
+        {
+            vehicle.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
+            vehicle.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
+        }
         // Limit pitch
         vehicle.controls.pitch = Clamp(vehicle.controls.pitch, 0.0f, 80.0f);
 
@@ -369,3 +389,5 @@ class Vehicle : ScriptObject
     }
 }
 
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions = "";

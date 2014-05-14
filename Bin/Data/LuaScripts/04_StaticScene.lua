@@ -3,13 +3,9 @@
 --     - Creating a 3D scene with static content
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling keyboard and mouse input to move a freelook camera
+--     - Applying a material shader to animate vegetation (simulate wind)
 
 require "LuaScripts/Utilities/Sample"
-
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
 
 function Start()
     -- Execute the common startup for samples
@@ -68,7 +64,7 @@ function CreateScene()
         mushroomNode:SetScale(0.5 + Random(2.0))
         local mushroomObject = mushroomNode:CreateComponent("StaticModel")
         mushroomObject.model = cache:GetResource("Model", "Models/Mushroom.mdl")
-        mushroomObject.material = cache:GetResource("Material", "Materials/Mushroom.xml")
+        mushroomObject.material = cache:GetResource("Material", "Materials/MushroomWind.xml") -- Apply Vegetation Windy shader
     end
 
     -- Create a scene node for the camera, which we will move around

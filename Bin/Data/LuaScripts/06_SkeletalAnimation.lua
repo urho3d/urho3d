@@ -8,22 +8,16 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
 
     -- Create the scene content
     CreateScene()
-    
+
     -- Create the UI content
     CreateInstructions()
-    
+
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
@@ -33,7 +27,7 @@ end
 
 function CreateScene()
     scene_ = Scene()
-    
+
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
@@ -45,7 +39,7 @@ function CreateScene()
     local planeObject = planeNode:CreateComponent("StaticModel")
     planeObject.model = cache:GetResource("Model", "Models/Plane.mdl")
     planeObject.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
-    
+
     -- Create a Zone component for ambient lighting & fog control
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
@@ -54,7 +48,7 @@ function CreateScene()
     zone.fogColor = Color(0.5, 0.5, 0.7)
     zone.fogStart = 100.0
     zone.fogEnd = 300.0
-    
+
     -- Create a directional light to the world. Enable cascaded shadows on it
     local lightNode = scene_:CreateChild("DirectionalLight")
     lightNode.direction = Vector3(0.6, -1.0, 0.8)
@@ -64,13 +58,13 @@ function CreateScene()
     light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
-    
+
     -- Create animated models
     local uint NUM_MODELS = 100
     local MODEL_MOVE_SPEED = 2.0
     local MODEL_ROTATE_SPEED = 100.0
     local bounds = BoundingBox(Vector3(-47.0, 0.0, -47.0), Vector3(47.0, 0.0, 47.0))
-    
+
     for i = 1, NUM_MODELS do
         local modelNode = scene_:CreateChild("Jack")
         modelNode.position = Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0)
@@ -79,7 +73,7 @@ function CreateScene()
         modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
         modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
         modelObject.castShadows = true
-        
+
         -- Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
         -- animation, The alternative would be to use an AnimationController component which updates the animation automatically,
         -- but we need to update the model's position manually in any case
@@ -89,7 +83,7 @@ function CreateScene()
         state.weight = 1.0
         state.looped = true
 
-        -- Create our Mover script object that will move & animate the model during each frame's update. 
+        -- Create our Mover script object that will move & animate the model during each frame's update.
 
         local object = modelNode:CreateScriptObject("Mover")
         object:SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds)
@@ -99,7 +93,7 @@ function CreateScene()
     cameraNode = scene_:CreateChild("Camera")
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
-    
+
     -- Set an initial position for the camera scene node above the plane
     cameraNode.position = Vector3(0.0, 5.0, 0.0)
 end
@@ -128,7 +122,7 @@ end
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
-    
+
     -- Subscribe HandlePostRenderUpdate() function for processing the post-render update event, sent after Renderer subsystem is
     -- done with defining the draw calls for the viewports (but before actually executing them.) We will request debug geometry
     -- rendering during that event
@@ -209,18 +203,33 @@ end
 function Mover:Update(timeStep)
     local node = self:GetNode()
     node:Translate(Vector3(0.0, 0.0, 1.0) * self.moveSpeed * timeStep)
-    
+
     -- If in risk of going outside the plane, rotate the model right
     local pos = node.position
     local bounds = self.bounds
     if pos.x < bounds.min.x or pos.x > bounds.max.x or pos.z < bounds.min.z or pos.z > bounds.max.z then
         node:Yaw(self.rotationSpeed * timeStep)
     end
-    
+
     -- Get the model's first (only) animation state and advance its time
     local model = node:GetComponent("AnimatedModel")
     local state = model:GetAnimationState(0)
     if state ~= nil then
         state:AddTime(timeStep)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>"..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />"..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>"..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">"..
+        "        <element type=\"Text\">"..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />"..
+        "            <attribute name=\"Text\" value=\"SPACE\" />"..
+        "        </element>"..
+        "    </add>"..
+        "</patch>"
 end
