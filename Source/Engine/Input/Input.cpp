@@ -1583,14 +1583,19 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 evt.key.keysym.sym = keyBindingVar.GetInt();
                 evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
             }
-            if (!mouseButtonBindingVar.IsEmpty() && !touchEmulation_)
+            if (!mouseButtonBindingVar.IsEmpty())
             {
                 // Mouse button are sent as extra events besides key events
-                // Do not send mouse events in touch emulation mode, because those would in turn be re-interpreted as touch
+                // Disable touch emulation handling during this to prevent endless loop
+                bool oldTouchEmulation = touchEmulation_;
+                touchEmulation_ = false;
+                
                 SDL_Event evt;
                 evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
                 evt.button.button = mouseButtonBindingVar.GetInt();
                 HandleSDLEvent(&evt);
+                
+                touchEmulation_ = oldTouchEmulation;
             }
         }
     }
