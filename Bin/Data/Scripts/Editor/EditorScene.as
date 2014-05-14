@@ -906,6 +906,12 @@ bool SceneRebuildNavigation()
     ui.cursor.shape = CS_BUSY;
 
     Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh", true);
+    if (navMeshes.empty)
+    {
+        MessageBox("No NavigationMesh components in the scene, nothing to rebuild.");
+        return false;
+    }
+
     bool success = true;
     for (uint i = 0; i < navMeshes.length; ++i)
     {
@@ -926,12 +932,20 @@ bool LoadParticleData(const String&in fileName)
     if (!xmlFile.Load(File(fileName, FILE_READ)))
         return false;
 
+    bool needRefresh = false;
+
     for (uint i = 0; i < editComponents.length; ++i)
     {
         ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[i]);
         if (emitter !is null)
+        {
             emitter.Load(xmlFile);
+            needRefresh = true;
+        }
     }
+    
+    if (needRefresh)
+        UpdateAttributeInspector();
 
     return true;
 }

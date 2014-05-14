@@ -556,6 +556,8 @@ bool PickFile()
             CreateFileSelector("Load particle data", "Load", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadParticleData");
         }
+        else
+            MessageBox("Need to have a selected ParticleEmitter component to load particle data.");
     }
     else if (action == "Save particle data")
     {
@@ -564,6 +566,8 @@ bool PickFile()
             CreateFileSelector("Save particle data", "Save", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveParticleData");
         }
+        else
+            MessageBox("Need to have a selected ParticleEmitter component to save particle data.");
     }
     // UI-element
     else if (action == "Open UI-layout...")
