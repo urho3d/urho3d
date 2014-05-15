@@ -900,7 +900,7 @@ The techniques for different LOD levels and quality settings must appear in a sp
 - Second most distant & highest quality
 - ...
 
-%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. A built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
+%Material shader parameters can be floats or vectors up to 4 components, or matrices.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
@@ -1013,6 +1013,35 @@ Pixel shader:
 - LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
 - SHADOWCMP: use manual shadow depth compare, Direct3D9 only for DF16 & DF24 shadow map formats
 - HEIGHTFOG: object's zone has height fog mode
+
+\section Shaders_InbuiltUniforms Inbuilt shader uniforms
+
+When objects or quad passes are being rendered, various engine inbuilt uniforms are set to assist with the rendering. Below is a partial list of the uniforms listed as HLSL data types. Look at the file Uniforms.glsl for the corresponding GLSL uniforms.
+
+Vertex shader uniforms:
+
+- float3 cAmbientStartColor: the start color value for a zone's ambient gradient
+- float3 cAmbientEndColor: the end color value for a zone's ambient gradient
+- float3 cCameraPos: camera's world position
+- float3x3 cCameraRot: camera's world rotation matrix
+- float cNearClip: camera's near clip distance
+- float cFarClip: camera's far clip distance
+- float cDeltaTime: the timestep of the current frame
+- float cElapsedTime: scene's elapsed time value. Can be used to implement animating materials
+- float4x3 cModel: the world transform matrix of the object being rendered
+- float4x4 cViewProj: the camera's concatenated view and projection matrices
+- float4x3 cZone: zone's transform matrix; used for ambient gradient calculations
+
+Pixel shader uniforms:
+
+- float3 cAmbientColor: ambient color for a zone with no ambient gradient
+- float3 cCameraPosPS: camera's world position
+- float cDeltaTimePS: the timestep of the current frame
+- float cElapsedTimePS: scene's elapsed time value
+- float3 cFogColor: the zone's fog color
+- float4 cFogParams: fog calculation parameters (see Batch.cpp and Fog.hlsl for the exact meaning)
+- float cNearClipPS: camera's near clip distance
+- float cFarClipPS: camera's far clip distance
 
 \section Shaders_Writing Writing shaders
 
