@@ -1,11 +1,5 @@
 $#include "StaticModel.h"
 
-struct StaticModelGeometryData
-{
-    Vector3 center_ @ center;
-    unsigned lodLevel_ @ lodLevel;
-};
-
 class StaticModel : public Drawable
 {
     void SetModel(Model* model);
