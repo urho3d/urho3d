@@ -1316,6 +1316,29 @@ Properties:
 - CursorShape shape
 - bool useSystemShapes
 
+### CustomGeometry : Drawable
+
+Methods:
+
+- void Clear()
+- void SetNumGeometries(unsigned num)
+- void BeginGeometry(unsigned index, PrimitiveType type)
+- void DefineVertex(const Vector3& position)
+- void DefineNormal(const Vector3& normal)
+- void DefineTangent(const Vector4& tangent)
+- void DefineColor(const Color& color)
+- void DefineTexCoord(const Vector2& texCoord)
+- void Commit()
+- void SetMaterial(Material* material)
+- bool SetMaterial(unsigned index, Material* material)
+- unsigned GetNumGeometries()
+- Material* GetMaterial(unsigned index = 0)
+
+Properties:
+
+- Material* material
+- unsigned numGeometries
+
 ### DebugHud : Object
 
 Methods:
@@ -4650,14 +4673,6 @@ Properties:
 - BoundingBox& boundingBox (readonly)
 - unsigned numGeometries (readonly)
 - unsigned occlusionLodLevel
-
-### StaticModelGeometryData
-
-
-Properties:
-
-- Vector3 center
-- unsigned lodLevel
 
 ### StaticModelGroup : StaticModel
 
