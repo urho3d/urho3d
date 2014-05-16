@@ -51,10 +51,10 @@ void Sprite2D::RegisterObject(Context* context)
 bool Sprite2D::Load(Deserializer& source)
 {
     SharedPtr<Texture2D> texture(new Texture2D(context_));
+    texture->SetName(GetName());
     if (!texture->Load(source))
         return false;
 
-    texture->SetName(GetName());
     SetTexture(texture);
 
     if (texture)

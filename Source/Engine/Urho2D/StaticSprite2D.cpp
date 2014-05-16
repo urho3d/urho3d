@@ -166,7 +166,7 @@ void StaticSprite2D::UpdateVertices()
 
     float leftU = rectangle_.left_ * invTexW;
     float rightU = rectangle_.right_ * invTexW;
-    float topV = rectangle_.top_ * invTexH;    
+    float topV = rectangle_.top_ * invTexH;
     float bottomV = rectangle_.bottom_ * invTexH;
     vertex0.uv_ = Vector2(leftU, bottomV);
     vertex1.uv_ = Vector2(leftU, topV);
