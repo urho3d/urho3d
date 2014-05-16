@@ -113,7 +113,7 @@ set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
 set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 # Install dependency for SDL_android_main.c, D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
+install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} SDL PARENT_SCOPE)
 install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_SHARE_DIR}/templates/android)
 
