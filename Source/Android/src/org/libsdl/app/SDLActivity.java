@@ -809,6 +809,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     y = -event.values[0];
                     break;
                 case Surface.ROTATION_180:
+                    // Urho3D: fix SDL copy-paste error
                     x = -event.values[0];
                     y = -event.values[1];
                     break;
