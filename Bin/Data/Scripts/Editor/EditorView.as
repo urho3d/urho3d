@@ -1086,8 +1086,11 @@ void UpdateViewports(float timeStep)
 
 void UpdateView(float timeStep)
 {
+    if (ui.HasModalElement() || ui.focusElement !is null)
+        return;
+
     // Move camera
-    if (ui.focusElement is null && !input.keyDown[KEY_LCTRL])
+    if (!input.keyDown[KEY_LCTRL])
     {
         float speedMultiplier = 1.0;
         if (input.keyDown[KEY_LSHIFT])
@@ -1171,7 +1174,7 @@ void UpdateView(float timeStep)
         orbiting = false;
 
     // Move/rotate/scale object
-    if (!editNodes.empty && editMode != EDIT_SELECT && ui.focusElement is null && input.keyDown[KEY_LCTRL])
+    if (!editNodes.empty && editMode != EDIT_SELECT && input.keyDown[KEY_LCTRL])
     {
         Vector3 adjust(0, 0, 0);
         if (input.keyDown[KEY_UP])
