@@ -1677,12 +1677,12 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 \page Urho2D Urho2D
 In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
 
-Basically you need to:
+A typical 2D game setup would consist of the following:
 	- Create an orthographic camera
 	- Create some sprites
 	- Use physics and constraints to interact with the scene
 
-To create a textured sprite with physics you must create a node that handles:
+To create a textured sprite with physics you must create a node that has:
 	- a drawable component + a resource (texture)
 	- a rigid body component + a collision shape component (for physics simulation)
 	- a constraint (optional)
