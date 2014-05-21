@@ -621,9 +621,8 @@ void PhysicsWorld::SendCollisionEvents()
         for (int i = 0; i < numManifolds; ++i)
         {
             btPersistentManifold* contactManifold = collisionDispatcher_->getManifoldByIndexInternal(i);
-            int numContacts = contactManifold->getNumContacts();
             // First check that there are actual contacts, as the manifold exists also when objects are close but not touching
-            if (!numContacts)
+            if (!contactManifold->getNumContacts())
                 continue;
 
             const btCollisionObject* objectA = contactManifold->getBody0();
@@ -667,7 +666,6 @@ void PhysicsWorld::SendCollisionEvents()
                 continue;
 
             btPersistentManifold* contactManifold = i->second_;
-            int numContacts = contactManifold->getNumContacts();
 
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
@@ -685,7 +683,7 @@ void PhysicsWorld::SendCollisionEvents()
 
             contacts_.Clear();
 
-            for (int j = 0; j < numContacts; ++j)
+            for (int j = 0; j < contactManifold->getNumContacts(); ++j)
             {
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
                 contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
@@ -728,7 +726,7 @@ void PhysicsWorld::SendCollisionEvents()
                 continue;
 
             contacts_.Clear();
-            for (int j = 0; j < numContacts; ++j)
+            for (int j = 0; j < contactManifold->getNumContacts(); ++j)
             {
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
                 contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
