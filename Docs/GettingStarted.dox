@@ -39,8 +39,7 @@ Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 -# Run CMake in the root directory with your preferred toolchain specified to generate the build files. You can use the provided batch files or shell scripts on the respective platform.\n
     - Windows: cmake_vs2008.bat, cmake_vs2010.bat, cmake_vs2012.bat, or cmake_mingw.bat,\n
     - Linux: cmake_gcc.sh, cmake_eclipse.sh, or cmake_codeblocks.sh\n
-    - Mac OS X: cmake_gcc.sh or cmake_macosx.sh.
-
+    - Mac OS X: cmake_gcc.sh or cmake_macosx.sh.\n
 -# Open the CMake's generated project file in the IDE of your choice. Change the build configuration (Debug/Release) and then build all the targets.\n
     - Visual Studio: open Urho3D.sln from the Build directory.\n
     - Xcode: open Urho3D.xcodeproj.\n
