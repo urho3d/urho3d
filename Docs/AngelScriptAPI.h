@@ -4032,6 +4032,7 @@ bool CreateDir(const String&);
 bool Delete(const String&);
 bool DirExists(const String&) const;
 bool FileExists(const String&) const;
+String GetAppPreferencesDir(const String&, const String&) const;
 uint GetLastModifiedTime(const String&) const;
 bool Rename(const String&, const String&);
 Array<String> ScanDir(const String&, const String&, uint, bool) const;

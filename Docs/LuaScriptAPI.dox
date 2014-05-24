@@ -1834,6 +1834,7 @@ Methods:
 - const Vector<String>& ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
+- String GetAppPreferencesDir(const String org, const String app) const
 
 ### FileWatcher : Object
 
