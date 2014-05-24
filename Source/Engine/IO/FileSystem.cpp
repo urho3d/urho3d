@@ -77,7 +77,7 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
-    char* prefPath = SDL_GetPrefPath("urho3d", "Urho3D");
+    char* prefPath = SDL_GetPrefPath("urho3d", "temp");
     if (prefPath)
     {
         stderrFilename = String(prefPath) + "command-stderr";
@@ -695,6 +695,21 @@ String FileSystem::GetUserDocumentsDir() const
     strcpy(pathName, getenv("HOME"));
     return AddTrailingSlash(String(pathName));
     #endif
+}
+
+String FileSystem::GetAppPreferencesDir(const String& org, const String& app) const
+{
+    String dir;
+    char* prefPath = SDL_GetPrefPath(org.CString(), app.CString());
+    if (prefPath)
+    {
+        dir = String(prefPath);
+        SDL_free(prefPath);
+    }
+    else
+        LOGWARNING("Could not get application preferences directory");
+
+    return dir;
 }
 
 void FileSystem::RegisterPath(const String& pathName)

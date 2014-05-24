@@ -94,6 +94,8 @@ public:
     String GetProgramDir() const;
     /// Return the user documents directory.
     String GetUserDocumentsDir() const;
+    /// Return the application preferences directory.
+    String GetAppPreferencesDir(const String& org, const String& app) const;
     
 private:
     /// Scan directory, called internally.
