@@ -117,11 +117,11 @@ public:
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// Set shader parameter.
     void SetShaderParameter(const String& name, const Variant& value);
-    /// Set shader paramter animation.
+    /// Set shader parameter animation.
     void SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
-    /// Set shader paramter animation.
+    /// Set shader parameter animation wrap mode.
     void SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode);
-    /// Set shader paramter animation.
+    /// Set shader parameter animation speed.
     void SetShaderParameterAnimationSpeed(const String& name, float speed);
     /// Set texture.
     void SetTexture(TextureUnit unit, Texture* texture);
