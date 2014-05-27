@@ -128,6 +128,48 @@ public:
         }
     }
 
+    TriangleMeshInterface(CustomGeometry* custom) : btTriangleIndexVertexArray()
+    {
+        const Vector<PODVector<CustomGeometryVertex> >& srcVertices = custom->GetVertices();
+        unsigned totalVertexCount = 0;
+        
+        for (unsigned i = 0; i < srcVertices.Size(); ++i)
+            totalVertexCount += srcVertices[i].Size();
+
+        if (totalVertexCount)
+        {
+            // CustomGeometry vertex data is unindexed, so build index data here
+            SharedArrayPtr<unsigned char> vertexData(new unsigned char[totalVertexCount * sizeof(Vector3)]);
+            SharedArrayPtr<unsigned char> indexData(new unsigned char[totalVertexCount * sizeof(unsigned)]);
+            dataArrays_.Push(vertexData);
+            dataArrays_.Push(indexData);
+            
+            Vector3* destVertex = reinterpret_cast<Vector3*>(&vertexData[0]);
+            unsigned* destIndex = reinterpret_cast<unsigned*>(&indexData[0]);
+            unsigned k = 0;
+            
+            for (unsigned i = 0; i < srcVertices.Size(); ++i)
+            {
+                for (unsigned j = 0; j < srcVertices[i].Size(); ++j)
+                {
+                    *destVertex++ = srcVertices[i][j].position_;
+                    *destIndex++ = k++;
+                }
+            }
+            
+            btIndexedMesh meshIndex;
+            meshIndex.m_numTriangles = totalVertexCount / 3;
+            meshIndex.m_triangleIndexBase = indexData;
+            meshIndex.m_triangleIndexStride = 3 * sizeof(unsigned);
+            meshIndex.m_numVertices = totalVertexCount;
+            meshIndex.m_vertexBase = vertexData;
+            meshIndex.m_vertexStride = sizeof(Vector3);
+            meshIndex.m_indexType = PHY_INTEGER;
+            meshIndex.m_vertexType = PHY_FLOAT;
+            m_indexedMeshes.push_back(meshIndex);
+        }
+    }
+    
 private:
     /// Shared vertex/index data used in the collision
     Vector<SharedArrayPtr<unsigned char> > dataArrays_;
@@ -139,6 +181,18 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
     infoMap_(0)
 {
     meshInterface_ = new TriangleMeshInterface(model, lodLevel);
+    shape_ = new btBvhTriangleMeshShape(meshInterface_, true, true);
+
+    infoMap_ = new btTriangleInfoMap();
+    btGenerateInternalEdgeInfo(shape_, infoMap_);
+}
+
+TriangleMeshData::TriangleMeshData(CustomGeometry* custom) :
+    meshInterface_(0),
+    shape_(0),
+    infoMap_(0)
+{
+    meshInterface_ = new TriangleMeshInterface(custom);
     shape_ = new btBvhTriangleMeshShape(meshInterface_, true, true);
 
     infoMap_ = new btTriangleInfoMap();
@@ -200,42 +254,15 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
 
 ConvexData::ConvexData(CustomGeometry* custom)
 {
+    const Vector<PODVector<CustomGeometryVertex> >& srcVertices = custom->GetVertices();
     PODVector<Vector3> vertices;
-    unsigned numGeometries = custom->GetNumGeometries();
 
-    for (unsigned i = 0; i < numGeometries; ++i)
+    for (unsigned i = 0; i < srcVertices.Size(); ++i)
     {
-        Geometry* geom = custom->GetLodGeometry(i, 0);
-        if (!geom)
-        {
-            LOGWARNING("Skipping null geometry for convex hull collision");
-            continue;
-        }
-
-        const unsigned char* vertexData;
-        const unsigned char* indexData;
-        unsigned vertexSize;
-        unsigned indexSize;
-        unsigned elementMask;
-
-        geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-        if (!vertexData)
-        {
-            LOGWARNING("Skipping geometry with no CPU-side geometry data for convex hull collision - no vertex data");
-            continue;
-        }
-
-        unsigned vertexStart = geom->GetVertexStart();
-        unsigned vertexCount = geom->GetVertexCount();
-
-        // Copy vertex data
-        for (unsigned j = 0; j < vertexCount; ++j)
-        {
-            const Vector3& v = *((const Vector3*)(&vertexData[(vertexStart + j) * vertexSize]));
-            vertices.Push(v);
-        }
+        for (unsigned j = 0; j < srcVertices[i].Size(); ++j)
+            vertices.Push(srcVertices[i][j].position_);
     }
-
+    
     BuildHull(vertices);
 }
 
@@ -553,6 +580,35 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     MarkNetworkUpdate();
 }
 
+void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+{
+    if (!custom)
+    {
+        LOGERROR("Null custom geometry, can not set triangle mesh");
+        return;
+    }
+    if (!custom->GetNode())
+    {
+        LOGERROR("Custom geometry has null scene node, can not set triangle mesh");
+        return;
+    }
+
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
+    shapeType_ = SHAPE_TRIANGLEMESH;
+    model_.Reset();
+    lodLevel_ = 0;
+    size_ = scale;
+    position_ = position;
+    rotation_ = rotation;
+    customGeometryID_ = custom->GetNode()->GetID();
+
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
+}
+
 void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
 {
     if (!model)
@@ -605,7 +661,6 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
     NotifyRigidBody();
     MarkNetworkUpdate();
 }
-
 
 void CollisionShape::SetTerrain()
 {
@@ -930,7 +985,20 @@ void CollisionShape::UpdateShape()
 
         case SHAPE_TRIANGLEMESH:
             size_ = size_.Abs();
-            if (model_ && model_->GetNumGeometries())
+            if (customGeometryID_ && GetScene())
+            {
+                Node* node = GetScene()->GetNode(customGeometryID_);
+                CustomGeometry* custom = node ? node->GetComponent<CustomGeometry>() : 0;
+                if (custom)
+                {
+                    geometry_ = new TriangleMeshData(custom);
+                    TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry_.Get());
+                    shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_, ToBtVector3(newWorldScale * size_));
+                }
+                else
+                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) + " for triangle mesh shape creation");
+            }
+            else if (model_ && model_->GetNumGeometries())
             {
                 // Check the geometry cache
                 Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
@@ -965,7 +1033,6 @@ void CollisionShape::UpdateShape()
                     ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
                     shape_ = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
                     shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
-                    LOGINFO("Set convexhull from customgeometry");
                 }
                 else
                     LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) + " for convex shape creation");

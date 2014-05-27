@@ -69,6 +69,8 @@ struct TriangleMeshData : public CollisionGeometryData
 {
     /// Construct from a model.
     TriangleMeshData(Model* model, unsigned lodLevel);
+    /// Construct from a custom geometry.
+    TriangleMeshData(CustomGeometry* custom);
     /// Destruct. Free geometry data.
     ~TriangleMeshData();
     
@@ -157,8 +159,10 @@ public:
     void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a cone.
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// Set as a triangle mesh.
+    /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
     void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    /// Set as a triangle mesh from CustomGeometry.
+    void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from Model.
     void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from CustomGeometry.
