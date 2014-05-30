@@ -3247,7 +3247,7 @@ Methods:
 - void SetEmitterSize(const Vector3& size)
 - void SetActiveTime(float time)
 - void SetInactiveTime(float time)
-- void SetEmitting(bool enable, bool resetPeriod = false)
+- void SetEmitting(bool enable)
 - void SetUpdateInvisible(bool enable)
 - void SetTimeToLive(float time)
 - void SetMinTimeToLive(float time)
@@ -3273,6 +3273,9 @@ Methods:
 - void SetColor(const Color& color)
 - void SetNumColors(unsigned num)
 - void SetNumTextureFrames(unsigned num)
+- void ResetEmissionTimer()
+- void RemoveAllParticles()
+- void Reset()
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
 - bool GetUpdateInvisible() const

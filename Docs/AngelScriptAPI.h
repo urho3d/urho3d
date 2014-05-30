@@ -6230,7 +6230,10 @@ bool Load(XMLFile);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAllParticles();
 void RemoveInstanceDefault();
+void Reset();
+void ResetEmissionTimer();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -6242,7 +6245,6 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetColor(const Color&);
-void SetEmitting(bool, bool);
 
 // Properties:
 float activeTime;
