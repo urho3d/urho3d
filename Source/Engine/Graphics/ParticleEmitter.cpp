@@ -619,9 +619,9 @@ void ParticleEmitter::SetInactiveTime(float time)
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
+void ParticleEmitter::SetEmitting(bool enable)
 {
-    if (enable != emitting_ || resetPeriod)
+    if (enable != emitting_)
     {
         emitting_ = enable;
         periodTimer_ = 0.0f;
@@ -792,6 +792,26 @@ void ParticleEmitter::SetTextureFrames(const Vector<TextureFrame>& animation)
 void ParticleEmitter::SetNumTextureFrames(unsigned num)
 {
     textureFrames_.Resize(num);
+}
+
+void ParticleEmitter::ResetEmissionTimer()
+{
+    emissionTimer_ = 0.0f;
+}
+
+void ParticleEmitter::RemoveAllParticles()
+{
+    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+        i->enabled_ = false;
+    
+    Commit();
+}
+
+void ParticleEmitter::Reset()
+{
+    RemoveAllParticles();
+    ResetEmissionTimer();
+    SetEmitting(true);
 }
 
 void ParticleEmitter::SetParticlesAttr(VariantVector value)
