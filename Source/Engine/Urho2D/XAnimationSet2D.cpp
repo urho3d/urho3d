@@ -1,0 +1,249 @@
+//
+// Copyright (c) 2008-2014 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#include "Precompiled.h"
+#include "Context.h"
+#include "Drawable2D.h"
+#include "FileSystem.h"
+#include "Log.h"
+#include "ResourceCache.h"
+#include "Sprite2D.h"
+#include "XAnimation2D.h"
+#include "XAnimationSet2D.h"
+#include "XMLFile.h"
+
+#include "DebugNew.h"
+
+namespace Urho3D
+{
+
+XAnimationSet2D::XAnimationSet2D(Context* context) :
+    Resource(context)
+{
+}
+
+XAnimationSet2D::~XAnimationSet2D()
+{
+}
+
+void XAnimationSet2D::RegisterObject(Context* context)
+{
+    context->RegisterFactory<XAnimationSet2D>();
+}
+
+bool XAnimationSet2D::Load(Deserializer& source)
+{
+    XMLFile xmlFile(context_);
+    if (!xmlFile.Load(source))
+    {
+        LOGERROR("Load XML filed " + source.GetName());
+        return false;
+    }
+
+    XMLElement rootElem = xmlFile.GetRoot("spriter_data");
+    if (!rootElem)
+    {
+        LOGERROR("Invalid spriter file " + source.GetName());
+        return false;
+    }
+    
+    if (!LoadFolders(rootElem))
+        return false;
+
+    XMLElement entityElem = rootElem.GetChild("entity");
+    if (!entityElem)
+    {
+        LOGERROR("Could not find entity");
+        return false;
+    }
+    
+    for (XMLElement animationElem = entityElem.GetChild("animation"); animationElem; animationElem = animationElem.GetNext("animation"))
+    {
+        if (!LoadAnimation(animationElem))
+            return false;
+    }
+
+    return true;
+}
+
+unsigned XAnimationSet2D::GetNumAnimations() const
+{
+    return animations_.Size();
+}
+
+XAnimation2D* XAnimationSet2D::GetAnimation(unsigned index) const
+{
+    if (index < animations_.Size())
+        return animations_[index];
+    return 0;
+}
+
+XAnimation2D* XAnimationSet2D::GetAnimation(const String& name) const
+{
+    for (unsigned i = 0; i < animations_.Size(); ++i)
+    {
+        if (animations_[i]->GetName() == name)
+            return animations_[i];
+    }
+    return 0;
+}
+
+Sprite2D* XAnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
+{
+    unsigned key = (folderId << 16) + fileId;
+    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(key);
+    if (i != sprites_.End())
+        return i->second_;
+    return 0;
+}
+
+bool XAnimationSet2D::LoadFolders(const XMLElement &rootElem)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String parentPath = GetParentPath(GetName());
+
+    for (XMLElement folderElem = rootElem.GetChild("folder"); folderElem; folderElem = folderElem.GetNext("folder"))
+    {
+        unsigned folderId = folderElem.GetUInt("id");
+
+        for (XMLElement fileElem = folderElem.GetChild("file"); fileElem; fileElem = fileElem.GetNext("file"))
+        {
+            unsigned fileId = fileElem.GetUInt("id");
+            String fileName = fileElem.GetAttribute("name");
+
+            SharedPtr<Sprite2D> sprite(cache->GetResource<Sprite2D>(parentPath + fileName));
+            if (!sprite)
+            {
+                LOGERROR("Could not load sprite " + parentPath + fileName);
+                return false;
+            }
+
+            sprites_[(folderId << 16) + fileId] = sprite;
+        }
+    }
+
+    return true;
+}
+
+
+bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
+{
+    SharedPtr<XAnimation2D> animation(new XAnimation2D());
+    
+    String name = animationElem.GetAttribute("name");
+    animation->SetName(name);
+
+    float length = animationElem.GetFloat("length") * 0.001f;
+    animation->SetLength(length);
+
+    bool looping = true;
+    if (animationElem.HasAttribute("looping"))
+        looping = animationElem.GetBool("looping");
+    animation->SetLoop(looping);
+
+    // Load main line
+    XMLElement mainlineElem = animationElem.GetChild("mainline");
+    for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
+    {
+        MainlineKey mainlineKey;
+        mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
+
+        // Just support object ref now
+        for (XMLElement objectRefElem = keyElem.GetChild("object_ref"); objectRefElem; objectRefElem = objectRefElem.GetNext("object_ref"))
+        {
+            ObjectRef objectRef;
+            objectRef.timeline_ = objectRefElem.GetInt("timeline");
+            objectRef.key_ = objectRefElem.GetInt("key");
+            objectRef.zIndex_ = objectRefElem.GetInt("z_index");
+
+            mainlineKey.objectRefs_.Push(objectRef);
+        }
+
+        animation->AddMainlineKey(mainlineKey);
+    }
+
+    // Load time lines
+    for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
+    {
+        Timeline timeline;
+        timeline.name_ = timelineElem.GetAttribute("name");
+
+        for (XMLElement keyElem = timelineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
+        {
+            ObjectKey objectKey;
+            objectKey.time_ = keyElem.GetFloat("time") * 0.001f;
+            objectKey.spin_ = 1;
+            if (keyElem.HasAttribute("spin"))
+                objectKey.spin_ = keyElem.GetInt("spin");
+
+            XMLElement objectElem = keyElem.GetChild("object");          
+            
+            int folder = objectElem.GetUInt("folder");
+            int file = objectElem.GetUInt("file");
+            objectKey.sprite_ = GetSprite(folder, file);
+            if (!objectKey.sprite_)
+            {
+                LOGERROR("Could not find sprite");
+                return false;
+            }
+
+            objectKey.position_.x_ = objectElem.GetFloat("x") * PIXEL_SIZE;
+            objectKey.position_.y_ = objectElem.GetFloat("y") * PIXEL_SIZE;
+            
+            if (objectElem.HasAttribute("pivot_x"))
+                objectKey.pivot_.x_ = objectElem.GetFloat("pivot_x");
+
+            if (objectElem.HasAttribute("pivot_y"))
+                objectKey.pivot_.y_ = objectElem.GetFloat("pivot_y");
+
+            if (objectElem.HasAttribute("scale_x"))
+                objectKey.scale_.x_ = objectElem.GetFloat("scale_x");
+
+            if (objectElem.HasAttribute("scale_y"))
+                objectKey.scale_.y_ = objectElem.GetFloat("scale_y");
+
+            objectKey.angle_= objectElem.GetFloat("angle");
+                
+            if (objectElem.HasAttribute("a"))
+                objectKey.alpha_ = objectElem.GetFloat("a");
+
+            timeline.objectKeys_.Push(objectKey);
+        }
+
+        // Add end key for looped animation
+        if (looping && timeline.objectKeys_.Back().time_ != length)
+        {
+            ObjectKey objectKey = timeline.objectKeys_.Front();
+            objectKey.time_ = length;
+            timeline.objectKeys_.Push(objectKey);
+        }
+
+        animation->AddTimeline(timeline);
+    }
+
+    animations_.Push(animation);
+
+    return true;
+}
+
+
+}

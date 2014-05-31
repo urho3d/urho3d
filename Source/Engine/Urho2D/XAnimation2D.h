@@ -97,7 +97,7 @@ struct Timeline
     Vector<ObjectKey> objectKeys_;
 };
 
-/// Spriter animation. for more information please refer http://www.brashmonkey.com/spriter.htm.
+/// Spriter animation. for more information please refer to http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API XAnimation2D : public RefCounted
 {
 public:
