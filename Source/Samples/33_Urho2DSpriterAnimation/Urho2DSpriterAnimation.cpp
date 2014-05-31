@@ -111,7 +111,7 @@ void Urho2DSpriterAnimation::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use mouse click to play next animation,\n Use WASD keys to move, use PageUp PageDown keys to zoom.");
+    instructionText->SetText("Use mouse click to play next animation, \nUse WASD keys to move, use PageUp PageDown keys to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center
