@@ -30,6 +30,7 @@ namespace Urho3D
 {
 
 class Sprite2D;
+class XAnimationSet2D;
 
 /// Object reference.
 struct ObjectRef
@@ -102,7 +103,7 @@ class URHO3D_API XAnimation2D : public RefCounted
 {
 public:
     /// Construct.
-    XAnimation2D();
+    XAnimation2D(XAnimationSet2D* animationSet);
     /// Destruct
     virtual ~XAnimation2D();
 
@@ -111,30 +112,34 @@ public:
     /// Set length.
     void SetLength(float length);
     /// Set loop.
-    void SetLoop(bool loop);
+    void SetLooped(bool looped);
     /// Add mainline key.
     void AddMainlineKey(const MainlineKey& mainlineKey);
     /// Add timeline.
     void AddTimeline(const Timeline& timeline);
 
+    /// Return animation set.
+    XAnimationSet2D* GetAnimationSet() const;
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return length.
     float GetLength() const { return length_; }
     /// Return looping.
-    bool GetLoop() const { return loop_; }
+    bool IsLooped() const { return looped_; }
     /// Return all mainline keys.
     const Vector<MainlineKey>& GetMainlineKeys() const { return mainlineKeys_; }
     /// Return all timelines.
     const Vector<Timeline>& GetTimelines() const { return timelines_; }
 
 private:
+    /// Animation set.
+    WeakPtr<XAnimationSet2D> animationSet_;
     /// Name.
     String name_;
     /// Length.
     float length_;
-    /// Loop.
-    bool loop_;
+    /// Looped.
+    bool looped_;
     /// All mainline Keys.
     Vector<MainlineKey> mainlineKeys_;
     /// All timelines.

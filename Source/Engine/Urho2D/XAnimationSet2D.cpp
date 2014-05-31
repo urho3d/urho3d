@@ -147,7 +147,7 @@ bool XAnimationSet2D::LoadFolders(const XMLElement &rootElem)
 
 bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
 {
-    SharedPtr<XAnimation2D> animation(new XAnimation2D());
+    SharedPtr<XAnimation2D> animation(new XAnimation2D(this));
     
     String name = animationElem.GetAttribute("name");
     animation->SetName(name);
@@ -155,10 +155,10 @@ bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
     float length = animationElem.GetFloat("length") * 0.001f;
     animation->SetLength(length);
 
-    bool looping = true;
+    bool looped = true;
     if (animationElem.HasAttribute("looping"))
-        looping = animationElem.GetBool("looping");
-    animation->SetLoop(looping);
+        looped = animationElem.GetBool("looping");
+    animation->SetLooped(looped);
 
     // Load main line
     XMLElement mainlineElem = animationElem.GetChild("mainline");
@@ -230,7 +230,7 @@ bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
         }
 
         // Add end key for looped animation
-        if (looping && timeline.objectKeys_.Back().time_ != length)
+        if (looped && timeline.objectKeys_.Back().time_ != length)
         {
             ObjectKey objectKey = timeline.objectKeys_.Front();
             objectKey.time_ = length;

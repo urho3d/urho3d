@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Sprite2D.h"
 #include "XAnimation2D.h"
+#include "XAnimationSet2D.h"
 
 #include "DebugNew.h"
 
@@ -64,9 +65,10 @@ Timeline::Timeline()
 {
 }
 
-XAnimation2D::XAnimation2D() : 
+XAnimation2D::XAnimation2D(XAnimationSet2D* animationSet) : 
+    animationSet_(animationSet),
     length_(0.0f), 
-    loop_(true)
+    looped_(true)
 {
 }
 
@@ -84,9 +86,9 @@ void XAnimation2D::SetLength(float length)
     length_ = Max(0.0f, length);
 }
 
-void XAnimation2D::SetLoop(bool loop)
+void XAnimation2D::SetLooped(bool looped)
 {
-    loop_ = loop;
+    looped_ = looped;
 }
 
 void XAnimation2D::AddMainlineKey(const MainlineKey& mainlineKey)
@@ -97,6 +99,11 @@ void XAnimation2D::AddMainlineKey(const MainlineKey& mainlineKey)
 void XAnimation2D::AddTimeline(const Timeline& timeline)
 {
     timelines_.Push(timeline);
+}
+
+XAnimationSet2D* XAnimation2D::GetAnimationSet() const
+{
+    return animationSet_;
 }
 
 }
