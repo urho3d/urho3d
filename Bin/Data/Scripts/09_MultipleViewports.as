@@ -147,7 +147,7 @@ void SetupViewports()
     // Make the bloom mixing parameter more pronounced
     effectRenderPath.shaderParameters["BloomMix"] = Variant(Vector2(0.9f, 0.6f));
     effectRenderPath.SetEnabled("Bloom", false);
-    effectRenderPath.SetEnabled("FXAA", false);
+    effectRenderPath.SetEnabled("FXAA2", false);
     viewport.renderPath = effectRenderPath;
 
     // Set up the rear camera viewport on top of the front view ("rear view mirror")
@@ -202,7 +202,7 @@ void MoveCamera(float timeStep)
     if (input.keyPress['B'])
         effectRenderPath.ToggleEnabled("Bloom");
     if (input.keyPress['F'])
-        effectRenderPath.ToggleEnabled("FXAA");
+        effectRenderPath.ToggleEnabled("FXAA2");
 
     // Toggle debug geometry with space
     if (input.keyPress[KEY_SPACE])

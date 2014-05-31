@@ -203,7 +203,7 @@ void MultipleViewports::SetupViewports()
     // Make the bloom mixing parameter more pronounced
     effectRenderPath->SetShaderParameter("BloomMix", Vector2(0.9f, 0.6f));
     effectRenderPath->SetEnabled("Bloom", false);
-    effectRenderPath->SetEnabled("FXAA", false);
+    effectRenderPath->SetEnabled("FXAA2", false);
     viewport->SetRenderPath(effectRenderPath);
     
     // Set up the rear camera viewport on top of the front view ("rear view mirror")
@@ -260,7 +260,7 @@ void MultipleViewports::MoveCamera(float timeStep)
     if (input->GetKeyPress('B'))
         effectRenderPath->ToggleEnabled("Bloom");
     if (input->GetKeyPress('F'))
-        effectRenderPath->ToggleEnabled("FXAA");
+        effectRenderPath->ToggleEnabled("FXAA2");
     
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
