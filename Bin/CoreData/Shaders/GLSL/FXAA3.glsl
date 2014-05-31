@@ -58,7 +58,6 @@ varying vec2 vScreenPos;
 /*--------------------------------------------------------------------------*/
 
 #define FXAA_FAST_PIXEL_OFFSET 0
-#define FXAA_GATHER4 0
 
 /*============================================================================
                         FXAA QUALITY - TUNING KNOBS
@@ -385,25 +384,12 @@ vec4 FxaaPixelShader(
     posM.x = pos.x;
     posM.y = pos.y;
     
-    #if (FXAA_GATHER4 == 1)
-        vec4 rgbyM = FxaaTexTop(tex, posM);
-        vec4 luma4A = FxaaTex4(tex, posM);
-        vec4 luma4B = FxaaTexOff4(tex, posM, vec2(-1, -1));
-        #define lumaM rgbyM.w
-        #define lumaE luma4A.z
-        #define lumaS luma4A.x
-        #define lumaSE luma4A.y
-        #define lumaNW luma4B.w
-        #define lumaN luma4B.z
-        #define lumaW luma4B.x
-    #else
-        vec4 rgbyM = FxaaTexTop(tex, posM);
-        #define lumaM rgbyM.y
-        float lumaS = FxaaLuma(FxaaTexOff(tex, posM, vec2( 0, 1), fxaaQualityRcpFrame.xy));
-        float lumaE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1, 0), fxaaQualityRcpFrame.xy));
-        float lumaN = FxaaLuma(FxaaTexOff(tex, posM, vec2( 0,-1), fxaaQualityRcpFrame.xy));
-        float lumaW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 0), fxaaQualityRcpFrame.xy));
-    #endif
+    vec4 rgbyM = FxaaTexTop(tex, posM);
+    #define lumaM rgbyM.y
+    float lumaS = FxaaLuma(FxaaTexOff(tex, posM, vec2( 0, 1), fxaaQualityRcpFrame.xy));
+    float lumaE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1, 0), fxaaQualityRcpFrame.xy));
+    float lumaN = FxaaLuma(FxaaTexOff(tex, posM, vec2( 0,-1), fxaaQualityRcpFrame.xy));
+    float lumaW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 0), fxaaQualityRcpFrame.xy));
 /*--------------------------------------------------------------------------*/
     float maxSM = max(lumaS, lumaM);
     float minSM = min(lumaS, lumaM);
@@ -421,15 +407,10 @@ vec4 FxaaPixelShader(
     if(earlyExit)
         return FxaaTexTop(tex, pos);
 /*--------------------------------------------------------------------------*/
-    #if (FXAA_GATHER4 == 0)
-        float lumaNW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1,-1), fxaaQualityRcpFrame.xy));
-        float lumaSE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1, 1), fxaaQualityRcpFrame.xy));
-        float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1,-1), fxaaQualityRcpFrame.xy));
-        float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 1), fxaaQualityRcpFrame.xy));
-    #else
-        float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, vec2(1, -1), fxaaQualityRcpFrame.xy));
-        float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 1), fxaaQualityRcpFrame.xy));
-    #endif
+    float lumaNW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1,-1), fxaaQualityRcpFrame.xy));
+    float lumaSE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1, 1), fxaaQualityRcpFrame.xy));
+    float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1,-1), fxaaQualityRcpFrame.xy));
+    float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 1), fxaaQualityRcpFrame.xy));
 /*--------------------------------------------------------------------------*/
     float lumaNS = lumaN + lumaS;
     float lumaWE = lumaW + lumaE;
