@@ -52,6 +52,8 @@
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
+#include "XAnimatedSprite2D.h"
+#include "XAnimationSet2D.h"
 
 #include "DebugNew.h"
 
@@ -72,6 +74,8 @@ void RegisterUrho2DLibrary(Context* context)
     Animation2D::RegisterObject(context);
     ParticleEffect2D::RegisterObject(context);
     ParticleEmitter2D::RegisterObject(context);
+    XAnimationSet2D::RegisterObject(context);
+    XAnimatedSprite2D::RegisterObject(context);
 
     Sprite2D::RegisterObject(context);
     SpriteSheet2D::RegisterObject(context);
