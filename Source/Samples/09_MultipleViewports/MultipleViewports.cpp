@@ -199,11 +199,11 @@ void MultipleViewports::SetupViewports()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/Bloom.xml"));
-    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/EdgeFilter.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     // Make the bloom mixing parameter more pronounced
     effectRenderPath->SetShaderParameter("BloomMix", Vector2(0.9f, 0.6f));
     effectRenderPath->SetEnabled("Bloom", false);
-    effectRenderPath->SetEnabled("EdgeFilter", false);
+    effectRenderPath->SetEnabled("FXAA", false);
     viewport->SetRenderPath(effectRenderPath);
     
     // Set up the rear camera viewport on top of the front view ("rear view mirror")
@@ -260,7 +260,7 @@ void MultipleViewports::MoveCamera(float timeStep)
     if (input->GetKeyPress('B'))
         effectRenderPath->ToggleEnabled("Bloom");
     if (input->GetKeyPress('F'))
-        effectRenderPath->ToggleEnabled("EdgeFilter");
+        effectRenderPath->ToggleEnabled("FXAA");
     
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))

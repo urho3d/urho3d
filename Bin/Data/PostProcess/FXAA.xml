@@ -1,5 +1,0 @@
-<renderpath>
-    <command type="quad" tag="FXAA" vs="FXAA" ps="FXAA" output="viewport">
-        <texture unit="diffuse" name="viewport" />
-    </command>
-</renderpath>

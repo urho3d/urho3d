@@ -14,7 +14,7 @@
 varying vec2 vScreenPos;
 
 #ifdef COMPILEPS
-uniform vec3 cEdgeFilterParams;
+uniform vec3 cFXAAParams;
 #endif
 
 void VS()
@@ -32,7 +32,7 @@ void PS()
     float FXAA_REDUCE_MUL = 1.0/8.0;
     float FXAA_REDUCE_MIN = 1.0/128.0;
 
-    vec2 posOffset = cGBufferInvSize.xy * cEdgeFilterParams.x;
+    vec2 posOffset = cGBufferInvSize.xy * cFXAAParams.x;
 
     vec3 rgbNW = texture2D(sDiffMap, vScreenPos + vec2(-posOffset.x, -posOffset.y)).rgb;
     vec3 rgbNE = texture2D(sDiffMap, vScreenPos + vec2(posOffset.x, -posOffset.y)).rgb;
@@ -50,7 +50,7 @@ void PS()
     float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
     float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
 
-    if (((lumaMax - lumaMin) / lumaMin) >= cEdgeFilterParams.y)
+    if (((lumaMax - lumaMin) / lumaMin) >= cFXAAParams.y)
     {
         vec2 dir;
         dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
@@ -64,7 +64,7 @@ void PS()
               max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
               dir * rcpDirMin)) * cGBufferInvSize.xy;
 
-        dir *= cEdgeFilterParams.z;
+        dir *= cFXAAParams.z;
 
         vec3 rgbA = (1.0/2.0) * (
             texture2D(sDiffMap, vScreenPos + dir * (1.0/3.0 - 0.5)).xyz +

@@ -56,56 +56,9 @@ varying vec2 vScreenPos;
 //                      Shader Requirements
 //
 /*--------------------------------------------------------------------------*/
-//define FXAA_GLSL_130 if GLSL version is >= 130
 
-//#define FXAA_GLSL_130
-
-
-/*--------------------------------------------------------------------------*/
-//Messing with these extensions seems dangerous...
-
-//#extension GL_EXT_gpu_shader4 : enable
-//#extension GL_NV_gpu_shader5  : enable
-//#extension GL_ARB_gpu_shader5 : enable
-
-/*==========================================================================*/
-
-#ifndef FXAA_FAST_PIXEL_OFFSET
-    //
-    // Used for GLSL 120 only.
-    //
-    // 1 = GL API supports fast pixel offsets
-    // 0 = do not use fast pixel offsets
-    //
-    #ifdef GL_EXT_gpu_shader4
-        #define FXAA_FAST_PIXEL_OFFSET 1
-    #endif
-    #ifdef GL_NV_gpu_shader5
-        #define FXAA_FAST_PIXEL_OFFSET 1
-    #endif
-    #ifdef GL_ARB_gpu_shader5
-        #define FXAA_FAST_PIXEL_OFFSET 1
-    #endif
-    #ifndef FXAA_FAST_PIXEL_OFFSET
-        #define FXAA_FAST_PIXEL_OFFSET 0
-    #endif
-#endif
-/*--------------------------------------------------------------------------*/
-#ifndef FXAA_GATHER4
-    //
-    // 1 = API supports gather4 on alpha channel.
-    // 0 = API does not support gather4 on alpha channel.
-    //
-    #ifdef GL_ARB_gpu_shader5
-        #define FXAA_GATHER4 1
-    #endif
-    #ifdef GL_NV_gpu_shader5
-        #define FXAA_GATHER4 1
-    #endif
-    #ifndef FXAA_GATHER4
-        #define FXAA_GATHER4 0
-    #endif
-#endif
+#define FXAA_FAST_PIXEL_OFFSET 0
+#define FXAA_GATHER4 0
 
 /*============================================================================
                         FXAA QUALITY - TUNING KNOBS
@@ -118,7 +71,7 @@ NOTE the other tuning knobs are now in the shader function inputs!
     // This needs to be compiled into the shader as it effects code.
     // Best option to include multiple presets is to 
     // in each shader define the preset, then include this file.
-    // 
+    //
     // OPTIONS
     // -----------------------------------------------------------------------
     // 10 to 15 - default medium dither (10=fastest, 15=highest quality)
@@ -358,55 +311,12 @@ vec4 MakeRGBA(vec3 rgb)
 {
     return vec4(rgb, CalcLuma(rgb));
 }
-/*--------------------------------------------------------------------------*/
-#if (FXAA_GATHER4 == 1)
-  vec4 FxaaTex4(sampler2D t, vec2 p)
-  {
-      vec4 R = textureGather(t, p, 0);
-      vec4 G = textureGather(t, p, 1);
-      vec4 B = textureGather(t, p, 2);
-      
-      float one = CalcLuma(vec3(R.r, G.r, B.r));
-      float two = CalcLuma(vec3(R.g, G.g, B.g));
-      float three = CalcLuma(vec3 (R.b, G.b, B.b));
-      float four = CalcLuma(vec3 (R.a, G.a, B.a));
 
-      return vec4(one, two, three, four);
-  }
-
-  vec4 FxaaTexOff4(sampler2D t, vec2 p, ivec2 o)
-  {   
-      vec4 R = textureGatherOffset(t, p, o, 0);
-      vec4 G = textureGatherOffset(t, p, o, 1);
-      vec4 B = textureGatherOffset(t, p, o, 2);
-      
-      float one = CalcLuma(vec3(R.r, G.r, B.r));
-      float two = CalcLuma(vec3(R.g, G.g, B.g));
-      float three = CalcLuma(vec3 (R.b, G.b, B.b));
-      float four = CalcLuma(vec3 (R.a, G.a, B.a));
-
-      return vec4(one, two, three, four);
-  }
-#endif
-/*--------------------------------------------------------------------------*/
-#ifndef FXAA_GLSL_130
-    // Requires,
-    //  #version 120
-    // And at least,
-    //  #extension GL_EXT_gpu_shader4 : enable
-    //  (or set FXAA_FAST_PIXEL_OFFSET 1 to work like DX9)
-    #define FxaaTexTop(t, p) MakeRGBA(texture2DLod(t, p, 0.0).rgb)
-    #if (FXAA_FAST_PIXEL_OFFSET == 1)
-        #define FxaaTexOff(t, p, o, r) MakeRGBA(texture2DLodOffset(t, p, 0.0, o).rgb)
-    #else
-        #define FxaaTexOff(t, p, o, r) MakeRGBA(texture2DLod(t, p + (o * r), 0.0).rgb)
-    #endif
-#endif
-/*--------------------------------------------------------------------------*/
-#ifdef FXAA_GLSL_130
-    // Requires "#version 130" or better
-    #define FxaaTexTop(t, p) MakeRGBA(textureLod(t, p, 0.0).rgb)
-    #define FxaaTexOff(t, p, o, r) MakeRGBA(textureLodOffset(t, p, 0.0, o).rgb)
+#define FxaaTexTop(t, p) MakeRGBA(texture2DLod(t, p, 0.0).rgb)
+#if (FXAA_FAST_PIXEL_OFFSET == 1)
+    #define FxaaTexOff(t, p, o, r) MakeRGBA(texture2DLodOffset(t, p, 0.0, o).rgb)
+#else
+    #define FxaaTexOff(t, p, o, r) MakeRGBA(texture2DLod(t, p + (o * r), 0.0).rgb)
 #endif
 
 /*============================================================================
@@ -478,7 +388,7 @@ vec4 FxaaPixelShader(
     #if (FXAA_GATHER4 == 1)
         vec4 rgbyM = FxaaTexTop(tex, posM);
         vec4 luma4A = FxaaTex4(tex, posM);
-        vec4 luma4B = FxaaTexOff4(tex, posM, ivec2(-1, -1));
+        vec4 luma4B = FxaaTexOff4(tex, posM, vec2(-1, -1));
         #define lumaM rgbyM.w
         #define lumaE luma4A.z
         #define lumaS luma4A.x
@@ -489,10 +399,10 @@ vec4 FxaaPixelShader(
     #else
         vec4 rgbyM = FxaaTexTop(tex, posM);
         #define lumaM rgbyM.y
-        float lumaS = FxaaLuma(FxaaTexOff(tex, posM, ivec2( 0, 1), fxaaQualityRcpFrame.xy));
-        float lumaE = FxaaLuma(FxaaTexOff(tex, posM, ivec2( 1, 0), fxaaQualityRcpFrame.xy));
-        float lumaN = FxaaLuma(FxaaTexOff(tex, posM, ivec2( 0,-1), fxaaQualityRcpFrame.xy));
-        float lumaW = FxaaLuma(FxaaTexOff(tex, posM, ivec2(-1, 0), fxaaQualityRcpFrame.xy));
+        float lumaS = FxaaLuma(FxaaTexOff(tex, posM, vec2( 0, 1), fxaaQualityRcpFrame.xy));
+        float lumaE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1, 0), fxaaQualityRcpFrame.xy));
+        float lumaN = FxaaLuma(FxaaTexOff(tex, posM, vec2( 0,-1), fxaaQualityRcpFrame.xy));
+        float lumaW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 0), fxaaQualityRcpFrame.xy));
     #endif
 /*--------------------------------------------------------------------------*/
     float maxSM = max(lumaS, lumaM);
@@ -512,13 +422,13 @@ vec4 FxaaPixelShader(
         return FxaaTexTop(tex, pos);
 /*--------------------------------------------------------------------------*/
     #if (FXAA_GATHER4 == 0)
-        float lumaNW = FxaaLuma(FxaaTexOff(tex, posM, ivec2(-1,-1), fxaaQualityRcpFrame.xy));
-        float lumaSE = FxaaLuma(FxaaTexOff(tex, posM, ivec2( 1, 1), fxaaQualityRcpFrame.xy));
-        float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, ivec2( 1,-1), fxaaQualityRcpFrame.xy));
-        float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, ivec2(-1, 1), fxaaQualityRcpFrame.xy));
+        float lumaNW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1,-1), fxaaQualityRcpFrame.xy));
+        float lumaSE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1, 1), fxaaQualityRcpFrame.xy));
+        float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, vec2( 1,-1), fxaaQualityRcpFrame.xy));
+        float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 1), fxaaQualityRcpFrame.xy));
     #else
-        float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, ivec2(1, -1), fxaaQualityRcpFrame.xy));
-        float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, ivec2(-1, 1), fxaaQualityRcpFrame.xy));
+        float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, vec2(1, -1), fxaaQualityRcpFrame.xy));
+        float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, vec2(-1, 1), fxaaQualityRcpFrame.xy));
     #endif
 /*--------------------------------------------------------------------------*/
     float lumaNS = lumaN + lumaS;
@@ -829,9 +739,9 @@ void PS()
         vScreenPos,							// vec2 pos,
         sDiffMap,							// sampler2D tex,
         rcpFrame,							// vec2 fxaaQualityRcpFrame,
-        0.75f,									// float fxaaQualitySubpix,
-        0.166f,									// float fxaaQualityEdgeThreshold,
-        0.0833f								// float fxaaQualityEdgeThresholdMin
+        0.75,								// float fxaaQualitySubpix,
+        0.166,								// float fxaaQualityEdgeThreshold,
+        0.0833								// float fxaaQualityEdgeThresholdMin
     ).rgb, 1.0);
 }
 

@@ -11,7 +11,7 @@
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 
-uniform float4 cEdgeFilterParams;
+uniform float4 cFXAAParams;
 
 void VS(float4 iPos : POSITION,
     out float4 oPos : POSITION,
@@ -31,7 +31,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float FXAA_REDUCE_MUL = 1.0/8.0;
     float FXAA_REDUCE_MIN = 1.0/128.0;
 
-    float2 posOffset = cGBufferInvSize.xy * cEdgeFilterParams.x;
+    float2 posOffset = cGBufferInvSize.xy * cFXAAParams.x;
 
     float3 rgbNW = Sample(sDiffMap, iScreenPos + float2(-posOffset.x, -posOffset.y)).rgb;
     float3 rgbNE = Sample(sDiffMap, iScreenPos + float2(posOffset.x, -posOffset.y)).rgb;
@@ -49,7 +49,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
     float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
 
-    if (((lumaMax - lumaMin) / lumaMin) >= cEdgeFilterParams.y)
+    if (((lumaMax - lumaMin) / lumaMin) >= cFXAAParams.y)
     {
         float2 dir;
         dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
@@ -63,7 +63,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
               max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
               dir * rcpDirMin)) * cGBufferInvSize.xy;
     
-        dir *= cEdgeFilterParams.z;
+        dir *= cFXAAParams.z;
     
         float3 rgbA = (1.0/2.0) * (
             Sample(sDiffMap, iScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
