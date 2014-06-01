@@ -111,7 +111,7 @@ public:
     void SetName(const String& name);
     /// Set length.
     void SetLength(float length);
-    /// Set loop.
+    /// Set looped.
     void SetLooped(bool looped);
     /// Add mainline key.
     void AddMainlineKey(const MainlineKey& mainlineKey);
@@ -124,7 +124,7 @@ public:
     const String& GetName() const { return name_; }
     /// Return length.
     float GetLength() const { return length_; }
-    /// Return looping.
+    /// Return looped.
     bool IsLooped() const { return looped_; }
     /// Return all mainline keys.
     const Vector<MainlineKey>& GetMainlineKeys() const { return mainlineKeys_; }

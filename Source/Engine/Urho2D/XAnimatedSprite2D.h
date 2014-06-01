@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Drawable2D.h"
+#include "Drawable.h"
 
 namespace Urho3D
 {
@@ -31,7 +31,7 @@ class XAnimationSet2D;
 class XAnimation2D;
 
 /// Spriter animation component.
-class URHO3D_API XAnimatedSprite2D : public Drawable2D
+class URHO3D_API XAnimatedSprite2D : public Drawable
 {
     OBJECT(XAnimatedSprite2D);
 
@@ -45,38 +45,64 @@ public:
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
+    
     /// Set layer.
-    virtual void SetLayer(int layer);
-
+    void SetLayer(int layer);
+    /// Set order in layer.
+    void SetOrderInLayer(int orderInLayer);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode mode);
     /// Set speed.
     void SetSpeed(float speed);
-
     /// Set animation by animation set and name.
     void SetAnimation(XAnimationSet2D* animationSet, const String& name);
-    /// Set animation.
-    void SetAnimation(XAnimation2D* animation);
+    /// Set animation set.
+    void SetAnimationSet(XAnimationSet2D* animationSet);
     /// Set animation by name.
     void SetAnimation(const String& name);
 
+    /// Return layer.
+    int GetLayer() const { return layer_; }
+    /// Return order in layer.
+    int GetOrderInLayer() const { return orderInLayer_; }
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
     /// Return animation.
-    XAnimation2D* GetAnimation() const;
+    XAnimationSet2D* GetAnimationSet() const;
+    /// Return animation name.
+    const String& GetAnimation() const { return animationName_; }
+
+    /// Set animation set attribute.
+    void SetAnimationSetAttr(ResourceRef value);
+    /// Return animtion set attribute.
+    ResourceRef GetAnimationSetAttr() const;
 
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// Update vertices.
-    virtual void UpdateVertices();
-    /// Handle scene post update.
-    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Set animation.
+    void SetAnimation(XAnimation2D* animation);
     /// Update.
     void UpdateAnimation(float timeStep);
+    /// Handle scene post update.
+    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
+    /// Layer.
+    int layer_;
+    /// Order in layer.
+    int orderInLayer_;
+    /// Blend mode.
+    BlendMode blendMode_;
     /// Speed.
     float speed_;
+    /// Animation set.
+    SharedPtr<XAnimationSet2D> animationSet_;
+    /// Animation name.
+    String animationName_;
     /// Animation.
     SharedPtr<XAnimation2D> animation_;
     /// Animation time.

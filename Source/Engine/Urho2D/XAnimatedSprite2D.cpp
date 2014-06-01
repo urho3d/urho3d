@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sprite2D.h"
@@ -36,9 +37,13 @@ namespace Urho3D
 {
 
 extern const char* URHO2D_CATEGORY;
+extern const char* blendModeNames[];
 
 XAnimatedSprite2D::XAnimatedSprite2D(Context* context) :
-    Drawable2D(context),
+    Drawable(context, DRAWABLE_GEOMETRY),
+    layer_(0),
+    orderInLayer_(0),
+    blendMode_(BLEND_ALPHA),
     speed_(1.0f),
     animationTime_(0.0f)
 {
@@ -51,12 +56,18 @@ XAnimatedSprite2D::~XAnimatedSprite2D()
 void XAnimatedSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<XAnimatedSprite2D>(URHO2D_CATEGORY);
+    ACCESSOR_ATTRIBUTE(XAnimatedSprite2D, VAR_INT, "Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(XAnimatedSprite2D, VAR_INT, "Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(XAnimatedSprite2D, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(XAnimatedSprite2D, VAR_FLOAT, "Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(XAnimatedSprite2D, VAR_RESOURCEREF, "Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef, ResourceRef(XAnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(XAnimatedSprite2D, VAR_STRING, "Animation", GetAnimation, SetAnimation, String, String::EMPTY, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
 }
 
 void XAnimatedSprite2D::OnSetEnabled()
 {
-    Drawable2D::OnSetEnabled();
+    Drawable::OnSetEnabled();
 
     Scene* scene = GetScene();
     if (scene)
@@ -70,11 +81,34 @@ void XAnimatedSprite2D::OnSetEnabled()
 
 void XAnimatedSprite2D::SetLayer(int layer)
 {
-    Drawable2D::SetLayer(layer);
+    if (layer == layer_)
+        return;
+
+    layer_ = layer;
+
     for (unsigned i = 0; i < objectNodes_.Size(); ++i)
     {
         StaticSprite2D* objectSprite = objectNodes_[i]->GetComponent<StaticSprite2D>();
-        objectSprite->SetLayer(layer);
+        objectSprite->SetLayer(layer_);
+    }
+}
+
+void XAnimatedSprite2D::SetOrderInLayer(int orderInLayer)
+{
+    orderInLayer_ = orderInLayer;
+}
+
+void XAnimatedSprite2D::SetBlendMode(BlendMode blendMode)
+{
+    if (blendMode == blendMode_)
+        return;
+
+    blendMode_ = blendMode;
+
+    for (unsigned i = 0; i < objectNodes_.Size(); ++i)
+    {
+        StaticSprite2D* objectSprite = objectNodes_[i]->GetComponent<StaticSprite2D>();
+        objectSprite->SetBlendMode(blendMode_);
     }
 }
 
@@ -86,71 +120,56 @@ void XAnimatedSprite2D::SetSpeed(float speed)
 
 void XAnimatedSprite2D::SetAnimation(XAnimationSet2D* animationSet, const String& name)
 {
-    SetAnimation(animationSet->GetAnimation(name));
+    animationSet_ = animationSet;
+    animationName_ = name;
+    
+    if (animationSet)
+        SetAnimation(animationSet->GetAnimation(name));
+    else
+        SetAnimation(0);
 }
 
-void XAnimatedSprite2D::SetAnimation(XAnimation2D* animation)
+void XAnimatedSprite2D::SetAnimationSet(XAnimationSet2D* animationSet)
 {
-    if (animation == animation_)
-    {
-        // Reset time
-        animationTime_ = 0.0f;
-        return;
-    }
-
-    if (animation_)
-    {
-        // Remove all object nodes
-        for (unsigned i = 0; i < objectNodes_.Size(); ++i)
-            objectNodes_[i]->Remove();
-        objectNodes_.Clear();
-    }
-
-    animation_ = animation;
-    
-    if (!animation_)
+    if (animationSet == animationSet_)
         return;
 
-    animationTime_ = 0.0f;
-    
-    for (unsigned i = 0; i < animation_->GetTimelines().Size(); ++i)
-    {
-        SharedPtr<Node> objectNode(GetNode()->CreateChild(animation_->GetTimelines()[i].name_));
+    animationSet_ = animationSet;
 
-        StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
-        staticSprite->SetLayer(GetLayer());
-        staticSprite->SetUseHotSpot(true);
-        staticSprite->SetBlendMode(BLEND_ALPHA);
+    if (animationSet_)
+        SetAnimation(animationSet_->GetAnimation(animationName_));
+    else
+        SetAnimation(0);
 
-        objectNodes_.Push(objectNode);        
-    }
-
-    UpdateAnimation(0.0f);
-
-    UpdateDefaultMaterial();
-    MarkNetworkUpdate();
 }
-
 void XAnimatedSprite2D::SetAnimation(const String& name)
 {
-    if (!animation_)
-        return;
+    animationName_ = name;
 
-    XAnimationSet2D* animationSet = animation_->GetAnimationSet();
-    if (!animationSet)
-        return;
-
-    SetAnimation(animationSet->GetAnimation(name));
+    if (animationSet_)
+        SetAnimation(animationSet_->GetAnimation(animationName_));
 }
 
-XAnimation2D* XAnimatedSprite2D::GetAnimation() const
+XAnimationSet2D* XAnimatedSprite2D::GetAnimationSet() const
 {
-    return animation_;
+    return animationSet_;
+}
+
+
+void XAnimatedSprite2D::SetAnimationSetAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetAnimationSet(cache->GetResource<XAnimationSet2D>(value.name_));
+}
+
+Urho3D::ResourceRef XAnimatedSprite2D::GetAnimationSetAttr() const
+{
+    return GetResourceRef(animationSet_, XAnimationSet2D::GetTypeStatic());
 }
 
 void XAnimatedSprite2D::OnNodeSet(Node* node)
 {
-    Drawable2D::OnNodeSet(node);
+    Drawable::OnNodeSet(node);
 
     if (node)
     {
@@ -174,15 +193,47 @@ void XAnimatedSprite2D::OnWorldBoundingBoxUpdate()
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
 }
 
-void XAnimatedSprite2D::UpdateVertices()
-{
-}
 
-void XAnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+
+void XAnimatedSprite2D::SetAnimation(XAnimation2D* animation)
 {
-    using namespace ScenePostUpdate;
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
-    UpdateAnimation(timeStep);
+    if (animation == animation_)
+    {
+        // Reset time
+        animationTime_ = 0.0f;
+        return;
+    }
+
+    if (animation_)
+    {
+        // Remove all object nodes
+        for (unsigned i = 0; i < objectNodes_.Size(); ++i)
+            objectNodes_[i]->Remove();
+        objectNodes_.Clear();
+    }
+
+    animation_ = animation;
+
+    if (!animation_)
+        return;
+
+    animationTime_ = 0.0f;
+
+    for (unsigned i = 0; i < animation_->GetTimelines().Size(); ++i)
+    {
+        SharedPtr<Node> objectNode(GetNode()->CreateChild(animation_->GetTimelines()[i].name_));
+
+        StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+        staticSprite->SetLayer(layer_);
+        staticSprite->SetBlendMode(blendMode_);
+        staticSprite->SetUseHotSpot(true);
+
+        objectNodes_.Push(objectNode);        
+    }
+
+    UpdateAnimation(0.0f);
+
+    MarkNetworkUpdate();
 }
 
 void XAnimatedSprite2D::UpdateAnimation(float timeStep)
@@ -231,7 +282,7 @@ void XAnimatedSprite2D::UpdateAnimation(float timeStep)
             objectNode->SetEnabled(true);
 
             StaticSprite2D* staticSprite = objectNode->GetComponent<StaticSprite2D>();
-            staticSprite->SetOrderInLayer(objectRef->zIndex_);
+            staticSprite->SetOrderInLayer(orderInLayer_ + objectRef->zIndex_);
 
             const Vector<ObjectKey>& objectKeys = timelines[i].objectKeys_;
             for (unsigned j = 0; j < objectKeys.Size() - 1; ++j)
@@ -271,6 +322,13 @@ void XAnimatedSprite2D::UpdateAnimation(float timeStep)
     }
 
     MarkForUpdate();
+}
+
+void XAnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ScenePostUpdate;
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+    UpdateAnimation(timeStep);
 }
 
 }

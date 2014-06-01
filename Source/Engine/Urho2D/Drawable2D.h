@@ -55,7 +55,7 @@ public:
     virtual void OnSetEnabled();
 
     /// Set layer.
-    virtual void SetLayer(int layer);
+    void SetLayer(int layer);
     /// Set order in layer.
     void SetOrderInLayer(int orderInLayer);
     /// Set sprite.

@@ -116,7 +116,7 @@ Sprite2D* XAnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
     return 0;
 }
 
-bool XAnimationSet2D::LoadFolders(const XMLElement &rootElem)
+bool XAnimationSet2D::LoadFolders(const XMLElement& rootElem)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String parentPath = GetParentPath(GetName());
