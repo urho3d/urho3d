@@ -27,19 +27,19 @@
 namespace Urho3D
 {
 
-class XAnimationSet2D;
+class AnimationSet2D;
 class Animation2D;
 
 /// Spriter animation component.
-class URHO3D_API XAnimatedSprite2D : public Drawable
+class URHO3D_API AnimatedSprite2D : public Drawable
 {
-    OBJECT(XAnimatedSprite2D);
+    OBJECT(AnimatedSprite2D);
 
 public:
     /// Construct.
-    XAnimatedSprite2D(Context* context);
+    AnimatedSprite2D(Context* context);
     /// Destruct.
-    ~XAnimatedSprite2D();
+    ~AnimatedSprite2D();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -55,9 +55,9 @@ public:
     /// Set speed.
     void SetSpeed(float speed);
     /// Set animation by animation set and name.
-    void SetAnimation(XAnimationSet2D* animationSet, const String& name);
+    void SetAnimation(AnimationSet2D* animationSet, const String& name);
     /// Set animation set.
-    void SetAnimationSet(XAnimationSet2D* animationSet);
+    void SetAnimationSet(AnimationSet2D* animationSet);
     /// Set animation by name.
     void SetAnimation(const String& name);
 
@@ -70,7 +70,7 @@ public:
     /// Return speed.
     float GetSpeed() const { return speed_; }
     /// Return animation.
-    XAnimationSet2D* GetAnimationSet() const;
+    AnimationSet2D* GetAnimationSet() const;
     /// Return animation name.
     const String& GetAnimation() const { return animationName_; }
 
@@ -100,7 +100,7 @@ protected:
     /// Speed.
     float speed_;
     /// Animation set.
-    SharedPtr<XAnimationSet2D> animationSet_;
+    SharedPtr<AnimationSet2D> animationSet_;
     /// Animation name.
     String animationName_;
     /// Animation.

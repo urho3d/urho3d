@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 class Sprite2D;
-class XAnimationSet2D;
+class AnimationSet2D;
 
 /// Object reference.
 struct ObjectRef
@@ -103,7 +103,7 @@ class URHO3D_API Animation2D : public RefCounted
 {
 public:
     /// Construct.
-    Animation2D(XAnimationSet2D* animationSet);
+    Animation2D(AnimationSet2D* animationSet);
     /// Destruct
     virtual ~Animation2D();
 
@@ -119,7 +119,7 @@ public:
     void AddTimeline(const Timeline& timeline);
 
     /// Return animation set.
-    XAnimationSet2D* GetAnimationSet() const;
+    AnimationSet2D* GetAnimationSet() const;
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return length.
@@ -133,7 +133,7 @@ public:
 
 private:
     /// Animation set.
-    WeakPtr<XAnimationSet2D> animationSet_;
+    WeakPtr<AnimationSet2D> animationSet_;
     /// Name.
     String name_;
     /// Length.

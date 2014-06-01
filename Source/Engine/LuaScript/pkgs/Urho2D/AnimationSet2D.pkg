@@ -1,6 +1,6 @@
-$#include "XAnimationSet2D.h"
+$#include "AnimationSet2D.h"
 
-class XAnimationSet2D : Resource
+class AnimationSet2D : Resource
 {
     unsigned GetNumAnimations() const;
     Animation2D* GetAnimation(unsigned index) const;

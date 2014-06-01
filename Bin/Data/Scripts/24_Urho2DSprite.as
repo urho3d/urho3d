@@ -78,13 +78,13 @@ void CreateScene()
         spriteNodes.Push(spriteNode);
     }
 
-    XAnimationSet2D@ animationSet = cache.GetResource("XAnimationSet2D", "Urho2D/GoldIcon.scml");
+    AnimationSet2D@ animationSet = cache.GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml");
     if (animationSet is null)
         return;
     Node@ spriteNode = scene_.CreateChild("AnimatedSprite2D");
     spriteNode.position = Vector3(0.0f, 0.0f, -1.0f);
 
-    XAnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("XAnimatedSprite2D");
+    AnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("AnimatedSprite2D");
     // Set animation
     animatedSprite.SetAnimation(animationSet, "idle");
 }

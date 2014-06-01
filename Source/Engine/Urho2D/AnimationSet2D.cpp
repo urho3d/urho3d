@@ -22,13 +22,13 @@
 
 #include "Precompiled.h"
 #include "Animation2D.h"
+#include "AnimationSet2D.h"
 #include "Context.h"
 #include "Drawable2D.h"
 #include "FileSystem.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Sprite2D.h"
-#include "XAnimationSet2D.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -36,21 +36,21 @@
 namespace Urho3D
 {
 
-XAnimationSet2D::XAnimationSet2D(Context* context) :
+AnimationSet2D::AnimationSet2D(Context* context) :
     Resource(context)
 {
 }
 
-XAnimationSet2D::~XAnimationSet2D()
+AnimationSet2D::~AnimationSet2D()
 {
 }
 
-void XAnimationSet2D::RegisterObject(Context* context)
+void AnimationSet2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<XAnimationSet2D>();
+    context->RegisterFactory<AnimationSet2D>();
 }
 
-bool XAnimationSet2D::Load(Deserializer& source)
+bool AnimationSet2D::Load(Deserializer& source)
 {
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))
@@ -85,19 +85,19 @@ bool XAnimationSet2D::Load(Deserializer& source)
     return true;
 }
 
-unsigned XAnimationSet2D::GetNumAnimations() const
+unsigned AnimationSet2D::GetNumAnimations() const
 {
     return animations_.Size();
 }
 
-Animation2D* XAnimationSet2D::GetAnimation(unsigned index) const
+Animation2D* AnimationSet2D::GetAnimation(unsigned index) const
 {
     if (index < animations_.Size())
         return animations_[index];
     return 0;
 }
 
-Animation2D* XAnimationSet2D::GetAnimation(const String& name) const
+Animation2D* AnimationSet2D::GetAnimation(const String& name) const
 {
     for (unsigned i = 0; i < animations_.Size(); ++i)
     {
@@ -107,7 +107,7 @@ Animation2D* XAnimationSet2D::GetAnimation(const String& name) const
     return 0;
 }
 
-Sprite2D* XAnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
+Sprite2D* AnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
 {
     unsigned key = (folderId << 16) + fileId;
     HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(key);
@@ -116,7 +116,7 @@ Sprite2D* XAnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
     return 0;
 }
 
-bool XAnimationSet2D::LoadFolders(const XMLElement& rootElem)
+bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String parentPath = GetParentPath(GetName());
@@ -152,7 +152,7 @@ bool XAnimationSet2D::LoadFolders(const XMLElement& rootElem)
 }
 
 
-bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
+bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
 {
     SharedPtr<Animation2D> animation(new Animation2D(this));
     

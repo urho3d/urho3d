@@ -22,6 +22,8 @@
 
 #include "Precompiled.h"
 #include "Animation2D.h"
+#include "AnimationSet2D.h"
+#include "AnimatedSprite2D.h"
 #include "APITemplates.h"
 #include "CollisionBox2D.h"
 #include "CollisionChain2D.h"
@@ -50,8 +52,6 @@
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
-#include "XAnimationSet2D.h"
-#include "XAnimatedSprite2D.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4345)
@@ -123,6 +123,40 @@ static void RegisterStaticSprite2D(asIScriptEngine* engine)
     RegisterStaticSprite2D<StaticSprite2D>(engine, "StaticSprite2D");
 }
 
+static void RegisterAnimation2D(asIScriptEngine* engine)
+{
+    RegisterRefCounted<Animation2D>(engine, "Animation2D");
+    engine->RegisterObjectMethod("Animation2D", "const String& get_name() const", asMETHOD(Animation2D, GetName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation2D", "float get_length() const", asMETHOD(Animation2D, GetLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation2D", "bool get_looped() const", asMETHOD(Animation2D, IsLooped), asCALL_THISCALL);
+}
+
+static void RegisterAnimationSet2D(asIScriptEngine* engine)
+{
+    RegisterResource<AnimationSet2D>(engine, "AnimationSet2D");
+    engine->RegisterObjectMethod("AnimationSet2D", "uint get_numAnimations() const", asMETHOD(AnimationSet2D, GetNumAnimations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationSet2D", "Animation2D@+ GetAnimation(uint) const", asMETHODPR(AnimationSet2D, GetAnimation, (unsigned) const, Animation2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationSet2D", "Animation2D@+ GetAnimation(const String&) const", asMETHODPR(AnimationSet2D, GetAnimation, (const String&) const, Animation2D*), asCALL_THISCALL);
+}
+
+static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
+{
+    RegisterDrawable<AnimatedSprite2D>(engine, "AnimatedSprite2D");
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_layer(int)", asMETHOD(AnimatedSprite2D, SetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "int get_layer() const", asMETHOD(AnimatedSprite2D, GetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_orderInLayer(int)", asMETHOD(AnimatedSprite2D, SetOrderInLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "int get_orderInLayer() const", asMETHOD(AnimatedSprite2D, GetOrderInLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_blendMode(BlendMode)", asMETHOD(AnimatedSprite2D, SetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "BlendMode get_blendMode() const", asMETHOD(AnimatedSprite2D, GetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(AnimationSet2D@+, const String&)", asMETHODPR(AnimatedSprite2D, SetAnimation, (AnimationSet2D*, const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animationSet(AnimationSet2D@+)", asMETHOD(AnimatedSprite2D, SetAnimationSet), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "AnimationSet2D@+ get_animationSet() const", asMETHOD(AnimatedSprite2D, GetAnimationSet), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animation(const String&)", asMETHODPR(AnimatedSprite2D, SetAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "const String& get_animation() const", asMETHOD(AnimatedSprite2D, GetAnimation), asCALL_THISCALL);
+}
+
 static void RegisterParticleEffect2D(asIScriptEngine* engine)
 {
     engine->RegisterEnum("EmitterType2D");
@@ -137,40 +171,6 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     RegisterDrawable2D<ParticleEmitter2D>(engine, "ParticleEmitter2D");
     engine->RegisterObjectMethod("ParticleEmitter2D", "void set_effect(ParticleEffect2D@+)", asMETHOD(ParticleEmitter2D, SetEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleEffect2D@+ get_effect() const", asMETHOD(ParticleEmitter2D, GetEffect), asCALL_THISCALL);
-}
-
-static void RegisterAnimation2D(asIScriptEngine* engine)
-{
-    RegisterRefCounted<Animation2D>(engine, "AnimationX2D");
-    engine->RegisterObjectMethod("AnimationX2D", "const String& get_name() const", asMETHOD(Animation2D, GetName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationX2D", "float get_length() const", asMETHOD(Animation2D, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationX2D", "bool get_looped() const", asMETHOD(Animation2D, IsLooped), asCALL_THISCALL);
-
-}
-static void RegisterXAnimationSet2D(asIScriptEngine* engine)
-{
-    RegisterResource<XAnimationSet2D>(engine, "XAnimationSet2D");
-    engine->RegisterObjectMethod("XAnimationSet2D", "uint get_numAnimations() const", asMETHOD(XAnimationSet2D, GetNumAnimations), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimationSet2D", "AnimationX2D@+ GetAnimation(uint) const", asMETHODPR(XAnimationSet2D, GetAnimation, (unsigned) const, Animation2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimationSet2D", "AnimationX2D@+ GetAnimation(const String&) const", asMETHODPR(XAnimationSet2D, GetAnimation, (const String&) const, Animation2D*), asCALL_THISCALL);
-}
-
-static void RegisterXAnimatedSprite2D(asIScriptEngine* engine)
-{
-    RegisterDrawable<XAnimatedSprite2D>(engine, "XAnimatedSprite2D");
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void set_layer(int)", asMETHOD(XAnimatedSprite2D, SetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "int get_layer() const", asMETHOD(XAnimatedSprite2D, GetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void set_orderInLayer(int)", asMETHOD(XAnimatedSprite2D, SetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "int get_orderInLayer() const", asMETHOD(XAnimatedSprite2D, GetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void set_blendMode(BlendMode)", asMETHOD(XAnimatedSprite2D, SetBlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "BlendMode get_blendMode() const", asMETHOD(XAnimatedSprite2D, GetBlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void set_speed(float)", asMETHOD(XAnimatedSprite2D, SetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "float get_speed() const", asMETHOD(XAnimatedSprite2D, GetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void SetAnimation(XAnimationSet2D@+, const String&)", asMETHODPR(XAnimatedSprite2D, SetAnimation, (XAnimationSet2D*, const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void set_animationSet(XAnimationSet2D@+)", asMETHOD(XAnimatedSprite2D, SetAnimationSet), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "XAnimationSet2D@+ get_animationSet() const", asMETHOD(XAnimatedSprite2D, GetAnimationSet), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "void set_animation(const String&)", asMETHODPR(XAnimatedSprite2D, SetAnimation, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimatedSprite2D", "const String& get_animation() const", asMETHOD(XAnimatedSprite2D, GetAnimation), asCALL_THISCALL);
 }
 
 static void RegisterRigidBody2D(asIScriptEngine* engine)
@@ -602,11 +602,13 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterSpriteSheet2D(engine);
     RegisterDrawable2D(engine);
     RegisterStaticSprite2D(engine);
+
+    RegisterAnimation2D(engine);
+    RegisterAnimationSet2D(engine);
+    RegisterAnimatedSprite2D(engine);
+
     RegisterParticleEffect2D(engine);
     RegisterParticleEmitter2D(engine);
-    RegisterAnimation2D(engine);
-    RegisterXAnimationSet2D(engine);
-    RegisterXAnimatedSprite2D(engine);
 
     RegisterRigidBody2D(engine);
     RegisterPhysicsWorld2D(engine);

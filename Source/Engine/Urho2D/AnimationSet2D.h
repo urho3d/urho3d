@@ -32,15 +32,15 @@ class Sprite2D;
 class Animation2D;
 
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.brashmonkey.com/spriter.htm.
-class URHO3D_API XAnimationSet2D : public Resource
+class URHO3D_API AnimationSet2D : public Resource
 {
-    OBJECT(XAnimationSet2D);
+    OBJECT(AnimationSet2D);
 
 public:
     /// Construct.
-    XAnimationSet2D(Context* context);
+    AnimationSet2D(Context* context);
     /// Destruct.
-    virtual ~XAnimationSet2D();
+    virtual ~AnimationSet2D();
     /// Register object factory. 
     static void RegisterObject(Context* context);
 

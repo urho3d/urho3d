@@ -21,6 +21,8 @@
 //
 
 #include "Precompiled.h"
+#include "AnimatedSprite2D.h"
+#include "AnimationSet2D.h"
 #include "CollisionBox2D.h"
 #include "CollisionChain2D.h"
 #include "CollisionCircle2D.h"
@@ -50,8 +52,6 @@
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
-#include "XAnimatedSprite2D.h"
-#include "XAnimationSet2D.h"
 
 #include "DebugNew.h"
 
@@ -65,16 +65,18 @@ void RegisterUrho2DLibrary(Context* context)
     MaterialCache2D::RegisterObject(context);
     DrawableProxy2D::RegisterObject(context);
 
+    Sprite2D::RegisterObject(context);
+    SpriteSheet2D::RegisterObject(context);
+    
     // Must register objects from base to derived order
     Drawable2D::RegisterObject(context);
     StaticSprite2D::RegisterObject(context);
+
+    AnimationSet2D::RegisterObject(context);
+    AnimatedSprite2D::RegisterObject(context);
+
     ParticleEffect2D::RegisterObject(context);
     ParticleEmitter2D::RegisterObject(context);
-    XAnimationSet2D::RegisterObject(context);
-    XAnimatedSprite2D::RegisterObject(context);
-
-    Sprite2D::RegisterObject(context);
-    SpriteSheet2D::RegisterObject(context);
 
     PhysicsWorld2D::RegisterObject(context);
     RigidBody2D::RegisterObject(context);

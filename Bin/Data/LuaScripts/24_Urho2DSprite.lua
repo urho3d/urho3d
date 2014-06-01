@@ -92,7 +92,7 @@ function CreateScene()
         end
     end
 
-    local animationSet = cache:GetResource("XAnimationSet2D", "Urho2D/GoldIcon.scml")
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml")
     if animationSet == nil then
         return
     end
@@ -100,7 +100,7 @@ function CreateScene()
     local spriteNode = scene_:CreateChild("AnimatedSprite2D")
     spriteNode.position = Vector3(0.0, 0.0, -1.0)
 
-    local animatedSprite = spriteNode:CreateComponent("XAnimatedSprite2D")
+    local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
     -- Set animation
     animatedSprite:SetAnimation(animationSet, "idle")
 end

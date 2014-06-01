@@ -22,8 +22,8 @@
 
 #include "Precompiled.h"
 #include "Animation2D.h"
+#include "AnimationSet2D.h"
 #include "Sprite2D.h"
-#include "XAnimationSet2D.h"
 
 #include "DebugNew.h"
 
@@ -65,7 +65,7 @@ Timeline::Timeline()
 {
 }
 
-Animation2D::Animation2D(XAnimationSet2D* animationSet) : 
+Animation2D::Animation2D(AnimationSet2D* animationSet) : 
     animationSet_(animationSet),
     length_(0.0f), 
     looped_(true)
@@ -101,7 +101,7 @@ void Animation2D::AddTimeline(const Timeline& timeline)
     timelines_.Push(timeline);
 }
 
-XAnimationSet2D* Animation2D::GetAnimationSet() const
+AnimationSet2D* Animation2D::GetAnimationSet() const
 {
     return animationSet_;
 }

@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Animation2D.h"
+#include "AnimatedSprite2D.h"
+#include "AnimationSet2D.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Drawable2D.h"
@@ -34,8 +35,6 @@
 #include "Scene.h"
 #include "Text.h"
 #include "Urho2DSpriterAnimation.h"
-#include "XAnimatedSprite2D.h"
-#include "XAnimationSet2D.h"
 #include "Zone.h"
 
 #include "DebugNew.h"
@@ -94,14 +93,14 @@ void Urho2DSpriterAnimation::CreateScene()
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();  
-    XAnimationSet2D* animationSet = cache->GetResource<XAnimationSet2D>("Urho2D/imp/imp.scml");
+    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
     if (!animationSet)
         return;
 
     spriteNode_ = scene_->CreateChild("SpriterAnimation");
     spriteNode_->SetPosition(Vector3(-1.4f, 2.0f, 0.0f));
 
-    XAnimatedSprite2D* animatedSprite = spriteNode_->CreateComponent<XAnimatedSprite2D>();
+    AnimatedSprite2D* animatedSprite = spriteNode_->CreateComponent<AnimatedSprite2D>();
     animatedSprite->SetAnimation(animationSet, animationNames[animationIndex_]);
 }
 
@@ -188,7 +187,7 @@ void Urho2DSpriterAnimation::HandleUpdate(StringHash eventType, VariantMap& even
 
 void Urho2DSpriterAnimation::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    XAnimatedSprite2D* animatedSprite = spriteNode_->GetComponent<XAnimatedSprite2D>();
+    AnimatedSprite2D* animatedSprite = spriteNode_->GetComponent<AnimatedSprite2D>();
     animationIndex_ = (animationIndex_ + 1) % 7;
     animatedSprite->SetAnimation(animationNames[animationIndex_]);
 }

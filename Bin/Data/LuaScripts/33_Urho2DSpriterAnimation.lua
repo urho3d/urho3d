@@ -54,7 +54,7 @@ function CreateScene()
     camera.orthographic = true
     camera.orthoSize = graphics.height * PIXEL_SIZE
 
-    local animationSet = cache:GetResource("XAnimationSet2D", "Urho2D/imp/imp.scml")
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/imp/imp.scml")
     if animationSet == nil then
         return
     end
@@ -62,7 +62,7 @@ function CreateScene()
     spriteNode = scene_:CreateChild("SpriterAnimation")
     spriteNode.position = Vector3(-1.4, 2.0, 0.0)
 
-    local animatedSprite = spriteNode:CreateComponent("XAnimatedSprite2D")
+    local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
     animatedSprite:SetAnimation(animationSet, animationNames[animationIndex + 1])
 end
 
@@ -138,7 +138,7 @@ function HandleUpdate(eventType, eventData)
 end
 
 function HandleMouseButtonDown(eventType, eventData)
-    local animatedSprite = spriteNode:GetComponent("XAnimatedSprite2D")
+    local animatedSprite = spriteNode:GetComponent("AnimatedSprite2D")
     animationIndex = (animationIndex + 1) % 7
     animatedSprite.animation = animationNames[animationIndex + 1]
 end

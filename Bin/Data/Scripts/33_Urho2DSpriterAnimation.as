@@ -58,14 +58,14 @@ void CreateScene()
     camera.orthographic = true;
     camera.orthoSize = graphics.height * PIXEL_SIZE;
 
-    XAnimationSet2D@ animationSet = cache.GetResource("XAnimationSet2D", "Urho2D/imp/imp.scml");
+    AnimationSet2D@ animationSet = cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml");
     if (animationSet is null)
         return;
 
     spriteNode = scene_.CreateChild("SpriterAnimation");
     spriteNode.position = Vector3(-1.4f, 2.0f, 0.0f);
 
-    XAnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("XAnimatedSprite2D");
+    AnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("AnimatedSprite2D");
     animatedSprite.SetAnimation(animationSet, animationNames[animationIndex]);
 }
 
@@ -144,7 +144,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    XAnimatedSprite2D@ animatedSprite = spriteNode.GetComponent("XAnimatedSprite2D");
+    AnimatedSprite2D@ animatedSprite = spriteNode.GetComponent("AnimatedSprite2D");
     animationIndex = (animationIndex + 1) % 7;
     animatedSprite.animation = animationNames[animationIndex];
 }
