@@ -74,8 +74,8 @@ struct ObjectKey
     SharedPtr<Sprite2D> sprite_;
     /// Position.
     Vector2 position_;
-    /// Pivot (hot spot).
-    Vector2 pivot_;
+    /// Hot spot (pivot).
+    Vector2 hotSpot_;
     /// Scale.
     Vector2 scale_;
     /// Spin direction.

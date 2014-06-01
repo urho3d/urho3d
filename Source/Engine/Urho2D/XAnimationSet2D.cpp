@@ -136,6 +136,13 @@ bool XAnimationSet2D::LoadFolders(const XMLElement& rootElem)
                 LOGERROR("Could not load sprite " + parentPath + fileName);
                 return false;
             }
+            
+            Vector2 hotSpot(0.0f, 1.0f);
+            if (fileElem.HasAttribute("pivot_x"))
+                hotSpot.x_ = fileElem.GetFloat("pivot_x");
+            if (fileElem.HasAttribute("pivot_y"))
+                hotSpot.y_ = fileElem.GetFloat("pivot_y");
+            sprite->SetHotSpot(hotSpot);
 
             sprites_[(folderId << 16) + fileId] = sprite;
         }
@@ -210,10 +217,14 @@ bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
             objectKey.position_.y_ = objectElem.GetFloat("y") * PIXEL_SIZE;
             
             if (objectElem.HasAttribute("pivot_x"))
-                objectKey.pivot_.x_ = objectElem.GetFloat("pivot_x");
+                objectKey.hotSpot_.x_ = objectElem.GetFloat("pivot_x");
+            else
+                objectKey.hotSpot_.x_ = objectKey.sprite_->GetHotSpot().x_;
 
             if (objectElem.HasAttribute("pivot_y"))
-                objectKey.pivot_.y_ = objectElem.GetFloat("pivot_y");
+                objectKey.hotSpot_.y_ = objectElem.GetFloat("pivot_y");
+            else
+                objectKey.hotSpot_.y_ = objectKey.sprite_->GetHotSpot().y_;
 
             if (objectElem.HasAttribute("scale_x"))
                 objectKey.scale_.x_ = objectElem.GetFloat("scale_x");

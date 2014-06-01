@@ -311,7 +311,7 @@ void XAnimatedSprite2D::UpdateAnimation(float timeStep)
                     objectNode->SetScale(currKey.scale_.Lerp(nextKey.scale_, t));
 
                     staticSprite->SetSprite(currKey.sprite_);
-                    staticSprite->SetHotSpot(currKey.pivot_.Lerp(nextKey.pivot_, t));
+                    staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
                     float alpha_ = Lerp(currKey.alpha_, nextKey.alpha_, t);
                     staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, alpha_));
 

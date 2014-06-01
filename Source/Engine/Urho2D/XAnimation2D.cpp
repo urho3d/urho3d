@@ -54,7 +54,7 @@ const ObjectRef* MainlineKey::GetObjectRef(int timeline) const
 
 ObjectKey::ObjectKey() :
     time_(0.0f),
-    pivot_(0.0f, 1.0f),
+    hotSpot_(0.0f, 1.0f),
     scale_(Vector2::ONE), 
     spin_(1),
     alpha_(1.0f)
