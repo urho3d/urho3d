@@ -141,13 +141,13 @@ protected:
     /// End time.
     float endTime_;
     /// Key frames.
-    PODVector<VAnimKeyFrame> keyFrames_;
+    Vector<VAnimKeyFrame> keyFrames_;
     /// Spline tangents.
     VariantVector splineTangents_;
     /// Spline tangents dirty.
     bool splineTangentsDirty_;
     /// Event frames.
-    PODVector<VAnimEventFrame> eventFrames_;
+    Vector<VAnimEventFrame> eventFrames_;
 };
 
 }

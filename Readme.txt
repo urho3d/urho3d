@@ -38,6 +38,7 @@ Urho3D development, contributions and bugfixes by:
 - Joshua Tippetts
 - Daniel Wiberg
 - Steven Zhang
+- AGreatFish
 - Firegorilla
 - Magic.Lixin
 - Mike3D
@@ -72,8 +73,6 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 - Comparison of several sorting algorithms by Juha Nieminen
   http://warp.povusers.org/SortComparison/
-- NVIDIA FXAA II for Consoles by Timothy Lottes
-  http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
 Urho3D uses the following third-party libraries:
 - AngelScript 2.28.1 (http://www.angelcode.com/angelscript/)

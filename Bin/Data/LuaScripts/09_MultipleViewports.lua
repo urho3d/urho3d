@@ -138,11 +138,11 @@ function SetupViewports()
     -- disabled.
     local effectRenderPath = viewport:GetRenderPath():Clone()
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/Bloom.xml"))
-    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/EdgeFilter.xml"))
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/FXAA2.xml"))
     -- Make the bloom mixing parameter more pronounced
     effectRenderPath:SetShaderParameter("BloomMix", Variant(Vector2(0.9, 0.6)))
     effectRenderPath:SetEnabled("Bloom", false)
-    effectRenderPath:SetEnabled("EdgeFilter", false)
+    effectRenderPath:SetEnabled("FXAA2", false)
     viewport:SetRenderPath(effectRenderPath)
 
     -- Set up the rear camera viewport on top of the front view ("rear view mirror")
@@ -201,7 +201,7 @@ function MoveCamera(timeStep)
         effectRenderPath:ToggleEnabled("Bloom")
     end
     if input:GetKeyPress(KEY_F) then
-        effectRenderPath:ToggleEnabled("EdgeFilter")
+        effectRenderPath:ToggleEnabled("FXAA2")
     end
 
     -- Toggle debug geometry with space

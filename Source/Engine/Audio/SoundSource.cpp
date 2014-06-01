@@ -484,6 +484,7 @@ void SoundSource::PlayLockless(Sound* sound)
         {
             // Compressed sound start
             PlayLockless(sound->GetDecoderStream());
+            sound_ = sound;
             return;
         }
     }

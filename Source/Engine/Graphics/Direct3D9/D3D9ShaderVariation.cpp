@@ -131,12 +131,13 @@ void ShaderVariation::Release()
         }
         
         object_ = 0;
-        compilerOutput_.Clear();
-        
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-            useTextureUnit_[i] = false;
-        parameters_.Clear();
     }
+    
+    compilerOutput_.Clear();
+    
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        useTextureUnit_[i] = false;
+    parameters_.Clear();
 }
 
 void ShaderVariation::SetName(const String& name)

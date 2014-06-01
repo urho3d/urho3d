@@ -211,7 +211,7 @@ private:
     SharedPtr<Cursor> cursor_;
     /// UI element being dragged.
     WeakPtr<UIElement> dragElement_;
-    /// Currently focused element
+    /// Currently focused element.
     WeakPtr<UIElement> focusElement_;
     /// UI rendering batches.
     PODVector<UIBatch> batches_;

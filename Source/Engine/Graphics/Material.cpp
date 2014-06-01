@@ -423,9 +423,6 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
             return;
         }
 
-        // Use shared ptr to avoid memory leak
-        SharedPtr<ValueAnimation> animationPtr(animation);
-
         if (shaderParameters_.Find(name) == shaderParameters_.End())
         {
             LOGERROR(GetName() + " has no shader parameter: " + name);
@@ -433,7 +430,7 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
         }
         
         StringHash nameHash(name);
-        shaderParameterAnimationInfos_[nameHash] = new ShaderParameterAnimationInfo(this, name, animationPtr, wrapMode, speed);
+        shaderParameterAnimationInfos_[nameHash] = new ShaderParameterAnimationInfo(this, name, animation, wrapMode, speed);
     }
     else
     {
