@@ -30,7 +30,9 @@
 namespace Urho3D
 {
 
-ObjectRef::ObjectRef() : 
+ObjectRef::ObjectRef() :
+    isBone_(false),
+    parent_(-1),
     timeline_(0),
     key_(0),
     zIndex_(0)
@@ -54,14 +56,16 @@ const ObjectRef* MainlineKey::GetObjectRef(int timeline) const
 
 ObjectKey::ObjectKey() :
     time_(0.0f),
-    hotSpot_(0.0f, 1.0f),
-    scale_(Vector2::ONE), 
     spin_(1),
+    angle_(0.0f),
+    scale_(Vector2::ONE), 
+    hotSpot_(0.0f, 1.0f),
     alpha_(1.0f)
 {
 }
 
-Timeline::Timeline()
+Timeline::Timeline() :
+    isBone_(false)
 {
 }
 

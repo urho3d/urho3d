@@ -186,8 +186,9 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
 
     for (unsigned i = 0; i < objectNodes_.Size(); ++i)
     {
-        StaticSprite2D* ss = objectNodes_[i]->GetComponent<StaticSprite2D>();
-        worldBoundingBox_.Merge(ss->GetWorldBoundingBox());
+        StaticSprite2D* staticSprite = objectNodes_[i]->GetComponent<StaticSprite2D>();
+        if (staticSprite)
+            worldBoundingBox_.Merge(staticSprite->GetWorldBoundingBox());
     }
 
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
@@ -219,14 +220,29 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 
     animationTime_ = 0.0f;
 
-    for (unsigned i = 0; i < animation_->GetTimelines().Size(); ++i)
+    const MainlineKey& mainlineKey = animation_->GetMainlineKeys().Front();
+    for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
     {
-        SharedPtr<Node> objectNode(GetNode()->CreateChild(animation_->GetTimelines()[i].name_));
+        const Timeline& timeline = animation_->GetTimeline(i);
 
-        StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
-        staticSprite->SetLayer(layer_);
-        staticSprite->SetBlendMode(blendMode_);
-        staticSprite->SetUseHotSpot(true);
+        SharedPtr<Node> objectNode;
+        const ObjectRef* objectRef = mainlineKey.GetObjectRef(i);
+        if (!objectRef || objectRef->parent_ == -1)
+            objectNode = GetNode()->CreateChild(timeline.name_);
+        else
+        {
+            assert(objectRef->parent_ < (int)objectNodes_.Size());
+            SharedPtr<Node> parentNode = objectNodes_[objectRef->parent_];
+            objectNode = parentNode->CreateChild(timeline.name_);
+        }
+
+        if (!timeline.isBone_)
+        {
+            StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+            staticSprite->SetLayer(layer_);
+            staticSprite->SetBlendMode(blendMode_);
+            staticSprite->SetUseHotSpot(true);
+        }
 
         objectNodes_.Push(objectNode);        
     }
@@ -269,8 +285,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     if (!mainlineKey)
         mainlineKey = &mainlineKeys.Back();
 
-    const Vector<Timeline>& timelines = animation_->GetTimelines();
-    for (unsigned i = 0; i < timelines.Size(); ++i)
+    for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
     {
         Node* objectNode = objectNodes_[i];
 
@@ -281,10 +296,8 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
         {
             objectNode->SetEnabled(true);
 
-            StaticSprite2D* staticSprite = objectNode->GetComponent<StaticSprite2D>();
-            staticSprite->SetOrderInLayer(orderInLayer_ + objectRef->zIndex_);
-
-            const Vector<ObjectKey>& objectKeys = timelines[i].objectKeys_;
+            const Timeline& timeline = animation_->GetTimeline(i);
+            const Vector<ObjectKey>& objectKeys = timeline.objectKeys_;
             for (unsigned j = 0; j < objectKeys.Size() - 1; ++j)
             {
                 if (time <= objectKeys[j + 1].time_)
@@ -310,10 +323,15 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
                     objectNode->SetScale(currKey.scale_.Lerp(nextKey.scale_, t));
 
-                    staticSprite->SetSprite(currKey.sprite_);
-                    staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
-                    float alpha_ = Lerp(currKey.alpha_, nextKey.alpha_, t);
-                    staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, alpha_));
+                    if (!timeline.isBone_)
+                    {
+                        StaticSprite2D* staticSprite = objectNode->GetComponent<StaticSprite2D>();
+                        staticSprite->SetOrderInLayer(orderInLayer_ + objectRef->zIndex_);
+                        staticSprite->SetSprite(currKey.sprite_);
+                        staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
+                        float alpha_ = Lerp(currKey.alpha_, nextKey.alpha_, t);
+                        staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, alpha_));
+                    }
 
                     break;
                 }

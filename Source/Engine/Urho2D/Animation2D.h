@@ -29,15 +29,19 @@
 namespace Urho3D
 {
 
-class Sprite2D;
 class AnimationSet2D;
+class Sprite2D;
 
 /// Object reference.
 struct ObjectRef
 {
     /// Construct.
     ObjectRef();
-
+    
+    /// Is bone.
+    bool isBone_;
+    /// Parent.
+    int parent_;
     /// Timeline.
     int timeline_;
     /// Key index.
@@ -57,7 +61,6 @@ public:
     float time_;
     /// Object references.
     Vector<ObjectRef> objectRefs_;
-
     /// Return object reference by timeline.
     const ObjectRef* GetObjectRef(int timeline) const;
 };
@@ -70,18 +73,20 @@ struct ObjectKey
 
     /// Time.
     float time_;
-    /// Sprite.
-    SharedPtr<Sprite2D> sprite_;
-    /// Position.
-    Vector2 position_;
-    /// Hot spot (pivot).
-    Vector2 hotSpot_;
-    /// Scale.
-    Vector2 scale_;
     /// Spin direction.
     int spin_;
+
+    /// Position.
+    Vector2 position_;
     /// Angle.
     float angle_;
+    /// Scale.
+    Vector2 scale_;
+
+    /// Sprite.
+    SharedPtr<Sprite2D> sprite_;
+    /// Hot spot (pivot).
+    Vector2 hotSpot_;
     /// Alpha.
     float alpha_;
 };
@@ -94,6 +99,8 @@ struct Timeline
 
     /// Name.
     String name_;
+    /// Is sprite.
+    bool isSprite_;
     /// Object keys.
     Vector<ObjectKey> objectKeys_;
 };
@@ -128,6 +135,10 @@ public:
     bool IsLooped() const { return looped_; }
     /// Return all mainline keys.
     const Vector<MainlineKey>& GetMainlineKeys() const { return mainlineKeys_; }
+    /// Return number of timelines.
+    unsigned GetNumTimelines() const { return timelines_.Size();}
+    /// Return timeline by index.
+    const Timeline& GetTimeline(unsigned index) const { return timelines_[index]; }
     /// Return all timelines.
     const Vector<Timeline>& GetTimelines() const { return timelines_; }
 
