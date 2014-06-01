@@ -704,12 +704,12 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float2 rcpFrame = float2(cGBufferInvSize.x, cGBufferInvSize.y);
 
     oColor = FxaaPixelShader(
-        iScreenPos,							// float2 pos,
-        sDiffMap,							// sampler2D tex,
-        rcpFrame,							// float2 fxaaQualityRcpFrame,
-        0.75f,						        // float fxaaQualitySubpix,
-        0.166f,								// float fxaaQualityEdgeThreshold,
-        0.0833f								// float fxaaQualityEdgeThresholdMin
+        iScreenPos,                         // float2 pos,
+        sDiffMap,                           // sampler2D tex,
+        rcpFrame,                           // float2 fxaaQualityRcpFrame,
+        0.75f,                              // float fxaaQualitySubpix,
+        0.166f,                             // float fxaaQualityEdgeThreshold,
+        0.0833f                             // float fxaaQualityEdgeThresholdMin
     );
 }
 
