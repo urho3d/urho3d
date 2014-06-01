@@ -288,21 +288,18 @@ NOTE the other tuning knobs are now in the shader function inputs!
 
 ============================================================================*/
 
-float FxaaLuma(float4 rgba) { return rgba.w; }
-/*--------------------------------------------------------------------------*/
 float CalcLuma(float3 rgb)
 {
     float3 luma = float3(0.299, 0.587, 0.114);
     return dot(rgb, luma);
 }
-/*--------------------------------------------------------------------------*/
-float4 MakeRGBA(float3 rgb) 
-{
-    return float4(rgb, CalcLuma(rgb));
-}
 
-#define FxaaTexTop(t, p) MakeRGBA(tex2Dlod(t, float4(p, 0.0, 0.0)).rgb)
-#define FxaaTexOff(t, p, o, r) MakeRGBA(tex2Dlod(t, float4(p + (o * r), 0, 0)).rgb)
+/*--------------------------------------------------------------------------*/
+
+#define FxaaTexTop(t, p) float4(tex2Dlod(t, float4(p, 0.0, 0.0)).rgb, 1.0)
+
+#define LumaTop(t, p) CalcLuma(tex2Dlod(t, float4(p, 0.0, 0.0)).rgb)
+#define LumaOff(t, p, o, r) CalcLuma(tex2Dlod(t, float4(p + (o * r), 0, 0)).rgb)
 
 /*============================================================================
 
@@ -371,11 +368,12 @@ float4 FxaaPixelShader(
     posM.y = pos.y;
     
     float4 rgbyM = FxaaTexTop(tex, posM);
+    rgbyM.y = CalcLuma(rgbyM.rgb);
     #define lumaM rgbyM.y
-    float lumaS = FxaaLuma(FxaaTexOff(tex, posM, float2( 0, 1), fxaaQualityRcpFrame.xy));
-    float lumaE = FxaaLuma(FxaaTexOff(tex, posM, float2( 1, 0), fxaaQualityRcpFrame.xy));
-    float lumaN = FxaaLuma(FxaaTexOff(tex, posM, float2( 0,-1), fxaaQualityRcpFrame.xy));
-    float lumaW = FxaaLuma(FxaaTexOff(tex, posM, float2(-1, 0), fxaaQualityRcpFrame.xy));
+    float lumaS = LumaOff(tex, posM, float2( 0, 1), fxaaQualityRcpFrame.xy);
+    float lumaE = LumaOff(tex, posM, float2( 1, 0), fxaaQualityRcpFrame.xy);
+    float lumaN = LumaOff(tex, posM, float2( 0,-1), fxaaQualityRcpFrame.xy);
+    float lumaW = LumaOff(tex, posM, float2(-1, 0), fxaaQualityRcpFrame.xy);
 /*--------------------------------------------------------------------------*/
     float maxSM = max(lumaS, lumaM);
     float minSM = min(lumaS, lumaM);
@@ -393,10 +391,10 @@ float4 FxaaPixelShader(
     if(earlyExit)
         return FxaaTexTop(tex, pos);
 /*--------------------------------------------------------------------------*/
-    float lumaNW = FxaaLuma(FxaaTexOff(tex, posM, float2(-1,-1), fxaaQualityRcpFrame.xy));
-    float lumaSE = FxaaLuma(FxaaTexOff(tex, posM, float2( 1, 1), fxaaQualityRcpFrame.xy));
-    float lumaNE = FxaaLuma(FxaaTexOff(tex, posM, float2( 1,-1), fxaaQualityRcpFrame.xy));
-    float lumaSW = FxaaLuma(FxaaTexOff(tex, posM, float2(-1, 1), fxaaQualityRcpFrame.xy));
+    float lumaNW = LumaOff(tex, posM, float2(-1,-1), fxaaQualityRcpFrame.xy);
+    float lumaSE = LumaOff(tex, posM, float2( 1, 1), fxaaQualityRcpFrame.xy);
+    float lumaNE = LumaOff(tex, posM, float2( 1,-1), fxaaQualityRcpFrame.xy);
+    float lumaSW = LumaOff(tex, posM, float2(-1, 1), fxaaQualityRcpFrame.xy);
 /*--------------------------------------------------------------------------*/
     float lumaNS = lumaN + lumaS;
     float lumaWE = lumaW + lumaE;
@@ -454,9 +452,9 @@ float4 FxaaPixelShader(
     posP.x = posB.x + offNP.x * FXAA_QUALITY_P0;
     posP.y = posB.y + offNP.y * FXAA_QUALITY_P0;
     float subpixD = ((-2.0)*subpixC) + 3.0;
-    float lumaEndN = FxaaLuma(FxaaTexTop(tex, posN));
+    float lumaEndN = LumaTop(tex, posN);
     float subpixE = subpixC * subpixC;
-    float lumaEndP = FxaaLuma(FxaaTexTop(tex, posP));
+    float lumaEndP = LumaTop(tex, posP);
 /*--------------------------------------------------------------------------*/
     if(!pairN) lumaNN = lumaSS;
     float gradientScaled = gradient * 1.0/4.0;
@@ -475,8 +473,8 @@ float4 FxaaPixelShader(
     if(!doneP) posP.y += offNP.y * FXAA_QUALITY_P1;
 /*--------------------------------------------------------------------------*/
     if(doneNP) {
-        if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-        if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+        if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+        if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
         doneN = abs(lumaEndN) >= gradientScaled;
@@ -489,8 +487,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
         #if (FXAA_QUALITY_PS > 3)
         if(doneNP) {
-            if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-            if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+            if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+            if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
             if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
             if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
             doneN = abs(lumaEndN) >= gradientScaled;
@@ -503,8 +501,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
             #if (FXAA_QUALITY_PS > 4)
             if(doneNP) {
-                if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                 if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                 if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                 doneN = abs(lumaEndN) >= gradientScaled;
@@ -517,8 +515,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
                 #if (FXAA_QUALITY_PS > 5)
                 if(doneNP) {
-                    if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                    if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                    if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                    if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                     if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                     if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                     doneN = abs(lumaEndN) >= gradientScaled;
@@ -531,8 +529,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
                     #if (FXAA_QUALITY_PS > 6)
                     if(doneNP) {
-                        if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                        if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                        if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                        if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                         doneN = abs(lumaEndN) >= gradientScaled;
@@ -545,8 +543,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
                         #if (FXAA_QUALITY_PS > 7)
                         if(doneNP) {
-                            if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                            if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                            if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                            if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                             if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                             if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                             doneN = abs(lumaEndN) >= gradientScaled;
@@ -559,8 +557,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
     #if (FXAA_QUALITY_PS > 8)
     if(doneNP) {
-        if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-        if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+        if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+        if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
         doneN = abs(lumaEndN) >= gradientScaled;
@@ -573,8 +571,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
         #if (FXAA_QUALITY_PS > 9)
         if(doneNP) {
-            if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-            if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+            if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+            if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
             if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
             if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
             doneN = abs(lumaEndN) >= gradientScaled;
@@ -587,8 +585,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
             #if (FXAA_QUALITY_PS > 10)
             if(doneNP) {
-                if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                 if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                 if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                 doneN = abs(lumaEndN) >= gradientScaled;
@@ -601,8 +599,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
                 #if (FXAA_QUALITY_PS > 11)
                 if(doneNP) {
-                    if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                    if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                    if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                    if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                     if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                     if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                     doneN = abs(lumaEndN) >= gradientScaled;
@@ -615,8 +613,8 @@ float4 FxaaPixelShader(
 /*--------------------------------------------------------------------------*/
                     #if (FXAA_QUALITY_PS > 12)
                     if(doneNP) {
-                        if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(tex, posN.xy));
-                        if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(tex, posP.xy));
+                        if(!doneN) lumaEndN = LumaTop(tex, posN.xy);
+                        if(!doneP) lumaEndP = LumaTop(tex, posP.xy);
                         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
                         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
                         doneN = abs(lumaEndN) >= gradientScaled;
@@ -705,13 +703,13 @@ void PS(float2 iScreenPos : TEXCOORD0,
 {
     float2 rcpFrame = float2(cGBufferInvSize.x, cGBufferInvSize.y);
 
-    oColor = float4(FxaaPixelShader(
+    oColor = FxaaPixelShader(
         iScreenPos,							// float2 pos,
         sDiffMap,							// sampler2D tex,
         rcpFrame,							// float2 fxaaQualityRcpFrame,
-        0.75f,									// float fxaaQualitySubpix,
-        0.166f,									// float fxaaQualityEdgeThreshold,
+        0.75f,						        // float fxaaQualitySubpix,
+        0.166f,								// float fxaaQualityEdgeThreshold,
         0.0833f								// float fxaaQualityEdgeThresholdMin
-    ).rgb, 1.0);
+    );
 }
 
