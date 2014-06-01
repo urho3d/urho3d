@@ -92,19 +92,17 @@ function CreateScene()
         end
     end
 
-    local animation = cache:GetResource("Animation2D", "Urho2D/GoldIcon.anm")
-    if animation == nil then
+    local animationSet = cache:GetResource("XAnimationSet2D", "Urho2D/GoldIcon.scml")
+    if animationSet == nil then
         return
     end
 
     local spriteNode = scene_:CreateChild("AnimatedSprite2D")
     spriteNode.position = Vector3(0.0, 0.0, -1.0)
 
-    local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
+    local animatedSprite = spriteNode:CreateComponent("XAnimatedSprite2D")
     -- Set animation
-    animatedSprite.animation = animation
-    -- Set blend mode
-    animatedSprite.blendMode = BLEND_ALPHA
+    animatedSprite:SetAnimation(animationSet, "idle")
 end
 
 function CreateInstructions()

@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedSprite2D.h"
-#include "Animation2D.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Engine.h"
@@ -37,6 +35,8 @@
 #include "Text.h"
 #include "Urho2DSprite.h"
 #include "Zone.h"
+#include "XAnimationSet2D.h"
+#include "XAnimatedSprite2D.h"
 
 #include "DebugNew.h"
 
@@ -117,19 +117,17 @@ void Urho2DSprite::CreateScene()
         spriteNodes_.Push(spriteNode);
     }
 
-    // Get animation
-    Animation2D* animation = cache->GetResource<Animation2D>("Urho2D/GoldIcon.anm");
-    if (!animation)
+    // Get animation set
+    XAnimationSet2D* animationSet = cache->GetResource<XAnimationSet2D>("Urho2D/GoldIcon.scml");
+    if (!animationSet)
         return;
 
     SharedPtr<Node> spriteNode(scene_->CreateChild("AnimatedSprite2D"));
     spriteNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
 
-    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
+    XAnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<XAnimatedSprite2D>();
     // Set animation
-    animatedSprite->SetAnimation(animation);
-    // Set blend mode
-    animatedSprite->SetBlendMode(BLEND_ALPHA);
+    animatedSprite->SetAnimation(animationSet, "idle");
 }
 
 void Urho2DSprite::CreateInstructions()
