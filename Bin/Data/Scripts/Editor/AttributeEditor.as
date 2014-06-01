@@ -885,6 +885,7 @@ void InitResourcePicker()
     Array<String> materialFilters = {"*.xml", "*.material"};
     Array<String> pexFilters = {"*.pex"};
     Array<String> anmFilters = {"*.anm"};
+    Array<String> anmSetFilters = {"*.scml"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani", ACTION_PICK | ACTION_TEST));
     resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
@@ -900,6 +901,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("Animation2D", anmFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("ParticleEffect2D", pexFilters, ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("XAnimationSet2D", anmSetFilters, ACTION_PICK | ACTION_OPEN));
 }
 
 ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
