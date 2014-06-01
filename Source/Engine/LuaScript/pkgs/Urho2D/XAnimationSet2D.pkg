@@ -1,0 +1,10 @@
+$#include "XAnimationSet2D.h"
+
+class XAnimationSet2D : Resource
+{
+    unsigned GetNumAnimations() const;
+    XAnimation2D* GetAnimation(unsigned index) const;
+    XAnimation2D* GetAnimation(const String name) const;
+
+    tolua_readonly tolua_property__get_set unsigned numAnimations;
+};

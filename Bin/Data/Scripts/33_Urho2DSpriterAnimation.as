@@ -63,7 +63,7 @@ void CreateScene()
         return;
 
     spriteNode = scene_.CreateChild("SpriterAnimation");
-    spriteNode.position = Vector3(-1.4f, 2.0f, -0.0f);
+    spriteNode.position = Vector3(-1.4f, 2.0f, 0.0f);
 
     XAnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("XAnimatedSprite2D");
     animatedSprite.SetAnimation(animationSet, animationNames[animationIndex]);

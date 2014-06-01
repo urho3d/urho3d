@@ -99,7 +99,7 @@ void Urho2DSpriterAnimation::CreateScene()
         return;
 
     spriteNode_ = scene_->CreateChild("SpriterAnimation");
-    spriteNode_->SetPosition(Vector3(-1.4f, 2.0f, -1.0f));
+    spriteNode_->SetPosition(Vector3(-1.4f, 2.0f, 0.0f));
 
     XAnimatedSprite2D* animatedSprite = spriteNode_->CreateComponent<XAnimatedSprite2D>();
     animatedSprite->SetAnimation(animationSet, animationNames[animationIndex_]);

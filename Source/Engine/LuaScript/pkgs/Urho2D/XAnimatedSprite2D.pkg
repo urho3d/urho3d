@@ -1,0 +1,26 @@
+$#include "XAnimatedSprite2D.h"
+
+class XAnimatedSprite2D : Drawable
+{
+    void SetLayer(int layer);
+    void SetOrderInLayer(int orderInLayer);
+    void SetBlendMode(BlendMode mode);
+    void SetSpeed(float speed);
+    void SetAnimation(const String name);
+    void SetAnimation(XAnimationSet2D* animationSet, const String name);
+    void SetAnimationSet(XAnimationSet2D* animationSet);
+
+    int GetLayer() const;
+    int GetOrderInLayer() const;
+    BlendMode GetBlendMode() const;
+    float GetSpeed() const;
+    XAnimationSet2D* GetAnimationSet() const;
+    const String GetAnimation() const;
+
+    tolua_property__get_set int layer;
+    tolua_property__get_set int orderInLayer;
+    tolua_property__get_set BlendMode blendMode;
+    tolua_property__get_set float speed;
+    tolua_property__get_set XAnimationSet2D* animationSet;
+    tolua_property__get_set String animation;
+};
