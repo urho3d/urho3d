@@ -21,8 +21,6 @@
 //
 
 #include "Precompiled.h"
-#include "AnimatedSprite2D.h"
-#include "Animation2D.h"
 #include "CollisionBox2D.h"
 #include "CollisionChain2D.h"
 #include "CollisionCircle2D.h"
@@ -70,8 +68,6 @@ void RegisterUrho2DLibrary(Context* context)
     // Must register objects from base to derived order
     Drawable2D::RegisterObject(context);
     StaticSprite2D::RegisterObject(context);
-    AnimatedSprite2D::RegisterObject(context);
-    Animation2D::RegisterObject(context);
     ParticleEffect2D::RegisterObject(context);
     ParticleEmitter2D::RegisterObject(context);
     XAnimationSet2D::RegisterObject(context);

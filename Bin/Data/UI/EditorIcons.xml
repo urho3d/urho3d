@@ -251,10 +251,6 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="48 16 62 30" />
     </element>
-    <element type="AnimatedSprite2D">
-        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
-        <attribute name="Image Rect" value="48 16 62 30" />
-    </element>
     <element type="XAnimatedSprite2D">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="48 16 62 30" />

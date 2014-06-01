@@ -22,8 +22,6 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
-#include "AnimatedSprite2D.h"
-#include "Animation2D.h"
 #include "CollisionBox2D.h"
 #include "CollisionChain2D.h"
 #include "CollisionCircle2D.h"
@@ -123,31 +121,6 @@ template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const ch
 static void RegisterStaticSprite2D(asIScriptEngine* engine)
 {
     RegisterStaticSprite2D<StaticSprite2D>(engine, "StaticSprite2D");
-}
-
-static void RegisterAnimation2D(asIScriptEngine* engine)
-{
-    RegisterResource<Animation2D>(engine, "Animation2D");
-    engine->RegisterObjectMethod("Animation2D", "float get_totalTime() const", asMETHOD(Animation2D, GetTotalTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation2D", "uint get_numFrames() const", asMETHOD(Animation2D, GetNumFrames), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation2D", "Sprite@+ GetFrameSprite(uint) const", asMETHOD(Animation2D, GetFrameSprite), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation2D", "Sprite@+ GetFrameSpriteByTime(float) const", asMETHOD(Animation2D, GetFrameSpriteByTime), asCALL_THISCALL);
-}
-
-static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
-{
-    engine->RegisterEnum("CycleMode");
-    engine->RegisterEnumValue("CycleMode", "CM_LOOP", CM_LOOP);
-    engine->RegisterEnumValue("CycleMode", "CM_CLAMP", CM_CLAMP);
-    engine->RegisterEnumValue("CycleMode", "CM_PINGPONG", CM_PINGPONG);
-
-    RegisterStaticSprite2D<AnimatedSprite2D>(engine, "AnimatedSprite2D");
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_cycleMode(CycleMode)", asMETHOD(AnimatedSprite2D, SetCycleMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "CycleMode get_cycleMode() const", asMETHOD(AnimatedSprite2D, GetCycleMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animation(Animation2D@+)", asMETHOD(AnimatedSprite2D, SetAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "Animation2D@+ get_animation() const", asMETHOD(AnimatedSprite2D, GetAnimation), asCALL_THISCALL);
 }
 
 static void RegisterParticleEffect2D(asIScriptEngine* engine)
@@ -629,8 +602,6 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterSpriteSheet2D(engine);
     RegisterDrawable2D(engine);
     RegisterStaticSprite2D(engine);
-    RegisterAnimation2D(engine);
-    RegisterAnimatedSprite2D(engine);
     RegisterParticleEffect2D(engine);
     RegisterParticleEmitter2D(engine);
     RegisterXAnimation2D(engine);
