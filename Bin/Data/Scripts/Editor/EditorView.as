@@ -1176,7 +1176,7 @@ void UpdateView(float timeStep)
     // Rotate/orbit
     if (input.mouseButtonDown[MOUSEB_RIGHT])
     {
-        if (input.keyDown[KEY_LSHIFT])
+        if (input.mouseButtonDown[MOUSEB_MIDDLE])
             CamView(true);
         else
             CamView();
@@ -1184,7 +1184,7 @@ void UpdateView(float timeStep)
     else
         input.mouseGrabbed = false;
     // Pan
-    if ( input.mouseButtonDown[MOUSEB_MIDDLE])
+    if ( input.mouseButtonDown[MOUSEB_MIDDLE] && !input.mouseButtonDown[MOUSEB_RIGHT])
     {
 
         IntVector2 mouseMove = input.mouseMove;
