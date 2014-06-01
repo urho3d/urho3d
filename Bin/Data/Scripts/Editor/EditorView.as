@@ -15,7 +15,7 @@ int  viewportBorderOffset = 2; // used to center borders over viewport seams,  s
 int  viewportBorderWidth = 4; // width of a viewport resize border
 IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
-bool mouseWheelCameraPosition = false;
+bool mouseWheelCameraPosition = true;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -1083,79 +1083,18 @@ void UpdateViewports(float timeStep)
         viewportContext.Update(timeStep);
     }
 }
-
-void UpdateView(float timeStep)
+void CamView(bool orbit_mode = false)
 {
-    if (ui.HasModalElement() || ui.focusElement !is null)
-        return;
-
-    // Move camera
-    if (!input.keyDown[KEY_LCTRL])
+    IntVector2 mouseMove = input.mouseMove;
+    if (mouseMove.x != 0 || mouseMove.y != 0)
     {
-        float speedMultiplier = 1.0;
-        if (input.keyDown[KEY_LSHIFT])
-            speedMultiplier = cameraShiftSpeedMultiplier;
-
-        if (input.keyDown['W'] || input.keyDown[KEY_UP])
-        {
-            cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
-        {
-            cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
-        {
-            cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
-        {
-            cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
-        {
-            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
-            FadeUI();
-        }
-        if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
-        {
-            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
-            FadeUI();
-        }
-        if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
-        {
-            if (mouseWheelCameraPosition)
-            {
-                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
-                    speedMultiplier);
-            }
-            else
-            {
-                float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-                camera.zoom = Clamp(zoom, .1, 30);
-            }
-        }
-    }
-
-    // Rotate/orbit camera
-    if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
-    {
-        IntVector2 mouseMove = input.mouseMove;
-        if (mouseMove.x != 0 || mouseMove.y != 0)
-        {
-            activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
-            activeViewport.cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
-
-            if (limitRotation)
-                activeViewport.cameraPitch = Clamp(activeViewport.cameraPitch, -90.0, 90.0);
-
+        activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
+        activeViewport.cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
+        if (limitRotation)
+            activeViewport.cameraPitch = Clamp(activeViewport.cameraPitch, -90.0, 90.0);
             Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
             cameraNode.rotation = q;
-            if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+            if (orbit_mode && (selectedNodes.length > 0 || selectedComponents.length > 0))
             {
                 Vector3 centerPoint = SelectedNodesCenterPoint();
                 Vector3 d = cameraNode.worldPosition - centerPoint;
@@ -1166,11 +1105,99 @@ void UpdateView(float timeStep)
             FadeUI();
             input.mouseGrabbed = true;
         }
+}
+void Zoom(float speedMultiplier)
+{
+    float zoom = camera.zoom + -input.mouseMoveWheel * 0.1f * speedMultiplier;
+    camera.zoom = Clamp(zoom, 0.1f, 30);
+}
+
+void UpdateView(float timeStep)
+{
+    if (ui.HasModalElement() || ui.focusElement !is null)
+        return;
+
+    float speedMultiplier = 1.0;
+    if (input.keyDown[KEY_LSHIFT])
+        speedMultiplier = cameraShiftSpeedMultiplier;
+
+    // Move camera
+    if (ui.focusElement is null)
+    {
+
+        if (!input.keyDown[KEY_LCTRL])
+        {
+            if (input.keyDown['W'] || input.keyDown[KEY_UP])
+            {
+                cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
+            {
+                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
+            {
+                cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
+            {
+                cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
+            {
+                cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
+                FadeUI();
+            }
+            if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
+            {
+                cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
+                FadeUI();
+            }
+        }
+
+        if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
+        {
+            // Zoom or move camera depending on settings and LCTRL modifier
+            if (mouseWheelCameraPosition)
+                input.keyDown[KEY_LCTRL] ?
+                        Zoom(speedMultiplier) : cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*5 * timeStep * speedMultiplier);
+
+            else
+                input.keyDown[KEY_LCTRL] ?
+                        cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*5 * timeStep * speedMultiplier) : Zoom(speedMultiplier);
+
+        }
+    }
+
+    // Rotate/orbit
+    if (input.mouseButtonDown[MOUSEB_RIGHT])
+    {
+        if (input.keyDown[KEY_LSHIFT])
+            CamView(true);
+        else
+            CamView();
     }
     else
         input.mouseGrabbed = false;
+    // Pan
+    if ( input.mouseButtonDown[MOUSEB_MIDDLE])
+    {
 
-    if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
+        IntVector2 mouseMove = input.mouseMove;
+        if (mouseMove.x != 0 || mouseMove.y != 0)
+        {
+            cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * speedMultiplier);
+            FadeUI();
+            input.mouseGrabbed = true;
+
+        }
+
+    }
+    if (orbiting && !input.mouseButtonDown[MOUSEB_RIGHT])
         orbiting = false;
 
     // Move/rotate/scale object
