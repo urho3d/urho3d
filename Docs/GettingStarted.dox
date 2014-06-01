@@ -533,55 +533,56 @@ Hint: to get some content to look at, run the Physics sample application (Bin/Da
 \section EditorInstructions_Controls Controls
 
 \verbatim
-Left mouse      - Select nodes or drag the node transform gizmo. Hold Shift to
-                  select components instead. Hold Ctrl to multiselect.
-Right mouse     - Hold down and move mouse to rotate camera
-Middle mouse    - Hold down orbits the camera around selected objects
+Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift to
+                     select components instead. Hold Ctrl to multiselect.
+Right mouse        - Hold down and move mouse to rotate camera
+Middle mouse       - Hold down orbits the camera around selected objects
+Shift+Middle mouse - Hold down pans the camera
 
-WSAD or arrows  - Move
-Shift+WSAD      - Move faster
-E               - Ascend
-Q               - Descend
-Shift+E,Q       - Ascend or descend faster
+WSAD or arrows     - Move
+Shift+WSAD         - Move faster
+E                  - Ascend
+Q                  - Descend
+Shift+E,Q          - Ascend or descend faster
 
-Numpad5         - Toggle orthographic / perspective camera
-Numpad1         - Front view
-Numpad3         - Right hand view
-Numpad7         - Top view
-Ctrl+Numpad1    - Back view
-Ctrl+Numpad3    - Left view
-Ctrl+Numpad7    - Bottom view
+Numpad5            - Toggle orthographic / perspective camera
+Numpad1            - Front view
+Numpad3            - Right hand view
+Numpad7            - Top view
+Ctrl+Numpad1       - Back view
+Ctrl+Numpad3       - Left view
+Ctrl+Numpad7       - Bottom view
 
-Ctrl+1,2,3      - Object manipulation mode: move/rotate/scale
-Ctrl+4          - Object selection mode, no manipulation
-Ctrl+5          - Toggle between world and local axes manipulation
-Ctrl+6,7        - Cycle through components to pick: geometries, lights, zones,
-                  collision shapes; and ui-elements
-Ctrl+arrows     - Manipulate node in X & Z directions
-Ctrl+pgup/pgdn  - Manipulate node in Y direction
-Ctrl+plus/minus - Scale node uniformly (scale mode only)
-Ctrl+Shift+N    - New scene
-Ctrl+O          - Open scene
-Ctrl+S          - Save scene
-Ctrl+Shift+S    - Save scene as
-Ctrl+A          - Select/deselect all root level nodes
-Ctrl+X,C,V      - Cut/copy/paste node or component
-Ctrl+E          - Enable/disable node hierarchy or component
-Ctrl+U          - Unparent scene node
-Ctrl+H          - Open the scene hierarchy window
-Ctrl+I          - Open the attribute inspector window
-Ctrl+P          - Toggle scene update on/off
-Ctrl+W          - Cycle through solid, wireframe and point rendering
-Ctrl+Z          - Undo
-Ctrl+Y          - Redo
-Ctrl+Space      - Open quick menu
-ESC             - Close the file selector or editor settings window
-DEL             - Delete node or component
-F1              - Toggle console
-F2              - Toggle rendering debug geometry
-F3              - Toggle physics debug geometry
-F4              - Toggle octree debug geometry
-F11             - Captures a screenshot
+Ctrl+1,2,3         - Object manipulation mode: move/rotate/scale
+Ctrl+4             - Object selection mode, no manipulation
+Ctrl+5             - Toggle between world and local axes manipulation
+Ctrl+6,7           - Cycle through components to pick: geometries, lights, zones,
+                     collision shapes; and ui-elements
+Ctrl+arrows        - Manipulate node in X & Z directions
+Ctrl+pgup/pgdn     - Manipulate node in Y direction
+Ctrl+plus/minus    - Scale node uniformly (scale mode only)
+Ctrl+Shift+N       - New scene
+Ctrl+O             - Open scene
+Ctrl+S             - Save scene
+Ctrl+Shift+S       - Save scene as
+Ctrl+A             - Select/deselect all root level nodes
+Ctrl+X,C,V         - Cut/copy/paste node or component
+Ctrl+E             - Enable/disable node hierarchy or component
+Ctrl+U             - Unparent scene node
+Ctrl+H             - Open the scene hierarchy window
+Ctrl+I             - Open the attribute inspector window
+Ctrl+P             - Toggle scene update on/off
+Ctrl+W             - Cycle through solid, wireframe and point rendering
+Ctrl+Z             - Undo
+Ctrl+Y             - Redo
+Ctrl+Space         - Open quick menu
+ESC                - Close the file selector or editor settings window
+DEL                - Delete node or component
+F1                 - Toggle console
+F2                 - Toggle rendering debug geometry
+F3                 - Toggle physics debug geometry
+F4                 - Toggle octree debug geometry
+F11                - Captures a screenshot
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.

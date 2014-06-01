@@ -1141,28 +1141,37 @@ void UpdateView(float timeStep)
         }
     }
 
-    // Rotate/orbit camera
+    // Rotate/orbit/pan camera
     if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
     {
         IntVector2 mouseMove = input.mouseMove;
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
-            activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
-            activeViewport.cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
-
-            if (limitRotation)
-                activeViewport.cameraPitch = Clamp(activeViewport.cameraPitch, -90.0, 90.0);
-
-            Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
-            cameraNode.rotation = q;
-            if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+            if (input.keyDown[KEY_LSHIFT] && input.mouseButtonDown[MOUSEB_MIDDLE])
             {
-                Vector3 centerPoint = SelectedNodesCenterPoint();
-                Vector3 d = cameraNode.worldPosition - centerPoint;
-                cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
-                orbiting = true;
+                cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
             }
+            else
+            {
+                activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
+                activeViewport.cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
 
+                if (limitRotation)
+                    activeViewport.cameraPitch = Clamp(activeViewport.cameraPitch, -90.0, 90.0);
+
+                Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+                cameraNode.rotation = q;
+                if (input.mouseButtonDown[MOUSEB_MIDDLE] && selectedNodes.length > 0 || selectedComponents.length > 0)
+                {
+                    Vector3 centerPoint = SelectedNodesCenterPoint();
+                    Vector3 d = cameraNode.worldPosition - centerPoint;
+                    cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
+                    orbiting = true;
+                }
+            }
+        }
+        else
+        {
             FadeUI();
             input.mouseGrabbed = true;
         }
