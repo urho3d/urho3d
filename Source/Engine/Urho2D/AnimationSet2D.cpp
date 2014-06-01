@@ -171,17 +171,17 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
     XMLElement mainlineElem = animationElem.GetChild("mainline");
     for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
     {
-        MainlineKey mainlineKey;
+        MainlineKey2D mainlineKey;
         mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
 
         for (XMLElement refElem = keyElem.GetChild(); refElem; refElem = refElem.GetNext())
         {
-            ObjectRef ref;
+            Reference2D ref;
             
             if (refElem.GetName() == "bone_ref")
-                ref.isBone_ = true;
+                ref.type_ = OT_BONE;
             else
-                ref.isBone_ = false;
+                ref.type_ = OT_SPRITE;
 
             if (refElem.HasAttribute("parent"))
                 ref.parent_ = refElem.GetInt("parent");
@@ -192,7 +192,7 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
             if (refElem.GetName() == "object_ref")
                 ref.zIndex_ = refElem.GetInt("z_index");
 
-            mainlineKey.objectRefs_.Push(ref);
+            mainlineKey.references_.Push(ref);
         }
 
         animation->AddMainlineKey(mainlineKey);
@@ -201,67 +201,67 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
     // Load time lines
     for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
     {
-        Timeline timeline;
+        Timeline2D timeline;
         timeline.name_ = timelineElem.GetAttribute("name");
         if (timelineElem.GetAttribute("object_type") == "bone")
-            timeline.isBone_ = true;
+            timeline.type_ = OT_BONE;
         else
-            timeline.isBone_ = false;
+            timeline.type_ = OT_SPRITE;
 
         for (XMLElement keyElem = timelineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
         {
-            ObjectKey objectKey;
-            objectKey.time_ = keyElem.GetFloat("time") * 0.001f;
-            objectKey.spin_ = 1;
+            TimelineKey2D key;
+            key.time_ = keyElem.GetFloat("time") * 0.001f;
+            key.spin_ = 1;
             if (keyElem.HasAttribute("spin"))
-                objectKey.spin_ = keyElem.GetInt("spin");
+                key.spin_ = keyElem.GetInt("spin");
 
             XMLElement childElem = keyElem.GetChild();
-            objectKey.position_.x_ = childElem.GetFloat("x") * PIXEL_SIZE;
-            objectKey.position_.y_ = childElem.GetFloat("y") * PIXEL_SIZE;
+            key.position_.x_ = childElem.GetFloat("x") * PIXEL_SIZE;
+            key.position_.y_ = childElem.GetFloat("y") * PIXEL_SIZE;
             
-            objectKey.angle_= childElem.GetFloat("angle");
+            key.angle_= childElem.GetFloat("angle");
 
             if (childElem.HasAttribute("scale_x"))
-                objectKey.scale_.x_ = childElem.GetFloat("scale_x");
+                key.scale_.x_ = childElem.GetFloat("scale_x");
 
             if (childElem.HasAttribute("scale_y"))
-                objectKey.scale_.y_ = childElem.GetFloat("scale_y");
+                key.scale_.y_ = childElem.GetFloat("scale_y");
 
-            if (!timeline.isBone_)
+            if (timeline.type_ == OT_SPRITE)
             {
                 int folder = childElem.GetUInt("folder");
                 int file = childElem.GetUInt("file");
-                objectKey.sprite_ = GetSprite(folder, file);
-                if (!objectKey.sprite_)
+                key.sprite_ = GetSprite(folder, file);
+                if (!key.sprite_)
                 {
                     LOGERROR("Could not find sprite");
                     return false;
                 }
 
                 if (childElem.HasAttribute("pivot_x"))
-                    objectKey.hotSpot_.x_ = childElem.GetFloat("pivot_x");
+                    key.hotSpot_.x_ = childElem.GetFloat("pivot_x");
                 else
-                    objectKey.hotSpot_.x_ = objectKey.sprite_->GetHotSpot().x_;
+                    key.hotSpot_.x_ = key.sprite_->GetHotSpot().x_;
 
                 if (childElem.HasAttribute("pivot_y"))
-                    objectKey.hotSpot_.y_ = childElem.GetFloat("pivot_y");
+                    key.hotSpot_.y_ = childElem.GetFloat("pivot_y");
                 else
-                    objectKey.hotSpot_.y_ = objectKey.sprite_->GetHotSpot().y_;
+                    key.hotSpot_.y_ = key.sprite_->GetHotSpot().y_;
 
                 if (childElem.HasAttribute("a"))
-                    objectKey.alpha_ = childElem.GetFloat("a");
+                    key.alpha_ = childElem.GetFloat("a");
             }
 
-            timeline.objectKeys_.Push(objectKey);
+            timeline.timelineKeys_.Push(key);
         }
 
         // Add end key for looped animation
-        if (looped && timeline.objectKeys_.Back().time_ != length)
+        if (looped && timeline.timelineKeys_.Back().time_ != length)
         {
-            ObjectKey objectKey = timeline.objectKeys_.Front();
+            TimelineKey2D objectKey = timeline.timelineKeys_.Front();
             objectKey.time_ = length;
-            timeline.objectKeys_.Push(objectKey);
+            timeline.timelineKeys_.Push(objectKey);
         }
 
         animation->AddTimeline(timeline);

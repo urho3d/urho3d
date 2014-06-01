@@ -32,14 +32,23 @@ namespace Urho3D
 class AnimationSet2D;
 class Sprite2D;
 
-/// Object reference.
-struct ObjectRef
+/// Object type.
+enum ObjectType2D
+{
+    /// Bone.
+    OT_BONE = 0,
+    /// Sprite.
+    OT_SPRITE,
+};
+
+/// Reference.
+struct Reference2D
 {
     /// Construct.
-    ObjectRef();
-    
-    /// Is bone.
-    bool isBone_;
+    Reference2D();
+
+    /// Object type.
+    ObjectType2D type_;
     /// Parent.
     int parent_;
     /// Timeline.
@@ -51,25 +60,28 @@ struct ObjectRef
 };
 
 /// Mainline Key.
-struct MainlineKey
+struct MainlineKey2D
 {
 public:
     /// Construct.
-    MainlineKey();
+    MainlineKey2D();
+
+    /// Return reference by timeline.
+    const Reference2D* GetReference(int timeline) const;
+    /// Return timeline by id.
+    unsigned GetTimeline(int id) const;
 
     /// Time.
     float time_;
-    /// Object references.
-    Vector<ObjectRef> objectRefs_;
-    /// Return object reference by timeline.
-    const ObjectRef* GetObjectRef(int timeline) const;
+    /// References.
+    Vector<Reference2D> references_;
 };
 
-/// Object key.
-struct ObjectKey
+/// Timeline key.
+struct TimelineKey2D
 {
     /// Construct.
-    ObjectKey();
+    TimelineKey2D();
 
     /// Time.
     float time_;
@@ -92,17 +104,17 @@ struct ObjectKey
 };
 
 /// Timeline.
-struct Timeline
+struct Timeline2D
 {
     /// Construct.
-    Timeline();
+    Timeline2D();
 
     /// Name.
     String name_;
-    /// Is sprite.
-    bool isSprite_;
+    /// Object type.
+    ObjectType2D type_;
     /// Object keys.
-    Vector<ObjectKey> objectKeys_;
+    Vector<TimelineKey2D> timelineKeys_;
 };
 
 /// Spriter animation. for more information please refer to http://www.brashmonkey.com/spriter.htm.
@@ -121,9 +133,9 @@ public:
     /// Set looped.
     void SetLooped(bool looped);
     /// Add mainline key.
-    void AddMainlineKey(const MainlineKey& mainlineKey);
+    void AddMainlineKey(const MainlineKey2D& mainlineKey);
     /// Add timeline.
-    void AddTimeline(const Timeline& timeline);
+    void AddTimeline(const Timeline2D& timeline);
 
     /// Return animation set.
     AnimationSet2D* GetAnimationSet() const;
@@ -134,13 +146,11 @@ public:
     /// Return looped.
     bool IsLooped() const { return looped_; }
     /// Return all mainline keys.
-    const Vector<MainlineKey>& GetMainlineKeys() const { return mainlineKeys_; }
+    const Vector<MainlineKey2D>& GetMainlineKeys() const { return mainlineKeys_; }
     /// Return number of timelines.
     unsigned GetNumTimelines() const { return timelines_.Size();}
     /// Return timeline by index.
-    const Timeline& GetTimeline(unsigned index) const { return timelines_[index]; }
-    /// Return all timelines.
-    const Vector<Timeline>& GetTimelines() const { return timelines_; }
+    const Timeline2D& GetTimeline(unsigned index) const { return timelines_[index]; }
 
 private:
     /// Animation set.
@@ -152,9 +162,9 @@ private:
     /// Looped.
     bool looped_;
     /// All mainline Keys.
-    Vector<MainlineKey> mainlineKeys_;
+    Vector<MainlineKey2D> mainlineKeys_;
     /// All timelines.
-    Vector<Timeline> timelines_;
+    Vector<Timeline2D> timelines_;
 };
 
 }

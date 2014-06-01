@@ -220,31 +220,39 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 
     animationTime_ = 0.0f;
 
-    const MainlineKey& mainlineKey = animation_->GetMainlineKeys().Front();
-    for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
-    {
-        const Timeline& timeline = animation_->GetTimeline(i);
+    objectNodes_.Resize(animation_->GetNumTimelines());
 
+    // Create hierarchy
+    const MainlineKey2D& mainlineKey = animation_->GetMainlineKeys().Front();
+    Vector<SharedPtr<Node> > objectNodes;
+    for (unsigned i = 0; i < mainlineKey.references_.Size(); ++i)
+    {
+        const Reference2D& ref = mainlineKey.references_[i];
+        const Timeline2D& timeline = animation_->GetTimeline(ref.timeline_);
         SharedPtr<Node> objectNode;
-        const ObjectRef* objectRef = mainlineKey.GetObjectRef(i);
-        if (!objectRef || objectRef->parent_ == -1)
+        if (ref.parent_ == -1)
             objectNode = GetNode()->CreateChild(timeline.name_);
         else
-        {
-            assert(objectRef->parent_ < (int)objectNodes_.Size());
-            SharedPtr<Node> parentNode = objectNodes_[objectRef->parent_];
-            objectNode = parentNode->CreateChild(timeline.name_);
-        }
+            objectNode = objectNodes[ref.parent_]->CreateChild(timeline.name_);
 
-        if (!timeline.isBone_)
+        objectNodes.Push(objectNode);
+        objectNodes_[ref.timeline_] = objectNode;
+    }
+
+    // Create sprite
+    for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
+    {
+        const Timeline2D& timeline = animation_->GetTimeline(i);
+        if (!objectNodes_[i])
+            objectNodes_[i] = GetNode()->CreateChild(timeline.name_);
+
+        if (timeline.type_ == OT_SPRITE)
         {
-            StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+            StaticSprite2D* staticSprite = objectNodes_[i]->CreateComponent<StaticSprite2D>();
             staticSprite->SetLayer(layer_);
             staticSprite->SetBlendMode(blendMode_);
             staticSprite->SetUseHotSpot(true);
         }
-
-        objectNodes_.Push(objectNode);        
     }
 
     UpdateAnimation(0.0f);
@@ -271,8 +279,8 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     else
         time = Clamp(animationTime_, 0.0f, animtationLength);
 
-    const Vector<MainlineKey>& mainlineKeys = animation_->GetMainlineKeys();
-    const MainlineKey* mainlineKey = 0;
+    const Vector<MainlineKey2D>& mainlineKeys = animation_->GetMainlineKeys();
+    const MainlineKey2D* mainlineKey = 0;
     for (unsigned i = 1; i < mainlineKeys.Size(); ++i)
     {
         if (time < mainlineKeys[i].time_)
@@ -289,27 +297,28 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     {
         Node* objectNode = objectNodes_[i];
 
-        const ObjectRef* objectRef = mainlineKey->GetObjectRef(i);
+        const Reference2D* objectRef = mainlineKey->GetReference(i);
         if (!objectRef)
             objectNode->SetEnabled(false);
         else
         {
             objectNode->SetEnabled(true);
 
-            const Timeline& timeline = animation_->GetTimeline(i);
-            const Vector<ObjectKey>& objectKeys = timeline.objectKeys_;
+            const Timeline2D& timeline = animation_->GetTimeline(i);
+            const Vector<TimelineKey2D>& objectKeys = timeline.timelineKeys_;
             for (unsigned j = 0; j < objectKeys.Size() - 1; ++j)
             {
                 if (time <= objectKeys[j + 1].time_)
                 {
-                    const ObjectKey& currKey = objectKeys[j];
-                    const ObjectKey& nextKey = objectKeys[j + 1];
+                    const TimelineKey2D& currKey = objectKeys[j];
+                    const TimelineKey2D& nextKey = objectKeys[j + 1];
 
                     float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
                     if (t < 0.0f || t > 1.0f)
                     {
                         t = 0;
                     }
+
                     objectNode->SetPosition(currKey.position_.Lerp(nextKey.position_, t));
 
                     float angle;
@@ -323,7 +332,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
                     objectNode->SetScale(currKey.scale_.Lerp(nextKey.scale_, t));
 
-                    if (!timeline.isBone_)
+                    if (timeline.type_ == OT_SPRITE)
                     {
                         StaticSprite2D* staticSprite = objectNode->GetComponent<StaticSprite2D>();
                         staticSprite->SetOrderInLayer(orderInLayer_ + objectRef->zIndex_);

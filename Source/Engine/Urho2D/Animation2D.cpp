@@ -30,8 +30,8 @@
 namespace Urho3D
 {
 
-ObjectRef::ObjectRef() :
-    isBone_(false),
+Reference2D::Reference2D() :
+    type_(OT_BONE),
     parent_(-1),
     timeline_(0),
     key_(0),
@@ -39,22 +39,28 @@ ObjectRef::ObjectRef() :
 {
 }
 
-MainlineKey::MainlineKey() :
+MainlineKey2D::MainlineKey2D() :
     time_(0)
 {
 }
 
-const ObjectRef* MainlineKey::GetObjectRef(int timeline) const
+const Reference2D* MainlineKey2D::GetReference(int timeline) const
 {
-    for (unsigned i = 0; i < objectRefs_.Size(); ++i)
+    for (unsigned i = 0; i < references_.Size(); ++i)
     {
-        if (timeline == objectRefs_[i].timeline_)
-            return &objectRefs_[i];
+        if (timeline == references_[i].timeline_)
+            return &references_[i];
     }
     return 0;
 }
 
-ObjectKey::ObjectKey() :
+unsigned MainlineKey2D::GetTimeline(int id) const
+{
+    assert(id < references_.Size());
+    return references_[id].timeline_;
+}
+
+TimelineKey2D::TimelineKey2D() :
     time_(0.0f),
     spin_(1),
     angle_(0.0f),
@@ -64,8 +70,8 @@ ObjectKey::ObjectKey() :
 {
 }
 
-Timeline::Timeline() :
-    isBone_(false)
+Timeline2D::Timeline2D() :
+    type_(OT_BONE)
 {
 }
 
@@ -95,12 +101,12 @@ void Animation2D::SetLooped(bool looped)
     looped_ = looped;
 }
 
-void Animation2D::AddMainlineKey(const MainlineKey& mainlineKey)
+void Animation2D::AddMainlineKey(const MainlineKey2D& mainlineKey)
 {
     mainlineKeys_.Push(mainlineKey);
 }
 
-void Animation2D::AddTimeline(const Timeline& timeline)
+void Animation2D::AddTimeline(const Timeline2D& timeline)
 {
     timelines_.Push(timeline);
 }
