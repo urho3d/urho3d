@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Animation2D.h"
 #include "Context.h"
 #include "ResourceCache.h"
 #include "Scene.h"
@@ -28,7 +29,6 @@
 #include "Sprite2D.h"
 #include "StaticSprite2D.h"
 #include "XAnimatedSprite2D.h"
-#include "XAnimation2D.h"
 #include "XAnimationSet2D.h"
 
 #include "DebugNew.h"
@@ -195,7 +195,7 @@ void XAnimatedSprite2D::OnWorldBoundingBoxUpdate()
 
 
 
-void XAnimatedSprite2D::SetAnimation(XAnimation2D* animation)
+void XAnimatedSprite2D::SetAnimation(Animation2D* animation)
 {
     if (animation == animation_)
     {

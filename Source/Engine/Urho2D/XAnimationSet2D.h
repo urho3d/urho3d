@@ -29,7 +29,7 @@ namespace Urho3D
 
 class XMLElement;
 class Sprite2D;
-class XAnimation2D;
+class Animation2D;
 
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API XAnimationSet2D : public Resource
@@ -50,9 +50,9 @@ public:
     /// Get number of animations.
     unsigned GetNumAnimations() const;
     /// Return animation by index.
-    XAnimation2D* GetAnimation(unsigned index) const;
+    Animation2D* GetAnimation(unsigned index) const;
     /// Return animation by name.
-    XAnimation2D* GetAnimation(const String& name) const;
+    Animation2D* GetAnimation(const String& name) const;
 
 private:
     /// Load folders.
@@ -65,7 +65,7 @@ private:
     /// Sprites.
     HashMap<unsigned, SharedPtr<Sprite2D> > sprites_;
     /// Animations.
-    Vector<SharedPtr<XAnimation2D> > animations_;
+    Vector<SharedPtr<Animation2D> > animations_;
 };
 
 }

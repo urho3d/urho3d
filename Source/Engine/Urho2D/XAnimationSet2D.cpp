@@ -21,13 +21,13 @@
 //
 
 #include "Precompiled.h"
+#include "Animation2D.h"
 #include "Context.h"
 #include "Drawable2D.h"
 #include "FileSystem.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Sprite2D.h"
-#include "XAnimation2D.h"
 #include "XAnimationSet2D.h"
 #include "XMLFile.h"
 
@@ -90,14 +90,14 @@ unsigned XAnimationSet2D::GetNumAnimations() const
     return animations_.Size();
 }
 
-XAnimation2D* XAnimationSet2D::GetAnimation(unsigned index) const
+Animation2D* XAnimationSet2D::GetAnimation(unsigned index) const
 {
     if (index < animations_.Size())
         return animations_[index];
     return 0;
 }
 
-XAnimation2D* XAnimationSet2D::GetAnimation(const String& name) const
+Animation2D* XAnimationSet2D::GetAnimation(const String& name) const
 {
     for (unsigned i = 0; i < animations_.Size(); ++i)
     {
@@ -154,7 +154,7 @@ bool XAnimationSet2D::LoadFolders(const XMLElement& rootElem)
 
 bool XAnimationSet2D::LoadAnimation(const XMLElement& animationElem)
 {
-    SharedPtr<XAnimation2D> animation(new XAnimation2D(this));
+    SharedPtr<Animation2D> animation(new Animation2D(this));
     
     String name = animationElem.GetAttribute("name");
     animation->SetName(name);

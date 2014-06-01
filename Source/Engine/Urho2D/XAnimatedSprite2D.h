@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 class XAnimationSet2D;
-class XAnimation2D;
+class Animation2D;
 
 /// Spriter animation component.
 class URHO3D_API XAnimatedSprite2D : public Drawable
@@ -85,7 +85,7 @@ protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Set animation.
-    void SetAnimation(XAnimation2D* animation);
+    void SetAnimation(Animation2D* animation);
     /// Update.
     void UpdateAnimation(float timeStep);
     /// Handle scene post update.
@@ -104,7 +104,7 @@ protected:
     /// Animation name.
     String animationName_;
     /// Animation.
-    SharedPtr<XAnimation2D> animation_;
+    SharedPtr<Animation2D> animation_;
     /// Animation time.
     float animationTime_;
     /// Object nodes.

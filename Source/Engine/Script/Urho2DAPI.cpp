@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Animation2D.h"
 #include "APITemplates.h"
 #include "CollisionBox2D.h"
 #include "CollisionChain2D.h"
@@ -49,7 +50,6 @@
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
-#include "XAnimation2D.h"
 #include "XAnimationSet2D.h"
 #include "XAnimatedSprite2D.h"
 
@@ -139,20 +139,20 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleEffect2D@+ get_effect() const", asMETHOD(ParticleEmitter2D, GetEffect), asCALL_THISCALL);
 }
 
-static void RegisterXAnimation2D(asIScriptEngine* engine)
+static void RegisterAnimation2D(asIScriptEngine* engine)
 {
-    RegisterRefCounted<XAnimation2D>(engine, "XAnimation2D");
-    engine->RegisterObjectMethod("XAnimation2D", "const String& get_name() const", asMETHOD(XAnimation2D, GetName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimation2D", "float get_length() const", asMETHOD(XAnimation2D, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimation2D", "bool get_looped() const", asMETHOD(XAnimation2D, IsLooped), asCALL_THISCALL);
+    RegisterRefCounted<Animation2D>(engine, "AnimationX2D");
+    engine->RegisterObjectMethod("AnimationX2D", "const String& get_name() const", asMETHOD(Animation2D, GetName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationX2D", "float get_length() const", asMETHOD(Animation2D, GetLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationX2D", "bool get_looped() const", asMETHOD(Animation2D, IsLooped), asCALL_THISCALL);
 
 }
 static void RegisterXAnimationSet2D(asIScriptEngine* engine)
 {
     RegisterResource<XAnimationSet2D>(engine, "XAnimationSet2D");
     engine->RegisterObjectMethod("XAnimationSet2D", "uint get_numAnimations() const", asMETHOD(XAnimationSet2D, GetNumAnimations), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimationSet2D", "XAnimation2D@+ GetAnimation(uint) const", asMETHODPR(XAnimationSet2D, GetAnimation, (unsigned) const, XAnimation2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XAnimationSet2D", "XAnimation2D@+ GetAnimation(const String&) const", asMETHODPR(XAnimationSet2D, GetAnimation, (const String&) const, XAnimation2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XAnimationSet2D", "AnimationX2D@+ GetAnimation(uint) const", asMETHODPR(XAnimationSet2D, GetAnimation, (unsigned) const, Animation2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XAnimationSet2D", "AnimationX2D@+ GetAnimation(const String&) const", asMETHODPR(XAnimationSet2D, GetAnimation, (const String&) const, Animation2D*), asCALL_THISCALL);
 }
 
 static void RegisterXAnimatedSprite2D(asIScriptEngine* engine)
@@ -604,7 +604,7 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterStaticSprite2D(engine);
     RegisterParticleEffect2D(engine);
     RegisterParticleEmitter2D(engine);
-    RegisterXAnimation2D(engine);
+    RegisterAnimation2D(engine);
     RegisterXAnimationSet2D(engine);
     RegisterXAnimatedSprite2D(engine);
 

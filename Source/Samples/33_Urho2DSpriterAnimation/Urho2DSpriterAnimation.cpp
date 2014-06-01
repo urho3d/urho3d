@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Animation2D.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Drawable2D.h"
@@ -34,7 +35,6 @@
 #include "Text.h"
 #include "Urho2DSpriterAnimation.h"
 #include "XAnimatedSprite2D.h"
-#include "XAnimation2D.h"
 #include "XAnimationSet2D.h"
 #include "Zone.h"
 

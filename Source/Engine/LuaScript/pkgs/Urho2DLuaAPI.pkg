@@ -1,10 +1,10 @@
 $pfile "Urho2D/Sprite2D.pkg"
 $pfile "Urho2D/SpriteSheet2D.pkg"
+$pfile "Urho2D/Animation2D.pkg"
 $pfile "Urho2D/Drawable2D.pkg"
 $pfile "Urho2D/StaticSprite2D.pkg"
 $pfile "Urho2D/ParticleEffect2D.pkg"
 $pfile "Urho2D/ParticleEmitter2D.pkg"
-$pfile "Urho2D/XAnimation2D.pkg"
 $pfile "Urho2D/XAnimationSet2D.pkg"
 $pfile "Urho2D/XAnimatedSprite2D.pkg"
 

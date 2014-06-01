@@ -1,6 +1,6 @@
-$#include "XAnimation2D.h"
+$#include "Animation2D.h"
 
-class XAnimation2D : RefCounted
+class Animation2D : RefCounted
 {
     const String GetName() const;
     float GetLength() const;

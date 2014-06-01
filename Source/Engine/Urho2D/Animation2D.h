@@ -99,13 +99,13 @@ struct Timeline
 };
 
 /// Spriter animation. for more information please refer to http://www.brashmonkey.com/spriter.htm.
-class URHO3D_API XAnimation2D : public RefCounted
+class URHO3D_API Animation2D : public RefCounted
 {
 public:
     /// Construct.
-    XAnimation2D(XAnimationSet2D* animationSet);
+    Animation2D(XAnimationSet2D* animationSet);
     /// Destruct
-    virtual ~XAnimation2D();
+    virtual ~Animation2D();
 
     /// Set name.
     void SetName(const String& name);

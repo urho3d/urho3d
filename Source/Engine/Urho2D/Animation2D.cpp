@@ -21,8 +21,8 @@
 //
 
 #include "Precompiled.h"
+#include "Animation2D.h"
 #include "Sprite2D.h"
-#include "XAnimation2D.h"
 #include "XAnimationSet2D.h"
 
 #include "DebugNew.h"
@@ -65,43 +65,43 @@ Timeline::Timeline()
 {
 }
 
-XAnimation2D::XAnimation2D(XAnimationSet2D* animationSet) : 
+Animation2D::Animation2D(XAnimationSet2D* animationSet) : 
     animationSet_(animationSet),
     length_(0.0f), 
     looped_(true)
 {
 }
 
-XAnimation2D::~XAnimation2D()
+Animation2D::~Animation2D()
 {
 }
 
-void XAnimation2D::SetName(const String& name)
+void Animation2D::SetName(const String& name)
 {
     name_ = name;
 }
 
-void XAnimation2D::SetLength(float length)
+void Animation2D::SetLength(float length)
 {
     length_ = Max(0.0f, length);
 }
 
-void XAnimation2D::SetLooped(bool looped)
+void Animation2D::SetLooped(bool looped)
 {
     looped_ = looped;
 }
 
-void XAnimation2D::AddMainlineKey(const MainlineKey& mainlineKey)
+void Animation2D::AddMainlineKey(const MainlineKey& mainlineKey)
 {
     mainlineKeys_.Push(mainlineKey);
 }
 
-void XAnimation2D::AddTimeline(const Timeline& timeline)
+void Animation2D::AddTimeline(const Timeline& timeline)
 {
     timelines_.Push(timeline);
 }
 
-XAnimationSet2D* XAnimation2D::GetAnimationSet() const
+XAnimationSet2D* Animation2D::GetAnimationSet() const
 {
     return animationSet_;
 }
