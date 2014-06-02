@@ -190,15 +190,16 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimation(AnimationSet2D, const String&);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetFlip(bool, bool);
 
 // Properties:
-Animation2D animation;
+String animation;
 bool animationEnabled;
+AnimationSet2D animationSet;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -212,14 +213,10 @@ BoundingBox boundingBox;
 bool castShadows;
 /* readonly */
 String category;
-Color color;
-CycleMode cycleMode;
 float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
-bool flipX;
-bool flipY;
 /* readonly */
 uint id;
 /* readonly */
@@ -227,7 +224,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -242,7 +238,6 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 float speed;
-Sprite2D sprite;
 bool temporary;
 /* readonly */
 ShortStringHash type;
@@ -299,35 +294,16 @@ int weakRefs;
 
 class Animation2D
 {
-// Methods:
-Sprite GetFrameSprite(uint) const;
-Sprite GetFrameSpriteByTime(float) const;
-bool Load(File);
-bool Load(VectorBuffer&);
-bool Save(File) const;
-bool Save(VectorBuffer&) const;
-void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+float length;
 /* readonly */
-String category;
+bool looped;
 /* readonly */
-uint memoryUse;
 String name;
 /* readonly */
-uint numFrames;
-/* readonly */
 int refs;
-/* readonly */
-float totalTime;
-/* readonly */
-ShortStringHash type;
-/* readonly */
-String typeName;
-/* readonly */
-uint useTimer;
 /* readonly */
 int weakRefs;
 };
@@ -414,6 +390,39 @@ bool temporary;
 ShortStringHash type;
 /* readonly */
 String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class AnimationSet2D
+{
+// Methods:
+Animation2D GetAnimation(const String&) const;
+Animation2D GetAnimation(uint) const;
+bool Load(File);
+bool Load(VectorBuffer&);
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+uint memoryUse;
+String name;
+/* readonly */
+uint numAnimations;
+/* readonly */
+int refs;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint useTimer;
 /* readonly */
 int weakRefs;
 };
@@ -11392,13 +11401,6 @@ CS_RESIZEDIAGONAL_TOPLEFT,
 CS_ACCEPTDROP,
 CS_REJECTDROP,
 CS_BUSY,
-};
-
-enum CycleMode
-{
-CM_LOOP,
-CM_CLAMP,
-CM_PINGPONG,
 };
 
 enum DumpMode

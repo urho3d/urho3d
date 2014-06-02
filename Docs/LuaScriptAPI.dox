@@ -68,22 +68,32 @@ Properties:
 - unsigned numMorphs (readonly)
 - bool master (readonly)
 
-### AnimatedSprite2D : StaticSprite2D
+### AnimatedSprite2D : Drawable
 
 Methods:
 
+- void SetLayer(int layer)
+- void SetOrderInLayer(int orderInLayer)
+- void SetBlendMode(BlendMode mode)
 - void SetSpeed(float speed)
-- void SetCycleMode(CycleMode cycleMode)
-- void SetAnimation(Animation2D* animation)
+- void SetAnimation(const String name)
+- void SetAnimation(AnimationSet2D* animationSet, const String name)
+- void SetAnimationSet(AnimationSet2D* animationSet)
+- int GetLayer() const
+- int GetOrderInLayer() const
+- BlendMode GetBlendMode() const
 - float GetSpeed() const
-- CycleMode GetCycleMode() const
-- Animation2D* GetAnimation() const
+- AnimationSet2D* GetAnimationSet() const
+- const String GetAnimation() const
 
 Properties:
 
+- int layer
+- int orderInLayer
+- BlendMode blendMode
 - float speed
-- CycleMode cycleMode
-- Animation2D* animation
+- AnimationSet2D* animationSet
+- String animation
 
 ### Animation : Resource
 
@@ -106,19 +116,19 @@ Properties:
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
 
-### Animation2D : Resource
+### Animation2D : RefCounted
 
 Methods:
 
-- float GetTotalTime() const
-- unsigned GetNumFrames() const
-- Sprite2D* GetFrameSprite(unsigned index) const
-- Sprite2D* GetFrameSpriteByTime(float time) const
+- const String GetName() const
+- float GetLength() const
+- bool IsLooped() const
 
 Properties:
 
-- float totalTime (readonly)
-- unsigned numFrames (readonly)
+- String name (readonly)
+- float length (readonly)
+- bool looped (readonly)
 
 ### AnimationControl
 
@@ -187,6 +197,18 @@ Properties:
 - Vector3 position
 - Quaternion rotation
 - Vector3 scale
+
+### AnimationSet2D : Resource
+
+Methods:
+
+- unsigned GetNumAnimations() const
+- Animation2D* GetAnimation(unsigned index) const
+- Animation2D* GetAnimation(const String name) const
+
+Properties:
+
+- unsigned numAnimations (readonly)
 
 ### AnimationState
 
@@ -6172,12 +6194,6 @@ Properties:
 - int CS_REJECTDROP
 - int CS_BUSY
 - int CS_MAX_SHAPES
-
-### CycleMode
-
-- int CM_LOOP
-- int CM_CLAMP
-- int CM_PINGPONG
 
 ### EmitterType
 

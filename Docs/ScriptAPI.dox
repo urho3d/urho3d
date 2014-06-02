@@ -641,22 +641,12 @@ namespace Urho3D
 - %Animation %States : VariantVector
 
 ### AnimatedSprite2D
-- %Speed : float
-- %Cycle %Mode : int
-- %Animation : ResourceRef
-- %Flip X : bool
-- %Flip Y : bool
-- %Color : Color
 - %Layer : int
 - %Order %in %Layer : int
-- %Sprite : ResourceRef
 - %Blend %Mode : int
-- %Material : ResourceRef
-- %Max %Lights : int
-- %View %Mask : int
-- %Light %Mask : int
-- %Shadow %Mask : int
-- %Zone %Mask : int
+- %Speed : float
+- %Animation %Set : ResourceRef
+- %Animation : String
 
 ### AnimationController
 - %Is %Enabled : bool
@@ -1371,6 +1361,11 @@ namespace Urho3D
 - %Sprite : ResourceRef
 - %Blend %Mode : int
 - %Material : ResourceRef
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
@@ -2133,16 +2128,17 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimation(AnimationSet2D@, const String&)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetFlip(bool, bool)
 
 Properties:
 
-- Animation2D@ animation
+- String animation
 - bool animationEnabled
+- AnimationSet2D@ animationSet
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -2151,19 +2147,14 @@ Properties:
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
-- Color color
-- CycleMode cycleMode
 - float drawDistance
 - bool enabled
 - bool enabledEffective // readonly
-- bool flipX
-- bool flipY
 - uint id // readonly
 - bool inView // readonly
 - int layer
 - uint lightMask
 - float lodBias
-- Material@ material
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -2175,7 +2166,6 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - float speed
-- Sprite2D@ sprite
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
@@ -2218,28 +2208,12 @@ Properties:
 
 ### Animation2D
 
-Methods:
-
-- Sprite@ GetFrameSprite(uint) const
-- Sprite@ GetFrameSpriteByTime(float) const
-- bool Load(File@)
-- bool Load(VectorBuffer&)
-- bool Save(File@) const
-- bool Save(VectorBuffer&) const
-- void SendEvent(const String&, VariantMap& = VariantMap ( ))
-
 Properties:
 
-- ShortStringHash baseType // readonly
-- String category // readonly
-- uint memoryUse // readonly
-- String name
-- uint numFrames // readonly
+- float length // readonly
+- bool looped // readonly
+- String name // readonly
 - int refs // readonly
-- float totalTime // readonly
-- ShortStringHash type // readonly
-- String typeName // readonly
-- uint useTimer // readonly
 - int weakRefs // readonly
 
 
@@ -2316,6 +2290,32 @@ Properties:
 - bool temporary
 - ShortStringHash type // readonly
 - String typeName // readonly
+- int weakRefs // readonly
+
+
+### AnimationSet2D
+
+Methods:
+
+- Animation2D@ GetAnimation(const String&) const
+- Animation2D@ GetAnimation(uint) const
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- ShortStringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- uint numAnimations // readonly
+- int refs // readonly
+- ShortStringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
 - int weakRefs // readonly
 
 
@@ -11678,13 +11678,6 @@ Properties:
 - CS_ACCEPTDROP
 - CS_REJECTDROP
 - CS_BUSY
-
-
-### CycleMode
-
-- CM_LOOP
-- CM_CLAMP
-- CM_PINGPONG
 
 
 ### DumpMode
