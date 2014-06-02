@@ -44,17 +44,17 @@ MainlineKey2D::MainlineKey2D() :
 
 const Reference2D* MainlineKey2D::GetReference(int timeline) const
 {
-    HashMap<int, Reference2D>::ConstIterator i = references_.Find(timeline);
-    if (i != references_.End())
-        return &i->second_;
+    for (unsigned i = 0; i < references_.Size(); ++i)
+    {
+        if (references_[i].timeline_ == timeline)
+            return &references_[i];
+    }
     return 0;
 }
 
 TimelineKey2D::TimelineKey2D() :
     time_(0.0f),
     spin_(1),
-    angle_(0.0f),
-    scale_(Vector2::ONE), 
     hotSpot_(0.0f, 1.0f),
     alpha_(1.0f)
 {
@@ -104,12 +104,81 @@ void Animation2D::AddTimeline(const Timeline2D& timeline)
 
 void Animation2D::SetTimelineParent(int timeline, int timelineParent)
 {
+    if (timeline == timelineParent)
+        return;
     timelines_[timeline].parent_ = timelineParent;
 }
 
 AnimationSet2D* Animation2D::GetAnimationSet() const
 {
     return animationSet_;
+}
+
+
+Transform2D::Transform2D() :
+position_(Vector2::ZERO),
+    angle_(0.0f),
+    scale_(Vector2::ONE)
+{
+
+}
+
+Transform2D::Transform2D(const Vector2 position, float angle, const Vector2& scale) :
+position_(position), 
+    angle_(angle), 
+    scale_(scale)
+{
+
+}
+
+Transform2D::Transform2D(const Transform2D& other) :
+position_(other.position_), 
+    angle_(other.angle_), 
+    scale_(other.scale_)
+{
+
+}
+
+Transform2D& Transform2D::operator = (const Transform2D& other)
+{
+    position_ = other.position_; 
+    angle_ = other.angle_;
+    scale_ = other.scale_;
+    return *this;
+}
+
+Transform2D Transform2D::operator * (const Transform2D& other) const
+{
+    float x = scale_.x_ * other.position_.x_;
+    float y = scale_.y_ * other.position_.y_;
+    float s = Sin(angle_);
+    float c = Cos(angle_);
+
+    Vector2 position;
+    position.x_ = (x * c) - (y * s);
+    position.y_ = (x * s) + (y * c);
+    position = position_ + position;
+
+    float angle = angle_ + other.angle_;
+    Vector2 scale = scale_ * other.scale_;
+
+    return Transform2D(position, angle, scale);
+}
+
+Urho3D::Transform2D Transform2D::Lerp(const Transform2D& other, float t, int spin) const
+{
+    Transform2D ret;
+    ret.position_ = position_.Lerp(other.position_, t);
+
+    if (spin > 0 && angle_ > other.angle_)
+        ret.angle_ = Urho3D::Lerp(angle_, other.angle_ + 360.0f, t);
+    else if (spin < 0 && angle_ < other.angle_)
+        ret.angle_= Urho3D::Lerp(angle_, other.angle_ - 360.0f, t);
+    else
+        ret.angle_= Urho3D::Lerp(angle_, other.angle_, t);
+
+    ret.scale_ = scale_.Lerp(other.scale_, t);
+    return ret;
 }
 
 }

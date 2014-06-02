@@ -69,7 +69,31 @@ public:
     /// Time.
     float time_;
     /// References.
-    HashMap<int, Reference2D> references_;
+    Vector<Reference2D> references_;
+};
+
+struct Transform2D
+{
+    /// Construct.
+    Transform2D();
+    /// Construct from position, angle, scale.
+    Transform2D(const Vector2 position, float angle, const Vector2& scale);
+    /// Copy-construct from another transform.
+    Transform2D(const Transform2D& other);
+
+    /// Assign from another transform.
+    Transform2D& operator = (const Transform2D& other);
+    /// Multiply a transform.
+    Transform2D operator * (const Transform2D& other) const;
+    /// Linear interpolation with another transform.
+    Transform2D Lerp(const Transform2D& other, float t, int spin) const;
+
+    /// Position.
+    Vector2 position_;
+    /// Angle.
+    float angle_;
+    /// Scale.
+    Vector2 scale_;
 };
 
 /// Timeline key.
@@ -82,14 +106,8 @@ struct TimelineKey2D
     float time_;
     /// Spin direction.
     int spin_;
-
-    /// Position.
-    Vector2 position_;
-    /// Angle.
-    float angle_;
-    /// Scale.
-    Vector2 scale_;
-
+    /// Transform.
+    Transform2D transform_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Hot spot (pivot).

@@ -186,16 +186,21 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
                 key.spin_ = keyElem.GetInt("spin");
 
             XMLElement childElem = keyElem.GetChild();
-            key.position_.x_ = childElem.GetFloat("x") * PIXEL_SIZE;
-            key.position_.y_ = childElem.GetFloat("y") * PIXEL_SIZE;
 
-            key.angle_= childElem.GetFloat("angle");
+            Vector2 position;
+            position.x_ = childElem.GetFloat("x") * PIXEL_SIZE;
+            position.y_ = childElem.GetFloat("y") * PIXEL_SIZE;
 
+            float angle = childElem.GetFloat("angle");
+
+            Vector2 scale(Vector2::ONE);
             if (childElem.HasAttribute("scale_x"))
-                key.scale_.x_ = childElem.GetFloat("scale_x");
+                scale.x_ = childElem.GetFloat("scale_x");
 
             if (childElem.HasAttribute("scale_y"))
-                key.scale_.y_ = childElem.GetFloat("scale_y");
+                scale.y_ = childElem.GetFloat("scale_y");
+
+            key.transform_ = Transform2D(position, angle, scale);
 
             if (timeline.type_ == OT_SPRITE)
             {
@@ -241,12 +246,14 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
     for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
     {
         MainlineKey2D mainlineKey;
+        int id = keyElem.GetInt("id");
         mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
 
         for (XMLElement refElem = keyElem.GetChild(); refElem; refElem = refElem.GetNext())
         {
             Reference2D ref;
             
+            int refId = refElem.GetInt("id");
             if (refElem.GetName() == "bone_ref")
                 ref.type_ = OT_BONE;
             else
@@ -257,13 +264,14 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
             if (refElem.HasAttribute("parent"))
             {
                 int parent = refElem.GetInt("parent");
-                animation->SetTimelineParent(ref.timeline_, mainlineKey.references_[parent].timeline_);
+                int parentTimeline = mainlineKey.references_[parent].timeline_;
+                animation->SetTimelineParent(ref.timeline_, parentTimeline);
             }
             
             if (refElem.GetName() == "object_ref")
                 ref.zIndex_ = refElem.GetInt("z_index");
 
-            mainlineKey.references_[ref.timeline_] = ref;
+            mainlineKey.references_.Push(ref);
         }
 
         animation->AddMainlineKey(mainlineKey);

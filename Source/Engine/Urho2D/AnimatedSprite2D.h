@@ -86,10 +86,10 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     /// Set animation.
     void SetAnimation(Animation2D* animation);
-    /// Create timeline Node.
-    Node* CreateTimelineNode(unsigned index);
-    /// Update.
+    /// Update animation.
     void UpdateAnimation(float timeStep);
+    /// Update timeline world transform.
+    void UpateTimelineWorldTransform(unsigned index);
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
@@ -111,6 +111,20 @@ protected:
     float currentTime_;
     /// Timeline nodes.
     Vector<SharedPtr<Node> > timelineNodes_;
+    /// Transform info.
+    struct TransformInfo
+    {
+        /// Parent.
+        int parent_;
+        /// Local transform.
+        Transform2D localTransform_;
+        /// World transform updated.
+        bool worldTransformUpdated_;
+        /// World transform.
+        Transform2D worldTransform_;
+    };
+    /// Timeline transform infos.
+    Vector<TransformInfo> timelineTransformInfos_;
 };
 
 }
