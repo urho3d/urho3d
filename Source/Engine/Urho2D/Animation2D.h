@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "HashMap.h"
 #include "Ptr.h"
 #include "RefCounted.h"
 #include "Vector2.h"
@@ -49,12 +50,8 @@ struct Reference2D
 
     /// Object type.
     ObjectType2D type_;
-    /// Parent.
-    int parent_;
     /// Timeline.
     int timeline_;
-    /// Key index.
-    int key_;
     /// Z index (draw order).
     int zIndex_;
 };
@@ -68,13 +65,11 @@ public:
 
     /// Return reference by timeline.
     const Reference2D* GetReference(int timeline) const;
-    /// Return timeline by id.
-    unsigned GetTimeline(int id) const;
 
     /// Time.
     float time_;
     /// References.
-    Vector<Reference2D> references_;
+    HashMap<int, Reference2D> references_;
 };
 
 /// Timeline key.
@@ -111,6 +106,8 @@ struct Timeline2D
 
     /// Name.
     String name_;
+    /// Parent.
+    int parent_;
     /// Object type.
     ObjectType2D type_;
     /// Object keys.
@@ -136,6 +133,8 @@ public:
     void AddMainlineKey(const MainlineKey2D& mainlineKey);
     /// Add timeline.
     void AddTimeline(const Timeline2D& timeline);
+    /// Set time line parent.
+    void SetTimelineParent(int timeline, int timelineParent);
 
     /// Return animation set.
     AnimationSet2D* GetAnimationSet() const;

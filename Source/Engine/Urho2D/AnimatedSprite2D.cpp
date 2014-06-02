@@ -45,7 +45,7 @@ AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
     speed_(1.0f),
-    animationTime_(0.0f)
+    currentTime_(0.0f)
 {
 }
 
@@ -86,9 +86,9 @@ void AnimatedSprite2D::SetLayer(int layer)
 
     layer_ = layer;
 
-    for (unsigned i = 0; i < objectNodes_.Size(); ++i)
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
-        StaticSprite2D* objectSprite = objectNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* objectSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
         objectSprite->SetLayer(layer_);
     }
 }
@@ -105,9 +105,9 @@ void AnimatedSprite2D::SetBlendMode(BlendMode blendMode)
 
     blendMode_ = blendMode;
 
-    for (unsigned i = 0; i < objectNodes_.Size(); ++i)
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
-        StaticSprite2D* objectSprite = objectNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* objectSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
         objectSprite->SetBlendMode(blendMode_);
     }
 }
@@ -184,9 +184,9 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
     boundingBox_.Clear();
     worldBoundingBox_.Clear();
 
-    for (unsigned i = 0; i < objectNodes_.Size(); ++i)
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
-        StaticSprite2D* staticSprite = objectNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
         if (staticSprite)
             worldBoundingBox_.Merge(staticSprite->GetWorldBoundingBox());
     }
@@ -194,23 +194,20 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
 }
 
-
-
 void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 {
     if (animation == animation_)
     {
         // Reset time
-        animationTime_ = 0.0f;
+        currentTime_ = 0.0f;
         return;
     }
 
     if (animation_)
     {
-        // Remove all object nodes
-        for (unsigned i = 0; i < objectNodes_.Size(); ++i)
-            objectNodes_[i]->Remove();
-        objectNodes_.Clear();
+        for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+            timelineNodes_[i]->Remove();
+        timelineNodes_.Clear();
     }
 
     animation_ = animation;
@@ -218,66 +215,62 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
     if (!animation_)
         return;
 
-    animationTime_ = 0.0f;
+    currentTime_ = 0.0f;
 
-    objectNodes_.Resize(animation_->GetNumTimelines());
-
-    // Create hierarchy
-    const MainlineKey2D& mainlineKey = animation_->GetMainlineKeys().Front();
-    Vector<SharedPtr<Node> > objectNodes;
-    for (unsigned i = 0; i < mainlineKey.references_.Size(); ++i)
-    {
-        const Reference2D& ref = mainlineKey.references_[i];
-        const Timeline2D& timeline = animation_->GetTimeline(ref.timeline_);
-        SharedPtr<Node> objectNode;
-        if (ref.parent_ == -1)
-            objectNode = GetNode()->CreateChild(timeline.name_);
-        else
-            objectNode = objectNodes[ref.parent_]->CreateChild(timeline.name_);
-
-        objectNodes.Push(objectNode);
-        objectNodes_[ref.timeline_] = objectNode;
-    }
-
-    // Create sprite
+    timelineNodes_.Resize(animation_->GetNumTimelines());
     for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
-    {
-        const Timeline2D& timeline = animation_->GetTimeline(i);
-        if (!objectNodes_[i])
-            objectNodes_[i] = GetNode()->CreateChild(timeline.name_);
-
-        if (timeline.type_ == OT_SPRITE)
-        {
-            StaticSprite2D* staticSprite = objectNodes_[i]->CreateComponent<StaticSprite2D>();
-            staticSprite->SetLayer(layer_);
-            staticSprite->SetBlendMode(blendMode_);
-            staticSprite->SetUseHotSpot(true);
-        }
-    }
+        CreateTimelineNode(i);
 
     UpdateAnimation(0.0f);
 
     MarkNetworkUpdate();
 }
 
+Node* AnimatedSprite2D::CreateTimelineNode(unsigned index)
+{
+    if (timelineNodes_[index])
+        return timelineNodes_[index];
+
+    const Timeline2D& timeline = animation_->GetTimeline(index);
+    Node* parentNode = 0;    
+    if (timeline.parent_ == -1)
+        parentNode = GetNode();
+    else
+        parentNode = CreateTimelineNode(timeline.parent_);
+
+    SharedPtr<Node> objectNode(parentNode->CreateChild(timeline.name_));
+    timelineNodes_[index] = objectNode;
+
+    if (timeline.type_ == OT_SPRITE)
+    {
+        StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+        staticSprite->SetLayer(layer_);
+        staticSprite->SetBlendMode(blendMode_);
+        staticSprite->SetUseHotSpot(true);
+    }
+
+    return objectNode;
+}
+
+
 void AnimatedSprite2D::UpdateAnimation(float timeStep)
 {
     if (!animation_)
         return;
     
-    animationTime_ += timeStep * speed_;
+    currentTime_ += timeStep * speed_;
 
     float animtationLength = animation_->GetLength();
     float time;
 
     if (animation_->IsLooped())
     {
-        time = fmodf(animationTime_, animtationLength);
+        time = fmodf(currentTime_, animtationLength);
         if (time < 0.0f)
             time += animation_->GetLength();
     }
     else
-        time = Clamp(animationTime_, 0.0f, animtationLength);
+        time = Clamp(currentTime_, 0.0f, animtationLength);
 
     const Vector<MainlineKey2D>& mainlineKeys = animation_->GetMainlineKeys();
     const MainlineKey2D* mainlineKey = 0;
@@ -295,7 +288,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
     for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
     {
-        Node* objectNode = objectNodes_[i];
+        Node* objectNode = timelineNodes_[i];
 
         const Reference2D* objectRef = mainlineKey->GetReference(i);
         if (!objectRef)

@@ -167,37 +167,6 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
         looped = animationElem.GetBool("looping");
     animation->SetLooped(looped);
 
-    // Load main line
-    XMLElement mainlineElem = animationElem.GetChild("mainline");
-    for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
-    {
-        MainlineKey2D mainlineKey;
-        mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
-
-        for (XMLElement refElem = keyElem.GetChild(); refElem; refElem = refElem.GetNext())
-        {
-            Reference2D ref;
-            
-            if (refElem.GetName() == "bone_ref")
-                ref.type_ = OT_BONE;
-            else
-                ref.type_ = OT_SPRITE;
-
-            if (refElem.HasAttribute("parent"))
-                ref.parent_ = refElem.GetInt("parent");
-
-            ref.timeline_ = refElem.GetInt("timeline");
-            ref.key_ = refElem.GetInt("key");
-
-            if (refElem.GetName() == "object_ref")
-                ref.zIndex_ = refElem.GetInt("z_index");
-
-            mainlineKey.references_.Push(ref);
-        }
-
-        animation->AddMainlineKey(mainlineKey);
-    }
-
     // Load time lines
     for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
     {
@@ -219,7 +188,7 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
             XMLElement childElem = keyElem.GetChild();
             key.position_.x_ = childElem.GetFloat("x") * PIXEL_SIZE;
             key.position_.y_ = childElem.GetFloat("y") * PIXEL_SIZE;
-            
+
             key.angle_= childElem.GetFloat("angle");
 
             if (childElem.HasAttribute("scale_x"))
@@ -259,12 +228,45 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
         // Add end key for looped animation
         if (looped && timeline.timelineKeys_.Back().time_ != length)
         {
-            TimelineKey2D objectKey = timeline.timelineKeys_.Front();
-            objectKey.time_ = length;
-            timeline.timelineKeys_.Push(objectKey);
+            TimelineKey2D key = timeline.timelineKeys_.Front();
+            key.time_ = length;
+            timeline.timelineKeys_.Push(key);
         }
 
         animation->AddTimeline(timeline);
+    }
+
+    // Load main line
+    XMLElement mainlineElem = animationElem.GetChild("mainline");
+    for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
+    {
+        MainlineKey2D mainlineKey;
+        mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
+
+        for (XMLElement refElem = keyElem.GetChild(); refElem; refElem = refElem.GetNext())
+        {
+            Reference2D ref;
+            
+            if (refElem.GetName() == "bone_ref")
+                ref.type_ = OT_BONE;
+            else
+                ref.type_ = OT_SPRITE;
+
+            ref.timeline_ = refElem.GetInt("timeline");
+
+            if (refElem.HasAttribute("parent"))
+            {
+                int parent = refElem.GetInt("parent");
+                animation->SetTimelineParent(ref.timeline_, mainlineKey.references_[parent].timeline_);
+            }
+            
+            if (refElem.GetName() == "object_ref")
+                ref.zIndex_ = refElem.GetInt("z_index");
+
+            mainlineKey.references_[ref.timeline_] = ref;
+        }
+
+        animation->AddMainlineKey(mainlineKey);
     }
 
     animations_.Push(animation);

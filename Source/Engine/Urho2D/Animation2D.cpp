@@ -32,9 +32,7 @@ namespace Urho3D
 
 Reference2D::Reference2D() :
     type_(OT_BONE),
-    parent_(-1),
     timeline_(0),
-    key_(0),
     zIndex_(0)
 {
 }
@@ -46,18 +44,10 @@ MainlineKey2D::MainlineKey2D() :
 
 const Reference2D* MainlineKey2D::GetReference(int timeline) const
 {
-    for (unsigned i = 0; i < references_.Size(); ++i)
-    {
-        if (timeline == references_[i].timeline_)
-            return &references_[i];
-    }
+    HashMap<int, Reference2D>::ConstIterator i = references_.Find(timeline);
+    if (i != references_.End())
+        return &i->second_;
     return 0;
-}
-
-unsigned MainlineKey2D::GetTimeline(int id) const
-{
-    assert(id < references_.Size());
-    return references_[id].timeline_;
 }
 
 TimelineKey2D::TimelineKey2D() :
@@ -71,7 +61,8 @@ TimelineKey2D::TimelineKey2D() :
 }
 
 Timeline2D::Timeline2D() :
-    type_(OT_BONE)
+    type_(OT_BONE),
+    parent_(-1)
 {
 }
 
@@ -109,6 +100,11 @@ void Animation2D::AddMainlineKey(const MainlineKey2D& mainlineKey)
 void Animation2D::AddTimeline(const Timeline2D& timeline)
 {
     timelines_.Push(timeline);
+}
+
+void Animation2D::SetTimelineParent(int timeline, int timelineParent)
+{
+    timelines_[timeline].parent_ = timelineParent;
 }
 
 AnimationSet2D* Animation2D::GetAnimationSet() const

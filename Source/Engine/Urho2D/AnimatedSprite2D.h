@@ -22,13 +22,13 @@
 
 #pragma once
 
+#include "Animation2D.h"
 #include "Drawable.h"
 
 namespace Urho3D
 {
 
 class AnimationSet2D;
-class Animation2D;
 
 /// Spriter animation component.
 class URHO3D_API AnimatedSprite2D : public Drawable
@@ -76,7 +76,7 @@ public:
 
     /// Set animation set attribute.
     void SetAnimationSetAttr(ResourceRef value);
-    /// Return animtion set attribute.
+    /// Return animation set attribute.
     ResourceRef GetAnimationSetAttr() const;
 
 protected:
@@ -86,6 +86,8 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     /// Set animation.
     void SetAnimation(Animation2D* animation);
+    /// Create timeline Node.
+    Node* CreateTimelineNode(unsigned index);
     /// Update.
     void UpdateAnimation(float timeStep);
     /// Handle scene post update.
@@ -105,10 +107,10 @@ protected:
     String animationName_;
     /// Animation.
     SharedPtr<Animation2D> animation_;
-    /// Animation time.
-    float animationTime_;
-    /// Object nodes.
-    Vector<SharedPtr<Node> > objectNodes_;
+    /// Current time.
+    float currentTime_;
+    /// Timeline nodes.
+    Vector<SharedPtr<Node> > timelineNodes_;
 };
 
 }
