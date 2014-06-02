@@ -1,12 +1,12 @@
 $#include "Animation2D.h"
 
-class Animation2D : public Resource
+class Animation2D : RefCounted
 {
-    float GetTotalTime() const;
-    unsigned GetNumFrames() const;
-    Sprite2D* GetFrameSprite(unsigned index) const;
-    Sprite2D* GetFrameSpriteByTime(float time) const;
-    
-    tolua_readonly tolua_property__get_set float totalTime;
-    tolua_readonly tolua_property__get_set unsigned numFrames;
+    const String GetName() const;
+    float GetLength() const;
+    bool IsLooped() const;
+
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set float length;
+    tolua_readonly tolua_property__is_set bool looped;
 };

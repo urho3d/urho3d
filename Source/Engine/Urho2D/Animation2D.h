@@ -22,45 +22,166 @@
 
 #pragma once
 
-#include "Resource.h"
+#include "HashMap.h"
+#include "Ptr.h"
+#include "RefCounted.h"
+#include "Vector2.h"
 
 namespace Urho3D
 {
 
+class AnimationSet2D;
 class Sprite2D;
 
-/// 2D animation.
-class URHO3D_API Animation2D : public Resource
+/// Object type.
+enum ObjectType2D
 {
-    OBJECT(Animation2D);
+    /// Bone.
+    OT_BONE = 0,
+    /// Sprite.
+    OT_SPRITE,
+};
 
+/// Reference.
+struct Reference2D
+{
+    /// Construct.
+    Reference2D();
+
+    /// Object type.
+    ObjectType2D type_;
+    /// Timeline.
+    int timeline_;
+    /// Z index (draw order).
+    int zIndex_;
+};
+
+/// Mainline Key.
+struct MainlineKey2D
+{
 public:
     /// Construct.
-    Animation2D(Context* context);
-    /// Destruct.
+    MainlineKey2D();
+
+    /// Return reference by timeline.
+    const Reference2D* GetReference(int timeline) const;
+
+    /// Time.
+    float time_;
+    /// References.
+    Vector<Reference2D> references_;
+};
+
+struct Transform2D
+{
+    /// Construct.
+    Transform2D();
+    /// Construct from position, angle, scale.
+    Transform2D(const Vector2 position, float angle, const Vector2& scale);
+    /// Copy-construct from another transform.
+    Transform2D(const Transform2D& other);
+
+    /// Assign from another transform.
+    Transform2D& operator = (const Transform2D& other);
+    /// Multiply a transform.
+    Transform2D operator * (const Transform2D& other) const;
+    /// Linear interpolation with another transform.
+    Transform2D Lerp(const Transform2D& other, float t, int spin) const;
+
+    /// Position.
+    Vector2 position_;
+    /// Angle.
+    float angle_;
+    /// Scale.
+    Vector2 scale_;
+};
+
+/// Timeline key.
+struct TimelineKey2D
+{
+    /// Construct.
+    TimelineKey2D();
+
+    /// Time.
+    float time_;
+    /// Spin direction.
+    int spin_;
+    /// Transform.
+    Transform2D transform_;
+    /// Sprite.
+    SharedPtr<Sprite2D> sprite_;
+    /// Hot spot (pivot).
+    Vector2 hotSpot_;
+    /// Alpha.
+    float alpha_;
+};
+
+/// Timeline.
+struct Timeline2D
+{
+    /// Construct.
+    Timeline2D();
+
+    /// Name.
+    String name_;
+    /// Parent.
+    int parent_;
+    /// Object type.
+    ObjectType2D type_;
+    /// Object keys.
+    Vector<TimelineKey2D> timelineKeys_;
+};
+
+/// Spriter animation. for more information please refer to http://www.brashmonkey.com/spriter.htm.
+class URHO3D_API Animation2D : public RefCounted
+{
+public:
+    /// Construct.
+    Animation2D(AnimationSet2D* animationSet);
+    /// Destruct
     virtual ~Animation2D();
-    /// Register object factory.
-    static void RegisterObject(Context* context);
 
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
-    /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    /// Set name.
+    void SetName(const String& name);
+    /// Set length.
+    void SetLength(float length);
+    /// Set looped.
+    void SetLooped(bool looped);
+    /// Add mainline key.
+    void AddMainlineKey(const MainlineKey2D& mainlineKey);
+    /// Add timeline.
+    void AddTimeline(const Timeline2D& timeline);
+    /// Set time line parent.
+    void SetTimelineParent(int timeline, int timelineParent);
 
-    /// Return total time.
-    float GetTotalTime() const;
-    /// Return number of frames.
-    unsigned GetNumFrames() const;
-    /// Return Frame sprite.
-    Sprite2D* GetFrameSprite(unsigned index) const;
-    /// Return frame sprite by time.
-    Sprite2D* GetFrameSpriteByTime(float time) const;
+    /// Return animation set.
+    AnimationSet2D* GetAnimationSet() const;
+    /// Return name.
+    const String& GetName() const { return name_; }
+    /// Return length.
+    float GetLength() const { return length_; }
+    /// Return looped.
+    bool IsLooped() const { return looped_; }
+    /// Return all mainline keys.
+    const Vector<MainlineKey2D>& GetMainlineKeys() const { return mainlineKeys_; }
+    /// Return number of timelines.
+    unsigned GetNumTimelines() const { return timelines_.Size();}
+    /// Return timeline by index.
+    const Timeline2D& GetTimeline(unsigned index) const { return timelines_[index]; }
 
 private:
-    /// Frame end times.
-    PODVector<float> frameEndTimes_;
-    /// Frame sprites.
-    Vector<SharedPtr<Sprite2D> > frameSprites_;
+    /// Animation set.
+    WeakPtr<AnimationSet2D> animationSet_;
+    /// Name.
+    String name_;
+    /// Length.
+    float length_;
+    /// Looped.
+    bool looped_;
+    /// All mainline Keys.
+    Vector<MainlineKey2D> mainlineKeys_;
+    /// All timelines.
+    Vector<Timeline2D> timelines_;
 };
 
 }

@@ -48,6 +48,10 @@ public:
     void SetFlipY(bool flipY);
     /// Set color.
     void SetColor(const Color& color);
+    /// Set use hot spot.
+    void SetUseHotSpot(bool useHotSpot);
+    /// Set hot spot.
+    void SetHotSpot(const Vector2& hotspot);
 
     /// Return flip X.
     bool GetFlipX() const { return flipX_; }
@@ -55,6 +59,10 @@ public:
     bool GetFlipY() const { return flipY_; }
     /// Return color.
     const Color& GetColor() const { return color_; }
+    /// Return use hot spot.
+    bool GetUseHotSpot() const { return useHotSpot_; }
+    /// Return hot spot.
+    const Vector2& GetHotSpot() const { return hotSpot_; }
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -68,6 +76,10 @@ protected:
     bool flipY_;
     /// Color.
     Color color_;
+    /// Use hot spot.
+    bool useHotSpot_;
+    /// Hot spot.
+    Vector2 hotSpot_;
 };
 
 }

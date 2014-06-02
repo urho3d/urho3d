@@ -1,12 +1,24 @@
 // Urho2D sprite example.
 // This sample demonstrates:
-//     - Creating a 2D scene with sprite
+//     - Creating a 2D scene with spriter animation
 //     - Displaying the scene using the Renderer subsystem
 //     - Handling keyboard to move and zoom 2D camera
 
 #include "Scripts/Utilities/Sample.as"
 
-Array<Node@> spriteNodes;
+Node@ spriteNode;
+int animationIndex = 0;
+
+Array<String> animationNames = 
+{
+    "idle",
+    "run",
+    "attack",
+    "hit",
+    "dead",
+    "dead2",
+    "dead3",
+};
 
 void Start()
 {
@@ -46,54 +58,22 @@ void CreateScene()
     camera.orthographic = true;
     camera.orthoSize = graphics.height * PIXEL_SIZE;
 
-    Sprite2D@ sprite = cache.GetResource("Sprite2D", "Urho2D/Aster.png");
-    if (sprite is null)
-        return;
-
-    uint halfWidth = uint(graphics.width * PIXEL_SIZE * 0.5f);
-    uint halfHeight = uint(graphics.height * PIXEL_SIZE * 0.5f);
-    // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
-    // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
-    // LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll
-    // see the model get simpler as it moves further away). Finally, rendering a large number of the same object with the
-    // same material allows instancing to be used, if the GPU supports it. This reduces the amount of CPU work in rendering the
-    // scene.
-    const uint NUM_SPRITES = 200;
-    for (uint i = 0; i < NUM_SPRITES; ++i)
-    {
-        Node@ spriteNode = scene_.CreateChild("StaticSprite2D");
-        spriteNode.position = Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0f);
-
-        StaticSprite2D@ staticSprite = spriteNode.CreateComponent("StaticSprite2D");
-        // Set color
-        staticSprite.color = Color(Random(1.0f), Random(1.0f), Random(1.0f), 1.0f);
-        // Set blend mode
-        staticSprite.blendMode = BLEND_ALPHA;
-        // Set sprite
-        staticSprite.sprite = sprite;
-
-        spriteNode.vars["MoveSpeed"] = Vector3(Random(-2.0f, 2.0f), Random(-2.0f, 2.0f), 0.0f);
-        spriteNode.vars["RotateSpeed"] = Random(-90.0f, 90.0f);
-
-        spriteNodes.Push(spriteNode);
-    }
-
-    AnimationSet2D@ animationSet = cache.GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml");
+    AnimationSet2D@ animationSet = cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml");
     if (animationSet is null)
         return;
-    Node@ spriteNode = scene_.CreateChild("AnimatedSprite2D");
-    spriteNode.position = Vector3(0.0f, 0.0f, -1.0f);
+
+    spriteNode = scene_.CreateChild("SpriterAnimation");
+    spriteNode.position = Vector3(-1.4f, 2.0f, 0.0f);
 
     AnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("AnimatedSprite2D");
-    // Set animation
-    animatedSprite.SetAnimation(animationSet, "idle");
+    animatedSprite.SetAnimation(animationSet, animationNames[animationIndex]);
 }
 
 void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Use WASD keys and mouse to move, Use PageUp PageDown to zoom.";
+    instructionText.text = "Mouse click to play next animation, \nUse WASD keys to move, use PageUp PageDown keys to zoom.";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center
@@ -147,6 +127,7 @@ void SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
+    SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown");
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent("SceneUpdate");
@@ -159,35 +140,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+}
 
-    float halfWidth = graphics.width * 0.5f * PIXEL_SIZE;
-    float halfHeight = graphics.height * 0.5f * PIXEL_SIZE;
-
-    // Go through all sprites
-    for (uint i = 0; i < spriteNodes.length; ++i)
-    {
-        Node@ spriteNode = spriteNodes[i];
-
-        Vector3 moveSpeed = spriteNode.vars["MoveSpeed"].GetVector3();
-        Vector3 newPosition = spriteNode.position + moveSpeed * timeStep;
-
-        if (newPosition.x < -halfWidth || newPosition.x > halfWidth)
-        {
-            newPosition.x = spriteNode.position.x;
-            moveSpeed.x = -moveSpeed.x;
-            spriteNode.vars["MoveSpeed"] = moveSpeed;
-        }
-
-        if (newPosition.y < -halfHeight || newPosition.y > halfHeight)
-        {
-            newPosition.y = spriteNode.position.y;
-            moveSpeed.y = -moveSpeed.y;
-            spriteNode.vars["MoveSpeed"] = moveSpeed;
-        }
-
-        spriteNode.position = newPosition;
-        spriteNode.Roll(spriteNode.vars["RotateSpeed"].GetFloat() * timeStep);
-    }
+void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
+{
+    AnimatedSprite2D@ animatedSprite = spriteNode.GetComponent("AnimatedSprite2D");
+    animationIndex = (animationIndex + 1) % 7;
+    animatedSprite.animation = animationNames[animationIndex];
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app

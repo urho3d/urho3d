@@ -22,26 +22,16 @@
 
 #pragma once
 
-#include "StaticSprite2D.h"
+#include "Animation2D.h"
+#include "Drawable.h"
 
 namespace Urho3D
 {
 
-class Animation2D;
+class AnimationSet2D;
 
-/// Cycle mode.
-enum CycleMode
-{
-    /// Loop mode.
-    CM_LOOP = 0,
-    /// Clamp mode.
-    CM_CLAMP,
-    /// Pingpong Mode.
-    CM_PINGPONG,
-};
-
-/// Animated sprite component.
-class URHO3D_API AnimatedSprite2D : public StaticSprite2D
+/// Spriter animation component.
+class URHO3D_API AnimatedSprite2D : public Drawable
 {
     OBJECT(AnimatedSprite2D);
 
@@ -55,42 +45,86 @@ public:
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-
+    
+    /// Set layer.
+    void SetLayer(int layer);
+    /// Set order in layer.
+    void SetOrderInLayer(int orderInLayer);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode mode);
     /// Set speed.
     void SetSpeed(float speed);
-    /// Set cycle mode.
-    void SetCycleMode(CycleMode cycleMode);
-    /// Set animation.
-    void SetAnimation(Animation2D* animation);
+    /// Set animation by animation set and name.
+    void SetAnimation(AnimationSet2D* animationSet, const String& name);
+    /// Set animation set.
+    void SetAnimationSet(AnimationSet2D* animationSet);
+    /// Set animation by name.
+    void SetAnimation(const String& name);
 
+    /// Return layer.
+    int GetLayer() const { return layer_; }
+    /// Return order in layer.
+    int GetOrderInLayer() const { return orderInLayer_; }
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
-    /// Return cycle mode.
-    CycleMode GetCycleMode() const { return cycleMode_; }
-    /// Return Animation.
-    Animation2D* GetAnimation() const;
+    /// Return animation.
+    AnimationSet2D* GetAnimationSet() const;
+    /// Return animation name.
+    const String& GetAnimation() const { return animationName_; }
 
-    /// Set animation attr.
-    void SetAnimationAttr(ResourceRef value);
-    /// Return animation attr.
-    ResourceRef GetAnimationAttr() const;
+    /// Set animation set attribute.
+    void SetAnimationSetAttr(ResourceRef value);
+    /// Return animation set attribute.
+    ResourceRef GetAnimationSetAttr() const;
 
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Recalculate the world-space bounding box.
+    virtual void OnWorldBoundingBoxUpdate();
+    /// Set animation.
+    void SetAnimation(Animation2D* animation);
+    /// Update animation.
+    void UpdateAnimation(float timeStep);
+    /// Update timeline world transform.
+    void UpateTimelineWorldTransform(unsigned index);
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
+    /// Layer.
+    int layer_;
+    /// Order in layer.
+    int orderInLayer_;
+    /// Blend mode.
+    BlendMode blendMode_;
     /// Speed.
     float speed_;
-    /// Cycle mode.
-    CycleMode cycleMode_;
+    /// Animation set.
+    SharedPtr<AnimationSet2D> animationSet_;
+    /// Animation name.
+    String animationName_;
     /// Animation.
     SharedPtr<Animation2D> animation_;
-    /// Animation time.
-    float animationTime_;
-    /// Animation total time.
-    float animationTotalTime_;
+    /// Current time.
+    float currentTime_;
+    /// Timeline nodes.
+    Vector<SharedPtr<Node> > timelineNodes_;
+    /// Transform info.
+    struct TransformInfo
+    {
+        /// Parent.
+        int parent_;
+        /// Local transform.
+        Transform2D localTransform_;
+        /// World transform updated.
+        bool worldTransformUpdated_;
+        /// World transform.
+        Transform2D worldTransform_;
+    };
+    /// Timeline transform infos.
+    Vector<TransformInfo> timelineTransformInfos_;
 };
 
 }

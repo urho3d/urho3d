@@ -1,11 +1,23 @@
 -- Urho2D sprite example.
 -- This sample demonstrates:
---     - Creating a 2D scene with sprite
+--     - Creating a 2D scene with spriter animation
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling keyboard to move and zoom 2D camera
---     - Usage of Lua Closure to update scene
 
 require "LuaScripts/Utilities/Sample"
+
+local spriteNode = nil
+local animationIndex = 0
+local animationNames = 
+{
+    "idle",
+    "run",
+    "attack",
+    "hit",
+    "dead",
+    "dead2",
+    "dead3",
+}
 
 function Start()
     -- Execute the common startup for samples
@@ -42,73 +54,22 @@ function CreateScene()
     camera.orthographic = true
     camera.orthoSize = graphics.height * PIXEL_SIZE
 
-    local sprite = cache:GetResource("Sprite2D", "Urho2D/Aster.png")
-    if sprite == nil then
-        return
-    end
-
-    local spriteNodes = {}
-    local NUM_SPRITES = 200
-    local halfWidth = graphics.width * PIXEL_SIZE * 0.5
-    local halfHeight = graphics.height * PIXEL_SIZE * 0.5
-    for i = 1, NUM_SPRITES do
-        local spriteNode = scene_:CreateChild("StaticSprite2D")
-        spriteNode.position = Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0)
-
-        local staticSprite = spriteNode:CreateComponent("StaticSprite2D")
-        -- Set color
-        staticSprite.color = Color(Random(1.0), Random(1.0), Random(1.0), 1.0)
-        -- Set blend mode
-        staticSprite.blendMode = BLEND_ALPHA
-        -- Set sprite
-        staticSprite.sprite = sprite
-
-        -- Set move speed
-        spriteNode.moveSpeed = Vector3(Random(-2.0, 2.0), Random(-2.0, 2.0), 0.0)
-        -- Set rotate speed
-        spriteNode.rotateSpeed = Random(-90.0, 90.0)
-
-        table.insert(spriteNodes, spriteNode)
-    end
-
-    scene_.Update = function(self, timeStep)
-        for _, spriteNode in ipairs(spriteNodes) do
-            local position = spriteNode.position
-            local moveSpeed = spriteNode.moveSpeed
-            local newPosition = position + moveSpeed * timeStep
-
-            if newPosition.x < -halfWidth or newPosition.x > halfWidth then
-                newPosition.x = position.x
-                moveSpeed.x = -moveSpeed.x
-            end
-
-            if newPosition.y < -halfHeight or newPosition.y > halfHeight then
-                newPosition.y = position.y
-                moveSpeed.y = -moveSpeed.y
-            end
-
-            spriteNode.position = newPosition
-            spriteNode:Roll(spriteNode.rotateSpeed * timeStep)
-        end
-    end
-
-    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml")
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/imp/imp.scml")
     if animationSet == nil then
         return
     end
 
-    local spriteNode = scene_:CreateChild("AnimatedSprite2D")
-    spriteNode.position = Vector3(0.0, 0.0, -1.0)
+    spriteNode = scene_:CreateChild("SpriterAnimation")
+    spriteNode.position = Vector3(-1.4, 2.0, 0.0)
 
     local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
-    -- Set animation
-    animatedSprite:SetAnimation(animationSet, "idle")
+    animatedSprite:SetAnimation(animationSet, animationNames[animationIndex + 1])
 end
 
 function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
-    instructionText:SetText("Use WASD keys and mouse to move, Use PageUp PageDown to zoom.")
+    instructionText:SetText("Click mouse to play next animation, \nUse WASD keys and mouse to move, Use PageUp PageDown to zoom.")
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
 
     -- Position the text relative to the screen center
@@ -162,6 +123,7 @@ end
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
+    SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown")
 
     -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent("SceneUpdate")
@@ -173,9 +135,12 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+end
 
-    -- Update scene
-    scene_:Update(timeStep)
+function HandleMouseButtonDown(eventType, eventData)
+    local animatedSprite = spriteNode:GetComponent("AnimatedSprite2D")
+    animationIndex = (animationIndex + 1) % 7
+    animatedSprite.animation = animationNames[animationIndex + 1]
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

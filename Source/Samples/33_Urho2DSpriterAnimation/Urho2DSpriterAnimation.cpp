@@ -24,6 +24,7 @@
 #include "AnimationSet2D.h"
 #include "Camera.h"
 #include "CoreEvents.h"
+#include "Drawable2D.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -32,27 +33,32 @@
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
 #include "Text.h"
-#include "Urho2DSprite.h"
+#include "Urho2DSpriterAnimation.h"
 #include "Zone.h"
 
 #include "DebugNew.h"
 
-// Number of static sprites to draw
-static const unsigned NUM_SPRITES = 200;
-static const ShortStringHash VAR_MOVESPEED("MoveSpeed");
-static const ShortStringHash VAR_ROTATESPEED("RotateSpeed");
+static const char* animationNames[] =
+{
+    "idle",
+    "run",
+    "attack",
+    "hit",
+    "dead",
+    "dead2",
+    "dead3",
+};
 
-DEFINE_APPLICATION_MAIN(Urho2DSprite)
+DEFINE_APPLICATION_MAIN(Urho2DSpriterAnimation)
 
-Urho2DSprite::Urho2DSprite(Context* context) :
-    Sample(context)
+Urho2DSpriterAnimation::Urho2DSpriterAnimation(Context* context) :
+    Sample(context),
+    animationIndex_(0)
 {
 }
 
-void Urho2DSprite::Start()
+void Urho2DSpriterAnimation::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -70,7 +76,7 @@ void Urho2DSprite::Start()
     SubscribeToEvents();
 }
 
-void Urho2DSprite::CreateScene()
+void Urho2DSpriterAnimation::CreateScene()
 {
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
@@ -86,58 +92,26 @@ void Urho2DSprite::CreateScene()
     Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    // Get sprite
-    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Aster.png");
-    if (!sprite)
-        return;
-
-    float halfWidth = graphics->GetWidth() * 0.5f * PIXEL_SIZE;
-    float halfHeight = graphics->GetHeight() * 0.5f * PIXEL_SIZE;
-
-    for (unsigned i = 0; i < NUM_SPRITES; ++i)
-    {
-        SharedPtr<Node> spriteNode(scene_->CreateChild("StaticSprite2D"));
-        spriteNode->SetPosition(Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0f));
-
-        StaticSprite2D* staticSprite = spriteNode->CreateComponent<StaticSprite2D>();
-        // Set random color
-        staticSprite->SetColor(Color(Random(1.0f), Random(1.0f), Random(1.0f), 1.0f));
-        // Set blend mode
-        staticSprite->SetBlendMode(BLEND_ALPHA);
-        // Set sprite
-        staticSprite->SetSprite(sprite);
-
-        // Set move speed
-        spriteNode->SetVar(VAR_MOVESPEED, Vector3(Random(-2.0f, 2.0f), Random(-2.0f, 2.0f), 0.0f));
-        // Set rotate speed
-        spriteNode->SetVar(VAR_ROTATESPEED, Random(-90.0f, 90.0f));
-
-        // Add to sprite node vector
-        spriteNodes_.Push(spriteNode);
-    }
-
-    // Get animation set
-    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml");
+    ResourceCache* cache = GetSubsystem<ResourceCache>();  
+    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
     if (!animationSet)
         return;
 
-    SharedPtr<Node> spriteNode(scene_->CreateChild("AnimatedSprite2D"));
-    spriteNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
+    spriteNode_ = scene_->CreateChild("SpriterAnimation");
+    spriteNode_->SetPosition(Vector3(-1.4f, 2.0f, 0.0f));
 
-    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
-    // Set animation
-    animatedSprite->SetAnimation(animationSet, "idle");
+    AnimatedSprite2D* animatedSprite = spriteNode_->CreateComponent<AnimatedSprite2D>();
+    animatedSprite->SetAnimation(animationSet, animationNames[animationIndex_]);
 }
 
-void Urho2DSprite::CreateInstructions()
+void Urho2DSpriterAnimation::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys to move, use PageUp PageDown keys to zoom.");
+    instructionText->SetText("Mouse click to play next animation, \nUse WASD keys to move, use PageUp PageDown keys to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
     // Position the text relative to the screen center
@@ -146,7 +120,7 @@ void Urho2DSprite::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void Urho2DSprite::SetupViewport()
+void Urho2DSpriterAnimation::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
 
@@ -155,7 +129,7 @@ void Urho2DSprite::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
-void Urho2DSprite::MoveCamera(float timeStep)
+void Urho2DSpriterAnimation::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
@@ -189,16 +163,18 @@ void Urho2DSprite::MoveCamera(float timeStep)
     }
 }
 
-void Urho2DSprite::SubscribeToEvents()
+void Urho2DSpriterAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DSprite, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DSpriterAnimation, HandleUpdate));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(Urho2DSpriterAnimation, HandleMouseButtonDown));
+
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
-void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void Urho2DSpriterAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
@@ -207,34 +183,11 @@ void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+}
 
-    Graphics* graphics = GetSubsystem<Graphics>();
-    float halfWidth = (float)graphics->GetWidth() * 0.5f * PIXEL_SIZE;
-    float halfHeight = (float)graphics->GetHeight() * 0.5f * PIXEL_SIZE;
-
-    for (unsigned i = 0; i < spriteNodes_.Size(); ++i)
-    {
-        SharedPtr<Node> node = spriteNodes_[i];
-
-        Vector3 position = node->GetPosition();
-        Vector3 moveSpeed = node->GetVar(VAR_MOVESPEED).GetVector3();
-        Vector3 newPosition = position + moveSpeed * timeStep;
-        if (newPosition.x_ < -halfWidth || newPosition.x_ > halfWidth)
-        {
-            newPosition.x_ = position.x_;
-            moveSpeed.x_ = -moveSpeed.x_;
-            node->SetVar(VAR_MOVESPEED, moveSpeed);
-        }
-        if (newPosition.y_ < -halfHeight || newPosition.y_ > halfHeight)
-        {
-            newPosition.y_ = position.y_;
-            moveSpeed.y_ = -moveSpeed.y_;
-            node->SetVar(VAR_MOVESPEED, moveSpeed);
-        }
-
-        node->SetPosition(newPosition);
-
-        float rotateSpeed = node->GetVar(VAR_ROTATESPEED).GetFloat();
-        node->Roll(rotateSpeed * timeStep);
-    }
+void Urho2DSpriterAnimation::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
+{
+    AnimatedSprite2D* animatedSprite = spriteNode_->GetComponent<AnimatedSprite2D>();
+    animationIndex_ = (animationIndex_ + 1) % 7;
+    animatedSprite->SetAnimation(animationNames[animationIndex_]);
 }

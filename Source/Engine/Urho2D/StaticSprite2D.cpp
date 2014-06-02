@@ -38,7 +38,9 @@ StaticSprite2D::StaticSprite2D(Context* context) :
     Drawable2D(context),
     flipX_(false),
     flipY_(false),
-    color_(Color::WHITE)
+    color_(Color::WHITE),
+    useHotSpot_(false),
+    hotSpot_(0.5f, 0.5f)
 {
     vertices_.Reserve(6);
 }
@@ -85,6 +87,30 @@ void StaticSprite2D::SetColor(const Color& color)
     color_ = color;
     verticesDirty_ = true;
     MarkNetworkUpdate();
+}
+
+void StaticSprite2D::SetUseHotSpot(bool useHotSpot)
+{
+    if (useHotSpot == useHotSpot_)
+        return;
+
+    useHotSpot_ = useHotSpot;
+    verticesDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void StaticSprite2D::SetHotSpot(const Vector2& hotspot)
+{
+    if (hotspot == hotSpot_)
+        return;
+
+    hotSpot_ = hotspot;
+
+    if (useHotSpot_)
+    {
+        verticesDirty_ = true;
+        MarkNetworkUpdate();
+    }
 }
 
 void StaticSprite2D::OnWorldBoundingBoxUpdate()
@@ -145,9 +171,20 @@ void StaticSprite2D::UpdateVertices()
     float width = (float)rectangle_.Width() * PIXEL_SIZE;     // Compute width and height in pixels
     float height = (float)rectangle_.Height() * PIXEL_SIZE;
 
-    const Vector2& hotSpot = sprite_->GetHotSpot();
-    float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
-    float hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
+    float hotSpotX;
+    float hotSpotY;
+
+    if (useHotSpot_)
+    {
+        hotSpotX = flipX_ ? (1.0f - hotSpot_.x_) : hotSpot_.x_;
+        hotSpotY = flipY_ ? (1.0f - hotSpot_.y_) : hotSpot_.y_;
+    }
+    else
+    {
+        const Vector2& hotSpot = sprite_->GetHotSpot();
+        hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
+        hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
+    }
 
     float leftX = -width * hotSpotX;
     float rightX = width * (1.0f - hotSpotX);
