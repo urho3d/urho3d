@@ -39,7 +39,7 @@ public:
     /// Construct.
     AnimatedSprite2D(Context* context);
     /// Destruct.
-    ~AnimatedSprite2D();
+    virtual ~AnimatedSprite2D();
     /// Register object factory.
     static void RegisterObject(Context* context);
 

@@ -385,5 +385,3 @@ void AnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& e
 }
 
 }
-
-

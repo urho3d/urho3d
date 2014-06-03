@@ -289,5 +289,4 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
     return true;
 }
 
-
 }

@@ -57,10 +57,10 @@ public:
 private:
     /// Load folders.
     bool LoadFolders(const XMLElement& rootElem);
-    /// Load animation.
-    bool LoadAnimation(const XMLElement& animationElem);
     /// Return sprite by folder id and file id.
     Sprite2D* GetSprite(unsigned folderId, unsigned fileId) const;
+    /// Load animation.
+    bool LoadAnimation(const XMLElement& animationElem);
 
     /// Sprites.
     HashMap<unsigned, SharedPtr<Sprite2D> > sprites_;
