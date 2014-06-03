@@ -67,114 +67,50 @@ bool SpriteSheet2D::Load(Deserializer& source)
 
     SetMemoryUse(source.GetSize());
 
-    XMLElement rootElem = xmlFile->GetRoot();
+    XMLElement rootElem = xmlFile->GetRoot("TextureAtlas");
     if (!rootElem)
     {
         LOGERROR("Invalid sprite sheet");
         return false;
     }
 
-    if (rootElem.GetName() == "spritesheet")
+    String textureFileName = rootElem.GetAttribute("imagePath");
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
+    if (!texture_)
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        String textureFileName = rootElem.GetAttribute("texture");
-        texture_ = cache->GetResource<Texture2D>(textureFileName, false);
-        // If texture not found, try get in current directory
-        if (!texture_)
-            texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
-
-        if (!texture_)
-        {
-            LOGERROR("Cound not load texture");
-            return false;
-        }
-
-        XMLElement spriteElem = rootElem.GetChild("sprite");
-        while (spriteElem)
-        {
-            String name = spriteElem.GetAttribute("name");
-            IntRect rectangle = spriteElem.GetIntRect("rectangle");
-
-            Vector2 hotSpot(0.5f, 0.5f);
-            if (spriteElem.HasAttribute("hotspot"))
-                hotSpot = spriteElem.GetVector2("hotspot");
-
-            DefineSprite(name, rectangle, hotSpot);
-
-            spriteElem = spriteElem.GetNext("sprite");
-        }
-    }
-    // Sparrow Starling texture atlas
-    else if (rootElem.GetName() == "TextureAtlas")
-    {    
-        String textureFileName = rootElem.GetAttribute("imagePath");
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        texture_ = cache->GetResource<Texture2D>(textureFileName, false);
-        // If texture not found, try get in current directory
-        if (!texture_)
-            texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
-
-        if (!texture_)
-        {
-            LOGERROR("Cound not load texture");
-            return false;
-        }
-
-        XMLElement subTextureElem = rootElem.GetChild("SubTexture");
-        while (subTextureElem)
-        {
-            String name = subTextureElem.GetAttribute("name");
-
-            int x = subTextureElem.GetInt("x");
-            int y = subTextureElem.GetInt("y");
-            int width = subTextureElem.GetInt("width");
-            int height = subTextureElem.GetInt("height");
-            IntRect rectangle(x, y, x + width, y + height);
-
-            Vector2 hotSpot(0.5f, 0.5f);
-            if (subTextureElem.HasAttribute("frameWidth") && subTextureElem.HasAttribute("frameHeight"))
-            {
-                int frameX = subTextureElem.GetInt("frameX");
-                int frameY = subTextureElem.GetInt("frameY");
-                int frameWidth = subTextureElem.GetInt("frameWidth");
-                int frameHeight = subTextureElem.GetInt("frameHeight");
-                hotSpot.x_ = ((float)frameX + frameWidth / 2) / width;
-                hotSpot.y_ = 1.0f - ((float)frameY + frameHeight / 2) / height;
-            }
-
-            DefineSprite(name, rectangle, hotSpot);
-
-            subTextureElem = subTextureElem.GetNext("SubTexture");
-        }
-    }
-    else
-    {
-        LOGERROR("Invalid sprite sheet file");
+        LOGERROR("Could not load texture " + GetParentPath(GetName()) + textureFileName);
         return false;
+    }
+
+    XMLElement subTextureElem = rootElem.GetChild("SubTexture");
+    while (subTextureElem)
+    {
+        String name = subTextureElem.GetAttribute("name");
+
+        int x = subTextureElem.GetInt("x");
+        int y = subTextureElem.GetInt("y");
+        int width = subTextureElem.GetInt("width");
+        int height = subTextureElem.GetInt("height");
+        IntRect rectangle(x, y, x + width, y + height);
+
+        Vector2 hotSpot(0.5f, 0.5f);
+        if (subTextureElem.HasAttribute("frameWidth") && subTextureElem.HasAttribute("frameHeight"))
+        {
+            int frameX = subTextureElem.GetInt("frameX");
+            int frameY = subTextureElem.GetInt("frameY");
+            int frameWidth = subTextureElem.GetInt("frameWidth");
+            int frameHeight = subTextureElem.GetInt("frameHeight");
+            hotSpot.x_ = ((float)frameX + frameWidth / 2) / width;
+            hotSpot.y_ = 1.0f - ((float)frameY + frameHeight / 2) / height;
+        }
+
+        DefineSprite(name, rectangle, hotSpot);
+
+        subTextureElem = subTextureElem.GetNext("SubTexture");
     }
 
     return true;
-}
-
-bool SpriteSheet2D::Save(Serializer& dest) const
-{
-    if (!texture_)
-        return false;
-
-    SharedPtr<XMLFile> xmlFile(new XMLFile(context_));    
-    XMLElement rootElem = xmlFile->CreateRoot("spritesheet");
-    rootElem.SetAttribute("texture", texture_->GetName());
-
-    for (HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Begin(); i != spriteMapping_.End(); ++i)
-    {
-        XMLElement spriteElem = rootElem.CreateChild("sprite");
-        spriteElem.SetAttribute("name", i->first_);
-        Sprite2D* sprite = i->second_;
-        spriteElem.SetIntRect("rectangle", sprite->GetRectangle());
-        spriteElem.SetVector2("hotspot", sprite->GetHotSpot());
-    }
-
-    return xmlFile->Save(dest);
 }
 
 Sprite2D* SpriteSheet2D::GetSprite(const String& name) const

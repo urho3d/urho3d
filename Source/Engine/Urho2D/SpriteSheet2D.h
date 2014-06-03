@@ -45,9 +45,7 @@ public:
 
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
-
+    
     /// Return texture.
     Texture2D* GetTexture() const { return texture_; }
     /// Return sprite.
