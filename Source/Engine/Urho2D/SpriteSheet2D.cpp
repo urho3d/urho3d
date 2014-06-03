@@ -95,17 +95,18 @@ bool SpriteSheet2D::Load(Deserializer& source)
         IntRect rectangle(x, y, x + width, y + height);
 
         Vector2 hotSpot(0.5f, 0.5f);
+        IntVector2 offset(0, 0);
         if (subTextureElem.HasAttribute("frameWidth") && subTextureElem.HasAttribute("frameHeight"))
         {
-            int frameX = subTextureElem.GetInt("frameX");
-            int frameY = subTextureElem.GetInt("frameY");
+            offset.x_ = subTextureElem.GetInt("frameX");
+            offset.y_ = subTextureElem.GetInt("frameY");
             int frameWidth = subTextureElem.GetInt("frameWidth");
             int frameHeight = subTextureElem.GetInt("frameHeight");
-            hotSpot.x_ = ((float)frameX + frameWidth / 2) / width;
-            hotSpot.y_ = 1.0f - ((float)frameY + frameHeight / 2) / height;
+            hotSpot.x_ = ((float)offset.x_ + frameWidth / 2) / width;
+            hotSpot.y_ = 1.0f - ((float)offset.y_ + frameHeight / 2) / height;
         }
 
-        DefineSprite(name, rectangle, hotSpot);
+        DefineSprite(name, rectangle, hotSpot, offset);
 
         subTextureElem = subTextureElem.GetNext("SubTexture");
     }
@@ -122,7 +123,7 @@ Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
     return i->second_;
 }
 
-void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot)
+void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& offset)
 {
     if (!texture_)
         return;
@@ -135,22 +136,10 @@ void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, c
     sprite->SetTexture(texture_);
     sprite->SetRectangle(rectangle);
     sprite->SetHotSpot(hotSpot);
+    sprite->SetOffset(offset);
     sprite->SetSpriteSheet(this);
 
     spriteMapping_[name] = sprite;
-}
-
-void SpriteSheet2D::UpdateSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot)
-{
-    if (!texture_)
-        return;
-
-    Sprite2D* sprite = GetSprite(name);
-    if (sprite)
-    {
-        sprite->SetRectangle(rectangle);
-        sprite->SetHotSpot(hotSpot);
-    }
 }
 
 }

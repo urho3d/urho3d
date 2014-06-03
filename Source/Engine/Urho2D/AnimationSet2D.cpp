@@ -126,21 +126,39 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
             String fileName = fileElem.GetAttribute("name");
 
             SharedPtr<Sprite2D> sprite;
+            
             if (spriterSheet)
                 sprite = spriterSheet->GetSprite(GetFileName(fileName));
             else
                 sprite = (cache->GetResource<Sprite2D>(parentPath + fileName));
+
             if (!sprite)
             {
-                LOGERROR("Could not load sprite " + parentPath + fileName);
+                LOGERROR("Could not load sprite " + fileName);
                 return false;
             }
-            
+
             Vector2 hotSpot(0.0f, 1.0f);
             if (fileElem.HasAttribute("pivot_x"))
                 hotSpot.x_ = fileElem.GetFloat("pivot_x");
             if (fileElem.HasAttribute("pivot_y"))
                 hotSpot.y_ = fileElem.GetFloat("pivot_y");
+
+            // If sprite is trimmed, recalculate hot spot
+            const IntVector2& offset = sprite->GetOffset();
+            if (offset != IntVector2::ZERO)
+            {
+                int width = fileElem.GetInt("width");
+                int height = fileElem.GetInt("height");
+
+                int pivotX = width * hotSpot.x_;
+                int pivotY = height * (1.0f - hotSpot.y_);
+
+                const IntRect& rectangle = sprite->GetRectangle();
+                hotSpot.x_ = ((float)offset.x_ + pivotX) / rectangle.Width();
+                hotSpot.y_ = 1.0f - ((float)offset.y_ + pivotY) / rectangle.Height();
+            }
+
             sprite->SetHotSpot(hotSpot);
 
             sprites_[(folderId << 16) + fileId] = sprite;

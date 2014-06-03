@@ -66,6 +66,8 @@ public:
     void SetRectangle(const IntRect& rectangle);
     /// Set hot spot.
     void SetHotSpot(const Vector2& hotSpot);
+    /// Set offset.
+    void SetOffset(const IntVector2& offset);
     /// Set sprite sheet.
     void SetSpriteSheet(SpriteSheet2D* spriteSheet);
 
@@ -75,6 +77,8 @@ public:
     const IntRect& GetRectangle() const { return rectangle_; }
     /// Return hot spot.
     const Vector2& GetHotSpot() const { return hotSpot_; }
+    /// Return offset.
+    const IntVector2& GetOffset() const { return offset_; }
     /// Return sprite sheet.
     SpriteSheet2D* GetSpriteSheet() const { return spriteSheet_; }
 
@@ -85,6 +89,8 @@ private:
     IntRect rectangle_;
     /// Hot spot.
     Vector2 hotSpot_;
+    /// Offset.
+    IntVector2 offset_;
     /// Sprite sheet.
     WeakPtr<SpriteSheet2D> spriteSheet_;
 };
