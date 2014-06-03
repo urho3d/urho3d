@@ -8869,6 +8869,7 @@ Vector2 hotSpot;
 /* readonly */
 uint memoryUse;
 String name;
+IntVector2 offset;
 IntRect rectangle;
 /* readonly */
 int refs;
@@ -8886,14 +8887,13 @@ int weakRefs;
 class SpriteSheet2D
 {
 // Methods:
-void DefineSprite(const String&, const IntRect&, const Vector2&);
+void DefineSprite(const String&, const IntRect&, const Vector2& = Vector2 ( 0.5f , 0.5f ), const IntVector2& = IntVector2 :: ZERO);
 Sprite2D GetSprite(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void UpdateSprite(const String&, const IntRect&, const Vector2&);
 
 // Properties:
 /* readonly */

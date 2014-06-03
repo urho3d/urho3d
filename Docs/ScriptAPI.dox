@@ -9519,6 +9519,7 @@ Properties:
 - Vector2 hotSpot
 - uint memoryUse // readonly
 - String name
+- IntVector2 offset
 - IntRect rectangle
 - int refs // readonly
 - Texture2D@ texture
@@ -9532,14 +9533,13 @@ Properties:
 
 Methods:
 
-- void DefineSprite(const String&, const IntRect&, const Vector2&)
+- void DefineSprite(const String&, const IntRect&, const Vector2& = Vector2 ( 0.5f , 0.5f ), const IntVector2& = IntVector2 :: ZERO)
 - Sprite2D@ GetSprite(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void UpdateSprite(const String&, const IntRect&, const Vector2&)
 
 Properties:
 

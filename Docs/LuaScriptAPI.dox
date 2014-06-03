@@ -4670,10 +4670,12 @@ Methods:
 - void SetTexture(Texture2D* texture)
 - void SetRectangle(const IntRect& rectangle)
 - void SetHotSpot(const Vector2& hotSpot)
+- void SetOffset(const IntVector2& offset)
 - void SetSpriteSheet(SpriteSheet2D* spriteSheet)
 - Texture2D* GetTexture() const
 - const IntRect& GetRectangle() const
 - const Vector2& GetHotSpot() const
+- const IntVector2& GetOffset() const
 - SpriteSheet2D* GetSpriteSheet() const
 
 Properties:
@@ -4681,6 +4683,7 @@ Properties:
 - Texture2D* texture
 - IntRect rectangle
 - Vector2 hotSpot
+- IntVector2 offset
 - SpriteSheet2D* spriteSheet
 
 ### SpriteSheet2D : Resource
@@ -4691,8 +4694,7 @@ Methods:
 - Sprite2D* GetSprite(const String name) const
 - void DefineSprite(const String name, const IntRect& rectangle)
 - void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
-- void UpdateSprite(const String name, const IntRect& rectangle)
-- void UpdateSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
+- void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& originSize)
 
 ### StaticModel : Drawable
 
