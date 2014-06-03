@@ -167,7 +167,7 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
         looped = animationElem.GetBool("looping");
     animation->SetLooped(looped);
 
-    // Load time lines
+    // Load timelines
     for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
     {
         Timeline2D timeline;

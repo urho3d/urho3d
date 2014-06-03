@@ -88,8 +88,8 @@ protected:
     void SetAnimation(Animation2D* animation);
     /// Update animation.
     void UpdateAnimation(float timeStep);
-    /// Update timeline world transform.
-    void UpateTimelineWorldTransform(unsigned index);
+    /// Calculate timeline world world transform.
+    void CalculateTimelineWorldTransform(unsigned index);
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
@@ -111,17 +111,23 @@ protected:
     float currentTime_;
     /// Timeline nodes.
     Vector<SharedPtr<Node> > timelineNodes_;
+
     /// Transform info.
     struct TransformInfo
     {
+        /// Construct.
+        TransformInfo() :
+            parent_(-1),
+            worldSpace_(false)
+        {
+        }
+
         /// Parent.
         int parent_;
-        /// Local transform.
-        Transform2D localTransform_;
-        /// World transform updated.
-        bool worldTransformUpdated_;
-        /// World transform.
-        Transform2D worldTransform_;
+        /// World space.
+        bool worldSpace_;
+        /// Transform.
+        Transform2D transform_;
     };
     /// Timeline transform infos.
     Vector<TransformInfo> timelineTransformInfos_;

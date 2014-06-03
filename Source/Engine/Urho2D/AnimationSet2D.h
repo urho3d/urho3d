@@ -27,9 +27,9 @@
 namespace Urho3D
 {
 
-class XMLElement;
-class Sprite2D;
 class Animation2D;
+class Sprite2D;
+class XMLElement;
 
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API AnimationSet2D : public Resource

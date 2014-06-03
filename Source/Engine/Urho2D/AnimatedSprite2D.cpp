@@ -88,8 +88,11 @@ void AnimatedSprite2D::SetLayer(int layer)
 
     for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
-        StaticSprite2D* objectSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
-        objectSprite->SetLayer(layer_);
+        if (!timelineNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        staticSprite->SetLayer(layer_);
     }
 }
 
@@ -107,8 +110,11 @@ void AnimatedSprite2D::SetBlendMode(BlendMode blendMode)
 
     for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
-        StaticSprite2D* objectSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
-        objectSprite->SetBlendMode(blendMode_);
+        if (!timelineNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        staticSprite->SetBlendMode(blendMode_);
     }
 }
 
@@ -283,8 +289,8 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
                 const TimelineKey2D& nextKey = objectKeys[j + 1];
                 float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
 
-                timelineTransformInfos_[i].localTransform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
-                timelineTransformInfos_[i].worldTransformUpdated_ = false;
+                timelineTransformInfos_[i].worldSpace_ = false;
+                timelineTransformInfos_[i].transform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
 
                 // Update sprite's sprite and hot spot and color
                 Node* timelineNode = timelineNodes_[i];
@@ -302,9 +308,9 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
         }
     }
 
-    // Update timeline's world transform
+    // Calculate timeline world transform.
     for (unsigned i = 0; i < timelineTransformInfos_.Size(); ++i)
-        UpateTimelineWorldTransform(i);
+        CalculateTimelineWorldTransform(i);
 
     // Get mainline key
     const Vector<MainlineKey2D>& mainlineKeys = animation_->GetMainlineKeys();
@@ -342,7 +348,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
                 timelineNode->SetEnabled(true);
 
             // Update node's transform
-            const Transform2D& transform = timelineTransformInfos_[i].worldTransform_;
+            const Transform2D& transform = timelineTransformInfos_[i].transform_;
             timelineNode->SetScale(transform.scale_);
             timelineNode->SetRotation(transform.angle_);
             timelineNode->SetPosition(transform.position_);
@@ -356,23 +362,18 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     MarkForUpdate();
 }
 
-void AnimatedSprite2D::UpateTimelineWorldTransform(unsigned index)
+void AnimatedSprite2D::CalculateTimelineWorldTransform(unsigned index)
 {
     TransformInfo& info = timelineTransformInfos_[index];
-    if (info.worldTransformUpdated_)
+    if (info.worldSpace_)
         return;
 
-    if (info.parent_ == -1)
-    {
-        info.worldTransform_ = info.localTransform_;
-        info.worldTransformUpdated_ = true;
-    }
-    else
-    {
-        UpateTimelineWorldTransform(info.parent_);
+    info.worldSpace_ = true;
 
-        info.worldTransform_ = timelineTransformInfos_[info.parent_].worldTransform_ * info.localTransform_;
-        info.worldTransformUpdated_ = true;
+    if (info.parent_ != -1)
+    {
+        CalculateTimelineWorldTransform(info.parent_);
+        info.transform_ = timelineTransformInfos_[info.parent_].transform_ * info.transform_;
     }
 }
 

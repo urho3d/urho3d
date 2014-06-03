@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "HashMap.h"
 #include "Ptr.h"
 #include "RefCounted.h"
 #include "Vector2.h"
@@ -151,7 +150,7 @@ public:
     void AddMainlineKey(const MainlineKey2D& mainlineKey);
     /// Add timeline.
     void AddTimeline(const Timeline2D& timeline);
-    /// Set time line parent.
+    /// Set timeline parent.
     void SetTimelineParent(int timeline, int timelineParent);
 
     /// Return animation set.
