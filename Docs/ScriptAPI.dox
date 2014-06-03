@@ -644,6 +644,9 @@ namespace Urho3D
 - %Layer : int
 - %Order %in %Layer : int
 - %Blend %Mode : int
+- %Flip X : bool
+- %Flip Y : bool
+- %Color : Color
 - %Speed : float
 - %Animation %Set : ResourceRef
 - %Animation : String
@@ -2133,6 +2136,7 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetFlip(bool, bool)
 
 Properties:
 
@@ -2147,9 +2151,12 @@ Properties:
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
+- Color color
 - float drawDistance
 - bool enabled
 - bool enabledEffective // readonly
+- bool flipX
+- bool flipY
 - uint id // readonly
 - bool inView // readonly
 - int layer

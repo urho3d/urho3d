@@ -75,6 +75,10 @@ Methods:
 - void SetLayer(int layer)
 - void SetOrderInLayer(int orderInLayer)
 - void SetBlendMode(BlendMode mode)
+- void SetFlip(bool flipX, bool flipY)
+- void SetFlipX(bool flipX)
+- void SetFlipY(bool flipY)
+- void SetColor(const Color& color)
 - void SetSpeed(float speed)
 - void SetAnimation(const String name)
 - void SetAnimation(AnimationSet2D* animationSet, const String name)
@@ -82,6 +86,9 @@ Methods:
 - int GetLayer() const
 - int GetOrderInLayer() const
 - BlendMode GetBlendMode() const
+- bool GetFlipX() const
+- bool GetFlipY() const
+- const Color& GetColor() const
 - float GetSpeed() const
 - AnimationSet2D* GetAnimationSet() const
 - const String GetAnimation() const
@@ -91,6 +98,9 @@ Properties:
 - int layer
 - int orderInLayer
 - BlendMode blendMode
+- bool flipX
+- bool flipY
+- Color& color
 - float speed
 - AnimationSet2D* animationSet
 - String animation

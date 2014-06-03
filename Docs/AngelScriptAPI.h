@@ -195,6 +195,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetFlip(bool, bool);
 
 // Properties:
 String animation;
@@ -213,10 +214,13 @@ BoundingBox boundingBox;
 bool castShadows;
 /* readonly */
 String category;
+Color color;
 float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
+bool flipX;
+bool flipY;
 /* readonly */
 uint id;
 /* readonly */
