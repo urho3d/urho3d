@@ -148,6 +148,13 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedSprite2D", "int get_orderInLayer() const", asMETHOD(AnimatedSprite2D, GetOrderInLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_blendMode(BlendMode)", asMETHOD(AnimatedSprite2D, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "BlendMode get_blendMode() const", asMETHOD(AnimatedSprite2D, GetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void SetFlip(bool, bool)", asMETHOD(AnimatedSprite2D, SetFlip), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_flipX(bool)", asMETHOD(AnimatedSprite2D, SetFlipX), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "bool get_flipX() const", asMETHOD(AnimatedSprite2D, GetFlipX), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_flipY(bool)", asMETHOD(AnimatedSprite2D, SetFlipY), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "bool get_flipY() const", asMETHOD(AnimatedSprite2D, GetFlipY), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_color(const Color&in)", asMETHOD(AnimatedSprite2D, SetColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "const Color& get_color() const", asMETHOD(AnimatedSprite2D, GetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(AnimationSet2D@+, const String&)", asMETHODPR(AnimatedSprite2D, SetAnimation, (AnimationSet2D*, const String&), void), asCALL_THISCALL);

@@ -52,6 +52,14 @@ public:
     void SetOrderInLayer(int orderInLayer);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
+    /// Set flip.
+    void SetFlip(bool flipX, bool flipY);
+    /// Set flip X.
+    void SetFlipX(bool flipX);
+    /// Set flip Y.
+    void SetFlipY(bool flipY);
+    /// Set color.
+    void SetColor(const Color& color);
     /// Set speed.
     void SetSpeed(float speed);
     /// Set animation by animation set and name.
@@ -67,6 +75,12 @@ public:
     int GetOrderInLayer() const { return orderInLayer_; }
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+    /// Return flip X.
+    bool GetFlipX() const { return flipX_; }
+    /// Return flip Y.
+    bool GetFlipY() const { return flipY_; }
+    /// Return color.
+    const Color& GetColor() const { return color_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
     /// Return animation.
@@ -99,6 +113,12 @@ protected:
     int orderInLayer_;
     /// Blend mode.
     BlendMode blendMode_;
+    /// Flip X.
+    bool flipX_;
+    /// Flip Y.
+    bool flipY_;
+    /// Color.
+    Color color_;
     /// Speed.
     float speed_;
     /// Animation set.

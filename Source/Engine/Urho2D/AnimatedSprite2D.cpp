@@ -44,6 +44,9 @@ AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     layer_(0),
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
+    flipX_(false),
+    flipY_(false),
+    color_(Color::WHITE),
     speed_(1.0f),
     currentTime_(0.0f)
 {
@@ -59,6 +62,9 @@ void AnimatedSprite2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_INT, "Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_INT, "Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_BOOL, "Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_BOOL, "Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_COLOR, "Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_FLOAT, "Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_RESOURCEREF, "Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef, ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_STRING, "Animation", GetAnimation, SetAnimation, String, String::EMPTY, AM_DEFAULT);
@@ -116,6 +122,42 @@ void AnimatedSprite2D::SetBlendMode(BlendMode blendMode)
         StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
         staticSprite->SetBlendMode(blendMode_);
     }
+}
+
+void AnimatedSprite2D::SetFlip(bool flipX, bool flipY)
+{
+    if (flipX_ == flipX && flipY_ == flipY)
+        return;
+
+    flipX_ = flipX;
+    flipY_ = flipY;
+
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    {
+        if (!timelineNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        staticSprite->SetFlip(flipX_, flipY_);
+    }
+
+    MarkNetworkUpdate();
+}
+
+void AnimatedSprite2D::SetFlipX(bool flipX)
+{
+    SetFlip(flipX, flipY_);
+}
+
+void AnimatedSprite2D::SetFlipY(bool flipY)
+{
+    SetFlip(flipX_, flipY);
+}
+
+void AnimatedSprite2D::SetColor(const Color& color)
+{
+    color_ = color;
+    MarkNetworkUpdate();
 }
 
 void AnimatedSprite2D::SetSpeed(float speed)
@@ -243,6 +285,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
             StaticSprite2D* staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetLayer(layer_);
             staticSprite->SetBlendMode(blendMode_);
+            staticSprite->SetFlip(flipX_, flipY_);
             staticSprite->SetUseHotSpot(true);
 
             timelineNodes_[i] = timelineNode;
@@ -299,8 +342,8 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
                     StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
                     staticSprite->SetSprite(currKey.sprite_);
                     staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
-                    float alpha_ = Lerp(currKey.alpha_, nextKey.alpha_, t);
-                    staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, alpha_));
+                    float alpha = Lerp(currKey.alpha_, nextKey.alpha_, t);
+                    staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * alpha));
                 }
 
                 break;
@@ -349,9 +392,19 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
             // Update node's transform
             const Transform2D& transform = timelineTransformInfos_[i].transform_;
+            Vector2 position = transform.position_;
+            if (flipX_)
+                position.x_ = -position.x_;
+            if (flipY_)
+                position.y_ = -position.y_;
+            timelineNode->SetPosition(position);
+
+            float angle = transform.angle_;
+            if (flipX_ != flipY_)
+                angle = -angle;
+            timelineNode->SetRotation(angle);
+
             timelineNode->SetScale(transform.scale_);
-            timelineNode->SetRotation(transform.angle_);
-            timelineNode->SetPosition(transform.position_);
 
             // Update sprite's z order
             StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
