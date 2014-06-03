@@ -29,6 +29,7 @@
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Sprite2D.h"
+#include "SpriteSheet2D.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -107,19 +108,13 @@ Animation2D* AnimationSet2D::GetAnimation(const String& name) const
     return 0;
 }
 
-Sprite2D* AnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
-{
-    unsigned key = (folderId << 16) + fileId;
-    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(key);
-    if (i != sprites_.End())
-        return i->second_;
-    return 0;
-}
-
 bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
+
     String parentPath = GetParentPath(GetName());
+    String spriteSheetFilePath = parentPath + GetFileName(GetName()) + ".xml";
+    SpriteSheet2D* spriterSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath, false);
 
     for (XMLElement folderElem = rootElem.GetChild("folder"); folderElem; folderElem = folderElem.GetNext("folder"))
     {
@@ -130,7 +125,11 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
             unsigned fileId = fileElem.GetUInt("id");
             String fileName = fileElem.GetAttribute("name");
 
-            SharedPtr<Sprite2D> sprite(cache->GetResource<Sprite2D>(parentPath + fileName));
+            SharedPtr<Sprite2D> sprite;
+            if (spriterSheet)
+                sprite = spriterSheet->GetSprite(GetFileName(fileName));
+            else
+                sprite = (cache->GetResource<Sprite2D>(parentPath + fileName));
             if (!sprite)
             {
                 LOGERROR("Could not load sprite " + parentPath + fileName);
@@ -151,6 +150,14 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
     return true;
 }
 
+Sprite2D* AnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
+{
+    unsigned key = (folderId << 16) + fileId;
+    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(key);
+    if (i != sprites_.End())
+        return i->second_;
+    return 0;
+}
 
 bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
 {
