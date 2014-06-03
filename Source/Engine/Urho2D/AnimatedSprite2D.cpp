@@ -131,7 +131,7 @@ void AnimatedSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-
+    
     for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
         if (!timelineNodes_[i])
@@ -140,6 +140,9 @@ void AnimatedSprite2D::SetFlip(bool flipX, bool flipY)
         StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
         staticSprite->SetFlip(flipX_, flipY_);
     }
+
+    // For editor paused mode
+    UpdateAnimation(0.0f);
 
     MarkNetworkUpdate();
 }
