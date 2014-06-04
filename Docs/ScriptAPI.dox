@@ -650,6 +650,11 @@ namespace Urho3D
 - %Speed : float
 - %Animation %Set : ResourceRef
 - %Animation : String
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
 
 ### AnimationController
 - %Is %Enabled : bool
@@ -1364,11 +1369,6 @@ namespace Urho3D
 - %Sprite : ResourceRef
 - %Blend %Mode : int
 - %Material : ResourceRef
-- %Max %Lights : int
-- %View %Mask : int
-- %Light %Mask : int
-- %Shadow %Mask : int
-- %Zone %Mask : int
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
