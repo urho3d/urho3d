@@ -25,6 +25,7 @@
 #include "Animation2D.h"
 #include "AnimationSet2D.h"
 #include "Context.h"
+#include "Drawable2D.h"
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -68,7 +69,7 @@ void AnimatedSprite2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_FLOAT, "Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_RESOURCEREF, "Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef, ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_STRING, "Animation", GetAnimation, SetAnimation, String, String::EMPTY, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
+    COPY_BASE_ATTRIBUTES(AnimatedSprite2D, Drawable);
 }
 
 void AnimatedSprite2D::OnSetEnabled()
@@ -395,7 +396,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
             // Update node's transform
             const Transform2D& transform = timelineTransformInfos_[i].transform_;
-            Vector2 position = transform.position_;
+            Vector2 position = transform.position_ * PIXEL_SIZE;
             if (flipX_)
                 position.x_ = -position.x_;
             if (flipY_)

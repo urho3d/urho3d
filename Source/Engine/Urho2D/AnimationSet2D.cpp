@@ -24,7 +24,6 @@
 #include "Animation2D.h"
 #include "AnimationSet2D.h"
 #include "Context.h"
-#include "Drawable2D.h"
 #include "FileSystem.h"
 #include "Log.h"
 #include "ResourceCache.h"
@@ -151,12 +150,12 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
                 int width = fileElem.GetInt("width");
                 int height = fileElem.GetInt("height");
 
-                int pivotX = width * hotSpot.x_;
-                int pivotY = height * (1.0f - hotSpot.y_);
+                float pivotX = width * hotSpot.x_;
+                float pivotY = height * (1.0f - hotSpot.y_);
 
                 const IntRect& rectangle = sprite->GetRectangle();
-                hotSpot.x_ = ((float)offset.x_ + pivotX) / rectangle.Width();
-                hotSpot.y_ = 1.0f - ((float)offset.y_ + pivotY) / rectangle.Height();
+                hotSpot.x_ = (offset.x_ + pivotX) / rectangle.Width();
+                hotSpot.y_ = 1.0f - (offset.y_ + pivotY) / rectangle.Height();
             }
 
             sprite->SetHotSpot(hotSpot);
@@ -213,8 +212,8 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
             XMLElement childElem = keyElem.GetChild();
 
             Vector2 position;
-            position.x_ = childElem.GetFloat("x") * PIXEL_SIZE;
-            position.y_ = childElem.GetFloat("y") * PIXEL_SIZE;
+            position.x_ = childElem.GetFloat("x");
+            position.y_ = childElem.GetFloat("y");
 
             float angle = childElem.GetFloat("angle");
 

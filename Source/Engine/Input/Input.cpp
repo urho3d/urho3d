@@ -577,19 +577,19 @@ bool Input::RecordGesture()
         return false;
     }
 
-    return SDL_RecordGesture(-1);
+    return SDL_RecordGesture(-1) != 0;
 }
 
 bool Input::SaveGestures(Serializer& dest)
 {
     RWOpsWrapper<Serializer> wrapper(dest);
-    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps());
+    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps()) != 0;
 }
 
 bool Input::SaveGesture(Serializer& dest, unsigned gestureID)
 {
     RWOpsWrapper<Serializer> wrapper(dest);
-    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps());
+    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps()) != 0;
 }
 
 unsigned Input::LoadGestures(Deserializer& source)
@@ -607,7 +607,7 @@ unsigned Input::LoadGestures(Deserializer& source)
 
 bool Input::RemoveGesture(unsigned gestureID)
 {
-    return SDL_RemoveDollarTemplate(gestureID);
+    return SDL_RemoveDollarTemplate(gestureID) != 0;
 }
 
 void Input::RemoveAllGestures()
@@ -798,7 +798,7 @@ bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
 
 bool Input::GetScreenKeyboardSupport() const
 {
-    return graphics_ ? SDL_HasScreenKeyboardSupport() : false;
+    return graphics_ ? SDL_HasScreenKeyboardSupport() != 0 : false;
 }
 
 bool Input::IsScreenKeyboardVisible() const
@@ -806,7 +806,7 @@ bool Input::IsScreenKeyboardVisible() const
     if (graphics_)
     {
         SDL_Window* window = graphics_->GetImpl()->GetWindow();
-        return SDL_IsScreenKeyboardShown(window);
+        return SDL_IsScreenKeyboardShown(window) != SDL_FALSE;
     }
     else
         return false;
