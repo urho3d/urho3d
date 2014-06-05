@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="BrowserActionMenu" />
+	<attribute name="Size" value="150 67" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Is Movable" value="false" />
+</element>

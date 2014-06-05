@@ -263,6 +263,10 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="240 64 254 78" />
     </element>
+    <element type="Filter">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="240 80 254 98" />
+    </element>
     <element type="EditMove">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="0 96 30 126" />

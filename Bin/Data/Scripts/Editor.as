@@ -13,6 +13,7 @@
 #include "Scripts/Editor/EditorSecondaryToolbar.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
+#include "Scripts/Editor/EditorResourceBrowser.as"
 #include "Scripts/Editor/EditorSpawn.as"
 
 String configFileName;
@@ -91,6 +92,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
+    DoResourceBrowserWork();
     UpdateView(timeStep);
     UpdateViewports(timeStep);
     UpdateStats(timeStep);
