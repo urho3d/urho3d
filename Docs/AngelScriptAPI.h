@@ -5878,9 +5878,6 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetEnabled(bool, bool);
-void SetPosition(const Vector2&);
-void SetRotation(float);
-void SetScale(const Vector2&);
 void SetScale(float);
 void SetTransform(const Vector2&, float);
 void SetTransform(const Vector2&, float, const Vector2&);
@@ -5888,9 +5885,6 @@ void SetTransform(const Vector2&, float, float);
 void SetTransform(const Vector3&, const Quaternion&);
 void SetTransform(const Vector3&, const Quaternion&, const Vector3&);
 void SetTransform(const Vector3&, const Quaternion&, float);
-void SetWorldPosition(const Vector2&);
-void SetWorldRotation(float);
-void SetWorldScale(const Vector2&);
 void SetWorldTransform(const Vector2&, float);
 void SetWorldTransform(const Vector2&, float, const Vector2&);
 void SetWorldTransform(const Vector2&, float, float);
@@ -5936,12 +5930,15 @@ ObjectAnimation objectAnimation;
 Connection owner;
 Node parent;
 Vector3 position;
+Vector2 position2D;
 /* readonly */
 int refs;
 /* readonly */
 Vector3 right;
 Quaternion rotation;
+float rotation2D;
 Vector3 scale;
+Vector2 scale2D;
 /* readonly */
 Scene scene;
 /* readonly */
@@ -5961,10 +5958,13 @@ VariantMap vars;
 int weakRefs;
 Vector3 worldDirection;
 Vector3 worldPosition;
+Vector2 worldPosition2D;
 /* readonly */
 Vector3 worldRight;
 Quaternion worldRotation;
+float worldRotation2D;
 Vector3 worldScale;
+Vector2 worldScale2D;
 /* readonly */
 Matrix3x4 worldTransform;
 /* readonly */
@@ -7315,9 +7315,6 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetPosition(const Vector2&);
-void SetRotation(float);
-void SetScale(const Vector2&);
 void SetScale(float);
 void SetTransform(const Vector2&, float);
 void SetTransform(const Vector2&, float, const Vector2&);
@@ -7325,9 +7322,6 @@ void SetTransform(const Vector2&, float, float);
 void SetTransform(const Vector3&, const Quaternion&);
 void SetTransform(const Vector3&, const Quaternion&, const Vector3&);
 void SetTransform(const Vector3&, const Quaternion&, float);
-void SetWorldPosition(const Vector2&);
-void SetWorldRotation(float);
-void SetWorldScale(const Vector2&);
 void SetWorldTransform(const Vector2&, float);
 void SetWorldTransform(const Vector2&, float, const Vector2&);
 void SetWorldTransform(const Vector2&, float, float);
@@ -7393,6 +7387,7 @@ PhysicsWorld physicsWorld;
 /* readonly */
 PhysicsWorld2D physicsWorld2D;
 Vector3 position;
+Vector2 position2D;
 /* readonly */
 int refs;
 /* readonly */
@@ -7400,7 +7395,9 @@ Array<PackageFile> requiredPackageFiles;
 /* readonly */
 Vector3 right;
 Quaternion rotation;
+float rotation2D;
 Vector3 scale;
+Vector2 scale2D;
 /* readonly */
 ScriptObject scriptObject;
 float smoothingConstant;
@@ -7422,10 +7419,13 @@ VariantMap vars;
 int weakRefs;
 Vector3 worldDirection;
 Vector3 worldPosition;
+Vector2 worldPosition2D;
 /* readonly */
 Vector3 worldRight;
 Quaternion worldRotation;
+float worldRotation2D;
 Vector3 worldScale;
+Vector2 worldScale2D;
 /* readonly */
 Matrix3x4 worldTransform;
 /* readonly */

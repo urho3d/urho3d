@@ -6955,9 +6955,6 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetEnabled(bool, bool)
-- void SetPosition(const Vector2&)
-- void SetRotation(float)
-- void SetScale(const Vector2&)
 - void SetScale(float)
 - void SetTransform(const Vector2&, float)
 - void SetTransform(const Vector2&, float, const Vector2&)
@@ -6965,9 +6962,6 @@ Methods:
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
-- void SetWorldPosition(const Vector2&)
-- void SetWorldRotation(float)
-- void SetWorldScale(const Vector2&)
 - void SetWorldTransform(const Vector2&, float)
 - void SetWorldTransform(const Vector2&, float, const Vector2&)
 - void SetWorldTransform(const Vector2&, float, float)
@@ -7003,10 +6997,13 @@ Properties:
 - Connection@ owner
 - Node@ parent
 - Vector3 position
+- Vector2 position2D
 - int refs // readonly
 - Vector3 right // readonly
 - Quaternion rotation
+- float rotation2D
 - Vector3 scale
+- Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
 - bool temporary
@@ -7018,9 +7015,12 @@ Properties:
 - int weakRefs // readonly
 - Vector3 worldDirection
 - Vector3 worldPosition
+- Vector2 worldPosition2D
 - Vector3 worldRight // readonly
 - Quaternion worldRotation
+- float worldRotation2D
 - Vector3 worldScale
+- Vector2 worldScale2D
 - Matrix3x4 worldTransform // readonly
 - Vector3 worldUp // readonly
 
@@ -8202,9 +8202,6 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetPosition(const Vector2&)
-- void SetRotation(float)
-- void SetScale(const Vector2&)
 - void SetScale(float)
 - void SetTransform(const Vector2&, float)
 - void SetTransform(const Vector2&, float, const Vector2&)
@@ -8212,9 +8209,6 @@ Methods:
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
-- void SetWorldPosition(const Vector2&)
-- void SetWorldRotation(float)
-- void SetWorldScale(const Vector2&)
 - void SetWorldTransform(const Vector2&, float)
 - void SetWorldTransform(const Vector2&, float, const Vector2&)
 - void SetWorldTransform(const Vector2&, float, float)
@@ -8262,11 +8256,14 @@ Properties:
 - PhysicsWorld@ physicsWorld // readonly
 - PhysicsWorld2D@ physicsWorld2D // readonly
 - Vector3 position
+- Vector2 position2D
 - int refs // readonly
 - PackageFile@[]@ requiredPackageFiles // readonly
 - Vector3 right // readonly
 - Quaternion rotation
+- float rotation2D
 - Vector3 scale
+- Vector2 scale2D
 - ScriptObject@ scriptObject // readonly
 - float smoothingConstant
 - float snapThreshold
@@ -8281,9 +8278,12 @@ Properties:
 - int weakRefs // readonly
 - Vector3 worldDirection
 - Vector3 worldPosition
+- Vector2 worldPosition2D
 - Vector3 worldRight // readonly
 - Quaternion worldRotation
+- float worldRotation2D
 - Vector3 worldScale
+- Vector2 worldScale2D
 - Matrix3x4 worldTransform // readonly
 - Vector3 worldUp // readonly
 
