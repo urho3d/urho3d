@@ -239,8 +239,12 @@ public:
     Connection* GetOwner() const { return owner_; }
     /// Return position in parent space.
     const Vector3& GetPosition() const { return position_; }
+    /// Return position in parent space (for Urho2D).
+    Vector2 GetPosition2D() const { return Vector2(position_.x_, position_.y_); }
     /// Return rotation in parent space.
     const Quaternion& GetRotation() const { return rotation_; }
+    /// Return rotation in parent space (for Urho2D).
+    float GetRotation2D() const { return rotation_.RollAngle(); }
     /// Return forward direction in parent space. Positive Z axis equals identity rotation.
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
     /// Return up direction in parent space. Positive Y axis equals identity rotation.
@@ -250,6 +254,8 @@ public:
 
     /// Return scale in parent space.
     const Vector3& GetScale() const { return scale_; }
+    /// Return scale in parent space (for Urho2D).
+    Vector2 GetScale2D() const { return Vector2(scale_.x_, scale_.y_); }
     /// Return parent space transform matrix.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
 
@@ -262,6 +268,13 @@ public:
         return worldTransform_.Translation();
     }
 
+    /// Return position in world space (for Urho2D).
+    Vector2 GetWorldPosition2D() const
+    {
+        Vector3 worldPosition = GetWorldPosition();
+        return Vector2(worldPosition.x_, worldPosition.y_);
+    }
+
     /// Return rotation in world space.
     Quaternion GetWorldRotation() const
     {
@@ -269,6 +282,12 @@ public:
             UpdateWorldTransform();
 
         return worldRotation_;
+    }
+
+    /// Return rotation in world space (for Urho2D).
+    float GetWorldRotation2D() const
+    {
+        return GetWorldRotation().RollAngle();
     }
 
     /// Return direction in world space.
@@ -305,6 +324,13 @@ public:
             UpdateWorldTransform();
 
         return worldTransform_.Scale();
+    }
+
+    /// Return scale in world space (for Urho2D).
+    Vector2 GetWorldScale2D() const
+    {
+        Vector3 worldScale = GetWorldScale();
+        return Vector2(worldScale.x_, worldScale.y_);
     }
 
     /// Return world space transform matrix.

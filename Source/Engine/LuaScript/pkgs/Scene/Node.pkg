@@ -27,12 +27,15 @@ class Node : public Animatable
     
     void SetPosition(const Vector3& position);
     void SetPosition(const Vector2& position);
+    void SetPosition2D(const Vector2& position);
     void SetRotation(const Quaternion& rotation);
     void SetRotation(float rotation);
+    void SetRotation2D(float rotation);
     void SetDirection(const Vector3& direction);
     void SetScale(float scale);
     void SetScale(const Vector3& scale);
     void SetScale(const Vector2& scale);
+    void SetScale2D(const Vector2& scale);
 
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     void SetTransform(const Vector2& position, float rotation);
@@ -43,13 +46,16 @@ class Node : public Animatable
     
     void SetWorldPosition(const Vector3& position);
     void SetWorldPosition(const Vector2& position);
+    void SetWorldPosition2D(const Vector2& position);
     void SetWorldRotation(const Quaternion& rotation);
     void SetWorldRotation(float rotation);
+    void SetWorldRotation2D(float rotation);
     void SetWorldDirection(const Vector3& direction);
     void SetWorldScale(float scale);
     void SetWorldScale(const Vector3& scale);
     void SetWorldScale(const Vector2& scale);
-    
+    void SetWorldScale2D(const Vector2& scale);
+
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
     void SetWorldTransform(const Vector2& position, float rotation);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
@@ -120,19 +126,25 @@ class Node : public Animatable
     Connection* GetOwner() const;
     
     const Vector3& GetPosition() const;
+    Vector2 GetPosition2D() const;
     const Quaternion& GetRotation() const;
+    float GetRotation2D() const;
     Vector3 GetDirection() const;
     Vector3 GetUp() const;
     Vector3 GetRight() const;
     const Vector3& GetScale() const;
+    Vector2 GetScale2D() const;
     
     Matrix3x4 GetTransform() const;
     Vector3 GetWorldPosition() const;
+    Vector2 GetWorldPosition2D() const;
     Quaternion GetWorldRotation() const;
+    float GetWorldRotation2D() const;
     Vector3 GetWorldDirection() const;
     Vector3 GetWorldUp() const;
     Vector3 GetWorldRight() const;
     Vector3 GetWorldScale() const;
+    Vector2 GetWorldScale2D() const;
     
     const Matrix3x4& GetWorldTransform() const;
     Vector3 LocalToWorld(const Vector3& position) const;
@@ -178,18 +190,24 @@ class Node : public Animatable
     tolua_property__is_set bool enabled;
     tolua_property__get_set Connection* owner;
     tolua_property__get_set Vector3& position;
+    tolua_property__get_set Vector2 position2D;
     tolua_property__get_set Quaternion& rotation;
+    tolua_property__get_set float rotation2D;
     tolua_property__get_set Vector3 direction;
     tolua_readonly tolua_property__get_set Vector3 up;
     tolua_readonly tolua_property__get_set Vector3 right;
     tolua_property__get_set Vector3& scale;
+    tolua_property__get_set Vector2 scale2D;
     tolua_readonly tolua_property__get_set Matrix3x4 transform;
     tolua_property__get_set Vector3 worldPosition;
+    tolua_property__get_set Vector2 worldPosition2D;
     tolua_property__get_set Quaternion worldRotation;
+    tolua_property__get_set float worldRotation2D;
     tolua_property__get_set Vector3 worldDirection;
     tolua_readonly tolua_property__get_set Vector3 worldUp;
     tolua_readonly tolua_property__get_set Vector3 worldRight;
     tolua_property__get_set Vector3 worldScale;
+    tolua_property__get_set Vector2 worldScale2D;
     tolua_readonly tolua_property__get_set Matrix3x4& worldTransform;
     tolua_readonly tolua_property__is_set bool dirty;
     tolua_readonly tolua_property__get_set unsigned numComponents;
@@ -197,6 +215,13 @@ class Node : public Animatable
 };
 
 ${
+#define SetPosition2D SetPosition
+#define SetRotation2D SetRotation
+#define SetScale2D SetScale
+#define SetWorldPosition2D SetWorldPosition
+#define SetWorldRotation2D SetWorldRotation
+#define SetWorldScale2D SetWorldScale
+
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_new00
 static int tolua_SceneLuaAPI_Node_new00(lua_State* tolua_S)
 {
