@@ -137,6 +137,7 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
     }
 
     cache.AddResourceDir(newPath);
+    RebuildResourceDatabase();
 
     if (!additive)
     {

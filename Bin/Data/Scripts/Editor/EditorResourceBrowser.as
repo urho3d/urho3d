@@ -112,6 +112,11 @@ void CreateResourceBrowser()
 
     CreateResourceBrowserUI();
     InitResourceBrowserPreview();
+    RebuildResourceDatabase();
+}
+
+void RebuildResourceDatabase()
+{
     ScanResourceDirectories();
     PopulateBrowserDirectories();
     PopulateResourceBrowserFilesByDirectory(rootDir);
@@ -633,9 +638,7 @@ void HandleResourceFilterToggled(StringHash eventType, VariantMap& eventData)
 
 void HandleRescanResourceBrowserClick(StringHash eventType, VariantMap& eventData)
 {
-    ScanResourceDirectories();
-    PopulateBrowserDirectories();
-    PopulateResourceBrowserFilesByDirectory(rootDir);
+    RebuildResourceDatabase();
 }
 
 void HandleResourceBrowserDirListSelectionChange(StringHash eventType, VariantMap& eventData)
