@@ -23,6 +23,10 @@ function Start()
     SubscribeToEvents()
 end
 
+function ToVector2(vector3)
+    return Vector2(vector3.x, vector3.y)
+end
+
 function CreateScene()
     scene_ = Scene()
     scene_:CreateComponent("Octree")
@@ -113,8 +117,8 @@ function CreateScene()
 
     local constraintDistance = boxNode:CreateComponent("ConstraintDistance2D") -- Apply ConstraintDistance2D to box
     constraintDistance.otherBody = ballBody -- Constrain ball to box
-    constraintDistance.ownerBodyAnchor = boxNode.position
-    constraintDistance.otherBodyAnchor = ballNode.position
+    constraintDistance.ownerBodyAnchor = ToVector2(boxNode.position)
+    constraintDistance.otherBodyAnchor = ToVector2(ballNode.position)
     -- Make the constraint soft (comment to make it rigid, which is its basic behavior)
     constraintDistance.frequencyHz = 4
     constraintDistance.dampingRatio = 0.5
@@ -128,8 +132,8 @@ function CreateScene()
 
     local constraintFriction = boxNode:CreateComponent("ConstraintFriction2D") -- Apply ConstraintDistance2D to box
     constraintFriction.otherBody = ballNode:GetComponent("RigidBody2D") -- Constraint ball to box
-    constraintFriction.ownerBodyAnchor = boxNode.position
-    --constraintFriction.otherBodyAnchor = ballNode.position
+    constraintFriction.ownerBodyAnchor = ToVector2(boxNode.position)
+    --constraintFriction.otherBodyAnchor = ToVector2(ballNode.position)
     --constraintFriction.maxForce = 10 -- ballBody.mass * gravity
     --constraintDistance.maxTorque = 10 -- ballBody.mass * radius * gravity
 
@@ -147,10 +151,10 @@ function CreateScene()
 
     local gear1 = baseNode:CreateComponent("ConstraintRevolute2D") -- Apply constraint to baseBox
     gear1.otherBody = ball1Body -- Constrain ball1 to baseBox
-    gear1.anchor = ball1Node.position
+    gear1.anchor = ToVector2(ball1Node.position)
     local gear2 = baseNode:CreateComponent("ConstraintRevolute2D") -- Apply constraint to baseBox
     gear2.otherBody = ball2Body -- Constrain ball2 to baseBox
-    gear2.anchor = ball2Node.position
+    gear2.anchor = ToVector2(ball2Node.position)
 
     local constraintGear = ball1Node:CreateComponent("ConstraintGear2D") -- Apply constraint to ball1
     constraintGear.otherBody = ball2Body -- Constrain ball2 to ball1
@@ -158,7 +162,7 @@ function CreateScene()
     constraintGear.otherConstraint = gear2
     constraintGear.ratio=1
 
-    ball1Body:ApplyAngularImpulse(0.015) -- Animate
+    ball1Body:ApplyAngularImpulse(0.015, true) -- Animate
 
     -- Create a vehicle from a compound of 2 ConstraintWheel2Ds
     CreateFlag("ConstraintWheel2Ds compound", -2.45, -1) -- Display Text3D flag
@@ -173,7 +177,7 @@ function CreateScene()
 
     local wheel1 = car:CreateComponent("ConstraintWheel2D")
     wheel1.otherBody = ball1Node:GetComponent("RigidBody2D")
-    wheel1.anchor = ball1Node.position
+    wheel1.anchor = ToVector2(ball1Node.position)
     wheel1.axis = Vector2(0, 1)
     wheel1.maxMotorTorque = 20
     wheel1.frequencyHz = 4
@@ -181,7 +185,7 @@ function CreateScene()
 
     local wheel2 = car:CreateComponent("ConstraintWheel2D")
     wheel2.otherBody = ball2Node:GetComponent("RigidBody2D")
-    wheel2.anchor = ball2Node.position
+    wheel2.anchor = ToVector2(ball2Node.position)
     wheel2.axis = Vector2(0, 1)
     wheel2.maxMotorTorque = 10
     wheel2.frequencyHz = 4
@@ -234,8 +238,8 @@ function CreateScene()
 
     local constraintPulley = boxNode:CreateComponent("ConstraintPulley2D") -- Apply constraint to box
     constraintPulley.otherBody = ballNode:GetComponent("RigidBody2D") -- Constrain ball to box
-    constraintPulley.ownerBodyAnchor = boxNode.position
-    constraintPulley.otherBodyAnchor = ballNode.position
+    constraintPulley.ownerBodyAnchor = ToVector2(boxNode.position)
+    constraintPulley.otherBodyAnchor = ToVector2(ballNode.position)
     constraintPulley.ownerBodyGroundAnchor = Vector2(boxNode.position.x, boxNode.position.y + 1)
     constraintPulley.otherBodyGroundAnchor = Vector2(ballNode.position.x, ballNode.position.y + 1)
     constraintPulley.ratio = 1 -- Weight ratio between ownerBody and otherBody
@@ -281,7 +285,7 @@ function CreateScene()
 
     local constraintWeld = boxNode:CreateComponent("ConstraintWeld2D")
     constraintWeld.otherBody = ballNode:GetComponent("RigidBody2D") -- Constrain ball to box
-    constraintWeld.anchor = boxNode.position
+    constraintWeld.anchor = ToVector2(boxNode.position)
     constraintWeld.frequencyHz = 4
     constraintWeld.dampingRatio = 0.5
 
@@ -294,7 +298,7 @@ function CreateScene()
 
     local constraintWheel = boxNode:CreateComponent("ConstraintWheel2D")
     constraintWheel.otherBody = ballNode:GetComponent("RigidBody2D") -- Constrain ball to box
-    constraintWheel.anchor = ballNode.position
+    constraintWheel.anchor = ToVector2(ballNode.position)
     constraintWheel.axis = Vector2(0, 1)
     constraintWheel.enableMotor = true
     constraintWheel.maxMotorTorque = 1
@@ -358,7 +362,7 @@ function HandleUpdate(eventType, eventData)
 end
 
 function HandlePostRenderUpdate(eventType, eventData)
-    if drawDebug then physicsWorld:DrawDebugGeometry(true) end
+    if drawDebug then physicsWorld:DrawDebugGeometry() end
 end
 
 function HandleMouseButtonDown(eventType, eventData)
