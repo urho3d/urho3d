@@ -165,6 +165,33 @@ template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type
     return 0;
 }
 
+template<> int ToluaIsPODVector<Vector2>(lua_State* L, int lo, const char* type, int def, tolua_Error* err)
+{
+    if (lua_istable(L, lo))
+    {
+        int length = lua_objlen(L, lo);
+        for (int i = 1; i <= length; ++i)
+        {
+            lua_pushinteger(L, i);
+            lua_gettable(L, lo);
+            if (!tolua_isusertype(L, -1, "Vector2", 0, err))
+            {
+                lua_pop(L, 1);
+                return 0;
+            }
+
+            lua_pop(L, 1);
+        }
+
+        return 1;
+    }
+
+    err->index = lo;
+    err->array = 0;
+    err->type = type;
+    return 0;
+}
+
 template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def)
 {
     if (!lua_istable(L, narg))

@@ -97,6 +97,8 @@ template<> int ToluaPushVector<String>(lua_State* L, void* data, const char* typ
 template<typename T> int ToluaIsPODVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
 /// Check is PODVector<unsigned>.
 template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+/// Check is PODVector<Vector2>.
+template<> int ToluaIsPODVector<Vector2>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
 
 /// Convert to PODVector<T>.
 template<typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def);
