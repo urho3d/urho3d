@@ -127,7 +127,7 @@ void AnimatedSprite2D::SetBlendMode(BlendMode blendMode)
 
 void AnimatedSprite2D::SetFlip(bool flipX, bool flipY)
 {
-    if (flipX_ == flipX && flipY_ == flipY)
+    if (flipX == flipX_ && flipY == flipY_)
         return;
 
     flipX_ = flipX;
@@ -207,6 +207,10 @@ AnimationSet2D* AnimatedSprite2D::GetAnimationSet() const
     return animationSet_;
 }
 
+Node* AnimatedSprite2D::GetRootNode() const
+{
+    return rootNode_;
+}
 
 void AnimatedSprite2D::SetAnimationSetAttr(ResourceRef value)
 {
@@ -228,6 +232,14 @@ void AnimatedSprite2D::OnNodeSet(Node* node)
         Scene* scene = GetScene();
         if (scene && IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
+    }
+    else
+    {
+        if (rootNode_)
+            rootNode_->Remove();
+        
+        rootNode_ = 0;
+        timelineNodes_.Clear();
     }
 }
 
@@ -275,6 +287,9 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
 
     currentTime_ = 0.0f;
 
+    if (!rootNode_)
+        rootNode_ = GetNode()->CreateChild("RootNode", LOCAL);
+
     timelineNodes_.Resize(animation_->GetNumTimelines());
     timelineTransformInfos_.Resize(animation_->GetNumTimelines());
 
@@ -284,7 +299,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
         // Just create sprite type node
         if (timeline.type_ == OT_SPRITE)
         {
-            SharedPtr<Node> timelineNode(GetNode()->CreateChild(timeline.name_));
+            SharedPtr<Node> timelineNode(rootNode_->CreateChild(timeline.name_, LOCAL));
             
             StaticSprite2D* staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetLayer(layer_);

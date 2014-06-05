@@ -60,7 +60,7 @@ void StaticSprite2D::RegisterObject(Context* context)
 
 void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 {
-    if (flipX_ == flipX && flipY_ == flipY)
+    if (flipX == flipX_ && flipY == flipY_)
         return;
 
     flipX_ = flipX;

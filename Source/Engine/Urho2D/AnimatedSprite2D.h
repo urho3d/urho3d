@@ -87,6 +87,8 @@ public:
     AnimationSet2D* GetAnimationSet() const;
     /// Return animation name.
     const String& GetAnimation() const { return animationName_; }
+    /// Return root node.
+    Node* GetRootNode() const;
 
     /// Set animation set attribute.
     void SetAnimationSetAttr(ResourceRef value);
@@ -129,9 +131,10 @@ protected:
     SharedPtr<Animation2D> animation_;
     /// Current time.
     float currentTime_;
+    /// Root node.
+    SharedPtr<Node> rootNode_;
     /// Timeline nodes.
     Vector<SharedPtr<Node> > timelineNodes_;
-
     /// Transform info.
     struct TransformInfo
     {
