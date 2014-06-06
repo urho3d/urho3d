@@ -80,9 +80,10 @@ Methods:
 - void SetFlipY(bool flipY)
 - void SetColor(const Color& color)
 - void SetSpeed(float speed)
-- void SetAnimation(const String name)
-- void SetAnimation(AnimationSet2D* animationSet, const String name)
+- void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT)
+- void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetAnimationSet(AnimationSet2D* animationSet)
+- void SetLoopMode(LoopMode2D loopMode)
 - int GetLayer() const
 - int GetOrderInLayer() const
 - BlendMode GetBlendMode() const
@@ -90,8 +91,9 @@ Methods:
 - bool GetFlipY() const
 - const Color& GetColor() const
 - float GetSpeed() const
-- AnimationSet2D* GetAnimationSet() const
 - const String GetAnimation() const
+- AnimationSet2D* GetAnimationSet() const
+- LoopMode2D GetLoopMode() const
 
 Properties:
 
@@ -102,8 +104,9 @@ Properties:
 - bool flipY
 - Color& color
 - float speed
-- AnimationSet2D* animationSet
 - String animation
+- AnimationSet2D* animationSet
+- LoopMode2D loopMode
 
 ### Animation : Resource
 
@@ -6338,6 +6341,12 @@ Properties:
 - int LOCK_HARDWARE
 - int LOCK_SHADOW
 - int LOCK_SCRATCH
+
+### LoopMode2D
+
+- int LM_DEFAULT
+- int LM_FORCE_LOOPED
+- int LM_FORCE_CLAMPED
 
 ### Orientation
 

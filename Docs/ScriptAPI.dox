@@ -650,6 +650,7 @@ namespace Urho3D
 - %Speed : float
 - %Animation %Set : ResourceRef
 - %Animation : String
+- %Loop %Mode : int
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
@@ -2131,7 +2132,8 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetAnimation(AnimationSet2D@, const String&)
+- void SetAnimation(AnimationSet2D@, const String&, LoopMode2D = LM_DEFAULT)
+- void SetAnimation(const String&, LoopMode2D = LM_DEFAULT)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
@@ -2162,6 +2164,7 @@ Properties:
 - int layer
 - uint lightMask
 - float lodBias
+- LoopMode2D loopMode
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -11795,6 +11798,13 @@ Properties:
 - LIGHT_DIRECTIONAL
 - LIGHT_SPOT
 - LIGHT_POINT
+
+
+### LoopMode2D
+
+- LM_DEFAULT
+- LM_FORCE_LOOPED
+- LM_FORCE_CLAMPED
 
 
 ### Orientation

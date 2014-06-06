@@ -190,7 +190,8 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAnimation(AnimationSet2D, const String&);
+void SetAnimation(AnimationSet2D, const String&, LoopMode2D = LM_DEFAULT);
+void SetAnimation(const String&, LoopMode2D = LM_DEFAULT);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
@@ -228,6 +229,7 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
+LoopMode2D loopMode;
 uint maxLights;
 /* readonly */
 Node node;
@@ -11515,6 +11517,13 @@ enum LightType
 LIGHT_DIRECTIONAL,
 LIGHT_SPOT,
 LIGHT_POINT,
+};
+
+enum LoopMode2D
+{
+LM_DEFAULT,
+LM_FORCE_LOOPED,
+LM_FORCE_CLAMPED,
 };
 
 enum Orientation
