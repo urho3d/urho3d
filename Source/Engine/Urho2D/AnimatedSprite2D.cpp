@@ -343,8 +343,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
         if (timeline.type_ == OT_SPRITE)
         {
             SharedPtr<Node> timelineNode(rootNode_->CreateChild(timeline.name_, LOCAL));
-            timelineNode->SetTemporary(true);
-            
+
             StaticSprite2D* staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetLayer(layer_);
             staticSprite->SetBlendMode(blendMode_);
