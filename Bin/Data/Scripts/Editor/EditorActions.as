@@ -792,13 +792,10 @@ class AssignMaterialAction : EditAction
     Array<String> oldMaterials;
     String newMaterialName;
 
-    void Define(StaticModel@ model_, Array<Material@> oldMaterials_, Material@ newMaterial_)
+    void Define(StaticModel@ model_, Array<String> oldMaterials_, Material@ newMaterial_)
     {
         model = model_;
-        for (uint i =0; i < oldMaterials_.length; ++i)
-        {
-            oldMaterials.Push(oldMaterials_[i].name);
-        }
+        oldMaterials = oldMaterials_;
         newMaterialName = newMaterial_.name;
     }
 

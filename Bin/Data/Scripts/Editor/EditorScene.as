@@ -993,11 +993,11 @@ void AssignMaterial(StaticModel@ model, String materialPath)
     if (material is null)
         return;
 
-    Array<Material@> oldMaterials;
-    for (uint i=0; i < model.numGeometries; ++i)
-    {
-        oldMaterials.Push(model.materials[i]);
-    }
+    ResourceRefList materials = model.GetAttribute("Material").GetResourceRefList();
+    Array<String> oldMaterials;
+    for(uint i = 0; i < materials.length; ++i)
+        oldMaterials.Push(materials.names[i]);
+
     model.material = material;
 
     AssignMaterialAction action;
