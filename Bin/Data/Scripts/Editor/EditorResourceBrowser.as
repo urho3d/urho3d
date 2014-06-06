@@ -214,7 +214,7 @@ void CreateResourceBrowserUI()
     }
     HideResourceFilterWindow();
 
-    int height = Min(ui.root.height * .25, 300);
+    int height = Min(ui.root.height / 4, 300);
     browserWindow.SetSize(900, height);
     browserWindow.SetPosition(35, ui.root.height - height - 25);
 
@@ -549,7 +549,7 @@ void PopulateResourceBrowserBySearch()
             if (find > -1)
             {
                 int fudge = query.length - file.fullname.length;
-                int score = find * Abs(fudge*2) + Abs(fudge);
+                int score = find * int(Abs(fudge*2)) + int(Abs(fudge));
                 file.sortScore = score;
                 scored.Push(file);
                 scores.Push(score);
