@@ -117,6 +117,9 @@ void CreateResourceBrowser()
 
 void RebuildResourceDatabase()
 {
+    if (browserWindow is null)
+        return;
+
     ScanResourceDirectories();
     PopulateBrowserDirectories();
     PopulateResourceBrowserFilesByDirectory(rootDir);
