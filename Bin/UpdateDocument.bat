@@ -1,12 +1,11 @@
 @echo off
-pushd %~dp0\..\Docs
+pushd "%~dp0..\Docs"
 echo Dumping AngelScript API...
-%~dp0\ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h
+"%~dp0ScriptCompiler" -dumpapi ScriptAPI.dox AngelScriptAPI.h
 if errorlevel 1 exit /B 1
 echo Dumping LuaScript API...
-set "out=%CD%\LuaScriptAPI.dox"
 pushd ..\Source\Engine\LuaScript\pkgs
-%~dp0\tolua++ -L ToDoxHook.lua -P -o %out% %~dp0\LuaPkgToDox.txt
+"%~dp0tolua++" -L ToDoxHook.lua -P -o "%~dp0..\Docs\LuaScriptAPI.dox" "%~dp0LuaPkgToDox.txt"
 if errorlevel 1 exit /B 1
 popd
 echo Converting Doxygen files to HTML...
