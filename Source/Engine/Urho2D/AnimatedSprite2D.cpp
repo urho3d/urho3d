@@ -328,7 +328,10 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
     currentTime_ = 0.0f;
 
     if (!rootNode_)
+    {
         rootNode_ = GetNode()->CreateChild("RootNode", LOCAL);
+        rootNode_->SetTemporary(true);
+    }
 
     timelineNodes_.Resize(animation_->GetNumTimelines());
     timelineTransformInfos_.Resize(animation_->GetNumTimelines());
@@ -340,6 +343,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
         if (timeline.type_ == OT_SPRITE)
         {
             SharedPtr<Node> timelineNode(rootNode_->CreateChild(timeline.name_, LOCAL));
+            timelineNode->SetTemporary(true);
             
             StaticSprite2D* staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetLayer(layer_);
