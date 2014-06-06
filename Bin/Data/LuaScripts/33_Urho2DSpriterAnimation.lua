@@ -140,7 +140,7 @@ end
 function HandleMouseButtonDown(eventType, eventData)
     local animatedSprite = spriteNode:GetComponent("AnimatedSprite2D")
     animationIndex = (animationIndex + 1) % 7
-    animatedSprite.animation = animationNames[animationIndex + 1]
+    animatedSprite:SetAnimation(animationNames[animationIndex + 1], LM_FORCE_LOOPED)
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

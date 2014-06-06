@@ -1,5 +1,12 @@
 $#include "AnimatedSprite2D.h"
 
+enum LoopMode2D
+{
+    LM_DEFAULT = 0,
+    LM_FORCE_LOOPED,
+    LM_FORCE_CLAMPED
+};
+
 class AnimatedSprite2D : Drawable
 {
     void SetLayer(int layer);
@@ -10,9 +17,10 @@ class AnimatedSprite2D : Drawable
     void SetFlipY(bool flipY);
     void SetColor(const Color& color);
     void SetSpeed(float speed);
-    void SetAnimation(const String name);
-    void SetAnimation(AnimationSet2D* animationSet, const String name);
+    void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT);
+    void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT);
     void SetAnimationSet(AnimationSet2D* animationSet);
+    void SetLoopMode(LoopMode2D loopMode);
 
     int GetLayer() const;
     int GetOrderInLayer() const;
@@ -21,8 +29,9 @@ class AnimatedSprite2D : Drawable
     bool GetFlipY() const;
     const Color& GetColor() const;
     float GetSpeed() const;
-    AnimationSet2D* GetAnimationSet() const;
     const String GetAnimation() const;
+    AnimationSet2D* GetAnimationSet() const;
+    LoopMode2D GetLoopMode() const;
 
     tolua_property__get_set int layer;
     tolua_property__get_set int orderInLayer;
@@ -31,6 +40,7 @@ class AnimatedSprite2D : Drawable
     tolua_property__get_set bool flipY;
     tolua_property__get_set Color& color;
     tolua_property__get_set float speed;
-    tolua_property__get_set AnimationSet2D* animationSet;
     tolua_property__get_set String animation;
+    tolua_property__get_set AnimationSet2D* animationSet;
+    tolua_property__get_set LoopMode2D loopMode;
 };

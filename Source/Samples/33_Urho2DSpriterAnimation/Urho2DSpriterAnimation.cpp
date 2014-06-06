@@ -189,5 +189,5 @@ void Urho2DSpriterAnimation::HandleMouseButtonDown(StringHash eventType, Variant
 {
     AnimatedSprite2D* animatedSprite = spriteNode_->GetComponent<AnimatedSprite2D>();
     animationIndex_ = (animationIndex_ + 1) % 7;
-    animatedSprite->SetAnimation(animationNames[animationIndex_]);
+    animatedSprite->SetAnimation(animationNames[animationIndex_], LM_FORCE_LOOPED);
 }

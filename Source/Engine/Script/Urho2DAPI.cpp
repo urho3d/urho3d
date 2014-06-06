@@ -142,6 +142,11 @@ static void RegisterAnimationSet2D(asIScriptEngine* engine)
 
 static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("LoopMode2D");
+    engine->RegisterEnumValue("LoopMode2D", "LM_DEFAULT", LM_DEFAULT);
+    engine->RegisterEnumValue("LoopMode2D", "LM_FORCE_LOOPED", LM_FORCE_LOOPED);
+    engine->RegisterEnumValue("LoopMode2D", "LM_FORCE_CLAMPED", LM_FORCE_CLAMPED);
+
     RegisterDrawable<AnimatedSprite2D>(engine, "AnimatedSprite2D");
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_layer(int)", asMETHOD(AnimatedSprite2D, SetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "int get_layer() const", asMETHOD(AnimatedSprite2D, GetLayer), asCALL_THISCALL);
@@ -158,11 +163,14 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedSprite2D", "const Color& get_color() const", asMETHOD(AnimatedSprite2D, GetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(AnimationSet2D@+, const String&)", asMETHODPR(AnimatedSprite2D, SetAnimation, (AnimationSet2D*, const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(AnimationSet2D@+, const String&, LoopMode2D loopMode=LM_DEFAULT)", asMETHODPR(AnimatedSprite2D, SetAnimation, (AnimationSet2D*, const String&, LoopMode2D), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(const String&, LoopMode2D loopMode=LM_DEFAULT)", asMETHODPR(AnimatedSprite2D, SetAnimation, (const String&, LoopMode2D), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animation(const String&)", asMETHODPR(AnimatedSprite2D, SetAnimationAttr, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "const String& get_animation() const", asMETHOD(AnimatedSprite2D, GetAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animationSet(AnimationSet2D@+)", asMETHOD(AnimatedSprite2D, SetAnimationSet), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "AnimationSet2D@+ get_animationSet() const", asMETHOD(AnimatedSprite2D, GetAnimationSet), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animation(const String&)", asMETHODPR(AnimatedSprite2D, SetAnimation, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "const String& get_animation() const", asMETHOD(AnimatedSprite2D, GetAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_loopMode(LoopMode2D)", asMETHOD(AnimatedSprite2D, SetLoopMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "LoopMode2D get_loopMode() const", asMETHOD(AnimatedSprite2D, GetLoopMode), asCALL_THISCALL);
 }
 
 static void RegisterParticleEffect2D(asIScriptEngine* engine)

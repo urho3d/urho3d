@@ -40,6 +40,19 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 extern const char* blendModeNames[];
 
+const char* loopModeNames[] = 
+{
+    "Default",
+    "ForceLooped",
+    "ForceClamped",
+    0
+};
+
+template<> LoopMode2D Variant::Get<LoopMode2D>() const
+{
+    return (LoopMode2D)GetInt();
+}
+
 AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     layer_(0),
@@ -49,6 +62,8 @@ AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     flipY_(false),
     color_(Color::WHITE),
     speed_(1.0f),
+    loopMode_(LM_DEFAULT),
+    looped_(false),
     currentTime_(0.0f)
 {
 }
@@ -68,7 +83,8 @@ void AnimatedSprite2D::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_COLOR, "Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_FLOAT, "Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_RESOURCEREF, "Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef, ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_STRING, "Animation", GetAnimation, SetAnimation, String, String::EMPTY, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, VAR_STRING, "Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(AnimatedSprite2D, "Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedSprite2D, Drawable);
 }
 
@@ -170,15 +186,19 @@ void AnimatedSprite2D::SetSpeed(float speed)
     MarkNetworkUpdate();
 }
 
-void AnimatedSprite2D::SetAnimation(AnimationSet2D* animationSet, const String& name)
+void AnimatedSprite2D::SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode)
 {
     animationSet_ = animationSet;
+
+    SetAnimation(name, loopMode);
+}
+
+void AnimatedSprite2D::SetAnimation(const String& name, LoopMode2D loopMode)
+{
     animationName_ = name;
-    
-    if (animationSet)
-        SetAnimation(animationSet->GetAnimation(name));
-    else
-        SetAnimation(0);
+
+    if (animationSet_)
+        SetAnimation(animationSet_->GetAnimation(animationName_), loopMode);
 }
 
 void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
@@ -188,18 +208,30 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 
     animationSet_ = animationSet;
 
-    if (animationSet_)
-        SetAnimation(animationSet_->GetAnimation(animationName_));
-    else
-        SetAnimation(0);
-
+    SetAnimation(animationName_, loopMode_);
 }
-void AnimatedSprite2D::SetAnimation(const String& name)
-{
-    animationName_ = name;
 
-    if (animationSet_)
-        SetAnimation(animationSet_->GetAnimation(animationName_));
+void AnimatedSprite2D::SetLoopMode(LoopMode2D loopMode)
+{
+    if (!animation_)
+        return;
+
+    loopMode_ = loopMode;
+
+    switch (loopMode_)
+    {
+    case LM_FORCE_LOOPED:
+        looped_ = true;
+        break;
+
+    case LM_FORCE_CLAMPED:
+        looped_ = false;
+        break;
+
+    default:
+        looped_ = animation_->IsLooped();
+        break;
+    }
 }
 
 AnimationSet2D* AnimatedSprite2D::GetAnimationSet() const
@@ -243,6 +275,14 @@ void AnimatedSprite2D::OnNodeSet(Node* node)
     }
 }
 
+void AnimatedSprite2D::SetAnimationAttr(const String& name)
+{
+    animationName_ = name;
+
+    if (animationSet_)
+        SetAnimation(animationSet_->GetAnimation(animationName_), loopMode_);
+}
+
 void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
 {
     boundingBox_.Clear();
@@ -260,23 +300,23 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
 }
 
-void AnimatedSprite2D::SetAnimation(Animation2D* animation)
+void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
 {
     if (animation == animation_)
     {
-        // Reset time
+        SetLoopMode(loopMode_);
+        
         currentTime_ = 0.0f;
+        UpdateAnimation(0.0f);
         return;
     }
 
     if (animation_)
     {
-        for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
-        {
-            if (timelineNodes_[i])
-                timelineNodes_[i]->Remove();
-        }
+        if (rootNode_)
+            rootNode_->Remove();
 
+        rootNode_ = 0;
         timelineNodes_.Clear();
     }
 
@@ -313,6 +353,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation)
         timelineTransformInfos_[i].parent_ = timeline.parent_;
     }
 
+    SetLoopMode(loopMode);
     UpdateAnimation(0.0f);
 
     MarkNetworkUpdate();
@@ -328,7 +369,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     float time;
     float animtationLength = animation_->GetLength();
 
-    if (animation_->IsLooped())
+    if (looped_)
     {
         time = fmodf(currentTime_, animtationLength);
         if (time < 0.0f)
@@ -343,31 +384,48 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
         const Timeline2D& timeline = animation_->GetTimeline(i);
         
         const Vector<TimelineKey2D>& objectKeys = timeline.timelineKeys_;
+        unsigned index = objectKeys.Size() - 1;
         for (unsigned j = 0; j < objectKeys.Size() - 1; ++j)
         {
             if (time <= objectKeys[j + 1].time_)
             {
-                const TimelineKey2D& currKey = objectKeys[j];
-                const TimelineKey2D& nextKey = objectKeys[j + 1];
-                float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
-
-                timelineTransformInfos_[i].worldSpace_ = false;
-                timelineTransformInfos_[i].transform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
-
-                // Update sprite's sprite and hot spot and color
-                Node* timelineNode = timelineNodes_[i];
-                if (timelineNode)
-                {
-                    StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-                    staticSprite->SetSprite(currKey.sprite_);
-                    staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
-                    float alpha = Lerp(currKey.alpha_, nextKey.alpha_, t);
-                    staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * alpha));
-                }
-
+                index = j;
                 break;
             }
         }
+
+        const TimelineKey2D& currKey = objectKeys[index];
+        if (index < objectKeys.Size() - 1)
+        {   
+            const TimelineKey2D& nextKey = objectKeys[index + 1];
+            float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
+            timelineTransformInfos_[i].worldSpace_ = false;
+            timelineTransformInfos_[i].transform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
+            // Update sprite's sprite and hot spot and color
+            Node* timelineNode = timelineNodes_[i];
+            if (timelineNode)
+            {
+                StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
+                staticSprite->SetSprite(currKey.sprite_);
+                staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
+                float alpha = Lerp(currKey.alpha_, nextKey.alpha_, t);
+                staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * alpha));
+            }
+        }
+        else
+        {
+            timelineTransformInfos_[i].worldSpace_ = false;
+            timelineTransformInfos_[i].transform_ = currKey.transform_;
+            // Update sprite's sprite and hot spot and color
+            Node* timelineNode = timelineNodes_[i];
+            if (timelineNode)
+            {
+                StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
+                staticSprite->SetSprite(currKey.sprite_);
+                staticSprite->SetHotSpot(currKey.hotSpot_);
+                staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * currKey.alpha_));
+            }
+        }        
     }
 
     // Calculate timeline world transform.

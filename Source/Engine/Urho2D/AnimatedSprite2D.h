@@ -25,6 +25,17 @@
 #include "Animation2D.h"
 #include "Drawable.h"
 
+/// Loop mode.
+enum LoopMode2D
+{
+    /// Default, use animation's value.
+    LM_DEFAULT = 0,
+    /// Force looped.
+    LM_FORCE_LOOPED,
+    /// Force clamped.
+    LM_FORCE_CLAMPED
+};
+
 namespace Urho3D
 {
 
@@ -62,12 +73,14 @@ public:
     void SetColor(const Color& color);
     /// Set speed.
     void SetSpeed(float speed);
-    /// Set animation by animation set and name.
-    void SetAnimation(AnimationSet2D* animationSet, const String& name);
+    /// Set animation by animation set, name and loop mode.
+    void SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode = LM_DEFAULT);
+    /// Set animation by name and loop mode.
+    void SetAnimation(const String& name, LoopMode2D loopMode = LM_DEFAULT);
     /// Set animation set.
     void SetAnimationSet(AnimationSet2D* animationSet);
-    /// Set animation by name.
-    void SetAnimation(const String& name);
+    /// Set loop mode.
+    void SetLoopMode(LoopMode2D loopMode);
 
     /// Return layer.
     int GetLayer() const { return layer_; }
@@ -83,10 +96,12 @@ public:
     const Color& GetColor() const { return color_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
-    /// Return animation.
-    AnimationSet2D* GetAnimationSet() const;
     /// Return animation name.
     const String& GetAnimation() const { return animationName_; }
+    /// Return animation.
+    AnimationSet2D* GetAnimationSet() const;
+    /// Return loop mode.
+    LoopMode2D GetLoopMode() const { return loopMode_; }
     /// Return root node.
     Node* GetRootNode() const;
 
@@ -94,6 +109,8 @@ public:
     void SetAnimationSetAttr(ResourceRef value);
     /// Return animation set attribute.
     ResourceRef GetAnimationSetAttr() const;
+    /// Set anmiation by name.
+    void SetAnimationAttr(const String& name);
 
 protected:
     /// Handle node being assigned.
@@ -101,7 +118,7 @@ protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Set animation.
-    void SetAnimation(Animation2D* animation);
+    void SetAnimation(Animation2D* animation, LoopMode2D loopMode);
     /// Update animation.
     void UpdateAnimation(float timeStep);
     /// Calculate timeline world world transform.
@@ -129,6 +146,10 @@ protected:
     String animationName_;
     /// Animation.
     SharedPtr<Animation2D> animation_;
+    /// Loop mode.
+    LoopMode2D loopMode_;
+    /// Looped.
+    bool looped_;
     /// Current time.
     float currentTime_;
     /// Root node.

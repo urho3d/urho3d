@@ -146,7 +146,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     AnimatedSprite2D@ animatedSprite = spriteNode.GetComponent("AnimatedSprite2D");
     animationIndex = (animationIndex + 1) % 7;
-    animatedSprite.animation = animationNames[animationIndex];
+    animatedSprite.SetAnimation(animationNames[animationIndex], LM_FORCE_LOOPED);
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app
