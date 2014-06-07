@@ -44,7 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_VECTOR2D_H_INC
 #define AI_VECTOR2D_H_INC
 
-#include <math.h>
+#ifdef __cplusplus
+#   include <cmath>
+#else
+#   include <math.h>
+#endif
 
 #include "./Compiler/pushpack1.h"
 
@@ -82,6 +86,8 @@ public:
 
 	bool operator== (const aiVector2t& other) const;
 	bool operator!= (const aiVector2t& other) const;
+
+	bool Equal(const aiVector2t& other, TReal epsilon = 1e-6) const;
 
 	aiVector2t& operator= (TReal f);
 	const aiVector2t SymMul(const aiVector2t& o);

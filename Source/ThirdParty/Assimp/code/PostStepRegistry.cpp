@@ -133,6 +133,15 @@ void GetPostProcessingStepInstanceList(std::vector< BaseProcess* >& out)
 	// validated - as RegisterPPStep() does - all dependencies must be given.
 	// ----------------------------------------------------------------------------
 	out.reserve(25);
+#if (!defined ASSIMP_BUILD_NO_MAKELEFTHANDED_PROCESS)
+	out.push_back( new MakeLeftHandedProcess());
+#endif
+#if (!defined ASSIMP_BUILD_NO_FLIPUVS_PROCESS)
+	out.push_back( new FlipUVsProcess());
+#endif
+#if (!defined ASSIMP_BUILD_NO_FLIPWINDINGORDER_PROCESS)
+	out.push_back( new FlipWindingOrderProcess());
+#endif
 #if (!defined ASSIMP_BUILD_NO_REMOVEVC_PROCESS)
 	out.push_back( new RemoveVCProcess());
 #endif
@@ -144,9 +153,6 @@ void GetPostProcessingStepInstanceList(std::vector< BaseProcess* >& out)
 #endif
 #if (!defined ASSIMP_BUILD_NO_OPTIMIZEGRAPH_PROCESS)
 	out.push_back( new OptimizeGraphProcess());
-#endif
-#if (!defined ASSIMP_BUILD_NO_OPTIMIZEMESHES_PROCESS)
-	out.push_back( new OptimizeMeshesProcess());
 #endif
 #if (!defined ASSIMP_BUILD_NO_FINDDEGENERATES_PROCESS)
 	out.push_back( new FindDegeneratesProcess());
@@ -168,6 +174,9 @@ void GetPostProcessingStepInstanceList(std::vector< BaseProcess* >& out)
 #endif
 #if (!defined ASSIMP_BUILD_NO_FINDINVALIDDATA_PROCESS)
 	out.push_back( new FindInvalidDataProcess());
+#endif
+#if (!defined ASSIMP_BUILD_NO_OPTIMIZEMESHES_PROCESS)
+	out.push_back( new OptimizeMeshesProcess());
 #endif
 #if (!defined ASSIMP_BUILD_NO_FIXINFACINGNORMALS_PROCESS)
 	out.push_back( new FixInfacingNormalsProcess());
@@ -206,15 +215,6 @@ void GetPostProcessingStepInstanceList(std::vector< BaseProcess* >& out)
 
 #if (!defined ASSIMP_BUILD_NO_SPLITLARGEMESHES_PROCESS)
 	out.push_back( new SplitLargeMeshesProcess_Vertex());
-#endif
-#if (!defined ASSIMP_BUILD_NO_MAKELEFTHANDED_PROCESS)
-	out.push_back( new MakeLeftHandedProcess());
-#endif
-#if (!defined ASSIMP_BUILD_NO_FLIPUVS_PROCESS)
-	out.push_back( new FlipUVsProcess());
-#endif
-#if (!defined ASSIMP_BUILD_NO_FLIPWINDINGORDER_PROCESS)
-	out.push_back( new FlipWindingOrderProcess());
 #endif
 #if (!defined ASSIMP_BUILD_NO_DEBONE_PROCESS)
 	out.push_back( new DeboneProcess());
