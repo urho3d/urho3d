@@ -931,7 +931,7 @@ Vector3 Node::LocalToWorld(const Vector4& vector) const
     return GetWorldTransform() * vector;
 }
 
-Vector2 Node::LocalToWorld(const Vector2& vector) const
+Vector2 Node::LocalToWorld2D(const Vector2& vector) const
 {
     Vector3 result = LocalToWorld(Vector3(vector));
     return Vector2(result.x_, result.y_);
@@ -947,7 +947,7 @@ Vector3 Node::WorldToLocal(const Vector4& vector) const
     return GetWorldTransform().Inverse() * vector;
 }
 
-Vector2 Node::WorldToLocal(const Vector2& vector) const
+Vector2 Node::WorldToLocal2D(const Vector2& vector) const
 {
     Vector3 result = WorldToLocal(Vector3(vector));
     return Vector2(result.x_, result.y_);
