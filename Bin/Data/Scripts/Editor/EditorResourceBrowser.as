@@ -17,7 +17,8 @@ int browserSearchSortMode = 0;
 BrowserDir@ rootDir;
 Array<BrowserFile@> browserFiles;
 Dictionary browserDirs;
-Array<int> activeResourceFilters;
+Array<int> activeResourceTypeFilters;
+Array<int> activeResourceDirFilters;
 
 Array<BrowserFile@> browserFilesToScan;
 const uint BROWSER_WORKER_ITEMS_PER_TICK = 10;
@@ -95,6 +96,7 @@ const ShortStringHash EXTENSION_TYPE_HTML(".html");
 const ShortStringHash TEXT_VAR_FILE_ID("browser_file_id");
 const ShortStringHash TEXT_VAR_DIR_ID("browser_dir_id");
 const ShortStringHash TEXT_VAR_RESOURCE_TYPE("resource_type");
+const ShortStringHash TEXT_VAR_RESOURCE_DIR_ID("resource_dir_id");
 
 const int BROWSER_FILE_SOURCE_RESOURCE_DIR = 1;
 
@@ -105,6 +107,7 @@ BrowserFile@ selectedBrowserFile;
 Text@ browserStatusMessage;
 Text@ browserResultsMessage;
 bool ignoreRefreshBrowserResults = false;
+String resourceDirsCache;
 
 void CreateResourceBrowser()
 {
@@ -120,7 +123,13 @@ void RebuildResourceDatabase()
     if (browserWindow is null)
         return;
 
+    String newResourceDirsCache = Join(cache.resourceDirs, ';');
     ScanResourceDirectories();
+    if (newResourceDirsCache != resourceDirsCache)
+    {
+        resourceDirsCache = newResourceDirsCache;
+        PopulateResourceDirFilters();
+    }
     PopulateBrowserDirectories();
     PopulateResourceBrowserFilesByDirectory(rootDir);
 }
@@ -180,41 +189,7 @@ void CreateResourceBrowserUI()
     browserWindow.opacity = uiMaxOpacity;
 
     browserFilterWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorResourceFilterWindow.xml"));
-    {
-        UIElement@ options = browserFilterWindow.GetChild("Options", true);
-        CheckBox@ toggleAll = browserFilterWindow.GetChild("ToggleAll", true);
-        SubscribeToEvent(toggleAll, "Toggled", "HandleResourceFilterToggleAllToggled");
-        SubscribeToEvent(browserFilterWindow.GetChild("CloseButton", true), "Released", "HideResourceFilterWindow");
-
-        UIElement@ col1 = browserFilterWindow.GetChild("FilterColumn1", true);
-        UIElement@ col2 = browserFilterWindow.GetChild("FilterColumn2", true);
-        for (int i=-2; i < 21; ++i)
-        {
-            if (i == RESOURCE_TYPE_NOTSET)
-                continue;
-
-            UIElement@ resourceTypeHolder = UIElement();
-            if (i < 10)
-                col1.AddChild(resourceTypeHolder);
-            else
-                col2.AddChild(resourceTypeHolder);
-            resourceTypeHolder.layoutMode = LM_HORIZONTAL;
-            resourceTypeHolder.layoutSpacing = 4;
-
-            Text@ label = Text();
-            label.style = "FileSelectorListText";
-            label.text = ResourceTypeName(i);
-            CheckBox@ checkbox = CheckBox();
-            checkbox.name = i;
-            checkbox.SetStyleAuto();
-            checkbox.vars[TEXT_VAR_RESOURCE_TYPE] = i;
-            checkbox.checked = true;
-            SubscribeToEvent(checkbox, "Toggled", "HandleResourceFilterToggled");
-
-            resourceTypeHolder.AddChild(checkbox);
-            resourceTypeHolder.AddChild(label);
-        }
-    }
+    CreateResourceFilterUI();
     HideResourceFilterWindow();
 
     int height = Min(ui.root.height / 4, 300);
@@ -233,6 +208,45 @@ void CreateResourceBrowserUI()
     SubscribeToEvent(browserFileList, "ItemClicked", "HandleBrowserFileClick");
     SubscribeToEvent(browserFileList, "SelectionChanged", "HandleResourceBrowserFileListSelectionChange");
     SubscribeToEvent(cache, "FileChanged", "HandleFileChanged");
+}
+
+void CreateResourceFilterUI()
+{
+    UIElement@ options = browserFilterWindow.GetChild("TypeOptions", true);
+    CheckBox@ toggleAllTypes = browserFilterWindow.GetChild("ToggleAllTypes", true);
+    CheckBox@ toggleAllResourceDirs = browserFilterWindow.GetChild("ToggleAllResourceDirs", true);
+    SubscribeToEvent(toggleAllTypes, "Toggled", "HandleResourceTypeFilterToggleAllTypesToggled");
+    SubscribeToEvent(toggleAllResourceDirs, "Toggled", "HandleResourceDirFilterToggleAllTypesToggled");
+    SubscribeToEvent(browserFilterWindow.GetChild("CloseButton", true), "Released", "HideResourceFilterWindow");
+
+    UIElement@ col1 = browserFilterWindow.GetChild("TypeFilterColumn1", true);
+    UIElement@ col2 = browserFilterWindow.GetChild("TypeFilterColumn2", true);
+    for (int i=-2; i < 21; ++i)
+    {
+        if (i == RESOURCE_TYPE_NOTSET)
+            continue;
+
+        UIElement@ resourceTypeHolder = UIElement();
+        if (i < 10)
+            col1.AddChild(resourceTypeHolder);
+        else
+            col2.AddChild(resourceTypeHolder);
+        resourceTypeHolder.layoutMode = LM_HORIZONTAL;
+        resourceTypeHolder.layoutSpacing = 4;
+
+        Text@ label = Text();
+        label.style = "EditorAttributeText";
+        label.text = ResourceTypeName(i);
+        CheckBox@ checkbox = CheckBox();
+        checkbox.name = i;
+        checkbox.SetStyleAuto();
+        checkbox.vars[TEXT_VAR_RESOURCE_TYPE] = i;
+        checkbox.checked = true;
+        SubscribeToEvent(checkbox, "Toggled", "HandleResourceTypeFilterToggled");
+
+        resourceTypeHolder.AddChild(checkbox);
+        resourceTypeHolder.AddChild(label);
+    }
 }
 
 void CreateDirList(BrowserDir@ dir, UIElement@ parentUI = null)
@@ -502,6 +516,35 @@ void ShowResourceFilterWindow()
     browserFilterWindow.BringToFront();
 }
 
+void PopulateResourceDirFilters()
+{
+    UIElement@ resourceDirs = browserFilterWindow.GetChild("DirFilters", true);
+    resourceDirs.RemoveAllChildren();
+    activeResourceDirFilters.Clear();
+    for (int i=0; i < cache.resourceDirs.length; ++i)
+    {
+        UIElement@ resourceDirHolder = UIElement();
+        resourceDirs.AddChild(resourceDirHolder);
+        resourceDirHolder.layoutMode = LM_HORIZONTAL;
+        resourceDirHolder.layoutSpacing = 4;
+        resourceDirHolder.SetFixedHeight(16);
+
+        Text@ label = Text();
+        label.style = "EditorAttributeText";
+        label.text = cache.resourceDirs[i].Replaced(fileSystem.programDir, "");
+        CheckBox@ checkbox = CheckBox();
+        checkbox.name = i;
+        checkbox.SetStyleAuto();
+        checkbox.vars[TEXT_VAR_RESOURCE_DIR_ID] = i;
+        checkbox.checked = true;
+        SubscribeToEvent(checkbox, "Toggled", "HandleResourceDirFilterToggled");
+
+        resourceDirHolder.AddChild(checkbox);
+        resourceDirHolder.AddChild(label);
+    }
+
+}
+
 void PopulateBrowserDirectories()
 {
     browserDirList.RemoveAllItems();
@@ -519,8 +562,10 @@ void PopulateResourceBrowserFilesByDirectory(BrowserDir@ dir)
     for(uint x=0; x < dir.files.length; x++)
     {
         BrowserFile@ file = dir.files[x];
-        int find = activeResourceFilters.Find(file.resourceType);
-        if (find == -1)
+        if (activeResourceDirFilters.Find(file.resourceSourceIndex) > -1)
+            continue;
+
+        if (activeResourceTypeFilters.Find(file.resourceType) == -1)
             files.Push(file);
     }
 
@@ -545,7 +590,10 @@ void PopulateResourceBrowserBySearch()
         {
             @file = browserFiles[x];
             file.sortScore = -1;
-            if (activeResourceFilters.Find(file.resourceType) > -1)
+            if (activeResourceTypeFilters.Find(file.resourceType) > -1)
+                continue;
+
+            if (activeResourceDirFilters.Find(file.resourceSourceIndex) > -1)
                 continue;
 
             int find = file.fullname.Find(query, 0, false);
@@ -603,10 +651,10 @@ void RefreshBrowserResults()
     }
 }
 
-void HandleResourceFilterToggleAllToggled(StringHash eventType, VariantMap& eventData)
+void HandleResourceTypeFilterToggleAllTypesToggled(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ checkbox = eventData["Element"].GetPtr();
-    UIElement@ filterHolder = browserFilterWindow.GetChild("Filters", true);
+    UIElement@ filterHolder = browserFilterWindow.GetChild("TypeFilters", true);
     Array<UIElement@> children = filterHolder.GetChildren(true);
 
     ignoreRefreshBrowserResults = true;
@@ -620,24 +668,58 @@ void HandleResourceFilterToggleAllToggled(StringHash eventType, VariantMap& even
     RefreshBrowserResults();
 }
 
-void HandleResourceFilterToggled(StringHash eventType, VariantMap& eventData)
+void HandleResourceTypeFilterToggled(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ checkbox = eventData["Element"].GetPtr();
     if (!checkbox.vars.Contains(TEXT_VAR_RESOURCE_TYPE))
         return;
 
     int resourceType = checkbox.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
-    int find = activeResourceFilters.Find(resourceType);
+    int find = activeResourceTypeFilters.Find(resourceType);
 
     if (checkbox.checked && find != -1)
-        activeResourceFilters.Erase(find);
+        activeResourceTypeFilters.Erase(find);
     else if (!checkbox.checked && find == -1)
-        activeResourceFilters.Push(resourceType);
+        activeResourceTypeFilters.Push(resourceType);
 
     if (ignoreRefreshBrowserResults == false)
         RefreshBrowserResults();
 }
 
+void HandleResourceDirFilterToggleAllTypesToggled(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ checkbox = eventData["Element"].GetPtr();
+    UIElement@ filterHolder = browserFilterWindow.GetChild("DirFilters", true);
+    Array<UIElement@> children = filterHolder.GetChildren(true);
+
+    ignoreRefreshBrowserResults = true;
+    for(uint i=0; i < children.length; ++i)
+    {
+        CheckBox@ filter = children[i];
+        if (filter !is null)
+            filter.checked = checkbox.checked;
+    }
+    ignoreRefreshBrowserResults = false;
+    RefreshBrowserResults();
+}
+
+void HandleResourceDirFilterToggled(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ checkbox = eventData["Element"].GetPtr();
+    if (!checkbox.vars.Contains(TEXT_VAR_RESOURCE_DIR_ID))
+        return;
+
+    int resourceDir = checkbox.GetVar(TEXT_VAR_RESOURCE_DIR_ID).GetInt();
+    int find = activeResourceDirFilters.Find(resourceDir);
+
+    if (checkbox.checked && find != -1)
+        activeResourceDirFilters.Erase(find);
+    else if (!checkbox.checked && find == -1)
+        activeResourceDirFilters.Push(resourceDir);
+
+    if (ignoreRefreshBrowserResults == false)
+        RefreshBrowserResults();
+}
 
 void HandleRescanResourceBrowserClick(StringHash eventType, VariantMap& eventData)
 {
