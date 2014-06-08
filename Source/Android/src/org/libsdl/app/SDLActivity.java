@@ -516,7 +516,11 @@ public class SDLActivity extends Activity {
             
     // Joystick glue code, just a series of stubs that redirect to the SDLJoystickHandler instance
     public static boolean handleJoystickMotionEvent(MotionEvent event) {
-        return mJoystickHandler.handleMotionEvent(event);
+        if (mJoystickHandler != null) {
+            return mJoystickHandler.handleMotionEvent(event);
+        } else {
+            return false;
+        }
     }
     
     public static void pollInputDevices() {
