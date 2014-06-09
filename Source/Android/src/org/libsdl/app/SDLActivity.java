@@ -513,14 +513,15 @@ public class SDLActivity extends Activity {
         }
         return Arrays.copyOf(filtered, used);
     }
-            
+
+    // Urho3D: add handler null check
     // Joystick glue code, just a series of stubs that redirect to the SDLJoystickHandler instance
     public static boolean handleJoystickMotionEvent(MotionEvent event) {
-        return mJoystickHandler.handleMotionEvent(event);
+        return mJoystickHandler != null && mJoystickHandler.handleMotionEvent(event); 
     }
     
     public static void pollInputDevices() {
-        if (SDLActivity.mSDLThread != null) {
+        if (SDLActivity.mSDLThread != null && mJoystickHandler != null) {
             mJoystickHandler.pollInputDevices();
         }
     }
