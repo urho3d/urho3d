@@ -136,7 +136,8 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
             cache.RemoveResourceDir(sceneResourcePath);
     }
 
-    cache.AddResourceDir(newPath);
+    // Add resource path as first priority so that it takes precedence over the default data paths
+    cache.AddResourceDir(newPath, 0);
     RebuildResourceDatabase();
 
     if (!additive)
