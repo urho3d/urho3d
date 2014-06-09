@@ -128,23 +128,18 @@ void Texture3D::OnDeviceLost()
 
 void Texture3D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_)
+    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
     {
-        // If has a file name, reload through the resource cache. Otherwise just recreate.
-        if (!GetName().Trimmed().Empty())
-            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
+        // If has a resource file, reload through the resource cache. Otherwise just recreate.
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        if (cache->Exists(GetName()))
+            dataLost_ = !cache->ReloadResource(this);
         else
         {
-            Create();
+            if (!object_)
+                Create();
             dataLost_ = true;
         }
-    }
-    else if (dataPending_)
-    {
-        if (!GetName().Trimmed().Empty())
-            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
-        else
-            dataLost_ = true;
     }
     
     dataPending_ = false;
