@@ -120,6 +120,7 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
 {
     LineEdit@ attrEdit = LineEdit();
     parent.AddChild(attrEdit);
+    attrEdit.dragDropMode = DD_TARGET;
     attrEdit.style = "EditorAttributeEdit";
     attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
     attrEdit.vars["Index"] = index;
@@ -883,8 +884,8 @@ void InitResourcePicker()
     Array<String> soundFilters = {"*.wav","*.ogg"};
     Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.tga", "*.ktx", "*.pvr"};
     Array<String> materialFilters = {"*.xml", "*.material"};
+    Array<String> anmSetFilters = {"*.scml"};
     Array<String> pexFilters = {"*.pex"};
-    Array<String> anmFilters = {"*.anm"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani", ACTION_PICK | ACTION_TEST));
     resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
@@ -898,7 +899,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
-    resourcePickers.Push(ResourcePicker("Animation2D", anmFilters, ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("AnimationSet2D", anmSetFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("ParticleEffect2D", pexFilters, ACTION_PICK | ACTION_OPEN));
 }
 
@@ -1063,6 +1064,11 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
     if (fileName.empty)
         return;
 
+    OpenResource(fileName);
+}
+
+void OpenResource(String fileName)
+{
     Array<String>@ resourceDirs = cache.resourceDirs;
     for (uint i = 0; i < resourceDirs.length; ++i)
     {

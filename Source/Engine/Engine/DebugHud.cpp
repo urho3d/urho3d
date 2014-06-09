@@ -97,6 +97,16 @@ void DebugHud::Update()
     if (!renderer || !graphics)
         return;
 
+    // Ensure UI-elements are not detached
+    if (!statsText_->GetParent())
+    {
+        UI* ui = GetSubsystem<UI>();
+        UIElement* uiRoot = ui->GetRoot();
+        uiRoot->AddChild(statsText_);
+        uiRoot->AddChild(modeText_);
+        uiRoot->AddChild(profilerText_);
+    }
+
     if (statsText_->IsVisible())
     {
         unsigned primitives, batches;

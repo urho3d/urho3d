@@ -33,7 +33,8 @@ namespace Urho3D
 
 Sprite2D::Sprite2D(Context* context) :
     Resource(context), 
-    hotSpot_(0.5f, 0.5f)
+    hotSpot_(0.5f, 0.5f),
+    offset_(0, 0)
 {
 
 }
@@ -51,14 +52,14 @@ void Sprite2D::RegisterObject(Context* context)
 bool Sprite2D::Load(Deserializer& source)
 {
     SharedPtr<Texture2D> texture(new Texture2D(context_));
+    texture->SetName(GetName());
     if (!texture->Load(source))
         return false;
 
-    texture->SetName(GetName());
     SetTexture(texture);
 
-    if (texture)
-        SetRectangle(IntRect(0, 0, texture->GetWidth(), texture->GetHeight()));
+    if (texture_)
+        SetRectangle(IntRect(0, 0, texture_->GetWidth(), texture_->GetHeight()));
 
     return true;
 }
@@ -76,6 +77,11 @@ void Sprite2D::SetRectangle(const IntRect& rectangle)
 void Sprite2D::SetHotSpot(const Vector2& hotSpot)
 {
     hotSpot_ = hotSpot;
+}
+
+void Sprite2D::SetOffset(const IntVector2& offset)
+{
+    offset_ = offset;
 }
 
 void Sprite2D::SetSpriteSheet(SpriteSheet2D* spriteSheet)

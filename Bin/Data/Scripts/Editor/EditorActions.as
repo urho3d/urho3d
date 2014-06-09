@@ -121,7 +121,7 @@ class ReparentNodeAction : EditAction
     {
         multiple = true;
         newParentID = newParent.id;
-        for(uint i = 0; i < nodes.length; i++)
+        for(uint i = 0; i < nodes.length; ++i)
         {
             Node@ node = nodes[i];
             nodeList.Push(node.id);
@@ -784,4 +784,80 @@ class EditMaterialAction : EditAction
             RefreshMaterialEditor();
         }
     }
+}
+
+class AssignMaterialAction : EditAction
+{
+    WeakHandle model;
+    Array<String> oldMaterials;
+    String newMaterialName;
+
+    void Define(StaticModel@ model_, Array<String> oldMaterials_, Material@ newMaterial_)
+    {
+        model = model_;
+        oldMaterials = oldMaterials_;
+        newMaterialName = newMaterial_.name;
+    }
+
+    void Undo()
+    {
+        StaticModel@ staticModel = model.Get();
+        if (staticModel is null)
+            return;
+
+        for(uint i=0; i<oldMaterials.length; ++i)
+        {
+            Material@ material = cache.GetResource("Material", oldMaterials[i]);
+            staticModel.materials[i] = material;
+        }
+    }
+
+    void Redo()
+    {
+        StaticModel@ staticModel = model.Get();
+        if (staticModel is null)
+            return;
+
+        Material@ material = cache.GetResource("Material", newMaterialName);
+        staticModel.material = material;
+    }
+}
+
+class AssignModelAction : EditAction
+{
+    WeakHandle staticModel;
+    String oldModel;
+    String newModel;
+
+    void Define(StaticModel@ staticModel_, Model@ oldModel_, Model@ newModel_)
+    {
+        staticModel = staticModel_;
+        oldModel = oldModel_.name;
+        newModel = newModel_.name;
+    }
+
+    void Undo()
+    {
+        StaticModel@ staticModel_ = staticModel.Get();
+        if (staticModel_ is null)
+            return;
+
+        Model@ model = cache.GetResource("Model", oldModel);
+        if (model is null)
+            return;
+        staticModel_.model = model;
+    }
+
+    void Redo()
+    {
+        StaticModel@ staticModel_ = staticModel.Get();
+        if (staticModel_ is null)
+            return;
+
+        Model@ model = cache.GetResource("Model", newModel);
+        if (model is null)
+            return;
+        staticModel_.model = model;
+    }
+
 }

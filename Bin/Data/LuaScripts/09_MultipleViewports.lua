@@ -5,12 +5,7 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
 local rearCameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
 
 function Start()
     -- Execute the common startup for samples
@@ -36,7 +31,7 @@ function CreateScene()
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("DebugRenderer")
-    
+
     -- Create scene node & StaticModel component for showing a static plane
     local planeNode = scene_:CreateChild("Plane")
     planeNode.scale = Vector3(100.0, 1.0, 100.0)
@@ -136,18 +131,18 @@ function SetupViewports()
     -- Set up the front camera viewport
     local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
-    
+
     -- Clone the default render path so that we do not interfere with the other viewport, then add
     -- bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
     -- for example with the effect name to allow easy toggling on and off. We start with the effects
     -- disabled.
     local effectRenderPath = viewport:GetRenderPath():Clone()
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/Bloom.xml"))
-    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/EdgeFilter.xml"))
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/FXAA2.xml"))
     -- Make the bloom mixing parameter more pronounced
     effectRenderPath:SetShaderParameter("BloomMix", Variant(Vector2(0.9, 0.6)))
     effectRenderPath:SetEnabled("Bloom", false)
-    effectRenderPath:SetEnabled("EdgeFilter", false)
+    effectRenderPath:SetEnabled("FXAA2", false)
     viewport:SetRenderPath(effectRenderPath)
 
     -- Set up the rear camera viewport on top of the front view ("rear view mirror")
@@ -206,7 +201,7 @@ function MoveCamera(timeStep)
         effectRenderPath:ToggleEnabled("Bloom")
     end
     if input:GetKeyPress(KEY_F) then
-        effectRenderPath:ToggleEnabled("EdgeFilter")
+        effectRenderPath:ToggleEnabled("FXAA2")
     end
 
     -- Toggle debug geometry with space
@@ -228,4 +223,51 @@ function HandlePostRenderUpdate(eventType, eventData)
     if drawDebug then
         renderer:DrawDebugGeometry(false)
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element\">" ..
+        "        <element type=\"Button\">" ..
+        "            <attribute name=\"Name\" value=\"Button3\" />" ..
+        "            <attribute name=\"Position\" value=\"-120 -120\" />" ..
+        "            <attribute name=\"Size\" value=\"96 96\" />" ..
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" ..
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" ..
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" ..
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" ..
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" ..
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"Label\" />" ..
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" ..
+        "                <attribute name=\"Text\" value=\"FXAA\" />" ..
+        "            </element>" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "                <attribute name=\"Text\" value=\"F\" />" ..
+        "            </element>" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Bloom</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"B\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

@@ -106,3 +106,11 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move sprites, scale movement with time step
     MoveSprites(timeStep);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" +
+        "        <attribute name=\"Is Visible\" value=\"false\" />" +
+        "    </add>" +
+        "</patch>";

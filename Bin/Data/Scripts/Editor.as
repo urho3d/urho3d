@@ -13,10 +13,9 @@
 #include "Scripts/Editor/EditorSecondaryToolbar.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
+#include "Scripts/Editor/EditorResourceBrowser.as"
 #include "Scripts/Editor/EditorSpawn.as"
 
-
-String configPath;
 String configFileName;
 
 bool instancingSetting = true;
@@ -25,12 +24,7 @@ int shadowQualitySetting = 2;
 void Start()
 {
     // Assign the value ASAP because configFileName is needed on exit, including exit on error
-    if (GetPlatform() == "Windows")
-        configPath = "Urho3D/Editor/";
-    else
-        // Unix-like platforms usually hide application configuration file
-        configPath = ".Urho3D/Editor/";
-    configFileName = fileSystem.userDocumentsDir + configPath + "Config.xml";
+    configFileName = fileSystem.GetAppPreferencesDir("urho3d", "Editor") + "Config.xml";
 
     if (engine.headless)
     {
@@ -98,6 +92,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
+    DoResourceBrowserWork();
     UpdateView(timeStep);
     UpdateViewports(timeStep);
     UpdateStats(timeStep);
@@ -236,8 +231,6 @@ void LoadConfig()
 
 void SaveConfig()
 {
-    CreateDir(configPath);
-
     XMLFile config;
     XMLElement configElem = config.CreateRoot("configuration");
     XMLElement cameraElem = configElem.CreateChild("camera");
@@ -318,15 +311,4 @@ void SaveConfig()
     consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
     config.Save(File(configFileName, FILE_WRITE));
-}
-
-void CreateDir(const String&in pathName, const String&in baseDir = fileSystem.userDocumentsDir)
-{
-    Array<String> dirs = pathName.Split('/');
-    String subdir = baseDir;
-    for (uint i = 0; i < dirs.length; ++i)
-    {
-        subdir += dirs[i] + "/";
-        fileSystem.CreateDir(subdir);
-    }
 }

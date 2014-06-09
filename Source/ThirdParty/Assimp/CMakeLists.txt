@@ -157,6 +157,8 @@ SET( Common_SRCS
 	code/TinyFormatter.h
 	code/Profiler.h
 	code/LogAux.h
+	code/Bitmap.cpp
+	code/Bitmap.h
 )
 SOURCE_GROUP(Common FILES ${Common_SRCS})
 
@@ -338,12 +340,16 @@ SET( Obj_SRCS
 SOURCE_GROUP( Obj FILES ${Obj_SRCS})
 
 SET( Ogre_SRCS
-	code/OgreImporter.hpp
-	code/OgreXmlHelper.hpp
+	code/OgreImporter.h
+	code/OgreStructs.h
+	code/OgreParsingUtils.h
+	code/OgreBinarySerializer.h
+	code/OgreXmlSerializer.h
 	code/OgreImporter.cpp
+	code/OgreStructs.cpp
+	code/OgreBinarySerializer.cpp
+	code/OgreXmlSerializer.cpp
 	code/OgreMaterial.cpp
-	code/OgreMesh.cpp
-	code/OgreSkeleton.cpp
 )
 SOURCE_GROUP( Ogre FILES ${Ogre_SRCS})
 

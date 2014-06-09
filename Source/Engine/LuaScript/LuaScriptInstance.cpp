@@ -137,31 +137,61 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
             tolua_pushurho3dstring(luaState_, src.GetString());
             break;
         case VAR_VECTOR2:
-            tolua_pushusertype(luaState_, (void*)&(src.GetVector2()), "Vector2");
+            {
+                Vector2* value = new Vector2(src.GetVector2());
+                tolua_pushusertype(luaState_, value, "Vector2");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }
             break;
         case VAR_VECTOR3:
-            tolua_pushusertype(luaState_, (void*)&(src.GetVector3()), "Vector3");
+            {
+                Vector3* value = new Vector3(src.GetVector3());
+                tolua_pushusertype(luaState_, value, "Vector3");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }
             break;
         case VAR_VECTOR4:
-            tolua_pushusertype(luaState_, (void*)&(src.GetVector4()), "Vector4");
+            {
+                Vector4* value = new Vector4(src.GetVector4());
+                tolua_pushusertype(luaState_, value, "Vector4");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }            
             break;
         case VAR_QUATERNION:
-            tolua_pushusertype(luaState_, (void*)&(src.GetQuaternion()), "Quaternion");
+            {
+                Quaternion* value = new Quaternion(src.GetQuaternion());
+                tolua_pushusertype(luaState_, value, "Quaternion");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }
+            
             break;
         case VAR_COLOR:
-            tolua_pushusertype(luaState_, (void*)&(src.GetColor()), "Color");
+            {
+                Color* value = new Color(src.GetColor());
+                tolua_pushusertype(luaState_, value, "Color");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }
             break;
         case VAR_INTRECT:
-            tolua_pushusertype(luaState_, (void*)&(src.GetIntRect()), "IntRect");
+            {
+                IntRect* value = new IntRect(src.GetIntRect());
+                tolua_pushusertype(luaState_, value, "IntRect");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }
             break;
         case VAR_INTVECTOR2:
-            tolua_pushusertype(luaState_, (void*)&(src.GetIntVector2()), "IntVector2");
+            {
+                IntVector2* value = new IntVector2(src.GetIntVector2());
+                tolua_pushusertype(luaState_, value, "IntVector2");
+                tolua_register_gc(luaState_, lua_gettop(luaState_));
+            }
             break;
         default:
             LOGERROR("Unsupported data type");
             lua_settop(luaState_, top);
             return;
         }
+
         lua_settable(luaState_, -3);
     }
 

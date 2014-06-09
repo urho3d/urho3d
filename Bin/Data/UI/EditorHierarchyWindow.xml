@@ -29,7 +29,7 @@
             <attribute name="Max Size" value="70 17" />
             <attribute name="Layout Mode" value="Horizontal" />
             <attribute name="Layout Border" value="1 1 1 1" />
-            <element type="Text">>
+            <element type="Text">
                 <attribute name="Text" value="Expand" />
                 <attribute name="Text Alignment" value="Center" />
             </element>

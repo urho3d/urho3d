@@ -1,9 +1,9 @@
 @ECHO OFF
 
 IF [%1] == [] (
-        Urho3DPlayer.exe Scripts/Editor.as -w -s
+        "%~dp0Urho3DPlayer" Scripts/Editor.as -w -s
         )
 
 IF NOT [%1] == [] (
-        Urho3DPlayer.exe Scripts/Editor.as %*
+        "%~dp0Urho3DPlayer" Scripts/Editor.as %*
         )

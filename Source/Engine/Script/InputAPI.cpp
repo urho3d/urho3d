@@ -430,17 +430,32 @@ static Input* GetInput()
 
 static bool InputSaveGestures(File* file, Input* ptr)
 {
-    return file ? ptr->SaveGestures(*file) : false;
+    return file && ptr->SaveGestures(*file);
+}
+
+static bool InputSaveGesturesVectorBuffer(VectorBuffer& buffer, Input* ptr)
+{
+    return ptr->SaveGestures(buffer);
 }
 
 static bool InputSaveGesture(File* file, unsigned gestureID, Input* ptr)
 {
-    return file ? ptr->SaveGesture(*file, gestureID) : false;
+    return file && ptr->SaveGesture(*file, gestureID);
+}
+
+static bool InputSaveGestureVectorBuffer(VectorBuffer& buffer, unsigned gestureID, Input* ptr)
+{
+    return ptr->SaveGesture(buffer, gestureID);
 }
 
 static unsigned InputLoadGestures(File* file, Input* ptr)
 {
     return file ? ptr->LoadGestures(*file) : 0;
+}
+
+static unsigned InputLoadGesturesVectorBuffer(VectorBuffer& buffer, Input* ptr)
+{
+    return ptr->LoadGestures(buffer);
 }
 
 static void RegisterInput(asIScriptEngine* engine)
@@ -453,7 +468,6 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TouchState", "const IntVector2 lastPosition", offsetof(TouchState, lastPosition_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 delta", offsetof(TouchState, delta_));
     engine->RegisterObjectProperty("TouchState", "const float pressure", offsetof(TouchState, pressure_));
-    engine->RegisterObjectProperty("TouchState", "const WeakHandle touchedElement", offsetof(TouchState, touchedElement_));
 
     engine->RegisterObjectType("JoystickState", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
@@ -474,8 +488,13 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool RemoveScreenJoystick(int)", asMETHOD(Input, RemoveScreenJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool RecordGesture()", asMETHOD(Input, RecordGesture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool SaveGestures(File@+)", asFUNCTION(InputSaveGestures), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Input", "bool SaveGestures(VectorBuffer&)", asFUNCTION(InputSaveGesturesVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Input", "bool SaveGesture(File@+, uint)", asFUNCTION(InputSaveGesture), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Input", "bool SaveGesture(VectorBuffer&, uint)", asFUNCTION(InputSaveGestureVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Input", "uint LoadGestures(File@+)", asFUNCTION(InputLoadGestures), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Input", "uint LoadGestures(VectorBuffer&)", asFUNCTION(InputLoadGesturesVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Input", "bool RemoveGesture(uint)", asMETHOD(Input, RemoveGesture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void RemoveAllGestures()", asMETHOD(Input, RemoveAllGestures), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int GetKeyFromName(const String&in) const", asMETHOD(Input, GetKeyFromName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int GetKeyFromScancode(int) const", asMETHOD(Input, GetKeyFromScancode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "String GetKeyName(int) const", asMETHOD(Input, GetKeyName), asCALL_THISCALL);

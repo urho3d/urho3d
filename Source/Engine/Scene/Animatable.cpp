@@ -177,9 +177,6 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
             return;
         }
 
-        // Use shared ptr to avoid memory leak
-        SharedPtr<ValueAnimation> animationPtr(attributeAnimation);
-
         // Get attribute info
         const AttributeInfo* attributeInfo = 0;
         if (info)
@@ -210,7 +207,7 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
         }
 
         // Check value type is same with attribute type
-        if (animationPtr->GetValueType() != attributeInfo->type_)
+        if (attributeAnimation->GetValueType() != attributeInfo->type_)
         {
             LOGERROR("Invalid value type");
             return;
@@ -220,7 +217,7 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
         if (attributeInfo->mode_ & AM_NET)
             animatedNetworkAttributes_.Insert(attributeInfo);
 
-        attributeAnimationInfos_[name] = new AttributeAnimationInfo(this, *attributeInfo, animationPtr, wrapMode, speed);
+        attributeAnimationInfos_[name] = new AttributeAnimationInfo(this, *attributeInfo, attributeAnimation, wrapMode, speed);
 
         if (!info)
             OnAttributeAnimationAdded();

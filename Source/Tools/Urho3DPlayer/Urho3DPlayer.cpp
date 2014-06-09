@@ -50,9 +50,11 @@ Urho3DPlayer::Urho3DPlayer(Context* context) :
 
 void Urho3DPlayer::Setup()
 {
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+
     // On Android and iOS, read command line from a file as parameters can not otherwise be easily given
     #if defined(ANDROID) || defined(IOS)
-    SharedPtr<File> commandFile(new File(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/CommandLine.txt",
+    SharedPtr<File> commandFile(new File(context_, filesystem->GetProgramDir() + "Data/CommandLine.txt",
         FILE_READ));
     String commandLine = commandFile->ReadLine();
     commandFile->Close();
@@ -116,6 +118,11 @@ void Urho3DPlayer::Setup()
             "-touch       Touch emulation on desktop platform\n"
             #endif
         );
+    }
+    else
+    {
+        // Use the script file name as the base name for the log file
+        engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("urho3d", "logs") + GetFileNameAndExtension(scriptFileName_) + ".log";
     }
 }
 

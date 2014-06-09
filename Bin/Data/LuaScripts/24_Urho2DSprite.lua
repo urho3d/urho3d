@@ -7,9 +7,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -57,7 +54,7 @@ function CreateScene()
     for i = 1, NUM_SPRITES do
         local spriteNode = scene_:CreateChild("StaticSprite2D")
         spriteNode.position = Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0)
-        
+
         local staticSprite = spriteNode:CreateComponent("StaticSprite2D")
         -- Set color
         staticSprite.color = Color(Random(1.0), Random(1.0), Random(1.0), 1.0)
@@ -95,19 +92,17 @@ function CreateScene()
         end
     end
 
-    local animation = cache:GetResource("Animation2D", "Urho2D/GoldIcon.anm")
-    if animation == nil then
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml")
+    if animationSet == nil then
         return
     end
 
     local spriteNode = scene_:CreateChild("AnimatedSprite2D")
     spriteNode.position = Vector3(0.0, 0.0, -1.0)
-    
+
     local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
     -- Set animation
-    animatedSprite.animation = animation
-    -- Set blend mode
-    animatedSprite.blendMode = BLEND_ALPHA
+    animatedSprite:SetAnimation(animationSet, "idle")
 end
 
 function CreateInstructions()
@@ -167,6 +162,9 @@ end
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
+
+    -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -178,4 +176,27 @@ function HandleUpdate(eventType, eventData)
 
     -- Update scene
     scene_:Update(timeStep)
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom In</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"PAGEUP\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom Out</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"PAGEDOWN\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

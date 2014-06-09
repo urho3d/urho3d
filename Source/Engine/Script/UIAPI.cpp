@@ -27,6 +27,7 @@
 #include "DropDownList.h"
 #include "FileSelector.h"
 #include "Font.h"
+#include "Input.h"
 #include "LineEdit.h"
 #include "ListView.h"
 #include "MessageBox.h"
@@ -45,6 +46,11 @@
 namespace Urho3D
 {
 
+static bool FontSaveXMLVectorBuffer(VectorBuffer& buffer, int pointSize, bool usedGlyphs, Font* ptr)
+{
+    return ptr->SaveXML(buffer, pointSize, usedGlyphs);
+}
+
 static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, Font* ptr)
 {
     if (fileName.Empty())
@@ -58,6 +64,7 @@ static void RegisterFont(asIScriptEngine* engine)
 {
     RegisterResource<Font>(engine, "Font");
     engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool arg2 = false)", asMETHOD(Font, SaveXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool arg2 = false)", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool arg2 = false)", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
 }
 
@@ -104,6 +111,9 @@ static void RegisterUIElement(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint DD_SOURCE_AND_TARGET", (void*)&DD_SOURCE_AND_TARGET);
 
     RegisterUIElement<UIElement>(engine, "UIElement");
+
+    // Register TouchState touchedElement property now
+    engine->RegisterObjectMethod("TouchState", "UIElement@+ get_touchedElement()", asMETHOD(TouchState, GetTouchedElement), asCALL_THISCALL);
 }
 
 static void RegisterBorderImage(asIScriptEngine* engine)
@@ -392,10 +402,8 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "const Color& get_colors(Corner) const", asMETHOD(Text3D, GetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_opacity(float)", asMETHOD(Text3D, SetOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "float get_opacity() const", asMETHOD(Text3D, GetOpacity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_faceCamera(bool)", asMETHOD(Text3D, SetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_faceCamera() const", asMETHOD(Text3D, GetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_faceCameraAxes(const Vector3&)", asMETHOD(Text3D, SetFaceCameraAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const Vector3& get_faceCameraAxes() const", asMETHOD(Text3D, GetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(Text3D, SetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "FaceCameraMode get_faceCameraMode() const", asMETHOD(Text3D, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHOD(Text3D, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numChars() const", asMETHOD(Text3D, GetNumChars), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_rowWidths(uint) const", asMETHOD(Text3D, GetRowWidth), asCALL_THISCALL);
@@ -584,6 +592,14 @@ static UIElement* UILoadLayoutFromFile(File* file, UI* ptr)
         return 0;
 }
 
+static UIElement* UILoadLayoutFromVectorBuffer(VectorBuffer& buffer, UI* ptr)
+{
+    SharedPtr<UIElement> root = ptr->LoadLayout(buffer);
+    if (root)
+        root->AddRef();
+    return root.Get();
+}
+
 static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, UI* ptr)
 {
     if (file)
@@ -595,6 +611,14 @@ static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, 
     }
     else
         return 0;
+}
+
+static UIElement* UILoadLayoutFromVectorBufferWithStyle(VectorBuffer& buffer, XMLFile* styleFile, UI* ptr)
+{
+    SharedPtr<UIElement> root = ptr->LoadLayout(buffer, styleFile);
+    if (root)
+        root->AddRef();
+    return root.Get();
 }
 
 static UIElement* UILoadLayout(XMLFile* file, UI* ptr)
@@ -618,6 +642,11 @@ static bool UISaveLayout(File* file, UIElement* element, UI* ptr)
     return file && ptr->SaveLayout(*file, element);
 }
 
+static bool UISaveLayoutVectorBuffer(VectorBuffer& buffer, UIElement* element, UI* ptr)
+{
+    return ptr->SaveLayout(buffer, element);
+}
+
 static void UISetFocusElement(UIElement* element, UI* ptr)
 {
     ptr->SetFocusElement(element);
@@ -630,9 +659,12 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void DebugDraw(UIElement@+)", asMETHOD(UI, DebugDraw), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(File@+)", asFUNCTION(UILoadLayoutFromFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(File@+, XMLFile@+)", asFUNCTION(UILoadLayoutFromFileWithStyle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(VectorBuffer&)", asFUNCTION(UILoadLayoutFromVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(VectorBuffer&, XMLFile@+)", asFUNCTION(UILoadLayoutFromVectorBufferWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+, XMLFile@+)", asFUNCTION(UILoadLayoutWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "bool SaveLayout(File@+, UIElement@+)", asFUNCTION(UISaveLayout), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "bool SaveLayout(VectorBuffer&, UIElement@+)", asFUNCTION(UISaveLayoutVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "void SetFocusElement(UIElement@+, bool byKey = false)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);

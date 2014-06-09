@@ -46,6 +46,16 @@ extern const char* GEOMETRY_CATEGORY;
 
 static const float INV_SQRT_TWO = 1.0f / sqrtf(2.0f);
 
+const char* faceCameraModeNames[] =
+{
+    "None",
+    "Rotate XYZ",
+    "Rotate Y",
+    "LookAt XYZ",
+    "LookAt Y",
+    0
+};
+
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 {
     return lhs->sortDistance_ > rhs->sortDistance_;
@@ -53,13 +63,12 @@ inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    faceCameraAxes_(Vector3::ONE),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),
     scaled_(true),
     sorted_(false),
-    faceCamera_(true),
+    faceCameraMode_(FC_ROTATE_XYZ),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
@@ -93,8 +102,7 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ATTRIBUTE(BillboardSet, VAR_BOOL, "Face Camera", faceCamera_, true, AM_DEFAULT);
-    ATTRIBUTE(BillboardSet, VAR_VECTOR3, "Face Camera Axes", faceCameraAxes_, Vector3::ONE, AM_DEFAULT);
+    ENUM_ATTRIBUTE(BillboardSet, "Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_ROTATE_XYZ, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
@@ -181,8 +189,8 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
     // Billboard positioning
     transforms_[0] = relative_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     // Billboard rotation
-    transforms_[1] = Matrix3x4(Vector3::ZERO, faceCamera_ ? frame.camera_->GetFaceCameraRotation(
-        node_->GetWorldRotation(), faceCameraAxes_) : node_->GetWorldRotation(), Vector3::ONE);
+    transforms_[1] = Matrix3x4(Vector3::ZERO, faceCameraMode_ != FC_NONE ? frame.camera_->GetFaceCameraRotation(
+        node_->GetWorldPosition(), node_->GetWorldRotation(), faceCameraMode_) : node_->GetWorldRotation(), Vector3::ONE);
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -253,15 +261,9 @@ void BillboardSet::SetSorted(bool enable)
     Commit();
 }
 
-void BillboardSet::SetFaceCamera(bool enable)
+void BillboardSet::SetFaceCameraMode(FaceCameraMode mode)
 {
-    faceCamera_ = enable;
-    MarkNetworkUpdate();
-}
-
-void BillboardSet::SetFaceCameraAxes(const Vector3& axes)
-{
-    faceCameraAxes_ = axes;
+    faceCameraMode_ = mode;
     MarkNetworkUpdate();
 }
 

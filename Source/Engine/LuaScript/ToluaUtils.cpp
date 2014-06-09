@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Object.h"
 #include "Ptr.h"
 #include "tolua++.h"
 #include "ToluaUtils.h"
@@ -164,6 +165,33 @@ template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type
     return 0;
 }
 
+template<> int ToluaIsPODVector<Vector2>(lua_State* L, int lo, const char* type, int def, tolua_Error* err)
+{
+    if (lua_istable(L, lo))
+    {
+        int length = lua_objlen(L, lo);
+        for (int i = 1; i <= length; ++i)
+        {
+            lua_pushinteger(L, i);
+            lua_gettable(L, lo);
+            if (!tolua_isusertype(L, -1, "Vector2", 0, err))
+            {
+                lua_pop(L, 1);
+                return 0;
+            }
+
+            lua_pop(L, 1);
+        }
+
+        return 1;
+    }
+
+    err->index = lo;
+    err->array = 0;
+    err->type = type;
+    return 0;
+}
+
 template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def)
 {
     if (!lua_istable(L, narg))
@@ -201,13 +229,15 @@ template<> void* ToluaToPODVector<Vector2>(lua_State* L, int narg, void* def)
     static PODVector<Vector2> result;
     result.Clear();
 
+    tolua_Error tolua_err;
+
     int length = lua_objlen(L, narg);
     for (int i = 1; i <= length; ++i)
     {
         lua_pushinteger(L, i);
         lua_gettable(L, narg);
 
-        if (!lua_isnumber(L, -1))
+        if (!tolua_isusertype(L, -1, "Vector2", 0, &tolua_err))
         {
             lua_pop(L, 1);
             return 0;
@@ -339,4 +369,9 @@ template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* da
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<RayQueryResult>*)data), "RayQueryResult");
+}
+
+void ToluaPushObject(lua_State*L, void* data, const char* type)
+{
+    tolua_pushusertype(L, data, data ? static_cast<Object*>(data)->GetTypeName().CString() : type);
 }

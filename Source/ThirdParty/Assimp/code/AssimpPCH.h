@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include our stdint.h replacement header for MSVC, take the global header for gcc/mingw
 #if defined( _MSC_VER) && (_MSC_VER < 1600)
-#	include "pstdint.h"
+#	include "../include/assimp/Compiler/pstdint.h"
 #else
 #	include <stdint.h>
 #endif
@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Helper macro to set a pointer to NULL in debug builds
  */
-#if (defined _DEBUG)
+#if (defined ASSIMP_BUILD_DEBUG)
 #	define AI_DEBUG_INVALIDATE_PTR(x) x = NULL;
 #else
 #	define AI_DEBUG_INVALIDATE_PTR(x)

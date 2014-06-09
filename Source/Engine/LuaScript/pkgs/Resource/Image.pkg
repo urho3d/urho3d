@@ -44,6 +44,7 @@ class Image : public Resource
     CompressedFormat GetCompressedFormat() const;
     unsigned GetNumCompressedLevels() const;
     CompressedLevel GetCompressedLevel(unsigned index) const;
+    Image* GetSubimage(const IntRect& rect) const;
 
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;

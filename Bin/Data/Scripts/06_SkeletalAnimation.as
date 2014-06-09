@@ -8,12 +8,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -21,10 +15,10 @@ void Start()
 
     // Create the scene content
     CreateScene();
-    
+
     // Create the UI content
     CreateInstructions();
-    
+
     // Setup the viewport for displaying the scene
     SetupViewport();
 
@@ -35,7 +29,7 @@ void Start()
 void CreateScene()
 {
     scene_ = Scene();
-    
+
     // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_.CreateComponent("Octree");
@@ -47,7 +41,7 @@ void CreateScene()
     StaticModel@ planeObject = planeNode.CreateComponent("StaticModel");
     planeObject.model = cache.GetResource("Model", "Models/Plane.mdl");
     planeObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -56,7 +50,7 @@ void CreateScene()
     zone.fogColor = Color(0.5f, 0.5f, 0.7f);
     zone.fogStart = 100.0f;
     zone.fogEnd = 300.0f;
-    
+
     // Create a directional light to the world. Enable cascaded shadows on it
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
     lightNode.direction = Vector3(0.6f, -1.0f, 0.8f);
@@ -66,7 +60,7 @@ void CreateScene()
     light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
-    
+
     // Create animated models
     const uint NUM_MODELS = 100;
     const float MODEL_MOVE_SPEED = 2.0f;
@@ -103,7 +97,7 @@ void CreateScene()
     cameraNode = scene_.CreateChild("Camera");
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 300.0f;
-    
+
     // Set an initial position for the camera scene node above the plane
     cameraNode.position = Vector3(0.0f, 5.0f, 0.0f);
 }
@@ -112,7 +106,7 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = 
+    instructionText.text =
         "Use WASD keys and mouse to move\n"
         "Space to toggle debug geometry";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
@@ -136,7 +130,7 @@ void SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
-    
+
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, sent after Renderer subsystem is
     // done with defining the draw calls for the viewports (but before actually executing them.) We will request debug geometry
     // rendering during that event
@@ -226,3 +220,16 @@ class Mover : ScriptObject
             state.AddTime(timeStep);
     }
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+    "<patch>"+
+    "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />"+
+    "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>"+
+    "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">"+
+    "        <element type=\"Text\">"+
+    "            <attribute name=\"Name\" value=\"KeyBinding\" />"+
+    "            <attribute name=\"Text\" value=\"SPACE\" />"+
+    "        </element>"+
+    "    </add>"+
+    "</patch>";

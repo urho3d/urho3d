@@ -1,3 +1,5 @@
+doxygen -v 1>/dev/null 2>&1
+if [ $? -ne 0 ]; then echo "Could not update document because doxygen is not installed" && exit 1; fi
 cd $( dirname $0 )
 BIN=`pwd`
 cd ../Docs

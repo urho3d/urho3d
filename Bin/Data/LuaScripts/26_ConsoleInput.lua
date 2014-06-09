@@ -33,7 +33,7 @@ local urhoThreatLevels = {
 function Start()
     -- Execute the common startup for samples
     SampleStart()
-    
+
     -- Disable default execution of Lua from the console
     SetExecuteConsoleCommands(false)
 
@@ -43,17 +43,17 @@ function Start()
 
     -- Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleEscKeyDown")
-    
+
     -- Hide logo to make room for the console
     SetLogoVisible(false)
 
     -- Show the console by default, make it large
     console.numRows = graphics.height / 16
-    console.numBufferedRows = 2 * console.numRows;
-    console.commandInterpreter = "LuaScript";
+    console.numBufferedRows = 2 * console.numRows
+    console.commandInterpreter = "LuaScript"
     console.visible = true
-    console.closeButton.visible = false;
-    
+    console.closeButton.visible = false
+
     -- Show OS mouse cursor
     input.mouseVisible = true
 
@@ -67,7 +67,7 @@ function Start()
     StartGame()
 
     -- Randomize from system clock
-    SetRandomSeed(time.systemTime)
+    SetRandomSeed(time:GetSystemTime())
 end
 
 function HandleConsoleCommand(eventType, eventData)
@@ -96,7 +96,7 @@ function StartGame()
           "objective is to survive as long as possible. Beware of hunger and the merciless\n" ..
           "predator cichlid Urho, who appears from time to time. Evading Urho is easier\n" ..
           "with an empty stomach. Type 'help' for available commands.")
-    
+
     gameOn = true
     foodAvailable = false
     eatenLastTurn = false
@@ -109,7 +109,7 @@ function EndGame(message)
     Print(message)
     Print("Game over! You survived " .. numTurns .. " turns.\n" ..
           "Do you want to play again (Y/N)?")
-    
+
     gameOn = false
 end
 
@@ -125,7 +125,7 @@ function Advance()
     elseif urhoThreat == 0 and Random() < 0.2 then
         urhoThreat = urhoThreat + 1
     end
-    
+
     if urhoThreat > 0 then
         Print(urhoThreatLevels[urhoThreat] .. ".")
     end
@@ -139,9 +139,9 @@ function Advance()
             Print("You are " .. hungerLevels[hunger + 1] .. ".")
         end
     end
-    
+
     eatenLastTurn = false
-    
+
     if foodAvailable then
         Print("The floating pieces of fish food are quickly eaten by other fish in the tank.")
         foodAvailable = false
@@ -149,7 +149,7 @@ function Advance()
         Print("The overhead dispenser drops pieces of delicious fish food to the water!")
         foodAvailable = true
     end
-    
+
     numTurns = numTurns + 1
 end
 
@@ -163,7 +163,7 @@ function HandleInput(input)
         Print("Empty input given!")
         return
     end
-    
+
     if inputLower == "quit" or inputLower == "exit" then
         engine:Exit()
     elseif gameOn then
@@ -229,4 +229,17 @@ end
 function Print(input)
     -- Logging appears both in the engine console and stdout
     Log:WriteRaw(input .. "\n")
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button2']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">" ..
+        "        <attribute name=\"Is Visible\" value=\"false\" />" ..
+        "    </add>" ..
+        "</patch>"
 end

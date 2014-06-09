@@ -7,12 +7,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-float yaw = 0.0f;
-float pitch = 0.0f;
-bool drawDebug = false;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -42,7 +36,7 @@ void CreateScene()
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("PhysicsWorld");
     scene_.CreateComponent("DebugRenderer");
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -61,7 +55,7 @@ void CreateScene()
     light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
-    
+
     // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
     // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
     // generate the necessary 3D texture coordinates for cube mapping
@@ -89,7 +83,7 @@ void CreateScene()
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
         shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
     }
-    
+
     {
         // Create a pyramid of movable physics objects
         for (int y = 0; y < 8; ++y)
@@ -102,9 +96,9 @@ void CreateScene()
                 boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
                 boxObject.material = cache.GetResource("Material", "Materials/StoneEnvMapSmall.xml");
                 boxObject.castShadows = true;
-                
+
                 // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
-                // and also adjust friction. The actual mass is not important; only the mass ratios between colliding 
+                // and also adjust friction. The actual mass is not important; only the mass ratios between colliding
                 // objects are significant
                 RigidBody@ body = boxNode.CreateComponent("RigidBody");
                 body.mass = 1.0f;
@@ -114,7 +108,7 @@ void CreateScene()
             }
         }
     }
-    
+
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load / save
     cameraNode = Node();
@@ -255,3 +249,24 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
     if (drawDebug)
         scene_.physicsWorld.DrawDebugGeometry(true);
 }
+
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Spawn</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" +
+        "            <attribute name=\"Text\" value=\"LEFT\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"SPACE\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

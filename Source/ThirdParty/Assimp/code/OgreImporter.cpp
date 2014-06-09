@@ -38,31 +38,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-/** @file  OgreImporter.cpp
- *  @brief Implementation of the Ogre XML (.mesh.xml) loader.
- */
 #include "AssimpPCH.h"
+
+#include "OgreImporter.h"
+#include "OgreBinarySerializer.h"
+#include "OgreXmlSerializer.h"
+
 #ifndef ASSIMP_BUILD_NO_OGRE_IMPORTER
 
-#include <vector>
-#include <sstream>
-using namespace std;
-
-#include "OgreImporter.hpp"
-#include "TinyFormatter.h"
-#include "irrXMLWrapper.h"
-
 static const aiImporterDesc desc = {
-	"Ogre XML Mesh Importer",
+	"Ogre3D Mesh Importer",
 	"",
 	"",
 	"",
-	aiImporterFlags_SupportTextFlavour,
+	aiImporterFlags_SupportTextFlavour | aiImporterFlags_SupportBinaryFlavour,
 	0,
 	0,
 	0,
 	0,
-	"mesh.xml"
+	"mesh mesh.xml"
 };
 
 namespace Assimp
@@ -70,194 +64,84 @@ namespace Assimp
 namespace Ogre
 {
 
-
-bool OgreImporter::CanRead(const std::string &pFile, Assimp::IOSystem *pIOHandler, bool checkSig) const
-{
-	if(!checkSig)//Check File Extension
-	{
-		std::string extension("mesh.xml");
-		int l=extension.length();
-		return pFile.substr(pFile.length()-l, l)==extension;
-	}
-	else//Check file Header
-	{
-		const char* tokens[] = {"<mesh>"};
-		return BaseImporter::SearchFileHeaderForToken(pIOHandler, pFile, tokens, 1);
-	}
-}
-
-
-void OgreImporter::InternReadFile(const std::string &pFile, aiScene *pScene, Assimp::IOSystem *pIOHandler)
-{
-	m_CurrentFilename=pFile;
-	m_CurrentIOHandler=pIOHandler;
-	m_CurrentScene=pScene;
-
-	//Open the File:
-	boost::scoped_ptr<IOStream> file(pIOHandler->Open(pFile));
-	if( file.get() == NULL)
-		throw DeadlyImportError("Failed to open file "+pFile+".");
-
-	//Read the Mesh File:
-	boost::scoped_ptr<CIrrXML_IOStreamReader> mIOWrapper( new CIrrXML_IOStreamReader( file.get()));
-	boost::scoped_ptr<XmlReader> MeshFile(irr::io::createIrrXMLReader(mIOWrapper.get()));
-	if(!MeshFile)//parse the xml file
-		throw DeadlyImportError("Failed to create XML Reader for "+pFile);
-
-
-	DefaultLogger::get()->debug("Mesh File opened");
-	
-	//Read root Node:
-	if(!(XmlRead(MeshFile.get()) && string(MeshFile->getNodeName())=="mesh"))
-	{
-		throw DeadlyImportError("Root Node is not <mesh>! "+pFile+"  "+MeshFile->getNodeName());
-	}
-
-	//eventually load shared geometry
-	XmlRead(MeshFile.get());//shared geometry is optional, so we need a reed for the next two if's
-	if(MeshFile->getNodeName()==string("sharedgeometry"))
-	{
-		unsigned int NumVertices=GetAttribute<int>(MeshFile.get(), "vertexcount");;
-
-		XmlRead(MeshFile.get());
-		while(MeshFile->getNodeName()==string("vertexbuffer"))
-		{
-			ReadVertexBuffer(m_SharedGeometry, MeshFile.get(), NumVertices);
-		}
-	}
-
-	//Go to the submeshs:
-	if(MeshFile->getNodeName()!=string("submeshes"))
-	{
-		throw DeadlyImportError("No <submeshes> node in <mesh> node! "+pFile);
-	}
-
-
-	//-------------------Read the submeshs and materials:-----------------------
-	std::list<boost::shared_ptr<SubMesh> > SubMeshes;
-	vector<aiMaterial*> Materials;
-	XmlRead(MeshFile.get());
-	while(MeshFile->getNodeName()==string("submesh"))
-	{
-		SubMesh* theSubMesh=new SubMesh();
-		theSubMesh->MaterialName=GetAttribute<string>(MeshFile.get(), "material");
-		DefaultLogger::get()->debug("Loading Submehs with Material: "+theSubMesh->MaterialName);
-		ReadSubMesh(*theSubMesh, MeshFile.get());
-
-		//just a index in a array, we add a mesh in each loop cycle, so we get indicies like 0, 1, 2 ... n;
-		//so it is important to do this before pushing the mesh in the vector!
-		theSubMesh->MaterialIndex=SubMeshes.size();
-
-		SubMeshes.push_back(boost::shared_ptr<SubMesh>(theSubMesh));
-
-		//Load the Material:
-		aiMaterial* MeshMat=LoadMaterial(theSubMesh->MaterialName);
-		
-		//Set the Material:
-		Materials.push_back(MeshMat);
-	}
-
-	if(SubMeshes.empty())
-		throw DeadlyImportError("no submesh loaded!");
-	if(SubMeshes.size()!=Materials.size())
-		throw DeadlyImportError("materialcount doesn't match mesh count!");
-
-	//____________________________________________________________
-
-
-	//skip submeshnames (stupid irrxml)
-	if(MeshFile->getNodeName()==string("submeshnames"))
-	{
-		XmlRead(MeshFile.get());
-		while(MeshFile->getNodeName()==string("submesh"))
-			XmlRead(MeshFile.get());
-	}
-
-
-	//----------------Load the skeleton: -------------------------------
-	vector<Bone> Bones;
-	vector<Animation> Animations;
-	if(MeshFile->getNodeName()==string("skeletonlink"))
-	{
-		string SkeletonFile=GetAttribute<string>(MeshFile.get(), "name");
-		LoadSkeleton(SkeletonFile, Bones, Animations);
-		XmlRead(MeshFile.get());
-	}
-	else
-	{
-		DefaultLogger::get()->debug("No skeleton file will be loaded");
-		DefaultLogger::get()->debug(MeshFile->getNodeName());
-	}
-	//__________________________________________________________________
-
-
-	//now there might be boneassignments for the shared geometry:
-	if(MeshFile->getNodeName()==string("boneassignments"))
-	{
-		ReadBoneWeights(m_SharedGeometry, MeshFile.get());
-	}
-
-
-	//----------------- Process Meshs -----------------------
-	BOOST_FOREACH(boost::shared_ptr<SubMesh> theSubMesh, SubMeshes)
-	{
-		ProcessSubMesh(*theSubMesh, m_SharedGeometry);
-	}
-	//_______________________________________________________
-
-
-
-	
-	//----------------- Now fill the Assimp scene ---------------------------
-	
-	//put the aiMaterials in the scene:
-	m_CurrentScene->mMaterials=new aiMaterial*[Materials.size()];
-	m_CurrentScene->mNumMaterials=Materials.size();
-	for(unsigned int i=0; i<Materials.size(); ++i)
-		m_CurrentScene->mMaterials[i]=Materials[i];
-
-	//create the aiMehs... 
-	vector<aiMesh*> aiMeshes;
-	BOOST_FOREACH(boost::shared_ptr<SubMesh> theSubMesh, SubMeshes)
-	{
-		aiMeshes.push_back(CreateAssimpSubMesh(*theSubMesh, Bones));
-	}
-	//... and put them in the scene:
-	m_CurrentScene->mNumMeshes=aiMeshes.size();
-	m_CurrentScene->mMeshes=new aiMesh*[aiMeshes.size()];
-	memcpy(m_CurrentScene->mMeshes, &(aiMeshes[0]), sizeof(aiMeshes[0])*aiMeshes.size());
-
-	//Create the root node
-	m_CurrentScene->mRootNode=new aiNode("root");
-
-	//link the meshs with the root node:
-	m_CurrentScene->mRootNode->mMeshes=new unsigned int[SubMeshes.size()];
-	m_CurrentScene->mRootNode->mNumMeshes=SubMeshes.size();
-	for(unsigned int i=0; i<SubMeshes.size(); ++i)
-		m_CurrentScene->mRootNode->mMeshes[i]=i;
-
-	
-
-	CreateAssimpSkeleton(Bones, Animations);
-	PutAnimationsInScene(Bones, Animations);
-	//___________________________________________________________
-}
-
-
-const aiImporterDesc* OgreImporter::GetInfo () const
+const aiImporterDesc* OgreImporter::GetInfo() const
 {
 	return &desc;
 }
 
-
 void OgreImporter::SetupProperties(const Importer* pImp)
 {
-	m_MaterialLibFilename=pImp->GetPropertyString(AI_CONFIG_IMPORT_OGRE_MATERIAL_FILE, "Scene.material");
-	m_TextureTypeFromFilename=pImp->GetPropertyBool(AI_CONFIG_IMPORT_OGRE_TEXTURETYPE_FROM_FILENAME, false);
+	m_userDefinedMaterialLibFile = pImp->GetPropertyString(AI_CONFIG_IMPORT_OGRE_MATERIAL_FILE, "Scene.material");
+	m_detectTextureTypeFromFilename = pImp->GetPropertyBool(AI_CONFIG_IMPORT_OGRE_TEXTURETYPE_FROM_FILENAME, false);
 }
 
+bool OgreImporter::CanRead(const std::string &pFile, Assimp::IOSystem *pIOHandler, bool checkSig) const
+{
+	if (!checkSig) {
+		return EndsWith(pFile, ".mesh.xml", false) || EndsWith(pFile, ".mesh", false);
+	}
 
-}//namespace Ogre
-}//namespace Assimp
+	if (EndsWith(pFile, ".mesh.xml", false))
+	{
+		const char* tokens[] = { "<mesh>" };
+		return SearchFileHeaderForToken(pIOHandler, pFile, tokens, 1);
+	}
+	else
+	{
+		/// @todo Read and validate first header chunk?
+		return EndsWith(pFile, ".mesh", false);
+	}
+}
 
-#endif  // !! ASSIMP_BUILD_NO_OGRE_IMPORTER
+void OgreImporter::InternReadFile(const std::string &pFile, aiScene *pScene, Assimp::IOSystem *pIOHandler)
+{
+	// Open source file
+	IOStream *f = pIOHandler->Open(pFile, "rb");
+	if (!f) {
+		throw DeadlyImportError("Failed to open file " + pFile);
+	}
+
+	// Binary .mesh import
+	if (EndsWith(pFile, ".mesh", false))
+	{
+		/// @note MemoryStreamReader takes ownership of f.
+		MemoryStreamReader reader(f);
+
+		// Import mesh
+		boost::scoped_ptr<Mesh> mesh = OgreBinarySerializer::ImportMesh(&reader);
+
+		// Import skeleton
+		OgreBinarySerializer::ImportSkeleton(pIOHandler, mesh);
+
+		// Import mesh referenced materials
+		ReadMaterials(pFile, pIOHandler, pScene, mesh.get());
+
+		// Convert to Assimp
+		mesh->ConvertToAssimpScene(pScene);
+	}
+	// XML .mesh.xml import
+	else
+	{
+		/// @note XmlReader does not take ownership of f, hence the scoped ptr.
+		boost::scoped_ptr<IOStream> scopedFile(f);
+		boost::scoped_ptr<CIrrXML_IOStreamReader> xmlStream(new CIrrXML_IOStreamReader(scopedFile.get()));
+		boost::scoped_ptr<XmlReader> reader(irr::io::createIrrXMLReader(xmlStream.get()));
+
+		// Import mesh
+		boost::scoped_ptr<MeshXml> mesh = OgreXmlSerializer::ImportMesh(reader.get());
+		
+		// Import skeleton
+		OgreXmlSerializer::ImportSkeleton(pIOHandler, mesh);
+
+		// Import mesh referenced materials
+		ReadMaterials(pFile, pIOHandler, pScene, mesh.get());
+
+		// Convert to Assimp
+		mesh->ConvertToAssimpScene(pScene);
+	}
+}
+
+} // Ogre
+} // Assimp
+
+#endif // ASSIMP_BUILD_NO_OGRE_IMPORTER

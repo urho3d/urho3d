@@ -132,12 +132,14 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
 }
 
-static bool ImageLoadColorLUT(File* file, Serializable* ptr)
+static bool ImageLoadColorLUT(File* file, Image* ptr)
 {
-    if (file)
-        return ptr->Load(*file);
-    else
-        return false;
+    return file && ptr->LoadColorLUT(*file);
+}
+
+static bool ImageLoadColorLUTVectorBuffer(VectorBuffer& buffer, Image* ptr)
+{
+    return ptr->LoadColorLUT(buffer);
 }
 
 static void RegisterImage(asIScriptEngine* engine)
@@ -148,6 +150,7 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "void SetPixel(int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SetPixel(int, int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, int, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool LoadColorLUT(File@+)", asFUNCTION(ImageLoadColorLUT), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Image", "bool LoadColorLUT(VectorBuffer&)", asFUNCTION(ImageLoadColorLUTVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Image", "void FlipVertical()", asMETHOD(Image, FlipVertical), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void Resize(int, int)", asMETHOD(Image, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void Clear(const Color&in)", asMETHOD(Image, Clear), asCALL_THISCALL);
@@ -164,6 +167,7 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "int get_depth() const", asMETHOD(Image, GetDepth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_components() const", asMETHOD(Image, GetComponents), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool get_compressed() const", asMETHOD(Image, IsCompressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHOD(Image, GetSubimage), asCALL_THISCALL);
 }
 
 static void ConstructJSONValue(JSONValue* ptr)
@@ -477,6 +481,7 @@ static XMLElement XMLFileGetRootDefault(XMLFile* ptr)
 
 static void RegisterXMLFile(asIScriptEngine* engine)
 {
+    engine->RegisterObjectMethod("XMLFile", "bool FromString(const String&in)", asMETHOD(XMLFile, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement CreateRoot(const String&in)", asMETHOD(XMLFile, CreateRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement GetRoot(const String&in name = String())", asMETHOD(XMLFile, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement get_root()", asFUNCTION(XMLFileGetRootDefault), asCALL_CDECL_OBJLAST);

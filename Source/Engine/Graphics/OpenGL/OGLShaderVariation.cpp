@@ -79,10 +79,10 @@ void ShaderVariation::Release()
         }
         
         object_ = 0;
-        compilerOutput_.Clear();
-        
         graphics_->CleanupShaderPrograms();
     }
+    
+    compilerOutput_.Clear();
 }
 
 bool ShaderVariation::Create()

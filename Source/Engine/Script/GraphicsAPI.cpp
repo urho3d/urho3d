@@ -272,8 +272,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     
     engine->RegisterEnum("RenderTargetSizeMode");
     engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_ABSOLUTE", SIZE_ABSOLUTE);
-    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_RENDERTARGETDIVISOR", SIZE_RENDERTARGETDIVISOR);
     engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_VIEWPORTDIVISOR", SIZE_VIEWPORTDIVISOR);
+    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_VIEWPORTMULTIPLIER", SIZE_VIEWPORTMULTIPLIER);
     
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
@@ -302,7 +302,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderTargetInfo", "String name", offsetof(RenderTargetInfo, name_));
     engine->RegisterObjectProperty("RenderTargetInfo", "String tag", offsetof(RenderTargetInfo, tag_));
     engine->RegisterObjectProperty("RenderTargetInfo", "uint format", offsetof(RenderTargetInfo, format_));
-    engine->RegisterObjectProperty("RenderTargetInfo", "IntVector2 size", offsetof(RenderTargetInfo, size_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "Vector2 size", offsetof(RenderTargetInfo, size_));
     engine->RegisterObjectProperty("RenderTargetInfo", "RenderTargetSizeMode sizeMode", offsetof(RenderTargetInfo, sizeMode_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool enabled", offsetof(RenderTargetInfo, enabled_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool filtered", offsetof(RenderTargetInfo, filtered_));
@@ -703,6 +703,7 @@ static void RegisterDrawable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("uint DRAWABLE_GEOMETRY", (void*)&DRAWABLE_GEOMETRY);
     engine->RegisterGlobalProperty("uint DRAWABLE_LIGHT", (void*)&DRAWABLE_LIGHT);
     engine->RegisterGlobalProperty("uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
+    engine->RegisterGlobalProperty("uint DRAWABLE_PROXYGEOMETRY", (void*)&DRAWABLE_PROXYGEOMETRY);
     engine->RegisterGlobalProperty("uint DRAWABLE_ANY", (void*)&DRAWABLE_ANY);
     engine->RegisterGlobalProperty("uint DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
     engine->RegisterGlobalProperty("uint DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
@@ -988,6 +989,13 @@ static void RegisterAnimationController(asIScriptEngine* engine)
 
 static void RegisterBillboardSet(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("FaceCameraMode");
+    engine->RegisterEnumValue("FaceCameraMode", "FC_NONE", FC_NONE);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_XYZ", FC_ROTATE_XYZ);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_Y", FC_ROTATE_Y);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_XYZ", FC_LOOKAT_XYZ);
+    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_Y", FC_LOOKAT_Y);
+    
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -1010,19 +1018,12 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "bool get_sorted() const", asMETHOD(BillboardSet, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_scaled(bool)", asMETHOD(BillboardSet, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "bool get_scaled() const", asMETHOD(BillboardSet, IsScaled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_faceCamera(bool)", asMETHOD(BillboardSet, SetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_faceCamera() const", asMETHOD(BillboardSet, GetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraAxes(const Vector3&)", asMETHOD(BillboardSet, SetFaceCameraAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const Vector3& get_faceCameraAxes() const", asMETHOD(BillboardSet, GetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(BillboardSet, SetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "FaceCameraMode get_faceCameraMode() const", asMETHOD(BillboardSet, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHOD(BillboardSet, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHOD(BillboardSet, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHOD(BillboardSet, GetBillboard), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHOD(BillboardSet, GetZone), asCALL_THISCALL);
-}
-
-void ParticleEmitterSetEmitting(bool enable, ParticleEmitter* ptr)
-{
-    ptr->SetEmitting(enable);
 }
 
 static void RegisterParticleEmitter(asIScriptEngine* engine)
@@ -1046,8 +1047,10 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
     engine->RegisterObjectMethod("ParticleEmitter", "bool Load(XMLFile@+)", asMETHODPR(ParticleEmitter, Load, (XMLFile*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool Save(XMLFile@+)", asMETHODPR(ParticleEmitter, Save, (XMLFile*) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void SetEmitting(bool, bool)", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void SetColor(const Color&in)", asMETHOD(ParticleEmitter, SetColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void ResetEmissionTimer()", asMETHOD(ParticleEmitter, ResetEmissionTimer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void RemoveAllParticles()", asMETHOD(ParticleEmitter, RemoveAllParticles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void Reset()", asMETHOD(ParticleEmitter, Reset), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_relative(bool)", asMETHOD(ParticleEmitter, SetRelative), asCALL_THISCALL);
@@ -1056,15 +1059,13 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_sorted() const", asMETHOD(ParticleEmitter, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_scaled(bool)", asMETHOD(ParticleEmitter, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCamera(bool)", asMETHOD(ParticleEmitter, SetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "bool get_faceCamera() const", asMETHOD(ParticleEmitter, GetFaceCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCameraAxes(const Vector3&)", asMETHOD(ParticleEmitter, SetFaceCameraAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_faceCameraAxes() const", asMETHOD(ParticleEmitter, GetFaceCameraAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(ParticleEmitter, SetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "FaceCameraMode get_faceCameraMode() const", asMETHOD(ParticleEmitter, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_updateInvisible(bool)", asMETHOD(ParticleEmitter, SetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_updateInvisible() const", asMETHOD(ParticleEmitter, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "float get_animationLodBias() const", asMETHOD(ParticleEmitter, GetAnimationLodBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_emitting() const", asFUNCTION(ParticleEmitterSetEmitting), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_emitting() const", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_emitting() const", asMETHOD(ParticleEmitter, IsEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_numParticles(uint) const", asMETHOD(ParticleEmitter, SetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
@@ -1229,6 +1230,11 @@ static void GraphicsPrecacheShaders(File* file, Graphics* ptr)
         ptr->PrecacheShaders(*file);
 }
 
+static void GraphicsPrecacheShadersVectorBuffer(VectorBuffer& buffer, Graphics* ptr)
+{
+    ptr->PrecacheShaders(buffer);
+}
+
 static Graphics* GetGraphics()
 {
     return GetScriptContext()->GetSubsystem<Graphics>();
@@ -1248,6 +1254,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "void BeginDumpShaders(const String&in)", asMETHOD(Graphics, BeginDumpShaders), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void EndDumpShaders()", asMETHOD(Graphics, EndDumpShaders), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void PrecacheShaders(File@+)", asFUNCTION(GraphicsPrecacheShaders), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Graphics", "void PrecacheShaders(VectorBuffer&)", asFUNCTION(GraphicsPrecacheShadersVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "void set_windowTitle(const String&in)", asMETHOD(Graphics, SetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "const String& get_windowTitle() const", asMETHOD(Graphics, GetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_windowIcon(Image@+)", asMETHOD(Graphics, SetWindowIcon), asCALL_THISCALL);

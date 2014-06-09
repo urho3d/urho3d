@@ -513,14 +513,15 @@ public class SDLActivity extends Activity {
         }
         return Arrays.copyOf(filtered, used);
     }
-            
+
+    // Urho3D: add handler null check
     // Joystick glue code, just a series of stubs that redirect to the SDLJoystickHandler instance
     public static boolean handleJoystickMotionEvent(MotionEvent event) {
-        return mJoystickHandler.handleMotionEvent(event);
+        return mJoystickHandler != null && mJoystickHandler.handleMotionEvent(event); 
     }
     
     public static void pollInputDevices() {
-        if (SDLActivity.mSDLThread != null) {
+        if (SDLActivity.mSDLThread != null && mJoystickHandler != null) {
             mJoystickHandler.pollInputDevices();
         }
     }
@@ -809,8 +810,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     y = -event.values[0];
                     break;
                 case Surface.ROTATION_180:
-                    x = -event.values[1];
-                    y = -event.values[0];
+                    // Urho3D: fix SDL copy-paste error
+                    x = -event.values[0];
+                    y = -event.values[1];
                     break;
                 default:
                     x = event.values[0];

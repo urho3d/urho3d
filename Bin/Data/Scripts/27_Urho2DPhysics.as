@@ -5,9 +5,6 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Scene@ scene_;
-Node@ cameraNode;
-
 void Start()
 {
     // Execute the common startup for samples
@@ -49,7 +46,7 @@ void CreateScene()
 
     // Create 2D physics world component
     scene_.CreateComponent("PhysicsWorld2D");
-    
+
     Sprite2D@ boxSprite = cache.GetResource("Sprite2D", "Urho2D/Box.png");
     Sprite2D@ ballSprite = cache.GetResource("Sprite2D", "Urho2D/Ball.png");
 
@@ -57,10 +54,10 @@ void CreateScene()
     Node@ groundNode = scene_.CreateChild("Ground");
     groundNode.position = Vector3(0.0f, -3.0f, 0.0f);
     groundNode.scale = Vector3(200.0f, 1.0f, 0.0f);
-    
+
     // Create 2D rigid body for gound
     RigidBody2D@ groundBody = groundNode.CreateComponent("RigidBody2D");
-    
+
     StaticSprite2D@ groundSprite = groundNode.CreateComponent("StaticSprite2D");
     groundSprite.sprite = boxSprite;
 
@@ -146,7 +143,7 @@ void MoveCamera(float timeStep)
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 4.0f;
-    
+
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown['W'])
         cameraNode.Translate(Vector3(0.0f, 1.0f, 0.0f) * MOVE_SPEED * timeStep);
@@ -162,7 +159,7 @@ void MoveCamera(float timeStep)
         Camera@ camera = cameraNode.GetComponent("Camera");
         camera.zoom = camera.zoom * 1.01f;
     }
-    
+
     if (input.keyDown[KEY_PAGEDOWN])
     {
         Camera@ camera = cameraNode.GetComponent("Camera");
@@ -174,6 +171,9 @@ void SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
+
+    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
+    UnsubscribeFromEvent("SceneUpdate");
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -185,3 +185,23 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 }
 
+// Create XML patch instructions for screen joystick layout specific to this sample app
+String patchInstructions =
+        "<patch>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom In</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"PAGEUP\" />" +
+        "        </element>" +
+        "    </add>" +
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" +
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Zoom Out</replace>" +
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" +
+        "        <element type=\"Text\">" +
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" +
+        "            <attribute name=\"Text\" value=\"PAGEDOWN\" />" +
+        "        </element>" +
+        "    </add>" +
+        "</patch>";

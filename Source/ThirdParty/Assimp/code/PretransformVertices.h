@@ -52,11 +52,11 @@ class PretransformVerticesTest;
 namespace Assimp	{
 
 // ---------------------------------------------------------------------------
-/** The PretransformVertices pretransforms all vertices in the nodegraph
+/** The PretransformVertices pre-transforms all vertices in the node tree
  *  and removes the whole graph. The output is a list of meshes, one for
  *  each material.
 */
-class PretransformVertices : public BaseProcess
+class ASSIMP_API PretransformVertices : public BaseProcess
 {
 public:
 
@@ -152,8 +152,10 @@ private:
 
 
 	//! Configuration option: keep scene hierarchy as long as possible
-	bool configKeepHierarchy, configNormalize;
-
+	bool configKeepHierarchy;
+	bool configNormalize;
+	bool configTransform;
+	aiMatrix4x4 configTransformation;
 };
 
 } // end of namespace Assimp

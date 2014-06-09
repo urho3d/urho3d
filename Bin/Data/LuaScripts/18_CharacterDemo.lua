@@ -16,7 +16,7 @@ CTRL_FORWARD = 1
 CTRL_BACK = 2
 CTRL_LEFT = 4
 CTRL_RIGHT = 8
-CTRL_JUMP = 16
+local CTRL_JUMP = 16
 
 local MOVE_FORCE = 0.8
 local INAIR_MOVE_FORCE = 0.02
@@ -24,9 +24,9 @@ local BRAKE_FORCE = 0.2
 local JUMP_FORCE = 7.0
 local YAW_SENSITIVITY = 0.1
 local INAIR_THRESHOLD_TIME = 0.1
+firstPerson = false -- First person camera flag
 
-scene_ = nil
-characterNode = nil
+local characterNode = nil
 
 function Start()
     -- Execute the common startup for samples
@@ -40,12 +40,6 @@ function Start()
 
     -- Create the UI content
     CreateInstructions()
-
-    -- Activate mobile stuff only when appropriate
-    if GetPlatform() == "Android" or GetPlatform() == "iOS" then 
-        SetLogoVisible(false)
-        InitTouchInput()
-    end
 
     -- Subscribe to necessary events
     SubscribeToEvents()
@@ -152,7 +146,7 @@ function CreateCharacter()
     characterNode:CreateComponent("AnimationController")
 
     -- Set the head bone for manual control
-    object.skeleton:GetBone("Bip01_Head").animated = false;
+    object.skeleton:GetBone("Bip01_Head").animated = false
 
     -- Create rigidbody, and set non-zero mass so that the body becomes dynamic
     local body = characterNode:CreateComponent("RigidBody")
@@ -198,10 +192,8 @@ function SubscribeToEvents()
     -- Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate")
 
-    -- Subscribe to mobile touch events
-    if touchEnabled == true then
-        SubscribeToTouchEvents()
-    end
+    -- Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
+    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -217,45 +209,60 @@ function HandleUpdate(eventType, eventData)
     -- Clear previous controls
     character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
 
-    if touchEnabled == true then
-        -- Update controls using touch (mobile)
-        updateTouches()
-    else 
-        -- Update controls using keys (desktop)
-        if ui.focusElement == nil then
+    -- Update controls using touch utility
+    if touchEnabled then UpdateTouches(character.controls) end
+
+    -- Update controls using keys
+    if ui.focusElement == nil then
+        if not touchEnabled or not useGyroscope then
             if input:GetKeyDown(KEY_W) then character.controls:Set(CTRL_FORWARD, true) end
             if input:GetKeyDown(KEY_S) then character.controls:Set(CTRL_BACK, true) end
             if input:GetKeyDown(KEY_A) then character.controls:Set(CTRL_LEFT, true) end
             if input:GetKeyDown(KEY_D) then character.controls:Set(CTRL_RIGHT, true) end
-            if input:GetKeyDown(KEY_SPACE) then character.controls:Set(CTRL_JUMP, true) end
+        end
+        if input:GetKeyDown(KEY_SPACE) then character.controls:Set(CTRL_JUMP, true) end
 
-            -- Add character yaw & pitch from the mouse motion
-            character.controls.yaw = character.controls.yaw + input.mouseMoveX * YAW_SENSITIVITY
-            character.controls.pitch = character.controls.pitch + input.mouseMoveY * YAW_SENSITIVITY
-            -- Limit pitch
-            character.controls.pitch = Clamp(character.controls.pitch, -80.0, 80.0)
+        -- Add character yaw & pitch from the mouse motion or touch input
+        if touchEnabled then
+            for i=0, input.numTouches - 1 do
+                local state = input:GetTouch(i)
+                if not state.touchedElement then -- Touch on empty space
+                    local camera = cameraNode:GetComponent("Camera")
+                    if not camera then return end
 
-            -- Switch between 1st and 3rd person
-            if input:GetKeyPress(KEY_F) then
-                firstPerson = not firstPerson
-                newFirstPerson = firstPerson
-            end
-
-            -- Check for loading / saving the scene
-            if input:GetKeyPress(KEY_F5) then
-                scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/CharacterDemo.xml")
-            end
-            if input:GetKeyPress(KEY_F7) then
-                scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/CharacterDemo.xml")
-                -- After loading we have to reacquire the character scene node, as it has been recreated
-                -- Simply find by name as there's only one of them
-                characterNode = scene_:GetChild("Jack", true)
-                if characterNode == nil then
-                    return
+                    character.controls.yaw = character.controls.yaw + TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.x
+                    character.controls.pitch = character.controls.pitch + TOUCH_SENSITIVITY * camera.fov / graphics.height * state.delta.y
                 end
             end
         else
-            character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
+            character.controls.yaw = character.controls.yaw + input.mouseMoveX * YAW_SENSITIVITY
+            character.controls.pitch = character.controls.pitch + input.mouseMoveY * YAW_SENSITIVITY
+        end
+        -- Limit pitch
+        character.controls.pitch = Clamp(character.controls.pitch, -80.0, 80.0)
+
+        -- Switch between 1st and 3rd person
+        if input:GetKeyPress(KEY_F) then
+            firstPerson = not firstPerson
+        end
+
+        -- Turn on/off gyroscope on mobile platform
+        if input:GetKeyPress(KEY_G) then
+            useGyroscope = not useGyroscope
+        end
+
+        -- Check for loading / saving the scene
+        if input:GetKeyPress(KEY_F5) then
+            scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/CharacterDemo.xml")
+        end
+        if input:GetKeyPress(KEY_F7) then
+            scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/CharacterDemo.xml")
+            -- After loading we have to reacquire the character scene node, as it has been recreated
+            -- Simply find by name as there's only one of them
+            characterNode = scene_:GetChild("Jack", true)
+            if characterNode == nil then
+                return
+            end
         end
     end
 
@@ -433,4 +440,51 @@ function Character:FixedUpdate(timeStep)
 
     -- Reset grounded flag for next frame
     self.onGround = false
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element\">" ..
+        "        <element type=\"Button\">" ..
+        "            <attribute name=\"Name\" value=\"Button3\" />" ..
+        "            <attribute name=\"Position\" value=\"-120 -120\" />" ..
+        "            <attribute name=\"Size\" value=\"96 96\" />" ..
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" ..
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" ..
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" ..
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" ..
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" ..
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"Label\" />" ..
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" ..
+        "                <attribute name=\"Text\" value=\"Gyroscope\" />" ..
+        "            </element>" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "                <attribute name=\"Text\" value=\"G\" />" ..
+        "            </element>" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">1st/3rd</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"F\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Jump</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

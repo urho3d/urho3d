@@ -151,6 +151,19 @@ enum ShaderType
     PS,
 };
 
+enum ShaderParameterGroup
+{
+    SP_FRAME = 0,
+    SP_CAMERA,
+    SP_VIEWPORT,
+    SP_ZONE,
+    SP_LIGHT,
+    SP_VERTEXLIGHTS,
+    SP_MATERIAL,
+    SP_OBJECTTRANSFORM,
+    MAX_SHADER_PARAMETER_GROUPS
+};
+
 enum TextureUnit
 {
     TU_DIFFUSE = 0,
@@ -172,17 +185,13 @@ enum TextureUnit
     MAX_TEXTURE_UNITS = 13
 };
 
-enum ShaderParameterGroup
+enum FaceCameraMode
 {
-    SP_FRAME = 0,
-    SP_CAMERA,
-    SP_VIEWPORT,
-    SP_ZONE,
-    SP_LIGHT,
-    SP_VERTEXLIGHTS,
-    SP_MATERIAL,
-    SP_OBJECTTRANSFORM,
-    MAX_SHADER_PARAMETER_GROUPS
+    FC_NONE = 0,
+    FC_ROTATE_XYZ,
+    FC_ROTATE_Y,
+    FC_LOOKAT_XYZ,
+    FC_LOOKAT_Y
 };
 
 static const int QUALITY_LOW;

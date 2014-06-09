@@ -476,10 +476,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
         pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
         #endif
-        
-        // Set up texture data read/write alignment
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
     
     // Set vsync
@@ -688,8 +684,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 {
-    if (!destination || !destination->GetRenderSurface() || destination->GetWidth() != width_ ||
-        destination->GetHeight() != height_)
+    if (!destination || !destination->GetRenderSurface())
         return false;
     
     PROFILE(ResolveToTexture);
@@ -709,10 +704,9 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     
     // Use Direct3D convention with the vertical coordinates ie. 0 is top
     SetTextureForUpdate(destination);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.left_, height_ - vpCopy.bottom_,
-        vpCopy.Width(), vpCopy.Height());
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.Width(), vpCopy.Height());
     SetTexture(0, 0);
-    
+
     return true;
 }
 
@@ -2323,10 +2317,15 @@ void Graphics::Restore()
         #ifdef IOS
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
         #endif
+        
         ResetCachedState();
     }
     if (!impl_->context_)
         return;
+    
+    // Set up texture data read/write alignment. It is important that this is done before uploading any texture data
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();

@@ -527,39 +527,47 @@ float Camera::GetLodDistance(float distance, float scale, float bias) const
         return orthoSize_ / d;
 }
 
-Quaternion Camera::GetFaceCameraRotation(const Quaternion& rotation, const Vector3& faceCameraAxes)
+Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaternion& rotation, FaceCameraMode mode)
 {
     if (!node_)
         return rotation;
     
-    // No facing
-    if (faceCameraAxes == Vector3::ZERO)
-        return rotation;
-    // Facing on all axes
-    else if (faceCameraAxes.x_ > 0.0f && faceCameraAxes.y_ > 0.0f && faceCameraAxes.z_ > 0.0f)
-        return node_->GetWorldRotation();
-    // Selective facing based on Euler angle rewriting
-    else
+    switch (mode)
     {
-        Vector3 euler = rotation.EulerAngles();
-        Vector3 cameraEuler = node_->GetWorldRotation().EulerAngles();
+    default:
+        return rotation;
         
-        if (faceCameraAxes.x_ > 0.0f)
-            euler.x_ = cameraEuler.x_;
-        else if (faceCameraAxes.x_ < 0.0f)
-            euler.x_ = cameraEuler.x_ + 180.0f;
+    case FC_ROTATE_XYZ:
+        return node_->GetWorldRotation();
         
-        if (faceCameraAxes.y_ > 0.0f)
-            euler.y_ = cameraEuler.y_;
-        else if (faceCameraAxes.y_ < 0.0f)
-            euler.y_ = -cameraEuler.y_ + 180.0f;
+    case FC_ROTATE_Y:
+        {
+            Vector3 euler = rotation.EulerAngles();
+            euler.y_ = node_->GetWorldRotation().EulerAngles().y_;
+            return Quaternion(euler.x_, euler.y_, euler.z_);
+        }
         
-        if (faceCameraAxes.z_ > 0.0f)
-            euler.z_ = cameraEuler.z_;
-        else if (faceCameraAxes.z_ < 0.0f)
-            euler.z_ = -cameraEuler.z_ + 180.0f;
-
-        return Quaternion(euler.x_, euler.y_, euler.z_);
+    case FC_LOOKAT_XYZ:
+        {
+            Quaternion lookAt;
+            lookAt.FromLookRotation(position - node_->GetWorldPosition());
+            return lookAt;
+        }
+        
+    case FC_LOOKAT_Y:
+        {
+            // Make the Y-only lookat happen on an XZ plane to make sure there are no unwanted transitions
+            // or singularities
+            Vector3 lookAtVec(position - node_->GetWorldPosition());
+            lookAtVec.y_ = 0.0f;
+            
+            Quaternion lookAt;
+            lookAt.FromLookRotation(lookAtVec);
+            
+            Vector3 euler = rotation.EulerAngles();
+            euler.y_ = lookAt.EulerAngles().y_;
+            return Quaternion(euler.x_, euler.y_, euler.z_);
+        }
     }
 }
 

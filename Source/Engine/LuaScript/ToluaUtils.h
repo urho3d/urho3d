@@ -97,6 +97,8 @@ template<> int ToluaPushVector<String>(lua_State* L, void* data, const char* typ
 template<typename T> int ToluaIsPODVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
 /// Check is PODVector<unsigned>.
 template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+/// Check is PODVector<Vector2>.
+template<> int ToluaIsPODVector<Vector2>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
 
 /// Convert to PODVector<T>.
 template<typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def);
@@ -131,3 +133,6 @@ template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data
 template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* type);
+/// Push Object to Lua.
+void ToluaPushObject(lua_State*L, void* data, const char* type);
+

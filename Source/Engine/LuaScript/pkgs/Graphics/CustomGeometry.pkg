@@ -1,0 +1,21 @@
+$#include "CustomGeometry.h"
+
+class CustomGeometry : public Drawable
+{
+    void Clear();
+    void SetNumGeometries(unsigned num);
+    void BeginGeometry(unsigned index, PrimitiveType type);
+    void DefineVertex(const Vector3& position);
+    void DefineNormal(const Vector3& normal);
+    void DefineTangent(const Vector4& tangent);
+    void DefineColor(const Color& color);
+    void DefineTexCoord(const Vector2& texCoord);
+    void Commit();
+    void SetMaterial(Material* material);
+    bool SetMaterial(unsigned index, Material* material);
+    unsigned GetNumGeometries();
+    Material* GetMaterial(unsigned index = 0);
+
+    tolua_property__get_set Material* material;
+    tolua_property__get_set unsigned numGeometries;
+};

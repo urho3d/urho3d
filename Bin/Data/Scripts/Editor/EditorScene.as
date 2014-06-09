@@ -1,4 +1,4 @@
-// Urho3D editor scene handling
+/// Urho3D editor scene handling
 
 #include "Scripts/Editor/EditorHierarchyWindow.as"
 #include "Scripts/Editor/EditorInspectorWindow.as"
@@ -136,7 +136,9 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
             cache.RemoveResourceDir(sceneResourcePath);
     }
 
-    cache.AddResourceDir(newPath);
+    // Add resource path as first priority so that it takes precedence over the default data paths
+    cache.AddResourceDir(newPath, 0);
+    RebuildResourceDatabase();
 
     if (!additive)
     {
@@ -258,9 +260,13 @@ bool SaveSceneWithExistingName()
         return SaveScene(editorScene.fileName);
 }
 
-void CreateNode(CreateMode mode)
+Node@ CreateNode(CreateMode mode)
 {
-    Node@ newNode = editorScene.CreateChild("", mode);
+    Node@ newNode = null;
+    if (editNode !is null)
+        newNode = editNode.CreateChild("", mode);
+    else
+        newNode = editorScene.CreateChild("", mode);
     // Set the new node a certain distance from the camera
     newNode.position = GetNewNodePosition();
 
@@ -271,6 +277,8 @@ void CreateNode(CreateMode mode)
     SetSceneModified();
 
     FocusNode(newNode);
+
+    return newNode;
 }
 
 void CreateComponent(const String&in componentType)
@@ -306,22 +314,32 @@ void CreateComponent(const String&in componentType)
     HandleHierarchyListSelectionChange();
 }
 
-void LoadNode(const String&in fileName)
+void CreateLoadedComponent(Component@ component)
+{
+    if (component is null) return;
+    CreateComponentAction action;
+    action.Define(component);
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(component);
+}
+
+Node@ LoadNode(const String&in fileName, Node@ parent = null)
 {
     if (fileName.empty)
-        return;
+        return null;
 
     if (!fileSystem.FileExists(fileName))
     {
         MessageBox("No such node file.\n" + fileName);
-        return;
+        return null;
     }
 
     File file(fileName, FILE_READ);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
-        return;
+        return null;
     }
 
     ui.cursor.shape = CS_BUSY;
@@ -329,16 +347,20 @@ void LoadNode(const String&in fileName)
     // Before instantiating, add object's resource path if necessary
     SetResourcePath(GetPath(fileName), true, true);
 
-    Vector3 position = GetNewNodePosition();
-    Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, instantiateMode);
+    Ray cameraRay = camera.GetScreenRay(0.5, 0.5); // Get ray at view center
+    Vector3 position, normal;
+    GetSpawnPosition(cameraRay, newNodeDistance, position, normal, 0, true);
+
+    Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, parent, instantiateMode);
     if (newNode !is null)
     {
         FocusNode(newNode);
         instantiateFileName = fileName;
     }
+    return newNode;
 }
 
-Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quaternion& rotation, float scaleMod = 1.0f, CreateMode mode = REPLICATED)
+Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quaternion& rotation, float scaleMod = 1.0f, Node@ parent = null, CreateMode mode = REPLICATED)
 {
     if (file is null)
         return null;
@@ -356,9 +378,23 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
 
     suppressSceneChanges = false;
 
+    if (parent !is null)
+        newNode.parent = parent;
+        
     if (newNode !is null)
     {
         newNode.scale = newNode.scale * scaleMod;
+        if (alignToAABBBottom)
+        {
+            Drawable@ drawable = GetFirstDrawable(newNode);
+            if (drawable !is null)
+            {
+                BoundingBox aabb = drawable.worldBoundingBox;
+                Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+                Vector3 offset = aabbBottomCenter - newNode.worldPosition;
+                newNode.worldPosition = newNode.worldPosition - offset;
+            }
+        }
 
         // Create an undo action for the load
         CreateNodeAction action;
@@ -742,7 +778,7 @@ bool SceneChangeParent(Node@ sourceNode, Array<Node@> sourceNodes, Node@ targetN
         SaveEditAction(action);
     }
 
-    for (uint i = 0; i < sourceNodes.length; i++)
+    for (uint i = 0; i < sourceNodes.length; ++i)
     {
         Node@ node = sourceNodes[i];
         node.parent = targetNode;
@@ -892,6 +928,12 @@ bool SceneRebuildNavigation()
     ui.cursor.shape = CS_BUSY;
 
     Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh", true);
+    if (navMeshes.empty)
+    {
+        MessageBox("No NavigationMesh components in the scene, nothing to rebuild.");
+        return false;
+    }
+
     bool success = true;
     for (uint i = 0; i < navMeshes.length; ++i)
     {
@@ -912,12 +954,20 @@ bool LoadParticleData(const String&in fileName)
     if (!xmlFile.Load(File(fileName, FILE_READ)))
         return false;
 
+    bool needRefresh = false;
+
     for (uint i = 0; i < editComponents.length; ++i)
     {
         ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[i]);
         if (emitter !is null)
+        {
             emitter.Load(xmlFile);
+            needRefresh = true;
+        }
     }
+    
+    if (needRefresh)
+        UpdateAttributeInspector();
 
     return true;
 }
@@ -938,6 +988,26 @@ bool SaveParticleData(const String&in fileName)
     return false;
 }
 
+void AssignMaterial(StaticModel@ model, String materialPath)
+{
+    Material@ material = cache.GetResource("Material", materialPath);
+    if (material is null)
+        return;
+
+    ResourceRefList materials = model.GetAttribute("Material").GetResourceRefList();
+    Array<String> oldMaterials;
+    for(uint i = 0; i < materials.length; ++i)
+        oldMaterials.Push(materials.names[i]);
+
+    model.material = material;
+
+    AssignMaterialAction action;
+    action.Define(model, oldMaterials, material);
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(model); 
+}
+
 void UpdateSceneMru(String filename)
 {
     while (uiRecentScenes.Find(filename) > -1)
@@ -945,8 +1015,71 @@ void UpdateSceneMru(String filename)
 
     uiRecentScenes.Insert(0, filename);
 
-    for(uint i=uiRecentScenes.length-1;i>=maxRecentSceneCount;i--)
+    for (uint i = uiRecentScenes.length - 1; i >= maxRecentSceneCount; i--)
         uiRecentScenes.Erase(i);
 
     PopulateMruScenes();
+}
+
+Drawable@ GetFirstDrawable(Node@ node)
+{
+    Array<Node@> nodes = node.GetChildren(true);
+    nodes.Insert(0, node);
+
+    for (uint i = 0; i < nodes.length; ++i)
+    {
+        Array<Component@> components = nodes[i].GetComponents();
+        for (uint j = 0; j < components.length; ++j)
+        {
+            Drawable@ drawable = cast<Drawable>(components[j]);
+            if (drawable !is null)
+                return drawable;
+        }
+    }
+    
+    return null;
+}
+
+void AssignModel(StaticModel@ assignee, String modelPath)
+{
+    Model@ model = cache.GetResource("Model", modelPath);
+    if (model is null)
+        return;
+
+    Model@ oldModel = assignee.model;
+    assignee.model = model;
+
+    AssignModelAction action;
+    action.Define(assignee, oldModel, model);
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(assignee); 
+}
+
+void CreateModelWithStaticModel(String filepath, Node@ parent)
+{
+    if (parent is null)
+        return;
+
+    Model@ model = cache.GetResource("Model", filepath);
+    if (model is null)
+        return;
+
+    StaticModel@ staticModel = cast<StaticModel>(editNode.CreateComponent("StaticModel"));
+    staticModel.model = model;
+    CreateLoadedComponent(staticModel);
+}
+
+void CreateModelWithAnimatedModel(String filepath, Node@ parent)
+{
+    if (parent is null)
+        return;
+
+    Model@ model = cache.GetResource("Model", filepath);
+    if (model is null)
+        return;
+
+    AnimatedModel@ animatedModel = cast<StaticModel>(editNode.CreateComponent("AnimatedModel"));
+    animatedModel.model = model;
+    CreateLoadedComponent(animatedModel);
 }

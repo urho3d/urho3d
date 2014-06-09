@@ -68,22 +68,45 @@ Properties:
 - unsigned numMorphs (readonly)
 - bool master (readonly)
 
-### AnimatedSprite2D : StaticSprite2D
+### AnimatedSprite2D : Drawable
 
 Methods:
 
+- void SetLayer(int layer)
+- void SetOrderInLayer(int orderInLayer)
+- void SetBlendMode(BlendMode mode)
+- void SetFlip(bool flipX, bool flipY)
+- void SetFlipX(bool flipX)
+- void SetFlipY(bool flipY)
+- void SetColor(const Color& color)
 - void SetSpeed(float speed)
-- void SetCycleMode(CycleMode cycleMode)
-- void SetAnimation(Animation2D* animation)
+- void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT)
+- void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
+- void SetAnimationSet(AnimationSet2D* animationSet)
+- void SetLoopMode(LoopMode2D loopMode)
+- int GetLayer() const
+- int GetOrderInLayer() const
+- BlendMode GetBlendMode() const
+- bool GetFlipX() const
+- bool GetFlipY() const
+- const Color& GetColor() const
 - float GetSpeed() const
-- CycleMode GetCycleMode() const
-- Animation2D* GetAnimation() const
+- const String GetAnimation() const
+- AnimationSet2D* GetAnimationSet() const
+- LoopMode2D GetLoopMode() const
 
 Properties:
 
+- int layer
+- int orderInLayer
+- BlendMode blendMode
+- bool flipX
+- bool flipY
+- Color& color
 - float speed
-- CycleMode cycleMode
-- Animation2D* animation
+- String animation
+- AnimationSet2D* animationSet
+- LoopMode2D loopMode
 
 ### Animation : Resource
 
@@ -106,19 +129,19 @@ Properties:
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
 
-### Animation2D : Resource
+### Animation2D : RefCounted
 
 Methods:
 
-- float GetTotalTime() const
-- unsigned GetNumFrames() const
-- Sprite2D* GetFrameSprite(unsigned index) const
-- Sprite2D* GetFrameSpriteByTime(float time) const
+- const String GetName() const
+- float GetLength() const
+- bool IsLooped() const
 
 Properties:
 
-- float totalTime (readonly)
-- unsigned numFrames (readonly)
+- String name (readonly)
+- float length (readonly)
+- bool looped (readonly)
 
 ### AnimationControl
 
@@ -187,6 +210,18 @@ Properties:
 - Vector3 position
 - Quaternion rotation
 - Vector3 scale
+
+### AnimationSet2D : Resource
+
+Methods:
+
+- unsigned GetNumAnimations() const
+- Animation2D* GetAnimation(unsigned index) const
+- Animation2D* GetAnimation(const String name) const
+
+Properties:
+
+- unsigned numAnimations (readonly)
 
 ### AnimationState
 
@@ -300,8 +335,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
-- void SetFaceCamera(bool enable)
-- void SetFaceCameraAxes(const Vector3& axes)
+- void SetFaceCameraMode(FaceCameraMode mode)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -310,8 +344,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
-- bool GetFaceCamera() const
-- const Vector3& GetFaceCameraAxes() const
+- FaceCameraMode GetFaceCameraMode() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -321,8 +354,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
-- bool faceCamera
-- Vector3& faceCameraAxes
+- FaceCameraMode faceCameraMode
 - float animationLodBias
 
 ### Bone
@@ -691,10 +723,18 @@ Methods:
 - void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale)
 - void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position)
 - void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+- void SetCustomTriangleMesh(CustomGeometry* custom)
+- void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale)
+- void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position)
+- void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
 - void SetConvexHull(Model* model, unsigned lodLevel = 0)
 - void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale)
 - void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position)
 - void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+- void SetCustomConvexHull(CustomGeometry* custom)
+- void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale)
+- void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position)
+- void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
 - void SetTerrain()
 - void SetShapeType(ShapeType type)
 - void SetSize(const Vector3& size)
@@ -1319,6 +1359,29 @@ Properties:
 - CursorShape shape
 - bool useSystemShapes
 
+### CustomGeometry : Drawable
+
+Methods:
+
+- void Clear()
+- void SetNumGeometries(unsigned num)
+- void BeginGeometry(unsigned index, PrimitiveType type)
+- void DefineVertex(const Vector3& position)
+- void DefineNormal(const Vector3& normal)
+- void DefineTangent(const Vector4& tangent)
+- void DefineColor(const Color& color)
+- void DefineTexCoord(const Vector2& texCoord)
+- void Commit()
+- void SetMaterial(Material* material)
+- bool SetMaterial(unsigned index, Material* material)
+- unsigned GetNumGeometries()
+- Material* GetMaterial(unsigned index = 0)
+
+Properties:
+
+- Material* material
+- unsigned numGeometries
+
 ### DebugHud : Object
 
 Methods:
@@ -1814,6 +1877,7 @@ Methods:
 - const Vector<String>& ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
+- String GetAppPreferencesDir(const String org, const String app) const
 
 ### FileWatcher : Object
 
@@ -2006,6 +2070,7 @@ Methods:
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
 - CompressedLevel GetCompressedLevel(unsigned index) const
+- Image* GetSubimage(const IntRect& rect) const
 
 Properties:
 
@@ -2036,6 +2101,8 @@ Methods:
 - bool SaveGestures(const String fileName)
 - bool SaveGesture(const String fileName, unsigned gestureID)
 - unsigned LoadGestures(const String fileName)
+- bool RemoveGesture(unsigned gestureID)
+- void RemoveAllGestures()
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -2935,39 +3002,43 @@ Methods:
 - bool SaveXML(File* dest) const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
-- void SetPosition(const Vector2& position)
+- void SetPosition2D(const Vector2& position)
+- void SetPosition2D(float x, float y)
 - void SetRotation(const Quaternion& rotation)
-- void SetRotation(float rotation)
+- void SetRotation2D(float rotation)
 - void SetDirection(const Vector3& direction)
 - void SetScale(float scale)
 - void SetScale(const Vector3& scale)
-- void SetScale(const Vector2& scale)
+- void SetScale2D(const Vector2& scale)
+- void SetScale2D(float x, float y)
 - void SetTransform(const Vector3& position, const Quaternion& rotation)
-- void SetTransform(const Vector2& position, float rotation)
-- void SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
-- void SetTransform(const Vector2& position, float rotation, float scale)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
-- void SetTransform(const Vector2& position, float rotation, const Vector2& scale)
+- void SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
+- void SetTransform2D(const Vector2& position, float rotation)
+- void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale)
+- void SetTransform2D(const Vector2& position, float rotation, float scale)
 - void SetWorldPosition(const Vector3& position)
-- void SetWorldPosition(const Vector2& position)
+- void SetWorldPosition2D(const Vector2& position)
+- void SetWorldPosition2D(float x, float y)
 - void SetWorldRotation(const Quaternion& rotation)
-- void SetWorldRotation(float rotation)
+- void SetWorldRotation2D(float rotation)
 - void SetWorldDirection(const Vector3& direction)
 - void SetWorldScale(float scale)
 - void SetWorldScale(const Vector3& scale)
-- void SetWorldScale(const Vector2& scale)
+- void SetWorldScale2D(const Vector2& scale)
+- void SetWorldScale2D(float x, float y)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation)
-- void SetWorldTransform(const Vector2& position, float rotation)
-- void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
-- void SetWorldTransform(const Vector2& position, float rotation, float scale)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
-- void SetWorldTransform(const Vector2& position, float rotation, const Vector3& scale)
+- void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
+- void SetWorldTransform2D(const Vector2& position, float rotation)
+- void SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale)
+- void SetWorldTransform2D(const Vector2& position, float rotation, float scale)
 - void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL)
-- void Translate(const Vector2& delta, TransformSpace space = TS_LOCAL)
+- void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL)
 - void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL)
-- void Rotate(float delta, TransformSpace space = TS_LOCAL)
+- void Rotate2D(float delta, TransformSpace space = TS_LOCAL)
 - void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL)
-- void RotateAround(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
+- void RotateAround2D(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
 - void Pitch(float angle, TransformSpace space = TS_LOCAL)
 - void Yaw(float angle, TransformSpace space = TS_LOCAL)
 - void Roll(float angle, TransformSpace space = TS_LOCAL)
@@ -2975,7 +3046,7 @@ Methods:
 - bool LookAt(const Vector3& target, const Vector3& upAxis, TransformSpace space = TS_WORLD)
 - void Scale(float scale)
 - void Scale(const Vector3& scale)
-- void Scale(const Vector2& scale)
+- void Scale2D(const Vector2& scale)
 - void SetEnabled(bool enable)
 - void SetEnabled(bool enable, bool recursive)
 - void SetOwner(Connection* owner)
@@ -2997,6 +3068,8 @@ Methods:
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
 - Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
+- Component* CloneComponent(Component* component, unsigned id = 0)
+- Component* CloneComponent(Component* component, CreateMode mode, unsigned id = 0)
 - int CreateScriptObject(const String scriptObjectType)
 - int CreateScriptObject(const String fileName, const String scriptObjectType)
 - int GetScriptObject() const
@@ -3009,25 +3082,31 @@ Methods:
 - bool IsEnabled() const
 - Connection* GetOwner() const
 - const Vector3& GetPosition() const
+- Vector2 GetPosition2D() const
 - const Quaternion& GetRotation() const
+- float GetRotation2D() const
 - Vector3 GetDirection() const
 - Vector3 GetUp() const
 - Vector3 GetRight() const
 - const Vector3& GetScale() const
+- Vector2 GetScale2D() const
 - Matrix3x4 GetTransform() const
 - Vector3 GetWorldPosition() const
+- Vector2 GetWorldPosition2D() const
 - Quaternion GetWorldRotation() const
+- float GetWorldRotation2D() const
 - Vector3 GetWorldDirection() const
 - Vector3 GetWorldUp() const
 - Vector3 GetWorldRight() const
 - Vector3 GetWorldScale() const
+- Vector2 GetWorldScale2D() const
 - const Matrix3x4& GetWorldTransform() const
 - Vector3 LocalToWorld(const Vector3& position) const
 - Vector3 LocalToWorld(const Vector4& vector) const
-- Vector2 LocalToWorld(const Vector2& vector) const
+- Vector2 LocalToWorld2D(const Vector2& vector) const
 - Vector3 WorldToLocal(const Vector3& position) const
 - Vector3 WorldToLocal(const Vector4& vector) const
-- Vector2 WorldToLocal(const Vector2& vector) const
+- Vector2 WorldToLocal2D(const Vector2& vector) const
 - bool IsDirty() const
 - unsigned GetNumChildren(bool recursive = false) const
 - Node* GetChild(const String name, bool recursive = false) const
@@ -3058,18 +3137,24 @@ Properties:
 - bool enabled
 - Connection* owner
 - Vector3& position
+- Vector2 position2D
 - Quaternion& rotation
+- float rotation2D
 - Vector3 direction
 - Vector3 up (readonly)
 - Vector3 right (readonly)
 - Vector3& scale
+- Vector2 scale2D
 - Matrix3x4 transform (readonly)
 - Vector3 worldPosition
+- Vector2 worldPosition2D
 - Quaternion worldRotation
+- float worldRotation2D
 - Vector3 worldDirection
 - Vector3 worldUp (readonly)
 - Vector3 worldRight (readonly)
 - Vector3 worldScale
+- Vector2 worldScale2D
 - Matrix3x4& worldTransform (readonly)
 - bool dirty (readonly)
 - unsigned numComponents (readonly)
@@ -3213,7 +3298,7 @@ Methods:
 - void SetEmitterSize(const Vector3& size)
 - void SetActiveTime(float time)
 - void SetInactiveTime(float time)
-- void SetEmitting(bool enable, bool resetPeriod = false)
+- void SetEmitting(bool enable)
 - void SetUpdateInvisible(bool enable)
 - void SetTimeToLive(float time)
 - void SetMinTimeToLive(float time)
@@ -3239,6 +3324,9 @@ Methods:
 - void SetColor(const Color& color)
 - void SetNumColors(unsigned num)
 - void SetNumTextureFrames(unsigned num)
+- void ResetEmissionTimer()
+- void RemoveAllParticles()
+- void Reset()
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
 - bool GetUpdateInvisible() const
@@ -4601,10 +4689,12 @@ Methods:
 - void SetTexture(Texture2D* texture)
 - void SetRectangle(const IntRect& rectangle)
 - void SetHotSpot(const Vector2& hotSpot)
+- void SetOffset(const IntVector2& offset)
 - void SetSpriteSheet(SpriteSheet2D* spriteSheet)
 - Texture2D* GetTexture() const
 - const IntRect& GetRectangle() const
 - const Vector2& GetHotSpot() const
+- const IntVector2& GetOffset() const
 - SpriteSheet2D* GetSpriteSheet() const
 
 Properties:
@@ -4612,6 +4702,7 @@ Properties:
 - Texture2D* texture
 - IntRect rectangle
 - Vector2 hotSpot
+- IntVector2 offset
 - SpriteSheet2D* spriteSheet
 
 ### SpriteSheet2D : Resource
@@ -4622,8 +4713,7 @@ Methods:
 - Sprite2D* GetSprite(const String name) const
 - void DefineSprite(const String name, const IntRect& rectangle)
 - void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
-- void UpdateSprite(const String name, const IntRect& rectangle)
-- void UpdateSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
+- void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& originSize)
 
 ### StaticModel : Drawable
 
@@ -4648,14 +4738,6 @@ Properties:
 - BoundingBox& boundingBox (readonly)
 - unsigned numGeometries (readonly)
 - unsigned occlusionLodLevel
-
-### StaticModelGeometryData
-
-
-Properties:
-
-- Vector3 center
-- unsigned lodLevel
 
 ### StaticModelGroup : StaticModel
 
@@ -4918,8 +5000,7 @@ Methods:
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
-- void SetFaceCamera(bool enable)
-- void SetFaceCameraAxes(const Vector3& axes)
+- void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
 - int GetFontSize() const
@@ -4941,8 +5022,7 @@ Methods:
 - IntVector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
-- bool GetFaceCamera() const
-- const Vector3& GetFaceCameraAxes() const
+- FaceCameraMode GetFaceCameraMode() const
 
 Properties:
 
@@ -4964,8 +5044,7 @@ Properties:
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
-- bool faceCamera
-- Vector3& faceCameraAxes
+- FaceCameraMode faceCameraMode
 
 ### Texture : Resource
 
@@ -5079,6 +5158,10 @@ Properties:
 ### TouchState
 
 
+Methods:
+
+- UIElement* GetTouchedElement()
+
 Properties:
 
 - int touchID
@@ -5086,7 +5169,7 @@ Properties:
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
-- WeakPtr<UIElement> touchedElement
+- UIElement* touchedElement (readonly)
 
 ### UI : Object
 
@@ -5912,6 +5995,7 @@ Methods:
 - bool RemoveAttribute(const String name = String::EMPTY)
 - bool SetValue(const String value)
 - bool SetAttribute(const String name, const String value)
+- bool SetAttribute(const String value)
 - bool SetBool(const String name, bool value)
 - bool SetBoundingBox(const BoundingBox& value)
 - bool SetColor(const String name, const Color& value)
@@ -5944,9 +6028,13 @@ Methods:
 - XMLElement GetParent() const
 - unsigned GetNumAttributes() const
 - bool HasAttribute(const String name) const
+- String GetValue() const
+- String GetAttribute(const String name = String::EMPTY) const
+- String GetAttributeLower(const String name) const
+- String GetAttributeUpper(const String name) const
+- Vector<String> GetAttributeNames() const
 - bool GetBool(const String name) const
 - BoundingBox GetBoundingBox() const
-- String GetValue() const
 - Color GetColor(const String name) const
 - float GetFloat(const String name) const
 - unsigned GetUInt(const String name) const
@@ -5974,8 +6062,8 @@ Properties:
 - const XMLElement EMPTY
 - bool null (readonly)
 - String name (readonly)
-- String value (readonly)
 - XMLElement parent (readonly)
+- String value (readonly)
 - unsigned numAttributes (readonly)
 - XMLFile* file (readonly)
 
@@ -5986,6 +6074,7 @@ Methods:
 - XMLFile() (GC)
 - XMLFile* new()
 - void delete()
+- bool FromString(const String source)
 - XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
 - void Patch(XMLFile* patchFile)
@@ -6137,12 +6226,6 @@ Properties:
 - int CS_BUSY
 - int CS_MAX_SHAPES
 
-### CycleMode
-
-- int CM_LOOP
-- int CM_CLAMP
-- int CM_PINGPONG
-
 ### EmitterType
 
 - int EMITTER_SPHERE
@@ -6152,6 +6235,14 @@ Properties:
 
 - int EMITTER_TYPE_GRAVITY
 - int EMITTER_TYPE_RADIAL
+
+### FaceCameraMode
+
+- int FC_NONE
+- int FC_ROTATE_XYZ
+- int FC_ROTATE_Y
+- int FC_LOOKAT_XYZ
+- int FC_LOOKAT_Y
 
 ### FileMode
 
@@ -6248,6 +6339,12 @@ Properties:
 - int LOCK_HARDWARE
 - int LOCK_SHADOW
 - int LOCK_SCRATCH
+
+### LoopMode2D
+
+- int LM_DEFAULT
+- int LM_FORCE_LOOPED
+- int LM_FORCE_CLAMPED
 
 ### Orientation
 
@@ -6622,6 +6719,7 @@ Properties:
 - unsigned DRAWABLE_ANY
 - unsigned DRAWABLE_GEOMETRY
 - unsigned DRAWABLE_LIGHT
+- unsigned DRAWABLE_PROXYGEOMETRY
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID

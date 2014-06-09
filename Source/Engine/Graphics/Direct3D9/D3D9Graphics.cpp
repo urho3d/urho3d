@@ -785,8 +785,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 {
-    if (!destination || !destination->GetRenderSurface() || destination->GetWidth() != width_ ||
-        destination->GetHeight() != height_)
+    if (!destination || !destination->GetRenderSurface())
         return false;
     
     PROFILE(ResolveToTexture);
@@ -803,8 +802,14 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     rect.right = Clamp(vpCopy.right_, 0, width_);
     rect.bottom = Clamp(vpCopy.bottom_, 0, height_);
     
+    RECT destRect;
+    destRect.left = 0;
+    destRect.top = 0;
+    destRect.right = destination->GetWidth();
+    destRect.bottom = destination->GetHeight();
+    
     return SUCCEEDED(impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
-        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &rect, D3DTEXF_NONE));
+        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE));
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)

@@ -39,6 +39,9 @@ class XMLFile;
 /// %Input state for a finger touch.
 struct TouchState
 {
+    /// Return last touched UI element, used by scripting integration.
+    UIElement* GetTouchedElement();
+    
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.
@@ -151,6 +154,10 @@ public:
     bool SaveGesture(Serializer& dest, unsigned gestureID);
     /// Load touch gestures from a file. Return number of loaded gestures, or 0 on failure.
     unsigned LoadGestures(Deserializer& source);
+    /// Remove an in-memory gesture by ID. Return true if was found.
+    bool RemoveGesture(unsigned gestureID);
+    /// Remove all in-memory gestures.
+    void RemoveAllGestures();
 
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;

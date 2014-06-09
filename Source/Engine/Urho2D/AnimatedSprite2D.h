@@ -22,26 +22,27 @@
 
 #pragma once
 
-#include "StaticSprite2D.h"
+#include "Animation2D.h"
+#include "Drawable.h"
+
+/// Loop mode.
+enum LoopMode2D
+{
+    /// Default, use animation's value.
+    LM_DEFAULT = 0,
+    /// Force looped.
+    LM_FORCE_LOOPED,
+    /// Force clamped.
+    LM_FORCE_CLAMPED
+};
 
 namespace Urho3D
 {
 
-class Animation2D;
+class AnimationSet2D;
 
-/// Cycle mode.
-enum CycleMode
-{
-    /// Loop mode.
-    CM_LOOP = 0,
-    /// Clamp mode.
-    CM_CLAMP,
-    /// Pingpong Mode.
-    CM_PINGPONG,
-};
-
-/// Animated sprite component.
-class URHO3D_API AnimatedSprite2D : public StaticSprite2D
+/// Spriter animation component.
+class URHO3D_API AnimatedSprite2D : public Drawable
 {
     OBJECT(AnimatedSprite2D);
 
@@ -49,48 +50,131 @@ public:
     /// Construct.
     AnimatedSprite2D(Context* context);
     /// Destruct.
-    ~AnimatedSprite2D();
+    virtual ~AnimatedSprite2D();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-
+    
+    /// Set layer.
+    void SetLayer(int layer);
+    /// Set order in layer.
+    void SetOrderInLayer(int orderInLayer);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode mode);
+    /// Set flip.
+    void SetFlip(bool flipX, bool flipY);
+    /// Set flip X.
+    void SetFlipX(bool flipX);
+    /// Set flip Y.
+    void SetFlipY(bool flipY);
+    /// Set color.
+    void SetColor(const Color& color);
     /// Set speed.
     void SetSpeed(float speed);
-    /// Set cycle mode.
-    void SetCycleMode(CycleMode cycleMode);
-    /// Set animation.
-    void SetAnimation(Animation2D* animation);
+    /// Set animation by animation set, name and loop mode.
+    void SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode = LM_DEFAULT);
+    /// Set animation by name and loop mode.
+    void SetAnimation(const String& name, LoopMode2D loopMode = LM_DEFAULT);
+    /// Set animation set.
+    void SetAnimationSet(AnimationSet2D* animationSet);
+    /// Set loop mode.
+    void SetLoopMode(LoopMode2D loopMode);
 
+    /// Return layer.
+    int GetLayer() const { return layer_; }
+    /// Return order in layer.
+    int GetOrderInLayer() const { return orderInLayer_; }
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
+    /// Return flip X.
+    bool GetFlipX() const { return flipX_; }
+    /// Return flip Y.
+    bool GetFlipY() const { return flipY_; }
+    /// Return color.
+    const Color& GetColor() const { return color_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
-    /// Return cycle mode.
-    CycleMode GetCycleMode() const { return cycleMode_; }
-    /// Return Animation.
-    Animation2D* GetAnimation() const;
+    /// Return animation name.
+    const String& GetAnimation() const { return animationName_; }
+    /// Return animation.
+    AnimationSet2D* GetAnimationSet() const;
+    /// Return loop mode.
+    LoopMode2D GetLoopMode() const { return loopMode_; }
+    /// Return root node.
+    Node* GetRootNode() const;
 
-    /// Set animation attr.
-    void SetAnimationAttr(ResourceRef value);
-    /// Return animation attr.
-    ResourceRef GetAnimationAttr() const;
+    /// Set animation set attribute.
+    void SetAnimationSetAttr(ResourceRef value);
+    /// Return animation set attribute.
+    ResourceRef GetAnimationSetAttr() const;
+    /// Set anmiation by name.
+    void SetAnimationAttr(const String& name);
 
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Recalculate the world-space bounding box.
+    virtual void OnWorldBoundingBoxUpdate();
+    /// Set animation.
+    void SetAnimation(Animation2D* animation, LoopMode2D loopMode);
+    /// Update animation.
+    void UpdateAnimation(float timeStep);
+    /// Calculate timeline world world transform.
+    void CalculateTimelineWorldTransform(unsigned index);
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
+    /// Layer.
+    int layer_;
+    /// Order in layer.
+    int orderInLayer_;
+    /// Blend mode.
+    BlendMode blendMode_;
+    /// Flip X.
+    bool flipX_;
+    /// Flip Y.
+    bool flipY_;
+    /// Color.
+    Color color_;
     /// Speed.
     float speed_;
-    /// Cycle mode.
-    CycleMode cycleMode_;
+    /// Animation set.
+    SharedPtr<AnimationSet2D> animationSet_;
+    /// Animation name.
+    String animationName_;
     /// Animation.
     SharedPtr<Animation2D> animation_;
-    /// Animation time.
-    float animationTime_;
-    /// Animation total time.
-    float animationTotalTime_;
+    /// Loop mode.
+    LoopMode2D loopMode_;
+    /// Looped.
+    bool looped_;
+    /// Current time.
+    float currentTime_;
+    /// Root node.
+    SharedPtr<Node> rootNode_;
+    /// Timeline nodes.
+    Vector<SharedPtr<Node> > timelineNodes_;
+    /// Transform info.
+    struct TransformInfo
+    {
+        /// Construct.
+        TransformInfo() :
+            parent_(-1),
+            worldSpace_(false)
+        {
+        }
+
+        /// Parent.
+        int parent_;
+        /// World space.
+        bool worldSpace_;
+        /// Transform.
+        Transform2D transform_;
+    };
+    /// Timeline transform infos.
+    Vector<TransformInfo> timelineTransformInfos_;
 };
 
 }

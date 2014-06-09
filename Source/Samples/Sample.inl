@@ -55,7 +55,7 @@ void Sample::Setup()
 {
     // Modify engine startup parameters
     engineParameters_["WindowTitle"] = GetTypeName();
-    engineParameters_["LogName"]     = GetTypeName() + ".log";
+    engineParameters_["LogName"]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
     engineParameters_["FullScreen"]  = false;
     engineParameters_["Headless"]    = false;
 }
@@ -95,11 +95,8 @@ void Sample::InitTouchInput()
     if (!patchString.Empty())
     {
         // Patch the screen joystick layout further on demand
-        VectorBuffer buffer;
-        buffer.WriteString(patchString);
-        buffer.Seek(0);
         SharedPtr<XMLFile> patchFile(new XMLFile(context_));
-        if (patchFile->Load(buffer))
+        if (patchFile->FromString(patchString))
             layout->Patch(patchFile);
     }
     screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));

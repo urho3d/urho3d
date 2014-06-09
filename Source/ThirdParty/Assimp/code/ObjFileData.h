@@ -183,6 +183,8 @@ struct Material
 	aiColor3D diffuse;
 	//!	Specular color
 	aiColor3D specular;
+	//!	Emissive color
+	aiColor3D emissive;
 	//!	Alpha value
 	float alpha;
 	//!	Shineness factor
@@ -288,7 +290,7 @@ struct Model
 	//!	Active group
 	std::string m_strActiveGroup;
 	//!	Vector with generated texture coordinates
-	std::vector<aiVector2D> m_TextureCoord;
+	std::vector<aiVector3D> m_TextureCoord;
 	//!	Current mesh instance
 	Mesh *m_pCurrentMesh;
 	//!	Vector with stored meshes

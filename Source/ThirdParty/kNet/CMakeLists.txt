@@ -59,7 +59,7 @@ endif ()
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 # Install dependency for Engine/Network/Connection.h and Engine/Network/Network.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
+install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} kNet PARENT_SCOPE)
 if (APPLE)
     set (AMALG_EXCLUDES UnixClock)

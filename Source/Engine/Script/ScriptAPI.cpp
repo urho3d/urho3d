@@ -276,7 +276,7 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "void ClearDelayedExecute(const String&in declaration = String())", asMETHOD(ScriptInstance, ClearDelayedExecute), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_scriptFile(ScriptFile@+)", asMETHOD(ScriptInstance, SetScriptFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "ScriptFile@+ get_scriptFile() const", asMETHOD(ScriptInstance, GetScriptFile), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScriptInstance", "ScriptObject@+ get_object() const", asMETHOD(ScriptInstance, GetScriptObject), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "ScriptObject@+ get_scriptObject() const", asMETHOD(ScriptInstance, GetScriptObject), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_className(const String&in)", asMETHOD(ScriptInstance, SetClassName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", asMETHOD(ScriptInstance, GetClassName), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);

@@ -751,7 +751,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
 
-Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D" library.
+Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D" sublibrary.
 
 \section Rendering_Optimizations Optimizations
 
@@ -900,7 +900,7 @@ The techniques for different LOD levels and quality settings must appear in a sp
 - Second most distant & highest quality
 - ...
 
-%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. A built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
+%Material shader parameters can be floats or vectors up to 4 components, or matrices.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
@@ -1014,6 +1014,35 @@ Pixel shader:
 - SHADOWCMP: use manual shadow depth compare, Direct3D9 only for DF16 & DF24 shadow map formats
 - HEIGHTFOG: object's zone has height fog mode
 
+\section Shaders_InbuiltUniforms Inbuilt shader uniforms
+
+When objects or quad passes are being rendered, various engine inbuilt uniforms are set to assist with the rendering. Below is a partial list of the uniforms listed as HLSL data types. Look at the file Uniforms.glsl for the corresponding GLSL uniforms.
+
+Vertex shader uniforms:
+
+- float3 cAmbientStartColor: the start color value for a zone's ambient gradient
+- float3 cAmbientEndColor: the end color value for a zone's ambient gradient
+- float3 cCameraPos: camera's world position
+- float3x3 cCameraRot: camera's world rotation matrix
+- float cNearClip: camera's near clip distance
+- float cFarClip: camera's far clip distance
+- float cDeltaTime: the timestep of the current frame
+- float cElapsedTime: scene's elapsed time value. Can be used to implement animating materials
+- float4x3 cModel: the world transform matrix of the object being rendered
+- float4x4 cViewProj: the camera's concatenated view and projection matrices
+- float4x3 cZone: zone's transform matrix; used for ambient gradient calculations
+
+Pixel shader uniforms:
+
+- float3 cAmbientColor: ambient color for a zone with no ambient gradient
+- float3 cCameraPosPS: camera's world position
+- float cDeltaTimePS: the timestep of the current frame
+- float cElapsedTimePS: scene's elapsed time value
+- float3 cFogColor: the zone's fog color
+- float4 cFogParams: fog calculation parameters (see Batch.cpp and Fog.hlsl for the exact meaning)
+- float cNearClipPS: camera's near clip distance
+- float cFarClipPS: camera's far clip distance
+
 \section Shaders_Writing Writing shaders
 
 Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
@@ -1072,7 +1101,7 @@ Note that the used shader variations will vary with graphics settings, for examp
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
+A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
 
 The available commands are:
 
@@ -1090,7 +1119,7 @@ The render path XML definition looks like this:
 
 \code
 <renderpath>
-    <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
+    <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
         format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" persistent="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
@@ -1390,7 +1419,9 @@ On platforms where touch input is available, touch begin/end/move events will be
 
 Touch gestures can be recorded using SDL's inbuilt $1 gesture recognition system. Use \ref Input::RecordGesture "RecordGesture()" to start recording. The following finger movements will be recorded until the finger is lifted, at which point the recording ends and the E_GESTURERECORDED event is sent with the hash ID of the new gesture. The current in-memory gesture(s) can be saved or loaded as binary data using the \ref Input::SaveGestures "SaveGestures()", \ref Input::SaveGesture "SaveGesture()", \ref Input::LoadGestures "LoadGestures()" functions.
 
-Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event will be sent. In addition to the ID of the best matched gesture, it contains the center position and an error metric (lower = better.)
+Whenever a recognized gesture is entered by the user, the E_GESTUREINPUT event will be sent. In addition to the ID of the best matched gesture, it contains the center position and an error metric (lower = better) to help filter out false gestures.
+
+Note that all recorded (whether saved or not) and loaded gestures are held in-memory. Two additional functions are available to clear them: \ref Input::RemoveGesture "RemoveGesture()" to selectively clear a gesture by its ID and \ref Input::RemoveAllGestures "RemoveAllGestures()" to clear them all.
 
 Touch input can also emulate a virtual joystick by displaying on-screen buttons. See the function \ref Input::AddScreenJoystick "AddScreenJoystick()".
 
@@ -1644,85 +1675,156 @@ Due to the free transformability, sprites can not be reliably queried with \ref 
 
 
 \page Urho2D Urho2D
-In order to make 2D Game in Urho3D, Urho2D is provided. Urho2D include 2D graphics and 2D physics. The classes provide are:
+In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
 
-- Sprite2D: a sprite is defined with texture and texture rectangle and hot spot.
-- SpriteSheet2D: a sprite sheet(texture atlas) include some sprites in it.
-- StaticSprite2D: a drawable component to display a sprite.
-- Animation2D: 2D animation with some frames, a frame include duration and a sprite.
-- AnimatedSprite2D : a drawable component to display an animation.
-- ParticleEffect2D: 2D particle model file.
-- ParticleEmitter2D: a 2D particle effect.
-- PhysicsWorld2D: implements 2D physics simulation. 2D physics components such as RigidBody2D or CollisionShape2D can not function properly without this.
-- RigidBody2D: a 2D physics object instance.
-- CollisionShape2D: base class for 2D physics collision shape. 
-- CollisionBox2D: defines 2D physics collision box.
-- CollisionCircle2D: defines 2D physics collision circle.
-- CollisionEdge2D: defines 2D physics collision edge.
-- CollisionChain2D: defines 2D physics collision chain.
-- CollisionPolygon2D: defines 2D physics collision polygon.
-- Constraint2D: base class for 2D physics constraint.
-- ConstraintDistance2D: define 2D physics distance constraint.
-- ConstraintFriction2D: define 2D physics friction constraint.
-- ConstraintGear2D: define 2D physics gear constraint.
-- ConstraintMotor2D: define 2D physics motor constraint.
-- ConstraintMouse2D: define 2D physics mouse constraint.
-- ConstraintPrismatic2D: define 2D physics prismatic constraint.
-- ConstraintPulley2D: define 2D physics pulley constraint.
-- ConstraintRevolute2D: define 2D physics revolute constraint.
-- ConstraintRope2D: define 2D physics rope constraint.
-- ConstraintWeld2D: define 2D physics weld constraint.
-- ConstraintWheel2D: define 2D physics wheel constraint.
+A typical 2D game setup would consist of the following:
+	- Create an orthographic camera
+	- Create some sprites
+	- Use physics and constraints to interact with the scene
 
-In order to use Urho2D, it is need set camera to orthographic mode first, it can be done with following code:
+\section Urho2D_Orthographic Orthographic camera
+In order to use Urho2D we need to set camera to orthographic mode first; it can be done with following code:
 
 C++:
 \code
     // Create camera node
     Node* cameraNode = scene_->CreateChild("Camera");
-    // Set camera node's position
-    cameraNode->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
     // Create camera
     Camera* camera = cameraNode->CreateComponent<Camera>();
     // Set camera orthographic
     camera->SetOrthographic(true);
-
     // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera->SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 \endcode 
 
 AngelScript:
 \code
     // Create camera node
     Node@ cameraNode = scene_.CreateChild("Camera");
-    // Set camera node's position
-    cameraNode.SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
     // Create camera
     Camera@ camera = cameraNode.CreateComponent("Camera");
     // Set camera orthographic
     camera.orthographic = true;
-
     // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE);
+    camera.orthoSize = graphics.height * PIXEL_SIZE;
 \endcode 
 
 Lua:
 \code
     -- Create camera node
     cameraNode = scene_:CreateChild("Camera")
-    -- Set camera node's position
-    cameraNode.position = Vector3(0.0, 0.0, -10.0)
 
     -- Create camera
     local camera = cameraNode:CreateComponent("Camera")
     -- Set camera orthographic
     camera.orthographic = true
-
     -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera:SetOrthoSize(Vector2(graphics.width, graphics.height) * PIXEL_SIZE)
+    camera.orthoSize = graphics.height * PIXEL_SIZE
 \endcode 
+
+To zoom in/out, use \ref Camera::SetZoom "SetZoom()".
+
+\section Urho2D_Sprites Sprites
+Urho2D provides a handful of classes for loading/drawing the kind of sprite required by your game.
+You can chose from animated sprites, 2D particle emitters and static sprites.
+
+\section Urho2D_Animated Animated sprites
+
+Workflow for creating animated sprites in Urho2D relies on Spriter (c). 
+Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see details below on how to generate this file). Keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
+A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
+
+- AnimationSet2D: a Spriter *.scml file including one or more animations.
+Each Spriter animation (Animation2D) contained in an AnimationSet2D can be accessed by its index and by its name (\ref AnimationSet2D::GetAnimation "GetAnimation()").
+
+- AnimatedSprite2D: used to display a Spriter animation (Animation2D from an AnimationSet2D). Equivalent to a 3D AnimatedModel. Animation2D animations inside the AnimationSet2D are accessed by their name (String) using \ref AnimatedSprite2D::SetAnimation "SetAnimation()". Playback animation speed can be controlled using \ref AnimatedSprite2D::SetSpeed "SetSpeed()". Loop mode can be controlled using \ref AnimatedSprite2D::SetLoopMode "SetLoopMode()" (you can use the default value set in Spriter or make the animation repeat or clamp).
+One interesting feature is the ability to flip/mirror animations on both axes, using \ref AnimatedSprite2D::SetFlip "SetFlip()", \ref AnimatedSprite2D::SetFlipX "SetFlipX()" or \ref AnimatedSprite2D::SetFlipY "SetFlipY()". Once flipped, the animation remains in that state until boolean state is restored to false. It is recommended to build your sprites centered in Spriter if you want to easily flip their animations (otherwise sprite position will seem to diverge).
+
+- Animation2D (RefCounted): a Spriter animation from an AnimationSet2D.
+
+For a demonstration, check examples 33_Urho2DSpriterAnimation and 24_Urho2DSprite.
+
+\section Urho2D_Particle Particle Emitters
+A 2D particle emitter is built from a *.pex file (a format used by many 2D engines).
+A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
+
+- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see Bin/Data/Urho2D/greenspiral.pex
+- ParticleEmitter2D: used to display a ParticleEffect2D. Equivalent to a 3D ParticleEmitter.
+
+For a demonstration, check example 25_Urho2DParticle.
+
+\section Urho2D_Static_Sprites Static Sprites
+Static sprites are built from single image files or from spritesheets/texture atlases.
+Single image files are loaded using Sprite2D class (Resource) and spritesheets/texture atlases are loaded using SpriteSheet2D class (Resource).
+Both are rendered using StaticSprite2D class (Drawable component):
+- StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
+- Sprite2D: an image defined with texture, texture rectangle and hot spot.
+- SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
+Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spritehelper/), TexturePacker (http://www.codeandweb.com/texturepacker), ...
+These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
+
+You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
+For example, to make the box sprite (Bin/Data/Urho2D/Box.png) nearest filtered, create a file Box.xml next to it, with the following content:
+
+\code
+<texture>
+    <filter mode="nearest" />
+</texture>
+\endcode 
+
+The full list of texture parameters is documented \ref Materials "here".
+
+\section Urho2D_Physics Physics
+Physics in Urho2D uses Box2D. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference (just substitute "joints" for "constraints").
+- PhysicsWorld2D: implements 2D physics simulation. Mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+
+\section Urho2D_Rigidbodies_Components Rigid bodies components
+- RigidBody2D: a 2D physics object instance.
+Available BodyType2Ds are:
+- BT_STATIC: A static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
+- BT_DYNAMIC: A dynamic body is fully simulated. It can be moved manually by the user, but normally they move according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
+- BT_KINEMATIC: A kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
+
+You should establish the body type at creation, using \ref RigidBody2D::SetBodyType "SetBodyType()", because changing the body type later is expensive.
+
+\section Urho2D_Collision_Shapes_Components Collision shapes components
+Use \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to display the shapes.
+- CollisionShape2D: base class for 2D physics collision shapes.
+- CollisionBox2D: defines 2D physics collision box.
+- CollisionCircle2D: defines 2D physics collision circle. Circle shapes have a position (\ref CollisionCircle2D::SetCenter "SetCenter()") and radius (\ref CollisionCircle2D::SetRadius "SetRadius()"). Circles are solid, you cannot make a hollow circle using the circle shape.
+- CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments defined by 2 vertices (\ref CollisionEdge2D::SetVertex1 "SetVertex1()" and \ref CollisionEdge2D::SetVertex2 "SetVertex2()" or globaly \ref CollisionEdge2D::SetVertices "SetVertices()"). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
+- CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (\ref CollisionChain2D::SetVertices "SetVertices()") to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
+- CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices are stored with a counter clockwise winding.
+
+Important: collision shapes must match your textures in order to be accurate. You can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you.
+Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
+
+\section Urho2D_Constraints_Components Constraints components
+Apply a constraint to a node (called 'ownerBody') and use \ref Constraint::SetOtherBody "SetOtherBody()" to set the other node's body to be constrained to the ownerBody.
+Use \ref Constraint2D::SetCollideConnected "SetCollideConnected()" to switch collision on/off between the bodies.
+Use \ref PhysicsWorld2D::SetDrawJoint "SetDrawJoint()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to display the joints.
+See 32_Urho2DConstraints sample for detailed examples and to help selecting the appropriate constraint.
+- Constraint2D: base class for 2D physics constraints.
+- ConstraintDistance2D: defines 2D physics distance constraint. The distance between two anchor points (\ref ConstraintDistance2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintDistance2D::SetOtherBodyAnchor "SetOtherBodyAnchor()") on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (\ref ConstraintDistance2D::SetFrequencyHz "SetFrequencyHz()" is below half of the timestep) and damping ratio (\ref ConstraintDistance2D::SetDampingRatio "SetDampingRatio()").
+- ConstraintFriction2D: defines 2D physics friction constraint. This constraint is used for top-down friction. It provides 2D translational friction (\ref ConstraintFriction2D::SetMaxForce "SetMaxForce()") and angular friction (\ref ConstraintFriction2D::SetMaxTorque "SetMaxTorque()").
+- ConstraintGear2D: defines 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (\ref ConstraintGear2D::SetOwnerConstraint "SetOwnerConstraint()" and \ref ConstraintGear2D::SetOtherConstraint "SetOtherConstraint()"). Like the pulley ratio, you can specify a gear ratio (\ref ConstraintGear2D::SetRatio "SetRatio()"). However, in this case the gear ratio can be negative.
+- ConstraintMotor2D: defines 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (\ref ConstraintMotor2D::SetLinearOffset "SetLinearOffset()") and rotation offsets (\ref ConstraintMotor2D::SetAngularOffset "SetAngularOffset()"). You can set the maximum motor force (\ref ConstraintMotor2D::SetMaxForce "SetMaxForce()") and torque (\ref ConstraintMotor2D::SetMaxTorque "SetMaxTorque()") that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
+- ConstraintMouse2D: defines 2D physics mouse constraint. Used to manipulate bodies with the mouse, this constraint is almost used in every Box2D tutorial available on the net, to allow interacting with the 2D scene. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (\ref ConstraintMouse2D::SetTarget "SetTarget()") initially coincides with the body’s anchor point. The maximum force (\ref ConstraintMouse2D::SetMaxForce "SetMaxForce()") is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (\ref ConstraintMouse2D::SetFrequencyHz "SetFrequencyHz()") and damping ratio (\ref ConstraintMouse2D::SetDampingRatio "SetDampingRatio()") are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
+- ConstraintPrismatic2D: defines 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (\ref ConstraintPrismatic2D::SetAxis "SetAxis()"). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
+- ConstraintPulley2D: defines 2D physics pulley constraint. The pulley connects two bodies to ground (\ref ConstraintPulley2D::SetOwnerBodyGroundAnchor "SetOwnerBodyGroundAnchor()" and \ref ConstraintPulley2D::SetOtherBodyGroundAnchor "SetOtherBodyGroundAnchor()") and to each other (\ref ConstraintPulley2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintPulley2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). As one body goes up, the other goes down. You can supply a ratio (\ref ConstraintPulley2D::SetRatio "SetRatio()") that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
+- ConstraintRevolute2D: defines 2D physics revolute constraint. This constraint forces two bodies to share a common hinge anchor point (\ref ConstraintRevolute2D::SetAnchor "SetAnchor()"). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (\ref ConstraintRevolute2D::SetEnableLimit "SetEnableLimit()") forces the joint angle to remain between a lower (\ref ConstraintRevolute2D::SetLowerAngle "SetLowerAngle()") and upper (\ref ConstraintRevolute2D::SetUpperAngle "SetUpperAngle()") bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (\ref ConstraintRevolute2D::SetEnableMotor "SetEnableMotor()") allows you to specify the constraint speed (the time derivative of the angle). The speed (\ref ConstraintRevolute2D::SetMotorSpeed "SetMotorSpeed()") can be negative or positive. When the maximum torque (\ref ConstraintRevolute2D::SetMaxMotorTorque "SetMaxMotorTorque()") is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
+- ConstraintRope2D: defines 2D physics rope constraint. This constraint restricts the maximum distance (\ref ConstraintRope2D::SetMaxLength "SetMaxLength()") between two points (\ref ConstraintRope2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintRope2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). This can be useful to prevent chains of bodies from stretching, even under high load.
+- ConstraintWeld2D: defines 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
+- ConstraintWheel2D: defines 2D physics wheel constraint. This constraint restricts a point on bodyB (\ref ConstraintWheel2D::SetAnchor() "SetAnchor()") to a line on bodyA (\ref ConstraintWheel2D::SetAxis "SetAxis()"). It also provides a suspension spring.
+
+\section Urho2D_Background_and_Layers Background and Layers
+To set the background color for the scene, use \ref Renderer::GetDefaultZone "GetDefaultZone()".fogColor
+
+You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange thir display order.
+
+Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
 
 \page Serialization Serialization
 

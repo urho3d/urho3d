@@ -16,6 +16,7 @@ int  viewportBorderWidth = 4; // width of a viewport resize border
 IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
 bool mouseWheelCameraPosition = false;
+bool contextMenuActionWaitFrame = false;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -213,10 +214,6 @@ class ViewportContext
 
     void SetOrthographic(bool orthographic)
     {
-        // This doesn't work that great
-        /* if (orthographic) */
-        /*     camera.orthoSize = (cameraNode.position - GetScreenCollision(IntVector2(viewport.rect.width, viewport.rect.height))).length; */
-
         camera.orthographic = orthographic;
         UpdateSettingsUI();
     }
@@ -404,6 +401,7 @@ void CreateCamera()
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("UIMouseClick", "ViewMouseClick");
     SubscribeToEvent("MouseMove", "ViewMouseMove");
+    SubscribeToEvent("UIMouseClickEnd", "ViewMouseClickEnd");
     SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
     SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
     SubscribeToEvent("BeginViewRender", "HandleBeginViewRender");
@@ -1081,7 +1079,7 @@ void UpdateStats(float timeStep)
 
 void UpdateViewports(float timeStep)
 {
-    for(uint i = 0; i < viewports.length; i++)
+    for(uint i = 0; i < viewports.length; ++i)
     {
         ViewportContext@ viewportContext = viewports[i];
         viewportContext.Update(timeStep);
@@ -1090,8 +1088,11 @@ void UpdateViewports(float timeStep)
 
 void UpdateView(float timeStep)
 {
+    if (ui.HasModalElement() || ui.focusElement !is null)
+        return;
+
     // Move camera
-    if (ui.focusElement is null && !input.keyDown[KEY_LCTRL])
+    if (!input.keyDown[KEY_LCTRL])
     {
         float speedMultiplier = 1.0;
         if (input.keyDown[KEY_LSHIFT])
@@ -1142,28 +1143,37 @@ void UpdateView(float timeStep)
         }
     }
 
-    // Rotate/orbit camera
+    // Rotate/orbit/pan camera
     if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
     {
         IntVector2 mouseMove = input.mouseMove;
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
-            activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
-            activeViewport.cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
-
-            if (limitRotation)
-                activeViewport.cameraPitch = Clamp(activeViewport.cameraPitch, -90.0, 90.0);
-
-            Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
-            cameraNode.rotation = q;
-            if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+            if (input.keyDown[KEY_LSHIFT] && input.mouseButtonDown[MOUSEB_MIDDLE])
             {
-                Vector3 centerPoint = SelectedNodesCenterPoint();
-                Vector3 d = cameraNode.worldPosition - centerPoint;
-                cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
-                orbiting = true;
+                cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
             }
+            else
+            {
+                activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
+                activeViewport.cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
 
+                if (limitRotation)
+                    activeViewport.cameraPitch = Clamp(activeViewport.cameraPitch, -90.0, 90.0);
+
+                Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+                cameraNode.rotation = q;
+                if (input.mouseButtonDown[MOUSEB_MIDDLE] && selectedNodes.length > 0 || selectedComponents.length > 0)
+                {
+                    Vector3 centerPoint = SelectedNodesCenterPoint();
+                    Vector3 d = cameraNode.worldPosition - centerPoint;
+                    cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
+                    orbiting = true;
+                }
+            }
+        }
+        else
+        {
             FadeUI();
             input.mouseGrabbed = true;
         }
@@ -1175,7 +1185,7 @@ void UpdateView(float timeStep)
         orbiting = false;
 
     // Move/rotate/scale object
-    if (!editNodes.empty && editMode != EDIT_SELECT && ui.focusElement is null && input.keyDown[KEY_LCTRL])
+    if (!editNodes.empty && editMode != EDIT_SELECT && input.keyDown[KEY_LCTRL])
     {
         Vector3 adjust(0, 0, 0);
         if (input.keyDown[KEY_UP])
@@ -1359,7 +1369,8 @@ void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
 void ViewMouseMove()
 {
     // setting mouse position based on mouse position
-    if (ui.focusElement !is null || input.mouseButtonDown[MOUSEB_LEFT|MOUSEB_MIDDLE|MOUSEB_RIGHT])
+    if (ui.dragElement !is null) { }
+    else if (ui.focusElement !is null || input.mouseButtonDown[MOUSEB_LEFT|MOUSEB_MIDDLE|MOUSEB_RIGHT])
         return;
 
     IntVector2 pos = ui.cursor.position;
@@ -1376,6 +1387,37 @@ void ViewMouseClick()
     ViewRaycast(true);
 }
 
+Ray GetActiveViewportCameraRay()
+{
+    IntRect view = activeViewport.viewport.rect;
+    return camera.GetScreenRay(
+        float(ui.cursorPosition.x - view.left) / view.width,
+        float(ui.cursorPosition.y - view.top) / view.height
+    );
+}
+
+void ViewMouseClickEnd()
+{
+    // checks to close open popup windows
+    IntVector2 pos = ui.cursorPosition;
+    if (contextMenu !is null && contextMenu.enabled)
+    {
+        if (contextMenuActionWaitFrame)
+            contextMenuActionWaitFrame = false;
+        else
+        {
+            if (!contextMenu.IsInside(pos, true))
+                CloseContextMenu();
+        }
+    }
+    if (quickMenu !is null && quickMenu.enabled)
+    {
+        bool enabled = quickMenu.IsInside(pos, true);
+        quickMenu.enabled = enabled;
+        quickMenu.visible = enabled;
+    }
+}
+
 void ViewRaycast(bool mouseClick)
 {
     // Ignore if UI has modal element
@@ -1388,7 +1430,7 @@ void ViewRaycast(bool mouseClick)
 
     IntVector2 pos = ui.cursorPosition;
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
-    if(editMode==EDIT_SPAWN)
+    if (editMode == EDIT_SPAWN)
     {
         if(mouseClick && input.mouseButtonPress[MOUSEB_LEFT] && elementAtPos is null)
             SpawnObject();
@@ -1400,7 +1442,6 @@ void ViewRaycast(bool mouseClick)
         return;
 
     DebugRenderer@ debug = editorScene.debugRenderer;
-
 
     if (pickMode == PICK_UI_ELEMENTS)
     {
@@ -1426,10 +1467,7 @@ void ViewRaycast(bool mouseClick)
     if (elementAtPos !is null)
         return;
 
-    IntRect view = activeViewport.viewport.rect;
-    Ray cameraRay = camera.GetScreenRay(
-        float(pos.x - view.left) / view.width,
-        float(pos.y - view.top) / view.height);
+    Ray cameraRay = GetActiveViewportCameraRay();
     Component@ selectedComponent;
 
     if (pickMode < PICK_RIGIDBODIES)
@@ -1653,6 +1691,19 @@ Vector3 GetScreenCollision(IntVector2 pos)
     return res;
 }
 
+Drawable@ GetDrawableAtMousePostion()
+{
+    IntVector2 pos = ui.cursorPosition;
+    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
+
+    if (editorScene.octree is null)
+        return null;
+
+    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY, 0x7fffffff);
+
+    return result.drawable;
+}
+
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Hide gizmo and grid from preview camera
@@ -1709,4 +1760,3 @@ void HandleEndViewRender(StringHash eventType, VariantMap& eventData)
         }
     }
 }
-

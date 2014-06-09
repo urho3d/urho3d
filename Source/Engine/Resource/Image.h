@@ -61,10 +61,10 @@ struct CompressedLevel
         rows_(0)
     {
     }
-    
+
     /// Decompress to RGBA. The destination buffer required is width * height * 4 bytes. Return true if successful.
     bool Decompress(unsigned char* dest);
-    
+
     /// Compressed image data.
     unsigned char* data_;
     /// Compression format.
@@ -89,7 +89,7 @@ struct CompressedLevel
 class URHO3D_API Image : public Resource
 {
     OBJECT(Image);
-    
+
 public:
     /// Construct empty.
     Image(Context* context);
@@ -97,10 +97,10 @@ public:
     virtual ~Image();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    
+
     /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
     bool SetSize(int width, int height, unsigned components);
     /// Set 3D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
@@ -127,7 +127,7 @@ public:
     bool SaveTGA(const String& fileName) const;
     /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality) const;
-    
+
     /// Return a 2D pixel color.
     Color GetPixel(int x, int y) const;
     /// Return a 3D pixel color.
@@ -156,15 +156,17 @@ public:
     SharedPtr<Image> GetNextLevel() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
+    /// Return subimage from the image or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the subimage yourself.
+    Image* GetSubimage(const IntRect& rect) const;
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
-    
+
 private:
     /// Decode an image using stb_image.
     static unsigned char* GetImageData(Deserializer& source, int& width, int& height, unsigned& components);
     /// Free an image file's pixel data.
     static void FreeImageData(unsigned char* pixelData);
-    
+
     /// Width.
     int width_;
     /// Height.

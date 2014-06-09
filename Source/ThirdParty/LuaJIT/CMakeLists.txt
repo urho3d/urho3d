@@ -299,7 +299,7 @@ if (NOT IOS AND URHO3D_TOOLS)
         COMMENT "Copying dependency files for luajit standalone executable")
 
     # Install dependency files required by luajit
-    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR}/Data/LuaScripts USE_SOURCE_PERMISSIONS)
+    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR}/Data/LuaScripts ${DEST_PERMISSIONS})
 endif ()
 
 # Add Data/LuaScripts directory into the LuaJIT module search path

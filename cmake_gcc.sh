@@ -37,6 +37,9 @@ IFS=#
 GENERATOR="Unix Makefiles"
 [[ $1 =~ ^eclipse$ ]] && GENERATOR="Eclipse CDT4 - Unix Makefiles" && shift && xmlstarlet --version >/dev/null 2>&1 && HAS_XMLSTARLET=1
 
+# Add support for CodeBlocks IDE
+[[ $1 =~ ^codeblocks$ ]] && GENERATOR="CodeBlocks - Unix Makefiles"
+
 # Add support for both native and cross-compiling build for Raspberry Pi
 [[ $( uname -m ) =~ ^armv6 ]] && PLATFORM="-DRASPI=1"
 

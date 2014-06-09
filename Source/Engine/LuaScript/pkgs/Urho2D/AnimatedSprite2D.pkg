@@ -1,23 +1,46 @@
 $#include "AnimatedSprite2D.h"
 
-enum CycleMode
+enum LoopMode2D
 {
-    CM_LOOP = 0,
-    CM_CLAMP,
-    CM_PINGPONG,
+    LM_DEFAULT = 0,
+    LM_FORCE_LOOPED,
+    LM_FORCE_CLAMPED
 };
 
-class AnimatedSprite2D : public StaticSprite2D
+class AnimatedSprite2D : Drawable
 {
+    void SetLayer(int layer);
+    void SetOrderInLayer(int orderInLayer);
+    void SetBlendMode(BlendMode mode);
+    void SetFlip(bool flipX, bool flipY);
+    void SetFlipX(bool flipX);
+    void SetFlipY(bool flipY);
+    void SetColor(const Color& color);
     void SetSpeed(float speed);
-    void SetCycleMode(CycleMode cycleMode);
-    void SetAnimation(Animation2D* animation);
+    void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT);
+    void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT);
+    void SetAnimationSet(AnimationSet2D* animationSet);
+    void SetLoopMode(LoopMode2D loopMode);
 
+    int GetLayer() const;
+    int GetOrderInLayer() const;
+    BlendMode GetBlendMode() const;
+    bool GetFlipX() const;
+    bool GetFlipY() const;
+    const Color& GetColor() const;
     float GetSpeed() const;
-    CycleMode GetCycleMode() const;
-    Animation2D* GetAnimation() const;
+    const String GetAnimation() const;
+    AnimationSet2D* GetAnimationSet() const;
+    LoopMode2D GetLoopMode() const;
 
+    tolua_property__get_set int layer;
+    tolua_property__get_set int orderInLayer;
+    tolua_property__get_set BlendMode blendMode;
+    tolua_property__get_set bool flipX;
+    tolua_property__get_set bool flipY;
+    tolua_property__get_set Color& color;
     tolua_property__get_set float speed;
-    tolua_property__get_set CycleMode cycleMode;
-    tolua_property__get_set Animation2D* animation;
+    tolua_property__get_set String animation;
+    tolua_property__get_set AnimationSet2D* animationSet;
+    tolua_property__get_set LoopMode2D loopMode;
 };

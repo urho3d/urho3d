@@ -9,13 +9,8 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
 local endPos = nil
 local currentPath = {}
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
 
 function Start()
     -- Execute the common startup for samples
@@ -23,10 +18,10 @@ function Start()
 
     -- Create the scene content
     CreateScene()
-    
+
     -- Create the UI content
     CreateUI()
-    
+
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
@@ -40,14 +35,14 @@ function CreateScene()
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("DebugRenderer")
-    
+
     -- Create scene node & StaticModel component for showing a static plane
     local planeNode = scene_:CreateChild("Plane")
     planeNode.scale = Vector3(100.0, 1.0, 100.0)
     local planeObject = planeNode:CreateComponent("StaticModel")
     planeObject.model = cache:GetResource("Model", "Models/Plane.mdl")
     planeObject.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
-    
+
     -- Create a Zone component for ambient lighting & fog control
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
@@ -72,7 +67,7 @@ function CreateScene()
     for i = 1, NUM_MUSHROOMS do
         CreateMushroom(Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0))
     end
-    
+
     -- Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
     -- rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
     local NUM_BOXES = 20
@@ -110,12 +105,12 @@ function CreateScene()
     -- physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     -- it will use renderable geometry instead
     navMesh:Build()
-    
+
     -- Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_:CreateChild("Camera")
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
-    
+
     -- Set an initial position for the camera scene node above the plane
     cameraNode.position = Vector3(0.0, 5.0, 0.0)
 end
@@ -129,7 +124,7 @@ function CreateUI()
     ui.cursor = cursor
     -- Set starting position of the cursor at the rendering window center
     cursor:SetPosition(graphics.width / 2, graphics.height / 2)
-    
+
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
@@ -169,12 +164,12 @@ function MoveCamera(timeStep)
     if ui.focusElement ~= nil then
         return
     end
-    
+
     -- Movement speed as world units per second
     local MOVE_SPEED = 20.0
     -- Mouse sensitivity as degrees per pixel
     local MOUSE_SENSITIVITY = 0.1
-    
+
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     -- Only move the camera when the cursor is hidden
     if not ui.cursor.visible then
@@ -224,11 +219,11 @@ function SetPathPoint()
             -- Teleport
             currentPath = {}
             jackNode:LookAt(Vector3(pathPos.x, jackNode.position.y, pathPos.z), Vector3(0.0, 1.0, 0.0))
-            jackNode.position = pathPos;
+            jackNode.position = pathPos
         else
             -- Calculate path from Jack's current position to the end point
-            endPos = pathPos;
-            currentPath = navMesh:FindPath(jackNode.position, endPos);
+            endPos = pathPos
+            currentPath = navMesh:FindPath(jackNode.position, endPos)
         end
     end
 end
@@ -240,7 +235,7 @@ function AddOrRemoveObject()
         -- The part of the navigation mesh we must update, which is the world bounding box of the associated
         -- drawable component
         local updateBox = nil
-        
+
         local hitNode = hitDrawable:GetNode()
         if hitNode.name == "Mushroom" then
             updateBox = hitDrawable.worldBoundingBox
@@ -250,12 +245,12 @@ function AddOrRemoveObject()
             local newObject = newNode:GetComponent("StaticModel")
             updateBox = newObject.worldBoundingBox
         end
-        
+
         -- Rebuild part of the navigation mesh, then recalculate path if applicable
         local navMesh = scene_:GetComponent("NavigationMesh")
         navMesh:Build(updateBox)
         if table.maxn(currentPath) > 0 then
-            currentPath = navMesh:FindPath(jackNode.position, endPos);
+            currentPath = navMesh:FindPath(jackNode.position, endPos)
         end
     end
 end
@@ -293,7 +288,7 @@ function Raycast(maxDistance)
         hitDrawable = result.drawable
         return true, hitPos, hitDrawable
     end
-    
+
     return false, nil, nil
 end
 
@@ -335,13 +330,13 @@ function HandlePostRenderUpdate(eventType, eventData)
         local navMesh = scene_:GetComponent("NavigationMesh")
         navMesh:DrawDebugGeometry(true)
     end
-    
+
     -- Visualize the start and end points and the last calculated path
     local size = table.maxn(currentPath)
     if size > 0 then
         local debug = scene_:GetComponent("DebugRenderer")
         debug:AddBoundingBox(BoundingBox(endPos - Vector3(0.1, 0.1, 0.1), endPos + Vector3(0.1, 0.1, 0.1)), Color(1.0, 1.0, 1.0))
-        
+
         -- Draw the path with a small upward bias so that it does not clip into the surfaces
         local bias = Vector3(0.0, 0.05, 0.0)
         debug:AddLine(jackNode.position + bias, currentPath[1] + bias, Color(1.0, 1.0, 1.0))
@@ -352,4 +347,77 @@ function HandlePostRenderUpdate(eventType, eventData)
             end
         end
     end
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <add sel=\"/element\">" ..
+        "        <element type=\"Button\">" ..
+        "            <attribute name=\"Name\" value=\"Button3\" />" ..
+        "            <attribute name=\"Position\" value=\"-120 -120\" />" ..
+        "            <attribute name=\"Size\" value=\"96 96\" />" ..
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" ..
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" ..
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" ..
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" ..
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" ..
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"Label\" />" ..
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" ..
+        "                <attribute name=\"Text\" value=\"Teleport\" />" ..
+        "            </element>" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "                <attribute name=\"Text\" value=\"LSHIFT\" />" ..
+        "            </element>" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "                <attribute name=\"Text\" value=\"LEFT\" />" ..
+        "            </element>" ..
+        "        </element>" ..
+        "        <element type=\"Button\">" ..
+        "            <attribute name=\"Name\" value=\"Button4\" />" ..
+        "            <attribute name=\"Position\" value=\"-120 -12\" />" ..
+        "            <attribute name=\"Size\" value=\"96 96\" />" ..
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />" ..
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />" ..
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />" ..
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />" ..
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />" ..
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"Label\" />" ..
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />" ..
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />" ..
+        "                <attribute name=\"Text\" value=\"Obstacles\" />" ..
+        "            </element>" ..
+        "            <element type=\"Text\">" ..
+        "                <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "                <attribute name=\"Text\" value=\"MIDDLE\" />" ..
+        "            </element>" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Set</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"LEFT\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

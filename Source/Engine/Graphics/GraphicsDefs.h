@@ -197,6 +197,52 @@ enum ShaderType
     PS,
 };
 
+/// Shader parameter groups for determining need to update.
+enum ShaderParameterGroup
+{
+    SP_FRAME = 0,
+    SP_CAMERA,
+    SP_VIEWPORT,
+    SP_ZONE,
+    SP_LIGHT,
+    SP_VERTEXLIGHTS,
+    SP_MATERIAL,
+    SP_OBJECTTRANSFORM,
+    MAX_SHADER_PARAMETER_GROUPS
+};
+
+/// Texture units.
+enum TextureUnit
+{
+    TU_DIFFUSE = 0,
+    TU_ALBEDOBUFFER = 0,
+    TU_NORMAL = 1,
+    TU_NORMALBUFFER = 1,
+    TU_SPECULAR = 2,
+    TU_EMISSIVE = 3,
+    TU_ENVIRONMENT = 4,
+    MAX_MATERIAL_TEXTURE_UNITS = 5,
+    TU_LIGHTRAMP = 5,
+    TU_LIGHTSHAPE = 6,
+    TU_SHADOWMAP = 7,
+    TU_FACESELECT = 8,
+    TU_INDIRECTION = 9,
+    TU_DEPTHBUFFER = 10,
+    TU_LIGHTBUFFER = 11,
+    TU_VOLUMEMAP = 12,
+    MAX_TEXTURE_UNITS = 13
+};
+
+/// Billboard camera facing modes.
+enum FaceCameraMode
+{
+    FC_NONE = 0,
+    FC_ROTATE_XYZ,
+    FC_ROTATE_Y,
+    FC_LOOKAT_XYZ,
+    FC_LOOKAT_Y
+};
+
 // Inbuilt shader parameters.
 extern StringHash VSP_AMBIENTSTARTCOLOR;
 extern StringHash VSP_AMBIENTENDCOLOR;
@@ -259,42 +305,6 @@ extern StringHash PASS_POSTALPHA;
 
 // Scale calculation from bounding box diagonal.
 extern Vector3 DOT_SCALE;
-
-/// Texture units.
-enum TextureUnit
-{
-    TU_DIFFUSE = 0,
-    TU_ALBEDOBUFFER = 0,
-    TU_NORMAL = 1,
-    TU_NORMALBUFFER = 1,
-    TU_SPECULAR = 2,
-    TU_EMISSIVE = 3,
-    TU_ENVIRONMENT = 4,
-    MAX_MATERIAL_TEXTURE_UNITS = 5,
-    TU_LIGHTRAMP = 5,
-    TU_LIGHTSHAPE = 6,
-    TU_SHADOWMAP = 7,
-    TU_FACESELECT = 8,
-    TU_INDIRECTION = 9,
-    TU_DEPTHBUFFER = 10,
-    TU_LIGHTBUFFER = 11,
-    TU_VOLUMEMAP = 12,
-    MAX_TEXTURE_UNITS = 13
-};
-
-/// Shader parameter groups for determining need to update.
-enum ShaderParameterGroup
-{
-    SP_FRAME = 0,
-    SP_CAMERA,
-    SP_VIEWPORT,
-    SP_ZONE,
-    SP_LIGHT,
-    SP_VERTEXLIGHTS,
-    SP_MATERIAL,
-    SP_OBJECTTRANSFORM,
-    MAX_SHADER_PARAMETER_GROUPS
-};
 
 static const int QUALITY_LOW = 0;
 static const int QUALITY_MEDIUM = 1;

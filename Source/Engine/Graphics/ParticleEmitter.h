@@ -154,8 +154,8 @@ public:
     void SetActiveTime(float time);
     /// Set emission inactive period length (0 = infinite.)
     void SetInactiveTime(float time);
-    /// Set whether should be emitting and optionally reset emission period.
-    void SetEmitting(bool enable, bool resetPeriod = false);
+    /// Set whether should be emitting. If the state was changed, also resets the emission period timer.
+    void SetEmitting(bool enable);
     /// Set whether to update when particles are not visible.
     void SetUpdateInvisible(bool enable);
     /// Set particle time to live (both minimum and maximum.)
@@ -210,6 +210,12 @@ public:
     void SetTextureFrames(const Vector<TextureFrame>& animation);
     /// Set number of texture animation frames.
     void SetNumTextureFrames(unsigned num);
+    /// Reset the emission period timer.
+    void ResetEmissionTimer();
+    /// Remove all current particles.
+    void RemoveAllParticles();
+    /// Reset the particle emitter completely. Removes current particles, sets emitting state on, and resets the emission timer.
+    void Reset();
     
     /// Return maximum number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }

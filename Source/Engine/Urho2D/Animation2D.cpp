@@ -22,160 +22,159 @@
 
 #include "Precompiled.h"
 #include "Animation2D.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "ResourceCache.h"
-#include "Serializer.h"
+#include "AnimationSet2D.h"
 #include "Sprite2D.h"
-#include "SpriteSheet2D.h"
-#include "XMLFile.h"
 
 #include "DebugNew.h"
 
 namespace Urho3D
 {
 
-Animation2D::Animation2D(Context* context) :
-    Resource(context)
+Reference2D::Reference2D() :
+    type_(OT_BONE),
+    timeline_(0),
+    zIndex_(0)
 {
+}
 
+MainlineKey2D::MainlineKey2D() :
+    time_(0)
+{
+}
+
+Transform2D::Transform2D() :
+    position_(Vector2::ZERO),
+    angle_(0.0f),
+    scale_(Vector2::ONE)
+{
+}
+
+Transform2D::Transform2D(const Vector2 position, float angle, const Vector2& scale) :
+position_(position), 
+    angle_(angle), 
+    scale_(scale)
+{
+}
+
+Transform2D::Transform2D(const Transform2D& other) :
+position_(other.position_), 
+    angle_(other.angle_), 
+    scale_(other.scale_)
+{
+}
+
+Transform2D& Transform2D::operator = (const Transform2D& other)
+{
+    position_ = other.position_; 
+    angle_ = other.angle_;
+    scale_ = other.scale_;
+    return *this;
+}
+
+Transform2D Transform2D::operator * (const Transform2D& other) const
+{
+    float x = scale_.x_ * other.position_.x_;
+    float y = scale_.y_ * other.position_.y_;
+    float s = Sin(angle_);
+    float c = Cos(angle_);
+
+    Vector2 position;
+    position.x_ = (x * c) - (y * s);
+    position.y_ = (x * s) + (y * c);
+    position = position_ + position;
+
+    float angle = angle_ + other.angle_;
+    Vector2 scale = scale_ * other.scale_;
+
+    return Transform2D(position, angle, scale);
+}
+
+Transform2D Transform2D::Lerp(const Transform2D& other, float t, int spin) const
+{
+    Transform2D ret;
+    ret.position_ = position_.Lerp(other.position_, t);
+
+    if (spin > 0 && angle_ > other.angle_)
+        ret.angle_ = Urho3D::Lerp(angle_, other.angle_ + 360.0f, t);
+    else if (spin < 0 && angle_ < other.angle_)
+        ret.angle_= Urho3D::Lerp(angle_, other.angle_ - 360.0f, t);
+    else
+        ret.angle_= Urho3D::Lerp(angle_, other.angle_, t);
+
+    ret.scale_ = scale_.Lerp(other.scale_, t);
+    return ret;
+}
+
+const Reference2D* MainlineKey2D::GetReference(int timeline) const
+{
+    for (unsigned i = 0; i < references_.Size(); ++i)
+    {
+        if (references_[i].timeline_ == timeline)
+            return &references_[i];
+    }
+    return 0;
+}
+
+TimelineKey2D::TimelineKey2D() :
+    time_(0.0f),
+    spin_(1),
+    hotSpot_(0.0f, 1.0f),
+    alpha_(1.0f)
+{
+}
+
+Timeline2D::Timeline2D() :
+    type_(OT_BONE),
+    parent_(-1)
+{
+}
+
+Animation2D::Animation2D(AnimationSet2D* animationSet) : 
+    animationSet_(animationSet),
+    length_(0.0f), 
+    looped_(true)
+{
 }
 
 Animation2D::~Animation2D()
 {
-
 }
 
-void Animation2D::RegisterObject(Context* context)
+void Animation2D::SetName(const String& name)
 {
-    context->RegisterFactory<Animation2D>();
+    name_ = name;
 }
 
-bool Animation2D::Load(Deserializer& source)
+void Animation2D::SetLength(float length)
 {
-    frameEndTimes_.Clear();
-    frameSprites_.Clear();
-
-    SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
-    if(!xmlFile->Load(source))
-    {
-        LOGERROR("Could not load animation");
-        return false;
-    }
-
-    SetMemoryUse(source.GetSize());
-
-    XMLElement rootElem = xmlFile->GetRoot("animation");
-    if (!rootElem)
-    {
-        LOGERROR("Invalid animation");
-        return false;
-    }
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    XMLElement keyFrameElem = rootElem.GetChild("frame");
-    if (!keyFrameElem)
-    {
-        LOGERROR("Could not found key frame");
-        return false;
-    }
-
-    float endTime = 0.0f;
-
-    while (keyFrameElem)
-    {
-        endTime += keyFrameElem.GetFloat("duration");
-        frameEndTimes_.Push(endTime);
-
-        SharedPtr<Sprite2D> sprite;
-        Vector<String> names = keyFrameElem.GetAttribute("sprite").Split('@');
-        if (names.Size() == 1)
-            sprite = cache->GetResource<Sprite2D>(names[0]);
-        else if (names.Size() == 2)
-        {
-            SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(names[0], false);
-            // If sprite sheet not found, try get in current directory
-            if (!spriteSheet)
-                spriteSheet = cache->GetResource<SpriteSheet2D>(GetParentPath(GetName()) + names[0]);
-
-            if (!spriteSheet)
-            {
-                LOGERROR("Could not get sprite speet");
-                return false;
-            }
-
-            sprite = spriteSheet->GetSprite(names[1]);
-        }
-
-        if (!sprite)
-        {
-            LOGERROR("Could not get sprite");
-            return false;
-        }
-
-        frameSprites_.Push(sprite);
-        keyFrameElem = keyFrameElem.GetNext("frame");
-    }
-
-    return true;
+    length_ = Max(0.0f, length);
 }
 
-bool Animation2D::Save(Serializer& dest) const
+void Animation2D::SetLooped(bool looped)
 {
-    XMLFile xmlFile(context_);
-    XMLElement rootElem = xmlFile.CreateRoot("animation");
-    
-    float endTime = 0.0f;
-    for (unsigned i = 0; i < frameSprites_.Size(); ++i)
-    {
-        XMLElement frameElem = rootElem.CreateChild("frame");
-        frameElem.SetFloat("duration", frameEndTimes_[i] - endTime);
-        endTime = frameEndTimes_[i];
-
-        Sprite2D* sprite = frameSprites_[i];
-        SpriteSheet2D* spriteSheet = sprite->GetSpriteSheet();
-        if (!spriteSheet)
-            frameElem.SetString("sprite", sprite->GetName());
-        else
-            frameElem.SetString("sprite", spriteSheet->GetName() + "@" + sprite->GetName());
-    }
-
-    return xmlFile.Save(dest);
+    looped_ = looped;
 }
 
-float Animation2D::GetTotalTime() const
+void Animation2D::AddMainlineKey(const MainlineKey2D& mainlineKey)
 {
-    return frameEndTimes_.Empty() ? 0.0f : frameEndTimes_.Back();
+    mainlineKeys_.Push(mainlineKey);
 }
 
-unsigned Animation2D::GetNumFrames() const
+void Animation2D::AddTimeline(const Timeline2D& timeline)
 {
-    return frameSprites_.Size();
+    timelines_.Push(timeline);
 }
 
-Sprite2D* Animation2D::GetFrameSprite(unsigned index) const
+void Animation2D::SetTimelineParent(int timeline, int timelineParent)
 {
-    if (index < frameSprites_.Size())
-        return frameSprites_[index];
-
-    return 0;
+    if (timeline == timelineParent)
+        return;
+    timelines_[timeline].parent_ = timelineParent;
 }
 
-Sprite2D* Animation2D::GetFrameSpriteByTime(float time) const
+AnimationSet2D* Animation2D::GetAnimationSet() const
 {
-    if (time < 0.0f)
-        return 0;
-
-    for (unsigned i = 0; i < frameEndTimes_.Size(); ++i)
-    {
-        if (time <= frameEndTimes_[i])
-            return frameSprites_[i];
-    }
-
-    return 0;
+    return animationSet_;
 }
 
 }

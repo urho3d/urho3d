@@ -70,6 +70,11 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
+UIElement* TouchState::GetTouchedElement()
+{
+    return touchedElement_.Get();
+}
+
 void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
 {
     buttons_.Resize(numButtons);
@@ -572,19 +577,19 @@ bool Input::RecordGesture()
         return false;
     }
 
-    return SDL_RecordGesture(-1);
+    return SDL_RecordGesture(-1) != 0;
 }
 
 bool Input::SaveGestures(Serializer& dest)
 {
     RWOpsWrapper<Serializer> wrapper(dest);
-    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps());
+    return SDL_SaveAllDollarTemplates(wrapper.GetRWOps()) != 0;
 }
 
 bool Input::SaveGesture(Serializer& dest, unsigned gestureID)
 {
     RWOpsWrapper<Serializer> wrapper(dest);
-    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps());
+    return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps()) != 0;
 }
 
 unsigned Input::LoadGestures(Deserializer& source)
@@ -598,6 +603,16 @@ unsigned Input::LoadGestures(Deserializer& source)
 
     RWOpsWrapper<Deserializer> wrapper(source);
     return SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
+}
+
+bool Input::RemoveGesture(unsigned gestureID)
+{
+    return SDL_RemoveDollarTemplate(gestureID) != 0;
+}
+
+void Input::RemoveAllGestures()
+{
+    SDL_RemoveAllDollarTemplates();
 }
 
 SDL_JoystickID Input::OpenJoystick(unsigned index)
@@ -783,7 +798,7 @@ bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
 
 bool Input::GetScreenKeyboardSupport() const
 {
-    return graphics_ ? SDL_HasScreenKeyboardSupport() : false;
+    return graphics_ ? SDL_HasScreenKeyboardSupport() != 0 : false;
 }
 
 bool Input::IsScreenKeyboardVisible() const
@@ -791,7 +806,7 @@ bool Input::IsScreenKeyboardVisible() const
     if (graphics_)
     {
         SDL_Window* window = graphics_->GetImpl()->GetWindow();
-        return SDL_IsScreenKeyboardShown(window);
+        return SDL_IsScreenKeyboardShown(window) != SDL_FALSE;
     }
     else
         return false;
@@ -1568,14 +1583,19 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 evt.key.keysym.sym = keyBindingVar.GetInt();
                 evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
             }
-            if (!mouseButtonBindingVar.IsEmpty() && !touchEmulation_)
+            if (!mouseButtonBindingVar.IsEmpty())
             {
                 // Mouse button are sent as extra events besides key events
-                // Do not send mouse events in touch emulation mode, because those would in turn be re-interpreted as touch
+                // Disable touch emulation handling during this to prevent endless loop
+                bool oldTouchEmulation = touchEmulation_;
+                touchEmulation_ = false;
+                
                 SDL_Event evt;
                 evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
                 evt.button.button = mouseButtonBindingVar.GetInt();
                 HandleSDLEvent(&evt);
+                
+                touchEmulation_ = oldTouchEmulation;
             }
         }
     }

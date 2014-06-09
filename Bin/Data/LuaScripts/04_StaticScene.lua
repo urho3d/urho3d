@@ -6,11 +6,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()

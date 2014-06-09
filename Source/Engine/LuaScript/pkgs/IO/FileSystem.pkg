@@ -30,6 +30,7 @@ class FileSystem : public Object
     
     String GetProgramDir() const;
     String GetUserDocumentsDir() const;
+    String GetAppPreferencesDir(const String org, const String app) const;
 };
 
 String GetPath(const String fullPath);

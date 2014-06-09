@@ -6,12 +6,6 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_ = nil
-local cameraNode = nil
-local yaw = 0.0
-local pitch = 0.0
-local drawDebug = false
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -89,7 +83,7 @@ function CreateScene()
             modelObject.castShadows = true
             -- Set the model to also update when invisible to avoid staying invisible when the model should come into
             -- view, but does not as the bounding box is not updated
-            modelObject.updateInvisible = true;
+            modelObject.updateInvisible = true
 
             -- Create a rigid body and a collision shape. These will act as a trigger for transforming the
             -- model into a ragdoll when hit by a moving object
@@ -124,7 +118,7 @@ function CreateInstructions()
         "Use WASD keys and mouse to move\n"..
         "LMB to spawn physics objects\n"..
         "F5 to save scene, F7 to load\n"..
-        "Space to toggle physics debug geometry");
+        "Space to toggle physics debug geometry")
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER
@@ -370,4 +364,27 @@ function CreateRagdoll:CreateRagdollConstraint(boneName, parentName, type, axis,
     constraint.otherAxis = parentAxis
     constraint.highLimit = highLimit
     constraint.lowLimit = lowLimit
+end
+
+-- Create XML patch instructions for screen joystick layout specific to this sample app
+function GetScreenJoystickPatchString()
+    return
+        "<patch>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Spawn</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"LEFT\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />" ..
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>" ..
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">" ..
+        "        <element type=\"Text\">" ..
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />" ..
+        "            <attribute name=\"Text\" value=\"SPACE\" />" ..
+        "        </element>" ..
+        "    </add>" ..
+        "</patch>"
 end

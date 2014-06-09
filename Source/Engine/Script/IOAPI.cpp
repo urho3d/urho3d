@@ -339,6 +339,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "bool Copy(const String&in, const String&in)", asMETHOD(FileSystem, Copy), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "bool Rename(const String&in, const String&in)", asMETHOD(FileSystem, Rename), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "bool Delete(const String&in)", asMETHOD(FileSystem, Delete), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String GetAppPreferencesDir(const String&in org, const String&in app) const", asMETHOD(FileSystem, GetAppPreferencesDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_currentDir() const", asMETHOD(FileSystem, GetCurrentDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const String&in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "void set_executeConsoleCommands(bool)", asMETHOD(FileSystem, SetExecuteConsoleCommands), asCALL_THISCALL);

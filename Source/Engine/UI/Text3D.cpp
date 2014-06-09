@@ -40,6 +40,7 @@ namespace Urho3D
 extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
 extern const char* textEffects[];
+extern const char* faceCameraModeNames[];
 extern const char* GEOMETRY_CATEGORY;
 
 static const float TEXT_SCALING = 1.0f / 128.0f;
@@ -50,8 +51,7 @@ Text3D::Text3D(Context* context) :
     text_(context),
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),
-    faceCameraAxes_(Vector3::ONE),
-    faceCamera_(false),
+    faceCameraMode_(FC_NONE),
     textDirty_(true),
     geometryDirty_(true)
 {
@@ -75,8 +75,7 @@ void Text3D::RegisterObject(Context* context)
     ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, false, AM_DEFAULT);
-    ATTRIBUTE(Text3D, VAR_VECTOR3, "Face Camera Axes", faceCameraAxes_, Vector3::ONE, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Text3D, "Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_INT, "Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
@@ -102,20 +101,20 @@ void Text3D::ApplyAttributes()
 
 void Text3D::UpdateBatches(const FrameInfo& frame)
 {
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
     
-    if (faceCamera_)
+    if (faceCameraMode_ != FC_NONE)
     {
-        customWorldTransform_ = Matrix3x4(node_->GetWorldPosition(), frame.camera_->GetFaceCameraRotation(
-            node_->GetWorldRotation(), faceCameraAxes_), node_->GetWorldScale());
+        Vector3 worldPosition = node_->GetWorldPosition();
+        customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
+            worldPosition, node_->GetWorldRotation(), faceCameraMode_), node_->GetWorldScale());
         worldBoundingBoxDirty_ = true;
     }
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].distance_ = distance_;
-        batches_[i].worldTransform_ = faceCamera_ ? &customWorldTransform_ : &worldTransform;
+        batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
     }
 }
 
@@ -283,20 +282,15 @@ void Text3D::SetOpacity(float opacity)
     MarkTextDirty();
 }
 
-void Text3D::SetFaceCamera(bool enable)
+void Text3D::SetFaceCameraMode(FaceCameraMode mode)
 {
-    if (enable != faceCamera_)
+    if (mode != faceCameraMode_)
     {
-        faceCamera_ = enable;
+        faceCameraMode_ = mode;
         
         // Bounding box must be recalculated
         OnMarkedDirty(node_);
     }
-}
-
-void Text3D::SetFaceCameraAxes(const Vector3& axes)
-{
-    faceCameraAxes_ = axes;
 }
 
 Material* Text3D::GetMaterial() const
@@ -418,7 +412,7 @@ void Text3D::OnWorldBoundingBoxUpdate()
         UpdateTextBatches();
     
     // In face camera mode, use the last camera rotation to build the world bounding box
-    worldBoundingBox_ = boundingBox_.Transformed(faceCamera_ ? Matrix3x4(node_->GetWorldPosition(),
+    worldBoundingBox_ = boundingBox_.Transformed(faceCameraMode_ != FC_NONE ? Matrix3x4(node_->GetWorldPosition(),
         customWorldTransform_.Rotation(), node_->GetWorldScale()) : node_->GetWorldTransform());
 }
 

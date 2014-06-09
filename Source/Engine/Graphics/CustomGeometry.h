@@ -92,7 +92,9 @@ public:
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return material by geometry index.
-    Material* GetMaterial(unsigned index) const;
+    Material* GetMaterial(unsigned index = 0) const;
+    /// Return all vertices.
+    const Vector<PODVector<CustomGeometryVertex> >& GetVertices() { return vertices_; }
     
     /// Set geometry data attribute.
     void SetGeometryDataAttr(PODVector<unsigned char> value);

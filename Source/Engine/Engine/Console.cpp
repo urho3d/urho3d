@@ -147,6 +147,7 @@ void Console::SetVisible(bool enable)
     }
     else
     {
+        rowContainer_->SetFocus(false);
         interpreters_->SetFocus(false);
         lineEdit_->SetFocus(false);
 
@@ -401,6 +402,15 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 
 void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // Ensure UI-elements are not detached
+    if (!background_->GetParent())
+    {
+        UI* ui = GetSubsystem<UI>();
+        UIElement* uiRoot = ui->GetRoot();
+        uiRoot->AddChild(background_);
+        uiRoot->AddChild(closeButton_);
+    }
+
     if (!rowContainer_->GetNumItems() || pendingRows_.Empty())
         return;
     

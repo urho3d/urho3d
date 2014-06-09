@@ -38,6 +38,7 @@ namespace Urho3D
 {
 
 extern const char* GEOMETRY_CATEGORY;
+extern const char* faceCameraModeNames[];
 
 static const char* emitterTypeNames[] =
 {
@@ -118,8 +119,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Face Camera", faceCamera_, true, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_VECTOR3, "Face Camera Axes", faceCameraAxes_, Vector3::ONE, AM_DEFAULT);
+    ENUM_ATTRIBUTE(ParticleEmitter, "Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_ROTATE_XYZ, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Min", timeToLiveMin_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Max", timeToLiveMax_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_VECTOR2, "Particle Size Min", sizeMin_, DEFAULT_PARTICLE_SIZE, AM_DEFAULT);
@@ -619,9 +619,9 @@ void ParticleEmitter::SetInactiveTime(float time)
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
+void ParticleEmitter::SetEmitting(bool enable)
 {
-    if (enable != emitting_ || resetPeriod)
+    if (enable != emitting_)
     {
         emitting_ = enable;
         periodTimer_ = 0.0f;
@@ -792,6 +792,26 @@ void ParticleEmitter::SetTextureFrames(const Vector<TextureFrame>& animation)
 void ParticleEmitter::SetNumTextureFrames(unsigned num)
 {
     textureFrames_.Resize(num);
+}
+
+void ParticleEmitter::ResetEmissionTimer()
+{
+    emissionTimer_ = 0.0f;
+}
+
+void ParticleEmitter::RemoveAllParticles()
+{
+    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+        i->enabled_ = false;
+    
+    Commit();
+}
+
+void ParticleEmitter::Reset()
+{
+    RemoveAllParticles();
+    ResetEmissionTimer();
+    SetEmitting(true);
 }
 
 void ParticleEmitter::SetParticlesAttr(VariantVector value)

@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="BrowserFilterMenu" />
+	<attribute name="Size" value="550 80" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="0" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Is Movable" value="true" />
+	<element>
+		<attribute name="Name" value="Title Bar" />
+		<attribute name="Min Size" value="152 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Layout Spacing" value="4" />
+		<element type="Text">
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Resource Filters" />
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element style="Panel">
+		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Layout Spacing" value="10" />
+		<attribute name="Layout Border" value="0 6 0 6" />
+		<element style="Panel">
+			<attribute name="Name" value="ResourceDirOptions" />
+			<attribute name="Layout Mode" value="Vertical" />
+			<attribute name="Layout Spacing" value="4" />
+			<attribute name="Layout Border" value="0 0 0 4" />
+			<attribute name="Max Size" value="300 1000" />
+			<element type="Text">
+				<attribute name="Text" value="Resource Directories" />
+			</element>
+			<element>
+				<attribute name="Layout Mode" value="Horizontal" />
+				<attribute name="Layout Spacing" value="4" />
+				<attribute name="Max Size" value="100 16" />
+				<element type="CheckBox">
+					<attribute name="Name" value="ToggleAllResourceDirs" />
+					<attribute name="Is Checked" value="true" />
+				</element>
+				<element type="Text" style="EditorAttributeText">
+					<attribute name="Text" value="Toggle All" />
+				</element>
+			</element>
+			<element style="Panel">
+				<attribute name="Name" value="DirFilters" />
+				<attribute name="Layout Mode" value="Vertical" />
+				<attribute name="Layout Spacing" value="2" />
+				<attribute name="Layout Border" value="0 4 0 4" />
+			</element>
+		</element>
+		<element style="Panel">
+			<attribute name="Max Size" value="250 1000" />
+			<attribute name="Name" value="TypeOptions" />
+			<attribute name="Layout Mode" value="Vertical" />
+			<attribute name="Layout Spacing" value="4" />
+			<attribute name="Layout Border" value="0 4 0 4" />
+			<element type="Text">
+				<attribute name="Text" value="Resource Types" />
+			</element>
+			<element>
+				<attribute name="Layout Mode" value="Horizontal" />
+				<attribute name="Layout Spacing" value="4" />
+				<element type="CheckBox">
+					<attribute name="Name" value="ToggleAllTypes" />
+					<attribute name="Is Checked" value="true" />
+				</element>
+				<element type="Text" style="EditorAttributeText">
+					<attribute name="Text" value="Toggle All" />
+				</element>
+			</element>
+			<element style="Panel">
+				<attribute name="Name" value="TypeFilters" />
+				<attribute name="Layout Mode" value="Horizontal" />
+				<attribute name="Layout Spacing" value="4" />
+				<attribute name="Layout Border" value="0 4 0 4" />
+				<element style="Panel">
+					<attribute name="Name" value="TypeFilterColumn1" />
+					<attribute name="Layout Border" value="2 0 2 0" />
+					<attribute name="Layout Spacing" value="2" />
+				</element>
+				<element style="Panel">
+					<attribute name="Name" value="TypeFilterColumn2" />
+					<attribute name="Layout Border" value="2 0 2 0" />
+					<attribute name="Layout Spacing" value="2" />
+				</element>
+			</element>
+		</element>
+	</element>
+</element>

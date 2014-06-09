@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "FileSystem.h"
+#include "Log.h"
 #include "ParticleEffect2D.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
@@ -115,13 +116,12 @@ bool ParticleEffect2D::Load(Deserializer& source)
 
     String texture = rootElem.GetChild("texture").GetAttribute("name");
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    sprite_= cache->GetResource<Sprite2D>(texture, false);
-    // If sprite not found, try get in current directory
+    sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
     if (!sprite_)
-        sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
-
-    if (!sprite_)
+    {
+        LOGERROR("Could not load sprite " + GetParentPath(GetName()) + texture);
         return false;
+    }
 
     sourcePositionVariance_ = ReadVector2(rootElem.GetChild("sourcePositionVariance"));
 
