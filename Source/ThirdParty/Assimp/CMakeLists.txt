@@ -8,7 +8,7 @@
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
-if (CMAKE_CROSSCOMPILING AND MINGW)
+if (MINGW)
     # The IFCReaderGen.cpp.obj has too many sections in DEBUG configuration build
     # Since GCC does not support /bigobj compiler flags as in MSVC, we use optimization flags to reduce the object file size
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O1")
