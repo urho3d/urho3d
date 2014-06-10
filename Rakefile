@@ -113,8 +113,8 @@ task :travis_ci_package_upload do
   else
     platform_prefix = ''
   end
-  # Generate the documentation if necessary
-  unless ENV['SITE_UPDATE']
+  # Generate the documentation if necessary (skip the doc build for iOS 64-bit for the time being as otherwise overall build time exceeds 50 minutes time limit)
+  if not ENV['SITE_UPDATE'] and not (ENV['IOS'] and ENV['URHO3D_64BIT'])
     system 'echo Generate documentation'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
