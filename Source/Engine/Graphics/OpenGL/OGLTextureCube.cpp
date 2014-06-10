@@ -85,10 +85,10 @@ void TextureCube::OnDeviceReset()
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
-        else
-        {
-            if (!object_)
-                Create();
+
+        if (!object_)
+        { 
+            Create();
             dataLost_ = true;
         }
     }
