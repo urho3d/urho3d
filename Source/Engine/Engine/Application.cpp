@@ -23,6 +23,10 @@
 #include "Precompiled.h"
 #include "Application.h"
 #include "Engine.h"
+#ifdef IOS
+#include "Graphics.h"
+#include "GraphicsImpl.h"
+#endif
 #include "IOEvents.h"
 #include "Log.h"
 #include "ProcessUtils.h"
@@ -34,6 +38,15 @@
 namespace Urho3D
 {
 
+#ifdef IOS
+// Code for supporting SDL_iPhoneSetAnimationCallback
+void RunFrame(void* data)
+{
+    Application* instance = reinterpret_cast<Application*>(data);
+    instance->GetSubsystem<Engine>()->RunFrame();
+}
+#endif
+    
 Application::Application(Context* context) :
     Object(context),
     exitCode_(EXIT_SUCCESS)
@@ -65,11 +78,18 @@ int Application::Run()
         if (exitCode_)
             return exitCode_;
 
+        // Platforms other than iOS run a blocking main loop
+        #ifndef IOS
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
         Stop();
-
+        // iOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
+        // support calling the Stop() function, as the application will never stop manually
+        #else
+        SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, this);
+        #endif
+        
         return exitCode_;
     }
     catch (std::bad_alloc&)
