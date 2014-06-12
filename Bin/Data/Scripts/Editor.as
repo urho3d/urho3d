@@ -33,7 +33,9 @@ void Start()
         return;
     }
 
-    SubscribeToEvent("Update", "HandleUpdate");
+    // Use the first frame to setup when the resolution is initialized
+    SubscribeToEvent("Update", "FirstFrame");
+
     SubscribeToEvent(input, "ExitRequested", "HandleExitRequested");
 
     // Disable Editor auto exit, check first if it is OK to exit
@@ -49,6 +51,10 @@ void Start()
     // Use system clipboard to allow transport of text in & out from the editor
     ui.useSystemClipboard = true;
 
+}
+
+void FirstFrame()
+{
     // Create root scene node
     CreateScene();
     // Load editor settings and preferences
@@ -59,6 +65,8 @@ void Start()
     CreateRootUIElement();
     // Load the initial scene if provided
     ParseArguments();
+    // Switch to real frame handler after initialization
+    SubscribeToEvent("Update", "HandleUpdate");
 }
 
 void Stop()
