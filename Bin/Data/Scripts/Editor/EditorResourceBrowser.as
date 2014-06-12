@@ -145,7 +145,12 @@ void ScanResourceDirectories()
 
     // collect all of the items and sort them afterwards
     for(uint i=0; i < cache.resourceDirs.length; ++i)
+    {
+        if (activeResourceDirFilters.Find(i) > -1)
+            continue;
+
         ScanResourceDir(i);
+    }
 }
 
 // used to stop ui from blocking while determining file types
@@ -562,8 +567,6 @@ void PopulateResourceBrowserFilesByDirectory(BrowserDir@ dir)
     for(uint x=0; x < dir.files.length; x++)
     {
         BrowserFile@ file = dir.files[x];
-        if (activeResourceDirFilters.Find(file.resourceSourceIndex) > -1)
-            continue;
 
         if (activeResourceTypeFilters.Find(file.resourceType) == -1)
             files.Push(file);
@@ -700,7 +703,7 @@ void HandleResourceDirFilterToggleAllTypesToggled(StringHash eventType, VariantM
             filter.checked = checkbox.checked;
     }
     ignoreRefreshBrowserResults = false;
-    RefreshBrowserResults();
+    RebuildResourceDatabase();
 }
 
 void HandleResourceDirFilterToggled(StringHash eventType, VariantMap& eventData)
@@ -718,7 +721,7 @@ void HandleResourceDirFilterToggled(StringHash eventType, VariantMap& eventData)
         activeResourceDirFilters.Push(resourceDir);
 
     if (ignoreRefreshBrowserResults == false)
-        RefreshBrowserResults();
+        RebuildResourceDatabase();
 }
 
 void HandleRescanResourceBrowserClick(StringHash eventType, VariantMap& eventData)
@@ -1321,6 +1324,7 @@ class BrowserDir
         files.Push(file);
         return file;
     }
+
 }
 
 class BrowserFile

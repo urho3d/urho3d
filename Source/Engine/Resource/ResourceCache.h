@@ -86,7 +86,7 @@ public:
     void ReleaseResources(const String& partialName, bool force = false);
     /// Release all resources. When called with the force flag false, releases all currently unused resources.
     void ReleaseAllResources(bool force = false);
-    /// Reload a resource. Return false and release it if fails.
+    /// Reload a resource. Return true on success. The resource will not be removed from the cache in case of failure.
     bool ReloadResource(Resource* resource);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(ShortStringHash type, unsigned budget);

@@ -18,6 +18,9 @@
 //
 // ===============================================================================
 
+// Modified by Yao Wei Tjong for Urho3D
+// Suppress 'gcc_struct' is being ignored warnings when compiling for Raspberry-PI
+
 #ifdef AI_PUSHPACK_IS_DEFINED
 #	error poppack1.h must be included after pushpack1.h
 #endif
@@ -26,7 +29,7 @@
 #	pragma pack(push,1)
 #	define PACK_STRUCT
 #elif defined( __GNUC__ )
-#	if defined(__clang__)
+#	if defined(__clang__) || defined(RASPI)
 #		define PACK_STRUCT	__attribute__((__packed__))
 #	else
 #		define PACK_STRUCT	__attribute__((gcc_struct, __packed__))

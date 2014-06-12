@@ -97,6 +97,7 @@ struct OutScene
 SharedPtr<Context> context_(new Context());
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
+String inputName_;
 String resourcePath_;
 String outPath_;
 bool useSubdirs_ = true;
@@ -156,6 +157,9 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
 void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
+String GetMaterialTextureName(const String& nameIn);
+String GenerateMaterialName(aiMaterial* material);
+String GenerateTextureName(unsigned texIndex);
 unsigned GetNumValidFaces(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
@@ -373,6 +377,7 @@ void Run(const Vector<String>& arguments)
         if (arguments.Size() > 2 && arguments[2][0] != '-')
             outFile = GetInternalPath(arguments[2]);
         
+        inputName_ = GetFileName(inFile);
         outPath_ = GetPath(outFile);
         
         if (resourcePath_.Empty())
@@ -1337,17 +1342,14 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         for (unsigned j = 0; j < model.meshes_.Size(); ++j)
         {
             String matName = GetMeshMaterialName(model.meshes_[j]);
-            if (!matName.Empty())
+            // Create a dummy material so that the reference can be stored
+            if (!cache->Exists(matName))
             {
-                // Create a dummy material so that the reference can be stored
-                if (!cache->Exists(matName))
-                {
-                    Material* dummyMat = new Material(context_);
-                    dummyMat->SetName(matName);
-                    cache->AddManualResource(dummyMat);
-                }
-                staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
+                Material* dummyMat = new Material(context_);
+                dummyMat->SetName(matName);
+                cache->AddManualResource(dummyMat);
             }
+            staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
         }
     }
     
@@ -1440,12 +1442,11 @@ void ExportMaterials(HashSet<String>& usedTextures)
 
 void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 {
-    // Material must have name so it can be successfully saved
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
     String matName = SanitateAssetName(FromAIString(matNameStr));
-    if (matName.Empty())
-        return;
+    if (matName.Trimmed().Empty())
+        matName = GenerateMaterialName(material);
     
     // Do not actually create a material instance, but instead craft an xml file manually
     XMLFile outMaterial(context_);
@@ -1525,35 +1526,35 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     {
         XMLElement diffuseElem = materialElem.CreateChild("texture");
         diffuseElem.SetString("unit", "diffuse");
-        diffuseElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + diffuseTexName);
+        diffuseElem.SetString("name", GetMaterialTextureName(diffuseTexName));
         usedTextures.Insert(diffuseTexName);
     }
     if (!normalTexName.Empty())
     {
         XMLElement normalElem = materialElem.CreateChild("texture");
         normalElem.SetString("unit", "normal");
-        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + normalTexName);
+        normalElem.SetString("name", GetMaterialTextureName(normalTexName));
         usedTextures.Insert(normalTexName);
     }
     if (!specularTexName.Empty())
     {
         XMLElement specularElem = materialElem.CreateChild("texture");
         specularElem.SetString("unit", "specular");
-        specularElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
+        specularElem.SetString("name", GetMaterialTextureName(specularTexName));
         usedTextures.Insert(specularTexName);
     }
     if (!lightmapTexName.Empty())
     {
         XMLElement lightmapElem = materialElem.CreateChild("texture");
         lightmapElem.SetString("unit", "emissive");
-        lightmapElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
+        lightmapElem.SetString("name", GetMaterialTextureName(lightmapTexName));
         usedTextures.Insert(lightmapTexName);
     }
     if (!emissiveTexName.Empty())
     {
         XMLElement emissiveElem = materialElem.CreateChild("texture");
         emissiveElem.SetString("unit", "emissive");
-        emissiveElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + emissiveTexName);
+        emissiveElem.SetString("name", GetMaterialTextureName(emissiveTexName));
         usedTextures.Insert(emissiveTexName);
     }
     
@@ -1601,38 +1602,75 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
     
     for (HashSet<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
-        String fullSourceName = sourcePath + *i;
-        String fullDestName = resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i;
-        
-        if (!fileSystem->FileExists(fullSourceName))
+        // Handle assimp embedded textures
+        if (i->Length() && i->At(0) == '*')
         {
-            PrintLine("Skipping copy of nonexisting material texture " + *i);
-            continue;
-        }
-        {
-            File test(context_, fullSourceName);
-            if (!test.GetSize())
+            unsigned texIndex = ToInt(i->Substring(1));
+            if (texIndex >= scene_->mNumTextures)
+                PrintLine("Skipping out of range texture index " + String(texIndex));
+            else
             {
-                PrintLine("Skipping copy of zero-size material texture " + *i);
-                continue;
+                aiTexture* tex = scene_->mTextures[texIndex];
+                String fullDestName = resourcePath_ + GenerateTextureName(texIndex);
+                bool destExists = fileSystem->FileExists(fullDestName);
+                if (destExists && noOverwriteTexture_)
+                {
+                    PrintLine("Skipping copy of existing embedded texture " + GetFileNameAndExtension(fullDestName));
+                    continue;
+                }
+                // Encoded texture
+                if (!tex->mHeight)
+                {
+                    PrintLine("Saving embedded texture " + GetFileNameAndExtension(fullDestName));
+                    File dest(context_, fullDestName, FILE_WRITE);
+                    dest.Write((const void*)tex->pcData, tex->mWidth);
+                }
+                // RGBA8 texture
+                else
+                {
+                    PrintLine("Saving embedded RGBA texture " + GetFileNameAndExtension(fullDestName));
+                    Image image(context_);
+                    image.SetSize(tex->mWidth, tex->mHeight, 4);
+                    memcpy(image.GetData(), (const void*)tex->pcData, tex->mWidth * tex->mHeight * 4);
+                    image.SavePNG(fullDestName);
+                }
             }
         }
-        
-        bool destExists = fileSystem->FileExists(fullDestName);
-        if (destExists && noOverwriteTexture_)
+        else
         {
-            PrintLine("Skipping copy of existing texture " + *i);
-            continue;
-        }
-        if (destExists && noOverwriteNewerTexture_ && fileSystem->GetLastModifiedTime(fullDestName) >
-            fileSystem->GetLastModifiedTime(fullSourceName))
-        {
-            PrintLine("Skipping copying of material texture " + *i + ", destination is newer");
-            continue;
-        }
+            String fullSourceName = sourcePath + *i;
+            String fullDestName = resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i;
+            
+            if (!fileSystem->FileExists(fullSourceName))
+            {
+                PrintLine("Skipping copy of nonexisting material texture " + *i);
+                continue;
+            }
+            {
+                File test(context_, fullSourceName);
+                if (!test.GetSize())
+                {
+                    PrintLine("Skipping copy of zero-size material texture " + *i);
+                    continue;
+                }
+            }
+            
+            bool destExists = fileSystem->FileExists(fullDestName);
+            if (destExists && noOverwriteTexture_)
+            {
+                PrintLine("Skipping copy of existing texture " + *i);
+                continue;
+            }
+            if (destExists && noOverwriteNewerTexture_ && fileSystem->GetLastModifiedTime(fullDestName) >
+                fileSystem->GetLastModifiedTime(fullSourceName))
+            {
+                PrintLine("Skipping copying of material texture " + *i + ", destination is newer");
+                continue;
+            }
 
-        PrintLine("Copying material texture " + *i);
-        fileSystem->Copy(fullSourceName, fullDestName);
+            PrintLine("Copying material texture " + *i);
+            fileSystem->Copy(fullSourceName, fullDestName);
+        }
     }
 }
 
@@ -1847,10 +1885,47 @@ String GetMeshMaterialName(aiMesh* mesh)
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
     String matName = SanitateAssetName(FromAIString(matNameStr));
-    if (matName.Empty())
-        return matName;
+    if (matName.Trimmed().Empty())
+        matName = GenerateMaterialName(material);
+    
+    return (useSubdirs_ ? "Materials/" : "") + matName + ".xml";
+}
+
+String GenerateMaterialName(aiMaterial* material)
+{
+    for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
+    {
+        if (scene_->mMaterials[i] == material)
+            return inputName_ + "_Material" + String(i);
+    }
+    
+    // Should not go here
+    return String::EMPTY;
+}
+
+String GetMaterialTextureName(const String& nameIn)
+{
+    // Detect assimp embedded texture
+    if (nameIn.Length() && nameIn[0] == '*')
+        return GenerateTextureName(ToInt(nameIn.Substring(1)));
     else
-        return (useSubdirs_ ? "Materials/" : "") + matName + ".xml";
+        return (useSubdirs_ ? "Textures/" : "") + nameIn;
+}
+
+String GenerateTextureName(unsigned texIndex)
+{
+    if (texIndex < scene_->mNumTextures)
+    {
+        // If embedded texture contains encoded data, use the format hint for file extension. Else save RGBA8 data as PNG
+        aiTexture* tex = scene_->mTextures[texIndex];
+        if (!tex->mHeight)
+            return (useSubdirs_ ? "Textures/" : "") + inputName_ + "_Texture" + String(texIndex) + "." + tex->achFormatHint;
+        else
+            return (useSubdirs_ ? "Textures/" : "") + inputName_ + "_Texture" + String(texIndex) + ".png";
+    }
+    
+    // Should not go here
+    return String::EMPTY;
 }
 
 unsigned GetNumValidFaces(aiMesh* mesh)

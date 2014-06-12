@@ -391,18 +391,29 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
     multiSample_ = multiSample;
     
-    // Check fullscreen mode validity. If not valid, revert to windowed
+    // Check fullscreen mode validity. Use a closest match if not found
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();
-        fullscreen = false;
-        for (unsigned i = 0; i < resolutions.Size(); ++i)
+        if (resolutions.Empty())
+            fullscreen = false;
+        else
         {
-            if (width == resolutions[i].x_ && height == resolutions[i].y_)
+            unsigned best = 0;
+            unsigned bestError = M_MAX_UNSIGNED;
+
+            for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
-                fullscreen = true;
-                break;
+                unsigned error = Abs(resolutions[i].x_ - width) * Abs(resolutions[i].y_ - height);
+                if (error < bestError)
+                {
+                    best = i;
+                    bestError = error;
+                }
             }
+            
+            width = resolutions[best].x_;
+            height = resolutions[best].y_;
         }
     }
     

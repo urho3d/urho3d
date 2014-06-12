@@ -503,6 +503,8 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, ShortStringHash t
 bool ResourceCache::Exists(const String& nameIn) const
 {
     String name = SanitateResourceName(nameIn);
+    if (name.Empty())
+        return false;
     
     for (unsigned i = 0; i < packages_.Size(); ++i)
     {
