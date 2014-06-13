@@ -195,10 +195,14 @@ public:
     float GetRotationEndVariance() const { return rotationEndVariance_; }
 
 private:
+    /// Read integer.
+    int ReadInt(const XMLElement& element, const String& name) const;
+    /// Read float.
+    float ReadFloat(const XMLElement& element, const String& name) const;
     /// Read Color.
-    Color ReadColor(const XMLElement& element) const;
+    Color ReadColor(const XMLElement& element, const String& name) const;
     /// Read Vector2.
-    Vector2 ReadVector2(const XMLElement& element) const;
+    Vector2 ReadVector2(const XMLElement& element, const String& name) const;
     
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;

@@ -123,59 +123,59 @@ bool ParticleEffect2D::Load(Deserializer& source)
         return false;
     }
 
-    sourcePositionVariance_ = ReadVector2(rootElem.GetChild("sourcePositionVariance"));
+    sourcePositionVariance_ = ReadVector2(rootElem, "sourcePositionVariance");
 
-    speed_ = rootElem.GetChild("speed").GetFloat("value");
-    speedVariance_ = rootElem.GetChild("speedVariance").GetFloat("value");
-    
-    particleLifeSpan_ = Max(0.01f, rootElem.GetChild("particleLifeSpan").GetFloat("value"));
-    particleLifespanVariance_ = rootElem.GetChild("particleLifespanVariance").GetFloat("value");
-    
-    angle_ = rootElem.GetChild("angle").GetFloat("value");
-    angleVariance_ = rootElem.GetChild("angleVariance").GetFloat("value");
-    
-    gravity_ = ReadVector2(rootElem.GetChild("gravity"));
+    speed_ = ReadFloat(rootElem, "speed");
+    speedVariance_ = ReadFloat(rootElem, "speedVariance");
 
-    radialAcceleration_ = rootElem.GetChild("radialAcceleration").GetFloat("value");
-    tangentialAcceleration_ = rootElem.GetChild("tangentialAcceleration").GetFloat("value");
-    
-    radialAccelVariance_ = rootElem.GetChild("radialAccelVariance").GetFloat("value");
-    tangentialAccelVariance_ = rootElem.GetChild("tangentialAccelVariance").GetFloat("value");
+    particleLifeSpan_ = Max(0.01f, ReadFloat(rootElem, "particleLifeSpan"));
+    particleLifespanVariance_ = ReadFloat(rootElem, "particleLifespanVariance");
 
-    startColor_ = ReadColor(rootElem.GetChild("startColor"));
-    startColorVariance_ = ReadColor(rootElem.GetChild("startColorVariance"));
-    
-    finishColor_ = ReadColor(rootElem.GetChild("finishColor"));
-    finishColorVariance_ = ReadColor(rootElem.GetChild("finishColorVariance"));
+    angle_ = ReadFloat(rootElem, "angle");
+    angleVariance_ = ReadFloat(rootElem, "angleVariance");
 
-    maxParticles_ = rootElem.GetChild("maxParticles").GetInt("value");
-    
-    startParticleSize_ = rootElem.GetChild("startParticleSize").GetFloat("value");
-    startParticleSizeVariance_ = rootElem.GetChild("startParticleSizeVariance").GetFloat("value");
-    
-    finishParticleSize_ = rootElem.GetChild("finishParticleSize").GetFloat("value");
-    FinishParticleSizeVariance_ = rootElem.GetChild("FinishParticleSizeVariance").GetFloat("value");
-    
+    gravity_ = ReadVector2(rootElem, "gravity");
+
+    radialAcceleration_ = ReadFloat(rootElem, "radialAcceleration");
+    tangentialAcceleration_ = ReadFloat(rootElem, "tangentialAcceleration");
+
+    radialAccelVariance_ = ReadFloat(rootElem, "radialAccelVariance");
+    tangentialAccelVariance_ = ReadFloat(rootElem, "tangentialAccelVariance");
+
+    startColor_ = ReadColor(rootElem, "startColor");
+    startColorVariance_ = ReadColor(rootElem, "startColorVariance");
+
+    finishColor_ = ReadColor(rootElem, "finishColor");
+    finishColorVariance_ = ReadColor(rootElem, "finishColorVariance");
+
+    maxParticles_ = ReadInt(rootElem, "maxParticles");
+
+    startParticleSize_ = ReadFloat(rootElem, "startParticleSize");
+    startParticleSizeVariance_ = ReadFloat(rootElem, "startParticleSizeVariance");
+
+    finishParticleSize_ = ReadFloat(rootElem, "finishParticleSize");
+    FinishParticleSizeVariance_ = ReadFloat(rootElem, "FinishParticleSizeVariance");
+
     duration_ = M_INFINITY;
     if (rootElem.HasChild("duration"))
     {
-        float duration = rootElem.GetChild("duration").GetFloat("value");
+        float duration = ReadFloat(rootElem, "duration");
         if (duration > 0.0f)
             duration_ = duration;
     }
 
 
-    emitterType_ = (EmitterType2D)rootElem.GetChild("emitterType").GetInt("value");
-    
-    maxRadius_ = rootElem.GetChild("maxRadius").GetFloat("value");
-    maxRadiusVariance_ = rootElem.GetChild("maxRadiusVariance").GetFloat("value");
-    minRadius_ = rootElem.GetChild("minRadius").GetFloat("value");
+    emitterType_ = (EmitterType2D)ReadInt(rootElem, "emitterType");
 
-    rotatePerSecond_ = rootElem.GetChild("rotatePerSecond").GetFloat("value");
-    rotatePerSecondVariance_ = rootElem.GetChild("rotatePerSecondVariance").GetFloat("value");
-    
-    int blendFuncSource = rootElem.GetChild("blendFuncSource").GetInt("value");
-    int blendFuncDestination = rootElem.GetChild("blendFuncDestination").GetInt("value");
+    maxRadius_ = ReadFloat(rootElem, "maxRadius");
+    maxRadiusVariance_ = ReadFloat(rootElem, "maxRadiusVariance");
+    minRadius_ = ReadFloat(rootElem, "minRadius");
+
+    rotatePerSecond_ = ReadFloat(rootElem, "rotatePerSecond");
+    rotatePerSecondVariance_ = ReadFloat(rootElem, "rotatePerSecondVariance");
+
+    int blendFuncSource = ReadInt(rootElem, "blendFuncSource");
+    int blendFuncDestination = ReadInt(rootElem, "blendFuncDestination");
     blendMode_ = BLEND_ALPHA;
     for (int i = 0; i < MAX_BLENDMODES; ++i)
     {
@@ -186,11 +186,11 @@ bool ParticleEffect2D::Load(Deserializer& source)
         }
     }
 
-    rotationStart_ = rootElem.GetChild("rotationStart").GetFloat("value");
-    rotationStartVariance_ = rootElem.GetChild("rotationStartVariance").GetFloat("value");
-    
-    rotationEnd_ = rootElem.GetChild("rotationEnd").GetFloat("value");
-    rotationEndVariance_ = rootElem.GetChild("rotationEndVariance").GetFloat("value");
+    rotationStart_ = ReadFloat(rootElem, "rotationStart");
+    rotationStartVariance_ = ReadFloat(rootElem, "rotationStartVariance");
+
+    rotationEnd_ = ReadFloat(rootElem, "rotationEnd");
+    rotationEndVariance_ = ReadFloat(rootElem, "rotationEndVariance");
 
     return true;
 }
@@ -365,19 +365,27 @@ void ParticleEffect2D::SetRotationEndVariance(float rotationEndVariance)
     rotationEndVariance_ = rotationEndVariance;
 }
 
-Color ParticleEffect2D::ReadColor(const XMLElement& element) const
+int ParticleEffect2D::ReadInt(const XMLElement& element, const String& name) const
 {
-    Color color;
-    color.r_ = element.GetFloat("red");
-    color.g_ = element.GetFloat("green");
-    color.b_ = element.GetFloat("blue");
-    color.a_ = element.GetFloat("alpha");
-    return color;
+    return element.GetChild(name).GetInt("value");
 }
 
-Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element) const
+float ParticleEffect2D::ReadFloat(const XMLElement& element, const String& name) const
 {
-    return Vector2(element.GetFloat("x"), element.GetFloat("y"));
+    return element.GetChild(name).GetFloat("value");
+}
+
+Color ParticleEffect2D::ReadColor(const XMLElement& element, const String& name) const
+{
+    XMLElement child = element.GetChild(name);
+    return Color(child.GetFloat("red"), child.GetFloat("green"), child.GetFloat("blue"), child.GetFloat("alpha"));
+}
+
+Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element, const String& name) const
+{
+    XMLElement child = element.GetChild(name);
+    return Vector2(child.GetFloat("x"), child.GetFloat("y"));
 }
 
 }
+
