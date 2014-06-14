@@ -343,7 +343,7 @@ bool ParticleEmitter::Load(XMLFile* file)
         sorted_ = rootElem.GetChild("sorted").GetBool("enable");
     
     if (rootElem.HasChild("animlodbias"))
-        SetAnimationLodBias(rootElem.GetChild("relative").GetFloat("value"));
+        SetAnimationLodBias(rootElem.GetChild("animlodbias").GetFloat("value"));
     
     if (rootElem.HasChild("emittertype"))
     {
