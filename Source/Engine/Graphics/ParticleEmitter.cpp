@@ -65,8 +65,11 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_FILE);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_FILE);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Emitting", emitting_, true, AM_FILE);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
 
 void ParticleEmitter::OnSetEnabled()
@@ -309,6 +312,43 @@ void ParticleEmitter::SetEffectAttr(ResourceRef value)
 ResourceRef ParticleEmitter::GetEffectAttr() const
 {
     return GetResourceRef(effect_, ParticleEffect::GetTypeStatic());
+}
+
+void ParticleEmitter::SetParticlesAttr(VariantVector value)
+{
+    unsigned index = 0;
+    SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
+    
+    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
+    {
+        i->velocity_ = value[index++].GetVector3();
+        i->size_ = value[index++].GetVector2();
+        i->timer_ = value[index++].GetFloat();
+        i->timeToLive_ = value[index++].GetFloat();
+        i->scale_ = value[index++].GetFloat();
+        i->rotationSpeed_ = value[index++].GetFloat();
+        i->colorIndex_ = value[index++].GetInt();
+        i->texIndex_ = value[index++].GetInt();
+    }
+}
+
+VariantVector ParticleEmitter::GetParticlesAttr() const
+{
+    VariantVector ret;
+    ret.Reserve(particles_.Size() * 8 + 1);
+    ret.Push(particles_.Size());
+    for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
+    {
+        ret.Push(i->velocity_);
+        ret.Push(i->size_);
+        ret.Push(i->timer_);
+        ret.Push(i->timeToLive_);
+        ret.Push(i->scale_);
+        ret.Push(i->rotationSpeed_);
+        ret.Push(i->colorIndex_);
+        ret.Push(i->texIndex_);
+    }
+    return ret;
 }
 
 void ParticleEmitter::OnNodeSet(Node* node)

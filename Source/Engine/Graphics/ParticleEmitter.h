@@ -92,6 +92,10 @@ public:
     void SetEffectAttr(ResourceRef value);
     /// Set particles effect attribute.
     ResourceRef GetEffectAttr() const;
+    /// Set particles attribute.
+    void SetParticlesAttr(VariantVector value);
+    /// Return particles attribute.
+    VariantVector GetParticlesAttr() const;
 
 protected:
     /// Handle node being assigned.
