@@ -858,16 +858,16 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
                 CreateModelWithStaticModel(browserFile.resourceKey, targetNode);
                 return;
             }
-            else if (type == RESOURCE_TYPE_PARTICLEEMITTER)
+            else if (type == RESOURCE_TYPE_PARTICLEEFFECT)
             {
                 if (browserFile.extension == "xml")
                 {
-                    XMLFile@ file = cache.GetResource("XMLFile", browserFile.resourceKey);
-                    if (file is null)
+                    ParticleEffect@ effect = cache.GetResource("ParticleEffect", browserFile.resourceKey);
+                    if (effect is null)
                         return;
 
                     ParticleEmitter@ emitter = targetNode.CreateComponent("ParticleEmitter");
-                    emitter.Load(file);
+                    emitter.effect = effect;
                     createdComponent = emitter;
                 }
             }
@@ -1104,7 +1104,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
             return type == RESOURCE_TYPE_PREFAB || 
                 type == RESOURCE_TYPE_SCRIPTFILE || 
                 type == RESOURCE_TYPE_MODEL || 
-                type == RESOURCE_TYPE_PARTICLEEMITTER ||
+                type == RESOURCE_TYPE_PARTICLEEFFECT ||
                 type == RESOURCE_TYPE_2D_PARTICLE_EFFECT;
         }
 

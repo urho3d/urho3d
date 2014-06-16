@@ -945,13 +945,14 @@ bool SceneRebuildNavigation()
     return success;
 }
 
+/*
 bool LoadParticleData(const String&in fileName)
 {
     if (fileName.empty)
         return false;
 
-    XMLFile xmlFile;
-    if (!xmlFile.Load(File(fileName, FILE_READ)))
+    ParticleEffect@ effect = cache.GetResource("ParticleEffect", fileName);
+    if (effect is null)
         return false;
 
     bool needRefresh = false;
@@ -961,7 +962,7 @@ bool LoadParticleData(const String&in fileName)
         ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[i]);
         if (emitter !is null)
         {
-            emitter.Load(xmlFile);
+            emitter.effect = effect;
             needRefresh = true;
         }
     }
@@ -987,6 +988,7 @@ bool SaveParticleData(const String&in fileName)
 
     return false;
 }
+*/
 
 void AssignMaterial(StaticModel@ model, String materialPath)
 {
