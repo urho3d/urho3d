@@ -55,14 +55,11 @@ class ParticleEffect : public Resource
     void SetMinRotation(float rotation);
     void SetMaxRotation(float rotation);
     void SetMinRotationSpeed(float speed);
-    void SetMaxRotationSpeed(float speed);
+    void SetMaxRotationSpeed(float speed);    
     void SetSizeAdd(float sizeAdd);
     void SetSizeMul(float sizeMul);
-    void SetColor(const Color& color);
-    // void SetColors(const Vector<ColorFrame>& colors);
-    void SetNumColors(unsigned num);
-    // void SetTextureFrames(const Vector<TextureFrame>& animation);
-    void SetNumTextureFrames(unsigned num);
+    void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
+    void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
 
     Material* GetMaterial() const;
     unsigned GetNumParticles() const;
@@ -93,10 +90,10 @@ class ParticleEffect : public Resource
     float GetMaxRotationSpeed() const;
     float GetSizeAdd() const;
     float GetSizeMul() const;
-    unsigned GetNumColors() const;
-    ColorFrame* GetColor(unsigned index);
+    unsigned GetNumColorFrames() const;
+    const ColorFrame* GetColorFrame(unsigned index) const;
     unsigned GetNumTextureFrames() const;
-    TextureFrame* GetTextureFrame(unsigned index);
+    const TextureFrame* GetTextureFrame(unsigned index) const;
 
     tolua_property__get_set Material* material;
     tolua_property__get_set unsigned numParticles;
@@ -127,6 +124,6 @@ class ParticleEffect : public Resource
     tolua_property__get_set float maxRotationSpeed;
     tolua_property__get_set float sizeAdd;
     tolua_property__get_set float sizeMul;
-    tolua_property__get_set unsigned numColors;
+    tolua_property__get_set unsigned numColorFrames;
     tolua_property__get_set unsigned numTextureFrames;
 };

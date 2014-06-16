@@ -207,7 +207,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
 
             // Color interpolation
             unsigned& index = particle.colorIndex_;
-            const Vector<ColorFrame>& colorFrames_ = effect_->GetColors();
+            const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
             if (index < colorFrames_.Size())
             {
                 if (index < colorFrames_.Size() - 1)
@@ -223,7 +223,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
 
             // Texture animation
             unsigned& texIndex = particle.texIndex_;
-            const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrame();
+            const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrames();
             if (textureFrames_.Size() && texIndex < textureFrames_.Size() - 1)
             {
                 if (particle.timer_ >= textureFrames_[texIndex + 1].time_)
@@ -382,10 +382,10 @@ bool ParticleEmitter::EmitNewParticle()
 
     billboard.position_ = startPos;
     billboard.size_ = particles_[index].size_;
-    const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrame();
+    const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrames();
     billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
     billboard.rotation_ = effect_->GetRandomRotation();
-    const Vector<ColorFrame>& colorFrames_ = effect_->GetColors();
+    const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
     billboard.color_ = colorFrames_[0].color_;
     billboard.enabled_ = true;
 

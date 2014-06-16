@@ -18,3 +18,10 @@ class ParticleEmitter : public BillboardSet
     tolua_property__is_set bool emitting;
 };
 
+${
+#define TOLUA_DISABLE_tolua_set_ParticleEffect_numColorFrames
+#define tolua_set_ParticleEffect_numColorFrames NULL
+
+#define TOLUA_DISABLE_tolua_set_ParticleEffect_numTextureFrames
+#define tolua_set_ParticleEffect_numTextureFrames NULL
+$}

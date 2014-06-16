@@ -79,7 +79,6 @@ ParticleEffect::ParticleEffect(Context* context) :
     sizeAdd_(0.0f),
     sizeMul_(1.0f)    
 {
-    SetColor(Color::WHITE);
 }
 
 ParticleEffect::~ParticleEffect()
@@ -207,34 +206,35 @@ bool ParticleEffect::Load(Deserializer& source)
     }
 
     if (rootElem.HasChild("color"))
-        SetColor(rootElem.GetChild("color").GetColor("value"));
+    {
+        ColorFrame colorFrame(rootElem.GetChild("color").GetColor("value"));
+        SetColorFrame(0, colorFrame);
+    }
 
     if (rootElem.HasChild("colorfade"))
     {
         Vector<ColorFrame> fades;
-        XMLElement colorFadeElem = rootElem.GetChild("colorfade");
-        while (colorFadeElem)
-        {
+        for (XMLElement colorFadeElem = rootElem.GetChild("colorfade"); colorFadeElem; colorFadeElem = colorFadeElem.GetNext("colorfade"))
             fades.Push(ColorFrame(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
 
-            colorFadeElem = colorFadeElem.GetNext("colorfade");
-        }
-        SetColors(fades);
+        SetColorFrames(fades);
     }
+
+    if (colorFrames_.Empty())
+        colorFrames_.Push(ColorFrame(Color::WHITE));
 
     if (rootElem.HasChild("texanim"))
     {
         Vector<TextureFrame> animations;
-        XMLElement animElem = rootElem.GetChild("texanim");
-        while (animElem)
+        for (XMLElement animElem = rootElem.GetChild("texanim"); animElem; animElem = animElem.GetNext("texanim"))
         {
             TextureFrame animation;
             animation.uv_ = animElem.GetRect("uv");
             animation.time_ = animElem.GetFloat("time");
             animations.Push(animation);
-            animElem = animElem.GetNext("texanim");
         }
-        textureFrames_ = animations;
+
+        SetTextureFrames(animations);
     }
 
     return true;
@@ -488,33 +488,38 @@ void ParticleEffect::SetSizeMul(float sizeMul)
     sizeMul_ = sizeMul;
 }
 
-void ParticleEffect::SetColor(const Color& color)
+void ParticleEffect::SetColorFrames(const Vector<ColorFrame>& colorFrames)
 {
-    colorFrames_.Clear();
-    colorFrames_.Push(ColorFrame(color));
+    colorFrames_ = colorFrames;
 }
 
-void ParticleEffect::SetColors(const Vector<ColorFrame>& colors)
+void ParticleEffect::SetColorFrame(unsigned index, const ColorFrame& colorFrame)
 {
-    if (!colors.Size())
-        return;
-
-    colorFrames_ = colors;
+    if (colorFrames_.Size() < index + 1)
+         colorFrames_.Resize(index + 1);
+    colorFrames_[index] = colorFrame;
 }
 
-void ParticleEffect::SetNumColors(unsigned num)
+void ParticleEffect::SetTextureFrames(const Vector<TextureFrame>& textureFrames)
 {
-    colorFrames_.Resize(num);
+    textureFrames_ = textureFrames;
 }
 
-void ParticleEffect::SetTextureFrames(const Vector<TextureFrame>& animation)
+void ParticleEffect::SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
 {
-    textureFrames_ = animation;
+    if (textureFrames_.Size() < index + 1)
+        textureFrames_.Resize(index + 1);
+    textureFrames_[index] = textureFrame;
 }
 
-void ParticleEffect::SetNumTextureFrames(unsigned num)
+const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 {
-    textureFrames_.Resize(num);
+    return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0;
+}
+
+const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
+{
+    return index < colorFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
 }
 
 Vector3 ParticleEffect::GetRandomDirection() const
@@ -595,5 +600,6 @@ void ParticleEffect::GetVector3MinMax(const XMLElement& element, Vector3& minVal
         maxValue = element.GetVector3("max");
     }
 }
+
 
 }

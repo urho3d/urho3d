@@ -173,16 +173,14 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
-    /// Set color of particles.
-    void SetColor(const Color& color);
     /// Set color animation of particles.
-    void SetColors(const Vector<ColorFrame>& colors);
+    void SetColorFrames(const Vector<ColorFrame>& colorFrames);
     /// Set number of color animation frames.
-    void SetNumColors(unsigned num);
+    void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
     /// Set particle texture animation.
     void SetTextureFrames(const Vector<TextureFrame>& animation);
     /// Set number of texture animation frames.
-    void SetNumTextureFrames(unsigned num);
+    void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
 
     /// Return material.
     Material* GetMaterial() const { return material_; }
@@ -243,17 +241,17 @@ public:
     /// Return particle size multiplicative modifier.
     float GetSizeMul() const { return sizeMul_; }
     /// Return all color animation frames.
-    Vector<ColorFrame>& GetColors() { return colorFrames_; }
+    const Vector<ColorFrame>& GetColorFrames() const { return colorFrames_; }
     /// Return number of color animation frames.
-    unsigned GetNumColors() const { return colorFrames_.Size(); }
+    unsigned GetNumColorFrames() const { return colorFrames_.Size(); }
     /// Return a color animation frame, or null if outside range.
-    ColorFrame* GetColor(unsigned index) { return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0; }
+    const ColorFrame* GetColorFrame(unsigned index) const;
     /// Return all texture animation frames.
-    Vector<TextureFrame>& GetTextureFrame() { return textureFrames_; }
+    const Vector<TextureFrame>& GetTextureFrames() const { return textureFrames_; }
     /// Return number of texture animation frames.
     unsigned GetNumTextureFrames() const { return textureFrames_.Size(); }
     /// Return a texture animation frame, or null if outside range.
-    TextureFrame* GetTextureFrame(unsigned index) { return index < colorFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0; }
+    const TextureFrame* GetTextureFrame(unsigned index) const;
 
     /// Return random direction.
     Vector3 GetRandomDirection() const;
