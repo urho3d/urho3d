@@ -517,6 +517,40 @@ void ParticleEffect::SetNumTextureFrames(unsigned num)
     textureFrames_.Resize(num);
 }
 
+Vector3 ParticleEffect::GetRandomDirection() const
+{
+    return Vector3(
+        Lerp(directionMin_.x_, directionMax_.x_, Random(1.0f)),
+        Lerp(directionMin_.y_, directionMax_.y_, Random(1.0f)),
+        Lerp(directionMin_.z_, directionMax_.z_, Random(1.0f))
+        );
+}
+
+Vector2 ParticleEffect::GetRandomSize() const
+{
+    return sizeMin_.Lerp(sizeMax_, Random(1.0f));
+}
+
+float ParticleEffect::GetRandomVelocity() const
+{
+    return Lerp(velocityMin_, velocityMax_, Random(1.0f));
+}
+
+float ParticleEffect::GetRandomTimeToLive() const
+{
+    return Lerp(timeToLiveMin_, timeToLiveMax_, Random(1.0f));
+}
+
+float ParticleEffect::GetRandomRotationSpeed() const
+{
+    return Lerp(rotationSpeedMin_, rotationSpeedMax_, Random(1.0f));
+}
+
+float ParticleEffect::GetRandomRotation() const
+{
+    return Lerp(rotationMin_, rotationMax_, Random(1.0f));
+}
+
 void ParticleEffect::GetFloatMinMax(const XMLElement& element, float& minValue, float& maxValue)
 {
     if (element.IsNull())

@@ -255,6 +255,19 @@ public:
     /// Return a texture animation frame, or null if outside range.
     TextureFrame* GetTextureFrame(unsigned index) { return index < colorFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0; }
 
+    /// Return random direction.
+    Vector3 GetRandomDirection() const;
+    /// Return random size.
+    Vector2 GetRandomSize() const;
+    /// Return random velocity.
+    float GetRandomVelocity() const;
+    /// Return random timetolive.
+    float GetRandomTimeToLive() const;
+    /// Return random rotationspeed.
+    float GetRandomRotationSpeed() const;
+    /// Return random rotation.
+    float GetRandomRotation() const;
+
 private:
     /// Read a float range from an XML element.
     void GetFloatMinMax(const XMLElement& element, float& minValue, float& maxValue);

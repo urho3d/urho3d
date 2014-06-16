@@ -1029,28 +1029,29 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
 
 static void RegisterParticleEffect(asIScriptEngine* engine)
 {
-    RegisterResource<ParticleEffect>(engine, "ParticleEffect");
-}
-
-static void RegisterParticleEmitter(asIScriptEngine* engine)
-{
     engine->RegisterEnum("EmitterType");
     engine->RegisterEnumValue("EmitterType", "EMITTER_SPHERE", EMITTER_SPHERE);
     engine->RegisterEnumValue("EmitterType", "EMITTER_BOX", EMITTER_BOX);
-    
+
     engine->RegisterObjectType("ColorFrame", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("ColorFrame", "Color color", offsetof(ColorFrame, color_));
     engine->RegisterObjectProperty("ColorFrame", "float time", offsetof(ColorFrame, time_));
-    
+
     engine->RegisterObjectType("TextureFrame", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("TextureFrame", "Rect uv", offsetof(TextureFrame, uv_));
     engine->RegisterObjectProperty("TextureFrame", "float time", offsetof(TextureFrame, time_));
     
+    RegisterResource<ParticleEffect>(engine, "ParticleEffect");
+}
+
+static void RegisterParticleEmitter(asIScriptEngine* engine)
+{   
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
+    /*
     engine->RegisterObjectMethod("ParticleEmitter", "bool Load(XMLFile@+)", asMETHODPR(ParticleEmitter, Load, (XMLFile*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool Save(XMLFile@+)", asMETHODPR(ParticleEmitter, Save, (XMLFile*) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void SetColor(const Color&in)", asMETHOD(ParticleEmitter, SetColor), asCALL_THISCALL);
@@ -1132,6 +1133,7 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "void set_numTextureFrames(uint)", asMETHOD(ParticleEmitter, SetNumTextureFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numTextureFrames() const", asMETHOD(ParticleEmitter, GetNumTextureFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
+    */
 }
 
 static void RegisterCustomGeometry(asIScriptEngine* engine)
