@@ -773,7 +773,7 @@ Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName,
 
     // Create the particle emitter
     ParticleEmitter@ emitter = newNode.CreateComponent("ParticleEmitter");
-    emitter.Load(cache.GetResource("XMLFile", effectName));
+    emitter.effect = cache.GetResource("ParticleEffect", effectName);
 
     // Create a GameObject for managing the effect lifetime
     GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
