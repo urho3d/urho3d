@@ -50,7 +50,7 @@ static const Vector3 DEFAULT_DIRECTION_MAX(1.0f, 1.0f, 1.0f);
 
 ParticleEffect::ParticleEffect(Context* context) :
     Resource(context),
-    numParticles_(10),
+    numParticles_(DEFAULT_NUM_PARTICLES),
     updateInvisible_(false),
     relative_(true),
     scaled_(true),
@@ -77,7 +77,7 @@ ParticleEffect::ParticleEffect(Context* context) :
     rotationSpeedMin_(0.0f),
     rotationSpeedMax_(0.0f),
     sizeAdd_(0.0f),
-    sizeMul_(1.0f)    
+    sizeMul_(1.0f)
 {
 }
 
@@ -105,6 +105,39 @@ bool ParticleEffect::Load(Deserializer& source)
         LOGERROR("Particle emitter parameter file does not have a valid root element");
         return false;
     }
+
+    // Reset to defaults first so that missing parameters in case of a live reload behave as expected
+    material_.Reset();
+    numParticles_ = DEFAULT_NUM_PARTICLES;
+    updateInvisible_ = false;
+    relative_ = true;
+    scaled_ = true;
+    sorted_ = false;
+    animationLodBias_ = 0.0f;
+    emitterType_ = EMITTER_SPHERE;
+    emitterSize_ = Vector3::ZERO;
+    directionMin_ = DEFAULT_DIRECTION_MIN;
+    directionMax_ = DEFAULT_DIRECTION_MAX;
+    constantForce_ = Vector3::ZERO;
+    dampingForce_ = 0.0f;
+    activeTime_ = 0.0f;
+    inactiveTime_ = 0.0;
+    emissionRateMin_ = DEFAULT_EMISSION_RATE;
+    emissionRateMax_ = DEFAULT_EMISSION_RATE;
+    sizeMin_ = DEFAULT_PARTICLE_SIZE;
+    sizeMax_ = DEFAULT_PARTICLE_SIZE;
+    timeToLiveMin_ = DEFAULT_TIME_TO_LIVE;
+    timeToLiveMax_ = DEFAULT_TIME_TO_LIVE;
+    velocityMin_ = DEFAULT_VELOCITY;
+    velocityMax_ = DEFAULT_VELOCITY;
+    rotationMin_ = 0.0f;
+    rotationMax_ = 0.0f;
+    rotationSpeedMin_ = 0.0f;
+    rotationSpeedMax_ = 0.0f;
+    sizeAdd_ = 0.0f;
+    sizeMul_ = 1.0f;
+    colorFrames_.Clear();
+    textureFrames_.Clear();
 
     if (rootElem.HasChild("material"))
         SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(rootElem.GetChild("material").GetAttribute("name")));

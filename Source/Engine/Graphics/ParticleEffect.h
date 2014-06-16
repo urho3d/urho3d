@@ -92,6 +92,8 @@ struct TextureFrame
     float time_;
 };
 
+static const unsigned DEFAULT_NUM_PARTICLES = 10;
+
 class Material;
 class XMLFile;
 class XMLElement;

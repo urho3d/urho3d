@@ -26,6 +26,7 @@
 #include "ParticleEmitter.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 
@@ -36,7 +37,6 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 extern const char* faceCameraModeNames[];
-static const unsigned DEFAULT_NUM_PARTICLES = 10;
 static const unsigned MAX_PARTICLES_IN_FRAME = 100;
 
 ParticleEmitter::ParticleEmitter(Context* context) :
@@ -251,14 +251,17 @@ void ParticleEmitter::SetEffect(ParticleEffect* effect)
 
     Reset();
 
+    // Unsubscribe from the reload event of previous effect (if any), then subscribe to the new
+    if (effect_)
+        UnsubscribeFromEvent(effect_, E_RELOADFINISHED);
+
     effect_ = effect;
 
     if (!effect_)
         return;
 
-    SetMaterial(effect_->GetMaterial());
-    SetNumParticles(effect_->GetNumParticles());
-    SetAnimationLodBias(effect_->GetAnimationLodBias());
+    SubscribeToEvent(effect, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleEffectReloadFinished));
+    ApplyEffect();
     MarkNetworkUpdate();
 }
 
@@ -457,6 +460,23 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         needUpdate_ = true;
         MarkForUpdate();
     }
+}
+
+void ParticleEmitter::HandleEffectReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    // When particle effect file is live-edited, remove existing particles and reapply the effect parameters
+    Reset();
+    ApplyEffect();
+}
+
+void ParticleEmitter::ApplyEffect()
+{
+    if (!effect_)
+        return;
+    
+    SetMaterial(effect_->GetMaterial());
+    SetNumParticles(effect_->GetNumParticles());
+    SetAnimationLodBias(effect_->GetAnimationLodBias());
 }
 
 }
