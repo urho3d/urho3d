@@ -1,0 +1,5 @@
+$#include "ParticleEffect.h"
+
+class ParticleEffect : public Resource
+{
+};

@@ -34,6 +34,7 @@
 #include "Light.h"
 #include "Material.h"
 #include "Octree.h"
+#include "ParticleEffect.h"
 #include "ParticleEmitter.h"
 #include "Renderer.h"
 #include "RenderPath.h"
@@ -1026,6 +1027,11 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHOD(BillboardSet, GetZone), asCALL_THISCALL);
 }
 
+static void RegisterParticleEffect(asIScriptEngine* engine)
+{
+    RegisterResource<ParticleEffect>(engine, "ParticleEffect");
+}
+
 static void RegisterParticleEmitter(asIScriptEngine* engine)
 {
     engine->RegisterEnum("EmitterType");
@@ -1542,6 +1548,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterAnimatedModel(engine);
     RegisterAnimationController(engine);
     RegisterBillboardSet(engine);
+    RegisterParticleEffect(engine);
     RegisterParticleEmitter(engine);
     RegisterCustomGeometry(engine);
     RegisterDecalSet(engine);
