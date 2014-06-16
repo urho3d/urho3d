@@ -96,11 +96,10 @@ class Material;
 class XMLFile;
 class XMLElement;
 
-/// %Particle emitter component.
+/// %Particle effect definition.
 class URHO3D_API ParticleEffect : public Resource
 {
     OBJECT(ParticleEffect);
-    friend class ParticleEmitter;
 
 public:
     /// Construct.

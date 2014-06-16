@@ -1289,11 +1289,9 @@ Like with skeletal animations, there are two ways to play back node animations:
 
 \page Particles %Particle systems
 
-The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically.
+The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically. 
 
-The particle system's properties can also be set through a XML description file, see \ref ParticleEmitter::Load "Load()".
-
-Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
+The parameters of the particle system are stored in a ParticleEffect resource class, which uses XML format. Call \ref ParticleEmitter::SetEffect "SetEffect()" to assign the effect resource to the emitter. Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
 
 \code
 <particleemitter>
