@@ -476,6 +476,9 @@ void ParticleEmitter::ApplyEffect()
     
     SetMaterial(effect_->GetMaterial());
     SetNumParticles(effect_->GetNumParticles());
+    SetRelative(effect_->IsRelative());
+    SetScaled(effect_->IsScaled());
+    SetSorted(effect_->IsSorted());
     SetAnimationLodBias(effect_->GetAnimationLodBias());
 }
 
