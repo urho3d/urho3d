@@ -485,7 +485,7 @@ bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space
         break;
     }
 
-    Vector3 lookDir = target - GetWorldPosition();
+    Vector3 lookDir = worldSpaceTarget - GetWorldPosition();
     // Check if target is very close, in that case can not reliably calculate lookat direction
     if (lookDir.Equals(Vector3::ZERO))
         return false;
