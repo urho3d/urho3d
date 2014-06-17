@@ -3203,8 +3203,8 @@ Methods:
 - const PODVector<OctreeQueryResult>& GetDrawables(const BoundingBox& box, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<OctreeQueryResult>& GetDrawables(const Frustum& frustum, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<OctreeQueryResult>& GetDrawables(const Sphere& sphere, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
-- RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
+- const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const
+- RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
 - void DrawDebugGeometry(bool depthTest)
