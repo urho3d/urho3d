@@ -1145,6 +1145,7 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "void ResetEmissionTimer()", asMETHOD(ParticleEmitter, ResetEmissionTimer), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void RemoveAllParticles()", asMETHOD(ParticleEmitter, RemoveAllParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void Reset()", asMETHOD(ParticleEmitter, Reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void ApplyEffect()", asMETHOD(ParticleEmitter, ApplyEffect), asCALL_THISCALL);
 }
 
 static void RegisterCustomGeometry(asIScriptEngine* engine)

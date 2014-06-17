@@ -8,6 +8,7 @@ class ParticleEmitter : public BillboardSet
     void ResetEmissionTimer();
     void RemoveAllParticles();
     void Reset();
+    void ApplyEffect();
 
     ParticleEffect* GetEffect() const { return effect_; }
     unsigned GetNumParticles() const { return particles_.Size(); }

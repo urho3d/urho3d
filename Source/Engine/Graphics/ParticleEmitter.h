@@ -80,6 +80,8 @@ public:
     void RemoveAllParticles();
     /// Reset the particle emitter completely. Removes current particles, sets emitting state on, and resets the emission timer.
     void Reset();
+    /// Apply not continuously updated values such as the material, the number of particles and sorting mode from the particle effect. Call this if you change the effect programmatically.
+    void ApplyEffect();
 
     /// Return particle effect.
     ParticleEffect* GetEffect() const { return effect_; }
@@ -111,9 +113,7 @@ private:
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle live reload of the particle effect.
     void HandleEffectReloadFinished(StringHash eventType, VariantMap& eventData);
-    /// Apply one-time values such as the material from the particle effect.
-    void ApplyEffect();
-    
+
     /// Particle effect.
     SharedPtr<ParticleEffect> effect_;
     /// Particles.

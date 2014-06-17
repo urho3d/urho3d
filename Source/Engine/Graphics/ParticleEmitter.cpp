@@ -257,10 +257,9 @@ void ParticleEmitter::SetEffect(ParticleEffect* effect)
 
     effect_ = effect;
 
-    if (!effect_)
-        return;
-
-    SubscribeToEvent(effect, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleEffectReloadFinished));
+    if (effect_)
+        SubscribeToEvent(effect_, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleEffectReloadFinished));
+    
     ApplyEffect();
     MarkNetworkUpdate();
 }
@@ -304,6 +303,19 @@ void ParticleEmitter::Reset()
     RemoveAllParticles();
     ResetEmissionTimer();
     SetEmitting(true);
+}
+
+void ParticleEmitter::ApplyEffect()
+{
+    if (!effect_)
+        return;
+    
+    SetMaterial(effect_->GetMaterial());
+    SetNumParticles(effect_->GetNumParticles());
+    SetRelative(effect_->IsRelative());
+    SetScaled(effect_->IsScaled());
+    SetSorted(effect_->IsSorted());
+    SetAnimationLodBias(effect_->GetAnimationLodBias());
 }
 
 void ParticleEmitter::SetEffectAttr(ResourceRef value)
@@ -467,19 +479,6 @@ void ParticleEmitter::HandleEffectReloadFinished(StringHash eventType, VariantMa
     // When particle effect file is live-edited, remove existing particles and reapply the effect parameters
     Reset();
     ApplyEffect();
-}
-
-void ParticleEmitter::ApplyEffect()
-{
-    if (!effect_)
-        return;
-    
-    SetMaterial(effect_->GetMaterial());
-    SetNumParticles(effect_->GetNumParticles());
-    SetRelative(effect_->IsRelative());
-    SetScaled(effect_->IsScaled());
-    SetSorted(effect_->IsSorted());
-    SetAnimationLodBias(effect_->GetAnimationLodBias());
 }
 
 }
