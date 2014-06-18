@@ -203,7 +203,15 @@ private:
     Color ReadColor(const XMLElement& element, const String& name) const;
     /// Read Vector2.
     Vector2 ReadVector2(const XMLElement& element, const String& name) const;
-    
+    /// Write integer.
+	void WriteInt(XMLElement& element, const String& name, int value) const;
+    /// Write float.
+	void WriteFloat(XMLElement& element, const String& name, float value) const;
+    /// Write Color.
+	void WriteColor(XMLElement& element, const String& name, const Color& color) const;
+    /// Write Vector2.
+    void WriteVector2(XMLElement& element, const String& name, const Vector2& value) const;
+
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Source position variance.
@@ -272,8 +280,6 @@ private:
     float rotationEnd_;
     /// Rotation end variance.
     float rotationEndVariance_;
-
-
 };
 
 }

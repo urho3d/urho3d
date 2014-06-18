@@ -154,6 +154,7 @@ bool ParticleEffect2D::Load(Deserializer& source)
     startParticleSizeVariance_ = ReadFloat(rootElem, "startParticleSizeVariance");
 
     finishParticleSize_ = ReadFloat(rootElem, "finishParticleSize");
+    // Typo in pex file
     FinishParticleSizeVariance_ = ReadFloat(rootElem, "FinishParticleSizeVariance");
 
     duration_ = M_INFINITY;
@@ -197,7 +198,73 @@ bool ParticleEffect2D::Load(Deserializer& source)
 
 bool ParticleEffect2D::Save(Serializer& dest) const
 {
-    return false;
+    if (!sprite_)
+        return false;
+
+    XMLFile xmlFile(context_);
+    XMLElement rootElem = xmlFile.CreateRoot("particleEmitterConfig");
+
+    String fileName = GetFileNameAndExtension(sprite_->GetName());
+    rootElem.CreateChild("texture").SetAttribute("name", fileName);
+
+    WriteVector2(rootElem, "sourcePosition", Vector2::ZERO);
+    WriteVector2(rootElem, "sourcePositionVariance", sourcePositionVariance_);
+
+    WriteFloat(rootElem, "speed", speed_);
+    WriteFloat(rootElem, "speedVariance", speedVariance_);
+
+    WriteFloat(rootElem, "particleLifeSpan", particleLifeSpan_);
+    WriteFloat(rootElem, "particleLifespanVariance", particleLifespanVariance_);
+
+    WriteFloat(rootElem, "angle", angle_);
+    WriteFloat(rootElem, "angleVariance", angleVariance_);
+
+    WriteVector2(rootElem, "gravity", gravity_);
+
+    WriteFloat(rootElem, "radialAcceleration", radialAcceleration_);
+    WriteFloat(rootElem, "tangentialAcceleration", tangentialAcceleration_);
+
+    WriteFloat(rootElem, "radialAccelVariance", radialAccelVariance_);
+    WriteFloat(rootElem, "tangentialAccelVariance", tangentialAccelVariance_);
+
+    WriteColor(rootElem, "startColor", startColor_);
+    WriteColor(rootElem, "startColorVariance", startColorVariance_);
+
+    WriteColor(rootElem, "finishColor", finishColor_);
+    WriteColor(rootElem, "finishColorVariance", finishColorVariance_);
+
+    WriteInt(rootElem, "maxParticles", maxParticles_);
+
+    WriteFloat(rootElem, "startParticleSize", startParticleSize_);
+    WriteFloat(rootElem, "startParticleSizeVariance", startParticleSizeVariance_);
+
+    WriteFloat(rootElem, "finishParticleSize", finishParticleSize_);
+    // Typo in pex file
+    WriteFloat(rootElem, "FinishParticleSizeVariance", FinishParticleSizeVariance_);
+
+    float duration = duration_;
+    if (duration == M_INFINITY)
+        duration = -1.0f;
+    WriteFloat(rootElem, "duration", duration);
+    WriteInt(rootElem, "emitterType", (int)emitterType_);
+
+    WriteFloat(rootElem, "maxRadius", maxRadius_);
+    WriteFloat(rootElem, "maxRadiusVariance", maxRadiusVariance_);
+    WriteFloat(rootElem, "minRadius", minRadius_);
+
+    WriteFloat(rootElem, "rotatePerSecond", rotatePerSecond_);
+    WriteFloat(rootElem, "rotatePerSecondVariance", rotatePerSecondVariance_);
+
+    WriteInt(rootElem, "blendFuncSource", srcBlendFuncs[blendMode_]);
+    WriteInt(rootElem, "blendFuncDestination", destBlendFuncs[blendMode_]);
+
+    WriteFloat(rootElem, "rotationStart", rotationStart_);
+    WriteFloat(rootElem, "rotationStartVariance", rotationStartVariance_);
+
+    WriteFloat(rootElem, "rotationEnd", rotationEnd_);
+    WriteFloat(rootElem, "rotationEndVariance", rotationEndVariance_);
+
+	return xmlFile.Save(dest);
 }
 
 void ParticleEffect2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance)
@@ -387,5 +454,32 @@ Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element, const String& n
     return Vector2(child.GetFloat("x"), child.GetFloat("y"));
 }
 
+void ParticleEffect2D::WriteInt(XMLElement& element, const String& name, int value) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetInt("value", value);
 }
 
+void ParticleEffect2D::WriteFloat(XMLElement& element, const String& name, float value) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetFloat("value", value);
+}
+
+void ParticleEffect2D::WriteColor(XMLElement& element, const String& name, const Color& color) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetFloat("red", color.r_);
+	child.SetFloat("green", color.g_);
+	child.SetFloat("blue", color.b_);
+	child.SetFloat("alpha", color.a_);
+}
+
+void ParticleEffect2D::WriteVector2(XMLElement& element,const String& name,const Vector2& value) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetFloat("x", value.x_);
+	child.SetFloat("y", value.y_);
+}
+
+}
