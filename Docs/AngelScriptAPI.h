@@ -6201,6 +6201,72 @@ String typeName;
 int weakRefs;
 };
 
+class ParticleEffect
+{
+// Methods:
+ColorFrame GetColorFrame(uint) const;
+TextureFrame GetTextureFrame(uint) const;
+bool Load(File);
+bool Load(VectorBuffer&);
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetColorFrame(uint, ColorFrame) const;
+void SetTextureFrame(uint, TextureFrame) const;
+
+// Properties:
+float activeTime;
+float animationLodBias;
+/* readonly */
+ShortStringHash baseType;
+/* readonly */
+String category;
+Vector3 constantForce;
+float dampingForce;
+Vector3 emitterSize;
+EmitterType emitterType;
+float inactiveTime;
+Material material;
+Vector3 maxDirection;
+float maxEmissionRate;
+Vector3 maxParticleSize;
+float maxRotation;
+float maxRotationSpeed;
+float maxTimeToLive;
+float maxVelocity;
+/* readonly */
+uint memoryUse;
+Vector3 minDirection;
+float minEmissionRate;
+Vector2 minParticleSize;
+float minRotation;
+float minRotationSpeed;
+float minTimeToLive;
+float minVelocity;
+String name;
+/* readonly */
+uint numColorFrames;
+uint numParticles;
+/* readonly */
+uint numTextureFrames;
+/* readonly */
+int refs;
+bool relative;
+bool scaled;
+float sizeAdd;
+float sizeMul;
+bool sorted;
+/* readonly */
+ShortStringHash type;
+/* readonly */
+String typeName;
+bool updateInvisible;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+};
+
 class ParticleEffect2D
 {
 // Methods:
@@ -6234,6 +6300,8 @@ class ParticleEmitter
 {
 // Methods:
 void ApplyAttributes();
+void ApplyEffect();
+void Commit();
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
@@ -6243,7 +6311,6 @@ Variant GetAttributeDefault(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
-bool Load(XMLFile);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
@@ -6254,17 +6321,14 @@ void ResetEmissionTimer();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool Save(XMLFile);
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetColor(const Color&);
 
 // Properties:
-float activeTime;
 bool animationEnabled;
 float animationLodBias;
 /* readonly */
@@ -6275,19 +6339,14 @@ Array<Variant> attributes;
 /* readonly */
 ShortStringHash baseType;
 /* readonly */
+Array<Billboard> billboards;
+/* readonly */
 BoundingBox boundingBox;
 bool castShadows;
 /* readonly */
 String category;
-/* readonly */
-Array<ColorFrame> colors;
-Vector3 constantForce;
-float dampingForce;
 float drawDistance;
-/* writeonly */
-float emissionRate;
-Vector3 emitterSize;
-EmitterType emitterType;
+ParticleEffect effect;
 bool emitting;
 bool enabled;
 /* readonly */
@@ -6297,62 +6356,31 @@ FaceCameraMode faceCameraMode;
 uint id;
 /* readonly */
 bool inView;
-float inactiveTime;
 uint lightMask;
 float lodBias;
 Material material;
-Vector3 maxDirection;
-float maxEmissionRate;
 uint maxLights;
-Vector3 maxParticleSize;
-float maxRotation;
-float maxRotationSpeed;
-float maxTimeToLive;
-float maxVelocity;
-Vector3 minDirection;
-float minEmissionRate;
-Vector2 minParticleSize;
-float minRotation;
-float minRotationSpeed;
-float minTimeToLive;
-float minVelocity;
 /* readonly */
 Node node;
 /* readonly */
 uint numAttributes;
-uint numColors;
+uint numBillboards;
 uint numParticles;
-uint numTextureFrames;
 ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
-/* writeonly */
-Vector2 particleSize;
 /* readonly */
 int refs;
 bool relative;
-/* writeonly */
-float rotation;
-/* writeonly */
-float rotationSpeed;
 bool scaled;
 float shadowDistance;
 uint shadowMask;
-float sizeAdd;
-float sizeMul;
 bool sorted;
 bool temporary;
-/* readonly */
-Array<TextureFrame> textureFrames;
-/* writeonly */
-float timeToLive;
 /* readonly */
 ShortStringHash type;
 /* readonly */
 String typeName;
-bool updateInvisible;
-/* writeonly */
-float velocity;
 uint viewMask;
 /* readonly */
 int weakRefs;

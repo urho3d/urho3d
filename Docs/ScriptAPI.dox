@@ -1323,45 +1323,14 @@ namespace Urho3D
 
 ### ParticleEmitter
 - %Is %Enabled : bool
-- %Material : ResourceRef
-- %Max %Particles : int
-- %Emission %Rate %Min : float
-- %Emission %Rate %Max : float
-- %Emitter %Type : int
-- %Emitter %Size : Vector3
-- %Active %Time : float
-- %Inactive %Time : float
-- %Is %Emitting : bool
-- %Update %When %Invisible : bool
-- %Relative %Position : bool
-- %Relative %Scale : bool
-- %Sort %By %Distance : bool
+- %Effect : ResourceRef
 - %Face %Camera %Mode : int
-- %Time %To %Live %Min : float
-- %Time %To %Live %Max : float
-- %Particle %Size %Min : Vector2
-- %Particle %Size %Max : Vector2
-- %Direction %Min : Vector3
-- %Direction %Max : Vector3
-- %Velocity %Min : float
-- %Velocity %Max : float
-- %Rotation %Min : float
-- %Rotation %Max : float
-- %Rotation %Speed %Min : float
-- %Rotation %Speed %Max : float
-- %Constant %Force : Vector3
-- %Damping %Force : float
-- %Size %Add : float
-- %Size %Mul : float
-- %Particle %Colors : VariantVector
-- %UV %Animation : VariantVector
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Draw %Distance : float
 - %Shadow %Distance : float
 - %Animation %LOD %Bias : float
-- %Period %Timer : float
-- %Emission %Timer : float
+- %Is %Emitting : bool
 
 ### ParticleEmitter2D
 - %Particle %Effect : ResourceRef
@@ -7213,6 +7182,64 @@ Properties:
 - int weakRefs // readonly
 
 
+### ParticleEffect
+
+Methods:
+
+- ColorFrame@ GetColorFrame(uint) const
+- TextureFrame@ GetTextureFrame(uint) const
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetColorFrame(uint, ColorFrame@) const
+- void SetTextureFrame(uint, TextureFrame@) const
+
+Properties:
+
+- float activeTime
+- float animationLodBias
+- ShortStringHash baseType // readonly
+- String category // readonly
+- Vector3 constantForce
+- float dampingForce
+- Vector3 emitterSize
+- EmitterType emitterType
+- float inactiveTime
+- Material@ material
+- Vector3 maxDirection
+- float maxEmissionRate
+- Vector3 maxParticleSize
+- float maxRotation
+- float maxRotationSpeed
+- float maxTimeToLive
+- float maxVelocity
+- uint memoryUse // readonly
+- Vector3 minDirection
+- float minEmissionRate
+- Vector2 minParticleSize
+- float minRotation
+- float minRotationSpeed
+- float minTimeToLive
+- float minVelocity
+- String name
+- uint numColorFrames // readonly
+- uint numParticles
+- uint numTextureFrames // readonly
+- int refs // readonly
+- bool relative
+- bool scaled
+- float sizeAdd
+- float sizeMul
+- bool sorted
+- ShortStringHash type // readonly
+- String typeName // readonly
+- bool updateInvisible
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+
 ### ParticleEffect2D
 
 Methods:
@@ -7241,6 +7268,8 @@ Properties:
 Methods:
 
 - void ApplyAttributes()
+- void ApplyEffect()
+- void Commit()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
@@ -7250,7 +7279,6 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
-- bool Load(XMLFile@)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -7261,85 +7289,53 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool Save(XMLFile@)
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetColor(const Color&)
 
 Properties:
 
-- float activeTime
 - bool animationEnabled
 - float animationLodBias
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - ShortStringHash baseType // readonly
+- Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
-- ColorFrame@[] colors // readonly
-- Vector3 constantForce
-- float dampingForce
 - float drawDistance
-- float emissionRate // writeonly
-- Vector3 emitterSize
-- EmitterType emitterType
+- ParticleEffect@ effect
 - bool emitting
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
 - uint id // readonly
 - bool inView // readonly
-- float inactiveTime
 - uint lightMask
 - float lodBias
 - Material@ material
-- Vector3 maxDirection
-- float maxEmissionRate
 - uint maxLights
-- Vector3 maxParticleSize
-- float maxRotation
-- float maxRotationSpeed
-- float maxTimeToLive
-- float maxVelocity
-- Vector3 minDirection
-- float minEmissionRate
-- Vector2 minParticleSize
-- float minRotation
-- float minRotationSpeed
-- float minTimeToLive
-- float minVelocity
 - Node@ node // readonly
 - uint numAttributes // readonly
-- uint numColors
+- uint numBillboards
 - uint numParticles
-- uint numTextureFrames
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
-- Vector2 particleSize // writeonly
 - int refs // readonly
 - bool relative
-- float rotation // writeonly
-- float rotationSpeed // writeonly
 - bool scaled
 - float shadowDistance
 - uint shadowMask
-- float sizeAdd
-- float sizeMul
 - bool sorted
 - bool temporary
-- TextureFrame@[] textureFrames // readonly
-- float timeToLive // writeonly
 - ShortStringHash type // readonly
 - String typeName // readonly
-- bool updateInvisible
-- float velocity // writeonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly

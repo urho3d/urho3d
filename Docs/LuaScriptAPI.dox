@@ -3282,116 +3282,131 @@ Properties:
 - unsigned checksum (readonly)
 - bool compressed (readonly)
 
-### ParticleEffect2D : Resource
-
-### ParticleEmitter : BillboardSet
+### ParticleEffect : Resource
 
 Methods:
 
-- bool Load(XMLFile* file)
-- bool Save(XMLFile* file)
+- void SetMaterial(Material* material)
 - void SetNumParticles(unsigned num)
-- void SetEmissionRate(float rate)
-- void SetMinEmissionRate(float rate)
-- void SetMaxEmissionRate(float rate)
+- void SetUpdateInvisible(bool enable)
+- void SetRelative(bool enable)
+- void SetScaled(bool enable)
+- void SetSorted(bool enable)
+- void SetAnimationLodBias(float lodBias)
 - void SetEmitterType(EmitterType type)
 - void SetEmitterSize(const Vector3& size)
-- void SetActiveTime(float time)
-- void SetInactiveTime(float time)
-- void SetEmitting(bool enable)
-- void SetUpdateInvisible(bool enable)
-- void SetTimeToLive(float time)
-- void SetMinTimeToLive(float time)
-- void SetMaxTimeToLive(float time)
-- void SetParticleSize(const Vector2& size)
-- void SetMinParticleSize(const Vector2& size)
-- void SetMaxParticleSize(const Vector2& size)
 - void SetMinDirection(const Vector3& direction)
 - void SetMaxDirection(const Vector3& direction)
-- void SetVelocity(float velocity)
-- void SetMinVelocity(float velocity)
-- void SetMaxVelocity(float velocity)
-- void SetRotation(float rotation)
-- void SetMinRotation(float rotation)
-- void SetMaxRotation(float rotation)
-- void SetRotationSpeed(float speed)
-- void SetMinRotationSpeed(float speed)
-- void SetMaxRotationSpeed(float speed)
 - void SetConstantForce(const Vector3& force)
 - void SetDampingForce(float force)
+- void SetActiveTime(float time)
+- void SetInactiveTime(float time)
+- void SetMinEmissionRate(float rate)
+- void SetMaxEmissionRate(float rate)
+- void SetMinParticleSize(const Vector2& size)
+- void SetMaxParticleSize(const Vector2& size)
+- void SetMinTimeToLive(float time)
+- void SetMaxTimeToLive(float time)
+- void SetMinVelocity(float velocity)
+- void SetMaxVelocity(float velocity)
+- void SetMinRotation(float rotation)
+- void SetMaxRotation(float rotation)
+- void SetMinRotationSpeed(float speed)
+- void SetMaxRotationSpeed(float speed)
 - void SetSizeAdd(float sizeAdd)
 - void SetSizeMul(float sizeMul)
-- void SetColor(const Color& color)
-- void SetNumColors(unsigned num)
-- void SetNumTextureFrames(unsigned num)
-- void ResetEmissionTimer()
-- void RemoveAllParticles()
-- void Reset()
+- void SetColorFrame(unsigned index, const ColorFrame& colorFrame)
+- void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
+- Material* GetMaterial() const
 - unsigned GetNumParticles() const
-- bool IsEmitting() const
 - bool GetUpdateInvisible() const
-- float GetMinEmissionRate() const
-- float GetMaxEmissionRate() const
+- bool IsRelative() const
+- bool IsScaled() const
+- bool IsSorted() const
+- float GetAnimationLodBias() const
 - EmitterType GetEmitterType() const
 - const Vector3& GetEmitterSize() const
-- float GetActiveTime() const
-- float GetInactiveTime() const
-- float GetMinTimeToLive() const
-- float GetMaxTimeToLive() const
-- const Vector2& GetMinParticleSize() const
-- const Vector2& GetMaxParticleSize() const
 - const Vector3& GetMinDirection() const
 - const Vector3& GetMaxDirection() const
+- const Vector3& GetConstantForce() const
+- float GetDampingForce() const
+- float GetActiveTime() const
+- float GetInactiveTime() const
+- float GetMinEmissionRate() const
+- float GetMaxEmissionRate() const
+- const Vector2& GetMinParticleSize() const
+- const Vector2& GetMaxParticleSize() const
+- float GetMinTimeToLive() const
+- float GetMaxTimeToLive() const
 - float GetMinVelocity() const
 - float GetMaxVelocity() const
 - float GetMinRotation() const
 - float GetMaxRotation() const
 - float GetMinRotationSpeed() const
 - float GetMaxRotationSpeed() const
-- const Vector3& GetConstantForce() const
-- float GetDampingForce() const
 - float GetSizeAdd() const
 - float GetSizeMul() const
-- unsigned GetNumColors() const
-- ColorFrame* GetColor(unsigned index)
+- unsigned GetNumColorFrames() const
+- const ColorFrame* GetColorFrame(unsigned index) const
 - unsigned GetNumTextureFrames() const
-- TextureFrame* GetTextureFrame(unsigned index)
+- const TextureFrame* GetTextureFrame(unsigned index) const
 
 Properties:
 
+- Material* material
 - unsigned numParticles
-- float emissionRate
-- bool emitting
 - bool updateInvisible
-- float minEmissionRate
-- float maxEmissionRate
+- bool relative
+- bool scaled
+- bool sorted
+- float animationLodBias
 - EmitterType emitterType
-- Vector3& emitterSize
+- const Vector3& emitterSize
+- const Vector3& minDirection
+- const Vector3& maxDirection
+- const Vector3& constantForce
+- float dampingForce
 - float activeTime
 - float inactiveTime
-- float timeToLive
+- float minEmissionRate
+- float maxEmissionRate
+- const Vector2& minParticleSize
+- const Vector2& maxParticleSize
 - float minTimeToLive
 - float maxTimeToLive
-- Vector2& particleSize
-- Vector2& minParticleSize
-- Vector2& maxParticleSize
-- Vector3& minDirection
-- Vector3& maxDirection
-- float velocity
 - float minVelocity
 - float maxVelocity
-- float rotation
 - float minRotation
 - float maxRotation
-- float rotationSpeed
 - float minRotationSpeed
 - float maxRotationSpeed
-- Vector3& constantForce
-- float dampingForce
 - float sizeAdd
 - float sizeMul
-- unsigned numColors
+- unsigned numColorFrames
 - unsigned numTextureFrames
+
+### ParticleEffect2D : Resource
+
+### ParticleEmitter : BillboardSet
+
+Methods:
+
+- void SetEffect(ParticleEffect* effect)
+- void SetNumParticles(unsigned num)
+- void SetEmitting(bool enable)
+- void ResetEmissionTimer()
+- void RemoveAllParticles()
+- void Reset()
+- void ApplyEffect()
+- ParticleEffect* GetEffect() const
+- unsigned GetNumParticles() const
+- bool IsEmitting() const
+
+Properties:
+
+- ParticleEffect* effect
+- unsigned numParticles
+- bool emitting
 
 ### ParticleEmitter2D : Drawable2D
 
