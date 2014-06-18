@@ -334,8 +334,6 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
-        popup.AddChild(CreateMenuItem("Load particle data", @PickFile));
-        popup.AddChild(CreateMenuItem("Save particle data", @PickFile));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -546,35 +544,6 @@ bool PickFile()
         CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
         uiFileSelector.directoryMode = true;
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
-    }
-    else if (action == "Load particle data")
-    {
-        bool hasParticleEmitter = false;
-        for (uint i = 0; i < editComponents.length; ++i)
-        {
-            if (editComponents[i].typeName == "ParticleEmitter")
-            {
-                hasParticleEmitter = true;
-                break;
-            }
-        }
-        if (hasParticleEmitter)
-        {
-            CreateFileSelector("Load particle data", "Load", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadParticleData");
-        }
-        else
-            MessageBox("Need to have a selected ParticleEmitter component to load particle data.");
-    }
-    else if (action == "Save particle data")
-    {
-        if (editComponents.length == 1 && editComponents[0].typeName == "ParticleEmitter")
-        {
-            CreateFileSelector("Save particle data", "Save", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveParticleData");
-        }
-        else
-            MessageBox("Need to have a selected ParticleEmitter component to save particle data.");
     }
     // UI-element
     else if (action == "Open UI-layout...")
@@ -1046,17 +1015,6 @@ void HandleImportScene(StringHash eventType, VariantMap& eventData)
     ImportScene(ExtractFileName(eventData));
 }
 
-void HandleLoadParticleData(StringHash eventType, VariantMap& eventData)
-{
-    CloseFileSelector(uiParticleFilter, uiParticlePath);
-    LoadParticleData(ExtractFileName(eventData));
-}
-
-void HandleSaveParticleData(StringHash eventType, VariantMap& eventData)
-{
-    CloseFileSelector(uiParticleFilter, uiParticlePath);
-    SaveParticleData(ExtractFileName(eventData, true));
-}
 
 void ExecuteScript(const String&in fileName)
 {

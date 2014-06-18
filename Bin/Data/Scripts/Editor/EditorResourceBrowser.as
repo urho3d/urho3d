@@ -40,7 +40,7 @@ const int RESOURCE_TYPE_TEXTURE = 8;
 const int RESOURCE_TYPE_FONT = 9;
 const int RESOURCE_TYPE_PREFAB = 10;
 const int RESOURCE_TYPE_TECHNIQUE = 11;
-const int RESOURCE_TYPE_PARTICLEEMITTER = 12;
+const int RESOURCE_TYPE_PARTICLEEFFECT = 12;
 const int RESOURCE_TYPE_UIELEMENT = 13;
 const int RESOURCE_TYPE_UIELEMENTS = 14;
 const int RESOURCE_TYPE_ANIMATION_SETTINGS = 15;
@@ -54,7 +54,7 @@ const ShortStringHash XML_TYPE_SCENE("scene");
 const ShortStringHash XML_TYPE_NODE("node");
 const ShortStringHash XML_TYPE_MATERIAL("material");
 const ShortStringHash XML_TYPE_TECHNIQUE("technique");
-const ShortStringHash XML_TYPE_PARTICLEEMITTER("particleemitter");
+const ShortStringHash XML_TYPE_PARTICLEEFFECT("particleeffect");
 const ShortStringHash XML_TYPE_TEXTURE("texture");
 const ShortStringHash XML_TYPE_ELEMENT("element");
 const ShortStringHash XML_TYPE_ELEMENTS("elements");
@@ -247,7 +247,8 @@ void CreateResourceFilterUI()
         checkbox.SetStyleAuto();
         checkbox.vars[TEXT_VAR_RESOURCE_TYPE] = i;
         checkbox.checked = true;
-        SubscribeToEvent(checkbox, "Toggled", "HandleResourceTypeFilterToggled");
+        SubscribeToEvent(checkbox, "Toggled", "HandleResourceTypeFilterToggled");
+
 
         resourceTypeHolder.AddChild(checkbox);
         resourceTypeHolder.AddChild(label);
@@ -307,7 +308,7 @@ void InitializeBrowserFileListRow(Text@ fileText, BrowserFile@ file)
 
     if (file.resourceType == RESOURCE_TYPE_MATERIAL || 
             file.resourceType == RESOURCE_TYPE_MODEL ||
-            file.resourceType == RESOURCE_TYPE_PARTICLEEMITTER ||
+            file.resourceType == RESOURCE_TYPE_PARTICLEEFFECT ||
             file.resourceType == RESOURCE_TYPE_PREFAB
         )
     {
@@ -542,7 +543,8 @@ void PopulateResourceDirFilters()
         checkbox.SetStyleAuto();
         checkbox.vars[TEXT_VAR_RESOURCE_DIR_ID] = i;
         checkbox.checked = true;
-        SubscribeToEvent(checkbox, "Toggled", "HandleResourceDirFilterToggled");
+        SubscribeToEvent(checkbox, "Toggled", "HandleResourceDirFilterToggled");
+
 
         resourceDirHolder.AddChild(checkbox);
         resourceDirHolder.AddChild(label);
@@ -1020,8 +1022,8 @@ int GetResourceType(ShortStringHash fileType)
         return RESOURCE_TYPE_MATERIAL;
     else if(fileType == XML_TYPE_TECHNIQUE)
         return RESOURCE_TYPE_TECHNIQUE;
-    else if(fileType == XML_TYPE_PARTICLEEMITTER)
-        return RESOURCE_TYPE_PARTICLEEMITTER;
+    else if(fileType == XML_TYPE_PARTICLEEFFECT)
+        return RESOURCE_TYPE_PARTICLEEFFECT;
     else if(fileType == XML_TYPE_TEXTURE)
         return RESOURCE_TYPE_TEXTURE;
     else if(fileType == XML_TYPE_ELEMENT)
@@ -1217,8 +1219,8 @@ bool GetXmlType(String path, ShortStringHash &out fileType, bool useCache = fals
             fileType = XML_TYPE_MATERIAL;
         else if(type == XML_TYPE_TECHNIQUE)
             fileType = XML_TYPE_TECHNIQUE;
-        else if(type == XML_TYPE_PARTICLEEMITTER)
-            fileType = XML_TYPE_PARTICLEEMITTER;
+        else if(type == XML_TYPE_PARTICLEEFFECT)
+            fileType = XML_TYPE_PARTICLEEFFECT;
         else if(type == XML_TYPE_TEXTURE)
             fileType = XML_TYPE_TEXTURE;
         else if(type == XML_TYPE_ELEMENT)
@@ -1273,8 +1275,8 @@ String ResourceTypeName(int resourceType)
         return "Prefab";
     else if (resourceType == RESOURCE_TYPE_TECHNIQUE)
         return "Render Technique";
-    else if (resourceType == RESOURCE_TYPE_PARTICLEEMITTER)
-        return "Particle Emitter";
+    else if (resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
+        return "Particle Effect";
     else if (resourceType == RESOURCE_TYPE_UIELEMENT)
         return "UI Element";
     else if (resourceType == RESOURCE_TYPE_UIELEMENTS)

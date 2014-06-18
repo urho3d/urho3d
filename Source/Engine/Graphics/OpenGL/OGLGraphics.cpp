@@ -39,6 +39,7 @@
 #include "Material.h"
 #include "Mutex.h"
 #include "Octree.h"
+#include "ParticleEffect.h"
 #include "ParticleEmitter.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
@@ -2974,6 +2975,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimatedModel::RegisterObject(context);
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
+    ParticleEffect::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
     CustomGeometry::RegisterObject(context);
     DecalSet::RegisterObject(context);

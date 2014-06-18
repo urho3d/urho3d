@@ -892,6 +892,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("LuaFile", luaFileFilters));
     resourcePickers.Push(ResourcePicker("Material", materialFilters, ACTION_PICK | ACTION_OPEN | ACTION_EDIT));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl", ACTION_PICK));
+    resourcePickers.Push(ResourcePicker("ParticleEffect", "*.xml", ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
     resourcePickers.Push(ResourcePicker("Technique", "*.xml"));
@@ -1210,20 +1211,6 @@ void InitVectorStructs()
         "   Layer"
     };
     vectorStructs.Push(VectorStruct("AnimatedModel", "Animation States", animationStateVariables, 1));
-
-    Array<String> particleColorVariables = {
-        "Color Animation Frames",
-        "   Color",
-        "   Time"
-    };
-    vectorStructs.Push(VectorStruct("ParticleEmitter", "Particle Colors", particleColorVariables, 1));
-
-    Array<String> particleUVAnimVariables = {
-        "UV Animation Frames",
-        "   UV Coords",
-        "   Time"
-    };
-    vectorStructs.Push(VectorStruct("ParticleEmitter", "UV Animation", particleUVAnimVariables, 1));
 
     Array<String> staticModelGroupInstanceVariables = {
         "Instance Count",
