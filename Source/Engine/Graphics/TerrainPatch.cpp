@@ -89,7 +89,11 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
         Vector3 normal = -query.ray_.direction_;
         
         if (level == RAY_TRIANGLE && distance < query.maxDistance_)
-            distance = geometry_->GetHitDistance(localRay, &normal);
+        {
+            Vector3 geometryNormal;
+            distance = geometry_->GetHitDistance(localRay, &geometryNormal);
+            normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+        }
         
         if (distance < query.maxDistance_)
         {
