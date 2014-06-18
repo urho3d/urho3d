@@ -129,9 +129,9 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
 
-void ExportModel(const String& outName);
+void ExportModel(const String& outName, bool animationOnly);
 void CollectMeshes(OutModel& model, aiNode* node);
-void CollectBones(OutModel& model);
+void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
@@ -424,7 +424,7 @@ void Run(const Vector<String>& arguments)
         }
         
         if (command == "model")
-            ExportModel(outFile);
+            ExportModel(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
         
         if (command == "scene" || command == "node")
         {
@@ -508,7 +508,7 @@ void DumpNodes(aiNode* rootNode, unsigned level)
         DumpNodes(rootNode->mChildren[i], level + 1);
 }
 
-void ExportModel(const String& outName)
+void ExportModel(const String& outName, bool animationOnly)
 {
     if (outName.Empty())
         ErrorExit("No output file defined");
@@ -518,7 +518,7 @@ void ExportModel(const String& outName)
     model.outName_ = outName;
     
     CollectMeshes(model, model.rootNode_);
-    CollectBones(model);
+    CollectBones(model, animationOnly);
     BuildBoneCollisionInfo(model);
     BuildAndSaveModel(model);
     if (!noAnimations_)
@@ -557,7 +557,7 @@ void CollectMeshes(OutModel& model, aiNode* node)
         CollectMeshes(model, node->mChildren[i]);
 }
 
-void CollectBones(OutModel& model)
+void CollectBones(OutModel& model, bool animationOnly)
 {
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
@@ -582,7 +582,7 @@ void CollectBones(OutModel& model)
             for (;;)
             {
                 boneNode = boneNode->mParent;
-                if (!boneNode || boneNode == meshNode || boneNode == meshParentNode)
+                if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
                     break;
                 rootNode = boneNode;
                 necessary.Insert(boneNode);
