@@ -527,7 +527,7 @@ void PopulateResourceDirFilters()
     UIElement@ resourceDirs = browserFilterWindow.GetChild("DirFilters", true);
     resourceDirs.RemoveAllChildren();
     activeResourceDirFilters.Clear();
-    for (int i=0; i < cache.resourceDirs.length; ++i)
+    for (uint i=0; i < cache.resourceDirs.length; ++i)
     {
         UIElement@ resourceDirHolder = UIElement();
         resourceDirs.AddChild(resourceDirHolder);
