@@ -84,6 +84,8 @@ public:
     void SetOccluder(bool enable);
     /// Set occludee flag for patches.
     void SetOccludee(bool enable);
+    /// Apply changes from the heightmap image.
+    void ApplyHeightMap();
 
     /// Return patch quads per side.
     int GetPatchSize() const { return patchSize_; }
@@ -107,6 +109,8 @@ public:
     float GetHeight(const Vector3& worldPosition) const;
     /// Return normal at world coordinates.
     Vector3 GetNormal(const Vector3& worldPosition) const;
+    /// Convert world position to heightmap pixel position. Note that the internal height data representation is reversed vertically, but in the heightmap image north is at the top.
+    IntVector2 WorldToHeightMap(const Vector3& worldPosition) const;
     /// Return raw height data.
     SharedArrayPtr<float> GetHeightData() const { return heightData_; }
     /// Return draw distance.
@@ -150,14 +154,14 @@ public:
     ResourceRef GetMaterialAttr() const;
 
 private:
-    /// Fully regenerate terrain geometry.
+    /// Regenerate terrain geometry.
     void CreateGeometry();
-    /// Filter the heightmap.
-    void SmoothHeightMap();
     /// Create index data shared by all patches.
     void CreateIndexData();
     /// Return an uninterpolated terrain height value, clamping to edges.
     float GetRawHeight(int x, int z) const;
+    /// Return a source terrain height value, clamping to edges. The source data is used for smoothing.
+    float GetSourceHeight(int x, int z) const;
     /// Return interpolated height for a specific LOD level.
     float GetLodHeight(int x, int z, unsigned lodLevel) const;
     /// Get slope-based terrain normal at position.
@@ -170,13 +174,17 @@ private:
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
-
+    /// Mark patch(es) dirty based on location. Used when checking the heightmap image for changes.
+    void MarkPatchesDirty(PODVector<bool>& dirtyPatches, int x, int z);
+    
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Heightmap image.
     SharedPtr<Image> heightMap_;
     /// Height data.
     SharedArrayPtr<float> heightData_;
+    /// Source height data for smoothing.
+    SharedArrayPtr<float> sourceHeightData_;
     /// Material.
     SharedPtr<Material> material_;
     /// Terrain patches.
@@ -185,18 +193,26 @@ private:
     PODVector<Pair<unsigned, unsigned> > drawRanges_;
     /// Vertex and height spacing.
     Vector3 spacing_;
+    /// Vertex and height sacing at the time of last update.
+    Vector3 lastSpacing_;
     /// Origin of patches on the XZ-plane.
     Vector2 patchWorldOrigin_;
     /// Size of a patch on the XZ-plane.
     Vector2 patchWorldSize_;
     /// Terrain size in vertices.
     IntVector2 numVertices_;
+    /// Terrain size in vertices at the time of last update.
+    IntVector2 lastNumVertices_;
     /// Terrain size in patches.
     IntVector2 numPatches_;
     /// Patch size, quads per side.
     int patchSize_;
+    /// Patch size at the time of last update.
+    int lastPatchSize_;
     /// Number of terrain LOD levels.
     unsigned numLodLevels_;
+    /// Number of terrain LOD levels at the time of last update.
+    unsigned lastNumLodLevels_;
     /// Smoothing enable flag.
     bool smoothing_;
     /// Visible flag.

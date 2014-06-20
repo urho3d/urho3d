@@ -18,6 +18,7 @@ class Terrain : public Component
     void SetCastShadows(bool enable);
     void SetOccluder(bool enable);
     void SetOccludee(bool enable);
+    void ApplyHeightMap();
 
     int GetPatchSize() const;
     const Vector3& GetSpacing() const;
@@ -30,6 +31,7 @@ class Terrain : public Component
     TerrainPatch* GetPatch(int x, int z) const;
     float GetHeight(const Vector3& worldPosition) const;
     Vector3 GetNormal(const Vector3& worldPosition) const;
+    IntVector2 WorldToHeightMap(constr Vector3& worldPosition) const;
     SharedArrayPtr<float> GetHeightData() const;
     float GetDrawDistance() const;
     float GetShadowDistance() const;
