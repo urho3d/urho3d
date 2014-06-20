@@ -9331,6 +9331,7 @@ class Terrain
 {
 // Methods:
 void ApplyAttributes();
+void ApplyHeightMap();
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
@@ -9355,6 +9356,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+IntVector2 WorldToHeightMap(const Vector3&) const;
 
 // Properties:
 bool animationEnabled;

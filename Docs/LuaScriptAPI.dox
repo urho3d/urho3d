@@ -4846,6 +4846,7 @@ Methods:
 - void SetCastShadows(bool enable)
 - void SetOccluder(bool enable)
 - void SetOccludee(bool enable)
+- void ApplyHeightMap()
 - int GetPatchSize() const
 - const Vector3& GetSpacing() const
 - const IntVector2& GetNumVertices() const
@@ -4857,6 +4858,7 @@ Methods:
 - TerrainPatch* GetPatch(int x, int z) const
 - float GetHeight(const Vector3& worldPosition) const
 - Vector3 GetNormal(const Vector3& worldPosition) const
+- IntVector2 WorldToHeightMap(const Vector3& worldPosition) const
 - SharedArrayPtr<float> GetHeightData() const
 - float GetDrawDistance() const
 - float GetShadowDistance() const
