@@ -211,8 +211,6 @@ private:
     int lastPatchSize_;
     /// Number of terrain LOD levels.
     unsigned numLodLevels_;
-    /// Number of terrain LOD levels at the time of last update.
-    unsigned lastNumLodLevels_;
     /// Smoothing enable flag.
     bool smoothing_;
     /// Visible flag.
