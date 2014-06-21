@@ -60,7 +60,7 @@ static int StringHashCmp(const StringHash& lhs, const StringHash& rhs)
     return cmp;
 }
 
-static void ConstructShortStringHash(StringHash* ptr)
+static void ConstructShortStringHash(ShortStringHash* ptr)
 {
     new(ptr) ShortStringHash();
 }
