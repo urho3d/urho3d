@@ -197,9 +197,9 @@ public:
     /// Remove child scene nodes that match criteria.
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     /// Create a component to this node (with specified ID if provided).
-    Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* CreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Create a component to this node if it does not exist already.
-    Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Clone a component from another node using its create mode. Return the clone if successful or null on failure.
     Component* CloneComponent(Component* component, unsigned id = 0);
     /// Clone a component from another node and specify the create mode. Return the clone if successful or null on failure.
@@ -207,7 +207,7 @@ public:
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
-    void RemoveComponent(ShortStringHash type);
+    void RemoveComponent(StringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
     /// Remove components that match criteria.
@@ -219,7 +219,7 @@ public:
     /// Set parent scene node. Retains the world transform.
     void SetParent(Node* parent);
     /// Set a user variable.
-    void SetVar(ShortStringHash key, const Variant& value);
+    void SetVar(StringHash key, const Variant& value);
     /// Add listener component that is notified of node being dirtied. Can either be in the same node or another.
     void AddListener(Component* component);
     /// Remove listener component.
@@ -371,7 +371,7 @@ public:
     /// Return child scene nodes, optionally recursive.
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
     /// Return child scene nodes with a specific component.
-    void GetChildrenWithComponent(PODVector<Node*>& dest, ShortStringHash type, bool recursive = false) const;
+    void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
     /// Return child scene node by name.
@@ -387,15 +387,15 @@ public:
     /// Return all components.
     const Vector<SharedPtr<Component> >& GetComponents() const { return components_; }
     /// Return all components of type. Optionally recursive.
-    void GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool recursive = false) const;
+    void GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const;
     /// Return component by type. If there are several, returns the first.
-    Component* GetComponent(ShortStringHash type) const;
+    Component* GetComponent(StringHash type) const;
     /// Return whether has a specific component.
-    bool HasComponent(ShortStringHash type) const;
+    bool HasComponent(StringHash type) const;
     /// Return listener components.
     const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
     /// Return a user variable.
-    const Variant& GetVar(ShortStringHash key) const;
+    const Variant& GetVar(StringHash key) const;
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
     /// Return first component derived from class.
@@ -463,7 +463,7 @@ protected:
 
 private:
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
-    Component* SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id);
+    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id);
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.
@@ -471,9 +471,9 @@ private:
     /// Return child nodes recursively.
     void GetChildrenRecursive(PODVector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively.
-    void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const;
+    void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const;
     /// Return specific components recursively.
-    void GetComponentsRecursive(PODVector<Component*>& dest, ShortStringHash type) const;
+    void GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const;
     /// Clone node recursively.
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     /// Remove a component from this node with the specified iterator.

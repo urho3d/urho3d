@@ -254,7 +254,6 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteString(const String&in)", asMETHODPR(T, WriteString, (const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteFileID(const String&in)", asMETHODPR(T, WriteFileID, (const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteStringHash(const StringHash&in)", asMETHODPR(T, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool WriteShortStringHash(const ShortStringHash&in)", asMETHODPR(T, WriteShortStringHash, (const ShortStringHash&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVariant(const Variant&in)", asMETHODPR(T, WriteVariant, (const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVariantMap(const VariantMap&in)", asMETHODPR(T, WriteVariantMap, (const VariantMap&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVLE(uint)", asMETHODPR(T, WriteVLE, (unsigned), bool), asCALL_THISCALL);
@@ -299,7 +298,6 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "String ReadString()", asMETHODPR(T, ReadString, (), String), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "String ReadFileID()", asMETHODPR(T, ReadFileID, (), String), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "StringHash ReadStringHash()", asMETHODPR(T, ReadStringHash, (), StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "ShortStringHash ReadShortStringHash()", asMETHODPR(T, ReadShortStringHash, (), ShortStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant ReadVariant()", asMETHODPR(T, ReadVariant, (), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap ReadVariantMap()", asMETHODPR(T, ReadVariantMap, (), VariantMap), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint ReadVLE()", asMETHODPR(T, ReadVLE, (), unsigned), asCALL_THISCALL);
@@ -334,8 +332,8 @@ template <class T> void ObjectSendEvent(const String& eventType, VariantMap& eve
 template <class T> void RegisterObject(asIScriptEngine* engine, const char* className)
 {
     RegisterRefCounted<T>(engine, className);
-    engine->RegisterObjectMethod(className, "ShortStringHash get_type() const", asMETHODPR(T, GetType, () const, ShortStringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "ShortStringHash get_baseType() const", asMETHODPR(T, GetBaseType, () const, ShortStringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "StringHash get_type() const", asMETHODPR(T, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "StringHash get_baseType() const", asMETHODPR(T, GetBaseType, () const, StringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
@@ -993,10 +991,10 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "uint FindChild(UIElement@+) const", asMETHOD(T, FindChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetParent(UIElement@+, uint index = M_MAX_UNSIGNED)", asMETHOD(T, SetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const ShortStringHash&in, const Variant&in value = Variant(), bool recursive = false) const", asMETHODPR(T, GetChild, (const ShortStringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const StringHash&in, const Variant&in value = Variant(), bool recursive = false) const", asMETHODPR(T, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool recursive = false) const", asFUNCTION(UIElementGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "UIElement@+ GetElementEventSender() const", asMETHOD(T, GetElementEventSender), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Variant& GetVar(const ShortStringHash&in)", asMETHOD(T, GetVar), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Variant& GetVar(const StringHash&in)", asMETHOD(T, GetVar), asCALL_THISCALL);
     if (!isSprite)
     {
         engine->RegisterObjectMethod(className, "IntVector2 ScreenToElement(const IntVector2&in)", asMETHOD(T, ScreenToElement), asCALL_THISCALL);

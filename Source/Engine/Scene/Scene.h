@@ -145,7 +145,7 @@ public:
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return a node user variable name, or empty if not registered.
-    const String& GetVarName(ShortStringHash hash) const;
+    const String& GetVarName(StringHash hash) const;
 
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
@@ -213,7 +213,7 @@ private:
     /// Required package files for networking.
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
-    HashMap<ShortStringHash, String> varNames_;
+    HashMap<StringHash, String> varNames_;
     /// Nodes to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateNodes_;
     /// Components to check for attribute changes on the next network update.

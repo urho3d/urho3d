@@ -194,19 +194,19 @@ static CScriptArray* GetObjectCategories()
 
 static CScriptArray* GetObjectsByCategory(const String& category)
 {
-    const HashMap<String, Vector<ShortStringHash> >& categories = GetScriptContext()->GetObjectCategories();
+    const HashMap<String, Vector<StringHash> >& categories = GetScriptContext()->GetObjectCategories();
     Vector<String> components;
 
-    HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Find(category);
+    HashMap<String, Vector<StringHash> >::ConstIterator i = categories.Find(category);
     if (i != categories.End())
     {
-        const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
-        const Vector<ShortStringHash>& factoryHashes = i->second_;
+        const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
+        const Vector<StringHash>& factoryHashes = i->second_;
         components.Reserve(factoryHashes.Size());
 
         for (unsigned j = 0; j < factoryHashes.Size(); ++j)
         {
-            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator k = factories.Find(factoryHashes[j]);
+            HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator k = factories.Find(factoryHashes[j]);
             if (k != factories.End())
                 components.Push(k->second_->GetTypeName());
         }
@@ -282,7 +282,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void UnregisterAllVars(const String&in)", asMETHOD(Scene, UnregisterAllVars), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint)", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint)", asMETHOD(Scene, GetNode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const String& GetVarName(ShortStringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& GetVarName(StringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHOD(Scene, SetUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_updateEnabled() const", asMETHOD(Scene, IsUpdateEnabled), asCALL_THISCALL);

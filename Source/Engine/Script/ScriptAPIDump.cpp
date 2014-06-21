@@ -244,10 +244,10 @@ void Script::DumpAPI(DumpMode mode)
         
         Log::WriteRaw("\n\\page AttributeList Attribute list\n");
         
-        const HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
+        const HashMap<StringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
 
         Vector<String> objectTypes;
-        for (HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End();
+        for (HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End();
             ++i)
             objectTypes.Push(context_->GetTypeName(i->first_));
         

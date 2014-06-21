@@ -172,7 +172,7 @@ struct URHO3D_API NodeReplicationState : public ReplicationState
     /// Dirty attribute bits.
     DirtyBits dirtyAttributes_;
     /// Dirty user vars.
-    HashSet<ShortStringHash> dirtyVars_;
+    HashSet<StringHash> dirtyVars_;
     /// Components by ID.
     HashMap<unsigned, ComponentReplicationState> componentStates_;
     /// Interest management priority accumulator.

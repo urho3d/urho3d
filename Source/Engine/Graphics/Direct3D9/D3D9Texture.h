@@ -107,7 +107,7 @@ public:
     
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
-    void CheckTextureBudget(ShortStringHash type);
+    void CheckTextureBudget(StringHash type);
     
     /// Texture format.
     unsigned format_;

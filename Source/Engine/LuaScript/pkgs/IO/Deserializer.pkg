@@ -36,7 +36,6 @@ class Deserializer
     String ReadString();
     String ReadFileID();
     StringHash ReadStringHash();
-    ShortStringHash ReadShortStringHash();
     
     // PODVector<unsigned char> ReadBuffer();
     VectorBuffer ReadBuffer();

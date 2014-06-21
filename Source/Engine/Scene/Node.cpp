@@ -706,7 +706,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
         MarkReplicationDirty();
 }
 
-Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
+Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
     // Check that creation succeeds and that the object in fact is a component
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
@@ -720,7 +720,7 @@ Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned
     return newComponent;
 }
 
-Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
+Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
@@ -794,7 +794,7 @@ void Node::RemoveComponent(Component* component)
     }
 }
 
-void Node::RemoveComponent(ShortStringHash type)
+void Node::RemoveComponent(StringHash type)
 {
     for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -885,7 +885,7 @@ void Node::SetParent(Node* parent)
     }
 }
 
-void Node::SetVar(ShortStringHash key, const Variant& value)
+void Node::SetVar(StringHash key, const Variant& value)
 {
     vars_[key] = value;
     MarkNetworkUpdate();
@@ -980,7 +980,7 @@ void Node::GetChildren(PODVector<Node*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
-void Node::GetChildrenWithComponent(PODVector<Node*>& dest, ShortStringHash type, bool recursive) const
+void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
 
@@ -1041,7 +1041,7 @@ unsigned Node::GetNumNetworkComponents() const
     return num;
 }
 
-void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool recursive) const
+void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
 
@@ -1057,7 +1057,7 @@ void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool
         GetComponentsRecursive(dest, type);
 }
 
-bool Node::HasComponent(ShortStringHash type) const
+bool Node::HasComponent(StringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -1067,13 +1067,13 @@ bool Node::HasComponent(ShortStringHash type) const
     return false;
 }
 
-const Variant& Node::GetVar(ShortStringHash key) const
+const Variant& Node::GetVar(StringHash key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
     return i != vars_.End() ? i->second_ : Variant::EMPTY;
 }
 
-Component* Node::GetComponent(ShortStringHash type) const
+Component* Node::GetComponent(StringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -1209,7 +1209,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
     for (unsigned i = 0; i < numComponents; ++i)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
-        ShortStringHash compType = compBuffer.ReadShortStringHash();
+        StringHash compType = compBuffer.ReadStringHash();
         unsigned compID = compBuffer.ReadUInt();
 
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
@@ -1253,7 +1253,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = SafeCreateComponent(typeName, ShortStringHash(typeName),
+        Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
@@ -1515,7 +1515,7 @@ void Node::OnAttributeAnimationRemoved()
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
 {
     // First check if factory for type exists
     if (!context_->GetTypeName(type).Empty())
@@ -1586,7 +1586,7 @@ void Node::GetChildrenRecursive(PODVector<Node*>& dest) const
     }
 }
 
-void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const
+void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const
 {
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -1598,7 +1598,7 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortString
     }
 }
 
-void Node::GetComponentsRecursive(PODVector<Component*>& dest, ShortStringHash type) const
+void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {

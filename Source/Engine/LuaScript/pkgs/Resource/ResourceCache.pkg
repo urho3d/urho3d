@@ -5,7 +5,7 @@ class ResourceCache
     void ReleaseAllResources(bool force = false);
     bool ReloadResource(Resource* resource);
 
-    void SetMemoryBudget(ShortStringHash type, unsigned budget);
+    void SetMemoryBudget(StringHash type, unsigned budget);
     void SetMemoryBudget(const String type, unsigned budget);
     
     void SetAutoReloadResources(bool enable);
@@ -17,8 +17,8 @@ class ResourceCache
     Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true);
 
     bool Exists(const String name) const;
-    unsigned GetMemoryBudget(ShortStringHash type) const;
-    unsigned GetMemoryUse(ShortStringHash type) const;
+    unsigned GetMemoryBudget(StringHash type) const;
+    unsigned GetMemoryUse(StringHash type) const;
     unsigned GetTotalMemoryUse() const;
     String GetResourceFileName(const String name) const;
 

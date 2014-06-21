@@ -61,7 +61,7 @@ static const unsigned short SERVER_PORT = 2345;
 // Identifier for our custom remote event we use to tell the client which object they control
 static const StringHash E_CLIENTOBJECTID("ClientObjectID");
 // Identifier for the node ID parameter in the event data
-static const ShortStringHash P_ID("ID");
+static const StringHash P_ID("ID");
 
 // Control bits we define
 static const unsigned CTRL_FORWARD = 1;

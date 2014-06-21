@@ -50,53 +50,53 @@ const int RESOURCE_TYPE_2D_PARTICLE_EFFECT = 18;
 const int RESOURCE_TYPE_TEXTURE_3D = 19;
 const int RESOURCE_TYPE_CUBEMAP = 20;
 
-const ShortStringHash XML_TYPE_SCENE("scene");
-const ShortStringHash XML_TYPE_NODE("node");
-const ShortStringHash XML_TYPE_MATERIAL("material");
-const ShortStringHash XML_TYPE_TECHNIQUE("technique");
-const ShortStringHash XML_TYPE_PARTICLEEFFECT("particleeffect");
-const ShortStringHash XML_TYPE_TEXTURE("texture");
-const ShortStringHash XML_TYPE_ELEMENT("element");
-const ShortStringHash XML_TYPE_ELEMENTS("elements");
-const ShortStringHash XML_TYPE_ANIMATION_SETTINGS("animation");
-const ShortStringHash XML_TYPE_RENDERPATH("renderpath");
-const ShortStringHash XML_TYPE_TEXTURE_ATLAS("TextureAtlas");
-const ShortStringHash XML_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
-const ShortStringHash XML_TYPE_TEXTURE_3D("texture3d");
-const ShortStringHash XML_TYPE_CUBEMAP("cubemap");
+const StringHash XML_TYPE_SCENE("scene");
+const StringHash XML_TYPE_NODE("node");
+const StringHash XML_TYPE_MATERIAL("material");
+const StringHash XML_TYPE_TECHNIQUE("technique");
+const StringHash XML_TYPE_PARTICLEEFFECT("particleeffect");
+const StringHash XML_TYPE_TEXTURE("texture");
+const StringHash XML_TYPE_ELEMENT("element");
+const StringHash XML_TYPE_ELEMENTS("elements");
+const StringHash XML_TYPE_ANIMATION_SETTINGS("animation");
+const StringHash XML_TYPE_RENDERPATH("renderpath");
+const StringHash XML_TYPE_TEXTURE_ATLAS("TextureAtlas");
+const StringHash XML_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
+const StringHash XML_TYPE_TEXTURE_3D("texture3d");
+const StringHash XML_TYPE_CUBEMAP("cubemap");
 
-const ShortStringHash BINARY_TYPE_SCENE("USCN");
-const ShortStringHash BINARY_TYPE_PACKAGE("UPAK");
-const ShortStringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
-const ShortStringHash BINARY_TYPE_ANGLESCRIPT("ASBC");
-const ShortStringHash BINARY_TYPE_MODEL("UMDL");
-const ShortStringHash BINARY_TYPE_SHADER("USHD");
-const ShortStringHash BINARY_TYPE_ANIMATION("UANI");
+const StringHash BINARY_TYPE_SCENE("USCN");
+const StringHash BINARY_TYPE_PACKAGE("UPAK");
+const StringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
+const StringHash BINARY_TYPE_ANGLESCRIPT("ASBC");
+const StringHash BINARY_TYPE_MODEL("UMDL");
+const StringHash BINARY_TYPE_SHADER("USHD");
+const StringHash BINARY_TYPE_ANIMATION("UANI");
 
-const ShortStringHash EXTENSION_TYPE_TTF(".ttf");
-const ShortStringHash EXTENSION_TYPE_OGG(".ogg");
-const ShortStringHash EXTENSION_TYPE_WAV(".wav");
-const ShortStringHash EXTENSION_TYPE_DDS(".dds");
-const ShortStringHash EXTENSION_TYPE_PNG(".png");
-const ShortStringHash EXTENSION_TYPE_JPG(".jpg");
-const ShortStringHash EXTENSION_TYPE_JPEG(".jpeg");
-const ShortStringHash EXTENSION_TYPE_TGA(".tga");
-const ShortStringHash EXTENSION_TYPE_OBJ(".obj");
-const ShortStringHash EXTENSION_TYPE_FBX(".fbx");
-const ShortStringHash EXTENSION_TYPE_COLLADA(".dae");
-const ShortStringHash EXTENSION_TYPE_BLEND(".blend");
-const ShortStringHash EXTENSION_TYPE_ANGELSCRIPT(".as");
-const ShortStringHash EXTENSION_TYPE_LUASCRIPT(".lua");
-const ShortStringHash EXTENSION_TYPE_HLSL(".hlsl");
-const ShortStringHash EXTENSION_TYPE_GLSL(".glsl");
-const ShortStringHash EXTENSION_TYPE_FRAGMENTSHADER(".frag");
-const ShortStringHash EXTENSION_TYPE_VERTEXSHADER(".vert");
-const ShortStringHash EXTENSION_TYPE_HTML(".html");
+const StringHash EXTENSION_TYPE_TTF(".ttf");
+const StringHash EXTENSION_TYPE_OGG(".ogg");
+const StringHash EXTENSION_TYPE_WAV(".wav");
+const StringHash EXTENSION_TYPE_DDS(".dds");
+const StringHash EXTENSION_TYPE_PNG(".png");
+const StringHash EXTENSION_TYPE_JPG(".jpg");
+const StringHash EXTENSION_TYPE_JPEG(".jpeg");
+const StringHash EXTENSION_TYPE_TGA(".tga");
+const StringHash EXTENSION_TYPE_OBJ(".obj");
+const StringHash EXTENSION_TYPE_FBX(".fbx");
+const StringHash EXTENSION_TYPE_COLLADA(".dae");
+const StringHash EXTENSION_TYPE_BLEND(".blend");
+const StringHash EXTENSION_TYPE_ANGELSCRIPT(".as");
+const StringHash EXTENSION_TYPE_LUASCRIPT(".lua");
+const StringHash EXTENSION_TYPE_HLSL(".hlsl");
+const StringHash EXTENSION_TYPE_GLSL(".glsl");
+const StringHash EXTENSION_TYPE_FRAGMENTSHADER(".frag");
+const StringHash EXTENSION_TYPE_VERTEXSHADER(".vert");
+const StringHash EXTENSION_TYPE_HTML(".html");
 
-const ShortStringHash TEXT_VAR_FILE_ID("browser_file_id");
-const ShortStringHash TEXT_VAR_DIR_ID("browser_dir_id");
-const ShortStringHash TEXT_VAR_RESOURCE_TYPE("resource_type");
-const ShortStringHash TEXT_VAR_RESOURCE_DIR_ID("resource_dir_id");
+const StringHash TEXT_VAR_FILE_ID("browser_file_id");
+const StringHash TEXT_VAR_DIR_ID("browser_dir_id");
+const StringHash TEXT_VAR_RESOURCE_TYPE("resource_type");
+const StringHash TEXT_VAR_RESOURCE_DIR_ID("resource_dir_id");
 
 const int BROWSER_FILE_SOURCE_RESOURCE_DIR = 1;
 
@@ -982,11 +982,11 @@ Menu@ CreateBrowserFileActionMenu(String text, String handler, BrowserFile@ brow
 
 int GetResourceType(String path)
 {
-    ShortStringHash fileType;
+    StringHash fileType;
     return GetResourceType(path, fileType);
 }
 
-int GetResourceType(String path, ShortStringHash &out fileType, bool useCache = false)
+int GetResourceType(String path, StringHash &out fileType, bool useCache = false)
 {
     if (GetExtensionType(path, fileType) || GetBinaryType(path, fileType, useCache) || GetXmlType(path, fileType, useCache))
         return GetResourceType(fileType);
@@ -995,7 +995,7 @@ int GetResourceType(String path, ShortStringHash &out fileType, bool useCache = 
 }
 
 
-int GetResourceType(ShortStringHash fileType)
+int GetResourceType(StringHash fileType)
 {
     // binary fileTypes
     if (fileType == BINARY_TYPE_SCENE)
@@ -1086,9 +1086,9 @@ int GetResourceType(ShortStringHash fileType)
     return RESOURCE_TYPE_UNKNOWN;
 }
 
-bool GetExtensionType(String path, ShortStringHash &out fileType)
+bool GetExtensionType(String path, StringHash &out fileType)
 {
-    ShortStringHash type = ShortStringHash(GetExtension(path));
+    StringHash type = StringHash(GetExtension(path));
     if (type == EXTENSION_TYPE_TTF)
         fileType = EXTENSION_TYPE_TTF;
     else if (type == EXTENSION_TYPE_OGG)
@@ -1133,9 +1133,9 @@ bool GetExtensionType(String path, ShortStringHash &out fileType)
     return true;
 }
 
-bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = false)
+bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
 {   
-    ShortStringHash type;
+    StringHash type;
     if (useCache)
     {
         File@ file = cache.GetFile(path);
@@ -1145,7 +1145,7 @@ bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = f
         if (file.size == 0)
             return false;
 
-        type = ShortStringHash(file.ReadFileID());
+        type = StringHash(file.ReadFileID());
     }
     else
     {
@@ -1156,7 +1156,7 @@ bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = f
         if (file.size == 0)
             return false;
 
-        type = ShortStringHash(file.ReadFileID());
+        type = StringHash(file.ReadFileID());
     }
 
     if (type == BINARY_TYPE_SCENE)
@@ -1179,7 +1179,7 @@ bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = f
     return true;
 }
 
-bool GetXmlType(String path, ShortStringHash &out fileType, bool useCache = false)
+bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
 {
     String name;
     if (useCache)
@@ -1210,7 +1210,7 @@ bool GetXmlType(String path, ShortStringHash &out fileType, bool useCache = fals
     if (!name.empty)
     {
         found = true;
-        ShortStringHash type = ShortStringHash(name);
+        StringHash type = StringHash(name);
         if (type == XML_TYPE_SCENE)
             fileType = XML_TYPE_SCENE;
         else if (type == XML_TYPE_NODE)
@@ -1337,7 +1337,7 @@ class BrowserFile
     String name;
     String fullname;
     String extension;
-    ShortStringHash fileType;
+    StringHash fileType;
     int resourceType = 0;
     int sourceType = 0;
     int sortScore = 0;

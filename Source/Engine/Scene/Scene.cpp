@@ -520,9 +520,9 @@ float Scene::GetAsyncProgress() const
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
 }
 
-const String& Scene::GetVarName(ShortStringHash hash) const
+const String& Scene::GetVarName(StringHash hash) const
 {
-    HashMap<ShortStringHash, String>::ConstIterator i = varNames_.Find(hash);
+    HashMap<StringHash, String>::ConstIterator i = varNames_.Find(hash);
     return i != varNames_.End() ? i->second_ : String::EMPTY;
 }
 
@@ -799,7 +799,7 @@ String Scene::GetVarNamesAttr() const
 
     if (!varNames_.Empty())
     {
-        for (HashMap<ShortStringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
+        for (HashMap<StringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
             ret += i->second_ + ';';
 
         ret.Resize(ret.Length() - 1);

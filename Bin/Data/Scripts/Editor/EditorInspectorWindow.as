@@ -9,9 +9,9 @@ bool attributesDirty = false;
 bool attributesFullDirty = false;
 
 const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
-const ShortStringHash NODE_IDS_VAR("NodeIDs");
-const ShortStringHash COMPONENT_IDS_VAR("ComponentIDs");
-const ShortStringHash UI_ELEMENT_IDS_VAR("UIElementIDs");
+const StringHash NODE_IDS_VAR("NodeIDs");
+const StringHash COMPONENT_IDS_VAR("ComponentIDs");
+const StringHash UI_ELEMENT_IDS_VAR("UIElementIDs");
 const int LABEL_WIDTH = 30;
 
 // Constants for accessing xmlResources
@@ -695,8 +695,8 @@ Variant ExtractVariantType(VariantMap& eventData)
     return Variant();   // This should not happen
 }
 
-/// Get back the human-readable variable name from the ShortStringHash.
-String GetVariableName(ShortStringHash hash)
+/// Get back the human-readable variable name from the StringHash.
+String GetVariableName(StringHash hash)
 {
     // First try to get it from scene
     String name = editorScene.GetVarName(hash);

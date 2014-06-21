@@ -48,7 +48,7 @@ Component::~Component()
 bool Component::Save(Serializer& dest) const
 {
     // Write type and ID
-    if (!dest.WriteShortStringHash(GetType()))
+    if (!dest.WriteStringHash(GetType()))
         return false;
     if (!dest.WriteUInt(id_))
         return false;
@@ -216,7 +216,7 @@ void Component::SetNode(Node* node)
     OnNodeSet(node_);
 }
 
-Component* Component::GetComponent(ShortStringHash type) const
+Component* Component::GetComponent(StringHash type) const
 {
     return node_ ? node_->GetComponent(type) : 0;
 }
@@ -226,7 +226,7 @@ bool Component::IsEnabledEffective() const
     return enabled_ && node_ && node_->IsEnabled();
 }
 
-void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const
+void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const
 {
     if (node_)
         node_->GetComponents(dest, type);

@@ -4,7 +4,7 @@ class Context
 {
     Object* GetEventSender() const;
     EventHandler* GetEventHandler() const;
-    const String GetTypeName(ShortStringHash objectType) const;
+    const String GetTypeName(StringHash objectType) const;
 };
 
 Context* GetContext();

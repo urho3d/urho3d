@@ -61,7 +61,7 @@ void SceneResolver::AddComponent(unsigned oldID, Component* component)
 void SceneResolver::Resolve()
 {
     // Nodes do not have component or node ID attributes, so only have to go through components
-    HashSet<ShortStringHash> noIDAttributes;
+    HashSet<StringHash> noIDAttributes;
     for (HashMap<unsigned, WeakPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = i->second_;

@@ -60,7 +60,6 @@ class File : public Object
     String ReadString();
     String ReadFileID();
     StringHash ReadStringHash();
-    ShortStringHash ReadShortStringHash();
     
     // PODVector<unsigned char> ReadBuffer();
     VectorBuffer ReadBuffer();
@@ -104,7 +103,6 @@ class File : public Object
     bool WriteString(const String value);
     bool WriteFileID(const String value);
     bool WriteStringHash(const StringHash& value);
-    bool WriteShortStringHash(const ShortStringHash& value);
     
     // bool WriteBuffer(const PODVector<unsigned char>& buffer);
     tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);

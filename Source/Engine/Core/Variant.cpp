@@ -590,11 +590,6 @@ template<> StringHash Variant::Get<StringHash>() const
     return GetStringHash();
 }
 
-template<> ShortStringHash Variant::Get<ShortStringHash>() const
-{
-    return GetShortStringHash();
-}
-
 template<> bool Variant::Get<bool>() const
 {
     return GetBool();
