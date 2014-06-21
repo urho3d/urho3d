@@ -57,7 +57,7 @@ public:
     virtual bool Save(Serializer& dest) const;
 
     /// Set sprite.
-    void SetSprite(const String& sprite);
+    void SetSprite(Sprite2D* sprite);
     /// Set source position variance.
     void SetSourcePositionVariance(const Vector2& sourcePositionVariance);
     /// Set speed.

@@ -267,6 +267,11 @@ bool ParticleEffect2D::Save(Serializer& dest) const
 	return xmlFile.Save(dest);
 }
 
+void ParticleEffect2D::SetSprite(Sprite2D* sprite)
+{
+    sprite_ = sprite;
+}
+
 void ParticleEffect2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance)
 {
     sourcePositionVariance_ = sourcePositionVariance;
