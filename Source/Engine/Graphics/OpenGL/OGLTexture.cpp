@@ -491,7 +491,7 @@ unsigned Texture::GetSRGBFormat(unsigned format)
     #endif
 }
 
-void Texture::CheckTextureBudget(ShortStringHash type)
+void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     unsigned textureBudget = cache->GetMemoryBudget(type);
