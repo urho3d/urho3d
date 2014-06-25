@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -369,30 +369,23 @@ int asCObjectType::GetTypeId() const
 // interface
 int asCObjectType::GetSubTypeId(asUINT subtypeIndex) const
 {
-	if( flags & asOBJ_TEMPLATE )
-	{
-		if( subtypeIndex >= templateSubTypes.GetLength() )
-			return asINVALID_ARG;
+	// This method is only supported for templates and template specializations
+	if( templateSubTypes.GetLength() == 0 )
+		return asERROR;
 
-		return engine->GetTypeIdFromDataType(templateSubTypes[subtypeIndex]);
-	}
+	if( subtypeIndex >= templateSubTypes.GetLength() )
+		return asINVALID_ARG;
 
-	// Only template types have sub types
-	return asERROR;
+	return engine->GetTypeIdFromDataType(templateSubTypes[subtypeIndex]);
 }
 
 // interface
 asIObjectType *asCObjectType::GetSubType(asUINT subtypeIndex) const
 {
-	if( flags & asOBJ_TEMPLATE )
-	{
-		if( subtypeIndex >= templateSubTypes.GetLength() )
-			return 0;
+	if( subtypeIndex >= templateSubTypes.GetLength() )
+		return 0;
 
-		return templateSubTypes[subtypeIndex].GetObjectType();
-	}
-
-	return 0;
+	return templateSubTypes[subtypeIndex].GetObjectType();
 }
 
 asUINT asCObjectType::GetSubTypeCount() const

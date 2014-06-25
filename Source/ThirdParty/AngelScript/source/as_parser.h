@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -83,11 +83,11 @@ protected:
 	asCScriptNode *ParseFunctionDefinition();
 	asCScriptNode *ParseParameterList();
 	asCScriptNode *SuperficiallyParseExpression();
-	asCScriptNode *ParseType(bool allowConst, bool allowVariableType = false);
+	asCScriptNode *ParseType(bool allowConst, bool allowVariableType = false, bool allowAuto = false);
 	asCScriptNode *ParseTypeMod(bool isParam);
 	void           ParseOptionalScope(asCScriptNode *node);
 	asCScriptNode *ParseRealType();
-	asCScriptNode *ParseDataType(bool allowVariableType = false);
+	asCScriptNode *ParseDataType(bool allowVariableType = false, bool allowAuto = false);
 	asCScriptNode *ParseIdentifier();
 
 	asCScriptNode *ParseListPattern();
@@ -143,7 +143,7 @@ protected:
 	asCScriptNode *ParseExprPreOp();
 	asCScriptNode *ParseExprPostOp();
 	asCScriptNode *ParseExprValue();
-	asCScriptNode *ParseArgList();
+	asCScriptNode *ParseArgList(bool withParenthesis = true);
 	asCScriptNode *ParseFunctionCall();
 	asCScriptNode *ParseVariableAccess();
 	asCScriptNode *ParseConstructCall();
@@ -168,6 +168,7 @@ protected:
 	asCString ExpectedTokens(const char *token1, const char *token2);
 	asCString ExpectedOneOf(int *tokens, int count);
 	asCString ExpectedOneOf(const char **tokens, int count);
+	asCString InsteadFound(sToken &t);
 
 	bool errorWhileParsing;
 	bool isSyntaxError;

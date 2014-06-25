@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -70,6 +70,7 @@ asFREEFUNC_t  userFree  = free;
 extern "C"
 {
 
+// interface
 int asSetGlobalMemoryFunctions(asALLOCFUNC_t allocFunc, asFREEFUNC_t freeFunc)
 {
 	userAlloc = allocFunc;
@@ -78,6 +79,7 @@ int asSetGlobalMemoryFunctions(asALLOCFUNC_t allocFunc, asFREEFUNC_t freeFunc)
 	return 0;
 }
 
+// interface
 int asResetGlobalMemoryFunctions()
 {
 	asThreadCleanup();
@@ -86,6 +88,18 @@ int asResetGlobalMemoryFunctions()
 	userFree  = free;
 
 	return 0;
+}
+
+// interface
+void *asAllocMem(size_t size)
+{
+	return asNEWARRAY(asBYTE, size);
+}
+
+// interface
+void asFreeMem(void *mem)
+{
+	asDELETEARRAY(mem);
 }
 
 } // extern "C"
