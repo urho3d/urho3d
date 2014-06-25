@@ -88,7 +88,7 @@ const char* SDL_IOS_GetResourceDir()
     if (!resource_dir)
     {
         const char *temp = [[[NSBundle mainBundle] resourcePath] UTF8String];
-        resource_dir = malloc(strlen(temp + 1));
+        resource_dir = malloc(strlen(temp) + 1);
         strcpy(resource_dir, temp);
     }
     
