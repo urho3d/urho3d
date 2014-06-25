@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -33,6 +33,8 @@
 // as_callfunc_x86.cpp
 //
 // These functions handle the actual calling of system functions
+//
+// Added support for functor methods by Jordi Oliveras Rovira in April, 2014.
 //
 
 
@@ -95,13 +97,44 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asQWORD retQW = 0;
 
 	// Prepare the parameters
-	int paramSize = sysFunc->paramSize;
 	asDWORD paramBuffer[64];
+	int callConv = sysFunc->callConv;
+
+#ifdef AS_NO_THISCALL_FUNCTOR_METHOD
+	int paramSize = sysFunc->paramSize;
 	if( sysFunc->takesObjByVal )
 	{
 		paramSize = 0;
 		int spos = 0;
 		int dpos = 1;
+#else
+	// Unpack the two object pointers
+	void **objectsPtrs  = (void**)obj;
+	void  *secondObject = objectsPtrs[1];
+	obj                 = objectsPtrs[0];
+
+	// Changed because need check for ICC_THISCALL_OBJFIRST or
+	// ICC_THISCALL_OBJLAST if sysFunc->takesObjByVal (avoid copy code)
+	// Check if is THISCALL_OBJ* calling convention (in this case needs to add secondObject pointer into stack).
+	bool isThisCallMethod = callConv >= ICC_THISCALL_OBJLAST;
+	int paramSize = isThisCallMethod || sysFunc->takesObjByVal ? 0 : sysFunc->paramSize;
+
+	int dpos = 1;
+
+	if( isThisCallMethod && 
+		(callConv >= ICC_THISCALL_OBJFIRST &&
+		 callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )
+	{
+		// Add the object pointer as the first parameter
+		paramBuffer[dpos++] = (asDWORD)secondObject;
+		paramSize++;
+	}
+
+	if( sysFunc->takesObjByVal || isThisCallMethod )
+	{
+		int spos = 0;
+#endif // AS_NO_THISCALL_FUNCTOR_METHOD
+
 		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
 		{
 			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
@@ -146,9 +179,19 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		args = &paramBuffer[1];
 	}
 
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	if( isThisCallMethod && 
+		(callConv >= ICC_THISCALL_OBJLAST &&
+		 callConv <= ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM) )
+	{
+		// Add the object pointer as the last parameter
+		paramBuffer[dpos++] = (asDWORD)secondObject;
+		paramSize++;
+	}
+#endif // AS_NO_THISCALL_FUNCTOR_METHOD
+
 	// Make the actual call
 	asFUNCTION_t func = sysFunc->func;
-	int callConv = sysFunc->callConv;
 	if( sysFunc->hostReturnInMemory )
 		callConv++;
 
@@ -176,14 +219,26 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		break;
 
 	case ICC_THISCALL:
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	case ICC_THISCALL_OBJFIRST:
+	case ICC_THISCALL_OBJLAST:
+#endif
 		retQW = CallThisCallFunction(obj, args, paramSize<<2, func);
 		break;
 
 	case ICC_THISCALL_RETURNINMEM:
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	case ICC_THISCALL_OBJFIRST_RETURNINMEM:
+	case ICC_THISCALL_OBJLAST_RETURNINMEM:
+#endif
 		retQW = CallThisCallFunctionRetByRef(obj, args, paramSize<<2, func, retPointer);
 		break;
 
 	case ICC_VIRTUAL_THISCALL:
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	case ICC_VIRTUAL_THISCALL_OBJFIRST:
+	case ICC_VIRTUAL_THISCALL_OBJLAST:
+#endif
 		{
 			// Get virtual function table from the object pointer
 			asFUNCTION_t *vftable = *(asFUNCTION_t**)obj;
@@ -192,6 +247,10 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		break;
 
 	case ICC_VIRTUAL_THISCALL_RETURNINMEM:
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	case ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM:
+	case ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM:
+#endif
 		{
 			// Get virtual function table from the object pointer
 			asFUNCTION_t *vftable = *(asFUNCTION_t**)obj;

@@ -150,7 +150,7 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 	// Remove object types (skip this if it is possible other groups are still using the types)
 	if( !notUsed )
 	{
-		for( n = 0; n < objTypes.GetLength(); n++ )
+		for( n = asUINT(objTypes.GetLength()); n-- > 0; )
 		{
 			asCObjectType *t = objTypes[n];
 			asSMapNode<asSNameSpaceNamePair, asCObjectType*> *cursor;

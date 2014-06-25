@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -51,6 +51,11 @@
 
 BEGIN_AS_NAMESPACE
 
+#ifdef AS_NO_COMPILER
+// Forward declare the structure, as it is part of some function signatures used even without the compiler
+struct sGlobalVariableDescription;
+#endif
+
 #ifndef AS_NO_COMPILER
 
 struct sFunctionDescription
@@ -72,6 +77,7 @@ struct sGlobalVariableDescription
 	asCString          name;
 	asCGlobalProperty *property;
 	asCDataType        datatype;
+	asSNameSpace      *ns;
 	int                index;
 	bool               isCompiled;
 	bool               isPureConstant;
@@ -161,6 +167,7 @@ protected:
 	void               WriteError(const asCString &msg, asCScriptCode *file, asCScriptNode *node);
 	void               WriteWarning(const asCString &scriptname, const asCString &msg, int r, int c);
 
+	bool               DoesGlobalPropertyExist(const char *prop, asSNameSpace *ns, asCGlobalProperty **outProp = 0, sGlobalVariableDescription **outDesc = 0, bool *isAppProp = 0);
 	asCGlobalProperty *GetGlobalProperty(const char *prop, asSNameSpace *ns, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue, bool *isAppProp);
 	int                ValidateDefaultArgs(asCScriptCode *script, asCScriptNode *node, asCScriptFunction *func);
 	asCString          GetCleanExpressionString(asCScriptNode *n, asCScriptCode *file);
@@ -174,15 +181,6 @@ protected:
 	asCObjectType     *GetObjectTypeFromTypesKnownByObject(const char *type, asCObjectType *currentType);
 	asCDataType        CreateDataTypeFromNode(asCScriptNode *node, asCScriptCode *file, asSNameSpace *implicitNamespace, bool acceptHandleForScope = false, asCObjectType *currentType = 0);
 	asCDataType        ModifyDataTypeFromNode(const asCDataType &type, asCScriptNode *node, asCScriptCode *file, asETypeModifiers *inOutFlag, bool *autoHandle);
-
-	struct preMessage_t
-	{
-		bool isSet;
-		asCString message;
-		asCString scriptname;
-		int r;
-		int c;
-	} preMessage;
 
 	int numErrors;
 	int numWarnings;

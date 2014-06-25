@@ -1376,8 +1376,9 @@ void CScriptArray::Precache()
                 if( !isCmp && !isEq )
                     continue;
 
-                // The parameter must either be a reference to the subtype or a handle to the subtype            
-                int paramTypeId = func->GetParamTypeId(0, &flags);
+                // The parameter must either be a reference to the subtype or a handle to the subtype
+                int paramTypeId;
+                func->GetParam(0, &paramTypeId, &flags);
 
                 if( (paramTypeId & ~(asTYPEID_OBJHANDLE|asTYPEID_HANDLETOCONST)) != (subTypeId &  ~(asTYPEID_OBJHANDLE|asTYPEID_HANDLETOCONST)) )
                     continue;

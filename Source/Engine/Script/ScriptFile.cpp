@@ -645,9 +645,10 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
     unsigned paramCount = function->GetParamCount();
     for (unsigned i = 0; i < parameters.Size() && i < paramCount; ++i)
     {
-        int paramType = function->GetParamTypeId(i);
+        int paramTypeId;
+        function->GetParam(i, &paramTypeId);
         
-        switch (paramType)
+        switch (paramTypeId)
         {
         case asTYPEID_BOOL:
             context->SetArgByte(i, (unsigned char)parameters[i].GetBool());
@@ -673,7 +674,7 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
             break;
             
         default:
-            if (paramType & asTYPEID_APPOBJECT)
+            if (paramTypeId & asTYPEID_APPOBJECT)
             {
                 switch (parameters[i].GetType())
                 {

@@ -261,8 +261,16 @@ void asCContext::DetachEngine()
 	m_stackBlockSize = 0;
 
 	// Clean the user data
-	if( m_userData && m_engine->cleanContextFunc )
-		m_engine->cleanContextFunc(this);
+	for( asUINT n = 0; n < m_userData.GetLength(); n += 2 )
+	{
+		if( m_userData[n+1] )
+		{
+			for( asUINT c = 0; c < m_engine->cleanContextFuncs.GetLength(); c++ )
+				if( m_engine->cleanContextFuncs[c].type == m_userData[n] )
+					m_engine->cleanContextFuncs[c].cleanFunc(this);
+		}
+	}
+	m_userData.SetLength(0);
 
 	// Clear engine pointer
 	if( m_holdEngineRef )
@@ -277,17 +285,55 @@ asIScriptEngine *asCContext::GetEngine() const
 }
 
 // interface
-void *asCContext::SetUserData(void *data)
+void *asCContext::SetUserData(void *data, asPWORD type)
 {
-	void *oldData = m_userData;
-	m_userData = data;
-	return oldData;
+	// As a thread might add a new new user data at the same time as another
+	// it is necessary to protect both read and write access to the userData member
+	ACQUIREEXCLUSIVE(m_engine->engineRWLock);
+
+	// It is not intended to store a lot of different types of userdata,
+	// so a more complex structure like a associative map would just have
+	// more overhead than a simple array.
+	for( asUINT n = 0; n < m_userData.GetLength(); n += 2 )
+	{
+		if( m_userData[n] == type )
+		{
+			void *oldData = reinterpret_cast<void*>(m_userData[n+1]);
+			m_userData[n+1] = reinterpret_cast<asPWORD>(data);
+
+			RELEASEEXCLUSIVE(m_engine->engineRWLock);
+
+			return oldData;
+		}
+	}
+
+	m_userData.PushLast(type);
+	m_userData.PushLast(reinterpret_cast<asPWORD>(data));
+
+	RELEASEEXCLUSIVE(m_engine->engineRWLock);
+
+	return 0;
 }
 
 // interface
-void *asCContext::GetUserData() const
+void *asCContext::GetUserData(asPWORD type) const
 {
-	return m_userData;
+	// There may be multiple threads reading, but when
+	// setting the user data nobody must be reading.
+	ACQUIRESHARED(m_engine->engineRWLock);
+
+	for( asUINT n = 0; n < m_userData.GetLength(); n += 2 )
+	{
+		if( m_userData[n] == type )
+		{
+			RELEASESHARED(m_engine->engineRWLock);
+			return reinterpret_cast<void*>(m_userData[n+1]);
+		}
+	}
+
+	RELEASESHARED(m_engine->engineRWLock);
+
+	return 0;
 }
 
 // interface
@@ -321,6 +367,16 @@ int asCContext::Prepare(asIScriptFunction *func)
 
 	// Release the returned object (if any)
 	CleanReturnObject();
+
+	// Release the object if it is a script object
+	if( m_initialFunction && m_initialFunction->objectType && (m_initialFunction->objectType->flags & asOBJ_SCRIPT_OBJECT) )
+	{
+		asCScriptObject *obj = *(asCScriptObject**)&m_regs.stackFramePointer[0];
+		if( obj )
+			obj->Release();
+
+		*(asPWORD*)&m_regs.stackFramePointer[0] = 0;
+	}
 
 	if( m_initialFunction && m_initialFunction == func )
 	{
@@ -436,6 +492,14 @@ int asCContext::Unprepare()
 
 	// Release the returned object (if any)
 	CleanReturnObject();
+
+	// Release the object if it is a script object
+	if( m_initialFunction && m_initialFunction->objectType && (m_initialFunction->objectType->flags & asOBJ_SCRIPT_OBJECT) )
+	{
+		asCScriptObject *obj = *(asCScriptObject**)&m_regs.stackFramePointer[0];
+		if( obj )
+			obj->Release();
+	}
 
 	// Release the initial function
 	if( m_initialFunction )
@@ -624,7 +688,14 @@ int asCContext::SetObject(void *obj)
 		return asERROR;
 	}
 
+	asASSERT( *(asPWORD*)&m_regs.stackFramePointer[0] == 0 );
+
 	*(asPWORD*)&m_regs.stackFramePointer[0] = (asPWORD)obj;
+
+	// TODO: This should be optional by having a flag where the application can chose whether it should be done or not
+	//       The flag could be named something like takeOwnership and have default value of true
+	if( obj && (m_initialFunction->objectType->flags & asOBJ_SCRIPT_OBJECT) )
+		reinterpret_cast<asCScriptObject*>(obj)->AddRef();
 
 	return 0;
 }
@@ -1174,13 +1245,12 @@ int asCContext::Execute()
 		if( gcPosObjects > gcPreObjects )
 		{
 			// Execute as many steps as there were new objects created
-			while( gcPosObjects-- > gcPreObjects )
-				m_engine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE);
+			m_engine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE, gcPosObjects - gcPreObjects);
 		}
 		else if( gcPosObjects > 0 )
 		{
 			// Execute at least one step, even if no new objects were created
-			m_engine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE);
+			m_engine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE, 1);
 		}
 	}
 
@@ -1512,25 +1582,27 @@ void asCContext::CallScriptFunction(asCScriptFunction *func)
 	m_currentFunction = func;
 	m_regs.programPointer = m_currentFunction->scriptData->byteCode.AddressOf();
 
-	// Make sure there is space on the stack to execute the function
-	asDWORD *oldStackPointer = m_regs.stackPointer;
-	if( !ReserveStackSpace(func->scriptData->stackNeeded) )
-		return;
-
-	// If a new stack block was allocated then we'll need to move
-	// over the function arguments to the new block
-	if( m_regs.stackPointer != oldStackPointer )
-	{
-		int numDwords = func->GetSpaceNeededForArguments() + (func->objectType ? AS_PTR_SIZE : 0) + (func->DoesReturnOnStack() ? AS_PTR_SIZE : 0);
-		memcpy(m_regs.stackPointer, oldStackPointer, sizeof(asDWORD)*numDwords);
-	}
-
 	PrepareScriptFunction();
 }
 
 void asCContext::PrepareScriptFunction()
 {
 	asASSERT( m_currentFunction->scriptData );
+
+	// Make sure there is space on the stack to execute the function
+	asDWORD *oldStackPointer = m_regs.stackPointer;
+	if( !ReserveStackSpace(m_currentFunction->scriptData->stackNeeded) )
+		return;
+
+	// If a new stack block was allocated then we'll need to move
+	// over the function arguments to the new block.
+	if( m_regs.stackPointer != oldStackPointer )
+	{
+		int numDwords = m_currentFunction->GetSpaceNeededForArguments() + 
+		                (m_currentFunction->objectType ? AS_PTR_SIZE : 0) + 
+		                (m_currentFunction->DoesReturnOnStack() ? AS_PTR_SIZE : 0);
+		memcpy(m_regs.stackPointer, oldStackPointer, sizeof(asDWORD)*numDwords);
+	}
 
 	// Update framepointer
 	m_regs.stackFramePointer = m_regs.stackPointer;
@@ -4622,23 +4694,6 @@ void asCContext::CleanStackFrame()
 				}
 			}
 		}
-
-		// If the object is a script declared object, then we must release it
-		// as the compiler adds a reference at the entry of the function. Make sure
-		// the function has actually been entered
-		if( m_currentFunction->objectType && m_regs.programPointer != m_currentFunction->scriptData->byteCode.AddressOf() )
-		{
-			// Methods returning a reference or constructors don't add a reference
-			if( !m_currentFunction->returnType.IsReference() && m_currentFunction->name != m_currentFunction->objectType->name )
-			{
-				asSTypeBehaviour *beh = &m_currentFunction->objectType->beh;
-				if( beh->release && *(asPWORD*)&m_regs.stackFramePointer[0] != 0 )
-				{
-					m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[0], beh->release);
-					*(asPWORD*)&m_regs.stackFramePointer[0] = 0;
-				}
-			}
-		}
 	}
 	else
 		m_isStackMemoryNotAllocated = false;
@@ -4733,7 +4788,7 @@ int asCContext::SetLineCallback(asSFuncPtr callback, void *obj, int callConv)
 	m_regs.doProcessSuspend = true;
 	m_lineCallbackObj = obj;
 	bool isObj = false;
-	if( (unsigned)callConv == asCALL_GENERIC )
+	if( (unsigned)callConv == asCALL_GENERIC || (unsigned)callConv == asCALL_THISCALL_OBJFIRST || (unsigned)callConv == asCALL_THISCALL_OBJLAST )
 	{
 		m_lineCallback = false;
 		m_regs.doProcessSuspend = m_doSuspend;
@@ -4772,7 +4827,7 @@ int asCContext::SetExceptionCallback(asSFuncPtr callback, void *obj, int callCon
 	m_exceptionCallback = true;
 	m_exceptionCallbackObj = obj;
 	bool isObj = false;
-	if( (unsigned)callConv == asCALL_GENERIC )
+	if( (unsigned)callConv == asCALL_GENERIC || (unsigned)callConv == asCALL_THISCALL_OBJFIRST || (unsigned)callConv == asCALL_THISCALL_OBJLAST )
 		return asNOT_SUPPORTED;
 	if( (unsigned)callConv >= asCALL_THISCALL )
 	{

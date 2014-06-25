@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -46,24 +46,28 @@ BEGIN_AS_NAMESPACE
 
 asCDataType::asCDataType()
 {
-	tokenType      = ttUnrecognizedToken;
-	objectType     = 0;
-	isReference    = false;
-	isReadOnly     = false;
-	isObjectHandle = false;
-	isConstHandle  = false;
-	funcDef        = 0;
+	tokenType              = ttUnrecognizedToken;
+	objectType             = 0;
+	isReference            = false;
+	isReadOnly             = false;
+	isAuto                 = false;
+	isObjectHandle         = false;
+	isConstHandle          = false;
+	funcDef                = 0;
+	isHandleToAsHandleType = false;
 }
 
 asCDataType::asCDataType(const asCDataType &dt)
 {
-	tokenType      = dt.tokenType;
-	objectType     = dt.objectType;
-	isReference    = dt.isReference;
-	isReadOnly     = dt.isReadOnly;
-	isObjectHandle = dt.isObjectHandle;
-	isConstHandle  = dt.isConstHandle;
-	funcDef        = dt.funcDef;
+	tokenType              = dt.tokenType;
+	objectType             = dt.objectType;
+	isReference            = dt.isReference;
+	isReadOnly             = dt.isReadOnly;
+	isAuto                 = dt.isAuto;
+	isObjectHandle         = dt.isObjectHandle;
+	isConstHandle          = dt.isConstHandle;
+	funcDef                = dt.funcDef;
+	isHandleToAsHandleType = dt.isHandleToAsHandleType;
 }
 
 asCDataType::~asCDataType()
@@ -86,6 +90,17 @@ asCDataType asCDataType::CreateObject(asCObjectType *ot, bool isConst)
 	dt.tokenType        = ttIdentifier;
 	dt.objectType       = ot;
 	dt.isReadOnly       = isConst;
+
+	return dt;
+}
+
+asCDataType asCDataType::CreateAuto(bool isConst)
+{
+	asCDataType dt;
+
+	dt.tokenType        = ttIdentifier;
+	dt.isReadOnly       = isConst;
+	dt.isAuto           = true;
 
 	return dt;
 }
@@ -191,6 +206,13 @@ asCString asCDataType::Format(bool includeNamespace) const
 			str += ">";
 		}
 	}
+	else if( isAuto )
+	{
+		if( isObjectHandle )
+			str += "<auto@>";
+		else
+			str += "<auto>";
+	}
 	else
 	{
 		str = "<unknown>";
@@ -211,13 +233,15 @@ asCString asCDataType::Format(bool includeNamespace) const
 
 asCDataType &asCDataType::operator =(const asCDataType &dt)
 {
-	tokenType        = dt.tokenType;
-	isReference      = dt.isReference;
-	objectType       = dt.objectType;
-	isReadOnly       = dt.isReadOnly;
-	isObjectHandle   = dt.isObjectHandle;
-	isConstHandle    = dt.isConstHandle;
-	funcDef          = dt.funcDef;
+	tokenType              = dt.tokenType;
+	isReference            = dt.isReference;
+	objectType             = dt.objectType;
+	isReadOnly             = dt.isReadOnly;
+	isObjectHandle         = dt.isObjectHandle;
+	isConstHandle          = dt.isConstHandle;
+	isAuto                 = dt.isAuto;
+	funcDef                = dt.funcDef;
+	isHandleToAsHandleType = dt.isHandleToAsHandleType;
 
 	return (asCDataType &)*this;
 }
@@ -226,29 +250,40 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 {
 	if( !b )
 	{
-		isObjectHandle = b;
+		isObjectHandle = false;
 		isConstHandle = false;
+		isHandleToAsHandleType = false;
 	}
-	else if( b && !isObjectHandle )
+	else
 	{
-		// Only reference types are allowed to be handles, 
-		// but not nohandle reference types, and not scoped references 
-		// (except when returned from registered function)
-		// funcdefs are special reference types and support handles
-		// value types with asOBJ_ASHANDLE are treated as a handle
-		if( !funcDef && 
-			(!objectType || 
-			!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE) || (objectType->flags & asOBJ_ASHANDLE)) || 
-			(objectType->flags & asOBJ_NOHANDLE) || 
-			((objectType->flags & asOBJ_SCOPED) && !acceptHandleForScope)) )
-			return -1;
+		if( isAuto )
+		{
+			isObjectHandle = true;
+		}
+		else if( !isObjectHandle )
+		{
+			// Only reference types are allowed to be handles, 
+			// but not nohandle reference types, and not scoped references 
+			// (except when returned from registered function)
+			// funcdefs are special reference types and support handles
+			// value types with asOBJ_ASHANDLE are treated as a handle
+			if( !funcDef && 
+				(!objectType || 
+				!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE) || (objectType->flags & asOBJ_ASHANDLE)) || 
+				(objectType->flags & asOBJ_NOHANDLE) || 
+				((objectType->flags & asOBJ_SCOPED) && !acceptHandleForScope)) )
+				return -1;
 
-		isObjectHandle = b;
-		isConstHandle = false;
+			isObjectHandle = b;
+			isConstHandle = false;
 
-		// ASHANDLE supports being handle, but as it really is a value type it will not be marked as a handle
-		if( (objectType->flags & asOBJ_ASHANDLE) )
-			isObjectHandle = false;
+			// ASHANDLE supports being handle, but as it really is a value type it will not be marked as a handle
+			if( (objectType->flags & asOBJ_ASHANDLE) )
+			{
+				isObjectHandle = false;
+				isHandleToAsHandleType = true;
+			}
+		}
 	}
 
 	return 0;
@@ -305,7 +340,7 @@ int asCDataType::MakeHandleToConst(bool b)
 bool asCDataType::SupportHandles() const
 {
 	if( objectType &&
-		(objectType->flags & asOBJ_REF) && 
+		(objectType->flags & (asOBJ_REF | asOBJ_ASHANDLE)) && 
 		!(objectType->flags & asOBJ_NOHANDLE) &&
 		!isObjectHandle )
 		return true;
@@ -359,6 +394,14 @@ bool asCDataType::IsHandleToConst() const
 {
 	if( !isObjectHandle ) return false;
 	return isReadOnly;
+}
+
+bool asCDataType::IsObjectConst() const
+{
+	if( IsObjectHandle() )
+		return IsHandleToConst();
+
+	return IsReadOnly();
 }
 
 // TODO: 3.0.0: This should be removed
@@ -505,13 +548,14 @@ bool asCDataType::IsBooleanType() const
 
 bool asCDataType::IsObject() const
 {
-	//	Enumerations are not objects, even though they are described with an objectType.
-	if( IsEnumType() )
+	if( IsPrimitive() )
 		return false;
 
-	if( objectType ) return true;
+	// Null handle doesn't have an object type but should still be considered an object
+	if( objectType == 0 ) 
+		return IsNullHandle();
 
-	return false;
+	return true;
 }
 
 int asCDataType::GetSizeInMemoryBytes() const
