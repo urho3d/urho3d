@@ -57,6 +57,8 @@ RigidBody2D::RigidBody2D(Context* context) :
     useFixtureMass_(true),
     body_(0)
 {
+    // Make sure the massData's center is zero-initialized as well
+    massData_.center.SetZero();
 }
 
 RigidBody2D::~RigidBody2D()
