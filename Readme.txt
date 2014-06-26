@@ -48,6 +48,7 @@ Urho3D development, contributions and bugfixes by:
 - atship
 - mightyCelu
 - ninjastone
+- rasteron
 - reattiva
 - skaiware
 - szamq
