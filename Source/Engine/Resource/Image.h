@@ -113,7 +113,7 @@ public:
     void SetPixel(int x, int y, int z, const Color& color);
     /// Set a 2D pixel with an integer color. R component is in the 8 lowest bits.
     void SetPixelInt(int x, int y, unsigned uintColor);
-    /// Set a 2D pixel with an integer color. R component is in the 8 lowest bits.
+    /// Set a 3D pixel with an integer color. R component is in the 8 lowest bits.
     void SetPixelInt(int x, int y, int z, unsigned uintColor);
     /// Load as color LUT. Return true if successful.
     bool LoadColorLUT(Deserializer& source);
