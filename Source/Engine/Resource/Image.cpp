@@ -515,15 +515,24 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
 
 void Image::SetPixel(int x, int y, const Color& color)
 {
-    SetPixel(x, y, 0, color);
+    SetPixelInt(x, y, 0, color.ToUInt());
 }
 
 void Image::SetPixel(int x, int y, int z, const Color& color)
 {
+    SetPixelInt(x, y, z, color.ToUInt());
+}
+
+void Image::SetPixelInt(int x, int y, unsigned uintColor)
+{
+    SetPixelInt(x, y, 0, uintColor);
+}
+
+void Image::SetPixelInt(int x, int y, int z, unsigned uintColor)
+{
     if (!data_ || x < 0 || x >= width_ || y < 0 || y >= height_ || z < 0 || z >= depth_ || IsCompressed())
         return;
 
-    unsigned uintColor = color.ToUInt();
     unsigned char* dest = data_ + (z * width_ * height_ + y * width_ + x) * components_;
     unsigned char* src = (unsigned char*)&uintColor;
 
@@ -688,6 +697,11 @@ bool Image::Resize(int width, int height)
 
 void Image::Clear(const Color& color)
 {
+    ClearInt(color.ToUInt());
+}
+
+void Image::ClearInt(unsigned uintColor)
+{
     PROFILE(ClearImage);
 
     if (!data_)
@@ -699,7 +713,6 @@ void Image::Clear(const Color& color)
         return;
     }
 
-    unsigned uintColor = color.ToUInt();
     unsigned char* src = (unsigned char*)&uintColor;
     for (unsigned i = 0; i < width_ * height_ * depth_ * components_; ++i)
         data_[i] = src[i % components_];
@@ -826,6 +839,45 @@ Color Image::GetPixel(int x, int y, int z) const
         break;
     default:
         ret.r_ = ret.g_ = ret.b_ = (float)src[0] / 255.0f;
+        break;
+    }
+
+    return ret;
+}
+
+unsigned Image::GetPixelInt(int x, int y) const
+{
+    return GetPixelInt(x, y, 0);
+}
+
+unsigned Image::GetPixelInt(int x, int y, int z) const
+{
+    if (!data_ || z < 0 || z >= depth_ || IsCompressed())
+        return 0xff000000;
+    x = Clamp(x, 0, width_ - 1);
+    y = Clamp(y, 0, height_ - 1);
+
+    unsigned char* src = data_ + (z * width_ * height_ + y * width_ + x) * components_;
+    unsigned ret = 0;
+    if (components_ < 4)
+        ret |= 0xff000000;
+
+    switch (components_)
+    {
+    case 4:
+        ret |= (unsigned)src[3] << 24;
+        // Fall through
+    case 3:
+        ret |= (unsigned)src[2] << 16;
+        // Fall through
+    case 2:
+        ret |= (unsigned)src[1] << 8;
+        ret |= (unsigned)src[0];
+        break;
+    default:
+        ret |= (unsigned)src[0] << 16;
+        ret |= (unsigned)src[0] << 8;
+        ret |= (unsigned)src[0];
         break;
     }
 
