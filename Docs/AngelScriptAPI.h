@@ -4297,10 +4297,13 @@ class Image
 {
 // Methods:
 void Clear(const Color&);
+void ClearInt(uint);
 void FlipVertical();
 Color GetPixel(int, int) const;
 Color GetPixel(int, int, int) const;
 Color GetPixelBilinear(float, float) const;
+uint GetPixelInt(int, int) const;
+uint GetPixelInt(int, int, int) const;
 Color GetPixelTrilinear(float, float, float) const;
 Image GetSubimage(const IntRect&) const;
 bool Load(File);
@@ -4317,6 +4320,8 @@ void SaveTGA(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetPixel(int, int, const Color&);
 void SetPixel(int, int, int, const Color&);
+void SetPixelInt(int, int, int, uint);
+void SetPixelInt(int, int, uint);
 bool SetSize(int, int, int, uint);
 bool SetSize(int, int, uint);
 

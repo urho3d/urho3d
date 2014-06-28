@@ -2049,17 +2049,22 @@ Methods:
 - bool SetSize(int width, int height, int depth, unsigned components)
 - void SetPixel(int x, int y, const Color& color)
 - void SetPixel(int x, int y, int z, const Color& color)
+- void SetPixelInt(int x, int y, unsigned uintColor)
+- void SetPixelInt(int x, int y, int z, unsigned uintColor)
 - bool LoadColorLUT(Deserializer& source)
 - bool LoadColorLUT(const String fileName)
 - void FlipVertical()
 - bool Resize(int width, int height)
 - void Clear(const Color& color)
+- void ClearInt(unsigned uintColor)
 - bool SaveBMP(const String fileName) const
 - bool SavePNG(const String fileName) const
 - bool SaveTGA(const String fileName) const
 - bool SaveJPG(const String fileName, int quality) const
 - Color GetPixel(int x, int y) const
 - Color GetPixel(int x, int y, int z) const
+- unsigned GetPixelInt(int x, int y) const
+- unsigned GetPixelInt(int x, int y, int z) const
 - Color GetPixelBilinear(float x, float y) const
 - Color GetPixelTrilinear(float x, float y, float z) const
 - int GetWidth() const
