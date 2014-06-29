@@ -894,7 +894,7 @@ Methods:
 - Scene* GetScene() const
 - bool IsEnabled() const
 - bool IsEnabledEffective() const
-- Component* GetComponent(ShortStringHash type) const
+- Component* GetComponent(StringHash type) const
 - Component* GetComponent(const String type) const
 
 ### Connection : Object
@@ -1319,7 +1319,7 @@ Methods:
 
 - Object* GetEventSender() const
 - EventHandler* GetEventHandler() const
-- const String GetTypeName(ShortStringHash objectType) const
+- const String GetTypeName(StringHash objectType) const
 
 ### Controls
 
@@ -1509,7 +1509,6 @@ Methods:
 - String ReadString()
 - String ReadFileID()
 - StringHash ReadStringHash()
-- ShortStringHash ReadShortStringHash()
 - VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
@@ -1732,7 +1731,6 @@ Methods:
 - String ReadString()
 - String ReadFileID()
 - StringHash ReadStringHash()
-- ShortStringHash ReadShortStringHash()
 - VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
@@ -1769,7 +1767,6 @@ Methods:
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
 - bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
@@ -3057,14 +3054,14 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
 - void RemoveComponent(Component* component)
-- void RemoveComponent(ShortStringHash type)
+- void RemoveComponent(StringHash type)
 - void RemoveComponent(const String type)
 - void RemoveAllComponents()
 - void RemoveComponents(bool removeReplicated, bool removeLocal)
 - Node* Clone(CreateMode mode = REPLICATED)
 - void Remove()
 - void SetParent(Node* parent)
-- void SetVar(ShortStringHash key, const Variant& value)
+- void SetVar(StringHash key, const Variant& value)
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
 - Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
@@ -3114,9 +3111,9 @@ Methods:
 - Node* GetChild(unsigned index) const
 - unsigned GetNumComponents() const
 - unsigned GetNumNetworkComponents() const
-- bool HasComponent(ShortStringHash type) const
+- bool HasComponent(StringHash type) const
 - bool HasComponent(const String type) const
-- const Variant& GetVar(ShortStringHash key) const
+- const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - Component* GetComponent(const String type) const
 - void SetID(unsigned id)
@@ -3164,16 +3161,16 @@ Properties:
 
 Methods:
 
-- ShortStringHash GetType() const
-- ShortStringHash GetBaseType() const
+- StringHash GetType() const
+- StringHash GetBaseType() const
 - const String GetTypeName() const
 - const String GetCategory() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
 
 Properties:
 
-- ShortStringHash type (readonly)
-- ShortStringHash baseType (readonly)
+- StringHash type (readonly)
+- StringHash baseType (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
 
@@ -3974,7 +3971,7 @@ Methods:
 
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
-- void SetMemoryBudget(ShortStringHash type, unsigned budget)
+- void SetMemoryBudget(StringHash type, unsigned budget)
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
 - void SetReturnFailedResources(bool enable)
@@ -3982,8 +3979,8 @@ Methods:
 - File* GetFile(const String name)
 - Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
 - bool Exists(const String name) const
-- unsigned GetMemoryBudget(ShortStringHash type) const
-- unsigned GetMemoryUse(ShortStringHash type) const
+- unsigned GetMemoryBudget(StringHash type) const
+- unsigned GetMemoryUse(StringHash type) const
 - unsigned GetTotalMemoryUse() const
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
@@ -4007,10 +4004,10 @@ Methods:
 
 - ResourceRef() (GC)
 - ResourceRef* new()
-- ResourceRef(ShortStringHash type) (GC)
-- ResourceRef* new(ShortStringHash type)
-- ResourceRef(ShortStringHash type, String name) (GC)
-- ResourceRef* new(ShortStringHash type, String name)
+- ResourceRef(StringHash type) (GC)
+- ResourceRef* new(StringHash type)
+- ResourceRef(StringHash type, String name) (GC)
+- ResourceRef* new(StringHash type, String name)
 - ResourceRef(const ResourceRef& rhs) (GC)
 - ResourceRef* new(const ResourceRef& rhs)
 - void delete()
@@ -4018,7 +4015,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash type
+- StringHash type
 - String name
 
 ### ResourceRefList
@@ -4028,14 +4025,14 @@ Methods:
 
 - ResourceRefList() (GC)
 - ResourceRefList* new()
-- ResourceRefList(ShortStringHash type) (GC)
-- ResourceRefList* new(ShortStringHash type)
+- ResourceRefList(StringHash type) (GC)
+- ResourceRefList* new(StringHash type)
 - void delete()
 - bool operator==(const ResourceRefList& rhs) const
 
 Properties:
 
-- ShortStringHash type
+- StringHash type
 
 ### RigidBody : Component
 
@@ -4233,7 +4230,7 @@ Methods:
 - float GetElapsedTime() const
 - float GetSmoothingConstant() const
 - float GetSnapThreshold() const
-- const String GetVarName(ShortStringHash hash) const
+- const String GetVarName(StringHash hash) const
 - void Update(float timeStep)
 - void BeginThreadedUpdate()
 - void EndThreadedUpdate()
@@ -4380,7 +4377,6 @@ Methods:
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
 - bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
@@ -4391,33 +4387,6 @@ Methods:
 - bool WriteVLE(unsigned value)
 - bool WriteNetID(unsigned value)
 - bool WriteLine(const String value)
-
-### ShortStringHash
-
-
-Methods:
-
-- ShortStringHash() (GC)
-- ShortStringHash* new()
-- ShortStringHash(const ShortStringHash& rhs) (GC)
-- ShortStringHash* new(const ShortStringHash& rhs)
-- ShortStringHash(const StringHash& rhs) (GC)
-- ShortStringHash* new(const StringHash& rhs)
-- ShortStringHash(short value) (GC)
-- ShortStringHash* new(short value)
-- ShortStringHash(const String str) (GC)
-- ShortStringHash* new(const String str)
-- void delete()
-- ShortStringHash operator+(const ShortStringHash& rhs) const
-- bool operator==(const ShortStringHash& rhs) const
-- bool operator<(const ShortStringHash& rhs) const
-- short Value() const
-- short Calculate(const char* str)
-
-Properties:
-
-- const ShortStringHash ZERO
-- short value (readonly)
 
 ### Skeleton
 
@@ -5335,7 +5304,7 @@ Methods:
 - void Remove()
 - unsigned FindChild(UIElement* element) const
 - void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED)
-- void SetVar(ShortStringHash key, const Variant& value)
+- void SetVar(StringHash key, const Variant& value)
 - void SetInternal(bool enable)
 - void SetTraversalMode(TraversalMode traversalMode)
 - void SetElementEventSender(bool flag)
@@ -5387,7 +5356,7 @@ Methods:
 - UIElement* GetParent() const
 - UIElement* GetRoot() const
 - const Color& GetDerivedColor() const
-- const Variant& GetVar(ShortStringHash key) const
+- const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - IntVector2 ScreenToElement(const IntVector2& screenPosition)
 - IntVector2 ElementToScreen(const IntVector2& position)
@@ -5499,8 +5468,6 @@ Methods:
 - Variant* new(unsigned value)
 - Variant(const StringHash& value) (GC)
 - Variant* new(const StringHash& value)
-- Variant(const ShortStringHash& value) (GC)
-- Variant* new(const ShortStringHash& value)
 - Variant(bool value) (GC)
 - Variant* new(bool value)
 - Variant(float value) (GC)
@@ -5559,14 +5526,12 @@ Methods:
 - bool operator==(const IntRect& rhs) const
 - bool operator==(const IntVector2& rhs) const
 - bool operator==(const StringHash& rhs) const
-- bool operator==(const ShortStringHash& rhs) const
 - bool operator==(const Matrix3& rhs) const
 - bool operator==(const Matrix3x4& rhs) const
 - bool operator==(const Matrix4& rhs) const
 - void SetInt(int value)
 - void SetUint(unsigned value)
 - void SetStringHash(const StringHash& value)
-- void SetShortStringHash(const ShortStringHash& value)
 - void SetBool(bool value)
 - void SetFloat(float value)
 - void SetVector2(const Vector2& value)
@@ -5586,7 +5551,6 @@ Methods:
 - int GetInt() const
 - int GetUInt() const
 - StringHash GetStringHash()
-- ShortStringHash GetShortStringHash()
 - bool GetBool() const
 - float GetFloat() const
 - const Vector2& GetVector2() const
@@ -5627,7 +5591,6 @@ Methods:
 - void SetInt(const String key, int value)
 - void SetUInt(const String key, unsigned value)
 - void SetStringHash(const String key, const StringHash& value)
-- void SetShortStringHash(const String key, const ShortStringHash& value)
 - void SetBool(const String key, bool value)
 - void SetFloat(const String key, float value)
 - void SetVector2(const String key, const Vector2 value)
@@ -5648,7 +5611,6 @@ Methods:
 - int GetInt(const String key)
 - int GetUInt(const String key)
 - StringHash GetStringHash(const String key)
-- ShortStringHash GetShortStringHash(const String key)
 - bool GetBool(const String key)
 - float GetFloat(const String key)
 - const Vector2& GetVector2(const String key)
@@ -5852,7 +5814,6 @@ Methods:
 - String ReadString()
 - String ReadFileID()
 - StringHash ReadStringHash()
-- ShortStringHash ReadShortStringHash()
 - VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
@@ -5889,7 +5850,6 @@ Methods:
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
 - bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
