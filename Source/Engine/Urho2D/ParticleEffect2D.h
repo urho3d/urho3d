@@ -110,6 +110,8 @@ public:
     void SetMaxRadiusVariance(float maxRadiusVariance);
     /// Set min radius.
     void SetMinRadius(float minRadius);
+    /// Set min radius variance.
+    void SetMinRadiusVariance(float minRadiusVariance);
     /// Set rotate per second.
     void SetRotatePerSecond(float rotatePerSecond);
     /// Set rotate per second variance.
@@ -179,6 +181,8 @@ public:
     float GetMaxRadiusVariance() const { return maxRadiusVariance_; }
     /// Return min radius.
     float GetMinRadius() const { return minRadius_; }
+    /// Return min radius variance.
+    float GetMinRadiusVariance() const { return minRadiusVariance_; }
     /// Return rotate per second.
     float GetRotatePerSecond() const { return rotatePerSecond_; }
     /// Return rotate per second variance.
@@ -266,6 +270,8 @@ private:
     float maxRadiusVariance_;
     /// Min radius.
     float minRadius_;
+    /// Min radius variance.
+    float minRadiusVariance_;
     /// Rotate per second.
     float rotatePerSecond_;
     /// Rotate per second variance.

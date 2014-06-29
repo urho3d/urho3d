@@ -85,6 +85,7 @@ ParticleEffect2D::ParticleEffect2D(Context* context) :
     maxRadius_(100.0f),
     maxRadiusVariance_(0.0f),
     minRadius_(0.0f),
+    minRadiusVariance_(0.0f),
     rotatePerSecond_(0.0f),
     rotatePerSecondVariance_(0.0f),
     blendMode_(BLEND_ALPHA),
@@ -171,6 +172,7 @@ bool ParticleEffect2D::Load(Deserializer& source)
     maxRadius_ = ReadFloat(rootElem, "maxRadius");
     maxRadiusVariance_ = ReadFloat(rootElem, "maxRadiusVariance");
     minRadius_ = ReadFloat(rootElem, "minRadius");
+    minRadiusVariance_ = ReadFloat(rootElem, "minRadiusVariance");
 
     rotatePerSecond_ = ReadFloat(rootElem, "rotatePerSecond");
     rotatePerSecondVariance_ = ReadFloat(rootElem, "rotatePerSecondVariance");
@@ -251,6 +253,7 @@ bool ParticleEffect2D::Save(Serializer& dest) const
     WriteFloat(rootElem, "maxRadius", maxRadius_);
     WriteFloat(rootElem, "maxRadiusVariance", maxRadiusVariance_);
     WriteFloat(rootElem, "minRadius", minRadius_);
+    WriteFloat(rootElem, "minRadiusVariance", minRadiusVariance_);
 
     WriteFloat(rootElem, "rotatePerSecond", rotatePerSecond_);
     WriteFloat(rootElem, "rotatePerSecondVariance", rotatePerSecondVariance_);
@@ -400,6 +403,11 @@ void ParticleEffect2D::SetMaxRadiusVariance(float maxRadiusVariance)
 void ParticleEffect2D::SetMinRadius(float minRadius)
 {
     minRadius_ = minRadius;
+}
+
+void ParticleEffect2D::SetMinRadiusVariance(float minRadiusVariance)
+{
+    minRadiusVariance_ = minRadiusVariance;
 }
 
 void ParticleEffect2D::SetRotatePerSecond(float rotatePerSecond)

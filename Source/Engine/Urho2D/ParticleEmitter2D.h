@@ -91,8 +91,12 @@ public:
 
     /// Set particle effect.
     void SetEffect(ParticleEffect2D* effect);
+    /// Set max particles.
+    void SetMaxParticles(unsigned maxParticles);
     /// Return particle effect.
     ParticleEffect2D* GetEffect() const;
+    /// Return max particles.
+    unsigned GetMaxParticles() const { return particles_.Size(); }
 
     /// Set particle model attr.
     void SetParticleEffectAttr(ResourceRef value);
@@ -119,8 +123,6 @@ private:
     int numParticles_;
     /// Emission time.
     float emissionTime_;
-    /// Emmision rate
-    float emissionRate_;
     /// Emit particle time
     float emitParticleTime_;
     /// Particles.
