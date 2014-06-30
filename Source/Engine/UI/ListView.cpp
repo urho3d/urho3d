@@ -49,7 +49,7 @@ template<> HighlightMode Variant::Get<HighlightMode>() const
     return (HighlightMode)GetInt();
 }
 
-static const ShortStringHash expandedHash("Expanded");
+static const StringHash expandedHash("Expanded");
 
 extern const char* UI_CATEGORY;
 
@@ -63,7 +63,7 @@ void SetItemExpanded(UIElement* item, bool enable)
     item->SetVar(expandedHash, enable);
 }
 
-static const ShortStringHash hierarchyParentHash("HierarchyParent");
+static const StringHash hierarchyParentHash("HierarchyParent");
 
 bool GetItemHierarchyParent(UIElement* item)
 {

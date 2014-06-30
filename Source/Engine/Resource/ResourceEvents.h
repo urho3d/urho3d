@@ -64,7 +64,7 @@ EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
 /// Unknown resource type.
 EVENT(E_UNKNOWNRESOURCETYPE, UnknownResourceType)
 {
-    PARAM(P_RESOURCETYPE, ResourceType);            // ShortStringHash
+    PARAM(P_RESOURCETYPE, ResourceType);            // StringHash
 }
 
 }

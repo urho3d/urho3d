@@ -34,8 +34,8 @@
 namespace Urho3D
 {
 
-const ShortStringHash VAR_SHOW_POPUP("ShowPopup");
-extern ShortStringHash VAR_ORIGIN;
+const StringHash VAR_SHOW_POPUP("ShowPopup");
+extern StringHash VAR_ORIGIN;
 
 extern const char* UI_CATEGORY;
 

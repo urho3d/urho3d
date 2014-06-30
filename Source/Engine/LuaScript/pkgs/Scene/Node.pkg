@@ -90,7 +90,7 @@ class Node : public Animatable
     void RemoveAllChildren();
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     void RemoveComponent(Component* component);
-    void RemoveComponent(ShortStringHash type);
+    void RemoveComponent(StringHash type);
     void RemoveComponent(const String type);
     
     void RemoveAllComponents();
@@ -100,7 +100,7 @@ class Node : public Animatable
     
     void Remove();
     void SetParent(Node* parent);
-    void SetVar(ShortStringHash key, const Variant& value);
+    void SetVar(StringHash key, const Variant& value);
     void AddListener(Component* component);
     void RemoveListener(Component* component);
     
@@ -161,10 +161,10 @@ class Node : public Animatable
     unsigned GetNumComponents() const;
     unsigned GetNumNetworkComponents() const;
 
-    bool HasComponent(ShortStringHash type) const;
+    bool HasComponent(StringHash type) const;
     bool HasComponent(const String type) const;
 
-    const Variant& GetVar(ShortStringHash key) const;
+    const Variant& GetVar(StringHash key) const;
     const VariantMap& GetVars() const;
 
     // template <class T> T* GetComponent() const;

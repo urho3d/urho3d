@@ -28,9 +28,9 @@
 namespace Urho3D
 {
 
-void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const char* name)
+void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attributes, StringHash objectType, const char* name)
 {
-    HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
+    HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
     if (i == attributes.End())
         return;
 
@@ -78,9 +78,9 @@ Context::~Context()
     eventDataMaps_.Clear();
 }
 
-SharedPtr<Object> Context::CreateObject(ShortStringHash objectType)
+SharedPtr<Object> Context::CreateObject(StringHash objectType)
 {
-    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
     if (i != factories_.End())
         return i->second_->CreateObject();
     else
@@ -113,14 +113,14 @@ void Context::RegisterSubsystem(Object* object)
     subsystems_[object->GetType()] = object;
 }
 
-void Context::RemoveSubsystem(ShortStringHash objectType)
+void Context::RemoveSubsystem(StringHash objectType)
 {
-    HashMap<ShortStringHash, SharedPtr<Object> >::Iterator i = subsystems_.Find(objectType);
+    HashMap<StringHash, SharedPtr<Object> >::Iterator i = subsystems_.Find(objectType);
     if (i != subsystems_.End())
         subsystems_.Erase(i);
 }
 
-void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr)
+void Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr)
 {
     // None or pointer types can not be supported
     if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
@@ -132,13 +132,13 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
         networkAttributes_[objectType].Push(attr);
 }
 
-void Context::RemoveAttribute(ShortStringHash objectType, const char* name)
+void Context::RemoveAttribute(StringHash objectType, const char* name)
 {
     RemoveNamedAttribute(attributes_, objectType, name);
     RemoveNamedAttribute(networkAttributes_, objectType, name);
 }
 
-void Context::UpdateAttributeDefaultValue(ShortStringHash objectType, const char* name, const Variant& defaultValue)
+void Context::UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue)
 {
     AttributeInfo* info = GetAttribute(objectType, name);
     if (info)
@@ -157,7 +157,7 @@ VariantMap& Context::GetEventDataMap()
 }
 
 
-void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType)
+void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {
     const Vector<AttributeInfo>* baseAttributes = GetAttributes(baseType);
     if (baseAttributes)
@@ -172,9 +172,9 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
     }
 }
 
-Object* Context::GetSubsystem(ShortStringHash type) const
+Object* Context::GetSubsystem(StringHash type) const
 {
-    HashMap<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
+    HashMap<StringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
     if (i != subsystems_.End())
         return i->second_;
     else
@@ -189,16 +189,16 @@ Object* Context::GetEventSender() const
         return 0;
 }
 
-const String& Context::GetTypeName(ShortStringHash objectType) const
+const String& Context::GetTypeName(StringHash objectType) const
 {
     // Search factories to find the hash-to-name mapping
-    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
     return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 
-AttributeInfo* Context::GetAttribute(ShortStringHash objectType, const char* name)
+AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
 {
-    HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
+    HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
     if (i == attributes_.End())
         return 0;
 

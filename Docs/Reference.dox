@@ -18,7 +18,7 @@ The classes in question are String, Vector, PODVector, List, HashSet and HashMap
 
 The list, set and map classes use a fixed-size allocator internally. This can also be used by the application, either by using the procedural functions AllocatorInitialize(), AllocatorUninitialize(), AllocatorReserve() and AllocatorFree(), or through the template class Allocator.
 
-In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<ShortStringHash, Variant>.
+In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<StringHash, Variant>.
 
 
 \page ObjectTypes %Object types and factories
@@ -27,7 +27,7 @@ Classes that derive from Object contain type-identification, they can be created
 
 %Object factory registration and object creation through factories are directly accessible only in C++, not in script.
 
-The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 16-bit hash of the type name (GetType() or GetTypeStatic()).
+The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
 
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
@@ -35,7 +35,7 @@ To register an object factory for a specific type, call the \ref Context::Regist
 context_->RegisterFactory<MyClass>();
 \endcode
 
-To create an object using a factory, call Context's \ref Context::CreateObject "CreateObject()" function. This takes the 16-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
+To create an object using a factory, call Context's \ref Context::CreateObject "CreateObject()" function. This takes the 32-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
 
 \code
 SharedPtr<Object> newComponent = context_->CreateObject(type));
@@ -76,7 +76,7 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
-Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 16-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
 
 When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
 
@@ -342,7 +342,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - TextureCube
 - XMLFile
 
-They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
+They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 32-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
 The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, the engine registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist.
 
@@ -504,7 +504,7 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Printing raw output to the log is simply called Print(). The rest of the logging functions are accessed by calling log.Debug(), log.Info(), log.Warning() and log.Error().
 
-- Functions that would take a StringHash or ShortStringHash parameter usually take a string instead. For example sending events, requesting resources and accessing components.
+- Functions that would take a StringHash parameter usually take a string instead. For example sending events, requesting resources and accessing components.
 
 - Most of StringUtils have been exposed as methods of the string class. For example String.ToBool().
 

@@ -32,7 +32,6 @@ namespace Urho3D
 {
 
 const StringHash StringHash::ZERO;
-const ShortStringHash ShortStringHash::ZERO;
 
 StringHash::StringHash(const char* str) :
     value_(Calculate(str))
@@ -66,28 +65,6 @@ String StringHash::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%08X", value_);
-    return String(tempBuffer);
-}
-
-ShortStringHash::ShortStringHash(const char* str) :
-    value_(Calculate(str))
-{
-}
-
-ShortStringHash::ShortStringHash(const String& str) :
-    value_(Calculate(str.CString()))
-{
-}
-
-unsigned short ShortStringHash::Calculate(const char* str)
-{
-    return StringHash::Calculate(str);
-}
-
-String ShortStringHash::ToString() const
-{
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%04X", value_);
     return String(tempBuffer);
 }
 

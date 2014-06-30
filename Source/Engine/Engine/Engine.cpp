@@ -370,8 +370,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     // In debug mode, check now that all factory created objects can be created without crashing
     #ifdef _DEBUG
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+    const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+    for (HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
         SharedPtr<Object> object = i->second_->CreateObject();
     #endif
 
@@ -513,10 +513,10 @@ void Engine::DumpResources()
 {
     #ifdef URHO3D_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    const HashMap<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
+    const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
 
-    for (HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
+    for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
         i != resourceGroups.End(); ++i)
     {
         unsigned num = i->second_.resources_.Size();
@@ -816,13 +816,13 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
 
 bool Engine::HasParameter(const VariantMap& parameters, const String& parameter)
 {
-    ShortStringHash nameHash(parameter);
+    StringHash nameHash(parameter);
     return parameters.Find(nameHash) != parameters.End();
 }
 
 const Variant& Engine::GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue)
 {
-    ShortStringHash nameHash(parameter);
+    StringHash nameHash(parameter);
     VariantMap::ConstIterator i = parameters.Find(nameHash);
     return i != parameters.End() ? i->second_ : defaultValue;
 }

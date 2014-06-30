@@ -15,9 +15,9 @@ bool suppressUIElementChanges = false;
 // Registered UIElement user variable reverse mappings
 VariantMap uiElementVarNames;
 
-const ShortStringHash FILENAME_VAR("FileName");
-const ShortStringHash MODIFIED_VAR("Modified");
-const ShortStringHash CHILD_ELEMENT_FILENAME_VAR("ChildElemFileName");
+const StringHash FILENAME_VAR("FileName");
+const StringHash MODIFIED_VAR("Modified");
+const StringHash CHILD_ELEMENT_FILENAME_VAR("ChildElemFileName");
 
 void ClearUIElementSelection()
 {

@@ -47,7 +47,7 @@ class Scene : public Node
     float GetElapsedTime() const;
     float GetSmoothingConstant() const;
     float GetSnapThreshold() const;
-    const String GetVarName(ShortStringHash hash) const;
+    const String GetVarName(StringHash hash) const;
 
     void Update(float timeStep);
     void BeginThreadedUpdate();

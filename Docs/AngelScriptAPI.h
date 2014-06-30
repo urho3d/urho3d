@@ -42,7 +42,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -52,7 +52,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -109,7 +109,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -154,7 +154,7 @@ uint shadowMask;
 Skeleton skeleton;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool updateInvisible;
@@ -208,7 +208,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -246,7 +246,7 @@ uint shadowMask;
 float speed;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -273,7 +273,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 /* readonly */
 String animationName;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -289,7 +289,7 @@ int refs;
 /* readonly */
 Array<AnimationTriggerPoint> triggers;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -376,7 +376,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -393,7 +393,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -413,7 +413,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -424,7 +424,7 @@ uint numAnimations;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -523,7 +523,7 @@ void Stop();
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -543,7 +543,7 @@ uint sampleSize;
 /* readonly */
 bool stereo;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -607,7 +607,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -645,7 +645,7 @@ uint shadowMask;
 bool sorted;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -688,8 +688,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -739,7 +739,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -749,7 +749,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -832,7 +832,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -900,8 +900,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -954,7 +954,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -964,7 +964,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -1053,7 +1053,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -1109,7 +1109,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoAspectRatio;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 Plane clipPlane;
@@ -1144,7 +1144,7 @@ Plane reflectionPlane;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useClipping;
@@ -1188,8 +1188,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -1240,7 +1240,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -1250,7 +1250,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -1335,7 +1335,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -1385,7 +1385,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1417,7 +1417,7 @@ Vector2 size;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -1462,7 +1462,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1493,7 +1493,7 @@ float restitution;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint vertexCount;
@@ -1536,7 +1536,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1568,7 +1568,7 @@ float restitution;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -1610,7 +1610,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1640,7 +1640,7 @@ float restitution;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 Vector2 vertex1;
@@ -1687,7 +1687,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1717,7 +1717,7 @@ float restitution;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint vertexCount;
@@ -1771,7 +1771,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -1795,7 +1795,7 @@ ShapeType shapeType;
 Vector3 size;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -1838,7 +1838,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1868,7 +1868,7 @@ float restitution;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -1957,7 +1957,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -1974,7 +1974,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -1995,7 +1995,7 @@ String ToString() const;
 /* readonly */
 String address;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -2022,7 +2022,7 @@ Scene scene;
 /* readonly */
 bool sceneLoaded;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2042,7 +2042,7 @@ bool autoVisibleOnError;
 /* readonly */
 BorderImage background;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -2062,7 +2062,7 @@ uint numRows;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool visible;
@@ -2106,7 +2106,7 @@ Array<Variant> attributes;
 /* writeonly */
 Vector3 axis;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 float cfm;
@@ -2138,7 +2138,7 @@ int refs;
 Quaternion rotation;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2180,7 +2180,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2201,7 +2201,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2242,7 +2242,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2267,7 +2267,7 @@ Vector2 ownerBodyAnchor;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2309,7 +2309,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2332,7 +2332,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2373,7 +2373,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2397,7 +2397,7 @@ float ratio;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2439,7 +2439,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2464,7 +2464,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2505,7 +2505,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2530,7 +2530,7 @@ int refs;
 Vector2 target;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2573,7 +2573,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 Vector2 axis;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2599,7 +2599,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 float upperTranslation;
@@ -2641,7 +2641,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2667,7 +2667,7 @@ float ratio;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2709,7 +2709,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2735,7 +2735,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 float upperAngle;
@@ -2777,7 +2777,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2801,7 +2801,7 @@ Vector2 ownerBodyAnchor;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2843,7 +2843,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2866,7 +2866,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2909,7 +2909,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 Vector2 axis;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2935,7 +2935,7 @@ RigidBody2D ownerBody;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -2974,8 +2974,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -3025,7 +3025,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -3035,7 +3035,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -3119,7 +3119,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -3176,7 +3176,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3210,7 +3210,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -3236,7 +3236,7 @@ void ToggleAll();
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 XMLFile defaultStyle;
@@ -3252,7 +3252,7 @@ int refs;
 /* readonly */
 Text statsText;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useRendererStats;
@@ -3302,7 +3302,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -3319,7 +3319,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -3364,7 +3364,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3403,7 +3403,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -3438,7 +3438,6 @@ Quaternion ReadPackedQuaternion();
 Vector3 ReadPackedVector3(float);
 Quaternion ReadQuaternion();
 int16 ReadShort();
-ShortStringHash ReadShortStringHash();
 String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
@@ -3522,7 +3521,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3552,7 +3551,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -3598,7 +3597,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -3633,7 +3632,7 @@ uint shadowMask;
 Sprite2D sprite;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -3661,8 +3660,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 Array<UIElement> GetItems() const;
@@ -3721,7 +3720,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 UIElement getPopup() const;
 
 // Properties:
@@ -3736,7 +3735,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -3839,7 +3838,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -3867,7 +3866,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 // Properties:
 bool autoExit;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -3884,7 +3883,7 @@ bool pauseMinimized;
 int refs;
 int timeStepSmoothing;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -3915,7 +3914,6 @@ Quaternion ReadPackedQuaternion();
 Vector3 ReadPackedVector3(float);
 Quaternion ReadQuaternion();
 int16 ReadShort();
-ShortStringHash ReadShortStringHash();
 String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
@@ -3948,7 +3946,6 @@ bool WritePackedQuaternion(const Quaternion&);
 bool WritePackedVector3(const Vector3&, float);
 bool WriteQuaternion(const Quaternion&);
 bool WriteShort(int16);
-bool WriteShortStringHash(const ShortStringHash&);
 bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
@@ -3963,7 +3960,7 @@ bool WriteVector4(const Vector4&);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -3985,7 +3982,7 @@ int refs;
 /* readonly */
 uint size;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4002,7 +3999,7 @@ void UpdateElements();
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 Button cancelButton;
 /* readonly */
@@ -4031,7 +4028,7 @@ String title;
 /* readonly */
 Text titleText;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4061,7 +4058,7 @@ uint SystemRunAsync(const String&, Array<String>);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 String currentDir;
@@ -4071,7 +4068,7 @@ String programDir;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4105,7 +4102,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4114,7 +4111,7 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4163,7 +4160,7 @@ bool ToggleFullscreen();
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 bool borderless;
 /* readonly */
@@ -4213,7 +4210,7 @@ bool sm3Support;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4250,7 +4247,6 @@ Quaternion ReadPackedQuaternion();
 Vector3 ReadPackedVector3(float);
 Quaternion ReadQuaternion();
 int16 ReadShort();
-ShortStringHash ReadShortStringHash();
 String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
@@ -4327,7 +4323,7 @@ bool SetSize(int, int, uint);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4344,7 +4340,7 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4379,7 +4375,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4435,7 +4431,7 @@ bool touchEmulation;
 /* readonly */
 Array<TouchState> touches;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4487,7 +4483,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4496,7 +4492,7 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -4663,7 +4659,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 float brightness;
@@ -4720,7 +4716,7 @@ Texture shapeTexture;
 float specularIntensity;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -4747,8 +4743,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -4798,7 +4794,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -4808,7 +4804,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -4903,7 +4899,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -4939,8 +4935,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 Array<UIElement> GetItems() const;
@@ -5001,7 +4997,7 @@ void SetViewPosition(int, int);
 void ToggleExpand(uint, bool = false);
 void ToggleSelection(uint);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -5012,7 +5008,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 int baseIndent;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -5113,7 +5109,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -5143,7 +5139,7 @@ void Write(const String&, bool = false);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -5154,7 +5150,7 @@ bool quiet;
 int refs;
 bool timeStamp;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5186,7 +5182,7 @@ void SortTechniques();
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 CullMode cullMode;
@@ -5209,7 +5205,7 @@ Array<TechniqueEntry> techniqueEntries;
 Array<Technique> techniques;
 Array<Texture> textures;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5328,8 +5324,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -5384,7 +5380,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 /* readonly */
@@ -5398,7 +5394,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -5490,7 +5486,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -5510,7 +5506,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 String message;
@@ -5518,7 +5514,7 @@ String message;
 int refs;
 String title;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5538,7 +5534,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 /* readonly */
@@ -5557,7 +5553,7 @@ int refs;
 /* readonly */
 Skeleton skeleton;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5600,7 +5596,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -5618,7 +5614,7 @@ bool recursive;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5673,7 +5669,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 /* readonly */
@@ -5706,7 +5702,7 @@ float regionMinSize;
 bool temporary;
 int tileSize;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5735,7 +5731,7 @@ void UnregisterRemoteEvent(const String&) const;
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -5748,7 +5744,7 @@ Connection serverConnection;
 /* readonly */
 bool serverRunning;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 int updateFps;
@@ -5792,7 +5788,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 float basePriority;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 float distanceFactor;
@@ -5811,7 +5807,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5915,7 +5911,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -5956,7 +5952,7 @@ bool temporary;
 /* readonly */
 Matrix3x4 transform;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -5987,13 +5983,13 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6019,7 +6015,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 /* readonly */
 Array<Variant> attributeAnimations;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6030,7 +6026,7 @@ int refs;
 /* readonly */
 Array<Variant> speeds;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6085,7 +6081,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -6104,7 +6100,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6147,7 +6143,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bidirectional;
 /* readonly */
 String category;
@@ -6167,7 +6163,7 @@ float radius;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6185,7 +6181,7 @@ bool compressed() const;
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6199,7 +6195,7 @@ int refs;
 /* readonly */
 uint totalSize;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6223,7 +6219,7 @@ void SetTextureFrame(uint, TextureFrame) const;
 float activeTime;
 float animationLodBias;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 Vector3 constantForce;
@@ -6262,7 +6258,7 @@ float sizeAdd;
 float sizeMul;
 bool sorted;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool updateInvisible;
@@ -6283,7 +6279,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6292,7 +6288,7 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6342,7 +6338,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -6383,7 +6379,7 @@ uint shadowMask;
 bool sorted;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -6431,7 +6427,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -6467,7 +6463,7 @@ uint shadowMask;
 Sprite2D sprite;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -6564,7 +6560,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -6587,7 +6583,7 @@ int refs;
 bool splitImpulse;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -6636,7 +6632,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoClearForces;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool continuousPhysics;
@@ -6662,7 +6658,7 @@ int refs;
 bool subStepping;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint velocityIterations;
@@ -6930,7 +6926,7 @@ void SetDefaultRenderPath(XMLFile);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6980,7 +6976,7 @@ int textureAnisotropy;
 TextureFilterMode textureFilterMode;
 int textureQuality;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 Array<Viewport> viewports;
@@ -6999,7 +6995,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7008,7 +7004,7 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -7026,12 +7022,12 @@ bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED);
 bool Exists(const String&) const;
 File GetFile(const String&);
 String GetPreferredResourceDir(const String&) const;
-Resource GetResource(ShortStringHash, const String&, bool = true);
+Resource GetResource(StringHash, const String&, bool = true);
 Resource GetResource(const String&, const String&, bool = true);
 String GetResourceFileName(const String&) const;
 void ReleaseAllResources(bool = false);
 void ReleaseResource(const String&, const String&, bool = false);
-void ReleaseResources(ShortStringHash, bool = false);
+void ReleaseResources(StringHash, bool = false);
 void ReleaseResources(const String&, bool = false);
 void ReleaseResources(const String&, const String&, bool = false);
 bool ReloadResource(Resource);
@@ -7045,7 +7041,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 // Properties:
 bool autoReloadResources;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 Array<uint> memoryBudget;
@@ -7065,7 +7061,7 @@ bool searchPackagesFirst;
 /* readonly */
 uint totalMemoryUse;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -7077,7 +7073,7 @@ class ResourceRef
 
 // Properties:
 String name;
-ShortStringHash type;
+StringHash type;
 };
 
 class ResourceRefList
@@ -7091,7 +7087,7 @@ bool empty;
 /* readonly */
 uint length;
 Array<String> names;
-ShortStringHash type;
+StringHash type;
 };
 
 class RigidBody
@@ -7147,7 +7143,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 float ccdMotionThreshold;
@@ -7187,7 +7183,7 @@ Quaternion rotation;
 bool temporary;
 bool trigger;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useGravity;
@@ -7237,7 +7233,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool awake;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BodyType2D bodyType;
 bool bullet;
 /* readonly */
@@ -7263,7 +7259,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useFixtureMass;
@@ -7368,7 +7364,7 @@ void SetWorldTransform2D(const Vector2&, float);
 void SetWorldTransform2D(const Vector2&, float, const Vector2&);
 void SetWorldTransform2D(const Vector2&, float, float);
 void StopAsyncLoading();
-const String& GetVarName(ShortStringHash) const;
+const String& GetVarName(StringHash) const;
 void Translate(const Vector3&, TransformSpace = TS_LOCAL);
 void Translate2D(const Vector2&, TransformSpace = TS_LOCAL);
 void UnregisterAllVars(const String&);
@@ -7391,7 +7387,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7446,7 +7442,7 @@ float timeScale;
 /* readonly */
 Matrix3x4 transform;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -7480,7 +7476,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 Scene defaultScene;
@@ -7489,7 +7485,7 @@ bool executeConsoleCommands;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -7511,7 +7507,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7522,7 +7518,7 @@ String name;
 /* readonly */
 int refs;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -7571,7 +7567,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 String className;
@@ -7592,7 +7588,7 @@ ScriptFile scriptFile;
 ScriptObject scriptObject;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -7620,8 +7616,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -7671,7 +7667,7 @@ bool SetStyleAuto(XMLFile = null);
 void StepBack();
 void StepForward();
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -7683,7 +7679,7 @@ Array<Variant> attributes;
 /* readonly */
 Button backButton;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -7769,7 +7765,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -7799,8 +7795,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -7850,7 +7846,7 @@ bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void SetViewPosition(int, int);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -7860,7 +7856,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -7944,7 +7940,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -7985,7 +7981,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7994,7 +7990,7 @@ uint numAttributes;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8023,7 +8019,6 @@ bool WritePackedQuaternion(const Quaternion&);
 bool WritePackedVector3(const Vector3&, float);
 bool WriteQuaternion(const Quaternion&);
 bool WriteShort(int16);
-bool WriteShortStringHash(const ShortStringHash&);
 bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
@@ -8035,16 +8030,6 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
-};
-
-class ShortStringHash
-{
-// Methods:
-String ToString() const;
-
-// Properties:
-/* readonly */
-uint16 value;
 };
 
 class Skeleton
@@ -8098,7 +8083,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -8134,7 +8119,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -8164,8 +8149,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -8215,7 +8200,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -8225,7 +8210,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -8313,7 +8298,7 @@ Texture texture;
 bool tiled;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -8362,7 +8347,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8385,7 +8370,7 @@ Vector3 targetWorldPosition;
 Quaternion targetWorldRotation;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8403,7 +8388,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -8425,7 +8410,7 @@ bool sixteenBit;
 /* readonly */
 bool stereo;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8468,7 +8453,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8485,7 +8470,7 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8534,7 +8519,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoRemove;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8561,7 +8546,7 @@ bool temporary;
 /* readonly */
 float timePosition;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8612,7 +8597,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoRemove;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8644,7 +8629,7 @@ bool temporary;
 /* readonly */
 float timePosition;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8731,7 +8716,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 Node controlledNode;
@@ -8754,7 +8739,7 @@ int refs;
 float speed;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8774,8 +8759,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -8822,7 +8807,7 @@ void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -8832,7 +8817,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 bool bringToBack;
 bool bringToFront;
@@ -8877,7 +8862,7 @@ String style;
 bool temporary;
 Texture texture;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -8901,7 +8886,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 Vector2 hotSpot;
@@ -8914,7 +8899,7 @@ IntRect rectangle;
 int refs;
 Texture2D texture;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8936,7 +8921,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -8947,7 +8932,7 @@ int refs;
 /* readonly */
 Texture2D texture;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -8994,7 +8979,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9031,7 +9016,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -9081,7 +9066,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9122,7 +9107,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -9171,7 +9156,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -9209,7 +9194,7 @@ uint shadowMask;
 Sprite2D sprite;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -9302,7 +9287,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -9314,7 +9299,7 @@ Array<Pass> passes;
 int refs;
 bool sm3;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -9371,7 +9356,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool castShadows;
 /* readonly */
 String category;
@@ -9408,7 +9393,7 @@ bool smoothing;
 Vector3 spacing;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -9452,7 +9437,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9482,7 +9467,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -9510,8 +9495,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -9562,7 +9547,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -9572,7 +9557,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -9675,7 +9660,7 @@ HorizontalAlignment textAlignment;
 TextEffect textEffect;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -9727,7 +9712,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9786,7 +9771,7 @@ String text;
 HorizontalAlignment textAlignment;
 TextEffect textEffect;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 VerticalAlignment verticalAlignment;
@@ -9815,7 +9800,7 @@ void SetNumLevels(uint);
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
@@ -9842,7 +9827,7 @@ String name;
 int refs;
 bool sRGB;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -9872,7 +9857,7 @@ bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
@@ -9901,7 +9886,7 @@ int refs;
 RenderSurface renderSurface;
 bool sRGB;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -9931,7 +9916,7 @@ bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
@@ -9960,7 +9945,7 @@ int refs;
 RenderSurface renderSurface;
 bool sRGB;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -9990,7 +9975,7 @@ bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
@@ -10019,7 +10004,7 @@ int refs;
 Array<RenderSurface> renderSurfaces;
 bool sRGB;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -10047,7 +10032,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -10063,7 +10048,7 @@ String timeStamp;
 /* readonly */
 float timeStep;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -10093,8 +10078,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -10142,7 +10127,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -10152,7 +10137,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -10229,7 +10214,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -10276,7 +10261,7 @@ void SetFocusElement(UIElement, bool = false);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 String clipBoardText;
@@ -10302,7 +10287,7 @@ int refs;
 /* readonly */
 UIElement root;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useMutableGlyphs;
@@ -10328,8 +10313,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -10377,7 +10362,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -10387,7 +10372,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -10463,7 +10448,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -10489,7 +10474,7 @@ void SetKeyFrame(float, const Variant&);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 InterpMethod interpolationMethod;
@@ -10500,7 +10485,7 @@ String name;
 int refs;
 float splineTension;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -10522,7 +10507,6 @@ VectorBuffer GetBuffer() const;
 float GetFloat() const;
 int GetInt() const;
 RefCounted GetPtr() const;
-ShortStringHash GetShortStringHash() const;
 StringHash GetStringHash() const;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
@@ -10556,14 +10540,14 @@ class VariantMap
 {
 // Methods:
 void Clear();
-bool Contains(ShortStringHash) const;
+bool Contains(StringHash) const;
 bool Contains(const String&) const;
-bool Erase(ShortStringHash);
+bool Erase(StringHash);
 bool Erase(const String&);
 
 // Properties:
 /* readonly */
-Array<ShortStringHash> keys;
+Array<StringHash> keys;
 /* readonly */
 uint length;
 };
@@ -10659,7 +10643,6 @@ Quaternion ReadPackedQuaternion();
 Vector3 ReadPackedVector3(float);
 Quaternion ReadQuaternion();
 int16 ReadShort();
-ShortStringHash ReadShortStringHash();
 String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
@@ -10693,7 +10676,6 @@ bool WritePackedQuaternion(const Quaternion&);
 bool WritePackedVector3(const Vector3&, float);
 bool WriteQuaternion(const Quaternion&);
 bool WriteShort(int16);
-bool WriteShortStringHash(const ShortStringHash&);
 bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
@@ -10735,8 +10717,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -10786,7 +10768,7 @@ bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void SetView(Scene, Camera);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -10797,7 +10779,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoUpdate;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -10891,7 +10873,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -10914,7 +10896,7 @@ void SetRenderPath(XMLFile);
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 Camera camera;
 /* readonly */
 String category;
@@ -10924,7 +10906,7 @@ int refs;
 RenderPath renderPath;
 Scene scene;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -10961,8 +10943,8 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
 UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 uint GetNumChildren(bool) const;
@@ -11010,7 +10992,7 @@ bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
 void UpdateLayout();
-const Variant& GetVar(const ShortStringHash&);
+const Variant& GetVar(const StringHash&);
 
 // Properties:
 bool animationEnabled;
@@ -11020,7 +11002,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -11105,7 +11087,7 @@ String style;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 bool useDerivedOpacity;
@@ -11215,7 +11197,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -11226,7 +11208,7 @@ int refs;
 /* readonly */
 XMLElement root;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
@@ -11307,7 +11289,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-ShortStringHash baseType;
+StringHash baseType;
 BoundingBox boundingBox;
 bool castShadows;
 /* readonly */
@@ -11346,7 +11328,7 @@ float shadowDistance;
 uint shadowMask;
 bool temporary;
 /* readonly */
-ShortStringHash type;
+StringHash type;
 /* readonly */
 String typeName;
 uint viewMask;
@@ -11844,7 +11826,7 @@ float Sign(float);
 float Sin(float);
 float SmoothStep(float, float, float);
 float Sqrt(float);
-const String& GetTypeName(ShortStringHash);
+const String& GetTypeName(StringHash);
 void SubscribeToEvent(Object, const String&, const String&);
 void SubscribeToEvent(const String&, const String&);
 float Tan(float);

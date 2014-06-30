@@ -203,7 +203,7 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
     }
 }
 
-void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bool force)
+void ResourceCache::ReleaseResource(StringHash type, const String& name, bool force)
 {
     StringHash nameHash(name);
     const SharedPtr<Resource>& existingRes = FindResource(type, nameHash);
@@ -218,11 +218,11 @@ void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bo
     }
 }
 
-void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
+void ResourceCache::ReleaseResources(StringHash type, bool force)
 {
     bool released = false;
     
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
         for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
@@ -242,11 +242,11 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
         UpdateResourceGroup(type);
 }
 
-void ResourceCache::ReleaseResources(ShortStringHash type, const String& partialName, bool force)
+void ResourceCache::ReleaseResources(StringHash type, const String& partialName, bool force)
 {
     bool released = false;
     
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
         for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
@@ -277,7 +277,7 @@ void ResourceCache::ReleaseResources(const String& partialName, bool force)
     
     while (repeat--)
     {
-        for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+        for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         {
             bool released = false;
             
@@ -307,7 +307,7 @@ void ResourceCache::ReleaseAllResources(bool force)
     
     while (repeat--)
     {
-        for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
+        for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
             i != resourceGroups_.End(); ++i)
         {
             bool released = false;
@@ -355,7 +355,7 @@ bool ResourceCache::ReloadResource(Resource* resource)
     return false;
 }
 
-void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
+void ResourceCache::SetMemoryBudget(StringHash type, unsigned budget)
 {
     resourceGroups_[type].memoryBudget_ = budget;
 }
@@ -425,12 +425,12 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const String& name, bool sendEventOnFailure)
 {
     return GetResource(type, name.CString(), sendEventOnFailure);
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
     
@@ -488,10 +488,10 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     return resource;
 }
 
-void ResourceCache::GetResources(PODVector<Resource*>& result, ShortStringHash type) const
+void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
 {
     result.Clear();
-    HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
         for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = i->second_.resources_.Begin();
@@ -526,18 +526,18 @@ bool ResourceCache::Exists(const String& nameIn) const
     return false;
 }
 
-unsigned ResourceCache::GetMemoryBudget(ShortStringHash type) const
+unsigned ResourceCache::GetMemoryBudget(StringHash type) const
 {
-    HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
         return i->second_.memoryBudget_;
     else
         return 0;
 }
 
-unsigned ResourceCache::GetMemoryUse(ShortStringHash type) const
+unsigned ResourceCache::GetMemoryUse(StringHash type) const
 {
-    HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
         return i->second_.memoryUse_;
     else
@@ -547,7 +547,7 @@ unsigned ResourceCache::GetMemoryUse(ShortStringHash type) const
 unsigned ResourceCache::GetTotalMemoryUse() const
 {
     unsigned total = 0;
-    for (HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+    for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         total += i->second_.memoryUse_;
     return total;
 }
@@ -673,9 +673,9 @@ void ResourceCache::ResetDependencies(Resource* resource)
     }
 }
 
-const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, StringHash nameHash)
+const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHash nameHash)
 {
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return noResource;
     HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
@@ -687,7 +687,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, Str
 
 const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 {
-    for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+    for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
     {
         HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
         if (j != i->second_.resources_.End())
@@ -699,7 +699,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 
 void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
 {
-    HashSet<ShortStringHash> affectedGroups;
+    HashSet<StringHash> affectedGroups;
     
     const HashMap<String, PackageEntry>& entries = package->GetEntries();
     for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
@@ -707,7 +707,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         StringHash nameHash(i->first_);
         
         // We do not know the actual resource type, so search all type containers
-        for (HashMap<ShortStringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin();
+        for (HashMap<StringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin();
             j != resourceGroups_.End(); ++j)
         {
             HashMap<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(nameHash);
@@ -724,13 +724,13 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         }
     }
     
-    for (HashSet<ShortStringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
+    for (HashSet<StringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
         UpdateResourceGroup(*i);
 }
 
-void ResourceCache::UpdateResourceGroup(ShortStringHash type)
+void ResourceCache::UpdateResourceGroup(StringHash type)
 {
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return;
     

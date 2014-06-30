@@ -77,9 +77,9 @@ public:
     /// Return whether is effectively enabled (node is also enabled.)
     bool IsEnabledEffective() const;
     /// Return component in the same scene node by type. If there are several, returns the first.
-    Component* GetComponent(ShortStringHash type) const;
+    Component* GetComponent(StringHash type) const;
     /// Return components in the same scene node by type.
-    void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
+    void GetComponents(PODVector<Component*>& dest, StringHash type) const;
     /// Template version of returning a component in the same scene node by type.
     template <class T> T* GetComponent() const;
     /// Template version of returning components in the same scene node by type.

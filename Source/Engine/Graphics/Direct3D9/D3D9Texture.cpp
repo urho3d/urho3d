@@ -302,7 +302,7 @@ void Texture::LoadParameters(const XMLElement& element)
     }
 }
 
-void Texture::CheckTextureBudget(ShortStringHash type)
+void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     unsigned textureBudget = cache->GetMemoryBudget(type);

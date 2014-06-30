@@ -5,7 +5,7 @@
 // - bool PreEditAttribute(Array<Serializable@>@ serializables, uint index);
 // - void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues);
 // - Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit);
-// - String GetVariableName(ShortStringHash hash);
+// - String GetVariableName(StringHash hash);
 
 const uint MIN_NODE_ATTRIBUTES = 4;
 const uint MAX_NODE_ATTRIBUTES = 8;
@@ -229,7 +229,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
 UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
     UIElement@ parent;
-    ShortStringHash resourceType;
+    StringHash resourceType;
 
     // Get the real attribute info from the serializable for the correct resource type
     AttributeInfo attrInfo = serializables[0].attributeInfos[index];
@@ -350,7 +350,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
     else if (type == VAR_VARIANTMAP)
     {
         VariantMap map = serializables[0].attributes[index].GetVariantMap();
-        Array<ShortStringHash>@ keys = map.keys;
+        Array<StringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
             String varName = GetVariableName(keys[i]);
@@ -552,7 +552,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
     {
         UIElement@ list = parent.parent;
         VariantMap map = value.GetVariantMap();
-        Array<ShortStringHash>@ keys = map.keys;
+        Array<StringHash>@ keys = map.keys;
         for (uint subIndex = 0; subIndex < keys.length; ++subIndex)
         {
             parent = GetAttributeEditorParent(list, index, subIndex);
@@ -653,7 +653,7 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     else if (info.type == VAR_VARIANTMAP)
     {
         VariantMap map = serializables[0].attributes[index].GetVariantMap();
-        ShortStringHash key(parent.vars["Key"].GetUInt());
+        StringHash key(parent.vars["Key"].GetUInt());
         for (uint i = 0; i < serializables.length; ++i)
         {
             VariantMap map = serializables[i].attributes[index].GetVariantMap();
@@ -726,7 +726,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
         LineEdit@ attrEdit = parent.children[0];
         ResourceRef ref;
         ref.name = attrEdit.text.Trimmed();
-        ref.type = ShortStringHash(attrEdit.vars[TYPE_VAR].GetUInt());
+        ref.type = StringHash(attrEdit.vars[TYPE_VAR].GetUInt());
         FillValue(values, Variant(ref));
     }
     else
@@ -841,7 +841,7 @@ const uint ACTION_TEST = 8;
 class ResourcePicker
 {
     String typeName;
-    ShortStringHash type;
+    StringHash type;
     String lastPath;
     uint lastFilter;
     Array<String> filters;
@@ -850,7 +850,7 @@ class ResourcePicker
     ResourcePicker(const String&in typeName_, const String&in filter_, uint actions_ = ACTION_PICK | ACTION_OPEN)
     {
         typeName = typeName_;
-        type = ShortStringHash(typeName_);
+        type = StringHash(typeName_);
         actions = actions_;
         filters.Push(filter_);
         filters.Push("*.*");
@@ -860,7 +860,7 @@ class ResourcePicker
     ResourcePicker(const String&in typeName_, const Array<String>@ filters_, uint actions_ = ACTION_PICK | ACTION_OPEN)
     {
         typeName = typeName_;
-        type = ShortStringHash(typeName_);
+        type = StringHash(typeName_);
         filters = filters_;
         actions = actions_;
         filters.Push("*.*");
@@ -904,7 +904,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("ParticleEffect2D", pexFilters, ACTION_PICK | ACTION_OPEN));
 }
 
-ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
+ResourcePicker@ GetResourcePicker(StringHash resourceType)
 {
     for (uint i = 0; i < resourcePickers.length; ++i)
     {
@@ -927,7 +927,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     resourcePickSubIndex = attrEdit.vars["SubIndex"].GetUInt();
     AttributeInfo info = targets[0].attributeInfos[resourcePickIndex];
 
-    ShortStringHash resourceType;
+    StringHash resourceType;
     if (info.type == VAR_RESOURCEREF)
         resourceType = targets[0].attributes[resourcePickIndex].GetResourceRef().type;
     else if (info.type == VAR_RESOURCEREFLIST)
@@ -1091,7 +1091,7 @@ void EditResource(StringHash eventType, VariantMap& eventData)
     if (fileName.empty)
         return;
 
-    ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    StringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
     Resource@ resource = cache.GetResource(resourceType, fileName);
 
     if (resource !is null)
@@ -1107,10 +1107,10 @@ void TestResource(StringHash eventType, VariantMap& eventData)
     UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
-    ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    StringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
     
     // For now only Animations can be tested
-    ShortStringHash animType("Animation");
+    StringHash animType("Animation");
     if (resourceType == animType)
         TestAnimation(attrEdit);
 }

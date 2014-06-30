@@ -77,11 +77,11 @@ public:
     /// Remove a package file by name. Optionally release the resources loaded from it.
     void RemovePackageFile(const String& fileName, bool releaseResources = true, bool forceRelease = false);
     /// Release a resource by name.
-    void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
+    void ReleaseResource(StringHash type, const String& name, bool force = false);
     /// Release all resources of a specific type.
-    void ReleaseResources(ShortStringHash type, bool force = false);
+    void ReleaseResources(StringHash type, bool force = false);
     /// Release resources of a specific type and partial name.
-    void ReleaseResources(ShortStringHash type, const String& partialName, bool force = false);
+    void ReleaseResources(StringHash type, const String& partialName, bool force = false);
     /// Release resources of all types by partial name.
     void ReleaseResources(const String& partialName, bool force = false);
     /// Release all resources. When called with the force flag false, releases all currently unused resources.
@@ -89,7 +89,7 @@ public:
     /// Reload a resource. Return true on success. The resource will not be removed from the cache in case of failure.
     bool ReloadResource(Resource* resource);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
-    void SetMemoryBudget(ShortStringHash type, unsigned budget);
+    void SetMemoryBudget(StringHash type, unsigned budget);
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
@@ -100,13 +100,13 @@ public:
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
-    Resource* GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure = true);
+    Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
-    Resource* GetResource(ShortStringHash type, const char* name, bool sendEventOnFailure = true);
+    Resource* GetResource(StringHash type, const char* name, bool sendEventOnFailure = true);
     /// Return all loaded resources of a specific type.
-    void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
+    void GetResources(PODVector<Resource*>& result, StringHash type) const;
     /// Return all loaded resources.
-    const HashMap<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
+    const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load directories.
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
     /// Return added package files.
@@ -120,9 +120,9 @@ public:
     /// Return whether a file exists by name.
     bool Exists(const String& name) const;
     /// Return memory budget for a resource type.
-    unsigned GetMemoryBudget(ShortStringHash type) const;
+    unsigned GetMemoryBudget(StringHash type) const;
     /// Return total memory use for a resource type.
-    unsigned GetMemoryUse(ShortStringHash type) const;
+    unsigned GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
     unsigned GetTotalMemoryUse() const;
     /// Return full absolute file name of resource if possible.
@@ -147,13 +147,13 @@ public:
     
 private:
     /// Find a resource.
-    const SharedPtr<Resource>& FindResource(ShortStringHash type, StringHash nameHash);
+    const SharedPtr<Resource>& FindResource(StringHash type, StringHash nameHash);
     /// Find a resource by name only. Searches all type groups.
     const SharedPtr<Resource>& FindResource(StringHash nameHash);
     /// Release resources loaded from a package file.
     void ReleasePackageResources(PackageFile* package, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
-    void UpdateResourceGroup(ShortStringHash type);
+    void UpdateResourceGroup(StringHash type);
     /// Handle begin frame event. Automatic resource reloads are processed here.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Search FileSystem for File.
@@ -162,7 +162,7 @@ private:
     File* SearchPackages(const String& nameIn);
     
     /// Resources by type.
-    HashMap<ShortStringHash, ResourceGroup> resourceGroups_;
+    HashMap<StringHash, ResourceGroup> resourceGroups_;
     /// Resource load directories.
     Vector<String> resourceDirs_;
     /// File watchers for resource directories, if automatic reloading enabled.
@@ -181,20 +181,20 @@ private:
 
 template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
 {
-    ShortStringHash type = T::GetTypeStatic();
+    StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
 template <class T> T* ResourceCache::GetResource(const char* name, bool sendEventOnFailure)
 {
-    ShortStringHash type = T::GetTypeStatic();
+    StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
     PODVector<Resource*>& resources = reinterpret_cast<PODVector<Resource*>&>(result);
-    ShortStringHash type = T::GetTypeStatic();
+    StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
     
     // Perform conversion of the returned pointers

@@ -11,6 +11,6 @@ class Component : public Animatable
     bool IsEnabled() const;
     bool IsEnabledEffective() const;
   
-    Component* GetComponent(ShortStringHash type) const;
+    Component* GetComponent(StringHash type) const;
     Component* GetComponent(const String type) const;
 };

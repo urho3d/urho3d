@@ -33,10 +33,10 @@
 namespace Urho3D
 {
 
-static HashMap<ShortStringHash, String> unknownTypeToName;
+static HashMap<StringHash, String> unknownTypeToName;
 static String letters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-static String GenerateNameFromType(ShortStringHash typeHash)
+static String GenerateNameFromType(StringHash typeHash)
 {
     if (unknownTypeToName.Contains(typeHash))
         return unknownTypeToName[typeHash];
@@ -62,7 +62,7 @@ static String GenerateNameFromType(ShortStringHash typeHash)
                 current /= numLetters;
             }
             
-            if (ShortStringHash(test) == typeHash)
+            if (StringHash(test) == typeHash)
             {
                 found = true;
                 break;
@@ -141,7 +141,7 @@ bool UnknownComponent::Save(Serializer& dest) const
         LOGWARNING("UnknownComponent loaded in XML mode, attributes will be empty for binary save");
     
     // Write type and ID
-    if (!dest.WriteShortStringHash(GetType()))
+    if (!dest.WriteStringHash(GetType()))
         return false;
     if (!dest.WriteUInt(id_))
         return false;
@@ -185,7 +185,7 @@ void UnknownComponent::SetTypeName(const String& typeName)
     typeHash_ = typeName;
 }
 
-void UnknownComponent::SetType(ShortStringHash typeHash)
+void UnknownComponent::SetType(StringHash typeHash)
 {
     typeName_ = GenerateNameFromType(typeHash);
     typeHash_ = typeHash;

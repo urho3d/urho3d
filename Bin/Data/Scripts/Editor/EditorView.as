@@ -627,7 +627,7 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 void UpdateCameraPreview()
 {
     previewCamera = null;
-    ShortStringHash cameraType("Camera");
+    StringHash cameraType("Camera");
 
     for (uint i = 0; i < selectedComponents.length; ++i)
     {

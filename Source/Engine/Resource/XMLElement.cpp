@@ -812,7 +812,7 @@ VariantMap XMLElement::GetVariantMap() const
     XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
-        ShortStringHash key(variantElem.GetInt("hash"));
+        StringHash key(variantElem.GetInt("hash"));
         ret[key] = variantElem.GetVariant();
         variantElem = variantElem.GetNext("variant");
     }

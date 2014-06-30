@@ -139,7 +139,7 @@ class UIElement : public Animatable
     void Remove();
     unsigned FindChild(UIElement* element) const;
     void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
-    void SetVar(ShortStringHash key, const Variant& value);
+    void SetVar(StringHash key, const Variant& value);
     void SetInternal(bool enable);
     void SetTraversalMode(TraversalMode traversalMode);
     void SetElementEventSender(bool flag);
@@ -194,7 +194,7 @@ class UIElement : public Animatable
     UIElement* GetParent() const;
     UIElement* GetRoot() const;
     const Color& GetDerivedColor() const;
-    const Variant& GetVar(ShortStringHash key) const;
+    const Variant& GetVar(StringHash key) const;
     const VariantMap& GetVars() const;
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
     IntVector2 ElementToScreen(const IntVector2& position);

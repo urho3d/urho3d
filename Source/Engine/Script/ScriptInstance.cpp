@@ -580,13 +580,13 @@ void ScriptInstance::GetScriptAttributes()
         else
         {
             // For a handle type, check if it's an Object subclass with a registered factory
-            ShortStringHash typeHash(typeName);
-            const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
+            StringHash typeHash(typeName);
+            const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+            HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
             if (j != factories.End())
             {
                 // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
-                ShortStringHash baseType = j->second_->GetBaseType();
+                StringHash baseType = j->second_->GetBaseType();
                 if (baseType == Node::GetTypeStatic())
                 {
                     info.mode_ |= AM_NODEID;

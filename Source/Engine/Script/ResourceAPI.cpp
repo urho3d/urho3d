@@ -40,7 +40,7 @@ void RegisterResource(asIScriptEngine* engine)
 
 static Resource* ResourceCacheGetResource(const String& type, const String& name, bool sendEventOnFailure, ResourceCache* ptr)
 {
-    return ptr->GetResource(ShortStringHash(type), name, sendEventOnFailure);
+    return ptr->GetResource(StringHash(type), name, sendEventOnFailure);
 }
 
 static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
@@ -103,7 +103,7 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(const String&in, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (const String&, bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResource(const String&in, const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResource), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(ShortStringHash, bool force = false)", asMETHODPR(ResourceCache, ReleaseResources, (ShortStringHash, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(StringHash, bool force = false)", asMETHODPR(ResourceCache, ReleaseResources, (StringHash, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResourcesPartial), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, bool force = false)", asMETHODPR(ResourceCache, ReleaseResources, (const String&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseAllResources(bool force = false)", asMETHOD(ResourceCache, ReleaseAllResources), asCALL_THISCALL);
@@ -115,7 +115,7 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "String SanitateResourceDirName(const String&in) const", asMETHOD(ResourceCache, SanitateResourceDirName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "String GetResourceFileName(const String&in) const", asMETHOD(ResourceCache, GetResourceFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in, bool sendEventOnFailure = true)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(ShortStringHash, const String&in, bool sendEventOnFailure = true)", asMETHODPR(ResourceCache, GetResource, (ShortStringHash, const String&, bool), Resource*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(StringHash, const String&in, bool sendEventOnFailure = true)", asMETHODPR(ResourceCache, GetResource, (StringHash, const String&, bool), Resource*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryBudget(const String&in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryUse(const String&in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);

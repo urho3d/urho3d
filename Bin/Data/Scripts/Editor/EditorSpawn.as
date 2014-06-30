@@ -88,7 +88,7 @@ void HideSpawnEditor()
 
 void PickSpawnObject()
 {
-    @resourcePicker = GetResourcePicker(ShortStringHash("Node"));
+    @resourcePicker = GetResourcePicker(StringHash("Node"));
     if (resourcePicker is null)
         return;
 

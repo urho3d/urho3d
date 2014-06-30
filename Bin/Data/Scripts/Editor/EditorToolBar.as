@@ -3,7 +3,7 @@ bool subscribedToEditorToolBar = false;
 bool toolBarDirty = true;
 UIElement@ toolBar;
 
-const ShortStringHash VIEW_MODE("VIEW_MODE");
+const StringHash VIEW_MODE("VIEW_MODE");
 
 void CreateToolBar()
 {

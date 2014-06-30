@@ -62,10 +62,10 @@
 namespace Urho3D
 {
 
-ShortStringHash VAR_ORIGIN("Origin");
-const ShortStringHash VAR_ORIGINAL_PARENT("OriginalParent");
-const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
-const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
+StringHash VAR_ORIGIN("Origin");
+const StringHash VAR_ORIGINAL_PARENT("OriginalParent");
+const StringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
+const StringHash VAR_PARENT_CHANGED("ParentChanged");
 
 const float DEFAULT_DOUBLECLICK_INTERVAL = 0.5f;
 const float DEFAULT_DRAGBEGIN_INTERVAL = 0.5f;

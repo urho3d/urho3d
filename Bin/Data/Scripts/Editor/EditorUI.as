@@ -11,18 +11,18 @@ FileSelector@ uiFileSelector;
 String consoleCommandInterpreter;
 Window@ contextMenu;
 
-const ShortStringHash UI_ELEMENT_TYPE("UIElement");
-const ShortStringHash WINDOW_TYPE("Window");
-const ShortStringHash MENU_TYPE("Menu");
-const ShortStringHash TEXT_TYPE("Text");
-const ShortStringHash CURSOR_TYPE("Cursor");
+const StringHash UI_ELEMENT_TYPE("UIElement");
+const StringHash WINDOW_TYPE("Window");
+const StringHash MENU_TYPE("Menu");
+const StringHash TEXT_TYPE("Text");
+const StringHash CURSOR_TYPE("Cursor");
 
 const String AUTO_STYLE("");    // Empty string means auto style, i.e. applying style according to UI-element's type automatically
 const String TEMP_SCENE_NAME("_tempscene_.xml");
-const ShortStringHash CALLBACK_VAR("Callback");
-const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
+const StringHash CALLBACK_VAR("Callback");
+const StringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 
-const ShortStringHash VAR_CONTEXT_MENU_HANDLER("ContextMenuHandler");
+const StringHash VAR_CONTEXT_MENU_HANDLER("ContextMenuHandler");
 
 const int SHOW_POPUP_INDICATOR = -1;
 const uint MAX_QUICK_MENU_ITEMS = 10;

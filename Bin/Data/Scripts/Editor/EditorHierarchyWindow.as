@@ -5,20 +5,20 @@ const int ITEM_NODE = 1;
 const int ITEM_COMPONENT = 2;
 const int ITEM_UI_ELEMENT = 3;
 const uint NO_ITEM = M_MAX_UNSIGNED;
-const ShortStringHash SCENE_TYPE("Scene");
-const ShortStringHash NODE_TYPE("Node");
-const ShortStringHash STATICMODEL_TYPE("StaticModel");
-const ShortStringHash ANIMATEDMODEL_TYPE("AnimatedModel");
-const ShortStringHash STATICMODELGROUP_TYPE("StaticModelGroup");
-const ShortStringHash SPLINEPATH_TYPE("SplinePath");
-const ShortStringHash CONSTRAINT_TYPE("Constraint");
+const StringHash SCENE_TYPE("Scene");
+const StringHash NODE_TYPE("Node");
+const StringHash STATICMODEL_TYPE("StaticModel");
+const StringHash ANIMATEDMODEL_TYPE("AnimatedModel");
+const StringHash STATICMODELGROUP_TYPE("StaticModelGroup");
+const StringHash SPLINEPATH_TYPE("SplinePath");
+const StringHash CONSTRAINT_TYPE("Constraint");
 const String NO_CHANGE(uint8(0));
-const ShortStringHash TYPE_VAR("Type");
-const ShortStringHash NODE_ID_VAR("NodeID");
-const ShortStringHash COMPONENT_ID_VAR("ComponentID");
-const ShortStringHash UI_ELEMENT_ID_VAR("UIElementID");
-const ShortStringHash DRAGDROPCONTENT_VAR("DragDropContent");
-const ShortStringHash[] ID_VARS = { ShortStringHash(""), NODE_ID_VAR, COMPONENT_ID_VAR, UI_ELEMENT_ID_VAR };
+const StringHash TYPE_VAR("Type");
+const StringHash NODE_ID_VAR("NodeID");
+const StringHash COMPONENT_ID_VAR("ComponentID");
+const StringHash UI_ELEMENT_ID_VAR("UIElementID");
+const StringHash DRAGDROPCONTENT_VAR("DragDropContent");
+const StringHash[] ID_VARS = { StringHash(""), NODE_ID_VAR, COMPONENT_ID_VAR, UI_ELEMENT_ID_VAR };
 Color nodeTextColor(1.0f, 1.0f, 1.0f);
 Color componentTextColor(0.7f, 1.0f, 0.7f);
 
@@ -664,7 +664,7 @@ void HandleHierarchyListSelectionChange()
     {
         if (editNode is null)
         {
-            ShortStringHash compType = selectedComponents[0].type;
+            StringHash compType = selectedComponents[0].type;
             bool sameType = true;
             for (uint i = 1; i < selectedComponents.length; ++i)
             {
@@ -690,7 +690,7 @@ void HandleHierarchyListSelectionChange()
         uint count = 0;
         for (uint j = 0; j < selectedNodes[0].numComponents; ++j)
         {
-            ShortStringHash compType = selectedNodes[0].components[j].type;
+            StringHash compType = selectedNodes[0].components[j].type;
             bool sameType = true;
             for (uint i = 1; i < selectedNodes.length; ++i)
             {
@@ -1166,19 +1166,19 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         LineEdit@ lineEdit = cast<LineEdit>(target);
         if (lineEdit !is null)
         {
-            ShortStringHash resourceType = GetResourceTypeFromPickerLineEdit(lineEdit);
-            if (resourceType == ShortStringHash("Material") && type == RESOURCE_TYPE_MATERIAL)
+            StringHash resourceType = GetResourceTypeFromPickerLineEdit(lineEdit);
+            if (resourceType == StringHash("Material") && type == RESOURCE_TYPE_MATERIAL)
                 return true;
-            else if (resourceType == ShortStringHash("Model") && type == RESOURCE_TYPE_MODEL)
+            else if (resourceType == StringHash("Model") && type == RESOURCE_TYPE_MODEL)
                 return true;
-            else if (resourceType == ShortStringHash("Animation") && type == RESOURCE_TYPE_ANIMATION)
+            else if (resourceType == StringHash("Animation") && type == RESOURCE_TYPE_ANIMATION)
                 return true;
         }
     }
     return true;
 }
 
-ShortStringHash GetResourceTypeFromPickerLineEdit(UIElement@ lineEdit)
+StringHash GetResourceTypeFromPickerLineEdit(UIElement@ lineEdit)
 {
     Array<Serializable@>@ targets = GetAttributeEditorTargets(lineEdit);
     if (!targets.empty)
@@ -1186,7 +1186,7 @@ ShortStringHash GetResourceTypeFromPickerLineEdit(UIElement@ lineEdit)
         resourcePickIndex = lineEdit.vars["Index"].GetUInt();
         resourcePickSubIndex = lineEdit.vars["SubIndex"].GetUInt();
         AttributeInfo info = targets[0].attributeInfos[resourcePickIndex];
-        ShortStringHash resourceType;
+        StringHash resourceType;
         if (info.type == VAR_RESOURCEREF)
             return targets[0].attributes[resourcePickIndex].GetResourceRef().type;
         else if (info.type == VAR_RESOURCEREFLIST)
@@ -1194,7 +1194,7 @@ ShortStringHash GetResourceTypeFromPickerLineEdit(UIElement@ lineEdit)
         else if (info.type == VAR_VARIANTVECTOR)
             return targets[0].attributes[resourcePickIndex].GetVariantVector()[resourcePickSubIndex].GetResourceRef().type;
     }
-    return ShortStringHash();
+    return StringHash();
 }
 
 void FocusNode(Node@ node)

@@ -324,7 +324,7 @@ VariantMap& Object::GetEventDataMap() const
     return context_->GetEventDataMap();
 }
 
-Object* Object::GetSubsystem(ShortStringHash type) const
+Object* Object::GetSubsystem(StringHash type) const
 {
     return context_->GetSubsystem(type);
 }
@@ -354,8 +354,8 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 
 const String& Object::GetCategory() const
 {
-    const HashMap<String, Vector<ShortStringHash> >& objectCategories = context_->GetObjectCategories();
-    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
+    const HashMap<String, Vector<StringHash> >& objectCategories = context_->GetObjectCategories();
+    for (HashMap<String, Vector<StringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
     {
         if (i->second_.Contains(GetType()))
             return i->first_;

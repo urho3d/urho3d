@@ -78,12 +78,12 @@ inline const String& GetResourceName(Resource* resource)
     return resource ? resource->GetName() : String::EMPTY;
 }
 
-inline ShortStringHash GetResourceType(Resource* resource, ShortStringHash defaultType)
+inline StringHash GetResourceType(Resource* resource, StringHash defaultType)
 {
     return resource ? resource->GetType() : defaultType;
 }
 
-inline ResourceRef GetResourceRef(Resource* resource, ShortStringHash defaultType)
+inline ResourceRef GetResourceRef(Resource* resource, StringHash defaultType)
 {
     return ResourceRef(GetResourceType(resource, defaultType), GetResourceName(resource));
 }

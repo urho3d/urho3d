@@ -557,7 +557,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             unsigned numVars = msg.ReadVLE();
             while (numVars)
             {
-                ShortStringHash key = msg.ReadShortStringHash();
+                StringHash key = msg.ReadStringHash();
                 node->SetVar(key, msg.ReadVariant());
                 --numVars;
             }
@@ -568,7 +568,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             {
                 --numComponents;
                 
-                ShortStringHash type = msg.ReadShortStringHash();
+                StringHash type = msg.ReadStringHash();
                 unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
@@ -606,7 +606,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 unsigned changedVars = msg.ReadVLE();
                 while (changedVars)
                 {
-                    ShortStringHash key = msg.ReadShortStringHash();
+                    StringHash key = msg.ReadStringHash();
                     node->SetVar(key, msg.ReadVariant());
                     --changedVars;
                 }
@@ -652,7 +652,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Node* node = scene_->GetNode(nodeID);
             if (node)
             {
-                ShortStringHash type = msg.ReadShortStringHash();
+                StringHash type = msg.ReadStringHash();
                 unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
@@ -1117,7 +1117,7 @@ void Connection::ProcessNewNode(Node* node)
     msg_.WriteVLE(vars.Size());
     for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)
     {
-        msg_.WriteShortStringHash(i->first_);
+        msg_.WriteStringHash(i->first_);
         msg_.WriteVariant(i->second_);
     }
     
@@ -1137,7 +1137,7 @@ void Connection::ProcessNewNode(Node* node)
         componentState.component_ = component;
         component->AddReplicationState(&componentState);
         
-        msg_.WriteShortStringHash(component->GetType());
+        msg_.WriteStringHash(component->GetType());
         msg_.WriteNetID(component->GetID());
         component->WriteInitialDeltaUpdate(msg_);
     }
@@ -1205,19 +1205,19 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
             // Write changed variables
             msg_.WriteVLE(nodeState.dirtyVars_.Size());
             const VariantMap& vars = node->GetVars();
-            for (HashSet<ShortStringHash>::ConstIterator i = nodeState.dirtyVars_.Begin(); i != nodeState.dirtyVars_.End(); ++i)
+            for (HashSet<StringHash>::ConstIterator i = nodeState.dirtyVars_.Begin(); i != nodeState.dirtyVars_.End(); ++i)
             {
                 VariantMap::ConstIterator j = vars.Find(*i);
                 if (j != vars.End())
                 {
-                    msg_.WriteShortStringHash(j->first_);
+                    msg_.WriteStringHash(j->first_);
                     msg_.WriteVariant(j->second_);
                 }
                 else
                 {
                     // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
                     LOGWARNING("Sending dummy user variable as original value was removed");
-                    msg_.WriteShortStringHash(ShortStringHash());
+                    msg_.WriteStringHash(StringHash());
                     msg_.WriteVariant(Variant::EMPTY);
                 }
             }
@@ -1311,7 +1311,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 
                 msg_.Clear();
                 msg_.WriteNetID(node->GetID());
-                msg_.WriteShortStringHash(component->GetType());
+                msg_.WriteStringHash(component->GetType());
                 msg_.WriteNetID(component->GetID());
                 component->WriteInitialDeltaUpdate(msg_);
                 
