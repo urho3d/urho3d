@@ -104,6 +104,28 @@ bool ShaderVariation::Create()
     
     const String& originalShaderCode = owner_->GetSourceCode(type_);
     String shaderCode;
+
+    // Check if the shader code contains a version define
+    unsigned verStart = originalShaderCode.Find('#');
+    unsigned verEnd = 0;
+    if (verStart != String::NPOS)
+    {
+        if (originalShaderCode.Substring(verStart + 1, 7) == "version")
+        {
+            verEnd = verStart + 9;
+            while (verEnd < originalShaderCode.Length())
+            {
+                if (IsDigit(originalShaderCode[verEnd]))
+                    ++verEnd;
+                else
+                    break;
+            }
+            // If version define found, insert it first
+            String versionDefine = originalShaderCode.Substring(verStart, verEnd - verStart);
+            shaderCode += versionDefine + "\n";
+        }
+    }
+
     // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
     shaderCode += type_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
     
@@ -128,7 +150,11 @@ bool ShaderVariation::Create()
         shaderCode += "#define RASPI\n";
     #endif
 
-    shaderCode += originalShaderCode;
+    // When version define found, do not insert it a second time
+    if (verEnd > 0)
+        shaderCode += (originalShaderCode.CString() + verEnd);
+    else
+        shaderCode += originalShaderCode;
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);
