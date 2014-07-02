@@ -30,6 +30,7 @@
 #include "Material.h"
 #include "Model.h"
 #include "Octree.h"
+#include "ObjectAnimation.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
@@ -93,15 +94,9 @@ void LightAnimation::CreateScene()
     light->SetLightType(LIGHT_POINT);
     light->SetRange(10.0f);
 
-    // Create light color animation
-    SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
-    colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
-    colorAnimation->SetKeyFrame(1.0f, Color::RED);
-    colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
-    colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
-    colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
-    light->SetAttributeAnimation("Color", colorAnimation);
-
+    // Create light animation
+    SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
+    
     // Create light position animation
     SharedPtr<ValueAnimation> positionAnimation(new ValueAnimation(context_));
     // Use spline interpolation method
@@ -113,7 +108,21 @@ void LightAnimation::CreateScene()
     positionAnimation->SetKeyFrame(2.0f, Vector3( 30.0f, 5.0f,  30.0f));
     positionAnimation->SetKeyFrame(3.0f, Vector3(-30.0f, 5.0f,  30.0f));
     positionAnimation->SetKeyFrame(4.0f, Vector3(-30.0f, 5.0f, -30.0f));
-    lightNode->SetAttributeAnimation("Position", positionAnimation);
+    // Set position animation
+    lightAnimation->AddAttributeAnimation("Position", positionAnimation);
+
+    // Create light color animation
+    SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
+    colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+    colorAnimation->SetKeyFrame(1.0f, Color::RED);
+    colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+    colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
+    colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
+    // Set Light component's color animation
+    lightAnimation->AddAttributeAnimation("@Light/Color", colorAnimation);
+
+    // Apply light animation to light node
+    lightNode->SetObjectAnimation(lightAnimation);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
     // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
