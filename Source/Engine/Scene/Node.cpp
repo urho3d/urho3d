@@ -1531,7 +1531,7 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             if (names[i].Front() != '#')
                 break;
 
-            unsigned index = ToInt(names[i].Substring(1, -1));
+            unsigned index = ToInt(names[i].Substring(1, names[i].Length() - 1));
             node = node->GetChild(index);
             if (!node)
             {
