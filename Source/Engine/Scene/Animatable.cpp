@@ -287,6 +287,11 @@ ResourceRef Animatable::GetObjectAnimationAttr() const
     return GetResourceRef(objectAnimation_, ObjectAnimation::GetTypeStatic());
 }
 
+void Animatable::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+{
+    SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+}
+
 void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
 {
     if (!objectAnimation)
@@ -298,7 +303,7 @@ void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
     {
         const String& name = i->first_;
         ValueAnimationInfo* info = i->second_;
-        SetAttributeAnimation(name, info->GetAnimation(), info->GetWrapMode(), info->GetSpeed());
+        SetObjectAttributeAnimation(name, info->GetAnimation(), info->GetWrapMode(), info->GetSpeed());
     }
 }
 
@@ -316,7 +321,7 @@ void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
     }
 
     for (unsigned int i = 0; i < names.Size(); ++i)
-        SetAttributeAnimation(names[i], 0);
+        SetObjectAttributeAnimation(names[i], 0, WM_LOOP, 1.0f);
 }
 
 void Animatable::UpdateAttributeAnimations(float timeStep)

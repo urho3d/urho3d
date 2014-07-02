@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1513,6 +1513,72 @@ void Node::OnAttributeAnimationRemoved()
 {
     if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
+}
+
+void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+{
+    Vector<String> names = name.Split('/');
+    // Only attribute name
+    if (names.Size() == 1)
+        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    else
+    {
+        // Name must in following format: "#0/#1/@component#0/attribute"
+        Node* node = this;
+        unsigned i = 0;
+        for (; i < names.Size() - 1; ++i)
+        {
+            if (names[i].Front() != '#')
+                break;
+
+            unsigned index = ToInt(names[i].Substring(1, -1));
+            node = node->GetChild(index);
+            if (!node)
+            {
+                LOGERROR("Could not find node by name " + name);
+                return;
+            }
+        }
+        
+        if (i == names.Size() - 1)
+        {
+            node->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+            return;
+        }
+
+        if (i != names.Size() - 2 || names[i].Front() != '@')
+        {
+            LOGERROR("Invalid name " + name);
+            return;
+        }
+
+        String componentName = names[i].Substring(1, names[i].Length() - 1);
+        Vector<String> componentNames = componentName.Split('#');
+        if (componentNames.Size() == 1)
+        {
+            Component* component = node->GetComponent(StringHash(componentNames.Front()));
+            if (!component)
+            {
+                LOGERROR("Could not find component by name " + name);
+                return;
+            }
+
+            component->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+        }
+        else
+        {
+            unsigned index = ToInt(componentNames[1]);
+            PODVector<Component*> components;
+            node->GetComponents(components, StringHash(componentNames.Front()));
+            if (index >= components.Size())
+            {
+                LOGERROR("Could not find component by name " + name);
+                return;
+            }
+
+            components[index]->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+        }
+    }
 }
 
 Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)

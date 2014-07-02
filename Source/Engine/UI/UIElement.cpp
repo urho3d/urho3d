@@ -1594,6 +1594,37 @@ void UIElement::OnAttributeAnimationRemoved()
         UnsubscribeFromEvent(E_POSTUPDATE);
 }
 
+void UIElement::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+{
+    Vector<String> names = name.Split('/');
+    // Only attribute name
+    if (names.Size() == 1)
+        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    else
+    {
+        // Name must in following format: "#0/#1/attribute"
+        UIElement* element = this;
+        for (unsigned i = 0; i < names.Size() - 1; ++i)
+        {
+            if (names[i].Front() != '#')
+            {
+                LOGERROR("Invalid name " + name);
+                return;
+            }
+
+            unsigned index = ToInt(names[i].Substring(1, names[i].Length() - 1));
+            element = element->GetChild(index);
+            if (!element)
+            {
+                LOGERROR("Could not find element by name " + name);
+                return;
+            }
+        }
+
+        element->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+    }
+}
+
 void UIElement::MarkDirty()
 {
     positionDirty_ = true;
