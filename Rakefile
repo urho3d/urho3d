@@ -113,8 +113,8 @@ task :travis_ci_package_upload do
   else
     platform_prefix = ''
   end
-  # Generate the documentation if necessary (skip the doc build for iOS 64-bit for the time being as otherwise overall build time exceeds 50 minutes time limit)
-  if not ENV['SITE_UPDATE'] and not (ENV['IOS'] and ENV['URHO3D_64BIT'])
+  # Generate the documentation if necessary
+  unless ENV['SITE_UPDATE']
     system 'echo Generate documentation'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
@@ -124,11 +124,13 @@ task :travis_ci_package_upload do
   end
   # Make the package
   if ENV['IOS']
-    # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-    system 'echo Rebuild Urho3D library as Mach-O universal binary'
-    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
-    # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
-    system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
+    if not ENV['URHO3D_64BIT']  # Skip Mach-O universal binary build for the time being as otherwise overall build time exceeds 50 minutes time limit
+      # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
+      system 'echo Rebuild Urho3D library as Mach-O universal binary'
+      xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
+      # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
+      system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
+    end
   elsif ENV['XCODE']
     xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package', false) or abort 'Failed to make binary package'
   else
@@ -144,10 +146,10 @@ task :travis_ci_package_upload do
   setup_digital_keys
   if ENV['RELEASE_TAG'].empty?
     upload_dir = '/home/frs/project/urho3d/Urho3D/Snapshots'
-    # Only keep the snapshots from the last +/- 30 revisions
+    # Only keep the snapshots from the last +/- 50 revisions
     if ENV['SITE_UPDATE']
       # The package revisions and their creation time may not always be in perfect chronological order due to Travis-CI build latency, so sort the final result one more time in order to get a unique revision removal list
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31 |sort |uniq
+      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +51 |sort |uniq
 cd #{upload_dir}
 ls -1t
 bye
