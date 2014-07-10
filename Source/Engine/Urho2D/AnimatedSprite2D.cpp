@@ -40,7 +40,7 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 extern const char* blendModeNames[];
 
-const char* loopModeNames[] = 
+const char* loopModeNames[] =
 {
     "Default",
     "ForceLooped",
@@ -148,7 +148,7 @@ void AnimatedSprite2D::SetFlip(bool flipX, bool flipY)
 
     flipX_ = flipX;
     flipY_ = flipY;
-    
+
     for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
         if (!timelineNodes_[i])
@@ -269,7 +269,7 @@ void AnimatedSprite2D::OnNodeSet(Node* node)
     {
         if (rootNode_)
             rootNode_->Remove();
-        
+
         rootNode_ = 0;
         timelineNodes_.Clear();
     }
@@ -305,20 +305,19 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
     if (animation == animation_)
     {
         SetLoopMode(loopMode_);
-        
+
         currentTime_ = 0.0f;
         UpdateAnimation(0.0f);
         return;
     }
 
-    if (animation_)
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
     {
-        if (rootNode_)
-            rootNode_->Remove();
-
-        rootNode_ = 0;
-        timelineNodes_.Clear();
+        if (timelineNodes_[i])
+            timelineNodes_[i]->SetEnabled(false);
     }
+
+    timelineNodes_.Clear();
 
     animation_ = animation;
 
@@ -339,12 +338,27 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
     for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
     {
         const Timeline2D& timeline = animation->GetTimeline(i);
-        // Just create sprite type node
+        // Just handle OT_SPRITE type timeline
         if (timeline.type_ == OT_SPRITE)
         {
-            SharedPtr<Node> timelineNode(rootNode_->CreateChild(timeline.name_, LOCAL));
+            SharedPtr<Node> timelineNode(rootNode_->GetChild(timeline.name_));
+            StaticSprite2D* staticSprite = 0;
 
-            StaticSprite2D* staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
+            if (timelineNode)
+            {
+                // Enable timeline node
+                timelineNode->SetEnabled(true);
+                // Get StaticSprite2D component
+                staticSprite = timelineNode->GetComponent<StaticSprite2D>();
+            }
+            else
+            {
+                // Create new timeline node
+                timelineNode = rootNode_->CreateChild(timeline.name_, LOCAL);
+                // Create StaticSprite2D component
+                staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
+            }
+
             staticSprite->SetLayer(layer_);
             staticSprite->SetBlendMode(blendMode_);
             staticSprite->SetFlip(flipX_, flipY_);
@@ -366,7 +380,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 {
     if (!animation_)
         return;
-    
+
     currentTime_ += timeStep * speed_;
 
     float time;
@@ -385,7 +399,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     for (unsigned i = 0; i < timelineTransformInfos_.Size(); ++i)
     {
         const Timeline2D& timeline = animation_->GetTimeline(i);
-        
+
         const Vector<TimelineKey2D>& objectKeys = timeline.timelineKeys_;
         unsigned index = objectKeys.Size() - 1;
         for (unsigned j = 0; j < objectKeys.Size() - 1; ++j)
@@ -399,7 +413,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
         const TimelineKey2D& currKey = objectKeys[index];
         if (index < objectKeys.Size() - 1)
-        {   
+        {
             const TimelineKey2D& nextKey = objectKeys[index + 1];
             float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
             timelineTransformInfos_[i].worldSpace_ = false;
@@ -428,7 +442,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
                 staticSprite->SetHotSpot(currKey.hotSpot_);
                 staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * currKey.alpha_));
             }
-        }        
+        }
     }
 
     // Calculate timeline world transform.
