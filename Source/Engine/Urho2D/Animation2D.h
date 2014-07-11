@@ -71,12 +71,13 @@ public:
     Vector<Reference2D> references_;
 };
 
+/// 2D Transform class for spriter animation.
 struct Transform2D
 {
     /// Construct.
     Transform2D();
     /// Construct from position, angle, scale.
-    Transform2D(const Vector2 position, float angle, const Vector2& scale);
+    Transform2D(const Vector2& position, float angle, const Vector2& scale);
     /// Copy-construct from another transform.
     Transform2D(const Transform2D& other);
 

@@ -49,15 +49,15 @@ Transform2D::Transform2D() :
 {
 }
 
-Transform2D::Transform2D(const Vector2 position, float angle, const Vector2& scale) :
-position_(position), 
+Transform2D::Transform2D(const Vector2& position, float angle, const Vector2& scale) :
+    position_(position), 
     angle_(angle), 
     scale_(scale)
 {
 }
 
 Transform2D::Transform2D(const Transform2D& other) :
-position_(other.position_), 
+    position_(other.position_), 
     angle_(other.angle_), 
     scale_(other.scale_)
 {
