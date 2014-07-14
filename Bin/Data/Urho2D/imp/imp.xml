@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with TexturePacker http://texturepacker.com-->
 <!-- $TexturePacker:SmartUpdate:f81cc230b601898a13f4c5b211f51db1$ -->
-<TextureAtlas imagePath="imp.png">
+<TextureAtlas imagePath="imp_all.png">
     <SubTexture name="imp_blood" x="242" y="153" width="226" height="73"/>
     <SubTexture name="imp_body" x="2" y="304" width="124" height="131"/>
     <SubTexture name="imp_footbig" x="2" y="437" width="65" height="49"/>
