@@ -33,9 +33,9 @@ class Scene;
 }
 
 /// Dynamic geometry example.
-///  This sample demonstrates:
+/// This sample demonstrates:
 ///     - Cloning a Model resource
-///     - Modifying the vertex buffer data of the cloned models to efficiently animate them
+///     - Modifying the vertex buffer data of the cloned models at runtime to efficiently animate them
 class DynamicGeometry : public Sample
 {
     OBJECT(DynamicGeometry);
@@ -52,7 +52,7 @@ protected:
     virtual String GetScreenJoystickPatchString() const { return
         "<patch>"
         "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />"
-        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Group</replace>"
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Animation</replace>"
         "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">"
         "        <element type=\"Text\">"
         "            <attribute name=\"Name\" value=\"KeyBinding\" />"
