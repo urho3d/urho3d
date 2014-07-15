@@ -1163,7 +1163,7 @@ void UpdateView(float timeStep)
 
                 Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
                 cameraNode.rotation = q;
-                if (input.mouseButtonDown[MOUSEB_MIDDLE] && selectedNodes.length > 0 || selectedComponents.length > 0)
+                if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
                 {
                     Vector3 centerPoint = SelectedNodesCenterPoint();
                     Vector3 d = cameraNode.worldPosition - centerPoint;
