@@ -139,7 +139,7 @@ public:
     void RemoveShaderParameter(const String& name);
     /// Reset all shader pointers.
     void ReleaseShaders();
-    /// Clone material.
+    /// Clone the material.
     SharedPtr<Material> Clone(const String& cloneName = String::EMPTY) const;
     /// Ensure that material techniques are listed in correct order.
     void SortTechniques();

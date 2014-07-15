@@ -200,9 +200,9 @@ bool Model::Load(Deserializer& source)
         newMorph.name_ = source.ReadString();
         newMorph.nameHash_ = newMorph.name_;
         newMorph.weight_ = 0.0f;
-        unsigned nubuffers_ = source.ReadUInt();
+        unsigned numBuffers = source.ReadUInt();
         
-        for (unsigned j = 0; j < nubuffers_; ++j)
+        for (unsigned j = 0; j < numBuffers; ++j)
         {
             VertexBufferMorph newBuffer;
             unsigned bufferIndex = source.ReadUInt();
@@ -219,7 +219,8 @@ bool Model::Load(Deserializer& source)
                 vertexSize += sizeof(Vector3);
             if (newBuffer.elementMask_ & MASK_TANGENT)
                 vertexSize += sizeof(Vector3);
-            newBuffer.morphData_ = new unsigned char[newBuffer.vertexCount_ * vertexSize];
+            newBuffer.dataSize_ = newBuffer.vertexCount_ * vertexSize;
+            newBuffer.morphData_ = new unsigned char[newBuffer.dataSize_];
             
             source.Read(&newBuffer.morphData_[0], newBuffer.vertexCount_ * vertexSize);
             
@@ -461,6 +462,125 @@ void Model::SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& geometry
 void Model::SetMorphs(const Vector<ModelMorph>& morphs)
 {
     morphs_ = morphs;
+}
+
+SharedPtr<Model> Model::Clone(const String& cloneName) const
+{
+    SharedPtr<Model> ret(new Model(context_));
+
+    ret->SetName(cloneName);
+    ret->boundingBox_ = boundingBox_;
+    ret->skeleton_ = skeleton_;
+    ret->geometryBoneMappings_ = geometryBoneMappings_;
+    ret->geometryCenters_ = geometryCenters_;
+    ret->morphs_ = morphs_;
+    ret->morphRangeStarts_ = morphRangeStarts_;
+    ret->morphRangeCounts_ = morphRangeCounts_;
+    
+    // Deep copy vertex/index buffers
+    HashMap<VertexBuffer*, VertexBuffer*> vbMapping;
+    for (Vector<SharedPtr<VertexBuffer> >::ConstIterator i = vertexBuffers_.Begin(); i != vertexBuffers_.End(); ++i)
+    {
+        VertexBuffer* origBuffer = *i;
+        SharedPtr<VertexBuffer> cloneBuffer;
+        
+        if (origBuffer)
+        {
+            cloneBuffer = new VertexBuffer(context_);
+            cloneBuffer->SetSize(origBuffer->GetVertexCount(), origBuffer->GetElementMask(), origBuffer->IsDynamic());
+            cloneBuffer->SetShadowed(origBuffer->IsShadowed());
+            if (origBuffer->IsShadowed())
+                cloneBuffer->SetData(origBuffer->GetShadowData());
+            else
+            {
+                void* origData = origBuffer->Lock(0, origBuffer->GetVertexCount());
+                if (origData)
+                    cloneBuffer->SetData(origData);
+                else
+                    LOGERROR("Failed to lock original vertex buffer for copying");
+            }
+            vbMapping[origBuffer] = cloneBuffer;
+        }
+
+        ret->vertexBuffers_.Push(cloneBuffer);
+    }
+    
+    HashMap<IndexBuffer*, IndexBuffer*> ibMapping;
+    for (Vector<SharedPtr<IndexBuffer> >::ConstIterator i = indexBuffers_.Begin(); i != indexBuffers_.End(); ++i)
+    {
+        IndexBuffer* origBuffer = *i;
+        SharedPtr<IndexBuffer> cloneBuffer;
+        
+        if (origBuffer)
+        {
+            cloneBuffer = new IndexBuffer(context_);
+            cloneBuffer->SetSize(origBuffer->GetIndexCount(), origBuffer->GetIndexSize() == sizeof(unsigned), origBuffer->IsDynamic());
+            cloneBuffer->SetShadowed(origBuffer->IsShadowed());
+            if (origBuffer->IsShadowed())
+                cloneBuffer->SetData(origBuffer->GetShadowData());
+            else
+            {
+                void* origData = origBuffer->Lock(0, origBuffer->GetIndexCount());
+                if (origData)
+                    cloneBuffer->SetData(origData);
+                else
+                    LOGERROR("Failed to lock original index buffer for copying");
+            }
+            ibMapping[origBuffer] = cloneBuffer;
+        }
+
+        ret->indexBuffers_.Push(cloneBuffer);
+    }
+    
+    // Deep copy all the geometry LOD levels and refer to the copied vertex/index buffers
+    ret->geometries_.Resize(geometries_.Size());
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        ret->geometries_[i].Resize(geometries_[i].Size());
+        for (unsigned j = 0; j < geometries_[i].Size(); ++j)
+        {
+            SharedPtr<Geometry> cloneGeometry;
+            Geometry* origGeometry = geometries_[i][j];
+            
+            if (origGeometry)
+            {
+                cloneGeometry = new Geometry(context_);
+                cloneGeometry->SetIndexBuffer(ibMapping[origGeometry->GetIndexBuffer()]);
+                unsigned numVbs = origGeometry->GetNumVertexBuffers();
+                for (unsigned k = 0; k < numVbs; ++k)
+                {
+                    cloneGeometry->SetVertexBuffer(k, vbMapping[origGeometry->GetVertexBuffer(k)],
+                        origGeometry->GetVertexElementMask(k));
+                }
+                cloneGeometry->SetDrawRange(origGeometry->GetPrimitiveType(), origGeometry->GetIndexStart(),
+                    origGeometry->GetIndexCount(), origGeometry->GetVertexStart(), origGeometry->GetVertexCount(), false);
+                cloneGeometry->SetLodDistance(origGeometry->GetLodDistance());
+            }
+            
+            ret->geometries_[i][j] = cloneGeometry;
+        }
+    }
+    
+    
+    // Deep copy the morph data (if any) to allow modifying it
+    for (Vector<ModelMorph>::Iterator i = ret->morphs_.Begin(); i != ret->morphs_.End(); ++i)
+    {
+        ModelMorph& morph = *i;
+        for (HashMap<unsigned, VertexBufferMorph>::Iterator j = morph.buffers_.Begin(); j != morph.buffers_.End(); ++j)
+        {
+            VertexBufferMorph& vbMorph = j->second_;
+            if (vbMorph.dataSize_)
+            {
+                SharedArrayPtr<unsigned char> cloneData(new unsigned char[vbMorph.dataSize_]);
+                memcpy(cloneData.Get(), vbMorph.morphData_.Get(), vbMorph.dataSize_);
+                vbMorph.morphData_ = cloneData;
+            }
+        }
+    }
+    
+    ret->SetMemoryUse(GetMemoryUse());
+    
+    return ret;
 }
 
 unsigned Model::GetNumGeometryLodLevels(unsigned index) const

@@ -43,6 +43,8 @@ struct VertexBufferMorph
     unsigned elementMask_;
     /// Number of vertices.
     unsigned vertexCount_;
+    /// Morphed vertices data size as bytes.
+    unsigned dataSize_;
     /// Morphed vertices. Stored packed as <index, data> pairs.
     SharedArrayPtr<unsigned char> morphData_;
 };
@@ -98,6 +100,8 @@ public:
     void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
     /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
+    /// Clone the model. The geometry data is deep-copied and can be modified in the clone without affecting the original.
+    SharedPtr<Model> Clone(const String& cloneName = String::EMPTY) const;
     
     /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
