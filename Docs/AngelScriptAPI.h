@@ -5526,6 +5526,7 @@ UIElement window;
 class Model
 {
 // Methods:
+Model Clone(const String& = String ( )) const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;

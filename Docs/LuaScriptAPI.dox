@@ -2814,6 +2814,7 @@ Properties:
 
 Methods:
 
+- Model* Clone(const String cloneName = String::EMPTY) const
 - const BoundingBox& GetBoundingBox() const
 - Skeleton& GetSkeleton()
 - unsigned GetNumGeometries() const

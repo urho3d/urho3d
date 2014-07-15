@@ -6625,6 +6625,7 @@ Properties:
 
 Methods:
 
+- Model@ Clone(const String& = String ( )) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
