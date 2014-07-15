@@ -32,20 +32,17 @@ class Scene;
 
 }
 
-/// Huge object count example.
+/// Dynamic geometry example.
 ///  This sample demonstrates:
-///     - Creating a scene with 250 x 250 simple objects
-///     - Competing with http://yosoygames.com.ar/wp/2013/07/ogre-2-0-is-up-to-3x-faster/ :)
-///     - Allowing examination of performance hotspots in the rendering code
-///     - Using the profiler to measure the time taken to animate the scene
-///     - Optionally speeding up rendering by grouping objects with the StaticModelGroup component
-class HugeObjectCount : public Sample
+///     - Cloning a Model resource
+///     - Modifying the vertex buffer data of the cloned models to efficiently animate them
+class DynamicGeometry : public Sample
 {
-    OBJECT(HugeObjectCount);
+    OBJECT(DynamicGeometry);
 
 public:
     /// Construct.
-    HugeObjectCount(Context* context);
+    DynamicGeometry(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
@@ -57,14 +54,6 @@ protected:
         "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />"
         "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Group</replace>"
         "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">"
-        "        <element type=\"Text\">"
-        "            <attribute name=\"Name\" value=\"KeyBinding\" />"
-        "            <attribute name=\"Text\" value=\"G\" />"
-        "        </element>"
-        "    </add>"
-        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />"
-        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Animation</replace>"
-        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">"
         "        <element type=\"Text\">"
         "            <attribute name=\"Name\" value=\"KeyBinding\" />"
         "            <attribute name=\"Text\" value=\"SPACE\" />"
@@ -84,15 +73,19 @@ private:
     void SubscribeToEvents();
     /// Read input and move the camera.
     void MoveCamera(float timeStep);
-    /// Animate the scene.
+    /// Animate the vertex data of the objects.
     void AnimateObjects(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Box scene nodes.
-    Vector<SharedPtr<Node> > boxNodes_;
+    /// Cloned models' vertex buffers that we will animate.
+    Vector<SharedPtr<VertexBuffer> > animatingBuffers_;
+    /// Original vertex positions for the sphere model.
+    PODVector<Vector3> originalVertices_;
+    /// If the vertices are duplicates, indices to the original vertices (to allow seamless animation.)
+    PODVector<unsigned> vertexDuplicates_;
     /// Animation flag.
     bool animate_;
-    /// Group optimization flag.
-    bool useGroups_;
+    /// Animation's elapsed time.
+    float time_;
 };
