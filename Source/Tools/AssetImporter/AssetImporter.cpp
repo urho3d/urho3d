@@ -984,32 +984,42 @@ void BuildAndSaveAnimations(OutModel* model)
     for (unsigned i = 0; i < animations.Size(); ++i)
     {
         aiAnimation* anim = animations[i];
+        
+        float duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
+        String animOutName;
+        
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
-        String animOutName;
         if (model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
         
-		double startTime = anim->mDuration;
-        for (unsigned j = 0; j < anim->mNumChannels; ++j)
-        {
-            aiNodeAnim* channel = anim->mChannels[j];
-			if (channel->mNumPositionKeys > 0) startTime = std::min(startTime, channel->mPositionKeys[0].mTime);
-			if (channel->mNumRotationKeys > 0) startTime = std::min(startTime, channel->mRotationKeys[0].mTime);
-			if (channel->mScalingKeys > 0) startTime = std::min(startTime, channel->mScalingKeys[0].mTime);
-		}
-		
-        SharedPtr<Animation> outAnim(new Animation(context_));
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
         if (ticksPerSecond < M_EPSILON)
             ticksPerSecond = defaultTicksPerSecond_;
         float tickConversion = 1.0f / ticksPerSecond;
+        
+        // Find out the start time of animation from each channel's first keyframe for adjusting the keyframe times
+        // to start from zero
+        float startTime = duration;
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+            aiNodeAnim* channel = anim->mChannels[j];
+            if (channel->mNumPositionKeys > 0)
+                startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
+            if (channel->mNumRotationKeys > 0)
+                startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
+            if (channel->mScalingKeys > 0)
+                startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
+        }
+        duration -= startTime;
+
+        SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
-        outAnim->SetLength((float)(anim->mDuration - startTime) * tickConversion);
+        outAnim->SetLength(duration * tickConversion);
         
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
@@ -1099,16 +1109,16 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.rotation_ = Quaternion::IDENTITY;
                 kf.scale_ = Vector3::ONE;
                 
-                // Get time for the keyframe
+                // Get time for the keyframe. Adjust with animation's start time
                 if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
-                    kf.time_ = (float)channel->mPositionKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
                 else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
-                    kf.time_ = (float)channel->mRotationKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
                 else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
-                    kf.time_ = (float)channel->mScalingKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
                 
-				// offset time
-				kf.time_ -= startTime;
+                // Make sure time stays positive
+                kf.time_ = Max(kf.time_, 0.0f);
                 
                 // Start with the bone's base transform
                 aiMatrix4x4 boneTransform = boneNode->mTransformation;
