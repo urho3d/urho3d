@@ -992,7 +992,16 @@ void BuildAndSaveAnimations(OutModel* model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
-            
+        
+		double startTime = anim->mDuration;
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+            aiNodeAnim* channel = anim->mChannels[j];
+			if (channel->mNumPositionKeys > 0) startTime = std::min(startTime, channel->mPositionKeys[0].mTime);
+			if (channel->mNumRotationKeys > 0) startTime = std::min(startTime, channel->mRotationKeys[0].mTime);
+			if (channel->mScalingKeys > 0) startTime = std::min(startTime, channel->mScalingKeys[0].mTime);
+		}
+		
         SharedPtr<Animation> outAnim(new Animation(context_));
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
@@ -1000,7 +1009,7 @@ void BuildAndSaveAnimations(OutModel* model)
             ticksPerSecond = defaultTicksPerSecond_;
         float tickConversion = 1.0f / ticksPerSecond;
         outAnim->SetAnimationName(animName);
-        outAnim->SetLength((float)anim->mDuration * tickConversion);
+        outAnim->SetLength((float)(anim->mDuration - startTime) * tickConversion);
         
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
@@ -1097,6 +1106,9 @@ void BuildAndSaveAnimations(OutModel* model)
                     kf.time_ = (float)channel->mRotationKeys[k].mTime * tickConversion;
                 else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     kf.time_ = (float)channel->mScalingKeys[k].mTime * tickConversion;
+                
+				// offset time
+				kf.time_ -= startTime;
                 
                 // Start with the bone's base transform
                 aiMatrix4x4 boneTransform = boneNode->mTransformation;
