@@ -898,6 +898,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("Technique", "*.xml"));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
+    resourcePickers.Push(ResourcePicker("Texture3D", "*.xml"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("AnimationSet2D", anmSetFilters, ACTION_PICK | ACTION_OPEN));
@@ -1034,10 +1035,25 @@ void StoreResourcePickerPath()
 Resource@ GetPickedResource(String resourceName)
 {
     resourceName = GetResourceNameFromFullName(resourceName);
-    Resource@ res = cache.GetResource(resourcePicker.typeName, resourceName);
+    String type = resourcePicker.typeName;
+    // Cube and 3D textures both use .xml extension. In that case interrogate the proper resource type
+    // from the file itself
+    if (type == "Texture3D" || type == "TextureCube")
+    {
+        XMLFile@ xmlRes = cache.GetResource("XMLFile", resourceName);
+        if (xmlRes !is null)
+        {
+            if (xmlRes.root.name.Compare("cubemap", false) == 0 || xmlRes.root.name.Compare("texturecube", false) == 0)
+                type = "TextureCube";
+            else if (xmlRes.root.name.Compare("texture3d", false) == 0)
+                type = "Texture3D";
+        }
+    }
+
+    Resource@ res = cache.GetResource(type, resourceName);
 
     if (res is null)
-        log.Warning("Cannot find resource type: " + resourcePicker.typeName + " Name:" + resourceName);
+        log.Warning("Cannot find resource type: " + type + " Name:" + resourceName);
 
     return res;
 }

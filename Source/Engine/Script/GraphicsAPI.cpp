@@ -292,6 +292,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
+    engine->RegisterEnumValue("TextureUnit", "TU_ZONE", TU_ZONE);
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
@@ -851,6 +852,8 @@ static void RegisterZone(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Zone", "bool get_override() const", asMETHOD(Zone, GetOverride), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_ambientGradient(bool)", asMETHOD(Zone, SetAmbientGradient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "bool get_ambientGradient() const", asMETHOD(Zone, GetAmbientGradient), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_zoneTexture(Texture@+)", asMETHOD(Zone, SetZoneTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "Texture@+ get_zoneTexture() const", asMETHOD(Zone, GetZoneTexture), asCALL_THISCALL);
 }
 
 static void RegisterStaticModel(asIScriptEngine* engine)

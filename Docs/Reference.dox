@@ -1341,8 +1341,9 @@ Zones have three special flags: height fog mode, override mode and ambient gradi
 - If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect.
 - When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors. To ensure objects use the gradient zone when inside it, the gradient zone should have higher priority than the neighbor zones. The gradient is always oriented along the gradient zone's local Z axis.
 
-Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
+Like lights, zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 
+Finally, zones can optionally define a texture, see \ref Zone::SetZoneTexture "SetZoneTexture()". This should be either a cube or 3D texture that will be bound to the zone texture unit (TU_ZONE) when rendering objects within the zone. This could be used to achieve for example precomputed environment reflections, ambient lighting or ambient occlusion in custom shaders; the default shaders do not use this texture. Due to texture unit limitations it is not available on OpenGL ES 2.0.
 
 \page AuxiliaryViews Auxiliary views
 

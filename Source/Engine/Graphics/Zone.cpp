@@ -25,7 +25,9 @@
 #include "DebugRenderer.h"
 #include "Node.h"
 #include "Octree.h"
+#include "ResourceCache.h"
 #include "Scene.h"
+#include "TextureCube.h"
 #include "Zone.h"
 
 #include "DebugNew.h"
@@ -82,6 +84,7 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Zone, VAR_RESOURCEREF, "Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Zone, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
@@ -158,6 +161,12 @@ void Zone::SetPriority(int priority)
     MarkNetworkUpdate();
 }
 
+void Zone::SetZoneTexture(Texture* texture)
+{
+    zoneTexture_ = texture;
+    MarkNetworkUpdate();
+}
+
 void Zone::SetHeightFog(bool enable)
 {
     heightFog_ = enable;
@@ -214,6 +223,17 @@ bool Zone::IsInside(const Vector3& point) const
     // Use an oriented bounding box test
     Vector3 localPoint(GetInverseWorldTransform() * point);
     return boundingBox_.IsInside(localPoint) != OUTSIDE;
+}
+
+void Zone::SetZoneTextureAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    zoneTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
+}
+
+ResourceRef Zone::GetZoneTextureAttr() const
+{
+    return GetResourceRef(zoneTexture_, TextureCube::GetTypeStatic());
 }
 
 void Zone::OnMarkedDirty(Node* node)

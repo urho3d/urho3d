@@ -2954,6 +2954,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
     textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
+    textureUnits_["ZoneCubeMap"] = TU_ZONE;
+    textureUnits_["ZoneVolumeMap"] = TU_ZONE;
 }
 
 void RegisterGraphicsLibrary(Context* context)

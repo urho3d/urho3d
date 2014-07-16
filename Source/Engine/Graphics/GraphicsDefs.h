@@ -230,7 +230,8 @@ enum TextureUnit
     TU_DEPTHBUFFER = 10,
     TU_LIGHTBUFFER = 11,
     TU_VOLUMEMAP = 12,
-    MAX_TEXTURE_UNITS = 13
+    TU_ZONE = 13,
+    MAX_TEXTURE_UNITS = 14
 };
 
 /// Billboard camera facing modes.

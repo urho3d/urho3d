@@ -13,6 +13,7 @@ class Zone : public Drawable
     void SetHeightFog(bool enable);
     void SetOverride(bool enable);
     void SetAmbientGradient(bool enable);
+    void SetZoneTexture(Texture* texture);
     
     const Matrix3x4& GetInverseWorldTransform() const;
     const Color& GetAmbientColor() const;
@@ -27,6 +28,7 @@ class Zone : public Drawable
     bool GetHeightFog() const;
     bool GetOverride() const;
     bool GetAmbientGradient() const;
+    Texture* GetZoneTexture() const;
     
     bool IsInside(const Vector3& point) const;
     
@@ -44,4 +46,5 @@ class Zone : public Drawable
     tolua_property__get_set bool heightFog;
     tolua_property__get_set bool override;
     tolua_property__get_set bool ambientGradient;
+    tolua_property__get_set Texture* zoneTexture;
 };

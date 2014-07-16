@@ -2766,6 +2766,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
+    textureUnits_["ZoneCubeMap"] = TU_ZONE;
+    textureUnits_["ZoneVolumeMap"] = TU_ZONE;
 }
 
 void RegisterGraphicsLibrary(Context* context)
