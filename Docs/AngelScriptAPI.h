@@ -11338,6 +11338,7 @@ int weakRefs;
 /* readonly */
 BoundingBox worldBoundingBox;
 uint zoneMask;
+Texture zoneTexture;
 };
 
 // Enumerations
@@ -11674,6 +11675,7 @@ TU_NORMALBUFFER,
 TU_DEPTHBUFFER,
 TU_LIGHTBUFFER,
 TU_VOLUMEMAP,
+TU_ZONE,
 MAX_MATERIAL_TEXTURE_UNITS,
 MAX_TEXTURE_UNITS,
 };
