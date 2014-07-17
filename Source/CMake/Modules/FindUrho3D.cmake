@@ -103,14 +103,10 @@ if (URHO3D_HOME)
         endif ()
     endif ()
 else ()
-    # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment variable to specify the prefix path to that location
+    # If Urho3D SDK is not being installed in the default system location, use the CMAKE_PREFIX_PATH environment variable to specify the prefix path to that location
     # Note that the prefix path should not contain the "/include" or "/lib"
-    # For example on Windows platform: URHO3D_INSTALL_PREFIX=C:/Users/john/Urho3D if the SDK is installed using CMAKE_INSTALL_PREFIX=C:/Users/john/Urho3D
-    # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
-    if (NOT CMAKE_PREFIX_PATH AND DEFINED ENV{URHO3D_INSTALL_PREFIX})
-        file (TO_CMAKE_PATH "$ENV{URHO3D_INSTALL_PREFIX}" URHO3D_INSTALL_PREFIX)
-        set (CMAKE_PREFIX_PATH ${URHO3D_INSTALL_PREFIX} CACHE PATH "Prefix path to Urho3D SDK installation")
-    endif ()
+    # For example on Windows platform: CMAKE_PREFIX_PATH=C:/Users/john/Urho3D if the SDK is installed using CMAKE_INSTALL_PREFIX=C:/Users/john/Urho3D
+    # For example on Linux platform: CMAKE_PREFIX_PATH=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
     if (WIN32)
         set (URHO3D_INC_SEARCH_PATH include)
         set (URHO3D_LIB_SEARCH_PATH lib)
@@ -119,9 +115,8 @@ else ()
         if (IOS)
             set (CMAKE_LIBRARY_ARCHITECTURE ios)
         endif ()
-        set (URHO3D_INC_SEARCH_PATH /opt/include)
-        set (URHO3D_LIB_SEARCH_PATH /opt/lib)
     endif ()
+    # Additional search paths are added by CMake by default which should already include most common platform specific paths
     find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     if (WIN32)
@@ -165,7 +160,7 @@ else ()
     if (Urho3D_FIND_REQUIRED)
         message (FATAL_ERROR
             "Could not find Urho3D library in default SDK installation location or Urho3D project root tree. "
-            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For searching in a non-default Urho3D SDK installation, use 'CMAKE_PREFIX_PATH' environment variable to specify the prefix path of the installation location. "
             "For searching in a build tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
     endif ()
 endif ()

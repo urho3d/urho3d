@@ -401,20 +401,20 @@ The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variabl
 
 \section UsingLibraryFromSDK From Urho3D SDK installation
 
-This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "URHO3D_INSTALL_PREFIX" environment variable to specify the prefix path of the non-default installation location.
+This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "CMAKE_PREFIX_PATH" environment variable to specify the prefix path of the non-default installation location.
 
 In your own project Source/ directory, create a new CMakeLists.txt file similar to the first approach but change the CMake module search path setup to read as follows on Windows platform:
 
 \code
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
 On non-Windows platform:
 
 \code
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
 \subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake

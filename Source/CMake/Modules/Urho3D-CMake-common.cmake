@@ -511,21 +511,17 @@ endmacro ()
 macro (add_android_native_init)
     # This source file could not be added when building SDL static library because it needs SDL_Main() which is not yet available at library building time
     # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-        list (APPEND SOURCE_FILES ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-        # Use Urho3D source installation
-        list (APPEND SOURCE_FILES ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS ${CMAKE_PREFIX_PATH}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on non-default installation location (PATH_SUFFIX variable is set in FindUrho3D.cmake module)
-        list (APPEND SOURCE_FILES ${CMAKE_PREFIX_PATH}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
-    elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on system default installation location
-        list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
+    find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATHS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android DOC "Path to SDL_android_main.c" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    if (NOT ANDROID_MAIN_C_PATH)
+        # Attempt another search using Urho3D SDK installation location which could be rooted
+        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c")
+    endif ()
+    if (ANDROID_MAIN_C_PATH)
+        list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
     else ()
         message (FATAL_ERROR
             "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
-            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For searching in a non-default Urho3D SDK installation, use 'CMAKE_PREFIX_PATH' environment variable to specify the prefix path of the installation location. "
             "For searching in a source tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
     endif ()
 endmacro ()

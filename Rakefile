@@ -41,7 +41,7 @@ task :scaffolding do
   scaffolding(abs_path, project, target)
   abs_path = Pathname.new(abs_path).realpath
   puts "\nNew project created in #{abs_path}\n\n"
-  puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'URHO3D_INSTALL_PREFIX' environment variable"
+  puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
   puts "Please see http://urho3d.github.io/documentation/a00004.html for more detail. For example:\n\n"
   puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
 end
@@ -194,8 +194,7 @@ endif ()
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH
     \\$ENV{URHO3D_HOME}/Source/CMake/Modules
-    \\$ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
-    \\${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
+    \\$ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
 # Include Urho3D CMake common module
