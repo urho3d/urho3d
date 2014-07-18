@@ -512,11 +512,10 @@ macro (add_android_native_init)
     # This source file could not be added when building SDL static library because it needs SDL_Main() which is not yet available at library building time
     # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
     if (URHO3D_HOME)
-        # First attempt to search using project source directory
+        # Search using project source directory which for sure is not rooted
         find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATHS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android DOC "Path to SDL_android_main.c" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-    endif ()
-    if (NOT ANDROID_MAIN_C_PATH)
-        # Attempt another search using Urho3D SDK installation location which could be rooted
+    else ()
+        # Search using Urho3D SDK installation location which could be rooted
         find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c")
     endif ()
     if (ANDROID_MAIN_C_PATH)
