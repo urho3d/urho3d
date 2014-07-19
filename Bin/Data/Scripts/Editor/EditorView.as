@@ -105,7 +105,7 @@ class ViewportContext
         viewport = Viewport(editorScene, camera, viewRect);
         index = index_;
         viewportId = viewportId_;
-        camera.viewMask = 0x80000000 + (uint(1) << index); // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
+        camera.viewMask = 0x80000000; // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
     }
 
     void ResetCamera()
@@ -1706,11 +1706,14 @@ Drawable@ GetDrawableAtMousePostion()
 
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Hide gizmo and grid from preview camera
-    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    // Hide gizmo and grid from any camera other then active viewport
+    if (eventData["Camera"].GetPtr() !is camera)
     {
         if (gizmo !is null)
             gizmo.viewMask = 0;
+    }
+    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    {
         if (grid !is null)
             grid.viewMask = 0;
     }
@@ -1718,11 +1721,14 @@ void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 
 void HandleEndViewUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Restore gizmo and grid after preview view update
-    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    // Restore gizmo and grid after camera view update
+    if (eventData["Camera"].GetPtr() !is camera)
     {
         if (gizmo !is null)
             gizmo.viewMask = 0x80000000;
+    }
+    if (eventData["Camera"].GetPtr() is previewCamera.Get())
+    {
         if (grid !is null)
             grid.viewMask = 0x80000000;
     }
