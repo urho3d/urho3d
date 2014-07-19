@@ -33,6 +33,7 @@ if (COMMAND cmake_policy)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
         cmake_policy (SET CMP0026 OLD) # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        cmake_policy (SET CMP0042 NEW) # MACOSX_RPATH is enabled by default
     endif ()
 endif ()
 
@@ -126,6 +127,9 @@ include (CPack)
 
 # Setup RPATH settings
 if (NOT WIN32)
+    if (APPLE AND (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12))
+        set (CMAKE_MACOSX_RPATH TRUE)
+    endif ()
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
     set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)

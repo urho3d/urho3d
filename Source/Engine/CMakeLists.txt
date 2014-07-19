@@ -96,7 +96,14 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
-set_target_properties (${TARGET_NAME} PROPERTIES VERSION ${URHO3D_VERSION} SOVERSION ${URHO3D_VERSION})
+if (APPLE)
+    # Apple linker only accepts 32-bit x.y.z version number in this format 0xffff.0xff.0xff so it does not accept our version number because our patch number is quite high
+    # Workaround by masking the high order byte
+    math (EXPR VERSION_PATCH "${CPACK_PACKAGE_VERSION_PATCH} & 255")
+else ()
+    set (VERSION_PATCH ${CPACK_PACKAGE_VERSION_PATCH})
+endif ()
+set_target_properties (${TARGET_NAME} PROPERTIES VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${VERSION_PATCH} SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${VERSION_PATCH})
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
