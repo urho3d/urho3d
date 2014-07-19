@@ -124,6 +124,17 @@ if ("$ENV{RELEASE_TAG}" STREQUAL "")
 endif ()
 include (CPack)
 
+# Setup RPATH settings
+if (NOT WIN32)
+    set (CMAKE_SKIP_BUILD_RPATH FALSE)
+    set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
+    if (isSystemDir STREQUAL -1)
+        set (CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}${PATH_SUFFIX})
+    endif ()
+endif ()
+
 # Add targets
 foreach (TARGET Box2D Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
