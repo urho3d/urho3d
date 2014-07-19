@@ -105,7 +105,7 @@ class ViewportContext
         viewport = Viewport(editorScene, camera, viewRect);
         index = index_;
         viewportId = viewportId_;
-        camera.viewMask = 0x80000000; // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
+        camera.viewMask = -1; // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
     }
 
     void ResetCamera()
