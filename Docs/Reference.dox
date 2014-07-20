@@ -1973,15 +1973,15 @@ Multithreading is so far not exposed to scripts, and is currently used only in a
 
 When making your own work functions, observe that the following things are (at least currently) unsafe and will result in undefined behavior and crashes, if done outside the main thread:
 
-- Sending events
-- Using profiler blocks
 - Modifying scene or UI content
 - Modifying GPU resources
 - Requesting resources from ResourceCache
 - Executing script functions
 
+Sending events and using the Profiler are treated as no-ops when called from outside the main thread.
+
 \page AttributeAnimation %Attribute animation
-Attribute animation is a new system for Urho3D, With it user can apply animation to object’s attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
+Attribute animation is a new system for Urho3D, With it user can apply animation to object's attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
 
 These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
 \code

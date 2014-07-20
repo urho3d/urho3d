@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Str.h"
+#include "Thread.h"
 #include "Timer.h"
 
 namespace Urho3D
@@ -180,6 +181,10 @@ public:
     /// Begin timing a profiling block.
     void BeginBlock(const char* name)
     {
+        // Profiler supports only the main thread currently
+        if (!Thread::IsMainThread())
+            return;
+        
         current_ = current_->GetChild(name);
         current_->Begin();
     }
@@ -187,6 +192,9 @@ public:
     /// End timing the current profiling block.
     void EndBlock()
     {
+        if (!Thread::IsMainThread())
+            return;
+        
         if (current_ != root_)
         {
             current_->End();

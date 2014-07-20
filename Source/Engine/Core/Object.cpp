@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Thread.h"
 
 #include "DebugNew.h"
 
@@ -222,6 +223,10 @@ void Object::SendEvent(StringHash eventType)
 
 void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
+    // Attempting to send events from other threads is treated as a no-op
+    if (!Thread::IsMainThread())
+        return;
+    
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
