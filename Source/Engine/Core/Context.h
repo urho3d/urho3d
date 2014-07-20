@@ -58,7 +58,7 @@ public:
     void UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap();
-    
+
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(StringHash baseType, StringHash derivedType);
     /// Template version of registering an object factory.

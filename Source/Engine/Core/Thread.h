@@ -24,6 +24,13 @@
 
 #include "Urho3D.h"
 
+#ifndef WIN32
+#include <pthread.h>
+typedef pthread_t ThreadID;
+#else
+typedef unsigned ThreadID;
+#endif
+
 namespace Urho3D
 {
 
@@ -48,12 +55,22 @@ public:
     
     /// Return whether thread exists.
     bool IsStarted() const { return handle_ != 0; }
+
+    /// Set the current thread as the main thread.
+    static void SetMainThread();
+    /// Return the current thread's ID.
+    static ThreadID GetCurrentThreadID();
+    /// Return whether is executing in the main thread.
+    static bool IsMainThread();
     
 protected:
     /// Thread handle.
     void* handle_;
     /// Running flag.
     volatile bool shouldRun_;
+    
+    /// Main thread's thread ID.
+    static ThreadID mainThreadID;
 };
 
 }
