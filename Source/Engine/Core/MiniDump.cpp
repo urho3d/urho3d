@@ -32,7 +32,7 @@
 #include <time.h>
 #include <windows.h>
 #include <dbghelp.h>
-#include <shlObj.h>
+#include <SDL.h>
 
 namespace Urho3D
 {
@@ -62,12 +62,11 @@ URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointer
     dateTimeStr.Replace("/", "");
     dateTimeStr.Replace(' ', '_');
     
-    wchar_t pathName[MAX_PATH];
-    pathName[0] = 0;
-    SHGetSpecialFolderPathW(0, pathName, CSIDL_PERSONAL, 0);
-    String applicationNameStr(applicationName);
-    String miniDumpDir = String(pathName) + "\\" + applicationNameStr;
-    String miniDumpName = miniDumpDir + "\\" + applicationNameStr + "_" + dateTimeStr + ".dmp";
+    char* pathName = SDL_GetPrefPath("urho3d", "crashdumps");
+    String miniDumpDir(pathName);
+    String miniDumpName = miniDumpDir + String(applicationName) + "_" + dateTimeStr + ".dmp";
+    if (pathName)
+        SDL_free(pathName);
     
     CreateDirectoryW(WString(miniDumpDir).CString(), 0);
     HANDLE file = CreateFileW(WString(miniDumpName).CString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ,
