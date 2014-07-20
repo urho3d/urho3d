@@ -281,8 +281,8 @@ else ()
         endif ()
         # MinGW-specific setup
         if (WIN32)
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc")
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
             # Additional compiler flags for Windows ports of GCC
             set (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
