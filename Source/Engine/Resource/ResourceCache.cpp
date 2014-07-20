@@ -450,12 +450,15 @@ Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool s
     {
         LOGERROR("Could not load unknown resource type " + String(type));
 
-        using namespace UnknownResourceType;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_RESOURCETYPE] = type;
-        SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
-
+        if (sendEventOnFailure)
+        {
+            using namespace UnknownResourceType;
+            
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCETYPE] = type;
+            SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
+        }
+        
         return 0;
     }
     
@@ -470,12 +473,15 @@ Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool s
     if (!resource->Load(*(file.Get())))
     {
         // Error should already been logged by corresponding resource descendant class
-        using namespace LoadFailed;
+        if (sendEventOnFailure)
+        {
+            using namespace LoadFailed;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_RESOURCENAME] = name;
-        SendEvent(E_LOADFAILED, eventData);
-
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCENAME] = name;
+            SendEvent(E_LOADFAILED, eventData);
+        }
+        
         if (!returnFailedResources_)
             return 0;
     }
@@ -484,6 +490,64 @@ Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool s
     resource->ResetUseTimer();
     resourceGroups_[type].resources_[nameHash] = resource;
     UpdateResourceGroup(type);
+    
+    return resource;
+}
+
+SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+{
+    String name = SanitateResourceName(nameIn);
+    
+    // If empty name, return null pointer immediately
+    if (name.Empty())
+        return SharedPtr<Resource>();
+    
+    StringHash nameHash(name);
+    const SharedPtr<Resource>& existing = FindResource(type, nameHash);
+    if (existing)
+        return existing;
+    
+    SharedPtr<Resource> resource;
+    // Make sure the pointer is non-null and is a Resource subclass
+    resource = DynamicCast<Resource>(context_->CreateObject(type));
+    if (!resource)
+    {
+        LOGERROR("Could not load unknown resource type " + String(type));
+
+        if (sendEventOnFailure)
+        {
+            using namespace UnknownResourceType;
+            
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCETYPE] = type;
+            SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
+        }
+        
+        return SharedPtr<Resource>();
+    }
+    
+    // Attempt to load the resource
+    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
+    if (!file)
+        return SharedPtr<Resource>();  // Error is already logged
+
+    LOGDEBUG("Loading temporary resource " + name);
+    resource->SetName(file->GetName());
+
+    if (!resource->Load(*(file.Get())))
+    {
+        // Error should already been logged by corresponding resource descendant class
+        if (sendEventOnFailure)
+        {
+            using namespace LoadFailed;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCENAME] = name;
+            SendEvent(E_LOADFAILED, eventData);
+        }
+        
+        return SharedPtr<Resource>();
+    }
     
     return resource;
 }

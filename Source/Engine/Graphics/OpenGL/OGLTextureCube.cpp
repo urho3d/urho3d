@@ -283,7 +283,7 @@ bool TextureCube::Load(Deserializer& source)
         if (faceTexPath.Empty())
             name = texPath + name;
         
-        SharedPtr<Image> image(cache->GetResource<Image>(name));
+        SharedPtr<Image> image(cache->GetTempResource<Image>(name));
         Load((CubeMapFace)faces, image);
         ++faces;
         

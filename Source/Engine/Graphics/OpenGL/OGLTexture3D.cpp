@@ -101,7 +101,7 @@ bool Texture3D::Load(Deserializer& source)
         if (volumeTexPath.Empty())
             name = texPath + name;
 
-        SharedPtr<Image> image(GetSubsystem<ResourceCache>()->GetResource<Image>(name));
+        SharedPtr<Image> image(GetSubsystem<ResourceCache>()->GetTempResource<Image>(name));
         return Load(image);
     }
     else if (colorlutElem)

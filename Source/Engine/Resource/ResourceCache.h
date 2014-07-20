@@ -103,6 +103,8 @@ public:
     Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
     Resource* GetResource(StringHash type, const char* name, bool sendEventOnFailure = true);
+    /// Load a resource without storing it in the resource cache. Return null if not found or if fails.
+    SharedPtr<Resource> GetTempResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, StringHash type) const;
     /// Return all loaded resources.
@@ -115,6 +117,8 @@ public:
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const char* name, bool sendEventOnFailure = true);
+    /// Template version of loading a resource without storing it to the cache.
+    template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists by name.
@@ -189,6 +193,12 @@ template <class T> T* ResourceCache::GetResource(const char* name, bool sendEven
 {
     StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
+}
+
+template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure)
+{
+    StringHash type = T::GetTypeStatic();
+    return StaticCast<T>(GetTempResource(type, name, sendEventOnFailure));
 }
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
