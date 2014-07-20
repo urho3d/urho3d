@@ -318,7 +318,7 @@ void RigidBody2D::ApplyTorque(float torque, bool wake)
 
 void RigidBody2D::ApplyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake)
 {
-    if (body_ && impulse != 0)
+    if (body_ && impulse != Vector2::ZERO)
         body_->ApplyLinearImpulse(ToB2Vec2(impulse), ToB2Vec2(point), wake);
 }
 
