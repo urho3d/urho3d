@@ -24,6 +24,7 @@
 
 #include "File.h"
 #include "HashSet.h"
+#include "Mutex.h"
 #include "Resource.h"
 
 namespace Urho3D
@@ -175,6 +176,8 @@ private:
     Vector<SharedPtr<PackageFile> > packages_;
     /// Dependent resources.
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
+    /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
+    mutable Mutex resourceMutex_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.

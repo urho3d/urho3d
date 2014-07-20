@@ -31,6 +31,7 @@
 #include "PackageFile.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
+#include "Thread.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -75,6 +76,8 @@ ResourceCache::~ResourceCache()
 
 bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority)
 {
+    MutexLock lock(resourceMutex_);
+    
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem || !fileSystem->DirExists(pathName))
     {
@@ -112,6 +115,8 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority
 
 void ResourceCache::AddPackageFile(PackageFile* package, unsigned int priority)
 {
+    MutexLock lock(resourceMutex_);
+    
     // Do not add packages that failed to load
     if (!package || !package->GetNumFiles())
         return;
@@ -148,6 +153,8 @@ bool ResourceCache::AddManualResource(Resource* resource)
 
 void ResourceCache::RemoveResourceDir(const String& pathName)
 {
+    MutexLock lock(resourceMutex_);
+    
     String fixedPath = SanitateResourceDirName(pathName);
     
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
@@ -172,6 +179,8 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
 
 void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResources, bool forceRelease)
 {
+    MutexLock lock(resourceMutex_);
+    
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (*i == package)
@@ -187,6 +196,8 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
 
 void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResources, bool forceRelease)
 {
+    MutexLock lock(resourceMutex_);
+
     // Compare the name and extension only, not the path
     String fileNameNoPath = GetFileNameAndExtension(fileName);
     
@@ -392,6 +403,8 @@ void ResourceCache::SetReturnFailedResources(bool enable)
 
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
 {
+    MutexLock lock(resourceMutex_);
+    
     String name = SanitateResourceName(nameIn);
     File* file = 0;
 
@@ -432,6 +445,12 @@ Resource* ResourceCache::GetResource(StringHash type, const String& name, bool s
 
 Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool sendEventOnFailure)
 {
+    if (!Thread::IsMainThread())
+    {
+        LOGERROR("Calling GetResource is only supported from the main thread. Use GetFile or GetTempResource instead.");
+        return 0;
+    }
+    
     String name = SanitateResourceName(nameIn);
     
     // If empty name, return null pointer immediately
@@ -502,11 +521,6 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     if (name.Empty())
         return SharedPtr<Resource>();
     
-    StringHash nameHash(name);
-    const SharedPtr<Resource>& existing = FindResource(type, nameHash);
-    if (existing)
-        return existing;
-    
     SharedPtr<Resource> resource;
     // Make sure the pointer is non-null and is a Resource subclass
     resource = DynamicCast<Resource>(context_->CreateObject(type));
@@ -566,6 +580,8 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) 
 
 bool ResourceCache::Exists(const String& nameIn) const
 {
+    MutexLock lock(resourceMutex_);
+    
     String name = SanitateResourceName(nameIn);
     if (name.Empty())
         return false;
@@ -618,6 +634,8 @@ unsigned ResourceCache::GetTotalMemoryUse() const
 
 String ResourceCache::GetResourceFileName(const String& name) const
 {
+    MutexLock lock(resourceMutex_);
+    
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
@@ -713,6 +731,8 @@ void ResourceCache::StoreResourceDependency(Resource* resource, const String& de
     if (!resource || !autoReloadResources_)
         return;
     
+    MutexLock lock(resourceMutex_);
+    
     StringHash nameHash(resource->GetName());
     HashSet<StringHash>& dependents = dependentResources_[dependency];
     dependents.Insert(nameHash);
@@ -722,6 +742,8 @@ void ResourceCache::ResetDependencies(Resource* resource)
 {
     if (!resource || !autoReloadResources_)
         return;
+    
+    MutexLock lock(resourceMutex_);
     
     StringHash nameHash(resource->GetName());
     
