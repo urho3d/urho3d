@@ -210,10 +210,8 @@ void Image::RegisterObject(Context* context)
     context->RegisterFactory<Image>();
 }
 
-bool Image::Load(Deserializer& source)
+bool Image::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadImage);
-
     // Check for DDS, KTX or PVR compressed format
     String fileID = source.ReadFileID();
 

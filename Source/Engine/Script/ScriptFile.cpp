@@ -112,10 +112,8 @@ void ScriptFile::RegisterObject(Context* context)
     context->RegisterFactory<ScriptFile>();
 }
 
-bool ScriptFile::Load(Deserializer& source)
+bool ScriptFile::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadScript);
-    
     ReleaseModule();
     
     // Create the module. Discard previous module if there was one

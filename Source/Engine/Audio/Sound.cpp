@@ -81,7 +81,7 @@ void Sound::RegisterObject(Context* context)
     context->RegisterFactory<Sound>();
 }
 
-bool Sound::Load(Deserializer& source)
+bool Sound::BeginLoad(Deserializer& source)
 {
     PROFILE(LoadSound);
     
@@ -343,7 +343,7 @@ void Sound::LoadParameters()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
     if (!file)
         return;
     

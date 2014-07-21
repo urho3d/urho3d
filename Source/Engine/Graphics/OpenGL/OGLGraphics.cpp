@@ -1537,6 +1537,8 @@ void Graphics::SetTextureAnisotropy(unsigned level)
 
 void Graphics::SetTextureParametersDirty()
 {
+    MutexLock lock(gpuObjectMutex_);
+    
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
         Texture* texture = dynamic_cast<Texture*>(*i);
@@ -2172,11 +2174,15 @@ void Graphics::WindowResized()
 
 void Graphics::AddGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+    
     gpuObjects_.Push(object);
 }
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+    
     gpuObjects_.Remove(object);
 }
 
@@ -2257,18 +2263,22 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     
     releasingGPUObjects_ = true;
     
-    if (clearGPUObjects)
     {
-        // Shutting down: release all GPU objects that still exist
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-            (*i)->Release();
-        gpuObjects_.Clear();
-    }
-    else
-    {
-        // We are not shutting down, but recreating the context: mark GPU objects lost
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-            (*i)->OnDeviceLost();
+        MutexLock lock(gpuObjectMutex_);
+        
+        if (clearGPUObjects)
+        {
+            // Shutting down: release all GPU objects that still exist
+            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+                (*i)->Release();
+            gpuObjects_.Clear();
+        }
+        else
+        {
+            // We are not shutting down, but recreating the context: mark GPU objects lost
+            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+                (*i)->OnDeviceLost();
+        }
     }
     
     releasingGPUObjects_ = false;
@@ -2339,8 +2349,12 @@ void Graphics::Restore()
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->OnDeviceReset();
+    {
+        MutexLock lock(gpuObjectMutex_);
+        
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceReset();
+    }
 }
 
 void Graphics::Maximize()

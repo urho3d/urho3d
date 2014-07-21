@@ -50,7 +50,7 @@ void AnimationSet2D::RegisterObject(Context* context)
     context->RegisterFactory<AnimationSet2D>();
 }
 
-bool AnimationSet2D::Load(Deserializer& source)
+bool AnimationSet2D::BeginLoad(Deserializer& source)
 {
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))

@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "FileSystem.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
@@ -30,6 +31,7 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Texture2D.h"
+#include "XMLFile.h"
 
 #include "DebugNew.h"
 
@@ -51,10 +53,8 @@ void Texture2D::RegisterObject(Context* context)
     context->RegisterFactory<Texture2D>();
 }
 
-bool Texture2D::Load(Deserializer& source)
+bool Texture2D::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadTexture2D);
-    
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
         return true;
@@ -67,17 +67,38 @@ bool Texture2D::Load(Deserializer& source)
         return true;
     }
     
+    // Load the image data for EndLoad()
+    loadImage_ = new Image(context_);
+    if (!loadImage_->Load(source))
+    {
+        loadImage_.Reset();
+        return false;
+    }
+    
+    // Load the optional parameters file
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String xmlName = ReplaceExtension(GetName(), ".xml");
+    loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
+    
+    return true;
+}
+
+bool Texture2D::EndLoad()
+{
+    // In headless mode, do not actually load the texture, just return success
+    if (!graphics_)
+        return true;
+    
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     CheckTextureBudget(GetTypeStatic());
+
+    SetParameters(loadParameters_);
+    bool success = SetData(loadImage_);
     
-    SharedPtr<Image> image(new Image(context_));
-    if (!image->Load(source))
-        return false;
+    loadImage_.Reset();
+    loadParameters_.Reset();
     
-    // Before actually loading the texture, get optional parameters from an XML description file
-    LoadParameters();
-    
-    return Load(image);
+    return success;
 }
 
 void Texture2D::OnDeviceLost()
@@ -173,6 +194,8 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
+    PROFILE(SetTextureData);
+    
     if (!object_)
     {
         LOGERROR("No texture created, can not set data");
@@ -283,7 +306,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     return true;
 }
 
-bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
+bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {

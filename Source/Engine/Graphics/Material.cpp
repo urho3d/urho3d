@@ -165,10 +165,8 @@ void Material::RegisterObject(Context* context)
     context->RegisterFactory<Material>();
 }
 
-bool Material::Load(Deserializer& source)
+bool Material::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadMaterial);
-
     // In headless mode, do not actually load the material, just return success
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)

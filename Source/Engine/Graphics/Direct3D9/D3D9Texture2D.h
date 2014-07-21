@@ -30,6 +30,7 @@ namespace Urho3D
 {
 
 class Image;
+class XMLFile;
 
 /// 2D texture resource.
 class URHO3D_API Texture2D : public Texture
@@ -44,8 +45,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Release default pool resources.
     virtual void OnDeviceLost();
     /// Recreate default pool resources.
@@ -57,8 +60,8 @@ public:
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
     /// Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
-    /// Load from an image. Return true if successful. Optionally make a single channel image alpha-only.
-    bool Load(SharedPtr<Image> image, bool useAlpha = false);
+    /// Set data from an image. Return true if successful. Optionally make a single channel image alpha-only.
+    bool SetData(SharedPtr<Image> image, bool useAlpha = false);
     
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned level, void* dest) const;
@@ -73,6 +76,10 @@ private:
     
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
+    /// Image file acquired during BeginLoad.
+    SharedPtr<Image> loadImage_;
+    /// Parameter file acquired during BeginLoad.
+    SharedPtr<XMLFile> loadParameters_;
 };
 
 }

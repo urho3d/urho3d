@@ -26,6 +26,7 @@
 #include "Color.h"
 #include "GraphicsDefs.h"
 #include "Image.h"
+#include "Mutex.h"
 #include "Object.h"
 #include "Plane.h"
 #include "Rect.h"
@@ -449,6 +450,8 @@ private:
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
     
+    /// Mutex for accessing the GPU objects vector from several threads.
+    Mutex gpuObjectMutex_;
     /// Implementation.
     GraphicsImpl* impl_;
     /// Window title.

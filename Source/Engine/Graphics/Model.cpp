@@ -73,10 +73,8 @@ void Model::RegisterObject(Context* context)
     context->RegisterFactory<Model>();
 }
 
-bool Model::Load(Deserializer& source)
+bool Model::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadModel);
-    
     // Check ID
     if (source.ReadFileID() != "UMDL")
     {

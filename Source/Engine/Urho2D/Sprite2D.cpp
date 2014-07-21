@@ -49,7 +49,7 @@ void Sprite2D::RegisterObject(Context* context)
     context->RegisterFactory<Sprite2D>();
 }
 
-bool Sprite2D::Load(Deserializer& source)
+bool Sprite2D::BeginLoad(Deserializer& source)
 {
     SharedPtr<Texture2D> texture(new Texture2D(context_));
     texture->SetName(GetName());

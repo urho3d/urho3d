@@ -29,9 +29,12 @@
 #include "JSONFile.h"
 #include "Log.h"
 #include "PackageFile.h"
+#include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Thread.h"
+#include "Timer.h"
+#include "WorkQueue.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -68,10 +71,74 @@ ResourceCache::ResourceCache(Context* context) :
 {
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
+    
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
 }
 
 ResourceCache::~ResourceCache()
 {
+}
+
+void ResourceCache::ThreadFunction()
+{
+    while (shouldRun_)
+    {
+        backgroundLoadMutex_.Acquire();
+        
+        // Search for a queued resource that has not been loaded yet
+        HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Begin();
+        while (i != backgroundLoadQueue_.End())
+        {
+            if (i->second_.resource_->GetAsyncLoadState() == ASYNC_QUEUED)
+                break;
+            else
+                ++i;
+        }
+        
+        if (i == backgroundLoadQueue_.End())
+        {
+            // No resources to load found
+            backgroundLoadMutex_.Release();
+            Time::Sleep(5);
+        }
+        else
+        {
+            BackgroundLoadItem& item = i->second_;
+            Resource* resource = item.resource_;
+            // We can be sure that the item is not removed from the queue as long as it is in the
+            // "queued" or "loading" state
+            backgroundLoadMutex_.Release();
+            
+            bool success = false;
+            SharedPtr<File> file = GetFile(resource->GetName(), item.sendEventOnFailure_);
+            if (file)
+            {
+                resource->SetAsyncLoadState(ASYNC_LOADING);
+                success = resource->BeginLoad(*file);
+            }
+            
+            // Process dependencies now
+            Pair<StringHash, StringHash> key = MakePair(resource->GetType(), resource->GetNameHash());
+            if (item.dependents_.Size())
+            {
+                // Need to lock the queue again when manipulating other entries
+                backgroundLoadMutex_.Acquire();
+                
+                for (unsigned i = 0; i < item.dependents_.Size(); ++i)
+                {
+                    HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator j =
+                        backgroundLoadQueue_.Find(item.dependents_[i]);
+                    if (j != backgroundLoadQueue_.End())
+                        j->second_.dependencies_.Remove(key);
+                }
+                
+                item.dependents_.Clear();
+                backgroundLoadMutex_.Release();
+            }
+            
+            resource->SetAsyncLoadState(success ? ASYNC_SUCCESS : ASYNC_FAIL);
+        }
+    }
 }
 
 bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority)
@@ -383,14 +450,9 @@ void ResourceCache::SetAutoReloadResources(bool enable)
                 watcher->StartWatching(resourceDirs_[i], true);
                 fileWatchers_.Push(watcher);
             }
-
-            SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
         }
         else
-        {
-            UnsubscribeFromEvent(E_BEGINFRAME);
             fileWatchers_.Clear();
-        }
         
         autoReloadResources_ = enable;
     }
@@ -428,11 +490,14 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     {
         LOGERROR("Could not find resource " + name);
 
-        using namespace ResourceNotFound;
+        if (Thread::IsMainThread())
+        {
+            using namespace ResourceNotFound;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_RESOURCENAME] = name;
-        SendEvent(E_RESOURCENOTFOUND, eventData);
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCENAME] = name;
+            SendEvent(E_RESOURCENOTFOUND, eventData);
+        }
     }
 
     return SharedPtr<File>();
@@ -458,6 +523,34 @@ Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool s
         return 0;
     
     StringHash nameHash(name);
+
+    // Check if the resource is being background loaded but is now needed immediately
+    {
+        backgroundLoadMutex_.Acquire();
+        
+        Pair<StringHash, StringHash> key = MakePair(type, nameHash);
+        HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Find(key);
+        if (i != backgroundLoadQueue_.End())
+        {
+            backgroundLoadMutex_.Release();
+            
+            for (;;)
+            {
+                Resource* resource = i->second_.resource_;
+                unsigned numDeps = i->second_.dependencies_.Size();
+                AsyncLoadState state = resource->GetAsyncLoadState();
+                if (numDeps > 0 || state == ASYNC_QUEUED || state == ASYNC_LOADING)
+                    Time::Sleep(1);
+                else
+                    break;
+            }
+            // This will store the resource (if successful) to the resource groups so that the code below will find it
+            FinishBackgroundLoading(i);
+        }
+        else
+            backgroundLoadMutex_.Release();
+    }
+    
     const SharedPtr<Resource>& existing = FindResource(type, nameHash);
     if (existing)
         return existing;
@@ -513,6 +606,75 @@ Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool s
     return resource;
 }
 
+bool ResourceCache::BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure, Resource* caller)
+{
+    return BackgroundLoadResource(type, name.CString());
+}
+
+bool ResourceCache::BackgroundLoadResource(StringHash type, const char* nameIn, bool sendEventOnFailure, Resource* caller)
+{
+    String name = SanitateResourceName(nameIn);
+    StringHash nameHash(name);
+    
+    // First check if already exists as a loaded resource
+    if (FindResource(type, nameHash) != noResource)
+        return false;
+    
+    Pair<StringHash, StringHash> key = MakePair(type, nameHash);
+    
+    MutexLock lock(backgroundLoadMutex_);
+    
+    // Also check if already exists in the queue
+    if (backgroundLoadQueue_.Find(MakePair(type, nameHash)) != backgroundLoadQueue_.End())
+        return false;
+    
+    BackgroundLoadItem item;
+    item.sendEventOnFailure_ = sendEventOnFailure;
+    
+    // Make sure the pointer is non-null and is a Resource subclass
+    item.resource_ = DynamicCast<Resource>(context_->CreateObject(type));
+    if (!item.resource_)
+    {
+        LOGERROR("Could not load unknown resource type " + String(type));
+
+        if (sendEventOnFailure && Thread::IsMainThread())
+        {
+            using namespace UnknownResourceType;
+            
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCETYPE] = type;
+            SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
+        }
+        
+        return false;
+    }
+    
+    item.resource_->SetName(name);
+    item.resource_->SetAsyncLoadState(ASYNC_QUEUED);
+    
+    // If this is a resource calling for the background load of more resources, mark the dependencies as necessary
+    if (caller)
+    {
+        Pair<StringHash, StringHash> callerKey = MakePair(caller->GetType(), caller->GetNameHash());
+        HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Find(callerKey);
+        if (i != backgroundLoadQueue_.End())
+        {
+            i->second_.dependents_.Push(callerKey);
+            item.dependencies_.Push(key);
+        }
+        else
+            LOGWARNING("Resource " + caller->GetName() + " requested for a background loaded resource but was not in the background load queue");
+    }
+    
+    backgroundLoadQueue_[key] = item;
+    
+    // Start the background loader thread now
+    if (!IsStarted())
+        Run();
+    
+    return true;
+}
+
 SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
@@ -564,6 +726,12 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     }
     
     return resource;
+}
+
+unsigned ResourceCache::GetNumBackgroundLoadResources() const
+{
+    MutexLock lock(backgroundLoadMutex_);
+    return backgroundLoadQueue_.Size();
 }
 
 void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
@@ -761,6 +929,8 @@ void ResourceCache::ResetDependencies(Resource* resource)
 
 const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHash nameHash)
 {
+    MutexLock lock(resourceMutex_);
+
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return noResource;
@@ -773,6 +943,8 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHa
 
 const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 {
+    MutexLock lock(resourceMutex_);
+
     for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
     {
         HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
@@ -905,6 +1077,21 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
             SendEvent(E_FILECHANGED, eventData);
         }
     }
+    
+    // Check for background loaded resources that can be finalized
+    MutexLock lock(backgroundLoadMutex_);
+    
+    for (HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Begin();
+        i != backgroundLoadQueue_.End(); ++i)
+    {
+        Resource* resource = i->second_.resource_;
+        unsigned numDeps = i->second_.dependencies_.Size();
+        AsyncLoadState state = resource->GetAsyncLoadState();
+        if (numDeps > 0 || state == ASYNC_QUEUED || state == ASYNC_LOADING)
+            continue;
+        else
+            FinishBackgroundLoading(i);
+    }
 }
 
 File* ResourceCache::SearchResourceDirs(const String& nameIn)
@@ -938,6 +1125,69 @@ File* ResourceCache::SearchPackages(const String& nameIn)
     }
 
     return 0;
+}
+
+void ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i)
+{
+    BackgroundLoadItem& item = i->second_;
+    Resource* resource = i->second_.resource_;
+    
+    bool success = resource->GetAsyncLoadState() == ASYNC_SUCCESS;
+    // If BeginLoad() phase was successful, call EndLoad() and get the final success/failure result
+    if (success)
+    {
+#ifdef URHO3D_PROFILING
+        String profileBlockName("EndLoad" + GetTypeName());
+    
+        Profiler* profiler = GetSubsystem<Profiler>();
+        if (profiler)
+            profiler->BeginBlock(profileBlockName.CString());
+#endif
+        success = resource->EndLoad();
+        
+#ifdef URHO3D_PROFILING
+        if (profiler)
+            profiler->EndBlock();
+#endif
+    }
+    resource->SetAsyncLoadState(ASYNC_DONE);
+    
+    if (!success && item.sendEventOnFailure_)
+    {
+        using namespace LoadFailed;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_RESOURCENAME] = resource->GetName();
+        SendEvent(E_LOADFAILED, eventData);
+    }
+    
+    // Send event, either success or failure
+    {
+        using namespace ResourceBackgroundLoaded;
+        
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_RESOURCENAME] = resource->GetName();
+        eventData[P_SUCCESS] = success;
+        eventData[P_RESOURCE] = resource;
+        SendEvent(E_RESOURCEBACKGROUNDLOADED, eventData);
+    }
+    
+    if (success || returnFailedResources_)
+    {
+        // Store to cache
+        StringHash type = resource->GetType();
+        StringHash nameHash = resource->GetNameHash();
+        
+        resource->ResetUseTimer();
+        resourceGroups_[type].resources_[nameHash] = resource;
+        UpdateResourceGroup(type);
+    }
+    
+    // Finally remove the background queue item
+    {
+        MutexLock lock(backgroundLoadMutex_);
+        backgroundLoadQueue_.Erase(i);
+    }
 }
 
 void RegisterResourceLibrary(Context* context)

@@ -54,7 +54,7 @@ void SpriteSheet2D::RegisterObject(Context* context)
     context->RegisterFactory<SpriteSheet2D>();
 }
 
-bool SpriteSheet2D::Load(Deserializer& source)
+bool SpriteSheet2D::BeginLoad(Deserializer& source)
 {
     spriteMapping_.Clear();
 

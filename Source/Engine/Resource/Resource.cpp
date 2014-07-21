@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Log.h"
+#include "Profiler.h"
 #include "Resource.h"
 
 namespace Urho3D
@@ -29,13 +30,45 @@ namespace Urho3D
 
 Resource::Resource(Context* context) :
     Object(context),
-    memoryUse_(0)
+    memoryUse_(0),
+    asyncLoadState_(ASYNC_DONE)
 {
 }
 
-bool Resource::Load(Deserializer& src)
+bool Resource::Load(Deserializer& source)
 {
+    // Because BeginLoad() / EndLoad() can be called from worker threads, where profiling would be a no-op,
+    // create a type name -based profile block here
+#ifdef URHO3D_PROFILING
+    String profileBlockName("Load" + GetTypeName());
+    
+    Profiler* profiler = GetSubsystem<Profiler>();
+    if (profiler)
+        profiler->BeginBlock(profileBlockName.CString());
+#endif
+
+    bool success = BeginLoad(source);
+    if (success)
+        success &= EndLoad();
+
+#ifdef URHO3D_PROFILING
+    if (profiler)
+        profiler->EndBlock();
+#endif
+
+    return success;
+}
+
+bool Resource::BeginLoad(Deserializer& source)
+{
+    // This always needs to be overridden by subclasses
     return false;
+}
+
+bool Resource::EndLoad()
+{
+    // If no GPU upload step is necessary, no override is necessary
+    return true;
 }
 
 bool Resource::Save(Serializer& dest) const
@@ -58,6 +91,11 @@ void Resource::SetMemoryUse(unsigned size)
 void Resource::ResetUseTimer()
 {
     useTimer_.Reset();
+}
+
+void Resource::SetAsyncLoadState(AsyncLoadState newState)
+{
+    asyncLoadState_ = newState;
 }
 
 unsigned Resource::GetUseTimer()

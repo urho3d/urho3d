@@ -35,7 +35,7 @@ class URHO3D_API ProfilerBlock
 public:
     /// Construct with the specified parent block and name.
     ProfilerBlock(ProfilerBlock* parent, const char* name) :
-        name_(name),
+        name_(0),
         time_(0),
         maxTime_(0),
         count_(0),
@@ -50,6 +50,12 @@ public:
         totalMaxTime_(0),
         totalCount_(0)
     {
+        if (name)
+        {
+            unsigned nameLength = String::CStringLength(name);
+            name_ = new char[nameLength + 1];
+            memcpy(name_, name, nameLength + 1);
+        }
     }
     
     /// Destruct. Free the child blocks.
@@ -60,6 +66,8 @@ public:
             delete *i;
             *i = 0;
         }
+        
+        delete name_;
     }
     
     /// Begin timing.
@@ -114,13 +122,6 @@ public:
     /// Return child block with the specified name.
     ProfilerBlock* GetChild(const char* name)
     {
-        // First check using string pointers only, then resort to actual strcmp
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        {
-            if ((*i)->name_ == name)
-                return *i;
-        }
-        
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if (!String::Compare((*i)->name_, name, true))
@@ -134,7 +135,7 @@ public:
     }
     
     /// Block name.
-    const char* name_;
+    char* name_;
     /// High-resolution timer for measuring the block duration.
     HiresTimer timer_;
     /// Time on current frame.

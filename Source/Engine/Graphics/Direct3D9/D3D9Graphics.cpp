@@ -252,11 +252,15 @@ Graphics::Graphics(Context* context) :
 
 Graphics::~Graphics()
 {
-    // Release all GPU objects that still exist
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->Release();
-    gpuObjects_.Clear();
-    
+    {
+        MutexLock lock(gpuObjectMutex_);
+
+        // Release all GPU objects that still exist
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->Release();
+        gpuObjects_.Clear();
+    }
+
     vertexDeclarations_.Clear();
     
     if (impl_->defaultColorSurface_)
@@ -2218,11 +2222,15 @@ void Graphics::Minimize()
 
 void Graphics::AddGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+
     gpuObjects_.Push(object);
 }
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+
     gpuObjects_.Remove(object);
 }
 
@@ -2665,14 +2673,22 @@ void Graphics::OnDeviceLost()
         impl_->frameQuery_ = 0;
     }
     
-    for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
-        gpuObjects_[i]->OnDeviceLost();
+    {
+        MutexLock lock(gpuObjectMutex_);
+
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceLost();
+    }
 }
 
 void Graphics::OnDeviceReset()
 {
-    for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
-        gpuObjects_[i]->OnDeviceReset();
+    {
+        MutexLock lock(gpuObjectMutex_);
+
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceReset();
+    }
     
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);

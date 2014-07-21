@@ -60,7 +60,7 @@ void LuaFile::RegisterObject(Context* context)
     context->RegisterFactory<LuaFile>();
 }
 
-bool LuaFile::Load(Deserializer& source)
+bool LuaFile::BeginLoad(Deserializer& source)
 {
     size_ = source.GetSize();
 

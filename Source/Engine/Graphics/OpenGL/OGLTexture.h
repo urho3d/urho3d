@@ -113,13 +113,11 @@ public:
     static unsigned GetExternalFormat(unsigned format);
     /// Return the data type corresponding to an OpenGL internal format.
     static unsigned GetDataType(unsigned format);
-    
-    /// Load parameters.
-    void LoadParameters();
-    /// Load parameters from an XML file.
-    void LoadParameters(XMLFile* xml);
-    /// Load parameters from an XML element.
-    void LoadParameters(const XMLElement& element);
+
+    /// Set additional parameters from an XML file.
+    void SetParameters(XMLFile* xml);
+    /// Set additional parameters from an XML element.
+    void SetParameters(const XMLElement& element);
     /// Return the corresponding SRGB texture format if supported. If not supported, return format unchanged.
     unsigned GetSRGBFormat(unsigned format);
     

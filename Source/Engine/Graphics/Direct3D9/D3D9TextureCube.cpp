@@ -169,6 +169,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
 
 bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
 {
+    PROFILE(SetTextureData);
+    
     if (!object_)
     {
         LOGERROR("No texture created, can not set data");
@@ -280,10 +282,8 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     return true;
 }
 
-bool TextureCube::Load(Deserializer& source)
+bool TextureCube::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadTextureCube);
-    
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
     // In headless mode, do not actually load the texture, just return success
@@ -298,22 +298,21 @@ bool TextureCube::Load(Deserializer& source)
         return true;
     }
     
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-    
     String texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
     
-    SharedPtr<XMLFile> xml(new XMLFile(context_));
-    if (!xml->Load(source))
+    loadParameters_ = (new XMLFile(context_));
+    if (!loadParameters_->Load(source))
+    {
+        loadParameters_.Reset();
         return false;
+    }
     
-    LoadParameters(xml);
+    loadImages_.Clear();
     
-    XMLElement textureElem = xml->GetRoot();
+    XMLElement textureElem = loadParameters_->GetRoot();
     XMLElement faceElem = textureElem.GetChild("face");
-    unsigned faces = 0;
-    while (faceElem && faces < MAX_CUBEMAP_FACES)
+    while (faceElem)
     {
         String name = faceElem.GetAttribute("name");
         
@@ -323,28 +322,43 @@ bool TextureCube::Load(Deserializer& source)
         if (faceTexPath.Empty())
             name = texPath + name;
         
-        SharedPtr<Image> image(cache->GetTempResource<Image>(name));
-        Load((CubeMapFace)faces, image);
-        faces++;
-        
+        loadImages_.Push(cache->GetTempResource<Image>(name));
         faceElem = faceElem.GetNext("face");
     }
     
     return true;
 }
 
-bool TextureCube::Load(CubeMapFace face, Deserializer& source)
+bool TextureCube::EndLoad()
 {
-    PROFILE(LoadTextureCube);
+    // In headless mode, do not actually load the texture, just return success
+    if (!graphics_)
+        return true;
     
+    // If over the texture budget, see if materials can be freed to allow textures to be freed
+    CheckTextureBudget(GetTypeStatic());
+
+    SetParameters(loadParameters_);
+    
+    for (unsigned i = 0; i < loadImages_.Size() && i < MAX_CUBEMAP_FACES; ++i)
+        SetData((CubeMapFace)i, loadImages_[i]);
+    
+    loadImages_.Clear();
+    loadParameters_.Reset();
+    
+    return true;
+}
+
+bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
+{
     SharedPtr<Image> image(new Image(context_));
     if (!image->Load(source))
         return false;
     
-    return Load(face, image);
+    return SetData(face, image);
 }
 
-bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
+bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {

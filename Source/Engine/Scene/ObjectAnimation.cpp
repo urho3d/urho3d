@@ -54,7 +54,7 @@ void ObjectAnimation::RegisterObject(Context* context)
     context->RegisterFactory<ObjectAnimation>();
 }
 
-bool ObjectAnimation::Load(Deserializer& source)
+bool ObjectAnimation::BeginLoad(Deserializer& source)
 {
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))

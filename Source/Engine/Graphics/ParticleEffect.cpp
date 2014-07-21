@@ -90,7 +90,7 @@ void ParticleEffect::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEffect>();
 }
 
-bool ParticleEffect::Load(Deserializer& source)
+bool ParticleEffect::BeginLoad(Deserializer& source)
 {
     XMLFile file(context_);
     if (!file.Load(source))

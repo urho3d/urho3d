@@ -172,19 +172,19 @@ static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, 
     return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
 }
 
-static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
+static bool Texture2DSetData(Image* image, bool useAlpha, Texture2D* ptr)
 {
-    return ptr->Load(SharedPtr<Image>(image), useAlpha);
+    return ptr->SetData(SharedPtr<Image>(image), useAlpha);
 }
 
-static bool Texture3DLoad(Image* image, bool useAlpha, Texture3D* ptr)
+static bool Texture3DSetData(Image* image, bool useAlpha, Texture3D* ptr)
 {
-    return ptr->Load(SharedPtr<Image>(image), useAlpha);
+    return ptr->SetData(SharedPtr<Image>(image), useAlpha);
 }
 
-static bool TextureCubeLoad(CubeMapFace face, Image* image, bool useAlpha, TextureCube* ptr)
+static bool TextureCubeSetData(CubeMapFace face, Image* image, bool useAlpha, TextureCube* ptr)
 {
-    return ptr->Load(face, SharedPtr<Image>(image), useAlpha);
+    return ptr->SetData(face, SharedPtr<Image>(image), useAlpha);
 }
 
 static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
@@ -446,17 +446,17 @@ static void RegisterTextures(asIScriptEngine* engine)
     
     RegisterTexture<Texture2D>(engine, "Texture2D");
     engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture2D", "bool Load(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Texture2D", "bool SetData(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Texture2D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2D, GetRenderSurface), asCALL_THISCALL);
 
     RegisterTexture<Texture3D>(engine, "Texture3D");
     engine->RegisterObjectMethod("Texture3D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture3D, SetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool Load(Image@+, bool useAlpha = false)", asFUNCTION(Texture3DLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Texture3D", "bool SetData(Image@+, bool useAlpha = false)", asFUNCTION(Texture3DSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Texture3D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture3D, GetRenderSurface), asCALL_THISCALL);
     
     RegisterTexture<TextureCube>(engine, "TextureCube");
     engine->RegisterObjectMethod("TextureCube", "bool SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("TextureCube", "bool SetData(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurfaces(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
     
     engine->RegisterGlobalFunction("uint GetAlphaFormat()", asFUNCTION(Graphics::GetAlphaFormat), asCALL_CDECL);

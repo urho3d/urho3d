@@ -57,10 +57,8 @@ void JSONFile::RegisterObject(Context* context)
     context->RegisterFactory<JSONFile>();
 }
 
-bool JSONFile::Load(Deserializer& source)
+bool JSONFile::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadJSONFile);
-
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {

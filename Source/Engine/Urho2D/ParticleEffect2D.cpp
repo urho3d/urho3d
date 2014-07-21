@@ -105,7 +105,7 @@ void ParticleEffect2D::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEffect2D>();
 }
 
-bool ParticleEffect2D::Load(Deserializer& source)
+bool ParticleEffect2D::BeginLoad(Deserializer& source)
 {
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))

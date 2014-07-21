@@ -57,10 +57,8 @@ void Font::RegisterObject(Context* context)
     context->RegisterFactory<Font>();
 }
 
-bool Font::Load(Deserializer& source)
+bool Font::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadFont);
-
     // In headless mode, do not actually load, just return success
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
