@@ -51,4 +51,9 @@ if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/install_postBuildPhase.makeDebu
     sed -i '' 's/$(EFFECTIVE_PLATFORM_NAME)//g' $BUILD/CMakeScripts/install_postBuildPhase.make*
 fi
 
+# Set Xcode build settings to skip dSYM file generation for Debug configuration (other configurations still use the default dwarf-with-dsym)
+if [ "$1" == "-DIOS=1" -a $(perl -v >/dev/null 2>&1) -e $BUILD/Urho3D.xcodeproj/project.pbxproj ]; then
+    perl -i -pe 'BEGIN { $/ = undef; } s/(Begin XCBuildConfiguration.*?Debug.*?Settings = {\n)/\1DEBUG_INFORMATION_FORMAT = dwarf;\n/s' $BUILD/Urho3D.xcodeproj/project.pbxproj
+fi
+
 # vi: set ts=4 sw=4 expandtab:
