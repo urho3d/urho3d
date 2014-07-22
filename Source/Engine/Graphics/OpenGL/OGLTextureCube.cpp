@@ -258,6 +258,8 @@ bool TextureCube::BeginLoad(Deserializer& source)
         return true;
     }
     
+    cache->ResetDependencies(this);
+    
     String texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
     
@@ -283,6 +285,8 @@ bool TextureCube::BeginLoad(Deserializer& source)
             name = texPath + name;
         
         loadImages_.Push(cache->GetTempResource<Image>(name));
+        cache->StoreResourceDependency(this, name);
+        
         faceElem = faceElem.GetNext("face");
     }
     

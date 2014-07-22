@@ -124,12 +124,13 @@ void ResourceCache::ThreadFunction()
                 // Need to lock the queue again when manipulating other entries
                 backgroundLoadMutex_.Acquire();
                 
-                for (unsigned i = 0; i < item.dependents_.Size(); ++i)
+                for (HashSet<Pair<StringHash, StringHash> >::Iterator i = item.dependents_.Begin(); i != item.dependents_.End();
+                    ++i)
                 {
                     HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator j =
-                        backgroundLoadQueue_.Find(item.dependents_[i]);
+                        backgroundLoadQueue_.Find(*i);
                     if (j != backgroundLoadQueue_.End())
-                        j->second_.dependencies_.Remove(key);
+                        j->second_.dependencies_.Erase(key);
                 }
                 
                 item.dependents_.Clear();
@@ -649,6 +650,8 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const char* nameIn, 
         return false;
     }
     
+    LOGDEBUG("Background loading resource " + name);
+
     item.resource_->SetName(name);
     item.resource_->SetAsyncLoadState(ASYNC_QUEUED);
     
@@ -659,8 +662,8 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const char* nameIn, 
         HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Find(callerKey);
         if (i != backgroundLoadQueue_.End())
         {
-            i->second_.dependents_.Push(callerKey);
-            item.dependencies_.Push(key);
+            i->second_.dependents_.Insert(callerKey);
+            item.dependencies_.Insert(key);
         }
         else
             LOGWARNING("Resource " + caller->GetName() + " requested for a background loaded resource but was not in the background load queue");
@@ -1137,7 +1140,7 @@ void ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>
     if (success)
     {
 #ifdef URHO3D_PROFILING
-        String profileBlockName("EndLoad" + GetTypeName());
+        String profileBlockName("EndLoad" + resource->GetTypeName());
     
         Profiler* profiler = GetSubsystem<Profiler>();
         if (profiler)

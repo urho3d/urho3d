@@ -62,9 +62,9 @@ struct BackgroundLoadItem
     /// Resource.
     SharedPtr<Resource> resource_;
     /// Resources depended on for loading.
-    Vector<Pair<StringHash, StringHash> > dependencies_;
+    HashSet<Pair<StringHash, StringHash> > dependencies_;
     /// Resources that depend on this resource's loading.
-    Vector<Pair<StringHash, StringHash> > dependents_;
+    HashSet<Pair<StringHash, StringHash> > dependents_;
     /// Whether to send failure event.
     bool sendEventOnFailure_;
 };

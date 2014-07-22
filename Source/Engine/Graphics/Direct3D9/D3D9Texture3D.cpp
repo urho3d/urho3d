@@ -55,6 +55,8 @@ void Texture3D::RegisterObject(Context* context)
 
 bool Texture3D::BeginLoad(Deserializer& source)
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
         return true;
@@ -70,6 +72,8 @@ bool Texture3D::BeginLoad(Deserializer& source)
     String texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
     
+    cache->ResetDependencies(this);
+
     loadParameters_ = new XMLFile(context_);
     if (!loadParameters_->Load(source))
     {
@@ -91,7 +95,8 @@ bool Texture3D::BeginLoad(Deserializer& source)
         if (volumeTexPath.Empty())
             name = texPath + name;
 
-        loadImage_ = GetSubsystem<ResourceCache>()->GetTempResource<Image>(name);
+        loadImage_ = cache->GetTempResource<Image>(name);
+        cache->StoreResourceDependency(this, name);
     }
     else if (colorlutElem)
     {
@@ -111,6 +116,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
             loadImage_.Reset();
             return false;
         }
+        cache->StoreResourceDependency(this, name);
     }
 
     return false;
