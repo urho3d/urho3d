@@ -577,9 +577,6 @@ void PickMaterialTextureDone(StringHash eventType, VariantMap& eventData)
     String resourceName = eventData["FileName"].GetString();
     Resource@ res = GetPickedResource(resourceName);
 
-    Print("INDEX");
-    Print(resourcePickIndex);
-    
     if (res !is null && editMaterial !is null)
     {
         BeginMaterialEdit();

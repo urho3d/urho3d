@@ -589,9 +589,6 @@ void Node::SetOwner(Connection* owner)
 
 void Node::MarkDirty()
 {
-    if (dirty_)
-        return;
-
     dirty_ = true;
 
     // Notify listener components first, then mark child nodes
@@ -1501,6 +1498,13 @@ unsigned Node::GetNumPersistentComponents() const
     }
 
     return ret;
+}
+
+void Node::SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+{
+    position_ = position;
+    rotation_ = rotation;
+    scale_ = scale;
 }
 
 void Node::OnAttributeAnimationAdded()

@@ -125,15 +125,17 @@ public:
     void Apply();
     
 private:
-    /// Apply animation to a skeleton.
+    /// Apply animation to a skeleton. Transform changes are applied silently, so the model needs to dirty its root model afterward.
     void ApplyToModel();
     /// Apply animation to a scene node hierarchy.
     void ApplyToNodes();
     /// Apply animation track to a scene node, full weight.
     void ApplyTrackFullWeight(AnimationStateTrack& stateTrack);
-    /// Apply animation track to a scene node, blended with current node transform.
-    void ApplyTrackBlended(AnimationStateTrack& stateTrack, float weight);
-    
+    /// Apply animation track to a scene node, full weight. Apply transform changes silently without marking the node dirty.
+    void ApplyTrackFullWeightSilent(AnimationStateTrack& stateTrack);
+    /// Apply animation track to a scene node, blended with current node transform. Apply transform changes silently without marking the node dirty.
+    void ApplyTrackBlendedSilent(AnimationStateTrack& stateTrack, float weight);
+
     /// Animated model (model mode.)
     WeakPtr<AnimatedModel> model_;
     /// Root scene node (node hierarchy mode.)

@@ -449,6 +449,14 @@ public:
     unsigned GetNumPersistentChildren() const;
     /// Calculate number of non-temporary components.
     unsigned GetNumPersistentComponents() const;
+    /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetPositionSilent(const Vector3& position) { position_ = position; }
+    /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetRotationSilent(const Quaternion& rotation) { rotation_ = rotation; }
+    /// Set scale in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetScaleSilent(const Vector3& scale) { scale_ = scale; }
+    /// Set local transform silently without marking the node & child nodes dirty. Used by animation code.
+    void SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
 protected:
     /// Handle attribute animation added.

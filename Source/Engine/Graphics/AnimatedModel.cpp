@@ -1134,10 +1134,13 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     // (first AnimatedModel in a node)
     if (isMaster_)
     {
-        skeleton_.Reset();
+        skeleton_.ResetSilent();
         for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
             (*i)->Apply();
         
+        // Skeleton reset and animations apply the node transforms "silently" to avoid repeated marking dirty. Mark dirty now
+        node_->MarkDirty();
+
         // Calculate new bone bounding box
         UpdateBoneBoundingBox();
     }

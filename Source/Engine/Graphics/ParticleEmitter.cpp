@@ -68,6 +68,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Emitting", emitting_, true, AM_FILE);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    COPY_BASE_ATTRIBUTES(ParticleEmitter, Drawable);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
