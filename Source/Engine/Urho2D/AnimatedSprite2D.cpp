@@ -294,7 +294,8 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
             continue;
 
         StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
-        worldBoundingBox_.Merge(staticSprite->GetWorldBoundingBox());
+        if (staticSprite)
+            worldBoundingBox_.Merge(staticSprite->GetWorldBoundingBox());
     }
 
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
@@ -338,34 +339,36 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
     for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
     {
         const Timeline2D& timeline = animation->GetTimeline(i);
-        // Just handle OT_SPRITE type timeline
-        if (timeline.type_ == OT_SPRITE)
+        SharedPtr<Node> timelineNode(rootNode_->GetChild(timeline.name_));
+
+        StaticSprite2D* staticSprite = 0;
+
+        if (timelineNode)
         {
-            SharedPtr<Node> timelineNode(rootNode_->GetChild(timeline.name_));
-            StaticSprite2D* staticSprite = 0;
-
-            if (timelineNode)
-            {
-                // Enable timeline node
-                timelineNode->SetEnabled(true);
-                // Get StaticSprite2D component
+            // Enable timeline node
+            timelineNode->SetEnabled(true);
+            // Get StaticSprite2D component
+            if (timeline.type_ == OT_SPRITE)
                 staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-            }
-            else
-            {
-                // Create new timeline node
-                timelineNode = rootNode_->CreateChild(timeline.name_, LOCAL);
-                // Create StaticSprite2D component
+        }
+        else
+        {
+            // Create new timeline node
+            timelineNode = rootNode_->CreateChild(timeline.name_, LOCAL);
+            // Create StaticSprite2D component
+            if (timeline.type_ == OT_SPRITE)
                 staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
-            }
+        }
 
+        if (staticSprite)
+        {
             staticSprite->SetLayer(layer_);
             staticSprite->SetBlendMode(blendMode_);
             staticSprite->SetFlip(flipX_, flipY_);
             staticSprite->SetUseHotSpot(true);
-
-            timelineNodes_[i] = timelineNode;
         }
+
+        timelineNodes_[i] = timelineNode;
 
         timelineTransformInfos_[i].parent_ = timeline.parent_;
     }
@@ -423,10 +426,13 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
             if (timelineNode)
             {
                 StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-                staticSprite->SetSprite(currKey.sprite_);
-                staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
-                float alpha = Lerp(currKey.alpha_, nextKey.alpha_, t);
-                staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * alpha));
+                if (staticSprite)
+                {
+                    staticSprite->SetSprite(currKey.sprite_);
+                    staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
+                    float alpha = Lerp(currKey.alpha_, nextKey.alpha_, t);
+                    staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * alpha));
+                }
             }
         }
         else
@@ -438,9 +444,12 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
             if (timelineNode)
             {
                 StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-                staticSprite->SetSprite(currKey.sprite_);
-                staticSprite->SetHotSpot(currKey.hotSpot_);
-                staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * currKey.alpha_));
+                if (staticSprite)
+                {
+                    staticSprite->SetSprite(currKey.sprite_);
+                    staticSprite->SetHotSpot(currKey.hotSpot_);
+                    staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * currKey.alpha_));
+                }
             }
         }
     }
@@ -502,7 +511,8 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
             // Update sprite's z order
             StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-            staticSprite->SetOrderInLayer(orderInLayer_ + ref->zIndex_);
+            if (staticSprite)
+                staticSprite->SetOrderInLayer(orderInLayer_ + ref->zIndex_);
         }
     }
 
