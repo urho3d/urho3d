@@ -129,6 +129,16 @@ void Skeleton::Reset()
     }
 }
 
+void Skeleton::ResetSilent()
+{
+    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
+    {
+        if (i->animated_ && i->node_)
+            i->node_->SetTransformSilent(i->initialPosition_, i->initialRotation_, i->initialScale_);
+    }
+}
+
+
 Bone* Skeleton::GetRootBone()
 {
     return GetBone(rootBoneIndex_);

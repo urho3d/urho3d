@@ -114,6 +114,9 @@ public:
     /// Return bone by name hash.
     Bone* GetBone(StringHash boneNameHash);
     
+    /// Reset all animating bones to initial positions without marking the nodes dirty. Requires the node dirtying to be performed later.
+    void ResetSilent();
+
 private:
     /// Bones.
     Vector<Bone> bones_;
