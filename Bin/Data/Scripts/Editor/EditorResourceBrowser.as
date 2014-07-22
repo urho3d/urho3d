@@ -49,12 +49,14 @@ const int RESOURCE_TYPE_TEXTURE_ATLAS = 17;
 const int RESOURCE_TYPE_2D_PARTICLE_EFFECT = 18;
 const int RESOURCE_TYPE_TEXTURE_3D = 19;
 const int RESOURCE_TYPE_CUBEMAP = 20;
+const int RESOURCE_TYPE_PARTICLEEMITTER = 21;
 
 const StringHash XML_TYPE_SCENE("scene");
 const StringHash XML_TYPE_NODE("node");
 const StringHash XML_TYPE_MATERIAL("material");
 const StringHash XML_TYPE_TECHNIQUE("technique");
 const StringHash XML_TYPE_PARTICLEEFFECT("particleeffect");
+const StringHash XML_TYPE_PARTICLEEMITTER("particleemitter");
 const StringHash XML_TYPE_TEXTURE("texture");
 const StringHash XML_TYPE_ELEMENT("element");
 const StringHash XML_TYPE_ELEMENTS("elements");
@@ -226,7 +228,7 @@ void CreateResourceFilterUI()
 
     UIElement@ col1 = browserFilterWindow.GetChild("TypeFilterColumn1", true);
     UIElement@ col2 = browserFilterWindow.GetChild("TypeFilterColumn2", true);
-    for (int i=-2; i < 21; ++i)
+    for (int i=-2; i < 22; ++i)
     {
         if (i == RESOURCE_TYPE_NOTSET)
             continue;
@@ -1024,6 +1026,8 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_TECHNIQUE;
     else if(fileType == XML_TYPE_PARTICLEEFFECT)
         return RESOURCE_TYPE_PARTICLEEFFECT;
+    else if(fileType == XML_TYPE_PARTICLEEMITTER)
+        return RESOURCE_TYPE_PARTICLEEMITTER;
     else if(fileType == XML_TYPE_TEXTURE)
         return RESOURCE_TYPE_TEXTURE;
     else if(fileType == XML_TYPE_ELEMENT)
@@ -1221,6 +1225,8 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
             fileType = XML_TYPE_TECHNIQUE;
         else if(type == XML_TYPE_PARTICLEEFFECT)
             fileType = XML_TYPE_PARTICLEEFFECT;
+        else if(type == XML_TYPE_PARTICLEEMITTER)
+            fileType = XML_TYPE_PARTICLEEMITTER;
         else if(type == XML_TYPE_TEXTURE)
             fileType = XML_TYPE_TEXTURE;
         else if(type == XML_TYPE_ELEMENT)
@@ -1277,6 +1283,8 @@ String ResourceTypeName(int resourceType)
         return "Render Technique";
     else if (resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
         return "Particle Effect";
+    else if (resourceType == RESOURCE_TYPE_PARTICLEEMITTER)
+        return "Particle Emitter";
     else if (resourceType == RESOURCE_TYPE_UIELEMENT)
         return "UI Element";
     else if (resourceType == RESOURCE_TYPE_UIELEMENTS)
