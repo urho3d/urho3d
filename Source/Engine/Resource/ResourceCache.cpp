@@ -618,10 +618,13 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const String& name, 
 
 bool ResourceCache::BackgroundLoadResource(StringHash type, const char* nameIn, bool sendEventOnFailure, Resource* caller)
 {
+    // If empty name, fail immediately
     String name = SanitateResourceName(nameIn);
-    StringHash nameHash(name);
+    if (name.Empty())
+        return false;
     
     // First check if already exists as a loaded resource
+    StringHash nameHash(name);
     if (FindResource(type, nameHash) != noResource)
         return false;
     
