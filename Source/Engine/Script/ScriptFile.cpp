@@ -21,11 +21,11 @@
 //
 
 #include "Precompiled.h"
-#include "ArrayPtr.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "FileSystem.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Script.h"
@@ -72,7 +72,7 @@ class ByteCodeDeserializer : public asIBinaryStream
 {
 public:
     /// Construct.
-    ByteCodeDeserializer(Deserializer& source) :
+    ByteCodeDeserializer(MemoryBuffer& source) :
         source_(source)
     {
     }
@@ -90,7 +90,7 @@ public:
     
 private:
     /// Source stream.
-    Deserializer& source_;
+    MemoryBuffer& source_;
 };
 
 ScriptFile::ScriptFile(Context* context) :
@@ -116,6 +116,8 @@ bool ScriptFile::BeginLoad(Deserializer& source)
 {
     ReleaseModule();
     
+    loadByteCode_.Reset();
+
     // Create the module. Discard previous module if there was one
     asIScriptEngine* engine = script_->GetScriptEngine();
     scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
@@ -128,40 +130,58 @@ bool ScriptFile::BeginLoad(Deserializer& source)
     // Check if this file is precompiled bytecode
     if (source.ReadFileID() == "ASBC")
     {
-        ByteCodeDeserializer deserializer = ByteCodeDeserializer(source);
-        if (scriptModule_->LoadByteCode(&deserializer) >= 0)
-        {
-            LOGINFO("Loaded script module " + GetName() + " from bytecode");
-            compiled_ = true;
-            // Map script module to script resource with userdata
-            scriptModule_->SetUserData(this);
-            
-            return true;
-        }
-        else
-            return false;
+        // Perform actual parsing in EndLoad(); read data now
+        loadByteCodeSize_ = source.GetSize() - source.GetPosition();
+        loadByteCode_ = new unsigned char[loadByteCodeSize_];
+        source.Read(loadByteCode_.Get(), loadByteCodeSize_);
+        return true;
     }
     else
         source.Seek(0);
     
-    // Not bytecode: add the initial section and check for includes
-    if (!AddScriptSection(engine, source))
-        return false;
-    
-    // Compile
-    int result = scriptModule_->Build();
-    if (result < 0)
+    // Not bytecode: add the initial section and check for includes.
+    // Perform actual building during EndLoad(), as AngelScript can not multithread module compilation,
+    // and static initializers may access arbitrary engine functionality which may not be thread-safe
+    return AddScriptSection(engine, source);
+}
+
+bool ScriptFile::EndLoad()
+{
+    bool success = false;
+
+    // Load from bytecode if available, else compile
+    if (loadByteCode_)
     {
-        LOGERROR("Failed to compile script module " + GetName());
-        return false;
+        MemoryBuffer buffer(loadByteCode_.Get(), loadByteCodeSize_);
+        ByteCodeDeserializer deserializer = ByteCodeDeserializer(buffer);
+
+        if (scriptModule_->LoadByteCode(&deserializer) >= 0)
+        {
+            LOGINFO("Loaded script module " + GetName() + " from bytecode");
+            success = true;
+        }
+    }
+    else
+    {
+        int result = scriptModule_->Build();
+        if (result >= 0)
+        {
+            LOGINFO("Compiled script module " + GetName());
+            success = true;
+        }
+        else
+            LOGERROR("Failed to compile script module " + GetName());
     }
     
-    LOGINFO("Compiled script module " + GetName());
-    compiled_ = true;
-    // Map script module to script resource with userdata
-    scriptModule_->SetUserData(this);
-    
-    return true;
+    if (success)
+    {
+        compiled_ = true;
+        // Map script module to script resource with userdata
+        scriptModule_->SetUserData(this);
+    }
+
+    loadByteCode_.Reset();
+    return success;
 }
 
 void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName)
