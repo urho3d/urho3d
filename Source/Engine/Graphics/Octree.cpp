@@ -75,11 +75,7 @@ void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
     {
         Drawable* drawable = *start;
         if (drawable)
-        {
             drawable->Update(frame);
-            // Ask for an updated world bounding box from the drawable already here to calculate them multithreaded
-            drawable->GetWorldBoundingBox();
-        }
         ++start;
     }
 }
@@ -412,7 +408,7 @@ void Octree::Update(const FrameInfo& frame)
         scene->BeginThreadedUpdate();
         
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
-        int drawablesPerItem = drawableUpdates_.Size() / numWorkItems;
+        int drawablesPerItem = Max((int)(drawableUpdates_.Size() / numWorkItems), 1);
         
         PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
         // Create a work item for each thread
