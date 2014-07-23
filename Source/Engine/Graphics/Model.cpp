@@ -90,7 +90,8 @@ bool Model::BeginLoad(Deserializer& source)
     indexBuffers_.Clear();
     
     unsigned memoryUse = sizeof(Model);
-    
+    bool async = GetAsyncLoadState() == ASYNC_LOADING;
+
     // Read vertex buffers
     unsigned numVertexBuffers = source.ReadUInt();
     vertexBuffers_.Reserve(numVertexBuffers);
@@ -108,12 +109,25 @@ bool Model::BeginLoad(Deserializer& source)
         unsigned vertexSize = VertexBuffer::GetVertexSize(elementMask);
 
         // Prepare vertex buffer data to be uploaded during EndLoad()
-        loadVBData_[i].vertexCount_ = vertexCount;
-        loadVBData_[i].elementMask_ = elementMask;
-        loadVBData_[i].dataSize_ = vertexCount * vertexSize;
-        loadVBData_[i].data_ = new unsigned char[loadVBData_[i].dataSize_];
-        source.Read(loadVBData_[i].data_.Get(), loadVBData_[i].dataSize_);
-        
+        if (async)
+        {
+            loadVBData_[i].vertexCount_ = vertexCount;
+            loadVBData_[i].elementMask_ = elementMask;
+            loadVBData_[i].dataSize_ = vertexCount * vertexSize;
+            loadVBData_[i].data_ = new unsigned char[loadVBData_[i].dataSize_];
+            source.Read(loadVBData_[i].data_.Get(), loadVBData_[i].dataSize_);
+        }
+        else
+        {
+            // If not async loading, use locking to avoid extra allocation & copy
+            loadVBData_[i].data_.Reset(); // Make sure no previous data
+            buffer->SetShadowed(true);
+            buffer->SetSize(vertexCount, elementMask);
+            void* dest = buffer->Lock(0, vertexCount);
+            source.Read(dest, vertexCount * vertexSize);
+            buffer->Unlock();
+        }
+
         memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
         vertexBuffers_.Push(buffer);
     }
@@ -130,12 +144,25 @@ bool Model::BeginLoad(Deserializer& source)
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
 
         // Prepare index buffer data to be uploaded during EndLoad()
-        loadIBData_[i].indexCount_ = indexCount;
-        loadIBData_[i].indexSize_ = indexSize;
-        loadIBData_[i].dataSize_ = indexCount * indexSize;
-        loadIBData_[i].data_ = new unsigned char[loadIBData_[i].dataSize_];
-        source.Read(loadIBData_[i].data_.Get(), loadIBData_[i].dataSize_);
-        
+        if (async)
+        {
+            loadIBData_[i].indexCount_ = indexCount;
+            loadIBData_[i].indexSize_ = indexSize;
+            loadIBData_[i].dataSize_ = indexCount * indexSize;
+            loadIBData_[i].data_ = new unsigned char[loadIBData_[i].dataSize_];
+            source.Read(loadIBData_[i].data_.Get(), loadIBData_[i].dataSize_);
+        }
+        else
+        {
+            // If not async loading, use locking to avoid extra allocation & copy
+            loadIBData_[i].data_.Reset(); // Make sure no previous data
+            buffer->SetShadowed(true);
+            buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
+            void* dest = buffer->Lock(0, indexCount);
+            source.Read(dest, indexCount * indexSize);
+            buffer->Unlock();
+        }
+
         memoryUse += sizeof(IndexBuffer) + indexCount * indexSize;
         indexBuffers_.Push(buffer);
     }
@@ -271,9 +298,12 @@ bool Model::EndLoad()
     {
         VertexBuffer* buffer = vertexBuffers_[i];
         VertexBufferDesc& desc = loadVBData_[i];
-        buffer->SetShadowed(true);
-        buffer->SetSize(desc.vertexCount_, desc.elementMask_);
-        buffer->SetData(desc.data_.Get());
+        if (desc.data_)
+        {
+            buffer->SetShadowed(true);
+            buffer->SetSize(desc.vertexCount_, desc.elementMask_);
+            buffer->SetData(desc.data_.Get());
+        }
     }
 
     // Upload index buffer data
@@ -281,9 +311,12 @@ bool Model::EndLoad()
     {
         IndexBuffer* buffer = indexBuffers_[i];
         IndexBufferDesc& desc = loadIBData_[i];
-        buffer->SetShadowed(true);
-        buffer->SetSize(desc.indexCount_, desc.indexSize_ > sizeof(unsigned short));
-        buffer->SetData(desc.data_.Get());
+        if (desc.data_)
+        {
+            buffer->SetShadowed(true);
+            buffer->SetSize(desc.indexCount_, desc.indexSize_ > sizeof(unsigned short));
+            buffer->SetData(desc.data_.Get());
+        }
     }
 
     // Set up geometries
