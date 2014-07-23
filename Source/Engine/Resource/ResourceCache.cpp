@@ -1141,11 +1141,12 @@ void ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>
     {
 #ifdef URHO3D_PROFILING
         String profileBlockName("EndLoad" + resource->GetTypeName());
-    
+        
         Profiler* profiler = GetSubsystem<Profiler>();
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif
+        LOGDEBUG("Finishing background loaded resource " + resource->GetName());
         success = resource->EndLoad();
         
 #ifdef URHO3D_PROFILING
