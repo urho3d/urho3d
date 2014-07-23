@@ -30,6 +30,7 @@ namespace Urho3D
 class Animation2D;
 class Sprite2D;
 class XMLElement;
+class XMLFile;
 
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API AnimationSet2D : public Resource
@@ -46,6 +47,8 @@ public:
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
 
     /// Get number of animations.
     unsigned GetNumAnimations() const;
@@ -66,6 +69,8 @@ private:
     HashMap<unsigned, SharedPtr<Sprite2D> > sprites_;
     /// Animations.
     Vector<SharedPtr<Animation2D> > animations_;
+    /// XML file used during loading.
+    SharedPtr<XMLFile> loadXMLFile_;
 };
 
 }

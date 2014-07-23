@@ -64,9 +64,9 @@ private:
     SharedPtr<Texture2D> texture_;
     /// Sprite mapping.
     HashMap<String, SharedPtr<Sprite2D> > spriteMapping_;
-    /// XML file used during loading.
+    /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
-    /// Texture name used during loading.
+    /// Texture name used while loading.
     String loadTextureName_;
 };
 

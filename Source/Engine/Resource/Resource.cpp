@@ -47,6 +47,9 @@ bool Resource::Load(Deserializer& source)
         profiler->BeginBlock(profileBlockName.CString());
 #endif
 
+    // Make sure any previous async state is cancelled
+    SetAsyncLoadState(ASYNC_DONE);
+
     bool success = BeginLoad(source);
     if (success)
         success &= EndLoad();

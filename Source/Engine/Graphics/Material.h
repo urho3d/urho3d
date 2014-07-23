@@ -225,7 +225,7 @@ private:
     /// Last animation update frame number.
     unsigned animationFrameNumber_;
     /// XML file used while loading.
-    SharedPtr<XMLFile> loadXML_;
+    SharedPtr<XMLFile> loadXMLFile_;
 };
 
 }

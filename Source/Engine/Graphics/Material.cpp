@@ -172,15 +172,15 @@ bool Material::BeginLoad(Deserializer& source)
     if (!graphics)
         return true;
 
-    loadXML_ = new XMLFile(context_);
-    if (loadXML_->Load(source))
+    loadXMLFile_ = new XMLFile(context_);
+    if (loadXMLFile_->Load(source))
     {
         // If async loading, scan the XML content beforehand for technique & texture resources
         // and request them to also be loaded. Can not do anything else at this point
         if (GetAsyncLoadState() == ASYNC_LOADING)
         {
             ResourceCache* cache = GetSubsystem<ResourceCache>();
-            XMLElement rootElem = loadXML_->GetRoot();
+            XMLElement rootElem = loadXMLFile_->GetRoot();
             XMLElement techniqueElem = rootElem.GetChild("technique");
             while (techniqueElem)
             {
@@ -207,7 +207,7 @@ bool Material::BeginLoad(Deserializer& source)
     else
     {
         ResetToDefaults();
-        loadXML_.Reset();
+        loadXMLFile_.Reset();
         return false;
     }
 }
@@ -220,14 +220,14 @@ bool Material::EndLoad()
         return true;
 
     bool success = false;
-    if (loadXML_)
+    if (loadXMLFile_)
     {
         // If async loading, get the techniques / textures which should be ready now
-        XMLElement rootElem = loadXML_->GetRoot();
+        XMLElement rootElem = loadXMLFile_->GetRoot();
         success = Load(rootElem);
     }
 
-    loadXML_.Reset();
+    loadXMLFile_.Reset();
     return success;
 }
 
