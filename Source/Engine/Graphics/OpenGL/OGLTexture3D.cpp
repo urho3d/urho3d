@@ -101,6 +101,9 @@ bool Texture3D::BeginLoad(Deserializer& source)
             name = texPath + name;
 
         loadImage_ = cache->GetTempResource<Image>(name);
+        // Precalculate mip levels if async loading
+        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
+            loadImage_->PrecalculateLevels();
         cache->StoreResourceDependency(this, name);
     }
     else if (colorlutElem)
@@ -121,11 +124,15 @@ bool Texture3D::BeginLoad(Deserializer& source)
             loadImage_.Reset();
             return false;
         }
+        // Precalculate mip levels if async loading
+        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
+            loadImage_->PrecalculateLevels();
         cache->StoreResourceDependency(this, name);
     }
 
     return false;
 }
+
 
 bool Texture3D::EndLoad()
 {

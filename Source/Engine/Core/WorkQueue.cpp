@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-const unsigned MAX_NONTHREADED_WORK_USEC = 1000;
+const unsigned MAX_NONTHREADED_WORK_USEC = 5000;
 
 /// Worker thread managed by the work queue.
 class WorkerThread : public Thread, public RefCounted

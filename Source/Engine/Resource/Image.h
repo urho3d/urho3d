@@ -170,6 +170,8 @@ public:
     Image* GetSubimage(const IntRect& rect) const;
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
+    /// Precalculate the mip levels. Used by asynchronous texture loading.
+    void PrecalculateLevels();
 
 private:
     /// Decode an image using stb_image.
@@ -191,6 +193,8 @@ private:
     CompressedFormat compressedFormat_;
     /// Pixel data.
     SharedArrayPtr<unsigned char> data_;
+    /// Precalculated mip level image.
+    SharedPtr<Image> nextLevel_;
 };
 
 }

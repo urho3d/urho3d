@@ -42,6 +42,8 @@
 namespace Urho3D
 {
 
+const unsigned MAX_FINISH_RESOURCES_USEC = 5000;
+
 static const char* checkDirs[] = {
     "Fonts",
     "Materials",
@@ -1081,19 +1083,30 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
         }
     }
     
-    // Check for background loaded resources that can be finalized
-    MutexLock lock(backgroundLoadMutex_);
-    
-    for (HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Begin();
-        i != backgroundLoadQueue_.End(); ++i)
+    // Check for background loaded resources that can be finished
+    if (IsStarted())
     {
-        Resource* resource = i->second_.resource_;
-        unsigned numDeps = i->second_.dependencies_.Size();
-        AsyncLoadState state = resource->GetAsyncLoadState();
-        if (numDeps > 0 || state == ASYNC_QUEUED || state == ASYNC_LOADING)
-            continue;
-        else
-            FinishBackgroundLoading(i);
+        PROFILE(FinishBackgroundResources);
+
+        MutexLock lock(backgroundLoadMutex_);
+    
+        HiresTimer timer;
+
+        for (HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Begin();
+            i != backgroundLoadQueue_.End(); ++i)
+        {
+            Resource* resource = i->second_.resource_;
+            unsigned numDeps = i->second_.dependencies_.Size();
+            AsyncLoadState state = resource->GetAsyncLoadState();
+            if (numDeps > 0 || state == ASYNC_QUEUED || state == ASYNC_LOADING)
+                continue;
+            else
+                FinishBackgroundLoading(i);
+
+            // Break when certain time passed to avoid bogging down the framerate
+            if (timer.GetUSec(false) >= MAX_FINISH_RESOURCES_USEC)
+                break;
+        }
     }
 }
 
@@ -1140,7 +1153,7 @@ void ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>
     if (success)
     {
 #ifdef URHO3D_PROFILING
-        String profileBlockName("EndLoad" + resource->GetTypeName());
+        String profileBlockName("Finish" + resource->GetTypeName());
         
         Profiler* profiler = GetSubsystem<Profiler>();
         if (profiler)

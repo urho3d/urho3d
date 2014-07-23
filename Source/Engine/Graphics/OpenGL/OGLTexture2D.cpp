@@ -76,6 +76,10 @@ bool Texture2D::BeginLoad(Deserializer& source)
         loadImage_.Reset();
         return false;
     }
+
+    // Precalculate mip levels if async loading
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+        loadImage_->PrecalculateLevels();
     
     // Load the optional parameters file
     ResourceCache* cache = GetSubsystem<ResourceCache>();

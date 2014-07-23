@@ -329,7 +329,17 @@ bool TextureCube::BeginLoad(Deserializer& source)
         
         faceElem = faceElem.GetNext("face");
     }
-    
+
+    // Precalculate mip levels if async loading
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+    {
+        for (unsigned i = 0; i < loadImages_.Size(); ++i)
+        {
+            if (loadImages_[i])
+                loadImages_[i]->PrecalculateLevels();
+        }
+    }
+
     return true;
 }
 
