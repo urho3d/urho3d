@@ -107,6 +107,8 @@ void ParticleEffect2D::RegisterObject(Context* context)
 
 bool ParticleEffect2D::BeginLoad(Deserializer& source)
 {
+    loadSpriteName_.Clear();
+
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))
         return false;
@@ -116,13 +118,10 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
         return false;
 
     String texture = rootElem.GetChild("texture").GetAttribute("name");
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
-    if (!sprite_)
-    {
-        LOGERROR("Could not load sprite " + GetParentPath(GetName()) + texture);
-        return false;
-    }
+    loadSpriteName_ = GetParentPath(GetName()) + texture;
+    // If async loading, request the sprite beforehand
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+        GetSubsystem<ResourceCache>()->BackgroundLoadResource<Sprite2D>(loadSpriteName_, true, this);
 
     sourcePositionVariance_ = ReadVector2(rootElem, "sourcePositionVariance");
 
@@ -195,6 +194,22 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
     rotationEnd_ = ReadFloat(rootElem, "rotationEnd");
     rotationEndVariance_ = ReadFloat(rootElem, "rotationEndVariance");
 
+    return true;
+}
+
+bool ParticleEffect2D::EndLoad()
+{
+    // Apply the sprite now
+    if (!loadSpriteName_.Empty())
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
+        if (!sprite_)
+            LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
+
+        loadSpriteName_.Clear();
+    }
+    
     return true;
 }
 

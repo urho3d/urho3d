@@ -53,6 +53,8 @@ public:
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
@@ -208,11 +210,11 @@ private:
     /// Read Vector2.
     Vector2 ReadVector2(const XMLElement& element, const String& name) const;
     /// Write integer.
-	void WriteInt(XMLElement& element, const String& name, int value) const;
+    void WriteInt(XMLElement& element, const String& name, int value) const;
     /// Write float.
-	void WriteFloat(XMLElement& element, const String& name, float value) const;
+    void WriteFloat(XMLElement& element, const String& name, float value) const;
     /// Write Color.
-	void WriteColor(XMLElement& element, const String& name, const Color& color) const;
+    void WriteColor(XMLElement& element, const String& name, const Color& color) const;
     /// Write Vector2.
     void WriteVector2(XMLElement& element, const String& name, const Vector2& value) const;
 
@@ -286,6 +288,8 @@ private:
     float rotationEnd_;
     /// Rotation end variance.
     float rotationEndVariance_;
+    /// Sprite name acquired during BeginLoad().
+    String loadSpriteName_;
 };
 
 }

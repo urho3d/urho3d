@@ -146,7 +146,7 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
         loadMaterialName_ = rootElem.GetChild("material").GetAttribute("name");
         // If async loading, can not GetResource() the material. But can do a background request for it
         if (GetAsyncLoadState() == ASYNC_LOADING)
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Material>(loadMaterialName_);
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Material>(loadMaterialName_, true, this);
     }
 
     if (rootElem.HasChild("numparticles"))
