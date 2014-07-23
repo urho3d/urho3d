@@ -113,6 +113,8 @@ public:
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
@@ -337,6 +339,8 @@ private:
     Vector<ColorFrame> colorFrames_;
     /// Texture animation frames.
     Vector<TextureFrame> textureFrames_;
+    /// Material name acquired during BeginLoad().
+    String loadMaterialName_;
 };
 
 }

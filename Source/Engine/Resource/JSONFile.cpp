@@ -73,7 +73,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
 
     if (document_->Parse<0>(buffer).HasParseError())
     {
-        LOGERROR("Could not parse JOSO data from " + source.GetName());
+        LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
     }
 

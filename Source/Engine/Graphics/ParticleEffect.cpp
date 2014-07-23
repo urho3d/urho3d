@@ -92,6 +92,8 @@ void ParticleEffect::RegisterObject(Context* context)
 
 bool ParticleEffect::BeginLoad(Deserializer& source)
 {
+    loadMaterialName_.Clear();
+
     XMLFile file(context_);
     if (!file.Load(source))
     {
@@ -140,7 +142,12 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
     textureFrames_.Clear();
 
     if (rootElem.HasChild("material"))
-        SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(rootElem.GetChild("material").GetAttribute("name")));
+    {
+        loadMaterialName_ = rootElem.GetChild("material").GetAttribute("name");
+        // If async loading, can not GetResource() the material. But can do a background request for it
+        if (GetAsyncLoadState() == ASYNC_LOADING)
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Material>(loadMaterialName_);
+    }
 
     if (rootElem.HasChild("numparticles"))
         SetNumParticles(rootElem.GetChild("numparticles").GetInt("value"));
@@ -268,6 +275,18 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
         }
 
         SetTextureFrames(animations);
+    }
+
+    return true;
+}
+
+bool ParticleEffect::EndLoad()
+{
+    // Apply the material now
+    if (!loadMaterialName_.Empty())
+    {
+        SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(loadMaterialName_));
+        loadMaterialName_.Clear();
     }
 
     return true;
