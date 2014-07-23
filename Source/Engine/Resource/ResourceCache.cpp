@@ -42,8 +42,6 @@
 namespace Urho3D
 {
 
-const unsigned MAX_FINISH_RESOURCES_USEC = 5000;
-
 static const char* checkDirs[] = {
     "Fonts",
     "Materials",
@@ -69,7 +67,8 @@ ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false),
     returnFailedResources_(false),
-    searchPackagesFirst_(true)
+    searchPackagesFirst_(true),
+    finishBackgroundResourcesMs_(5)
 {
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
@@ -1093,18 +1092,18 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
         HiresTimer timer;
 
         for (HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Begin();
-            i != backgroundLoadQueue_.End(); ++i)
+            i != backgroundLoadQueue_.End();)
         {
             Resource* resource = i->second_.resource_;
             unsigned numDeps = i->second_.dependencies_.Size();
             AsyncLoadState state = resource->GetAsyncLoadState();
             if (numDeps > 0 || state == ASYNC_QUEUED || state == ASYNC_LOADING)
-                continue;
+                ++i;
             else
-                FinishBackgroundLoading(i);
+                i = FinishBackgroundLoading(i);
 
-            // Break when certain time passed to avoid bogging down the framerate
-            if (timer.GetUSec(false) >= MAX_FINISH_RESOURCES_USEC)
+            // Break when the configured time passed to avoid bogging down the framerate
+            if (timer.GetUSec(false) >= finishBackgroundResourcesMs_ * 1000)
                 break;
         }
     }
@@ -1143,7 +1142,7 @@ File* ResourceCache::SearchPackages(const String& nameIn)
     return 0;
 }
 
-void ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i)
+HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i)
 {
     BackgroundLoadItem& item = i->second_;
     Resource* resource = i->second_.resource_;
@@ -1203,7 +1202,7 @@ void ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>
     // Finally remove the background queue item
     {
         MutexLock lock(backgroundLoadMutex_);
-        backgroundLoadQueue_.Erase(i);
+        return backgroundLoadQueue_.Erase(i);
     }
 }
 

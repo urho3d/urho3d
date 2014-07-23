@@ -115,6 +115,8 @@ public:
     void SetReturnFailedResources(bool enable);
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
+    /// Set how many milliseconds maximum per frame to spend on finishing background loaded resources.
+    void SetFinishBackgroundResourcesMs(int ms) { finishBackgroundResourcesMs_ = Max(ms, 1); }
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
@@ -162,8 +164,10 @@ public:
     bool GetAutoReloadResources() const { return autoReloadResources_; }
     /// Return whether resources that failed to load are returned.
     bool GetReturnFailedResources() const { return returnFailedResources_; }
-    /// Define whether when getting resources should check package files or directories first.
+    /// Return whether when getting resources should check package files or directories first.
     bool GetSearchPackagesFirst() const { return searchPackagesFirst_; }
+    /// Return how many milliseconds maximum to spend on finishing background loaded resources.
+    int GetFinishBackgroundResourcesMs() const { return finishBackgroundResourcesMs_; }
 
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
@@ -192,7 +196,7 @@ private:
     /// Search resource packages for file.
     File* SearchPackages(const String& nameIn);
     /// Finish the loading of a background loaded resource.
-    void FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i);
+    HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i);
     
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
@@ -216,6 +220,8 @@ private:
     bool returnFailedResources_;
     /// Search priority flag.
     bool searchPackagesFirst_;
+    /// How many milliseconds maximum per frame to spend on finishing background loaded resources.
+    int finishBackgroundResourcesMs_;
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)

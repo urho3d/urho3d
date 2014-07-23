@@ -134,6 +134,8 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "bool get_autoReloadResources() const", asMETHOD(ResourceCache, GetAutoReloadResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_returnFailedResources(bool)", asMETHOD(ResourceCache, SetReturnFailedResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool get_returnFailedResources() const", asMETHOD(ResourceCache, GetReturnFailedResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void set_finishBackgroundResourcesMs(int)", asMETHOD(ResourceCache, SetFinishBackgroundResourcesMs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "int get_finishBackgroundResourcesMs() const", asMETHOD(ResourceCache, GetFinishBackgroundResourcesMs), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "uint get_numBackgroundLoadResources() const", asMETHOD(ResourceCache, GetNumBackgroundLoadResources), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);

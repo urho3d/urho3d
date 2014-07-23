@@ -32,8 +32,6 @@
 namespace Urho3D
 {
 
-const unsigned MAX_NONTHREADED_WORK_USEC = 5000;
-
 /// Worker thread managed by the work queue.
 class WorkerThread : public Thread, public RefCounted
 {
@@ -69,7 +67,8 @@ WorkQueue::WorkQueue(Context* context) :
     pausing_(false),
     paused_(false),
     tolerance_(10),
-    lastSize_(0)
+    lastSize_(0),
+    maxNonThreadedWorkMs_(5)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WorkQueue, HandleBeginFrame));
 }
@@ -343,7 +342,7 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
         
         HiresTimer timer;
         
-        while (!queue_.Empty() && timer.GetUSec(false) < MAX_NONTHREADED_WORK_USEC)
+        while (!queue_.Empty() && timer.GetUSec(false) < maxNonThreadedWorkMs_ * 1000)
         {
             WorkItem* item = queue_.Front();
             queue_.PopFront();
