@@ -547,7 +547,10 @@ Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool s
                     break;
             }
             // This will store the resource (if successful) to the resource groups so that the code below will find it
-            FinishBackgroundLoading(i);
+            FinishBackgroundLoading(i->second_);
+            backgroundLoadMutex_.Acquire();
+            backgroundLoadQueue_.Erase(i);
+            backgroundLoadMutex_.Release();
         }
         else
             backgroundLoadMutex_.Release();
@@ -1087,10 +1090,10 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
     {
         PROFILE(FinishBackgroundResources);
 
-        MutexLock lock(backgroundLoadMutex_);
-    
         HiresTimer timer;
 
+        backgroundLoadMutex_.Acquire();
+        
         for (HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i = backgroundLoadQueue_.Begin();
             i != backgroundLoadQueue_.End();)
         {
@@ -1100,12 +1103,21 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
             if (numDeps > 0 || state == ASYNC_QUEUED || state == ASYNC_LOADING)
                 ++i;
             else
-                i = FinishBackgroundLoading(i);
-
+            {
+                // Finishing a resource may need it to wait for other resources to load, in which case we can not
+                // hold on to the mutex
+                backgroundLoadMutex_.Release();
+                FinishBackgroundLoading(i->second_);
+                backgroundLoadMutex_.Acquire();
+                i = backgroundLoadQueue_.Erase(i);
+            }
+            
             // Break when the configured time passed to avoid bogging down the framerate
             if (timer.GetUSec(false) >= finishBackgroundResourcesMs_ * 1000)
                 break;
         }
+        
+        backgroundLoadMutex_.Release();
     }
 }
 
@@ -1142,10 +1154,9 @@ File* ResourceCache::SearchPackages(const String& nameIn)
     return 0;
 }
 
-HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator ResourceCache::FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i)
+void ResourceCache::FinishBackgroundLoading(BackgroundLoadItem& item)
 {
-    BackgroundLoadItem& item = i->second_;
-    Resource* resource = i->second_.resource_;
+    Resource* resource = item.resource_;
     
     bool success = resource->GetAsyncLoadState() == ASYNC_SUCCESS;
     // If BeginLoad() phase was successful, call EndLoad() and get the final success/failure result
@@ -1197,12 +1208,6 @@ HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator ResourceCach
         resource->ResetUseTimer();
         resourceGroups_[type].resources_[nameHash] = resource;
         UpdateResourceGroup(type);
-    }
-    
-    // Finally remove the background queue item
-    {
-        MutexLock lock(backgroundLoadMutex_);
-        return backgroundLoadQueue_.Erase(i);
     }
 }
 

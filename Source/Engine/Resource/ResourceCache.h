@@ -196,7 +196,7 @@ private:
     /// Search resource packages for file.
     File* SearchPackages(const String& nameIn);
     /// Finish the loading of a background loaded resource.
-    HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator FinishBackgroundLoading(HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator i);
+    void FinishBackgroundLoading(BackgroundLoadItem& item);
     
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
