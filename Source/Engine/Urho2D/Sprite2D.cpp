@@ -51,17 +51,33 @@ void Sprite2D::RegisterObject(Context* context)
 
 bool Sprite2D::BeginLoad(Deserializer& source)
 {
-    SharedPtr<Texture2D> texture(new Texture2D(context_));
-    texture->SetName(GetName());
-    if (!texture->Load(source))
+    loadTexture_ = new Texture2D(context_);
+    loadTexture_->SetName(GetName());
+    // In case we're async loading, only call BeginLoad() for the texture (load image but do not upload to GPU)
+    if (!loadTexture_->BeginLoad(source))
+    {
+        loadTexture_.Reset();
         return false;
-
-    SetTexture(texture);
-
-    if (texture_)
-        SetRectangle(IntRect(0, 0, texture_->GetWidth(), texture_->GetHeight()));
-
+    }
+    
     return true;
+}
+
+bool Sprite2D::EndLoad()
+{
+    // Finish loading of the texture in the main thread
+    bool success = false;
+    if (loadTexture_ && loadTexture_->EndLoad())
+    {
+        success = true;
+        SetTexture(loadTexture_);
+        
+        if (texture_)
+            SetRectangle(IntRect(0, 0, texture_->GetWidth(), texture_->GetHeight()));
+    }
+
+    loadTexture_.Reset();
+    return success;
 }
 
 void Sprite2D::SetTexture(Texture2D* texture)

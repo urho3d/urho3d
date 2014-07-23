@@ -56,33 +56,51 @@ void SpriteSheet2D::RegisterObject(Context* context)
 
 bool SpriteSheet2D::BeginLoad(Deserializer& source)
 {
+    loadTextureName_.Clear();
     spriteMapping_.Clear();
 
-    SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
-    if(!xmlFile->Load(source))
+    loadXMLFile_ = new XMLFile(context_);
+    if(!loadXMLFile_->Load(source))
     {
         LOGERROR("Could not load sprite sheet");
+        loadXMLFile_.Reset();
         return false;
     }
 
     SetMemoryUse(source.GetSize());
 
-    XMLElement rootElem = xmlFile->GetRoot("TextureAtlas");
+    XMLElement rootElem = loadXMLFile_->GetRoot("TextureAtlas");
     if (!rootElem)
     {
         LOGERROR("Invalid sprite sheet");
+        loadXMLFile_.Reset();
         return false;
     }
 
-    String textureFileName = rootElem.GetAttribute("imagePath");
+    // If we're async loading, request the texture now. Finish during EndLoad().
+    loadTextureName_ = GetParentPath(GetName()) + rootElem.GetAttribute("imagePath");
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+        GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(loadTextureName_, true, this);
+
+    return true;
+}
+
+bool SpriteSheet2D::EndLoad()
+{
+    if (!loadXMLFile_)
+        return false;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    texture_ = cache->GetResource<Texture2D>(GetParentPath(GetName()) + textureFileName);
+    texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
-        LOGERROR("Could not load texture " + GetParentPath(GetName()) + textureFileName);
+        LOGERROR("Could not load texture " + loadTextureName_);
+        loadXMLFile_.Reset();
+        loadTextureName_.Clear();
         return false;
     }
 
+    XMLElement rootElem = loadXMLFile_->GetRoot("TextureAtlas");
     XMLElement subTextureElem = rootElem.GetChild("SubTexture");
     while (subTextureElem)
     {
@@ -111,6 +129,8 @@ bool SpriteSheet2D::BeginLoad(Deserializer& source)
         subTextureElem = subTextureElem.GetNext("SubTexture");
     }
 
+    loadXMLFile_.Reset();
+    loadTextureName_.Clear();
     return true;
 }
 
