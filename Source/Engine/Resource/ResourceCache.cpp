@@ -512,13 +512,13 @@ Resource* ResourceCache::GetResource(StringHash type, const String& name, bool s
 
 Resource* ResourceCache::GetResource(StringHash type, const char* nameIn, bool sendEventOnFailure)
 {
+    String name = SanitateResourceName(nameIn);
+    
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Calling GetResource is only supported from the main thread. Use GetFile or GetTempResource instead.");
+        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
         return 0;
     }
-    
-    String name = SanitateResourceName(nameIn);
     
     // If empty name, return null pointer immediately
     if (name.Empty())

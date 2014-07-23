@@ -96,6 +96,7 @@ bool Model::BeginLoad(Deserializer& source)
     vertexBuffers_.Reserve(numVertexBuffers);
     morphRangeStarts_.Resize(numVertexBuffers);
     morphRangeCounts_.Resize(numVertexBuffers);
+    loadVBData_.Resize(numVertexBuffers);
     for (unsigned i = 0; i < numVertexBuffers; ++i)
     {
         unsigned vertexCount = source.ReadUInt();
@@ -104,13 +105,14 @@ bool Model::BeginLoad(Deserializer& source)
         morphRangeCounts_[i] = source.ReadUInt();
         
         SharedPtr<VertexBuffer> buffer(new VertexBuffer(context_));
-        buffer->SetShadowed(true);
-        buffer->SetSize(vertexCount, elementMask);
-        
-        void* dest = buffer->Lock(0, vertexCount);
-        unsigned vertexSize = buffer->GetVertexSize();
-        source.Read(dest, vertexCount * vertexSize);
-        buffer->Unlock();
+        unsigned vertexSize = VertexBuffer::GetVertexSize(elementMask);
+
+        // Prepare vertex buffer data to be uploaded during EndLoad()
+        loadVBData_[i].vertexCount_ = vertexCount;
+        loadVBData_[i].elementMask_ = elementMask;
+        loadVBData_[i].dataSize_ = vertexCount * vertexSize;
+        loadVBData_[i].data_ = new unsigned char[loadVBData_[i].dataSize_];
+        source.Read(loadVBData_[i].data_.Get(), loadVBData_[i].dataSize_);
         
         memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
         vertexBuffers_.Push(buffer);
@@ -119,18 +121,20 @@ bool Model::BeginLoad(Deserializer& source)
     // Read index buffers
     unsigned numIndexBuffers = source.ReadUInt();
     indexBuffers_.Reserve(numIndexBuffers);
+    loadIBData_.Resize(numIndexBuffers);
     for (unsigned i = 0; i < numIndexBuffers; ++i)
     {
         unsigned indexCount = source.ReadUInt();
         unsigned indexSize = source.ReadUInt();
         
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
-        buffer->SetShadowed(true);
-        buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
-        
-        void* dest = buffer->Lock(0, indexCount);
-        source.Read(dest, indexCount * indexSize);
-        buffer->Unlock();
+
+        // Prepare index buffer data to be uploaded during EndLoad()
+        loadIBData_[i].indexCount_ = indexCount;
+        loadIBData_[i].indexSize_ = indexSize;
+        loadIBData_[i].dataSize_ = indexCount * indexSize;
+        loadIBData_[i].data_ = new unsigned char[loadIBData_[i].dataSize_];
+        source.Read(loadIBData_[i].data_.Get(), loadIBData_[i].dataSize_);
         
         memoryUse += sizeof(IndexBuffer) + indexCount * indexSize;
         indexBuffers_.Push(buffer);
@@ -141,6 +145,7 @@ bool Model::BeginLoad(Deserializer& source)
     geometries_.Reserve(numGeometries);
     geometryBoneMappings_.Reserve(numGeometries);
     geometryCenters_.Reserve(numGeometries);
+    loadGeometries_.Resize(numGeometries);
     for (unsigned i = 0; i < numGeometries; ++i)
     {
         // Read bone mappings
@@ -153,34 +158,45 @@ bool Model::BeginLoad(Deserializer& source)
         unsigned numLodLevels = source.ReadUInt();
         Vector<SharedPtr<Geometry> > geometryLodLevels;
         geometryLodLevels.Reserve(numLodLevels);
+        loadGeometries_[i].Resize(numLodLevels);
         
         for (unsigned j = 0; j < numLodLevels; ++j)
         {
             float distance = source.ReadFloat();
             PrimitiveType type = (PrimitiveType)source.ReadUInt();
             
-            unsigned vertexBufferRef = source.ReadUInt();
-            unsigned indexBufferRef = source.ReadUInt();
+            unsigned vbRef = source.ReadUInt();
+            unsigned ibRef = source.ReadUInt();
             unsigned indexStart = source.ReadUInt();
             unsigned indexCount = source.ReadUInt();
             
-            if (vertexBufferRef >= vertexBuffers_.Size())
+            if (vbRef >= vertexBuffers_.Size())
             {
                 LOGERROR("Vertex buffer index out of bounds");
+                loadVBData_.Clear();
+                loadIBData_.Clear();
+                loadGeometries_.Clear();
                 return false;
             }
-            if (indexBufferRef >= indexBuffers_.Size())
+            if (ibRef >= indexBuffers_.Size())
             {
                 LOGERROR("Index buffer index out of bounds");
+                loadVBData_.Clear();
+                loadIBData_.Clear();
+                loadGeometries_.Clear();
                 return false;
             }
             
             SharedPtr<Geometry> geometry(new Geometry(context_));
-            geometry->SetVertexBuffer(0, vertexBuffers_[vertexBufferRef]);
-            geometry->SetIndexBuffer(indexBuffers_[indexBufferRef]);
-            geometry->SetDrawRange(type, indexStart, indexCount);
             geometry->SetLodDistance(distance);
-            
+
+            // Prepare geometry to be defined during EndLoad()
+            loadGeometries_[i][j].type_ = type;
+            loadGeometries_[i][j].vbRef_ = vbRef;
+            loadGeometries_[i][j].ibRef_ = ibRef;
+            loadGeometries_[i][j].indexStart_ = indexStart;
+            loadGeometries_[i][j].indexCount_ = indexCount;
+
             geometryLodLevels.Push(geometry);
             memoryUse += sizeof(Geometry);
         }
@@ -245,6 +261,47 @@ bool Model::BeginLoad(Deserializer& source)
     memoryUse += sizeof(Vector3) * geometries_.Size();
     
     SetMemoryUse(memoryUse);
+    return true;
+}
+
+bool Model::EndLoad()
+{
+    // Upload vertex buffer data
+    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
+    {
+        VertexBuffer* buffer = vertexBuffers_[i];
+        VertexBufferDesc& desc = loadVBData_[i];
+        buffer->SetShadowed(true);
+        buffer->SetSize(desc.vertexCount_, desc.elementMask_);
+        buffer->SetData(desc.data_.Get());
+    }
+
+    // Upload index buffer data
+    for (unsigned i = 0; i < indexBuffers_.Size(); ++i)
+    {
+        IndexBuffer* buffer = indexBuffers_[i];
+        IndexBufferDesc& desc = loadIBData_[i];
+        buffer->SetShadowed(true);
+        buffer->SetSize(desc.indexCount_, desc.indexSize_ > sizeof(unsigned short));
+        buffer->SetData(desc.data_.Get());
+    }
+
+    // Set up geometries
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        for (unsigned j = 0; j < geometries_[i].Size(); ++j)
+        {
+            Geometry* geometry = geometries_[i][j];
+            GeometryDesc& desc = loadGeometries_[i][j];
+            geometry->SetVertexBuffer(0, vertexBuffers_[desc.vbRef_]);
+            geometry->SetIndexBuffer(indexBuffers_[desc.ibRef_]);
+            geometry->SetDrawRange(desc.type_, desc.indexStart_, desc.indexCount_);
+        }
+    }
+
+    loadVBData_.Clear();
+    loadIBData_.Clear();
+    loadGeometries_.Clear();
     return true;
 }
 
