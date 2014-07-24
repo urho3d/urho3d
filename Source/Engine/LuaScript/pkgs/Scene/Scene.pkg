@@ -5,6 +5,13 @@ static const unsigned LAST_REPLICATED_ID;
 static const unsigned FIRST_LOCAL_ID;
 static const unsigned LAST_LOCAL_ID;
 
+enum LoadMode
+{
+    LOAD_RESOURCES_ONLY = 0,
+    LOAD_SCENE,
+    LOAD_SCENE_AND_RESOURCES
+};
+
 class Scene : public Node
 {
     Scene();
@@ -23,10 +30,10 @@ class Scene : public Node
     tolua_outside Node* SceneInstantiateXML @ InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     tolua_outside Node* SceneInstantiateXML @ InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
 
-    bool LoadAsync(File* file);
-    bool LoadAsyncXML(File* file);
-    tolua_outside bool SceneLoadAsync @ LoadAsync(const String fileName);
-    tolua_outside bool SceneLoadAsyncXML @ LoadAsyncXML(const String fileName);
+    bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    tolua_outside bool SceneLoadAsync @ LoadAsync(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    tolua_outside bool SceneLoadAsyncXML @ LoadAsyncXML(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
     void StopAsyncLoading();
     void Clear(bool clearReplicated = true, bool clearLocal = true);
     void SetUpdateEnabled(bool enable);
@@ -34,6 +41,7 @@ class Scene : public Node
     void SetElapsedTime(float time);
     void SetSmoothingConstant(float constant);
     void SetSnapThreshold(float threshold);
+    void SetAsyncLoadingMs(int ms);
     
     Node* GetNode(unsigned id) const;
     //Component* GetComponent(unsigned id) const;
@@ -41,12 +49,14 @@ class Scene : public Node
     bool IsUpdateEnabled() const;
     bool IsAsyncLoading() const;
     float GetAsyncProgress() const;
+    LoadMode GetAsyncLoadMode() const;
     const String GetFileName() const;
     unsigned GetChecksum() const;
     float GetTimeScale() const;
     float GetElapsedTime() const;
     float GetSmoothingConstant() const;
     float GetSnapThreshold() const;
+    int GetAsyncLoadingMs() const;
     const String GetVarName(StringHash hash) const;
 
     void Update(float timeStep);
@@ -71,12 +81,14 @@ class Scene : public Node
     tolua_property__is_set bool updateEnabled;
     tolua_readonly tolua_property__is_set bool asyncLoading;
     tolua_readonly tolua_property__get_set float asyncProgress;
+    tolua_readonly tolua_property__get_set LoadMode asyncLoadMode;
     tolua_property__get_set const String fileName;
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_property__get_set float timeScale;
     tolua_property__get_set float elapsedTime;
     tolua_property__get_set float smoothingConstant;
     tolua_property__get_set float snapThreshold;
+    tolua_property__get_set int asyncLoadingMs;
     tolua_readonly tolua_property__is_set bool threadedUpdate;
     tolua_property__get_set String varNamesAttr;
 };
@@ -140,16 +152,16 @@ static bool SceneSaveXML(const Scene* scene, const String& fileName)
     return scene->SaveXML(file);
 }
 
-static bool SceneLoadAsync(Scene* scene, const String& fileName)
+static bool SceneLoadAsync(Scene* scene, const String& fileName, LoadMode mode)
 {
     SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
-    return file->IsOpen() && scene->LoadAsync(file);
+    return file->IsOpen() && scene->LoadAsync(file, mode);
 }
 
-static bool SceneLoadAsyncXML(Scene* scene, const String& fileName)
+static bool SceneLoadAsyncXML(Scene* scene, const String& fileName, LoadMode mode)
 {
     SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
-    return file->IsOpen() && scene->LoadAsyncXML(file);
+    return file->IsOpen() && scene->LoadAsyncXML(file, mode);
 }
 
 static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)

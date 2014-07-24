@@ -310,7 +310,7 @@ Scenes can be loaded and saved in either binary or XML format; see the functions
 
 Nodes and components that are marked temporary will not be saved. See \ref Serializable::SetTemporary "SetTemporary()".
 
-To be able to track the progress of loading a (large) scene without having the program stall for the duration of the loading, a scene can also be loaded asynchronously. This means that on each frame the scene loads child nodes until a certain amount of milliseconds has been exceeded. See \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()". Use the functions \ref Scene::IsAsyncLoading "IsAsyncLoading()" and \ref Scene::GetAsyncProgress "GetAsyncProgress()" to track the loading progress; the latter returns a float value between 0 and 1, where 1 is fully loaded. The scene will not update or render before it is fully loaded.
+To be able to track the progress of loading a (large) scene without having the program stall for the duration of the loading, a scene can also be loaded asynchronously. This means that on each frame the scene loads resources and child nodes until a certain amount of milliseconds has been exceeded. See \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()". Use the functions \ref Scene::IsAsyncLoading "IsAsyncLoading()" and \ref Scene::GetAsyncProgress "GetAsyncProgress()" to track the loading progress; the latter returns a float value between 0 and 1, where 1 is fully loaded. The scene will not update or render before it is fully loaded.
 
 \section SceneModel_Instantiation Object prefabs
 
@@ -334,11 +334,13 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Image
 - Model
 - Material
+- ParticleEffect
 - ScriptFile
 - Shader
 - Sound
 - Technique
 - Texture2D
+- Texture3D
 - TextureCube
 - XMLFile
 
@@ -364,6 +366,22 @@ Resources can also be created manually and stored to the resource cache as if th
 
 Memory budgets can be set per resource type: if resources consume more memory than allowed, the oldest resources will be removed from the cache if not in use anymore. By default the memory budgets are set to unlimited.
 
+\section Resources_Background Background loading of resources
+
+Normally, when requesting resources using \ref ResourceCache::GetResource "GetResource()", they are loaded immediately in the main thread, which may take several milliseconds for all the required steps (load file from disk,
+parse data, upload to GPU if necessary) and can therefore result in framerate drops.
+
+If you know in advance what resources you need, you can request them to be loaded in a background thread by calling \ref ResourceCache::BackgroundLoadResource "BackgroundLoadResource()". The event E_RESOURCEBACKGROUNDLOADED will be sent after the loading is complete; it will tell if the loading actually was a success or a failure. Depending on the resource, only a part of the loading process may be moved to a background thread, for example the finishing GPU upload step always needs to happen in the main thread. Note that if you call GetResource() for a resource that is queued for background loading, the main thread will stall until its loading is complete.
+
+The asynchronous scene loading functionality \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()" has the option to background load the resources first before proceeding to load the scene content. It can also be used to only load the resources without modifying the scene, by specifying the LOAD_RESOURCES_ONLY mode. This allows to prepare a scene or object prefab file for fast instantiation.
+
+Finally the maximum time (in milliseconds) spent each frame on finishing background loaded resources can be configured, see \ref ResourceCache::SetFinishBackgroundResourcesMs "SetFinishBackgroundResourcesMs()".
+
+\section Resources_BackgroundImplementation Implementing background loading
+
+When writing new resource types, the background loading mechanism requires implementing two functions: \ref Resource::BeginLoad "BeginLoad()" and \ref Resource::EndLoad "EndLoad()". BeginLoad() is potentially called in a background thread and should do as much work (such as file I/O) as possible without violating the \ref Multithreading "multithreading" rules. EndLoad() should perform the main thread finishing step, such as GPU upload. Either step can return false to indicate failure to load the resource.
+
+If a resource depends on other resources, writing efficient threaded loading for it can be hard, as calling GetResource() is not allowed inside BeginLoad() when background loading. There are a few options: it is allowed to queue new background load requests by calling BackgroundLoadResource() within BeginLoad(), or if the needed resource does not need to be permanently stored in the cache and is safe to load outside the main thread (for example Image or XMLFile, which do not possess any GPU-side data), \ref ResourceCache::GetTempResource "GetTempResource()" can be called inside BeginLoad.
 
 \page Scripting Scripting
 
@@ -1969,21 +1987,21 @@ void WorkFunction(const WorkItem* item, unsigned threadIndex)
 
 The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
 
-Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
+Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not. Additionally there are dedicated threads for audio mixing and background loading of resources.
 
-When making your own work functions, observe that the following things are (at least currently) unsafe and will result in undefined behavior and crashes, if done outside the main thread:
+When making your own work functions or threads, observe that the following things are unsafe and will result in undefined behavior and crashes, if done outside the main thread:
 
-- Modifying scene or UI content
+- Modifying scene or %UI content
 - Modifying GPU resources
-- Requesting resources from ResourceCache
 - Executing script functions
+- Pointing SharedPtr's or WeakPtr's to the same RefCounted object from multiple threads simultaneously
 
-Sending events and using the Profiler are treated as no-ops when called from outside the main thread.
+Using the Profiler is treated as a no-op when called from outside the main thread. Trying to send an event or get a resource from the ResourceCache when not in the main thread will cause an error to be logged. %Log messages from other threads are collected and handled in the main thread at the end of the frame.
 
 \page AttributeAnimation %Attribute animation
 Attribute animation is a new system for Urho3D, With it user can apply animation to object's attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
 
-These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
+These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object's attribute. Here is a simple code for light color animation:
 \code
 SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
@@ -1993,7 +2011,7 @@ colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
 \endcode
 
-On above code, we first create an ValueAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+On above code, we first create an ValueAnimation object call colorAnimation, and set its key frame value, then apply it to light's color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
 
 Another way is load attribute animation from resource, here is a simple sample:
 \code
@@ -2004,7 +2022,7 @@ light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 These are three kind of wrap mode for attribute animation:
 - WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
 - WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
-- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame’s value.
+- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame's value.
 
 These is another argument call speed the animation play speed, the default value is 1.0f, user can change the value to control the animation play speed. User can also change animation’s wrap mode and speed on fly.
 

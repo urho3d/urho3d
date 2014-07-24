@@ -231,7 +231,7 @@ void BackgroundLoader::FinishResources(int maxMs)
                 i = backgroundLoadQueue_.Erase(i);
             }
             
-            // Break when the time limit passed to avoid bogging down the framerate
+            // Break when the time limit passed so that we keep sufficient FPS
             if (timer.GetUSec(false) >= maxMs * 1000)
                 break;
         }
