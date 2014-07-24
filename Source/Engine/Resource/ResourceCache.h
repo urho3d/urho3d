@@ -23,15 +23,14 @@
 #pragma once
 
 #include "File.h"
-#include "HashSet.h"
 #include "List.h"
 #include "Mutex.h"
 #include "Resource.h"
-#include "Thread.h"
 
 namespace Urho3D
 {
 
+class BackgroundLoader;
 class FileWatcher;
 class PackageFile;
 
@@ -56,21 +55,8 @@ struct ResourceGroup
     HashMap<StringHash, SharedPtr<Resource> > resources_;
 };
 
-/// Queue item for background loading of a resource.
-struct BackgroundLoadItem
-{
-    /// Resource.
-    SharedPtr<Resource> resource_;
-    /// Resources depended on for loading.
-    HashSet<Pair<StringHash, StringHash> > dependencies_;
-    /// Resources that depend on this resource's loading.
-    HashSet<Pair<StringHash, StringHash> > dependents_;
-    /// Whether to send failure event.
-    bool sendEventOnFailure_;
-};
-
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
-class URHO3D_API ResourceCache : public Object, public Thread
+class URHO3D_API ResourceCache : public Object
 {
     OBJECT(ResourceCache);
     
@@ -79,9 +65,6 @@ public:
     ResourceCache(Context* context);
     /// Destruct. Free all resources.
     virtual ~ResourceCache();
-    
-    /// Resource background loading loop.
-    virtual void ThreadFunction();
     
     /// Add a resource load directory. Optional priority parameter which will control search order.
     bool AddResourceDir(const String& pathName, unsigned int priority = PRIORITY_LAST );
@@ -118,18 +101,14 @@ public:
     /// Set how many milliseconds maximum per frame to spend on finishing background loaded resources.
     void SetFinishBackgroundResourcesMs(int ms) { finishBackgroundResourcesMs_ = Max(ms, 1); }
 
-    /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
+    /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
+    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
     Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
-    Resource* GetResource(StringHash type, const char* name, bool sendEventOnFailure = true);
-    /// Load a resource without storing it in the resource cache. Return null if not found or if fails.
+    /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)
     SharedPtr<Resource> GetTempResource(StringHash type, const String& name, bool sendEventOnFailure = true);
-    /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Also used by resources to queue further dependencies.
+    /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Can be called from outside the main thread.
     bool BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure = true, Resource* caller = 0);
-    /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Also used by resources to queue further dependencies.
-    bool BackgroundLoadResource(StringHash type, const char* name, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Return number of pending background-loaded resources.
     unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
@@ -195,13 +174,9 @@ private:
     File* SearchResourceDirs(const String& nameIn);
     /// Search resource packages for file.
     File* SearchPackages(const String& nameIn);
-    /// Finish the loading of a background loaded resource.
-    void FinishBackgroundLoading(BackgroundLoadItem& item);
     
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
-    /// Mutex for thread-safe access to the background load queue.
-    mutable Mutex backgroundLoadMutex_;
     /// Resources by type.
     HashMap<StringHash, ResourceGroup> resourceGroups_;
     /// Resource load directories.
@@ -210,10 +185,10 @@ private:
     Vector<SharedPtr<FileWatcher> > fileWatchers_;
     /// Package files.
     Vector<SharedPtr<PackageFile> > packages_;
-    /// Dependent resources.
+    /// Dependent resources. Only used with automatic reload to eg. trigger reload of a cube texture when any of its faces change.
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
-    /// Background load queue for resources.
-    HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem> backgroundLoadQueue_;
+    /// Resource background loader.
+    SharedPtr<BackgroundLoader> backgroundLoader_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.
@@ -247,7 +222,6 @@ template <class T> bool ResourceCache::BackgroundLoadResource(const String& name
     StringHash type = T::GetTypeStatic();
     return BackgroundLoadResource(type, name, sendEventOnFailure, caller);
 }
-
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
