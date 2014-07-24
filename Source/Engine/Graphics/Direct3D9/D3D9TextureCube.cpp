@@ -65,6 +65,87 @@ void TextureCube::RegisterObject(Context* context)
     context->RegisterFactory<TextureCube>();
 }
 
+bool TextureCube::BeginLoad(Deserializer& source)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    // In headless mode, do not actually load the texture, just return success
+    if (!graphics_)
+        return true;
+    
+    // If device is lost, retry later
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture load while device is lost");
+        dataPending_ = true;
+        return true;
+    }
+    
+    cache->ResetDependencies(this);
+
+    String texPath, texName, texExt;
+    SplitPath(GetName(), texPath, texName, texExt);
+    
+    loadParameters_ = (new XMLFile(context_));
+    if (!loadParameters_->Load(source))
+    {
+        loadParameters_.Reset();
+        return false;
+    }
+    
+    loadImages_.Clear();
+
+    XMLElement textureElem = loadParameters_->GetRoot();
+    XMLElement faceElem = textureElem.GetChild("face");
+    while (faceElem)
+    {
+        String name = faceElem.GetAttribute("name");
+        
+        String faceTexPath, faceTexName, faceTexExt;
+        SplitPath(name, faceTexPath, faceTexName, faceTexExt);
+        // If path is empty, add the XML file path
+        if (faceTexPath.Empty())
+            name = texPath + name;
+        
+        loadImages_.Push(cache->GetTempResource<Image>(name));
+        cache->StoreResourceDependency(this, name);
+        
+        faceElem = faceElem.GetNext("face");
+    }
+
+    // Precalculate mip levels if async loading
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+    {
+        for (unsigned i = 0; i < loadImages_.Size(); ++i)
+        {
+            if (loadImages_[i])
+                loadImages_[i]->PrecalculateLevels();
+        }
+    }
+
+    return true;
+}
+
+bool TextureCube::EndLoad()
+{
+    // In headless mode, do not actually load the texture, just return success
+    if (!graphics_ || graphics_->IsDeviceLost())
+        return true;
+    
+    // If over the texture budget, see if materials can be freed to allow textures to be freed
+    CheckTextureBudget(GetTypeStatic());
+
+    SetParameters(loadParameters_);
+    
+    for (unsigned i = 0; i < loadImages_.Size() && i < MAX_CUBEMAP_FACES; ++i)
+        SetData((CubeMapFace)i, loadImages_[i]);
+    
+    loadImages_.Clear();
+    loadParameters_.Reset();
+    
+    return true;
+}
+
 void TextureCube::OnDeviceLost()
 {
     if (pool_ == D3DPOOL_DEFAULT)
@@ -279,87 +360,6 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     }
     
     ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
-    return true;
-}
-
-bool TextureCube::BeginLoad(Deserializer& source)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-    
-    // If device is lost, retry later
-    if (graphics_->IsDeviceLost())
-    {
-        LOGWARNING("Texture load while device is lost");
-        dataPending_ = true;
-        return true;
-    }
-    
-    cache->ResetDependencies(this);
-
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
-    
-    loadParameters_ = (new XMLFile(context_));
-    if (!loadParameters_->Load(source))
-    {
-        loadParameters_.Reset();
-        return false;
-    }
-    
-    loadImages_.Clear();
-
-    XMLElement textureElem = loadParameters_->GetRoot();
-    XMLElement faceElem = textureElem.GetChild("face");
-    while (faceElem)
-    {
-        String name = faceElem.GetAttribute("name");
-        
-        String faceTexPath, faceTexName, faceTexExt;
-        SplitPath(name, faceTexPath, faceTexName, faceTexExt);
-        // If path is empty, add the XML file path
-        if (faceTexPath.Empty())
-            name = texPath + name;
-        
-        loadImages_.Push(cache->GetTempResource<Image>(name));
-        cache->StoreResourceDependency(this, name);
-        
-        faceElem = faceElem.GetNext("face");
-    }
-
-    // Precalculate mip levels if async loading
-    if (GetAsyncLoadState() == ASYNC_LOADING)
-    {
-        for (unsigned i = 0; i < loadImages_.Size(); ++i)
-        {
-            if (loadImages_[i])
-                loadImages_[i]->PrecalculateLevels();
-        }
-    }
-
-    return true;
-}
-
-bool TextureCube::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-    
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    
-    for (unsigned i = 0; i < loadImages_.Size() && i < MAX_CUBEMAP_FACES; ++i)
-        SetData((CubeMapFace)i, loadImages_[i]);
-    
-    loadImages_.Clear();
-    loadParameters_.Reset();
-    
     return true;
 }
 

@@ -131,7 +131,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
 bool Texture3D::EndLoad()
 {
     // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
+    if (!graphics_ || graphics_->IsDeviceLost())
         return true;
     
     // If over the texture budget, see if materials can be freed to allow textures to be freed

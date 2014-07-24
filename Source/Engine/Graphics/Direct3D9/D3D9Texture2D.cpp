@@ -90,7 +90,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
 bool Texture2D::EndLoad()
 {
     // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
+    if (!graphics_ || graphics_->IsDeviceLost())
         return true;
     
     // If over the texture budget, see if materials can be freed to allow textures to be freed
@@ -119,7 +119,7 @@ void Texture2D::OnDeviceReset()
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
-
+        
         if (!object_)
         {
             Create();
