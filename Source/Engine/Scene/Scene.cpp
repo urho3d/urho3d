@@ -280,6 +280,8 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         // Preload resources if appropriate, then return to the original position for loading the scene content
         if (mode != LOAD_SCENE)
         {
+            PROFILE(FindResourcesToPreload);
+            
             unsigned currentPos = file->GetPosition();
             PreloadResources(file, isSceneFile);
             file->Seek(currentPos);
@@ -301,6 +303,8 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
     }
     else
     {
+        PROFILE(FindResourcesToPreload);
+        
         LOGINFO("Preloading resources from " + file->GetName());
         PreloadResources(file, isSceneFile);
     }
@@ -341,8 +345,12 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
         
         // Preload resources if appropriate
         if (mode != LOAD_SCENE)
+        {
+            PROFILE(FindResourcesToPreload);
+            
             PreloadResourcesXML(rootElement);
-
+        }
+        
         // Store own old ID for resolving possible root node references
         unsigned nodeID = rootElement.GetInt("id");
         resolver_.AddNode(nodeID, this);
@@ -364,6 +372,8 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
     }
     else
     {
+        PROFILE(FindResourcesToPreload);
+        
         LOGINFO("Preloading resources from " + file->GetName());
         PreloadResourcesXML(xml->GetRoot());
     }

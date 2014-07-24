@@ -46,7 +46,7 @@ enum LoadMode
     LOAD_RESOURCES_ONLY = 0,
     /// Load scene content without preloading. Resources will be requested synchronously when encountered.
     LOAD_SCENE,
-    /// Default mode: reload resources used by the scene on the background first, then load the scene content.
+    /// Default mode: preload resources used by the scene first, then load the scene content.
     LOAD_SCENE_AND_RESOURCES
 };
 
