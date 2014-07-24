@@ -23,6 +23,7 @@
 #pragma once
 
 #include "File.h"
+#include "HashSet.h"
 #include "List.h"
 #include "Mutex.h"
 #include "Resource.h"
