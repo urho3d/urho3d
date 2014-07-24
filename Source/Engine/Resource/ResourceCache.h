@@ -121,8 +121,6 @@ public:
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
-    /// Template version of returning a resource by name.
-    template <class T> T* GetResource(const char* name, bool sendEventOnFailure = true);
     /// Template version of loading a resource without storing it to the cache.
     template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
     /// Template version of queueing a resource background load.
@@ -200,12 +198,6 @@ private:
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
-{
-    StringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
-}
-
-template <class T> T* ResourceCache::GetResource(const char* name, bool sendEventOnFailure)
 {
     StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
