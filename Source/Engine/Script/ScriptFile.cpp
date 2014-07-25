@@ -115,16 +115,20 @@ void ScriptFile::RegisterObject(Context* context)
 bool ScriptFile::BeginLoad(Deserializer& source)
 {
     ReleaseModule();
-    
     loadByteCode_.Reset();
-
-    // Create the module. Discard previous module if there was one
+    
     asIScriptEngine* engine = script_->GetScriptEngine();
-    scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
-    if (!scriptModule_)
+    
     {
-        LOGERROR("Failed to create script module " + GetName());
-        return false;
+        MutexLock lock(script_->GetModuleMutex());
+    
+        // Create the module. Discard previous module if there was one
+        scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
+        if (!scriptModule_)
+        {
+            LOGERROR("Failed to create script module " + GetName());
+            return false;
+        }
     }
     
     // Check if this file is precompiled bytecode
@@ -737,8 +741,6 @@ void ScriptFile::ReleaseModule()
 {
     if (scriptModule_)
     {
-        script_->ClearObjectTypeCache();
-        
         // Clear search caches and event handlers
         includeFiles_.Clear();
         validClasses_.Clear();
@@ -747,10 +749,17 @@ void ScriptFile::ReleaseModule()
         delayedCalls_.Clear();
         eventInvokers_.Clear();
         
-        // Remove the module
-        scriptModule_->SetUserData(0);
         asIScriptEngine* engine = script_->GetScriptEngine();
-        engine->DiscardModule(GetName().CString());
+        scriptModule_->SetUserData(0);
+        
+        // Remove the module
+        {
+            MutexLock lock(script_->GetModuleMutex());
+            
+            script_->ClearObjectTypeCache();
+            engine->DiscardModule(GetName().CString());
+        }
+        
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);
