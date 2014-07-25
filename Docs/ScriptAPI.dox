@@ -329,6 +329,11 @@ namespace Urho3D
 ### UnknownResourceType
 - %ResourceType : StringHash
 
+### ResourceBackgroundLoaded
+- %ResourceName : String
+- %Success : bool
+- %Resource : Resource pointer
+
 ## %Scene events
 
 ### SceneUpdate
@@ -364,6 +369,8 @@ namespace Urho3D
 - %Progress : float
 - %LoadedNodes : int
 - %TotalNodes : int
+- %LoadedResources : int
+- %TotalResources : int
 
 ### AsyncLoadFinished
 - %Scene : Scene pointer
@@ -7915,6 +7922,7 @@ Methods:
 - bool AddManualResource(Resource@)
 - void AddPackageFile(PackageFile@, uint = M_MAX_UNSIGNED)
 - bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED)
+- bool BackgroundLoadResource(const String&, const String&, bool = true)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&) const
@@ -7939,8 +7947,10 @@ Properties:
 - bool autoReloadResources
 - StringHash baseType // readonly
 - String category // readonly
+- int finishBackgroundResourcesMs
 - uint[] memoryBudget
 - uint[] memoryUse // readonly
+- uint numBackgroundLoadResources // readonly
 - PackageFile@[]@ packageFiles // readonly
 - int refs // readonly
 - String[]@ resourceDirs // readonly
@@ -8171,8 +8181,8 @@ Methods:
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
-- bool LoadAsync(File@)
-- bool LoadAsyncXML(File@)
+- bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsyncXML(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -8241,7 +8251,9 @@ Methods:
 Properties:
 
 - bool animationEnabled
+- LoadMode asyncLoadMode // readonly
 - bool asyncLoading // readonly
+- int asyncLoadingMs
 - float asyncProgress // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -10310,11 +10322,11 @@ Methods:
 
 - void ClearDataLost()
 - bool Load(File@)
-- bool Load(Image@, bool = false)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
 - bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
 
@@ -10353,11 +10365,11 @@ Methods:
 
 - void ClearDataLost()
 - bool Load(File@)
-- bool Load(Image@, bool = false)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
 - bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
 
@@ -10395,12 +10407,12 @@ Properties:
 Methods:
 
 - void ClearDataLost()
-- bool Load(CubeMapFace, Image@, bool = false)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(CubeMapFace, Image@, bool = false)
 - void SetNumLevels(uint)
 - bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC)
 
@@ -11794,6 +11806,13 @@ Properties:
 - LIGHT_DIRECTIONAL
 - LIGHT_SPOT
 - LIGHT_POINT
+
+
+### LoadMode
+
+- LOAD_RESOURCES_ONLY
+- LOAD_SCENE
+- LOAD_SCENE_AND_RESOURCES
 
 
 ### LoopMode2D

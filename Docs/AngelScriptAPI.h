@@ -7020,6 +7020,7 @@ class ResourceCache
 bool AddManualResource(Resource);
 void AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
 bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED);
+bool BackgroundLoadResource(const String&, const String&, bool = true);
 bool Exists(const String&) const;
 File GetFile(const String&);
 String GetPreferredResourceDir(const String&) const;
@@ -7045,9 +7046,12 @@ bool autoReloadResources;
 StringHash baseType;
 /* readonly */
 String category;
+int finishBackgroundResourcesMs;
 Array<uint> memoryBudget;
 /* readonly */
 Array<uint> memoryUse;
+/* readonly */
+uint numBackgroundLoadResources;
 /* readonly */
 Array<PackageFile> packageFiles;
 /* readonly */
@@ -7309,8 +7313,8 @@ Node InstantiateXML(XMLFile, const Vector3&, const Quaternion&, CreateMode = REP
 Node InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
-bool LoadAsync(File);
-bool LoadAsyncXML(File);
+bool LoadAsync(File, LoadMode = LOAD_SCENE_AND_RESOURCES);
+bool LoadAsyncXML(File, LoadMode = LOAD_SCENE_AND_RESOURCES);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(const XMLElement&, bool = false);
@@ -7379,7 +7383,10 @@ void Yaw(float, TransformSpace = TS_LOCAL);
 // Properties:
 bool animationEnabled;
 /* readonly */
+LoadMode asyncLoadMode;
+/* readonly */
 bool asyncLoading;
+int asyncLoadingMs;
 /* readonly */
 float asyncProgress;
 /* readonly */
@@ -9846,11 +9853,11 @@ class Texture2D
 // Methods:
 void ClearDataLost();
 bool Load(File);
-bool Load(Image, bool = false);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(Image, bool = false);
 void SetNumLevels(uint);
 bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 
@@ -9905,11 +9912,11 @@ class Texture3D
 // Methods:
 void ClearDataLost();
 bool Load(File);
-bool Load(Image, bool = false);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(Image, bool = false);
 void SetNumLevels(uint);
 bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 
@@ -9963,12 +9970,12 @@ class TextureCube
 {
 // Methods:
 void ClearDataLost();
-bool Load(CubeMapFace, Image, bool = false);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(CubeMapFace, Image, bool = false);
 void SetNumLevels(uint);
 bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
 
@@ -11540,6 +11547,13 @@ enum LightType
 LIGHT_DIRECTIONAL,
 LIGHT_SPOT,
 LIGHT_POINT,
+};
+
+enum LoadMode
+{
+LOAD_RESOURCES_ONLY,
+LOAD_SCENE,
+LOAD_SCENE_AND_RESOURCES,
 };
 
 enum LoopMode2D

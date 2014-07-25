@@ -3982,8 +3982,11 @@ Methods:
 - void SetAutoReloadResources(bool enable)
 - void SetReturnFailedResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
+- void SetFinishBackgroundResourcesMs(int ms)
 - File* GetFile(const String name)
-- Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
+- Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true)
+- bool BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true)
+- unsigned GetNumBackgroundLoadResources() const
 - bool Exists(const String name) const
 - unsigned GetMemoryBudget(StringHash type) const
 - unsigned GetMemoryUse(StringHash type) const
@@ -3992,6 +3995,7 @@ Methods:
 - bool GetAutoReloadResources() const
 - bool GetReturnFailedResources() const
 - bool GetSearchPackagesFirst() const
+- int GetFinishBackgroundResourcesMs() const
 - String GetPreferredResourceDir(const String path) const
 - String SanitateResourceName(const String name) const
 - String SanitateResourceDirName(const String name) const
@@ -3999,9 +4003,11 @@ Methods:
 Properties:
 
 - unsigned totalMemoryUse (readonly)
-- bool autoReloadResources (readonly)
-- bool returnFailedResources (readonly)
-- bool searchPackagesFirst (readonly)
+- bool autoReloadResources
+- bool returnFailedResources
+- bool searchPackagesFirst
+- unsigned numBackgroundLoadResources (readonly)
+- int finishBackgroundResourcesMs
 
 ### ResourceRef
 
@@ -4215,10 +4221,10 @@ Methods:
 - Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
-- bool LoadAsync(File* file)
-- bool LoadAsyncXML(File* file)
-- bool LoadAsync(const String fileName)
-- bool LoadAsyncXML(const String fileName)
+- bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsync(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsyncXML(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
 - void StopAsyncLoading()
 - void Clear(bool clearReplicated = true, bool clearLocal = true)
 - void SetUpdateEnabled(bool enable)
@@ -4226,16 +4232,19 @@ Methods:
 - void SetElapsedTime(float time)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
+- void SetAsyncLoadingMs(int ms)
 - Node* GetNode(unsigned id) const
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
 - float GetAsyncProgress() const
+- LoadMode GetAsyncLoadMode() const
 - const String GetFileName() const
 - unsigned GetChecksum() const
 - float GetTimeScale() const
 - float GetElapsedTime() const
 - float GetSmoothingConstant() const
 - float GetSnapThreshold() const
+- int GetAsyncLoadingMs() const
 - const String GetVarName(StringHash hash) const
 - void Update(float timeStep)
 - void BeginThreadedUpdate()
@@ -4261,12 +4270,14 @@ Properties:
 - bool updateEnabled
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
+- LoadMode asyncLoadMode (readonly)
 - const String fileName
 - unsigned checksum (readonly)
 - float timeScale
 - float elapsedTime
 - float smoothingConstant
 - float snapThreshold
+- int asyncLoadingMs
 - bool threadedUpdate (readonly)
 - String varNamesAttr
 
@@ -5087,7 +5098,7 @@ Methods:
 - Texture2D* new()
 - void delete()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
-- bool Load(Image* image, bool useAlpha = false)
+- bool SetData(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
 
 Properties:
@@ -6318,6 +6329,12 @@ Properties:
 - int LIGHT_DIRECTIONAL
 - int LIGHT_SPOT
 - int LIGHT_POINT
+
+### LoadMode
+
+- int LOAD_RESOURCES_ONLY
+- int LOAD_SCENE
+- int LOAD_SCENE_AND_RESOURCES
 
 ### LockState
 
