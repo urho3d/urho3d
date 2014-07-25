@@ -51,6 +51,8 @@ void* ThreadFunctionStatic(void* data)
 }
 #endif
 
+ThreadID Thread::mainThreadID;
+
 Thread::Thread() :
     handle_(0),
     shouldRun_(false)
@@ -111,6 +113,25 @@ void Thread::SetPriority(int priority)
     if (thread)
         pthread_setschedprio(*thread, priority);
     #endif
+}
+
+void Thread::SetMainThread()
+{
+    mainThreadID = GetCurrentThreadID();
+}
+
+ThreadID Thread::GetCurrentThreadID()
+{
+    #ifdef WIN32
+    return GetCurrentThreadId();
+    #else
+    return pthread_self();
+    #endif
+}
+
+bool Thread::IsMainThread()
+{
+    return GetCurrentThreadID() == mainThreadID;
 }
 
 }

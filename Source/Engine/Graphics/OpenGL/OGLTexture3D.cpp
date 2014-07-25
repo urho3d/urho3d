@@ -58,10 +58,10 @@ void Texture3D::RegisterObject(Context* context)
     context->RegisterFactory<Texture3D>();
 }
 
-bool Texture3D::Load(Deserializer& source)
+bool Texture3D::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadTexture3D);
-    
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
         return true;
@@ -74,20 +74,19 @@ bool Texture3D::Load(Deserializer& source)
         return true;
     }
     
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    // Before actually loading the texture, get optional parameters from an XML description file
-    LoadParameters();
-
     String texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
     
-    SharedPtr<XMLFile> xml(new XMLFile(context_));
-    if (!xml->Load(source))
-        return false;
+    cache->ResetDependencies(this);
 
-    XMLElement textureElem = xml->GetRoot();
+    loadParameters_ = new XMLFile(context_);
+    if (!loadParameters_->Load(source))
+    {
+        loadParameters_.Reset();
+        return false;
+    }
+    
+    XMLElement textureElem = loadParameters_->GetRoot();
     XMLElement volumeElem = textureElem.GetChild("volume");
     XMLElement colorlutElem = textureElem.GetChild("colorlut");
 
@@ -101,8 +100,11 @@ bool Texture3D::Load(Deserializer& source)
         if (volumeTexPath.Empty())
             name = texPath + name;
 
-        SharedPtr<Image> image(GetSubsystem<ResourceCache>()->GetTempResource<Image>(name));
-        return Load(image);
+        loadImage_ = cache->GetTempResource<Image>(name);
+        // Precalculate mip levels if async loading
+        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
+            loadImage_->PrecalculateLevels();
+        cache->StoreResourceDependency(this, name);
     }
     else if (colorlutElem)
     {
@@ -115,14 +117,39 @@ bool Texture3D::Load(Deserializer& source)
             name = texPath + name;
 
         SharedPtr<File> file = GetSubsystem<ResourceCache>()->GetFile(name);
-        SharedPtr<Image> image(new Image(context_));
-        if (!image->LoadColorLUT(*(file.Get())))
+        loadImage_ = new Image(context_);
+        if (!loadImage_->LoadColorLUT(*(file.Get())))
+        {
+            loadParameters_.Reset();
+            loadImage_.Reset();
             return false;
-
-        return Load(image);
+        }
+        // Precalculate mip levels if async loading
+        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
+            loadImage_->PrecalculateLevels();
+        cache->StoreResourceDependency(this, name);
     }
 
     return false;
+}
+
+
+bool Texture3D::EndLoad()
+{
+    // In headless mode, do not actually load the texture, just return success
+    if (!graphics_ || graphics_->IsDeviceLost())
+        return true;
+    
+    // If over the texture budget, see if materials can be freed to allow textures to be freed
+    CheckTextureBudget(GetTypeStatic());
+
+    SetParameters(loadParameters_);
+    bool success = SetData(loadImage_);
+    
+    loadImage_.Reset();
+    loadParameters_.Reset();
+    
+    return success;
 }
 
 void Texture3D::OnDeviceLost()
@@ -211,6 +238,8 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
+    PROFILE(SetTextureData);
+
     if (!object_ || !graphics_)
     {
         LOGERROR("No texture created, can not set data");
@@ -277,14 +306,14 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     return true;
 }
 
-bool Texture3D::Load(SharedPtr<Image> image, bool useAlpha)
+bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
-        LOGERROR("Null image, can not load texture");
+        LOGERROR("Null image, can not set data");
         return false;
     }
-    
+
     unsigned memoryUse = sizeof(Texture3D);
     
     int quality = QUALITY_HIGH;

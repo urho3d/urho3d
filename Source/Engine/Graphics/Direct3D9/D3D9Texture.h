@@ -97,13 +97,11 @@ public:
     unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
-    
-    /// Load parameters.
-    void LoadParameters();
-    /// Load parameters from an XML file.
-    void LoadParameters(XMLFile* xml);
-    /// Load parameters from an XML element.
-    void LoadParameters(const XMLElement& element);
+
+    /// Set additional parameters from an XML file.
+    void SetParameters(XMLFile* xml);
+    /// Set additional parameters from an XML element.
+    void SetParameters(const XMLElement& element);
     
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.

@@ -50,38 +50,68 @@ void AnimationSet2D::RegisterObject(Context* context)
     context->RegisterFactory<AnimationSet2D>();
 }
 
-bool AnimationSet2D::Load(Deserializer& source)
+bool AnimationSet2D::BeginLoad(Deserializer& source)
 {
-    XMLFile xmlFile(context_);
-    if (!xmlFile.Load(source))
+    loadXMLFile_ = new XMLFile(context_);
+    if (!loadXMLFile_->Load(source))
     {
-        LOGERROR("Load XML filed " + source.GetName());
+        LOGERROR("Load XML failed " + source.GetName());
+        loadXMLFile_.Reset();
         return false;
     }
 
-    XMLElement rootElem = xmlFile.GetRoot("spriter_data");
+    XMLElement rootElem = loadXMLFile_->GetRoot("spriter_data");
     if (!rootElem)
     {
         LOGERROR("Invalid spriter file " + source.GetName());
+        loadXMLFile_.Reset();
         return false;
     }
     
-    if (!LoadFolders(rootElem))
+    // When async loading, preprocess folders for spritesheet / sprite files and request them for background loading
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+    {
+        if (!LoadFolders(rootElem))
+        {
+            loadXMLFile_.Reset();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool AnimationSet2D::EndLoad()
+{
+    // Actually load the folders and animations now
+    if (!loadXMLFile_)
         return false;
+
+    XMLElement rootElem = loadXMLFile_->GetRoot("spriter_data");
+    if (!LoadFolders(rootElem))
+    {
+        loadXMLFile_.Reset();
+        return false;
+    }
 
     XMLElement entityElem = rootElem.GetChild("entity");
     if (!entityElem)
     {
         LOGERROR("Could not find entity");
+        loadXMLFile_.Reset();
         return false;
     }
     
     for (XMLElement animationElem = entityElem.GetChild("animation"); animationElem; animationElem = animationElem.GetNext("animation"))
     {
         if (!LoadAnimation(animationElem))
+        {
+            loadXMLFile_.Reset();
             return false;
+        }
     }
 
+    loadXMLFile_.Reset();
     return true;
 }
 
@@ -111,9 +141,22 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
+    bool async = GetAsyncLoadState() == ASYNC_LOADING;
+
     String parentPath = GetParentPath(GetName());
     String spriteSheetFilePath = parentPath + GetFileName(GetName()) + ".xml";
-    SpriteSheet2D* spriterSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath, false);
+    SpriteSheet2D* spriteSheet = 0;
+    bool hasSpriteSheet = false;
+
+    // When async loading, request the sprite sheet for background loading but do not actually get it
+    if (!async)
+        spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath, false);
+    else
+    {
+        hasSpriteSheet = cache->Exists(spriteSheetFilePath);
+        if (hasSpriteSheet)
+            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath, false, this);
+    }
 
     for (XMLElement folderElem = rootElem.GetChild("folder"); folderElem; folderElem = folderElem.GetNext("folder"))
     {
@@ -124,43 +167,49 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
             unsigned fileId = fileElem.GetUInt("id");
             String fileName = fileElem.GetAttribute("name");
 
-            SharedPtr<Sprite2D> sprite;
-            
-            if (spriterSheet)
-                sprite = spriterSheet->GetSprite(GetFileName(fileName));
-            else
-                sprite = (cache->GetResource<Sprite2D>(parentPath + fileName));
-
-            if (!sprite)
+            // When async loading, request the sprites for background loading but do not actually get them
+            if (!async)
             {
-                LOGERROR("Could not load sprite " + fileName);
-                return false;
+                SharedPtr<Sprite2D> sprite;
+                
+                if (spriteSheet)
+                    sprite = spriteSheet->GetSprite(GetFileName(fileName));
+                else
+                    sprite = (cache->GetResource<Sprite2D>(parentPath + fileName));
+
+                if (!sprite)
+                {
+                    LOGERROR("Could not load sprite " + fileName);
+                    return false;
+                }
+
+                Vector2 hotSpot(0.0f, 1.0f);
+                if (fileElem.HasAttribute("pivot_x"))
+                    hotSpot.x_ = fileElem.GetFloat("pivot_x");
+                if (fileElem.HasAttribute("pivot_y"))
+                    hotSpot.y_ = fileElem.GetFloat("pivot_y");
+
+                // If sprite is trimmed, recalculate hot spot
+                const IntVector2& offset = sprite->GetOffset();
+                if (offset != IntVector2::ZERO)
+                {
+                    int width = fileElem.GetInt("width");
+                    int height = fileElem.GetInt("height");
+
+                    float pivotX = width * hotSpot.x_;
+                    float pivotY = height * (1.0f - hotSpot.y_);
+
+                    const IntRect& rectangle = sprite->GetRectangle();
+                    hotSpot.x_ = (offset.x_ + pivotX) / rectangle.Width();
+                    hotSpot.y_ = 1.0f - (offset.y_ + pivotY) / rectangle.Height();
+                }
+
+                sprite->SetHotSpot(hotSpot);
+
+                sprites_[(folderId << 16) + fileId] = sprite;
             }
-
-            Vector2 hotSpot(0.0f, 1.0f);
-            if (fileElem.HasAttribute("pivot_x"))
-                hotSpot.x_ = fileElem.GetFloat("pivot_x");
-            if (fileElem.HasAttribute("pivot_y"))
-                hotSpot.y_ = fileElem.GetFloat("pivot_y");
-
-            // If sprite is trimmed, recalculate hot spot
-            const IntVector2& offset = sprite->GetOffset();
-            if (offset != IntVector2::ZERO)
-            {
-                int width = fileElem.GetInt("width");
-                int height = fileElem.GetInt("height");
-
-                float pivotX = width * hotSpot.x_;
-                float pivotY = height * (1.0f - hotSpot.y_);
-
-                const IntRect& rectangle = sprite->GetRectangle();
-                hotSpot.x_ = (offset.x_ + pivotX) / rectangle.Width();
-                hotSpot.y_ = 1.0f - (offset.y_ + pivotY) / rectangle.Height();
-            }
-
-            sprite->SetHotSpot(hotSpot);
-
-            sprites_[(folderId << 16) + fileId] = sprite;
+            else if (!hasSpriteSheet)
+                cache->BackgroundLoadResource<Sprite2D>(parentPath + fileName, true, this);
         }
     }
 

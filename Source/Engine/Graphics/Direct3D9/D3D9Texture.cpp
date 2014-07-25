@@ -234,26 +234,16 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
-void Texture::LoadParameters()
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
-    
-    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
-    if (file)
-        LoadParameters(file);
-}
-
-void Texture::LoadParameters(XMLFile* file)
+void Texture::SetParameters(XMLFile* file)
 {
     if (!file)
         return;
     
     XMLElement rootElem = file->GetRoot();
-    LoadParameters(rootElem);
+    SetParameters(rootElem);
 }
 
-void Texture::LoadParameters(const XMLElement& element)
+void Texture::SetParameters(const XMLElement& element)
 {
     XMLElement paramElem = element.GetChild();
     while (paramElem)

@@ -375,8 +375,8 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         if (!scene_ || !camera_ || !camera_->IsEnabledEffective())
             return false;
         
-        // If scene is loading asynchronously, it is incomplete and should not be rendered
-        if (scene_->IsAsyncLoading())
+        // If scene is loading scene content asynchronously, it is incomplete and should not be rendered
+        if (scene_->IsAsyncLoading() && scene_->GetAsyncLoadMode() > LOAD_RESOURCES_ONLY)
             return false;
         
         octree_ = scene_->GetComponent<Octree>();

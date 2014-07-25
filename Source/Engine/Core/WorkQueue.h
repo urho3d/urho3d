@@ -98,6 +98,8 @@ public:
     void Complete(unsigned priority);
     /// Set the pool telerance before it starts deleting pool items.
     void SetTolerance(int tolerance) { tolerance_ = tolerance; }
+    /// Set how many milliseconds maximum per frame to spend on low-priority work, when there are no worker threads.
+    void SetNonThreadedWorkMs(int ms) { maxNonThreadedWorkMs_ = Max(ms, 1); }
     
     /// Return number of worker threads.
     unsigned GetNumThreads() const { return threads_.Size(); }
@@ -105,6 +107,8 @@ public:
     bool IsCompleted(unsigned priority) const;
     /// Return the pool tolerance.
     int GetTolerance() const { return tolerance_; }
+    /// Return how many milliseconds maximum to spend on non-threaded low-priority work.
+    int GetNonThreadedWorkMs() const { return maxNonThreadedWorkMs_; }
     
 private:
     /// Process work items until shut down. Called by the worker threads.
@@ -136,6 +140,8 @@ private:
     int tolerance_;
     /// Last size of the shared pool.
     unsigned lastSize_;
+    /// Maximum milliseconds per frame to spend on low-priority work, when there are no worker threads.
+    int maxNonThreadedWorkMs_;
 };
 
 }

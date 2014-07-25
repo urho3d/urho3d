@@ -57,10 +57,8 @@ void JSONFile::RegisterObject(Context* context)
     context->RegisterFactory<JSONFile>();
 }
 
-bool JSONFile::Load(Deserializer& source)
+bool JSONFile::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadJSONFile);
-
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
@@ -75,7 +73,7 @@ bool JSONFile::Load(Deserializer& source)
 
     if (document_->Parse<0>(buffer).HasParseError())
     {
-        LOGERROR("Could not parse JOSO data from " + source.GetName());
+        LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
     }
 

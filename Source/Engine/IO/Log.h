@@ -22,12 +22,16 @@
 
 #pragma once
 
+#include "List.h"
+#include "Mutex.h"
 #include "Object.h"
 #include "StringUtils.h"
 
 namespace Urho3D
 {
 
+/// Fictional message level to indicate a stored raw message.
+static const int LOG_RAW = -1;
 /// Debug message level. By default only shown in debug mode.
 static const int LOG_DEBUG = 0;
 /// Informative message level.
@@ -40,6 +44,30 @@ static const int LOG_ERROR = 3;
 static const int LOG_NONE = 4;
 
 class File;
+
+/// Stored log message from another thread.
+struct StoredLogMessage
+{
+    /// Construct undefined.
+    StoredLogMessage()
+    {
+    }
+    
+    /// Construct with parameters.
+    StoredLogMessage(const String& message, int level, bool error) :
+        message_(message),
+        level_(level),
+        error_(error)
+    {
+    }
+    
+    /// Message text.
+    String message_;
+    /// Message level. -1 for raw messages.
+    int level_;
+    /// Error flag for raw messages.
+    bool error_;
+};
 
 /// Logging subsystem.
 class URHO3D_API Log : public Object
@@ -78,6 +106,13 @@ public:
     static void WriteRaw(const String& message, bool error = false);
 
 private:
+    /// Handle end of frame. Process the threaded log messages.
+    void HandleEndFrame(StringHash eventType, VariantMap& eventData);
+    
+    /// Mutex for threaded operation.
+    Mutex logMutex_;
+    /// Log messages from other threads.
+    List<StoredLogMessage> threadMessages_;
     /// Log file.
     SharedPtr<File> logFile_;
     /// Last log message.

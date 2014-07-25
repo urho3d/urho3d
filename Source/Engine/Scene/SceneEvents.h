@@ -86,6 +86,8 @@ EVENT(E_ASYNCLOADPROGRESS, AsyncLoadProgress)
     PARAM(P_PROGRESS, Progress);            // float
     PARAM(P_LOADEDNODES, LoadedNodes);      // int
     PARAM(P_TOTALNODES, TotalNodes);        // int
+    PARAM(P_LOADEDRESOURCES, LoadedResources); // int
+    PARAM(P_TOTALRESOURCES, TotalResources);   // int
 };
 
 /// Asynchronous scene loading finished.

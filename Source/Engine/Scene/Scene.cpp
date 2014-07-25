@@ -30,6 +30,8 @@
 #include "PackageFile.h"
 #include "Profiler.h"
 #include "ReplicationState.h"
+#include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
@@ -48,8 +50,6 @@ const char* SCENE_CATEGORY = "Scene";
 const char* LOGIC_CATEGORY = "Logic";
 const char* SUBSYSTEM_CATEGORY = "Subsystem";
 
-static const int ASYNC_LOAD_MIN_FPS = 30;
-static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
 
@@ -64,6 +64,7 @@ Scene::Scene(Context* context) :
     elapsedTime_(0),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
+    asyncLoadingMs_(5),
     updateEnabled_(true),
     asyncLoading_(false),
     threadedUpdate_(false)
@@ -73,6 +74,7 @@ Scene::Scene(Context* context) :
     NodeAdded(this);
 
     SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
+    SubscribeToEvent(E_RESOURCEBACKGROUNDLOADED, HANDLER(Scene, HandleResourceBackgroundLoaded));
 }
 
 Scene::~Scene()
@@ -237,7 +239,7 @@ bool Scene::SaveXML(Serializer& dest) const
         return false;
 }
 
-bool Scene::LoadAsync(File* file)
+bool Scene::LoadAsync(File* file, LoadMode mode)
 {
     if (!file)
     {
@@ -248,34 +250,69 @@ bool Scene::LoadAsync(File* file)
     StopAsyncLoading();
 
     // Check ID
-    if (file->ReadFileID() != "USCN")
+    bool isSceneFile = file->ReadFileID() == "USCN";
+    if (!isSceneFile)
     {
-        LOGERROR(file->GetName() + " is not a valid scene file");
-        return false;
+        // In resource load mode can load also object prefabs, which have no identifier
+        if (mode > LOAD_RESOURCES_ONLY)
+        {
+            LOGERROR(file->GetName() + " is not a valid scene file");
+            return false;
+        }
+        else
+            file->Seek(0);
     }
 
-    LOGINFO("Loading scene from " + file->GetName());
-
-    Clear();
-
-    // Store own old ID for resolving possible root node references
-    unsigned nodeID = file->ReadUInt();
-    resolver_.AddNode(nodeID, this);
-
-    // Load root level components first
-    if (!Node::Load(*file, resolver_, false))
-        return false;
-
-    // Then prepare for loading all root level child nodes in the async update
+    if (mode > LOAD_RESOURCES_ONLY)
+    {
+        LOGINFO("Loading scene from " + file->GetName());
+        Clear();
+    }
+    
     asyncLoading_ = true;
     asyncProgress_.file_ = file;
-    asyncProgress_.loadedNodes_ = 0;
-    asyncProgress_.totalNodes_ = file->ReadVLE();
+    asyncProgress_.mode_ = mode;
+    asyncProgress_.loadedNodes_ = asyncProgress_.totalNodes_ = asyncProgress_.loadedResources_ = asyncProgress_.totalResources_ = 0;
+    asyncProgress_.resources_.Clear();
+    
+    if (mode > LOAD_RESOURCES_ONLY)
+    {
+        // Preload resources if appropriate, then return to the original position for loading the scene content
+        if (mode != LOAD_SCENE)
+        {
+            PROFILE(FindResourcesToPreload);
+            
+            unsigned currentPos = file->GetPosition();
+            PreloadResources(file, isSceneFile);
+            file->Seek(currentPos);
+        }
+        
+        // Store own old ID for resolving possible root node references
+        unsigned nodeID = file->ReadUInt();
+        resolver_.AddNode(nodeID, this);
+
+        // Load root level components first
+        if (!Node::Load(*file, resolver_, false))
+        {
+            StopAsyncLoading();
+            return false;
+        }
+        
+        // Then prepare to load child nodes in the async updates
+        asyncProgress_.totalNodes_ = file->ReadVLE();
+    }
+    else
+    {
+        PROFILE(FindResourcesToPreload);
+        
+        LOGINFO("Preloading resources from " + file->GetName());
+        PreloadResources(file, isSceneFile);
+    }
 
     return true;
 }
 
-bool Scene::LoadAsyncXML(File* file)
+bool Scene::LoadAsyncXML(File* file, LoadMode mode)
 {
     if (!file)
     {
@@ -289,36 +326,58 @@ bool Scene::LoadAsyncXML(File* file)
     if (!xml->Load(*file))
         return false;
 
-    LOGINFO("Loading scene from " + file->GetName());
-
-    Clear();
-
-    XMLElement rootElement = xml->GetRoot();
-
-    // Store own old ID for resolving possible root node references
-    unsigned nodeID = rootElement.GetInt("id");
-    resolver_.AddNode(nodeID, this);
-
-    // Load the root level components first
-    if (!Node::LoadXML(rootElement, resolver_, false))
-        return false;
-
-    // Then prepare for loading all root level child nodes in the async update
-    XMLElement childNodeElement = rootElement.GetChild("node");
-    asyncLoading_ = true;
-    asyncProgress_.file_ = file;
-    asyncProgress_.xmlFile_ = xml;
-    asyncProgress_.xmlElement_ = childNodeElement;
-    asyncProgress_.loadedNodes_ = 0;
-    asyncProgress_.totalNodes_ = 0;
-
-    // Count the amount of child nodes
-    while (childNodeElement)
+    if (mode > LOAD_RESOURCES_ONLY)
     {
-        ++asyncProgress_.totalNodes_;
-        childNodeElement = childNodeElement.GetNext("node");
+        LOGINFO("Loading scene from " + file->GetName());
+        Clear();
     }
+    
+    asyncLoading_ = true;
+    asyncProgress_.xmlFile_ = xml;
+    asyncProgress_.file_ = file;
+    asyncProgress_.mode_ = mode;
+    asyncProgress_.loadedNodes_ = asyncProgress_.totalNodes_ = asyncProgress_.loadedResources_ = asyncProgress_.totalResources_ = 0;
+    asyncProgress_.resources_.Clear();
+    
+    if (mode > LOAD_RESOURCES_ONLY)
+    {
+        XMLElement rootElement = xml->GetRoot();
+        
+        // Preload resources if appropriate
+        if (mode != LOAD_SCENE)
+        {
+            PROFILE(FindResourcesToPreload);
+            
+            PreloadResourcesXML(rootElement);
+        }
+        
+        // Store own old ID for resolving possible root node references
+        unsigned nodeID = rootElement.GetInt("id");
+        resolver_.AddNode(nodeID, this);
 
+        // Load the root level components first
+        if (!Node::LoadXML(rootElement, resolver_, false))
+            return false;
+
+        // Then prepare for loading all root level child nodes in the async update
+        XMLElement childNodeElement = rootElement.GetChild("node");
+        asyncProgress_.xmlElement_ = childNodeElement;
+
+        // Count the amount of child nodes
+        while (childNodeElement)
+        {
+            ++asyncProgress_.totalNodes_;
+            childNodeElement = childNodeElement.GetNext("node");
+        }
+    }
+    else
+    {
+        PROFILE(FindResourcesToPreload);
+        
+        LOGINFO("Preloading resources from " + file->GetName());
+        PreloadResourcesXML(xml->GetRoot());
+    }
+    
     return true;
 }
 
@@ -328,6 +387,7 @@ void Scene::StopAsyncLoading()
     asyncProgress_.file_.Reset();
     asyncProgress_.xmlFile_.Reset();
     asyncProgress_.xmlElement_ = XMLElement::EMPTY;
+    asyncProgress_.resources_.Clear();
     resolver_.Reset();
 }
 
@@ -438,6 +498,11 @@ void Scene::SetSnapThreshold(float threshold)
     Node::MarkNetworkUpdate();
 }
 
+void Scene::SetAsyncLoadingMs(int ms)
+{
+    asyncLoadingMs_ = Max(ms, 1);
+}
+
 void Scene::SetElapsedTime(float time)
 {
     elapsedTime_ = time;
@@ -514,10 +579,13 @@ Component* Scene::GetComponent(unsigned id) const
 
 float Scene::GetAsyncProgress() const
 {
-    if (!asyncLoading_ || !asyncProgress_.totalNodes_)
+    if (!asyncLoading_ || asyncProgress_.totalNodes_ + asyncProgress_.totalResources_ == 0)
         return 1.0f;
     else
-        return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
+    {
+        return (float)(asyncProgress_.loadedNodes_ + asyncProgress_.loadedResources_) / (float)(asyncProgress_.totalNodes_ + 
+            asyncProgress_.totalResources_);
+    }
 }
 
 const String& Scene::GetVarName(StringHash hash) const
@@ -531,7 +599,9 @@ void Scene::Update(float timeStep)
     if (asyncLoading_)
     {
         UpdateAsyncLoading();
-        return;
+        // If only preloading resources, scene update can continue
+        if (asyncProgress_.mode_ > LOAD_RESOURCES_ONLY)
+            return;
     }
 
     PROFILE(UpdateScene);
@@ -890,11 +960,30 @@ void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
         Update(eventData[P_TIMESTEP].GetFloat());
 }
 
+void Scene::HandleResourceBackgroundLoaded(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ResourceBackgroundLoaded;
+    
+    if (asyncLoading_)
+    {
+        Resource* resource = static_cast<Resource*>(eventData[P_RESOURCE].GetPtr());
+        if (asyncProgress_.resources_.Contains(resource->GetNameHash()))
+        {
+            asyncProgress_.resources_.Erase(resource->GetNameHash());
+            ++asyncProgress_.loadedResources_;
+        }
+    }
+}
+
 void Scene::UpdateAsyncLoading()
 {
     PROFILE(UpdateAsyncLoading);
 
-    Timer asyncLoadTimer;
+    // If resources left to load, do not load nodes yet
+    if (asyncProgress_.loadedResources_ < asyncProgress_.totalResources_)
+        return;
+    
+    HiresTimer asyncLoadTimer;
 
     for (;;)
     {
@@ -925,7 +1014,7 @@ void Scene::UpdateAsyncLoading()
         ++asyncProgress_.loadedNodes_;
 
         // Break if time limit exceeded, so that we keep sufficient FPS
-        if (asyncLoadTimer.GetMSec(false) >= ASYNC_LOAD_MAX_MSEC)
+        if (asyncLoadTimer.GetUSec(false) >= asyncLoadingMs_ * 1000)
             break;
     }
 
@@ -933,17 +1022,23 @@ void Scene::UpdateAsyncLoading()
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_SCENE] = this;
-    eventData[P_PROGRESS] = (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
-    eventData[P_LOADEDNODES]  = asyncProgress_.loadedNodes_;
-    eventData[P_TOTALNODES]  = asyncProgress_.totalNodes_;
+    eventData[P_PROGRESS] = GetAsyncProgress();
+    eventData[P_LOADEDNODES] = asyncProgress_.loadedNodes_;
+    eventData[P_TOTALNODES] = asyncProgress_.totalNodes_;
+    eventData[P_LOADEDRESOURCES]  = asyncProgress_.loadedResources_;
+    eventData[P_TOTALRESOURCES] = asyncProgress_.totalResources_;
     SendEvent(E_ASYNCLOADPROGRESS, eventData);
 }
 
 void Scene::FinishAsyncLoading()
 {
-    resolver_.Resolve();
-    ApplyAttributes();
-    FinishLoading(asyncProgress_.file_);
+    if (asyncProgress_.mode_ > LOAD_RESOURCES_ONLY)
+    {
+        resolver_.Resolve();
+        ApplyAttributes();
+        FinishLoading(asyncProgress_.file_);
+    }
+
     StopAsyncLoading();
 
     using namespace AsyncLoadFinished;
@@ -969,6 +1064,155 @@ void Scene::FinishSaving(Serializer* dest) const
     {
         fileName_ = ptr->GetName();
         checksum_ = ptr->GetChecksum();
+    }
+}
+
+void Scene::PreloadResources(File* file, bool isSceneFile)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    // Read node ID (not needed)
+    unsigned nodeID = file->ReadUInt();
+
+    // Read Node or Scene attributes; these do not include any resources
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(isSceneFile ? Scene::GetTypeStatic() : Node::GetTypeStatic());
+    assert(attributes);
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_FILE))
+            continue;
+        Variant varValue = file->ReadVariant(attr.type_);
+    }
+    
+    // Read component attributes
+    unsigned numComponents = file->ReadVLE();
+    for (unsigned i = 0; i < numComponents; ++i)
+    {
+        VectorBuffer compBuffer(*file, file->ReadVLE());
+        StringHash compType = compBuffer.ReadStringHash();
+        unsigned compID = compBuffer.ReadUInt();
+        
+        attributes = context_->GetAttributes(compType);
+        if (attributes)
+        {
+            for (unsigned j = 0; j < attributes->Size(); ++j)
+            {
+                const AttributeInfo& attr = attributes->At(j);
+                if (!(attr.mode_ & AM_FILE))
+                    continue;
+                Variant varValue = compBuffer.ReadVariant(attr.type_);
+                if (attr.type_ == VAR_RESOURCEREF)
+                {
+                    const ResourceRef& ref = varValue.GetResourceRef();
+                    // Sanitate resource name beforehand so that when we get the background load event, the name matches exactly
+                    String name = cache->SanitateResourceName(ref.name_);
+                    bool success = cache->BackgroundLoadResource(ref.type_, name);
+                    if (success)
+                    {
+                        ++asyncProgress_.totalResources_;
+                        asyncProgress_.resources_.Insert(StringHash(name));
+                    }
+                }
+                else if (attr.type_ == VAR_RESOURCEREFLIST)
+                {
+                    const ResourceRefList& refList = varValue.GetResourceRefList();
+                    for (unsigned k = 0; k < refList.names_.Size(); ++k)
+                    {
+                        String name = cache->SanitateResourceName(refList.names_[k]);
+                        bool success = cache->BackgroundLoadResource(refList.type_, name);
+                        if (success)
+                        {
+                            ++asyncProgress_.totalResources_;
+                            asyncProgress_.resources_.Insert(StringHash(name));
+                        }
+                    }
+                }
+             }
+        }
+    }
+    
+    // Read child nodes
+    unsigned numChildren = file->ReadVLE();
+    for (unsigned i = 0; i < numChildren; ++i)
+        PreloadResources(file, false);
+}
+
+void Scene::PreloadResourcesXML(const XMLElement& element)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    // Node or Scene attributes do not include any resources; therefore skip to the components
+    XMLElement compElem = element.GetChild("component");
+    while (compElem)
+    {
+        String typeName = compElem.GetAttribute("type");
+        const Vector<AttributeInfo>* attributes = context_->GetAttributes(StringHash(typeName));
+        if (attributes)
+        {
+            XMLElement attrElem = compElem.GetChild("attribute");
+            unsigned startIndex = 0;
+
+            while (attrElem)
+            {
+                String name = attrElem.GetAttribute("name");
+                unsigned i = startIndex;
+                unsigned attempts = attributes->Size();
+
+                while (attempts)
+                {
+                    const AttributeInfo& attr = attributes->At(i);
+                    if ((attr.mode_ & AM_FILE) && !attr.name_.Compare(name, true))
+                    {
+                        if (attr.type_ == VAR_RESOURCEREF)
+                        {
+                            ResourceRef ref = attrElem.GetVariantValue(attr.type_).GetResourceRef();
+                            String name = cache->SanitateResourceName(ref.name_);
+                            bool success = cache->BackgroundLoadResource(ref.type_, name);
+                            if (success)
+                            {
+                                ++asyncProgress_.totalResources_;
+                                asyncProgress_.resources_.Insert(StringHash(name));
+                            }
+                        }
+                        else if (attr.type_ == VAR_RESOURCEREFLIST)
+                        {
+                            ResourceRefList refList = attrElem.GetVariantValue(attr.type_).GetResourceRefList();
+                            for (unsigned k = 0; k < refList.names_.Size(); ++k)
+                            {
+                                String name = cache->SanitateResourceName(refList.names_[k]);
+                                bool success = cache->BackgroundLoadResource(refList.type_, name);
+                                if (success)
+                                {
+                                    ++asyncProgress_.totalResources_;
+                                    asyncProgress_.resources_.Insert(StringHash(name));
+                                }
+                            }
+                        }
+                        
+                        startIndex = (i + 1) % attributes->Size();
+                        break;
+                    }
+                    else
+                    {
+                        i = (i + 1) % attributes->Size();
+                        --attempts;
+                    }
+                }
+                
+                attrElem = attrElem.GetNext("attribute");
+            }
+        }
+
+        compElem = compElem.GetNext("component");
+    }
+
+    XMLElement childElem = element.GetChild("node");
+    while (childElem)
+    {
+        PreloadResourcesXML(childElem);
+        childElem = childElem.GetNext("node");
     }
 }
 

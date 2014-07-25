@@ -73,10 +73,8 @@ void Animation::RegisterObject(Context* context)
     context->RegisterFactory<Animation>();
 }
 
-bool Animation::Load(Deserializer& source)
+bool Animation::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadAnimation);
-    
     unsigned memoryUse = sizeof(Animation);
     
     // Check ID
@@ -126,7 +124,7 @@ bool Animation::Load(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     
-    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
     if (file)
     {
         XMLElement rootElem = file->GetRoot();

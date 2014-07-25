@@ -54,8 +54,9 @@ public:
     virtual ~Font();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false);
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.

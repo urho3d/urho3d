@@ -210,10 +210,8 @@ void Image::RegisterObject(Context* context)
     context->RegisterFactory<Image>();
 }
 
-bool Image::Load(Deserializer& source)
+bool Image::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadImage);
-
     // Check for DDS, KTX or PVR compressed format
     String fileID = source.ReadFileID();
 
@@ -508,6 +506,7 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
     components_ = components;
     compressedFormat_ = CF_NONE;
     numCompressedLevels_ = 0;
+    nextLevel_.Reset();
 
     SetMemoryUse(width * height * depth * components);
     return true;
@@ -558,7 +557,14 @@ void Image::SetData(const unsigned char* pixelData)
     if (!data_)
         return;
 
+    if (IsCompressed())
+    {
+        LOGERROR("Can not set new pixel data for a compressed image");
+        return;
+    }
+
     memcpy(data_.Get(), pixelData, width_ * height_ * depth_ * components_);
+    nextLevel_.Reset();
 }
 
 bool Image::LoadColorLUT(Deserializer& source)
@@ -938,6 +944,11 @@ SharedPtr<Image> Image::GetNextLevel() const
         LOGERROR("Illegal number of image components for mip level generation");
         return SharedPtr<Image>();
     }
+
+    if (nextLevel_)
+        return nextLevel_;
+
+    PROFILE(CalculateImageMipLevel);
 
     int widthOut = width_ / 2;
     int heightOut = height_ / 2;
@@ -1374,6 +1385,27 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
         LOGERROR("Failed to create SDL surface from image " + GetName());
 
     return surface;
+}
+
+void Image::PrecalculateLevels()
+{
+    if (!data_ || IsCompressed())
+        return;
+
+    PROFILE(PrecalculateImageMipLevels);
+
+    nextLevel_.Reset();
+
+    if (width_ > 1 || height_ > 1)
+    {
+        SharedPtr<Image> current = GetNextLevel();
+        nextLevel_ = current;
+        while (current && (current->width_ > 1 || current->height_ > 1))
+        {
+            current->nextLevel_ = current->GetNextLevel();
+            current = current->nextLevel_;
+        }
+    }
 }
 
 unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components)

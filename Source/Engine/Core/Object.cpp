@@ -22,6 +22,8 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Log.h"
+#include "Thread.h"
 
 #include "DebugNew.h"
 
@@ -222,6 +224,12 @@ void Object::SendEvent(StringHash eventType)
 
 void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
+    if (!Thread::IsMainThread())
+    {
+        LOGERROR("Sending events is only supported from the main thread");
+        return;
+    }
+    
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
