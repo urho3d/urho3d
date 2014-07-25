@@ -851,6 +851,15 @@ void asCParser::Error(const asCString &text, sToken *token)
 		builder->WriteError(script->name, text, row, col);
 }
 
+void asCParser::Warning(const asCString &text, sToken *token)
+{
+	int row, col;
+	script->ConvertPosToRowCol(token->pos, &row, &col);
+
+	if( builder )
+		builder->WriteWarning(script->name, text, row, col);
+}
+
 void asCParser::Info(const asCString &text, sToken *token)
 {
 	RewindTo(token);
@@ -1238,14 +1247,25 @@ asCScriptNode *asCParser::ParseExprValue()
 			else 
 				break;
 		}
+
+		bool isDataType = IsDataType(t2);
+		bool isTemplateType = false;
+		if( isDataType )
+		{
+			// Is this a template type?
+			tempString.Assign(&script->code[t2.pos], t2.length);
+			if( engine->IsTemplateType(tempString.AddressOf()) )
+				isTemplateType = true;
+		}
 		
 		// Rewind so the real parsing can be done, after deciding what to parse
 		RewindTo(&t1);
 
 		// Check if this is a construct call
-		if( IsDataType(t2) && (t.type == ttOpenParanthesis || 
-		                       t.type == ttLessThan || 
-		                       t.type == ttOpenBracket) )
+		if( isDataType && (t.type == ttOpenParanthesis ||  // type()
+			               t.type == ttOpenBracket) )      // type[]()
+			node->AddChildLast(ParseConstructCall());
+		else if( isTemplateType && t.type == ttLessThan )  // type<t>()
 			node->AddChildLast(ParseConstructCall());
 		else if( IsFunctionCall() )
 			node->AddChildLast(ParseFunctionCall());
@@ -1425,14 +1445,17 @@ asCScriptNode *asCParser::ParseArgList(bool withParenthesis)
 		for(;;)
 		{
 			// Determine if this is a named argument
-			// Careful not to mistake 'type = {init list}' as named argument
-			sToken tl, t2, t3;
+			sToken tl, t2;
 			GetToken(&tl);
 			GetToken(&t2);
-			GetToken(&t3);
 			RewindTo(&tl);
 
-			if( tl.type == ttIdentifier && t2.type == ttAssignment && t3.type != ttStartStatementBlock )
+			// Named arguments uses the syntax: arg : expr
+			// This avoids confusion when the argument has the same name as a local variable, i.e. var = expr
+			// It also avoids conflict with expressions to that creates anonymous objects initialized with lists, i.e. type = {...}
+			// The alternate syntax: arg = expr, is supported to provide backwards compatibility with 2.29.0
+			// TODO: 3.0.0: Remove the alternate syntax
+			if( tl.type == ttIdentifier && (t2.type == ttColon || (engine->ep.alterSyntaxNamedArgs && t2.type == ttAssignment)) )
 			{
 				asCScriptNode *named = CreateNode(snNamedArgument);
 				if( named == 0 ) return 0;
@@ -1440,7 +1463,9 @@ asCScriptNode *asCParser::ParseArgList(bool withParenthesis)
 
 				named->AddChildLast(ParseIdentifier());
 				GetToken(&t2);
-				asASSERT( t2.type == ttAssignment );
+
+				if( engine->ep.alterSyntaxNamedArgs == 1 && t2.type == ttAssignment )
+					Warning(TXT_NAMED_ARGS_WITH_OLD_SYNTAX, &t2);
 
 				named->AddChildLast(ParseAssignment());
 			}
@@ -1978,8 +2003,8 @@ asCScriptNode *asCParser::ParseScript(bool inBlock)
 			else if( t1.type == ttTypedef )
 				node->AddChildLast(ParseTypedef());		// Handle primitive typedefs
 			else if( t1.type == ttClass || 
-					 ((IdentifierIs(t1, SHARED_TOKEN) || IdentifierIs(t1, FINAL_TOKEN)) && t2.type == ttClass) || 
-					 (IdentifierIs(t1, SHARED_TOKEN) && IdentifierIs(t2, FINAL_TOKEN)) )
+					((IdentifierIs(t1, SHARED_TOKEN) || IdentifierIs(t1, FINAL_TOKEN) || IdentifierIs(t1, ABSTRACT_TOKEN)) && t2.type == ttClass) || 
+					 (IdentifierIs(t1, SHARED_TOKEN) && (IdentifierIs(t2, FINAL_TOKEN) || IdentifierIs(t2, ABSTRACT_TOKEN))) )
 				node->AddChildLast(ParseClass());
 			else if( t1.type == ttMixin )
 				node->AddChildLast(ParseMixin());
@@ -2298,8 +2323,10 @@ bool asCParser::IsVarDecl()
 	}
 
 	// Object handles can be interleaved with the array brackets
+	// Even though declaring variables with & is invalid we'll accept 
+	// it here to give an appropriate error message later
 	GetToken(&t2);
-	while( t2.type == ttHandle || t2.type == ttOpenBracket )
+	while( t2.type == ttHandle || t2.type == ttAmp || t2.type == ttOpenBracket )
 	{
 		if( t2.type == ttOpenBracket )
 		{
@@ -2679,6 +2706,7 @@ asCScriptNode *asCParser::ParseFunction(bool isMethod)
 		if( t1.type == ttConst )
 			node->AddChildLast(ParseToken(ttConst));
 
+		// TODO: Should support abstract methods, in which case no statement block should be provided
 		ParseMethodOverrideBehaviors(node);
 		if( isSyntaxError ) return node;
 	}
@@ -2958,15 +2986,10 @@ asCScriptNode *asCParser::ParseClass()
 	sToken t;
 	GetToken(&t);
 
-	// Allow the keyword 'shared' before 'class'
-	if( IdentifierIs(t, SHARED_TOKEN) )
-	{
-		RewindTo(&t);
-		node->AddChildLast(ParseIdentifier());
-		GetToken(&t);
-	}
-
-	if( IdentifierIs(t, FINAL_TOKEN) )
+	// Allow the keywords 'shared', 'abstract', and 'final' before 'class'
+	while( IdentifierIs(t, SHARED_TOKEN) ||
+		   IdentifierIs(t, ABSTRACT_TOKEN) ||
+		   IdentifierIs(t, FINAL_TOKEN) )
 	{
 		RewindTo(&t);
 		node->AddChildLast(ParseIdentifier());
@@ -3563,7 +3586,14 @@ asCScriptNode *asCParser::ParseStatement()
 	else if( t1.type == ttSwitch )
 		return ParseSwitch();
 	else
+	{
+		if( IsVarDecl() )
+		{
+			Error(TXT_UNEXPECTED_VAR_DECL, &t1);
+			return 0;
+		}
 		return ParseExpressionStatement();
+	}
 }
 
 asCScriptNode *asCParser::ParseExpressionStatement()

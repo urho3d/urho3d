@@ -166,6 +166,7 @@ protected:
 	void               WriteError(const asCString &scriptname, const asCString &msg, int r, int c);
 	void               WriteError(const asCString &msg, asCScriptCode *file, asCScriptNode *node);
 	void               WriteWarning(const asCString &scriptname, const asCString &msg, int r, int c);
+	void               WriteWarning(const asCString &msg, asCScriptCode *file, asCScriptNode *node);
 
 	bool               DoesGlobalPropertyExist(const char *prop, asSNameSpace *ns, asCGlobalProperty **outProp = 0, sGlobalVariableDescription **outDesc = 0, bool *isAppProp = 0);
 	asCGlobalProperty *GetGlobalProperty(const char *prop, asSNameSpace *ns, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue, bool *isAppProp);

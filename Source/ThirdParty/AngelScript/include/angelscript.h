@@ -59,8 +59,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22900
-#define ANGELSCRIPT_VERSION_STRING "2.29.0"
+#define ANGELSCRIPT_VERSION        22901
+#define ANGELSCRIPT_VERSION_STRING "2.29.1 WIP"
 
 // Data types
 
@@ -134,6 +134,7 @@ enum asEEngineProp
 	asEP_ALWAYS_IMPL_DEFAULT_CONSTRUCT      = 18,
 	asEP_COMPILER_WARNINGS                  = 19,
 	asEP_DISALLOW_VALUE_ASSIGN_FOR_REF_TYPE = 20,
+	asEP_ALTER_SYNTAX_NAMED_ARGS            = 21,
 
 	asEP_LAST_PROPERTY
 };
@@ -200,7 +201,8 @@ enum asEObjTypeFlags
 	asOBJ_LIST_PATTERN               = (1<<25),
 	asOBJ_ENUM                       = (1<<26),
 	asOBJ_TEMPLATE_SUBTYPE           = (1<<27),
-	asOBJ_TYPEDEF                    = (1<<28)
+	asOBJ_TYPEDEF                    = (1<<28),
+	asOBJ_ABSTRACT                   = (1<<29)
 };
 
 // Behaviours
@@ -561,6 +563,59 @@ extern "C"
 	AS_API asILockableSharedBool *asCreateLockableSharedBool();
 }
 #endif // ANGELSCRIPT_DLL_MANUAL_IMPORT
+
+// Determine traits of a type for registration of value types
+// Relies on C++11 features so it can not be used with non-compliant compilers
+#ifdef AS_CAN_USE_CPP11
+
+END_AS_NAMESPACE
+#include <type_traits>
+BEGIN_AS_NAMESPACE
+
+template<typename T>
+asUINT asGetTypeTraits()
+{
+	bool hasConstructor =  std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
+#if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8) 
+	// http://stackoverflow.com/questions/12702103/writing-code-that-works-when-has-trivial-destructor-is-defined-instead-of-is
+	bool hasDestructor = std::is_destructible<T>::value && !std::is_trivially_destructible<T>::value;
+#else
+	bool hasDestructor = std::is_destructible<T>::value && !std::has_trivial_destructor<T>::value;
+#endif
+	bool hasAssignmentOperator = std::is_copy_assignable<T>::value && !std::has_trivial_copy_assign<T>::value;
+	bool hasCopyConstructor = std::is_copy_constructible<T>::value && !std::has_trivial_copy_constructor<T>::value;
+	bool isFloat = std::is_floating_point<T>::value;
+	bool isPrimitive = std::is_integral<T>::value || std::is_pointer<T>::value || std::is_enum<T>::value;
+	bool isClass = std::is_class<T>::value;
+	bool isArray = std::is_array<T>::value;
+
+	if( isFloat )
+		return asOBJ_APP_FLOAT;
+	if( isPrimitive )
+		return asOBJ_APP_PRIMITIVE;
+	
+	if( isClass )
+	{
+		asDWORD flags = asOBJ_APP_CLASS;
+		if( hasConstructor )
+			flags |= asOBJ_APP_CLASS_CONSTRUCTOR;
+		if( hasDestructor )
+			flags |= asOBJ_APP_CLASS_DESTRUCTOR;
+		if( hasAssignmentOperator )
+			flags |= asOBJ_APP_CLASS_ASSIGNMENT;
+		if( hasCopyConstructor )
+			flags |= asOBJ_APP_CLASS_COPY_CONSTRUCTOR;
+		return flags;
+	}
+
+	if( isArray )
+		return asOBJ_APP_ARRAY;
+
+	// Unknown type traits
+	return 0;
+}
+
+#endif // c++11
 
 // Interface declarations
 

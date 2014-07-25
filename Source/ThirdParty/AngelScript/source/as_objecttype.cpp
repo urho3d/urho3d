@@ -713,7 +713,7 @@ asDWORD asCObjectType::GetAccessMask() const
 asCObjectProperty *asCObjectType::AddPropertyToClass(const asCString &name, const asCDataType &dt, bool isPrivate)
 {
 	asASSERT( flags & asOBJ_SCRIPT_OBJECT );
-	asASSERT( dt.CanBeInstanciated() );
+	asASSERT( dt.CanBeInstantiated() );
 	asASSERT( !IsInterface() );
 
 	// Store the properties in the object type descriptor

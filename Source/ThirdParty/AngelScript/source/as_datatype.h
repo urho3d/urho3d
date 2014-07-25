@@ -96,6 +96,8 @@ public:
 	bool IsEnumType()             const;
 	bool IsAnyType()              const {return tokenType == ttQuestion;}
 	bool IsHandleToAsHandleType() const {return isHandleToAsHandleType;}
+	bool IsAbstractClass()        const;
+	bool IsInterface()            const;
 
 	bool IsObjectConst()    const;
 
@@ -105,7 +107,7 @@ public:
 	bool IsNullHandle()                                    const;
 
 	bool SupportHandles() const;
-	bool CanBeInstanciated() const;
+	bool CanBeInstantiated() const;
 	bool CanBeCopied() const;
 
 	bool operator ==(const asCDataType &) const;

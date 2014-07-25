@@ -784,7 +784,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 	ReadFunctionSignature(func);
 	if( error )
 	{
-		asDELETE(func, asCScriptFunction);
+		func->DestroyHalfCreated();
 		return 0;
 	}
 
@@ -795,7 +795,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 		{
 			// Out of memory
 			error = true;
-			asDELETE(func, asCScriptFunction);
+			func->DestroyHalfCreated();
 			return 0;
 		}
 
@@ -817,6 +817,13 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			func->scriptData->funcVariableTypes.PushLast((asCScriptFunction*)(asPWORD)idx);
 			num = ReadEncodedUInt();
 			func->scriptData->objVariablePos.PushLast(num);
+
+			if( error )
+			{
+				// No need to continue (the error has already been reported before)
+				func->DestroyHalfCreated();
+				return 0;
+			}
 		}
 		if( count > 0 )
 			func->scriptData->objVariablesOnHeap = ReadEncodedUInt();
@@ -840,7 +847,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			{
 				// Out of memory
 				error = true;
-				asDELETE(func, asCScriptFunction);
+				func->DestroyHalfCreated();
 				return 0;
 			}
 			for( i = 0; i < length; ++i )
@@ -853,7 +860,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			{
 				// Out of memory
 				error = true;
-				asDELETE(func, asCScriptFunction);
+				func->DestroyHalfCreated();
 				return 0;
 			}
 			for( i = 0; i < length; ++i )
@@ -881,7 +888,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 				{
 					// Out of memory
 					error = true;
-					asDELETE(func, asCScriptFunction);
+					func->DestroyHalfCreated();
 					return 0;
 				}
 				func->scriptData->variables.PushLast(var);
@@ -890,6 +897,13 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 				var->stackOffset = ReadEncodedUInt();
 				ReadString(&var->name);
 				ReadDataType(&var->type);
+
+				if( error )
+				{
+					// No need to continue (the error has already been reported before)
+					func->DestroyHalfCreated();
+					return 0;
+				}
 			}
 		}
 
@@ -914,7 +928,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			if( count > func->parameterTypes.GetLength() )
 			{
 				error = true;
-				asDELETE(func, asCScriptFunction);
+				func->DestroyHalfCreated();
 				return 0;
 			}
 			func->parameterNames.SetLength(count);
@@ -1640,9 +1654,12 @@ asCObjectType* asCReader::ReadObjectType()
 	if( ch == 'a' )
 	{
 		// Read the name of the template type
-		asCString typeName;
+		asCString typeName, ns;
 		ReadString(&typeName);
-		asCObjectType *tmpl = engine->GetRegisteredObjectType(typeName.AddressOf(), engine->nameSpaces[0]);
+		ReadString(&ns);
+		asSNameSpace *nameSpace = engine->AddNameSpace(ns.AddressOf());
+
+		asCObjectType *tmpl = engine->GetRegisteredObjectType(typeName.AddressOf(), nameSpace);
 		if( tmpl == 0 )
 		{
 			asCString str;
@@ -1770,7 +1787,7 @@ asCObjectType* asCReader::ReadObjectType()
 	else
 	{
 		// No object type
-		asASSERT( ch == '\0' );
+		asASSERT( ch == '\0' || error );
 		ot = 0;
 	}
 
@@ -3823,6 +3840,7 @@ void asCWriter::WriteObjectType(asCObjectType* ot)
 				ch = 'a';
 				WriteData(&ch, 1);
 				WriteString(&ot->name);
+				WriteString(&ot->nameSpace->name);
 
 				WriteEncodedInt64(ot->templateSubTypes.GetLength());
 				for( asUINT n = 0; n < ot->templateSubTypes.GetLength(); n++ )

@@ -351,8 +351,8 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 		{
 			if( ctx == 0 )
 			{
-				r = engine->CreateContext(&ctx, true);
-				if( r < 0 )
+				ctx = engine->RequestContext();
+				if( ctx == 0 )
 					break;
 			}
 
@@ -391,7 +391,7 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 
 	if( ctx && !myCtx )
 	{
-		ctx->Release();
+		engine->ReturnContext(ctx);
 		ctx = 0;
 	}
 

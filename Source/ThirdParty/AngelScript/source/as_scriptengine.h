@@ -343,7 +343,7 @@ public:
 
 	// Store information about template types
 	// This list will contain all instances of templates, both registered specialized 
-	// types and those automacially instanciated from scripts
+	// types and those automacially instantiated from scripts
 	asCArray<asCObjectType *>      templateInstanceTypes;
 
 	// Store information about list patterns
@@ -375,7 +375,7 @@ public:
 	bool                   isBuilding;
 	bool                   deferValidationOfTemplateTypes;
 
-	// Tokenizer is instanciated once to share resources
+	// Tokenizer is instantiated once to share resources
 	asCTokenizer tok;
 
 	// Stores script declared object types
@@ -475,6 +475,7 @@ public:
 		bool   alwaysImplDefaultConstruct;
 		int    compilerWarnings;
 		bool   disallowValueAssignForRefType;
+		int    alterSyntaxNamedArgs;
 	} ep;
 
 	// This flag is to allow a quicker shutdown when releasing the engine

@@ -308,6 +308,7 @@ const char * const FINAL_TOKEN    = "final";
 const char * const OVERRIDE_TOKEN = "override";
 const char * const GET_TOKEN      = "get";
 const char * const SET_TOKEN      = "set";
+const char * const ABSTRACT_TOKEN = "abstract";
 
 END_AS_NAMESPACE
 

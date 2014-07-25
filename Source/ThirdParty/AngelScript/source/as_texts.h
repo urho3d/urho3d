@@ -42,7 +42,9 @@
 // Compiler messages
 
 #define TXT_s_ALREADY_DECLARED                    "'%s' is already declared"
+#define TXT_ABSTRACT_CLASS_s_CANNOT_BE_INSTANTIATED "Abstract class '%s' cannot be instantiated"
 #define TXT_ARG_NOT_LVALUE                        "Argument cannot be assigned. Output will be discarded."
+#define TXT_ATTR_s_INFORMED_MULTIPLE_TIMES        "Attribute '%s' informed multiple times"
 
 #define TXT_BOTH_MUST_BE_SAME                     "Both expressions must have the same type"
 #define TXT_BOTH_CONDITIONS_MUST_CALL_CONSTRUCTOR "Both conditions must call constructor"
@@ -57,12 +59,13 @@
 #define TXT_CANNOT_INHERIT_FROM_s_FINAL            "Can't inherit from class '%s' marked as final"
 #define TXT_CANNOT_INHERIT_FROM_MULTIPLE_CLASSES   "Can't inherit from multiple classes"
 #define TXT_CANNOT_INHERIT_FROM_SELF               "Can't inherit from itself, or another class that inherits from this class"
-#define TXT_CANNOT_INSTANCIATE_TEMPLATE_s_WITH_s   "Can't instanciate template '%s' with subtype '%s'"
+#define TXT_CANNOT_INSTANTIATE_TEMPLATE_s_WITH_s   "Can't instantiate template '%s' with subtype '%s'"
 #define TXT_CANNOT_PASS_CLASS_METHOD_AS_ARG        "Can't pass class method as arg directly. Use a delegate object instead"
 #define TXT_CANNOT_RETURN_REF_TO_LOCAL             "Can't return reference to local value."
 #define TXT_CANT_IMPLICITLY_CONVERT_s_TO_s         "Can't implicitly convert from '%s' to '%s'."
 #define TXT_CANT_RETURN_VALUE                      "Can't return value when return type is 'void'"
 #define TXT_CHANGE_SIGN                            "Implicit conversion changed sign of value"
+#define TXT_CLASS_CANT_BE_FINAL_AND_ABSTRACT       "A class cannot be both abstract and final"
 #define TXT_COMPILING_s                            "Compiling %s"
 #define TXT_COMPOUND_ASGN_WITH_PROP                "Compound assignments with property accessors are not allowed"
 #define TXT_CONSTRUCTOR_NAME_ERROR                 "The name of constructors and destructors must be the same as the class"
@@ -115,6 +118,8 @@
 #define TXT_HANDLE_OF_HANDLE_IS_NOT_ALLOWED      "Handle to handle is not allowed"
 
 #define TXT_IDENTIFIER_s_NOT_DATA_TYPE             "Identifier '%s' is not a data type"
+#define TXT_IDENTIFIER_s_NOT_DATA_TYPE_IN_GLOBAL_NS "Identifier '%s' is not a data type in global namespace"
+#define TXT_IDENTIFIER_s_NOT_DATA_TYPE_IN_NS_s     "Identifier '%s' is not a data type in namespace '%s' or parent"
 #define TXT_IF_WITH_EMPTY_STATEMENT                "If with empty statement"
 #define TXT_ILLEGAL_MEMBER_TYPE                    "Illegal member type"
 // TODO: Should be TXT_ILLEGAL_OPERATION_ON_s
@@ -124,6 +129,7 @@
 #define TXT_ILLEGAL_VARIABLE_NAME_s                "Illegal variable name '%s'."
 #define TXT_INIT_LIST_CANNOT_BE_USED_WITH_s        "Initialization lists cannot be used with '%s'"
 #define TXT_INSTEAD_FOUND_s                        "Instead found '%s'"
+#define TXT_INTERFACE_s_CANNOT_BE_INSTANTIATED     "Interface '%s' cannot be instantiated"
 #define TXT_INTERFACE_CAN_ONLY_IMPLEMENT_INTERFACE "Interfaces can only implement other interfaces"
 #define TXT_INVALID_BREAK                          "Invalid 'break'"
 #define TXT_INVALID_CHAR_LITERAL                   "Invalid character literal"
@@ -163,14 +169,15 @@
 #define TXT_NAME_CONFLICT_s_OBJ_PROPERTY           "Name conflict. '%s' is an object property."
 #define TXT_NAME_CONFLICT_s_METHOD                 "Name conflict. '%s' is a class method."
 #define TXT_NAME_CONFLICT_s_ALREADY_USED           "Name conflict. '%s' is already used."
+#define TXT_NAMED_ARGS_WITH_OLD_SYNTAX             "Detected named argument with old syntax"
 #define TXT_NO_APPROPRIATE_INDEX_OPERATOR          "No appropriate indexing operator found"
-#define TXT_NO_APPROPRIATE_OPHNDLASSIGN_s          "No appropriate opHndlAssign method found in '%s'"
+#define TXT_NO_APPROPRIATE_OPHNDLASSIGN_s          "No appropriate opHndlAssign method found in '%s' for handle assignment"
 #define TXT_NO_APPROPRIATE_OPEQUALS                "No appropriate opEquals method found"
 #define TXT_NO_CONVERSION_s_TO_s                   "No conversion from '%s' to '%s' available."
 #define TXT_NO_CONVERSION_s_TO_MATH_TYPE           "No conversion from '%s' to math type available."
 #define TXT_NO_DEFAULT_ARRAY_TYPE                  "The application doesn't support the default array type."
 #define TXT_NO_DEFAULT_CONSTRUCTOR_FOR_s           "No default constructor for object of type '%s'."
-#define TXT_NO_DEFAULT_COPY_OP_FOR_s               "No appropriate opAssign method found in '%s'"
+#define TXT_NO_DEFAULT_COPY_OP_FOR_s               "No appropriate opAssign method found in '%s' for value assignment"
 #define TXT_NO_COPY_CONSTRUCTOR_FOR_s              "No copy constructor for object of type '%s'."
 #define TXT_NO_MATCHING_SIGNATURES_TO_s            "No matching signatures to '%s'"
 #define TXT_NO_MATCHING_OP_FOUND_FOR_TYPE_s        "No matching operator that takes the type '%s' found"
@@ -198,7 +205,7 @@
 #define TXT_OPERANDS_MUST_BE_HANDLES       "Both operands must be handles when comparing identity"
 
 #define TXT_PARAMETER_ALREADY_DECLARED            "Parameter already declared"
-#define TXT_PARAMETER_CANT_BE_s                   "Parameter type can't be '%s', because the type cannot be instanciated."
+#define TXT_PARAMETER_CANT_BE_s                   "Parameter type can't be '%s', because the type cannot be instantiated."
 #define TXT_PRIVATE_METHOD_CALL_s                 "Illegal call to private method '%s'"
 #define TXT_PRIVATE_PROP_ACCESS_s                 "Illegal access to private property '%s'"
 #define TXT_PROPERTY_ACCESSOR_DISABLED            "Property accessors have been disabled by the application"
@@ -236,6 +243,7 @@
 
 #define TXT_UNEXPECTED_END_OF_FILE             "Unexpected end of file"
 #define TXT_UNEXPECTED_TOKEN_s                 "Unexpected token '%s'"
+#define TXT_UNEXPECTED_VAR_DECL                "Unexpected variable declaration"
 #define TXT_UNINITIALIZED_GLOBAL_VAR_s         "Use of uninitialized global variable '%s'."
 #define TXT_UNKNOWN_SCOPE_s                    "Unknown scope '%s'"
 #define TXT_UNREACHABLE_CODE                   "Unreachable code"
@@ -284,7 +292,7 @@
 #define TXT_TEMPLATE_LIST_FACTORY_EXPECTS_2_REF_PARAMS   "Template list factory expects two reference parameters. The last is the pointer to the initialization buffer"
 #define TXT_LIST_FACTORY_EXPECTS_1_REF_PARAM             "List factory expects only one reference parameter. The pointer to the initialization buffer will be passed in this parameter"
 #define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s            "Failed to read subtype of template type '%s'"
-#define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s               "Attempting to instanciate invalid template type '%s<%s>'"
+#define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s               "Attempting to instantiate invalid template type '%s<%s>'"
 #define TXT_FAILED_IN_FUNC_s_d                           "Failed in call to function '%s' (Code: %d)"
 #define TXT_FAILED_IN_FUNC_s_WITH_s_d                    "Failed in call to function '%s' with '%s' (Code: %d)"
 #define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s_d              "Failed in call to function '%s' with '%s' and '%s' (Code: %d)"
@@ -296,6 +304,7 @@
 #define TXT_RESURRECTING_SCRIPTOBJECT_s                  "The script object of type '%s' is being resurrected illegally during destruction"
 #define TXT_INVALID_BYTECODE_d                           "LoadByteCode failed. The bytecode is invalid. Number of bytes read from stream: %d"
 #define TXT_NO_JIT_IN_FUNC_s                             "Function '%s' appears to have been compiled without JIT entry points"
+#define TXT_ENGINE_REF_COUNT_ERROR_DURING_SHUTDOWN       "Uh oh! The engine's reference count is increasing while it is being destroyed. Make sure references needed for clean-up are immediately released"
 
 // Internal names
 

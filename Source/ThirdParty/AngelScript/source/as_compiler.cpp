@@ -195,7 +195,7 @@ int asCCompiler::CompileFactory(asCBuilder *builder, asCScriptCode *script, asCS
 		}
 	}
 
-	// Allocate the class and instanciate it with the constructor
+	// Allocate the class and instantiate it with the constructor
 	int varOffset = AllocateVariable(dt, true);
 
 	outFunc->scriptData->variableSpace = AS_PTR_SIZE;
@@ -341,8 +341,8 @@ int asCCompiler::SetupParametersAndReturnVariable(asCArray<asCString> &parameter
 	}
 
 	// Is the return type allowed?
-	if( (!returnType.CanBeInstanciated() && returnType != asCDataType::CreatePrimitive(ttVoid, false)) ||
-		(returnType.IsReference() && !returnType.CanBeInstanciated()) )
+	if( returnType != asCDataType::CreatePrimitive(ttVoid, false) &&
+		!returnType.CanBeInstantiated() )
 	{
 		// TODO: Hasn't this been validated by the builder already?
 		asCString str;
@@ -368,8 +368,8 @@ int asCCompiler::SetupParametersAndReturnVariable(asCArray<asCString> &parameter
 
 		// Is the data type allowed?
 		// TODO: Hasn't this been validated by the builder already?
-		if( (type.IsReference() && inoutFlag != asTM_INOUTREF && !type.CanBeInstanciated()) ||
-			(!type.IsReference() && !type.CanBeInstanciated()) )
+		if( (type.IsReference() && inoutFlag != asTM_INOUTREF && !type.CanBeInstantiated()) ||
+			(!type.IsReference() && !type.CanBeInstantiated()) )
 		{
 			asCString parm = type.Format();
 			if( inoutFlag == asTM_INREF )
@@ -1804,6 +1804,7 @@ void asCCompiler::PrepareFunctionCall(int funcId, asCByteCode *bc, asCArray<asSE
 
 	// If the function being called is the opAssign or copy constructor for the same type
 	// as the argument, then we should avoid making temporary copy of the argument
+	asASSERT( descr->parameterTypes.GetLength() == args.GetLength() );
 	bool makingCopy = false;
 	if( descr->parameterTypes.GetLength() == 1 &&
 		descr->parameterTypes[0].IsEqualExceptRefAndConst(args[0]->type.dataType) &&
@@ -2521,11 +2522,16 @@ void asCCompiler::CompileDeclaration(asCScriptNode *decl, asCByteCode *bc)
 			preCompiled = CompileAutoType(type, compiledCtx, node->next, node);
 
 		// Is the type allowed?
-		if( !type.CanBeInstanciated() )
+		if( !type.CanBeInstantiated() )
 		{
 			asCString str;
-			// TODO: Change to "'type' cannot be declared as variable"
-			str.Format(TXT_DATA_TYPE_CANT_BE_s, type.Format().AddressOf());
+			if( type.IsAbstractClass() )
+				str.Format(TXT_ABSTRACT_CLASS_s_CANNOT_BE_INSTANTIATED, type.Format().AddressOf());
+			else if( type.IsInterface() )
+				str.Format(TXT_INTERFACE_s_CANNOT_BE_INSTANTIATED, type.Format().AddressOf());
+			else
+				// TODO: Improve error message to explain why
+				str.Format(TXT_DATA_TYPE_CANT_BE_s, type.Format().AddressOf());
 			Error(str, node);
 
 			// Use int instead to avoid further problems
@@ -5960,7 +5966,7 @@ asUINT asCCompiler::ImplicitConvObjectRef(asSExprContext *ctx, const asCDataType
 
 	asASSERT(ctx->type.dataType.GetObjectType() || ctx->methodName != "");
 
-	// First attempt to convert the base type without instanciating another instance
+	// First attempt to convert the base type without instantiating another instance
 	if( to.GetObjectType() != ctx->type.dataType.GetObjectType() && ctx->methodName == "" )
 	{
 		// If the to type is an interface and the from type implements it, then we can convert it immediately
@@ -9206,6 +9212,21 @@ void asCCompiler::CompileConstructCall(asCScriptNode *node, asSExprContext *ctx)
 	{
 		// This is a cast to a primitive type
 		CompileConversion(node, ctx);
+		return;
+	}
+
+	if( !dt.CanBeInstantiated() )
+	{
+		asCString str;
+		if( dt.IsAbstractClass() )
+			str.Format(TXT_ABSTRACT_CLASS_s_CANNOT_BE_INSTANTIATED, dt.Format().AddressOf());
+		else if( dt.IsInterface() )
+			str.Format(TXT_INTERFACE_s_CANNOT_BE_INSTANTIATED, dt.Format().AddressOf());
+		else
+			// TODO: Improve error message to explain why
+			str.Format(TXT_DATA_TYPE_CANT_BE_s, dt.Format().AddressOf());
+		Error(str, node);
+		ctx->type.SetDummy();
 		return;
 	}
 

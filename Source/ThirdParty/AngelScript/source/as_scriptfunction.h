@@ -178,6 +178,8 @@ public:
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();
 
+	void     DestroyHalfCreated();
+
 	// TODO: 2.29.0: operator==
 	// TODO: 2.29.0: The asIScriptFunction should provide operator== and operator!= that should do a
 	//               a value comparison. Two delegate objects that point to the same object and class method should compare as equal
