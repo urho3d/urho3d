@@ -485,9 +485,12 @@ void Clear();
 void Erase(uint);
 int Find(const T&) const;
 int Find(uint, const T&) const;
+int FindByRef(const T&) const;
+int FindByRef(uint, const T&) const;
 void Insert(uint, const T&);
 void Pop();
 void Push(const T&);
+void Reserve(uint);
 void Resize(uint);
 void Reverse();
 void Sort();
@@ -3473,9 +3476,9 @@ bool Exists(const String&) const;
 bool Get(const String&, void*) const;
 bool Get(const String&, double&) const;
 bool Get(const String&, int64&) const;
-void Set(const String&, void*);
-void Set(const String&, double&);
-void Set(const String&, int64&);
+void Set(const String&, const void*);
+void Set(const String&, const double&);
+void Set(const String&, const int64&);
 
 // Properties:
 /* readonly */
@@ -3484,6 +3487,10 @@ bool empty;
 Array<String> keys;
 /* readonly */
 uint length;
+};
+
+class DictionaryValue
+{
 };
 
 class Drawable

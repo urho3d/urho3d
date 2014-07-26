@@ -2359,9 +2359,12 @@ Methods:
 - void Erase(uint)
 - int Find(const T&) const
 - int Find(uint, const T&) const
+- int FindByRef(const T&) const
+- int FindByRef(uint, const T&) const
 - void Insert(uint, const T&)
 - void Pop()
 - void Push(const T&)
+- void Reserve(uint)
 - void Resize(uint)
 - void Reverse()
 - void Sort()
@@ -4895,15 +4898,18 @@ Methods:
 - bool Get(const String&, ?&) const
 - bool Get(const String&, double&) const
 - bool Get(const String&, int64&) const
-- void Set(const String&, ?&)
-- void Set(const String&, double&)
-- void Set(const String&, int64&)
+- void Set(const String&, const ?&)
+- void Set(const String&, const double&)
+- void Set(const String&, const int64&)
 
 Properties:
 
 - bool empty // readonly
 - String[]@ keys // readonly
 - uint length // readonly
+
+
+### DictionaryValue
 
 
 ### Drawable
