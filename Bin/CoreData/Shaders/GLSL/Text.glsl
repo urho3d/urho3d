@@ -26,6 +26,10 @@ void PS()
     else
         gl_FragColor.a = vColor.a;
 
+    // Stroke effect testing
+    if (distance < 0.53f)
+        gl_FragColor.r = 1.0f;
+
     float width = 0.015f;
     gl_FragColor.a *= smoothstep(0.5f - width, 0.5f + width, distance);
 #else
