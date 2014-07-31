@@ -20,13 +20,14 @@ void PS()
     gl_FragColor.rgb = vColor.rgb;
 
 #ifdef SIGNED_DISTANCE_FIELD
-    float mask = texture2D(sDiffMap, vTexCoord).a;
-    if (mask < 0.5)
+    float distance = texture2D(sDiffMap, vTexCoord).a;
+    if (distance < 0.5f)
         gl_FragColor.a = 0.0;
     else
         gl_FragColor.a = vColor.a;
 
-    gl_FragColor.a *= smoothstep(0.25, 0.75, mask);
+    float width = 0.015f;
+    gl_FragColor.a *= smoothstep(0.5f - width, 0.5f + width, distance);
 #else
     gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).a;
 #endif
