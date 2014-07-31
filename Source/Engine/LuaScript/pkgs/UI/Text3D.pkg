@@ -5,8 +5,8 @@ class Text3D : public Drawable
     Text3D();
     ~Text3D();
     
-    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE, bool useSDF =  false);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF =  false);
     
     void SetMaterial(Material* material);
     
@@ -30,6 +30,7 @@ class Text3D : public Drawable
     Font* GetFont() const;
     Material* GetMaterial() const;
     int GetFontSize() const;
+    bool IsUseSDF() const;
     const String GetText() const;
     HorizontalAlignment GetTextAlignment() const;
     HorizontalAlignment GetHorizontalAlignment() const;
@@ -53,6 +54,7 @@ class Text3D : public Drawable
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set int fontSize;
+    tolua_readonly tolua_property__is_set bool useSDF;
     tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;

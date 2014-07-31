@@ -49,6 +49,7 @@ static const float DEFAULT_EFFECT_DEPTH_BIAS = 0.1f;
 Text3D::Text3D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     text_(context),
+    useSDF_(false),
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),
     faceCameraMode_(FC_NONE),
@@ -156,10 +157,11 @@ void Text3D::SetMaterial(Material* material)
     UpdateTextMaterials(true);
 }
 
-bool Text3D::SetFont(const String& fontName, int size)
+bool Text3D::SetFont(const String& fontName, int size, bool useSDF)
 {
     bool success = text_.SetFont(fontName, size);
-    
+    useSDF_ = useSDF;
+
     // Changing font requires materials to be re-evaluated. Material evaluation can not be done in worker threads,
     // so UI batches must be brought up-to-date immediately
     MarkTextDirty();
@@ -169,10 +171,11 @@ bool Text3D::SetFont(const String& fontName, int size)
     return success;
 }
 
-bool Text3D::SetFont(Font* font, int size)
+bool Text3D::SetFont(Font* font, int size, bool useSDF)
 {
     bool success = text_.SetFont(font, size);
-    
+    useSDF_ = useSDF;
+
     MarkTextDirty();
     UpdateTextBatches();
     UpdateTextMaterials();
@@ -521,10 +524,10 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Material* material = new Material(context_);
                 Technique* tech = new Technique(context_);
                 Pass* pass = tech->CreatePass(PASS_ALPHA);
-                pass->SetVertexShader("Basic");
-                pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
-                pass->SetPixelShader("Basic");
-                pass->SetPixelShaderDefines("ALPHAMAP VERTEXCOLOR");
+                pass->SetVertexShader("Text");
+                pass->SetPixelShader("Text");
+                if (useSDF_)
+                    pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD");
                 pass->SetBlendMode(BLEND_ALPHA);
                 pass->SetDepthWrite(false);
                 material->SetTechnique(0, tech);

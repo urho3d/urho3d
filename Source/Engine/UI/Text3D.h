@@ -55,9 +55,9 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType();
     
     /// Set font and font size. Return true if successful.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
     /// Set font and font size. Return true if successful.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
     /// Set material.
     void SetMaterial(Material* material);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
@@ -97,6 +97,8 @@ public:
     Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
+    /// Is use SDF.
+    bool IsUseSDF() const { return useSDF_; }
     /// Return text.
     const String& GetText() const;
     /// Return row alignment.
@@ -165,6 +167,8 @@ private:
     
     /// Internally used text element.
     Text text_;
+    /// Use signed distance field.
+    bool useSDF_;
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
     /// Vertex buffer.
