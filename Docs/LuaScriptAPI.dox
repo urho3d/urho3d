@@ -6364,6 +6364,10 @@ Properties:
 
 - int TRIANGLE_LIST
 - int LINE_LIST
+- int POINT_LIST
+- int TRIANGLE_STRIP
+- int LINE_STRIP
+- int TRIANGLE_FAN
 
 ### RayQueryLevel
 
