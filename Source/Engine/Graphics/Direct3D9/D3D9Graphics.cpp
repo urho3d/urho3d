@@ -197,6 +197,42 @@ static unsigned GetD3DColor(const Color& color)
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
 }
 
+static void GetD3DPrimitiveType(unsigned elementCount, PrimitiveType type, unsigned& primitiveCount, D3DPRIMITIVETYPE& d3dPrimitiveType)
+{
+    switch (type)
+    {
+    case TRIANGLE_LIST:
+        primitiveCount = elementCount / 3;
+        d3dPrimitiveType = D3DPT_TRIANGLELIST;
+        break;
+        
+    case LINE_LIST:
+        primitiveCount = elementCount / 2;
+        d3dPrimitiveType = D3DPT_LINELIST;
+        break;
+
+    case POINT_LIST:
+        primitiveCount = elementCount;
+        d3dPrimitiveType = D3DPT_POINTLIST;
+        break;
+        
+    case TRIANGLE_STRIP:
+        primitiveCount = elementCount - 2;
+        d3dPrimitiveType = D3DPT_TRIANGLESTRIP;
+        break;
+        
+    case LINE_STRIP:
+        primitiveCount = elementCount - 1;
+        d3dPrimitiveType = D3DPT_LINESTRIP;
+        break;
+        
+    case TRIANGLE_FAN:
+        primitiveCount = elementCount - 2;
+        d3dPrimitiveType = D3DPT_TRIANGLEFAN;
+        break;
+    }
+}
+
 static HWND GetWindowHandle(SDL_Window* window)
 {
     SDL_SysWMinfo sysInfo;
@@ -835,20 +871,11 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     
     ResetStreamFrequencies();
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = vertexCount / 3;
-        impl_->device_->DrawPrimitive(D3DPT_TRIANGLELIST, vertexStart, primitiveCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = vertexCount / 2;
-        impl_->device_->DrawPrimitive(D3DPT_LINELIST, vertexStart, primitiveCount);
-        break;
-    }
+    GetD3DPrimitiveType(vertexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawPrimitive(d3dPrimitiveType, vertexStart, primitiveCount);
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -861,20 +888,11 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     
     ResetStreamFrequencies();
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_LINELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-    }
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -898,20 +916,11 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         }
     }
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_LINELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-    }
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
     
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;

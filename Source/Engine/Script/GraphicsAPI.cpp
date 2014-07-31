@@ -1166,6 +1166,10 @@ static void RegisterCustomGeometry(asIScriptEngine* engine)
     engine->RegisterEnum("PrimitiveType");
     engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
     engine->RegisterEnumValue("PrimitiveType", "LINE_LIST", LINE_LIST);
+    engine->RegisterEnumValue("PrimitiveType", "POINT_LIST", POINT_LIST);
+    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_STRIP", TRIANGLE_STRIP);
+    engine->RegisterEnumValue("PrimitiveType", "LINE_STRIP", LINE_STRIP);
+    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_FAN", TRIANGLE_FAN);
     
     RegisterDrawable<CustomGeometry>(engine, "CustomGeometry");
     engine->RegisterObjectMethod("CustomGeometry", "void Clear()", asMETHOD(CustomGeometry, Clear), asCALL_THISCALL);

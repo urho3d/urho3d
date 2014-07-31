@@ -180,6 +180,41 @@ bool CheckExtension(String& extensions, const String& name)
     return extensions.Contains(name);
 }
 
+static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsigned& primitiveCount, GLenum& glPrimitiveType)
+{
+    switch (type)
+    {
+    case TRIANGLE_LIST:
+        primitiveCount = elementCount / 3;
+        glPrimitiveType = GL_TRIANGLES;
+        break;
+        
+    case LINE_LIST:
+        primitiveCount = elementCount / 2;
+        glPrimitiveType = GL_LINES;
+        break;
+
+    case POINT_LIST:
+        primitiveCount = elementCount;
+        glPrimitiveType = GL_POINTS;
+        break;
+        
+    case TRIANGLE_STRIP:
+        primitiveCount = elementCount - 2;
+        glPrimitiveType = GL_TRIANGLE_STRIP;
+        break;
+        
+    case LINE_STRIP:
+        primitiveCount = elementCount - 1;
+        glPrimitiveType = GL_LINE_STRIP;
+        break;
+        
+    case TRIANGLE_FAN:
+        primitiveCount = elementCount - 2;
+        glPrimitiveType = GL_TRIANGLE_FAN;
+        break;
+    }
+}
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
@@ -730,20 +765,11 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = vertexCount / 3;
-        glDrawArrays(GL_TRIANGLES, vertexStart, vertexCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = vertexCount / 2;
-        glDrawArrays(GL_LINES, vertexStart, vertexCount);
-        break;
-    }
+    GetGLPrimitiveType(vertexCount, type, primitiveCount, glPrimitiveType);
+    glDrawArrays(glPrimitiveType, vertexStart, vertexCount);
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -757,27 +783,15 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
-    unsigned primitiveCount = 0;
     unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        if (indexSize == sizeof(unsigned short))
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        else
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        if (indexSize == sizeof(unsigned short))
-            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        else
-            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        break;
-    }
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    if (indexSize == sizeof(unsigned short))
+        glDrawElements(glPrimitiveType, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
+    else
+        glDrawElements(glPrimitiveType, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -792,38 +806,20 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
-    unsigned primitiveCount = 0;
     unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
     
-    switch (type)
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    if (indexSize == sizeof(unsigned short))
     {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        if (indexSize == sizeof(unsigned short))
-        {
-            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        else
-        {
-            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        if (indexSize == sizeof(unsigned short))
-        {
-            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        else
-        {
-            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        break;
+        glDrawElementsInstancedARB(glPrimitiveType, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+            instanceCount);
+    }
+    else
+    {
+        glDrawElementsInstancedARB(glPrimitiveType, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+            instanceCount);
     }
     
     numPrimitives_ += instanceCount * primitiveCount;
