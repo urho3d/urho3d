@@ -49,13 +49,13 @@ static const float DEFAULT_EFFECT_DEPTH_BIAS = 0.1f;
 Text3D::Text3D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     text_(context),
-    useSDF_(false),
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),
     faceCameraMode_(FC_NONE),
     textDirty_(true),
     geometryDirty_(true)
 {
+    text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
@@ -71,6 +71,7 @@ void Text3D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_INT, "Font Size", text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_BOOL, "Use SDF", text_.useSDF_, false, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_STRING, "Text", text_.text_, String::EMPTY, AM_DEFAULT);
     ENUM_ATTRIBUTE(Text3D, "Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
@@ -159,8 +160,7 @@ void Text3D::SetMaterial(Material* material)
 
 bool Text3D::SetFont(const String& fontName, int size, bool useSDF)
 {
-    bool success = text_.SetFont(fontName, size);
-    useSDF_ = useSDF;
+    bool success = text_.SetFont(fontName, size, useSDF);
 
     // Changing font requires materials to be re-evaluated. Material evaluation can not be done in worker threads,
     // so UI batches must be brought up-to-date immediately
@@ -173,8 +173,7 @@ bool Text3D::SetFont(const String& fontName, int size, bool useSDF)
 
 bool Text3D::SetFont(Font* font, int size, bool useSDF)
 {
-    bool success = text_.SetFont(font, size);
-    useSDF_ = useSDF;
+    bool success = text_.SetFont(font, size, useSDF);
 
     MarkTextDirty();
     UpdateTextBatches();
@@ -309,6 +308,11 @@ Font* Text3D::GetFont() const
 int Text3D::GetFontSize() const
 {
     return text_.GetFontSize();
+}
+
+bool Text3D::IsUseSDF() const
+{
+    return text_.IsUseSDF();
 }
 
 const String& Text3D::GetText() const
@@ -526,7 +530,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Pass* pass = tech->CreatePass(PASS_ALPHA);
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
-                if (useSDF_)
+                if (IsUseSDF())
                     pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD");
                 pass->SetBlendMode(BLEND_ALPHA);
                 pass->SetDepthWrite(false);

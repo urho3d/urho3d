@@ -335,8 +335,8 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
 
     RegisterUIElement<Text>(engine, "Text");
-    engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int)", asMETHODPR(Text, SetFont, (const String&, int), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, int)", asMETHODPR(Text, SetFont, (Font*, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int, bool=false)", asMETHODPR(Text, SetFont, (const String&, int, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, int, bool=false)", asMETHODPR(Text, SetFont, (Font*, int, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void ClearSelection()", asMETHOD(Text, ClearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "Font@+ get_font() const", asMETHOD(Text, GetFont), asCALL_THISCALL);

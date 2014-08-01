@@ -93,10 +93,10 @@ public:
     /// React to indent change.
     virtual void OnIndentSet();
 
-    /// Set font and font size.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    /// Set font and font size and use signed distance field.
+    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
+    /// Set font and font size and use signed distance field.
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set row alignment.
@@ -122,6 +122,8 @@ public:
     Font* GetFont() const { return font_; }
     /// Return font size.
     int GetFontSize() const { return fontSize_; }
+    /// Return use signed distance field.
+    bool IsUseSDF() const { return useSDF_; }
     /// Return text.
     const String& GetText() const { return text_; }
     /// Return row alignment.
@@ -155,6 +157,8 @@ public:
     /// Return size of character by index.
     IntVector2 GetCharSize(unsigned index);
 
+    /// Set used in Text3D.
+    void SetUsedInText3D(bool usedInText3D);
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
     /// Return effect Z bias.
@@ -178,12 +182,16 @@ protected:
     /// Contruct batch.
     void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
 
+    /// Used in Text3D.
+    bool usedInText3D_;
     /// Font.
     SharedPtr<Font> font_;
     /// Current face.
     WeakPtr<FontFace> fontFace_;
     /// Font size.
     int fontSize_;
+    /// Use SDF.
+    bool useSDF_;
     /// UTF-8 encoded text.
     String text_;
     /// Row alignment.

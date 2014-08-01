@@ -54,9 +54,9 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
     
-    /// Set font and font size. Return true if successful.
+    /// Set font and font size and use signed distance field font. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
-    /// Set font and font size. Return true if successful.
+    /// Set font and font size and use signed distance field font. Return true if successful.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
     /// Set material.
     void SetMaterial(Material* material);
@@ -97,8 +97,8 @@ public:
     Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
-    /// Is use SDF.
-    bool IsUseSDF() const { return useSDF_; }
+    /// Is use signed distance field.
+    bool IsUseSDF() const;
     /// Return text.
     const String& GetText() const;
     /// Return row alignment.
@@ -167,8 +167,6 @@ private:
     
     /// Internally used text element.
     Text text_;
-    /// Use signed distance field.
-    bool useSDF_;
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
     /// Vertex buffer.

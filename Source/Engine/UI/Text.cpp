@@ -50,7 +50,9 @@ extern const char* UI_CATEGORY;
 
 Text::Text(Context* context) :
     UIElement(context),
+    usedInText3D_(false),
     fontSize_(DEFAULT_FONT_SIZE),
+    useSDF_(false),
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
     wordWrap_(false),
@@ -226,13 +228,13 @@ void Text::OnIndentSet()
     charLocationsDirty_ = true;
 }
 
-bool Text::SetFont(const String& fontName, int size)
+bool Text::SetFont(const String& fontName, int size, bool useSDF)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    return SetFont(cache->GetResource<Font>(fontName), size);
+    return SetFont(cache->GetResource<Font>(fontName), size, useSDF);
 }
 
-bool Text::SetFont(Font* font, int size)
+bool Text::SetFont(Font* font, int size, bool useSDF)
 {
     if (!font)
     {
@@ -240,10 +242,14 @@ bool Text::SetFont(Font* font, int size)
         return false;
     }
 
-    if (font != font_ || size != fontSize_)
+    if (!usedInText3D_ && useSDF)
+        useSDF = false;
+
+    if (font != font_ || size != fontSize_ || useSDF != useSDF_)
     {
         font_ = font;
         fontSize_ = Max(size, 1);
+        useSDF_ = useSDF;
         UpdateText();
     }
 
@@ -321,6 +327,11 @@ void Text::SetTextEffect(TextEffect textEffect)
 void Text::SetEffectColor(const Color& effectColor)
 {
     effectColor_ = effectColor;
+}
+
+void Text::SetUsedInText3D(bool usedInText3D)
+{
+    usedInText3D_ = usedInText3D;
 }
 
 void Text::SetEffectDepthBias(float bias)
