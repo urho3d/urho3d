@@ -1171,6 +1171,15 @@ static void RegisterCustomGeometry(asIScriptEngine* engine)
     engine->RegisterEnumValue("PrimitiveType", "LINE_STRIP", LINE_STRIP);
     engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_FAN", TRIANGLE_FAN);
     
+    engine->RegisterObjectType("CustomGeometryVertex", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("CustomGeometryVertex", "Vector3 position", offsetof(CustomGeometryVertex, position_));
+    engine->RegisterObjectProperty("CustomGeometryVertex", "Vector3 normal", offsetof(CustomGeometryVertex, normal_));
+    engine->RegisterObjectProperty("CustomGeometryVertex", "uint color", offsetof(CustomGeometryVertex, color_));
+    engine->RegisterObjectProperty("CustomGeometryVertex", "Vector2 texCoord", offsetof(CustomGeometryVertex, texCoord_));
+    engine->RegisterObjectProperty("CustomGeometryVertex", "Vector4 tangent", offsetof(CustomGeometryVertex, tangent_));
+
     RegisterDrawable<CustomGeometry>(engine, "CustomGeometry");
     engine->RegisterObjectMethod("CustomGeometry", "void Clear()", asMETHOD(CustomGeometry, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void BeginGeometry(uint, PrimitiveType)", asMETHOD(CustomGeometry, BeginGeometry), asCALL_THISCALL);
@@ -1179,12 +1188,17 @@ static void RegisterCustomGeometry(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "void DefineColor(const Color&in)", asMETHOD(CustomGeometry, DefineColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void DefineTexCoord(const Vector2&in)", asMETHOD(CustomGeometry, DefineTexCoord), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void DefineTangent(const Vector4&in)", asMETHOD(CustomGeometry, DefineTangent), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineGeometry(uint, PrimitiveType, uint, bool, bool, bool, bool)", asMETHOD(CustomGeometry, DefineGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void Commit()", asMETHOD(CustomGeometry, Commit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "CustomGeometryVertex@+ GetVertex(uint, uint)", asMETHOD(CustomGeometry, GetVertex), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void set_dynamic(bool)", asMETHOD(CustomGeometry, SetDynamic), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "bool get_dynamic() const", asMETHOD(CustomGeometry, IsDynamic), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void set_material(Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "bool set_materials(uint, Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "Material@+ get_materials(uint) const", asMETHOD(CustomGeometry, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void set_numGeometries(uint)", asMETHOD(CustomGeometry, SetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "uint get_numGeometries() const", asMETHOD(CustomGeometry, GetNumGeometries), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "uint get_numVertices(uint) const", asMETHOD(CustomGeometry, GetNumVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "Zone@+ get_zone() const", asMETHOD(CustomGeometry, GetZone), asCALL_THISCALL);
 }
 

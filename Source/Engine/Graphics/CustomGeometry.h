@@ -70,32 +70,42 @@ public:
     void Clear();
     /// Set number of geometries.
     void SetNumGeometries(unsigned num);
-    /// Begin defining a geometry. Clears existing geometry in that index.
+    /// Set vertex buffer dynamic mode. A dynamic buffer should be faster to update frequently. Effective at the next Commit() call.
+    void SetDynamic(bool enable);
+    /// Begin defining a geometry. Clears existing vertices in that index.
     void BeginGeometry(unsigned index, PrimitiveType type);
     /// Define a vertex position. This begins a new vertex.
     void DefineVertex(const Vector3& position);
     /// Define a vertex normal.
     void DefineNormal(const Vector3& normal);
-    /// Define a vertex tangent.
-    void DefineTangent(const Vector4& tangent);
     /// Define a vertex color.
     void DefineColor(const Color& color);
     /// Define a vertex UV coordinate.
     void DefineTexCoord(const Vector2& texCoord);
+    /// Define a vertex tangent.
+    void DefineTangent(const Vector4& tangent);
+    /// Set the primitive type, number of vertices and elements in a geometry, after which the vertices can be edited with GetVertex(). An alternative to BeginGeometry() / DefineVertex().
+    void DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords, bool hasTangents);
     /// Update vertex buffer and calculate the bounding box. Call after finishing defining geometry.
     void Commit();
     /// Set material on all geometries.
     void SetMaterial(Material* material);
     /// Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
-    
+
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
+    /// Return number of vertices in a geometry.
+    unsigned GetNumVertices(unsigned index) const;
+    /// Return whether vertex buffer dynamic mode is enabled.
+    bool IsDynamic() const { return dynamic_; }
     /// Return material by geometry index.
     Material* GetMaterial(unsigned index = 0) const;
-    /// Return all vertices.
-    const Vector<PODVector<CustomGeometryVertex> >& GetVertices() { return vertices_; }
-    
+    /// Return all vertices. These can be edited; calling Commit() updates the vertex buffer.
+    Vector<PODVector<CustomGeometryVertex> >& GetVertices() { return vertices_; }
+    /// Return a vertex in a geometry for editing, or null if out of bounds. After the edits are finished, calling Commit() updates  the vertex buffer.
+    CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
+
     /// Set geometry data attribute.
     void SetGeometryDataAttr(PODVector<unsigned char> value);
     /// Set materials attribute.
@@ -124,6 +134,8 @@ private:
     unsigned geometryIndex_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
+    /// Vertex buffer dynamic flag.
+    bool dynamic_;
 };
 
 }
