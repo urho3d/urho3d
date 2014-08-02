@@ -1365,22 +1365,39 @@ Methods:
 
 - void Clear()
 - void SetNumGeometries(unsigned num)
+- void SetDynamic(bool enable)
 - void BeginGeometry(unsigned index, PrimitiveType type)
 - void DefineVertex(const Vector3& position)
 - void DefineNormal(const Vector3& normal)
 - void DefineTangent(const Vector4& tangent)
 - void DefineColor(const Color& color)
 - void DefineTexCoord(const Vector2& texCoord)
+- void DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords, bool hasTangents)
 - void Commit()
 - void SetMaterial(Material* material)
 - bool SetMaterial(unsigned index, Material* material)
-- unsigned GetNumGeometries()
+- unsigned GetNumGeometries() const
+- unsigned GetNumVertices(unsigned index) const
+- bool IsDynamic() const
 - Material* GetMaterial(unsigned index = 0)
+- CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum)
 
 Properties:
 
 - Material* material
 - unsigned numGeometries
+- bool dynamic
+
+### CustomGeometryVertex
+
+
+Properties:
+
+- Vector3 position
+- Vector3 normal
+- unsigned color
+- Vector2 texCoord
+- Vector4 tangent
 
 ### DebugHud : Object
 

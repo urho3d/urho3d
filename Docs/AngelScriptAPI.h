@@ -3144,6 +3144,7 @@ void BeginGeometry(uint, PrimitiveType);
 void Clear();
 void Commit();
 void DefineColor(const Color&);
+void DefineGeometry(uint, PrimitiveType, uint, bool, bool, bool, bool);
 void DefineNormal(const Vector3&);
 void DefineTangent(const Vector4&);
 void DefineTexCoord(const Vector2&);
@@ -3154,6 +3155,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+CustomGeometryVertex GetVertex(uint, uint);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -3186,6 +3188,7 @@ bool castShadows;
 /* readonly */
 String category;
 float drawDistance;
+bool dynamic;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -3204,6 +3207,8 @@ Node node;
 /* readonly */
 uint numAttributes;
 uint numGeometries;
+/* readonly */
+Array<uint> numVertices;
 ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
@@ -3224,6 +3229,17 @@ BoundingBox worldBoundingBox;
 /* readonly */
 Zone zone;
 uint zoneMask;
+};
+
+class CustomGeometryVertex
+{
+
+// Properties:
+uint color;
+Vector3 normal;
+Vector3 position;
+Vector4 tangent;
+Vector2 texCoord;
 };
 
 class DebugHud
