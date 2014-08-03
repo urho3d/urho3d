@@ -61,6 +61,8 @@ public:
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false);
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(int pointSize);
+    /// Is signed distance field font.
+    bool IsSDFFont() const { return sdfFont_; }
     
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
@@ -79,6 +81,8 @@ private:
     unsigned fontDataSize_;
     /// Font type.
     FONT_TYPE fontType_;
+    /// Signed distance field font.
+    bool sdfFont_;
 };
 
 }

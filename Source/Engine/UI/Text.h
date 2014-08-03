@@ -93,9 +93,9 @@ public:
     /// React to indent change.
     virtual void OnIndentSet();
 
-    /// Set font and font size.
+    /// Set font and font size and use signed distance field.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size.
+    /// Set font and font size and use signed distance field.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
@@ -155,6 +155,8 @@ public:
     /// Return size of character by index.
     IntVector2 GetCharSize(unsigned index);
 
+    /// Set used in Text3D.
+    void SetUsedInText3D(bool usedInText3D);
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
     /// Return effect Z bias.
@@ -178,6 +180,8 @@ protected:
     /// Contruct batch.
     void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
 
+    /// Used in Text3D.
+    bool usedInText3D_;
     /// Font.
     SharedPtr<Font> font_;
     /// Current face.
