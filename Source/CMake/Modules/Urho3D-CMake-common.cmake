@@ -23,8 +23,8 @@
 # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
 if (WIN32 AND NOT MSVC)
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (GCC_VERSION VERSION_GREATER 4.7.2 AND GCC_VERSION VERSION_LESS 4.9.1)
-        message ("Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1.")
+    if (GCC_VERSION VERSION_LESS 4.9.1)
+        message ("Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
         set (URHO3D_DEFAULT_SSE FALSE)
     else ()
         set (URHO3D_DEFAULT_SSE TRUE)
