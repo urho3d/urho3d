@@ -71,7 +71,6 @@ void Text3D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_INT, "Font Size", text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
-    ATTRIBUTE(Text3D, VAR_BOOL, "Use SDF", text_.useSDF_, false, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_STRING, "Text", text_.text_, String::EMPTY, AM_DEFAULT);
     ENUM_ATTRIBUTE(Text3D, "Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
@@ -158,9 +157,9 @@ void Text3D::SetMaterial(Material* material)
     UpdateTextMaterials(true);
 }
 
-bool Text3D::SetFont(const String& fontName, int size, bool useSDF)
+bool Text3D::SetFont(const String& fontName, int size)
 {
-    bool success = text_.SetFont(fontName, size, useSDF);
+    bool success = text_.SetFont(fontName, size);
 
     // Changing font requires materials to be re-evaluated. Material evaluation can not be done in worker threads,
     // so UI batches must be brought up-to-date immediately
@@ -171,9 +170,9 @@ bool Text3D::SetFont(const String& fontName, int size, bool useSDF)
     return success;
 }
 
-bool Text3D::SetFont(Font* font, int size, bool useSDF)
+bool Text3D::SetFont(Font* font, int size)
 {
-    bool success = text_.SetFont(font, size, useSDF);
+    bool success = text_.SetFont(font, size);
 
     MarkTextDirty();
     UpdateTextBatches();
@@ -308,11 +307,6 @@ Font* Text3D::GetFont() const
 int Text3D::GetFontSize() const
 {
     return text_.GetFontSize();
-}
-
-bool Text3D::IsUseSDF() const
-{
-    return text_.IsUseSDF();
 }
 
 const String& Text3D::GetText() const
@@ -530,8 +524,10 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Pass* pass = tech->CreatePass(PASS_ALPHA);
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
-                if (IsUseSDF())
+
+                if (GetFont()->IsSDFFont())
                     pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD");
+
                 pass->SetBlendMode(BLEND_ALPHA);
                 pass->SetDepthWrite(false);
                 material->SetTechnique(0, tech);

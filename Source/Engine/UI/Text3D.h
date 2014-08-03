@@ -55,9 +55,9 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType();
     
     /// Set font and font size and use signed distance field font. Return true if successful.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
+    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size and use signed distance field font. Return true if successful.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     /// Set material.
     void SetMaterial(Material* material);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
@@ -97,8 +97,6 @@ public:
     Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
-    /// Is use signed distance field.
-    bool IsUseSDF() const;
     /// Return text.
     const String& GetText() const;
     /// Return row alignment.

@@ -12,8 +12,8 @@ class Text : public UIElement
     Text();
     virtual ~Text();
 
-    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
+    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     
     void SetText(const String text);
     
@@ -51,7 +51,6 @@ class Text : public UIElement
     
     tolua_property__get_set Font* font;
     tolua_readonly tolua_property__get_set int fontSize;
-    tolua_readonly tolua_property__is_set bool useSDF;
     tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set float rowSpacing;

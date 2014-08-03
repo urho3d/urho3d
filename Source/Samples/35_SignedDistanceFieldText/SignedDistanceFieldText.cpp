@@ -117,12 +117,12 @@ void SignedDistanceFieldText::CreateScene()
         mushroomTitleText->SetText("Mushroom " + String(i));
         if ((i % 2) == 0)
         {
-            mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.fnt"), 24, true);
+            mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
             mushroomTitleText->SetColor(Color::GREEN);
         }
         else
         {
-            mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.ttf"), 24, false);
+            mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.sdf"), 24);
             mushroomTitleText->SetColor(Color::RED);
         }
         mushroomTitleText->SetAlignment(HA_CENTER, VA_CENTER);

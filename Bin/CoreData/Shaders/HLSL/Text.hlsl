@@ -29,12 +29,7 @@ void PS(float4 iColor : COLOR0,
     else
         oColor.a = iColor.a;
 
-    // Stroke effect testing
-    if (distance < 0.53f)
-        oColor.r = 1.0f;
-
-    float width = 0.015f;
-    oColor.a *= smoothstep(0.5f - width, 0.5f + width, distance);
+    oColor.a *= smoothstep(0.5f, 0.505f, distance);
 #else
     oColor.a = iColor.a * tex2D(sDiffMap, iTexCoord).a;
 #endif

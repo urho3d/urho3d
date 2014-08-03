@@ -52,7 +52,6 @@ Text::Text(Context* context) :
     UIElement(context),
     usedInText3D_(false),
     fontSize_(DEFAULT_FONT_SIZE),
-    useSDF_(false),
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
     wordWrap_(false),
@@ -228,13 +227,13 @@ void Text::OnIndentSet()
     charLocationsDirty_ = true;
 }
 
-bool Text::SetFont(const String& fontName, int size, bool useSDF)
+bool Text::SetFont(const String& fontName, int size)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    return SetFont(cache->GetResource<Font>(fontName), size, useSDF);
+    return SetFont(cache->GetResource<Font>(fontName), size);
 }
 
-bool Text::SetFont(Font* font, int size, bool useSDF)
+bool Text::SetFont(Font* font, int size)
 {
     if (!font)
     {
@@ -242,14 +241,10 @@ bool Text::SetFont(Font* font, int size, bool useSDF)
         return false;
     }
 
-    if (!usedInText3D_ && useSDF)
-        useSDF = false;
-
-    if (font != font_ || size != fontSize_ || useSDF != useSDF_)
+    if (font != font_ || size != fontSize_)
     {
         font_ = font;
         fontSize_ = Max(size, 1);
-        useSDF_ = useSDF;
         UpdateText();
     }
 

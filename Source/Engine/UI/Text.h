@@ -94,9 +94,9 @@ public:
     virtual void OnIndentSet();
 
     /// Set font and font size and use signed distance field.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
+    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size and use signed distance field.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE, bool useSDF = false);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set row alignment.
@@ -122,8 +122,6 @@ public:
     Font* GetFont() const { return font_; }
     /// Return font size.
     int GetFontSize() const { return fontSize_; }
-    /// Return use signed distance field.
-    bool IsUseSDF() const { return useSDF_; }
     /// Return text.
     const String& GetText() const { return text_; }
     /// Return row alignment.
@@ -190,8 +188,6 @@ protected:
     WeakPtr<FontFace> fontFace_;
     /// Font size.
     int fontSize_;
-    /// Use SDF.
-    bool useSDF_;
     /// UTF-8 encoded text.
     String text_;
     /// Row alignment.

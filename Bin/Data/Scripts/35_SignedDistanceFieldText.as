@@ -74,12 +74,12 @@ void CreateScene()
         mushroomTitleText.text = "Mushroom " + i;
         if ((i % 2) == 0)
         {
-            mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.fnt"), 24, true);
+            mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.sdf"), 24);
             mushroomTitleText.color = Color(0.0f, 1.0f, 0.0f);
         }
         else
         {
-            mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.ttf"), 24, false);
+            mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.sdf"), 24);
             mushroomTitleText.color = Color(1.0f, 0.0f, 0.0f);
         }
         mushroomTitleText.SetAlignment(HA_CENTER, VA_CENTER);
