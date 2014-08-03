@@ -20,6 +20,19 @@
 # THE SOFTWARE.
 #
 
+# Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+if (WIN32 AND NOT MSVC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (GCC_VERSION VERSION_GREATER 4.7.2 AND GCC_VERSION VERSION_LESS 4.9.1)
+        message ("Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1.")
+        set (URHO3D_DEFAULT_SSE FALSE)
+    else ()
+        set (URHO3D_DEFAULT_SSE TRUE)
+    endif ()
+else ()
+    set (URHO3D_DEFAULT_SSE TRUE)
+endif ()
+
 # Define all supported build options
 include (CMakeDependentOption)
 option (ANDROID "Setup build for Android platform")
@@ -29,7 +42,7 @@ option (URHO3D_64BIT "Enable 64-bit build")
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support")
 option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)")
-option (URHO3D_SSE "Enable SSE instruction set" TRUE)
+option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE})
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua scripting only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
