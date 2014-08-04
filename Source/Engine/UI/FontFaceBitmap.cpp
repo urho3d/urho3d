@@ -111,7 +111,13 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         SharedPtr<Texture2D> texture = LoadFaceTexture(fontImage);
         if (!texture)
             return 0;
+        
         textures_.Push(texture);
+
+        // Add texture to resource cache
+        texture->SetName(fontFile->GetName());
+        resourceCache->AddManualResource(texture);
+
         totalTextureSize += fontImage->GetWidth() * fontImage->GetHeight() * fontImage->GetComponents();
 
         pageElem = pageElem.GetNext("page");
