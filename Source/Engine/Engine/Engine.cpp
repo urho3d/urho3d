@@ -509,27 +509,48 @@ void Engine::DumpProfiler()
         LOGRAW(profiler->GetData(true, true) + "\n");
 }
 
-void Engine::DumpResources()
+void Engine::DumpResources(bool dumpFileName)
 {
     #ifdef URHO3D_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
-
+    
+    if (dumpFileName)
+    {
+        LOGRAW("Used resources:\n");
+    }
+    
     for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
         i != resourceGroups.End(); ++i)
     {
-        unsigned num = i->second_.resources_.Size();
-        unsigned memoryUse = i->second_.memoryUse_;
-
-        if (num)
+        const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
+        if (dumpFileName)
         {
-            LOGRAW("Resource type " + i->second_.resources_.Begin()->second_->GetTypeName() +
-                ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
+            for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
+                j != resources.End(); ++j)
+            {
+                LOGRAW(j->second_->GetName() + "\n");
+            }
+
+        }
+        else
+        {
+            unsigned num = resources.Size();
+            unsigned memoryUse = i->second_.memoryUse_;
+
+            if (num)
+            {
+                LOGRAW("Resource type " + resources.Begin()->second_->GetTypeName() +
+                    ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
+            }
         }
     }
 
-    LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
+    if (!dumpFileName)
+    {
+        LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
+    }
     #endif
 }
 

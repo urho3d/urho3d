@@ -67,7 +67,7 @@ public:
     /// Dump profiling information to the log.
     void DumpProfiler();
     /// Dump information of all resources to the log.
-    void DumpResources();
+    void DumpResources(bool dumpFileName = false);
     /// Dump information of all memory allocations to the log. Supported in MSVC debug mode only.
     void DumpMemory();
     

@@ -111,7 +111,7 @@ static void RegisterEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "void RunFrame()", asMETHOD(Engine, RunFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void Exit()", asMETHOD(Engine, Exit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void DumpProfiler()", asMETHOD(Engine, DumpProfiler), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Engine", "void DumpResources()", asMETHOD(Engine, DumpResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void DumpResources(bool=false)", asMETHOD(Engine, DumpResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void DumpMemory()", asMETHOD(Engine, DumpMemory), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Console@+ CreateConsole()", asMETHOD(Engine, CreateConsole), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "DebugHud@+ CreateDebugHud()", asMETHOD(Engine, CreateDebugHud), asCALL_THISCALL);

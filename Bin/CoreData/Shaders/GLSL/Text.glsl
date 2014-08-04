@@ -47,7 +47,7 @@ void PS()
     #endif
 
     #ifdef TEXT_EFFECT_SHADOW
-        if (tex2D(sDiffMap, vTexCoord + cShadowOffset).a < 0.5f)
+        if (texture2D(sDiffMap, vTexCoord + cShadowOffset).a < 0.5f)
             gl_FragColor.a = vColor.a;
         else
     #endif
