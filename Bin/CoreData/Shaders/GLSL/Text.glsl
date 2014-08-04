@@ -34,13 +34,10 @@ void PS()
     {
     #ifdef TEXT_EFFECT_SHADOW
         if (texture2D(sDiffMap, vTexCoord - cShadowOffset).a > 0.5f)
-        {
-            gl_FragColor.rgb = cShadowColor.rgb;
-            gl_FragColor.a = 1.0f;
-        }
-    #else
-        gl_FragColor.a = 0.0f;
+            gl_FragColor = cShadowColor;
+        else
     #endif
+        gl_FragColor.a = 0.0f;
     }
     else
     {
@@ -51,7 +48,7 @@ void PS()
 
     #ifdef TEXT_EFFECT_SHADOW
         if (tex2D(sDiffMap, vTexCoord + cShadowOffset).a < 0.5f)
-            gl_FragColor.a = 1.0f;
+            gl_FragColor.a = vColor.a;
         else
     #endif
         gl_FragColor.a = vColor.a * smoothstep(0.5f, 0.505f, distance);
