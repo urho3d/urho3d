@@ -36,13 +36,11 @@ void PS(float4 iColor : COLOR0,
     if (distance < 0.5f)
     {
     #ifdef TEXT_EFFECT_SHADOW
-        // In shadow
         if (tex2D(sDiffMap, iTexCoord - cShadowOffset).a > 0.5f)
             oColor = cShadowColor;
         else
-    #else
-        oColor.a = 0.0f;
     #endif
+        oColor.a = 0.0f;
     }
     else
     {
