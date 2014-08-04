@@ -3881,7 +3881,7 @@ Console CreateConsole();
 DebugHud CreateDebugHud();
 void DumpMemory();
 void DumpProfiler();
-void DumpResources();
+void DumpResources(bool = false);
 void Exit();
 void RunFrame();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
