@@ -115,16 +115,23 @@ void SignedDistanceFieldText::CreateScene()
         mushroomTitleNode->SetPosition(Vector3(0.0f, 1.2f, 0.0f));
         Text3D* mushroomTitleText = mushroomTitleNode->CreateComponent<Text3D>();
         mushroomTitleText->SetText("Mushroom " + String(i));
-        if ((i % 2) == 0)
+        mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
+
+        mushroomTitleText->SetColor(Color::RED);
+        
+        if (i % 3 == 1)
         {
-            mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
             mushroomTitleText->SetColor(Color::GREEN);
+            mushroomTitleText->SetTextEffect(TE_SHADOW);
+            mushroomTitleText->SetEffectColor(Color(0.5f, 0.5f, 0.5f));
         }
-        else
+        else if (i % 3 == 2)
         {
-            mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.sdf"), 24);
-            mushroomTitleText->SetColor(Color::RED);
+            mushroomTitleText->SetColor(Color::YELLOW);
+            mushroomTitleText->SetTextEffect(TE_STROKE);
+            mushroomTitleText->SetEffectColor(Color(0.5f, 0.5f, 0.5f));
         }
+
         mushroomTitleText->SetAlignment(HA_CENTER, VA_CENTER);
     }
 

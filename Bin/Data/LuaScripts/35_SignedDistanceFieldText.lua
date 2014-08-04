@@ -69,13 +69,22 @@ function CreateScene()
         mushroomTitleNode.position = Vector3(0.0, 1.2, 0.0)
         local mushroomTitleText = mushroomTitleNode:CreateComponent("Text3D")
         mushroomTitleText.text = "Mushroom " .. i
-        if (i % 2) == 0 then
-            mushroomTitleText:SetFont(cache:GetResource("Font", "Fonts/BlueHighway.sdf"), 24)
+
+        mushroomTitleText:SetFont(cache:GetResource("Font", "Fonts/BlueHighway.sdf"), 24)
+        mushroomTitleText.color = Color(1.0, 0.0, 0.0)
+
+        if (i % 3) == 1 then
             mushroomTitleText.color = Color(0.0, 1.0, 0.0)
-        else
-            mushroomTitleText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.sdf"), 24)
-            mushroomTitleText.color = Color(1.0, 0.0, 0.0)
+            mushroomTitleText.textEffect = TE_SHADOW
+            mushroomTitleText.effectColor = Color(0.5, 0.5, 0.5)
         end
+
+        if (i % 3) == 2 then
+            mushroomTitleText.color = Color(1.0, 1.0, 0.0)
+            mushroomTitleText.textEffect = TE_STROKE
+            mushroomTitleText.effectColor = Color(0.5, 0.5, 0.5)
+        end
+        
         mushroomTitleText:SetAlignment(HA_CENTER, VA_CENTER)
     end
 

@@ -238,6 +238,7 @@ void Text3D::SetTextEffect(TextEffect textEffect)
     text_.SetTextEffect(textEffect);
     
     MarkTextDirty();
+    UpdateTextMaterials(true);
 }
 
 void Text3D::SetEffectColor(const Color& effectColor)
@@ -245,6 +246,7 @@ void Text3D::SetEffectColor(const Color& effectColor)
     text_.SetEffectColor(effectColor);
     
     MarkTextDirty();
+    UpdateTextMaterials();
 }
 
 void Text3D::SetEffectDepthBias(float bias)
@@ -526,7 +528,22 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 pass->SetPixelShader("Text");
 
                 if (GetFont()->IsSDFFont())
-                    pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD");
+                {
+                    switch (GetTextEffect())
+                    {
+                    case TE_NONE:
+                        pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD");
+                        break;
+
+                    case TE_SHADOW:
+                        pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD TEXT_EFFECT_SHADOW");
+                        break;
+
+                    case TE_STROKE:
+                        pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD TEXT_EFFECT_STROKE");
+                        break;
+                    }
+                }
 
                 pass->SetBlendMode(BLEND_ALPHA);
                 pass->SetDepthWrite(false);
@@ -539,9 +556,31 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
         }
         
         Material* material = batches_[i].material_;
-        material->SetTexture(TU_DIFFUSE, uiBatches_[i].texture_);
+        Texture* texture = uiBatches_[i].texture_;
+        material->SetTexture(TU_DIFFUSE, texture);
+
+        if (GetFont()->IsSDFFont())
+        {
+            switch (GetTextEffect())
+            {
+            case TE_SHADOW:
+                if (texture)
+                {
+                    Vector2 shadowOffset(0.5f / texture->GetWidth(), 0.5f / texture->GetHeight());
+                    material->SetShaderParameter("ShadowOffset", shadowOffset);
+                }
+                material->SetShaderParameter("ShadowColor", GetEffectColor());
+                break;
+
+            case TE_STROKE:
+                material->SetShaderParameter("StrokeColor", GetEffectColor());
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 }
-
 
 }

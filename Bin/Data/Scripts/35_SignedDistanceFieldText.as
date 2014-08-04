@@ -72,16 +72,23 @@ void CreateScene()
         mushroomTitleNode.position = Vector3(0.0f, 1.2f, 0.0f);
         Text3D@ mushroomTitleText = mushroomTitleNode.CreateComponent("Text3D");
         mushroomTitleText.text = "Mushroom " + i;
-        if ((i % 2) == 0)
+
+        mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.sdf"), 24);
+        mushroomTitleText.color = Color(1.0f, 0.0f, 0.0f);
+
+        if (i % 3 == 1)
         {
-            mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.sdf"), 24);
             mushroomTitleText.color = Color(0.0f, 1.0f, 0.0f);
+            mushroomTitleText.textEffect = TE_SHADOW;
+            mushroomTitleText.effectColor = Color(0.5f, 0.5f, 0.5f);
         }
-        else
+        else if (i % 3 == 2)
         {
-            mushroomTitleText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.sdf"), 24);
-            mushroomTitleText.color = Color(1.0f, 0.0f, 0.0f);
+            mushroomTitleText.color = Color(1.0f, 1.0f, 0.0f);
+            mushroomTitleText.textEffect = TE_STROKE;
+            mushroomTitleText.effectColor = Color(0.5f, 0.5f, 0.5f);
         }
+
         mushroomTitleText.SetAlignment(HA_CENTER, VA_CENTER);
     }
 

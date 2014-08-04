@@ -2,6 +2,15 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 
+#ifdef TEXT_EFFECT_SHADOW
+uniform float2 cShadowOffset;
+uniform float4 cShadowColor;
+#endif
+
+#ifdef TEXT_EFFECT_STROKE
+uniform float4 cStrokeColor;
+#endif
+
 void VS(float4 iPos : POSITION,
         float4 iColor : COLOR0,
         float2 iTexCoord : TEXCOORD0,
@@ -25,13 +34,32 @@ void PS(float4 iColor : COLOR0,
 #ifdef SIGNED_DISTANCE_FIELD
     float distance = tex2D(sDiffMap, iTexCoord).a;
     if (distance < 0.5f)
+    {
+    #ifdef TEXT_EFFECT_SHADOW
+        if (tex2D(sDiffMap, iTexCoord - cShadowOffset).a > 0.5f)
+        {
+            oColor.rgb = cShadowColor.rgb;
+            oColor.a = 1.0f;
+        }
+    #else
         oColor.a = 0.0f;
+    #endif
+    }
     else
-        oColor.a = iColor.a;
+    {
+    #ifdef TEXT_EFFECT_STROKE
+        if (distance < 0.525f)
+            oColor.rgb = cStrokeColor.rgb;
+    #endif
 
-    oColor.a *= smoothstep(0.5f, 0.505f, distance);
+    #ifdef TEXT_EFFECT_SHADOW
+        if (tex2D(sDiffMap, iTexCoord + cShadowOffset).a < 0.5f)
+            oColor.a = 1.0f;
+        else
+    #endif
+        oColor.a = iColor.a * smoothstep(0.5f, 0.505f, distance);
+    }
 #else
     oColor.a = iColor.a * tex2D(sDiffMap, iTexCoord).a;
 #endif
 }
-
