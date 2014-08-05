@@ -250,7 +250,7 @@ void AnimatedSprite2D::SetAnimationSetAttr(ResourceRef value)
     SetAnimationSet(cache->GetResource<AnimationSet2D>(value.name_));
 }
 
-Urho3D::ResourceRef AnimatedSprite2D::GetAnimationSetAttr() const
+ResourceRef AnimatedSprite2D::GetAnimationSetAttr() const
 {
     return GetResourceRef(animationSet_, AnimationSet2D::GetTypeStatic());
 }

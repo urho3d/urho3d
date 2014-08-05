@@ -52,6 +52,9 @@
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "StaticSprite2D.h"
+#include "TileMap2D.h"
+#include "TileMapLayer2D.h"
+#include "TmxFile2D.h"
 
 #include "DebugNew.h"
 
@@ -77,6 +80,10 @@ void RegisterUrho2DLibrary(Context* context)
 
     ParticleEffect2D::RegisterObject(context);
     ParticleEmitter2D::RegisterObject(context);
+
+    TmxFile2D::RegisterObject(context);
+    TileMap2D::RegisterObject(context);
+    TileMapLayer2D::RegisterObject(context);
 
     PhysicsWorld2D::RegisterObject(context);
     RigidBody2D::RegisterObject(context);
