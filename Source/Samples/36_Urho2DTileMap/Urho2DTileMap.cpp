@@ -105,9 +105,10 @@ void Urho2DTileMap::CreateScene()
     // Set animation
     tileMap->SetTmxFile(tmxFile);
 
-    Vector2 halfSize = tileMap->GetSize() * 0.5f;
     // Set camera's position
-    cameraNode_->SetPosition(Vector3(halfSize.x_, halfSize.y_, -10.0f));
+    float x = tileMap->GetWidth() * tileMap->GetTileWidth() * 0.5f;
+    float y = tileMap->GetHeight() * tileMap->GetTileHeight() * 0.5f;
+    cameraNode_->SetPosition(Vector3(x, y, -10.0f));
 }
 
 void Urho2DTileMap::CreateInstructions()

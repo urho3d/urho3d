@@ -34,9 +34,6 @@
 namespace Urho3D
 {
 
-
-extern const float PIXEL_SIZE;
-
 TileMapLayer2D::TileMapLayer2D(Context* context) :
     Component(context),
     tmxLayer_(0),
@@ -80,14 +77,14 @@ void TileMapLayer2D::SetTmxLayer(const TmxLayer2D* tmxLayer, int drawOrder)
     tileNodes_.Resize(width * height);
 
     TmxFile2D* tmxFile = tmxLayer_->tmxFile_;
-    float tileWidth = tmxFile->GetTileWidth() * PIXEL_SIZE;
-    float tileHeight = tmxFile->GetTileHeight() * PIXEL_SIZE;
+    float tileWidth = tmxFile->GetTileWidth();
+    float tileHeight = tmxFile->GetTileHeight();
 
-    for (int x = 0; x < width; ++x)
+    for (int y = 0; y < height; ++y)
     {
-        for (int y = 0; y < height; ++y)
+        for (int x = 0; x < width; ++x)
         {
-            int gid = tmxLayer->tiles_[y * width + x];
+            int gid = tmxLayer->tileGids_[y * width + x];
             if (gid <= 0)
                 continue;
             
@@ -97,12 +94,12 @@ void TileMapLayer2D::SetTmxLayer(const TmxLayer2D* tmxLayer, int drawOrder)
             
             SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
             tileNode->SetTemporary(true);
+            tileNode->SetPosition(Vector3(x * tileWidth, y * tileHeight, 0.0f));
 
-            tileNode->SetPosition(Vector3(x * tileWidth, (height - y - 1) * tileHeight, 0.0f));
             StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(sprite);
             staticSprite->SetLayer(drawOrder_);
-            staticSprite->SetOrderInLayer(y * width + x);
+            staticSprite->SetOrderInLayer((height - 1 - y) * width + x);
 
             tileNodes_[y * width + x] = tileNode;
         }
@@ -117,7 +114,10 @@ void TileMapLayer2D::SetDrawOrder(int drawOrder)
     drawOrder_ = drawOrder;
 
     for (unsigned i = 0; i < tileNodes_.Size(); ++i)
-        tileNodes_[i]->GetComponent<StaticSprite2D>()->SetLayer(drawOrder_);
+    {
+        if (tileNodes_[i])
+            tileNodes_[i]->GetComponent<StaticSprite2D>()->SetLayer(drawOrder_);
+    }
 }
 
 int TileMapLayer2D::GetWidth() const
@@ -138,7 +138,7 @@ Node* TileMapLayer2D::GetTileNode(int x, int y) const
     if (x < 0 || x >= tmxLayer_->width_ || y < 0 || y >= tmxLayer_->height_)
         return 0;
 
-    return tileNodes_[y * tmxLayer_->height_ + x];
+    return tileNodes_[y * tmxLayer_->width_ + x];
 }
 
 }

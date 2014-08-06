@@ -52,14 +52,10 @@ public:
     int GetWidth() const;
     /// Return height.
     int GetHeight() const;
-    /// Return size.
-    Vector2 GetSize() const;
-    /// Return tile width in pixel.
-    int GetTileWidth() const;
+    /// Return tile width
+    float GetTileWidth() const;
     /// Return tile height in pixel.
-    int GetTileHeight() const;
-    /// Return tile size.
-    Vector2 GetTileSize() const;
+    float GetTileHeight() const;
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return tile map layer at index.

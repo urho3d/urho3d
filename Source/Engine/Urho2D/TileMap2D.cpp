@@ -99,32 +99,14 @@ int TileMap2D::GetHeight() const
 
 }
 
-int TileMap2D::GetTileWidth() const
+float TileMap2D::GetTileWidth() const
 {
-    return tmxFile_ ? tmxFile_->GetTileWidth() : 0;
-
+    return tmxFile_ ? tmxFile_->GetTileWidth() : 0.0f;
 }
 
-int TileMap2D::GetTileHeight() const
+float TileMap2D::GetTileHeight() const
 {
-    return tmxFile_ ? tmxFile_->GetTileHeight() : 0;
-
-}
-Vector2 TileMap2D::GetSize() const
-{
-    if (!tmxFile_)
-        return Vector2::ZERO;
-
-    return Vector2(tmxFile_->GetWidth() * tmxFile_->GetTileWidth() * PIXEL_SIZE,
-        tmxFile_->GetHeight() * tmxFile_->GetTileHeight() * PIXEL_SIZE);
-}
-
-Vector2 TileMap2D::GetTileSize() const
-{
-    if (!tmxFile_)
-        return Vector2::ZERO;
-
-    return Vector2(tmxFile_->GetTileWidth() * PIXEL_SIZE, tmxFile_->GetTileHeight() * PIXEL_SIZE);
+    return tmxFile_ ? tmxFile_->GetTileHeight() : 0.0f;
 }
 
 TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const

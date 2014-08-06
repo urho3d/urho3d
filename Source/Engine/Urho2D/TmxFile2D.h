@@ -34,7 +34,7 @@ class XMLElement;
 class XMLFile;
 
 /// Tile map layer.
-struct TmxLayer2D
+struct URHO3D_API TmxLayer2D
 {
     /// Tmx file.
     WeakPtr<TmxFile2D> tmxFile_;
@@ -44,8 +44,8 @@ struct TmxLayer2D
     int width_;
     /// Height.
     int height_;
-    /// Tiles.
-    PODVector<int> tiles_;
+    /// Tiles gids.
+    PODVector<int> tileGids_;
 };
 
 /// Tile map file.
@@ -71,9 +71,9 @@ public:
     /// Return height.
     int GetHeight() const { return height_; }
     /// Return tile width.
-    int GetTileWidth() const { return tileWidth_; }
+    float GetTileWidth() const { return tileWidth_; }
     /// Return tile height.
-    int GetTileHeight() const { return tileHeight_; }
+    float GetTileHeight() const { return tileHeight_; }
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return layer at index.
@@ -94,11 +94,11 @@ private:
     /// Height.
     int height_;
     /// Tile width.
-    int tileWidth_;
+    float tileWidth_;
     /// Tile height.
-    int tileHeight_;
-    /// Textures.
-    Vector<SharedPtr<Texture2D> > textures_;
+    float tileHeight_;
+    /// Tile set textures.
+    Vector<SharedPtr<Texture2D> > tileSetTextures_;
     /// Gid to tile sprite mapping.
     HashMap<int, SharedPtr<Sprite2D> > tileSprites_;
     /// Layers.

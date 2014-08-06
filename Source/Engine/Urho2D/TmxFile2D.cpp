@@ -36,12 +36,14 @@
 namespace Urho3D
 {
 
+extern const float PIXEL_SIZE;
+
 TmxFile2D::TmxFile2D(Context* context) :
     Resource(context),
     width_(0),
     height_(0),
-    tileWidth_(0),
-    tileHeight_(0)
+    tileWidth_(0.0f),
+    tileHeight_(0.0f)
 {
 }
 
@@ -77,8 +79,8 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
     {
         for (XMLElement tileSetElem = rootElem.GetChild("tileset"); tileSetElem; tileSetElem = tileSetElem.GetNext("tileset"))
         {
-            String loadTextureName = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(loadTextureName, true, this);
+            String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
         }
     }
 
@@ -87,12 +89,10 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
 
 bool TmxFile2D::EndLoad()
 {
-    // Actually load the folders and animations now
     if (!loadXMLFile_)
         return false;
 
     XMLElement rootElem = loadXMLFile_->GetRoot("map");
-
     String version = rootElem.GetAttribute("version");
     if (version != "1.0")
     {
@@ -109,8 +109,8 @@ bool TmxFile2D::EndLoad()
 
     width_ = rootElem.GetInt("width");
     height_ = rootElem.GetInt("height");
-    tileWidth_ = rootElem.GetInt("tilewidth");
-    tileHeight_ = rootElem.GetInt("tileheight");
+    tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
+    tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
     // Load tile set
     for (XMLElement tileSetElem = rootElem.GetChild("tileset"); tileSetElem; tileSetElem = tileSetElem.GetNext("tileset"))
@@ -156,17 +156,17 @@ Sprite2D* TmxFile2D::GetTileSprite(int gid) const
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
 {
     XMLElement imageElem = element.GetChild("image");
-    String loadTextureName = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+    String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(loadTextureName));
+    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
     {
-        LOGERROR("Could not load texture " + loadTextureName);
+        LOGERROR("Could not load texture " + textureFilePath);
         loadXMLFile_.Reset();
         return false;
     }
 
-    textures_.Push(texture);
+    tileSetTextures_.Push(texture);
 
     int gid = element.GetInt("firstgid");
     int tileWidth = element.GetInt("tilewidth");
@@ -183,6 +183,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
             sprite->SetTexture(texture);
             sprite->SetRectangle(IntRect(x, y, x + tileWidth, y + tileHeight));
+            // Set hot spot at left bottom
             sprite->SetHotSpot(Vector2(0.0f, 0.0f));
 
             tileSprites_[gid++] = sprite;
@@ -216,11 +217,21 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
         return false;
     }
 
-    layer.tiles_.Reserve(layer.width_ * layer.height_);
-
-    for (XMLElement tileElem = dataElem.GetChild("tile"); tileElem; tileElem = tileElem.GetNext("tile"))
+    XMLElement tileElem = dataElem.GetChild("tile");
+    layer.tileGids_.Resize(layer.width_ * layer.height_);
+    
+    // Flip y
+    for (int y = layer.height_ - 1; y >= 0; --y)
     {
-        layer.tiles_.Push(tileElem.GetInt("gid"));
+        for (int x = 0; x < layer.width_; ++x)
+        {
+            if (!tileElem)
+                return false;
+
+            int gid = tileElem.GetInt("gid");
+            tileElem = tileElem.GetNext("tile");
+            layer.tileGids_[y * layer.width_ + x] = gid;
+        }
     }
 
     return true;
