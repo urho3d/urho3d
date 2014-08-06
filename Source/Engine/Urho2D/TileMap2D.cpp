@@ -60,7 +60,10 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     if (tmxFile_)
     {
         for (unsigned i = 0; i < layers_.Size(); ++i)
-            layers_[i]->GetNode()->Remove();
+        {
+            if (layers_[i])
+                layers_[i]->GetNode()->Remove();
+        }
         layers_.Clear();
     }
 
@@ -70,16 +73,23 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
         return;
 
     unsigned numLayers = tmxFile_->GetNumLayers();
+    layers_.Resize(numLayers);
+
     for (unsigned i = 0; i < numLayers; ++i)
     {
         const TmxLayer2D* tmxLayer = tmxFile_->GetLayer(i);
+        // Dont create object group
+        if (tmxLayer->type_ == LT_OBJECT_GROUP)
+            continue;
+
         SharedPtr<Node> layerNode(GetNode()->CreateChild(tmxLayer->name_, LOCAL));
         layerNode->SetTemporary(true);
 
-        SharedPtr<TileMapLayer2D> tileMapLayer(layerNode->CreateComponent<TileMapLayer2D>());
-        tileMapLayer->SetTmxLayer(tmxLayer, i);
+        SharedPtr<TileMapLayer2D> layer(layerNode->CreateComponent<TileMapLayer2D>());
+        layer->SetTmxLayer(tmxLayer);
+        layer->SetDrawOrder(i);
 
-        layers_.Push(tileMapLayer);
+        layers_[i] = layer;
     }
 }
 
@@ -115,6 +125,15 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
         return 0;
 
     return layers_[index];
+}
+
+TileMapLayer2D* TileMap2D::GetLayer(const String& name) const
+{
+    for (unsigned i = 0; i < layers_.Size(); ++i)
+        if (layers_[i] && name == layers_[i]->GetName())
+            return layers_[i];
+
+    return 0;
 }
 
 void TileMap2D::SetTmxFileAttr(ResourceRef value)

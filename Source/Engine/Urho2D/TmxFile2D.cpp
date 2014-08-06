@@ -49,6 +49,8 @@ TmxFile2D::TmxFile2D(Context* context) :
 
 TmxFile2D::~TmxFile2D()
 {
+    for (unsigned i = 0; i < layers_.Size(); ++i)
+        delete layers_[i];
 }
 
 void TmxFile2D::RegisterObject(Context* context)
@@ -82,6 +84,12 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
             String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
             GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
         }
+
+        for (XMLElement imageLayerElem = rootElem.GetChild("imagelayer"); imageLayerElem; imageLayerElem = imageLayerElem.GetNext("imagelayer"))
+        {
+            String textureFilePath = GetParentPath(GetName()) + imageLayerElem.GetChild("image").GetAttribute("source");
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+        }
     }
 
     return true;
@@ -112,26 +120,30 @@ bool TmxFile2D::EndLoad()
     tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
     tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
-    // Load tile set
-    for (XMLElement tileSetElem = rootElem.GetChild("tileset"); tileSetElem; tileSetElem = tileSetElem.GetNext("tileset"))
+    for (unsigned i = 0; i < layers_.Size(); ++i)
+        delete layers_[i];
+    layers_.Clear();
+
+    for (XMLElement childElement = rootElem.GetChild(); childElement; childElement = childElement.GetNext())
     {
-        if (!LoadTileSet(tileSetElem))
+        bool ret = true;
+        String name = childElement.GetName();
+        if (name == "tileset")
+            ret = LoadTileSet(childElement);
+        else if (name == "layer")
+            ret = LoadLayer(childElement);
+        else if (name == "objectgroup")
+            ret = LoadObjectGroup(childElement);
+        else if (name == "imagelayer")
+            ret = LoadImageLayer(childElement);
+
+        if (!ret)
         {
             loadXMLFile_.Reset();
             return false;
         }
     }
-
-    // Load layer
-    for (XMLElement layerElem = rootElem.GetChild("layer"); layerElem; layerElem = layerElem.GetNext("layer"))
-    {
-        if (!LoadLayer(layerElem))
-        {
-            loadXMLFile_.Reset();
-            return false;
-        }
-    }
-
+   
     loadXMLFile_.Reset();
     return true;
 }
@@ -141,7 +153,7 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
     if (index >= layers_.Size())
         return 0;
 
-    return &layers_[index];
+    return layers_[index];
 }
 
 Sprite2D* TmxFile2D::GetTileSprite(int gid) const
@@ -162,7 +174,6 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     if (!texture)
     {
         LOGERROR("Could not load texture " + textureFilePath);
-        loadXMLFile_.Reset();
         return false;
     }
 
@@ -195,14 +206,13 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
 
 bool TmxFile2D::LoadLayer(const XMLElement& element)
 {
-    layers_.Push(TmxLayer2D());
-    TmxLayer2D& layer = layers_.Back();
-    layer.tmxFile_ = this;
+    TmxTileLayer2D* tileLayer = new TmxTileLayer2D(this);
+    layers_.Push(tileLayer);
 
-    layer.name_ = element.GetAttribute("name");
+    tileLayer->name_ = element.GetAttribute("name");
 
-    layer.width_ = element.GetInt("width");
-    layer.height_ = element.GetInt("height");
+    tileLayer->width_ = element.GetInt("width");
+    tileLayer->height_ = element.GetInt("height");
 
     XMLElement dataElem = element.GetChild("data");
     if (!dataElem)
@@ -218,21 +228,59 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
     }
 
     XMLElement tileElem = dataElem.GetChild("tile");
-    layer.tileGids_.Resize(layer.width_ * layer.height_);
+    tileLayer->tileGids_.Resize(tileLayer->width_ * tileLayer->height_);
     
     // Flip y
-    for (int y = layer.height_ - 1; y >= 0; --y)
+    for (int y = tileLayer->height_ - 1; y >= 0; --y)
     {
-        for (int x = 0; x < layer.width_; ++x)
+        for (int x = 0; x < tileLayer->width_; ++x)
         {
             if (!tileElem)
                 return false;
 
             int gid = tileElem.GetInt("gid");
             tileElem = tileElem.GetNext("tile");
-            layer.tileGids_[y * layer.width_ + x] = gid;
+            tileLayer->tileGids_[y * tileLayer->width_ + x] = gid;
         }
     }
+
+    return true;
+}
+
+bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
+{
+    return true;
+}
+
+bool TmxFile2D::LoadImageLayer(const XMLElement& element)
+{
+    TmxImageLayer2D* imageLayer = new TmxImageLayer2D(this);
+    layers_.Push(imageLayer);
+
+    imageLayer->name_ = element.GetAttribute("name");
+    imageLayer->width_ = element.GetInt("width");
+    imageLayer->height_ = element.GetInt("height");
+
+    XMLElement imageElem = element.GetChild("image");
+    if (!imageElem)
+        return false;
+
+    String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+    if (!texture)
+    {
+        LOGERROR("Could not load texture " + textureFilePath);
+        return false;
+    }
+
+    SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
+    sprite->SetTexture(texture);
+    sprite->SetRectangle(IntRect(0, 0, texture->GetWidth(), texture->GetHeight()));
+    // Left top
+    sprite->SetHotSpot(Vector2(0.0f, 1.0f));
+    
+    imageLayer->sprite_ = sprite;
 
     return true;
 }

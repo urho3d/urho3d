@@ -50,60 +50,31 @@ void TileMapLayer2D::RegisterObject(Context* context)
     context->RegisterFactory<TileMapLayer2D>();
 }
 
-void TileMapLayer2D::SetTmxLayer(const TmxLayer2D* tmxLayer, int drawOrder)
+void TileMapLayer2D::SetTmxLayer(const TmxLayer2D* tmxLayer)
 {
     if (tmxLayer == tmxLayer_)
         return;
 
     if (tmxLayer_)
     {
-        for (unsigned i = 0; i < tileNodes_.Size(); ++i)
+        for (unsigned i = 0; i < nodes_.Size(); ++i)
         {
-            if (tileNodes_[i])
-                tileNodes_[i]->Remove();
+            if (nodes_[i])
+                nodes_[i]->Remove();
         }
 
-        tileNodes_.Clear();
+        nodes_.Clear();
     }
 
     tmxLayer_ = tmxLayer;
-    drawOrder_ = drawOrder;
 
     if (!tmxLayer_)
         return;
 
-    int width = tmxLayer_->width_;
-    int height = tmxLayer->height_;
-    tileNodes_.Resize(width * height);
-
-    TmxFile2D* tmxFile = tmxLayer_->tmxFile_;
-    float tileWidth = tmxFile->GetTileWidth();
-    float tileHeight = tmxFile->GetTileHeight();
-
-    for (int y = 0; y < height; ++y)
-    {
-        for (int x = 0; x < width; ++x)
-        {
-            int gid = tmxLayer->tileGids_[y * width + x];
-            if (gid <= 0)
-                continue;
-            
-            Sprite2D* sprite = tmxFile->GetTileSprite(gid);
-            if (!sprite)
-                continue;
-            
-            SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
-            tileNode->SetTemporary(true);
-            tileNode->SetPosition(Vector3(x * tileWidth, y * tileHeight, 0.0f));
-
-            StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
-            staticSprite->SetSprite(sprite);
-            staticSprite->SetLayer(drawOrder_);
-            staticSprite->SetOrderInLayer((height - 1 - y) * width + x);
-
-            tileNodes_[y * width + x] = tileNode;
-        }
-    }
+    if (tmxLayer_->type_ == LT_TILE_LAYER)
+        SetTileLayer((TmxTileLayer2D*)tmxLayer_);
+    else if (tmxLayer_->type_ == LT_IMAGE_LAYER)
+        SetImageLayer((TmxImageLayer2D*)tmxLayer_);
 }
 
 void TileMapLayer2D::SetDrawOrder(int drawOrder)
@@ -113,11 +84,21 @@ void TileMapLayer2D::SetDrawOrder(int drawOrder)
 
     drawOrder_ = drawOrder;
 
-    for (unsigned i = 0; i < tileNodes_.Size(); ++i)
+    for (unsigned i = 0; i < nodes_.Size(); ++i)
     {
-        if (tileNodes_[i])
-            tileNodes_[i]->GetComponent<StaticSprite2D>()->SetLayer(drawOrder_);
+        if (nodes_[i])
+            nodes_[i]->GetComponent<StaticSprite2D>()->SetLayer(drawOrder_);
     }
+}
+
+TmxLayerType2D TileMapLayer2D::GetLayerType() const
+{
+    return tmxLayer_ ? tmxLayer_->type_ : LT_INVALID;
+}
+
+const String& TileMapLayer2D::GetName() const
+{
+    return tmxLayer_ ? tmxLayer_->name_ : String::EMPTY;
 }
 
 int TileMapLayer2D::GetWidth() const
@@ -132,13 +113,81 @@ int TileMapLayer2D::GetHeight() const
 
 Node* TileMapLayer2D::GetTileNode(int x, int y) const
 {
-    if (!tmxLayer_)
+    if (!tmxLayer_ || tmxLayer_->type_ != LT_TILE_LAYER)
         return 0;
 
-    if (x < 0 || x >= tmxLayer_->width_ || y < 0 || y >= tmxLayer_->height_)
+    const TmxTileLayer2D* tileLayer = (const TmxTileLayer2D*)tmxLayer_;
+    if (x < 0 || x >= tileLayer->width_ || y < 0 || y >= tileLayer->height_)
         return 0;
 
-    return tileNodes_[y * tmxLayer_->width_ + x];
+    return nodes_[y * tileLayer->width_ + x];
+}
+
+Node* TileMapLayer2D::GetImageNode() const
+{
+    if (!tmxLayer_ || tmxLayer_->type_ != LT_IMAGE_LAYER)
+        return 0;
+
+    if (nodes_.Empty())
+        return 0;
+
+    return nodes_[0];
+}
+
+void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
+{
+    int width = tileLayer->width_;
+    int height = tileLayer->height_;
+    nodes_.Resize(width * height);
+
+    TmxFile2D* tmxFile = tileLayer->tmxFile_;
+    float tileWidth = tmxFile->GetTileWidth();
+    float tileHeight = tmxFile->GetTileHeight();
+
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            int gid = tileLayer->tileGids_[y * width + x];
+            if (gid <= 0)
+                continue;
+
+            Sprite2D* sprite = tmxFile->GetTileSprite(gid);
+            if (!sprite)
+                continue;
+
+            SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
+            tileNode->SetTemporary(true);
+            tileNode->SetPosition(Vector3(x * tileWidth, y * tileHeight, 0.0f));
+
+            StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
+            staticSprite->SetSprite(sprite);
+            staticSprite->SetLayer(drawOrder_);
+            staticSprite->SetOrderInLayer((height - 1 - y) * width + x);
+
+            nodes_[y * width + x] = tileNode;
+        }
+    }
+}
+
+void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
+{
+    if (!imageLayer->sprite_)
+        return;
+
+    TmxFile2D* tmxFile = imageLayer->tmxFile_;
+    int height = tmxFile->GetHeight();
+    float tileHeight = tmxFile->GetTileHeight();
+
+    SharedPtr<Node> imageNode(GetNode()->CreateChild("Tile"));
+    imageNode->SetTemporary(true);
+    imageNode->SetPosition(Vector3(0.0f, height * tileHeight, 0.0f));
+
+    StaticSprite2D* staticSprite = imageNode->CreateComponent<StaticSprite2D>();
+    staticSprite->SetSprite(imageLayer->sprite_);
+    staticSprite->SetOrderInLayer(0);
+
+    nodes_.Push(imageNode);
 }
 
 }

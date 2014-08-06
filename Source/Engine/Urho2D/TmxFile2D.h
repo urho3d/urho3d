@@ -23,6 +23,8 @@
 #pragma once
 
 #include "Resource.h"
+#include "Ptr.h"
+#include "Sprite2D.h"
 
 namespace Urho3D
 {
@@ -33,19 +35,72 @@ class TmxFile2D;
 class XMLElement;
 class XMLFile;
 
-/// Tile map layer.
+/// Tmx layer type.
+enum TmxLayerType2D
+{
+    /// Invalid layer.
+    LT_INVALID = 0,
+    /// Tile layer.
+    LT_TILE_LAYER,
+    /// Object group.
+    LT_OBJECT_GROUP,
+    /// Image layer.
+    LT_IMAGE_LAYER,
+};
+
+/// Tmx layer.
 struct URHO3D_API TmxLayer2D
 {
+    TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type) :
+        tmxFile_(tmxFile),
+        type_(type)
+    {
+    }
+    
+    virtual ~TmxLayer2D()
+    {
+    }
+
     /// Tmx file.
     WeakPtr<TmxFile2D> tmxFile_;
+    /// Layer type.
+    TmxLayerType2D type_;
     /// Name.
     String name_;
     /// Width.
     int width_;
     /// Height.
     int height_;
-    /// Tiles gids.
+};
+
+/// Tmx tile layer.
+struct URHO3D_API TmxTileLayer2D : TmxLayer2D
+{
+    TmxTileLayer2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_TILE_LAYER)
+    {
+    }
+
     PODVector<int> tileGids_;
+};
+
+
+/// Tmx image layer.
+struct URHO3D_API TmxObjectGroup2D : TmxLayer2D
+{
+    TmxObjectGroup2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_OBJECT_GROUP)
+    {
+    }
+};
+
+/// Tmx image layer.
+struct URHO3D_API TmxImageLayer2D : TmxLayer2D
+{
+    TmxImageLayer2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_IMAGE_LAYER)
+    {
+    }
+
+    /// Sprite.
+    SharedPtr<Sprite2D> sprite_;
 };
 
 /// Tile map file.
@@ -86,6 +141,10 @@ private:
     bool LoadTileSet(const XMLElement& element);
     /// Load layer.
     bool LoadLayer(const XMLElement& element);
+    /// Load object group.
+    bool LoadObjectGroup(const XMLElement& element);
+    /// Load image layer.
+    bool LoadImageLayer(const XMLElement& element);
     
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
@@ -102,7 +161,7 @@ private:
     /// Gid to tile sprite mapping.
     HashMap<int, SharedPtr<Sprite2D> > tileSprites_;
     /// Layers.
-    Vector<TmxLayer2D> layers_;
+    Vector<TmxLayer2D*> layers_;
 };
 
 }

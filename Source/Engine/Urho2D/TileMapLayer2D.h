@@ -27,7 +27,11 @@
 namespace Urho3D
 {
 
+enum TmxLayerType2D;
 struct TmxLayer2D;
+struct TmxTileLayer2D;
+struct TmxImageLayer2D;
+
 class Node;
 
 /// Tile map component.
@@ -44,7 +48,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set tmx layer.
-    void SetTmxLayer(const TmxLayer2D* tmxLayer, int drawOrder);
+    void SetTmxLayer(const TmxLayer2D* tmxLayer);
     /// Set draw order
     void SetDrawOrder(int drawOrder);
 
@@ -52,20 +56,33 @@ public:
     const TmxLayer2D* GetTmxLayer() const { return tmxLayer_; }
     /// Return draw order.
     int GetDrawOrder() const { return drawOrder_; }
+
+    /// Return layer type.
+    TmxLayerType2D GetLayerType() const;
+    /// Return name.
+    const String& GetName() const;
     /// Return width.
     int GetWidth() const;
     /// Return height.
     int GetHeight() const;
-    /// Return tile node.
+
+    /// Return tile node (for tile layer only).
     Node* GetTileNode(int x, int y) const;
+    /// Return image node (for image layer only).
+    Node* GetImageNode() const;
 
 private:
+    /// Set tile layer.
+    void SetTileLayer(const TmxTileLayer2D* tileLayer);
+    /// Set image layer.
+    void SetImageLayer(const TmxImageLayer2D* imageLayer);
+
     /// Tmx layer.
     const TmxLayer2D* tmxLayer_;
     /// Draw order.
     int drawOrder_;
-    /// Tile nodes.
-    Vector<SharedPtr<Node> > tileNodes_;
+    /// Tile or image nodes.
+    Vector<SharedPtr<Node> > nodes_;
 };
 
 }
