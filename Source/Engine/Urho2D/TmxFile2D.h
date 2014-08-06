@@ -38,14 +38,14 @@ class XMLFile;
 /// Tmx layer type.
 enum TmxLayerType2D
 {
-    /// Invalid layer.
-    LT_INVALID = 0,
     /// Tile layer.
-    LT_TILE_LAYER,
+    LT_TILE_LAYER = 0,
     /// Object group.
     LT_OBJECT_GROUP,
     /// Image layer.
     LT_IMAGE_LAYER,
+    /// Invalid.
+    LT_INVALID,
 };
 
 /// Tmx layer.
@@ -83,6 +83,35 @@ struct URHO3D_API TmxTileLayer2D : TmxLayer2D
     PODVector<int> tileGids_;
 };
 
+/// Object type.
+enum TmxObjectType
+{
+    /// Rectangle.
+    OT_RECTANGLE = 0,
+    /// Ellipse.
+    OT_ELLIPSE,
+    /// Polygon.
+    OT_POLYGON,
+    /// Polyline.
+    OT_POLYLINE,
+    /// Tile.
+    OT_TILE,
+};
+
+/// Tmx object.
+struct URHO3D_API TmxObject
+{
+    /// Object type.
+    TmxObjectType type_;
+    /// Position.
+    float x_, y_;
+    /// Size (for rectangle and ellipse).
+    float width_, height_;
+    /// Points(for polygon and polyline).
+    Vector<Vector2> points_;
+    /// Gid (for tile).
+    int gid_;
+};
 
 /// Tmx image layer.
 struct URHO3D_API TmxObjectGroup2D : TmxLayer2D
@@ -90,6 +119,9 @@ struct URHO3D_API TmxObjectGroup2D : TmxLayer2D
     TmxObjectGroup2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_OBJECT_GROUP)
     {
     }
+
+    /// Objects.
+    Vector<TmxObject> objects_;
 };
 
 /// Tmx image layer.

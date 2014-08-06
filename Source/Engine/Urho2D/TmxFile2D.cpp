@@ -210,7 +210,6 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
     layers_.Push(tileLayer);
 
     tileLayer->name_ = element.GetAttribute("name");
-
     tileLayer->width_ = element.GetInt("width");
     tileLayer->height_ = element.GetInt("height");
 
@@ -249,6 +248,64 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
 
 bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
 {
+    TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
+    layers_.Push(objectGroup);
+
+    objectGroup->name_ = element.GetAttribute("name");
+    objectGroup->width_ = element.GetInt("width");
+    objectGroup->height_ = element.GetInt("height");
+
+    const float mapHeight = height_ * tileHeight_;
+
+    for (XMLElement objectElem = element.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
+    {
+        objectGroup->objects_.Push(TmxObject());
+        TmxObject& object = objectGroup->objects_.Back();
+
+        object.x_ = objectElem.GetInt("x") * PIXEL_SIZE;
+        // Flip y
+        object.y_ = mapHeight - objectElem.GetInt("y") * PIXEL_SIZE;
+
+        if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
+        {
+            if (!objectElem.HasChild("ellipse"))
+                object.type_ = OT_RECTANGLE;
+            else
+                object.type_ = OT_ELLIPSE;
+
+            object.width_ = objectElem.GetInt("width") * PIXEL_SIZE;
+            object.height_ = objectElem.GetInt("height") * PIXEL_SIZE;
+
+            object.y_ -= object.height_;
+        }
+        else if (objectElem.HasAttribute("gid"))
+        {
+            object.type_ = OT_TILE;
+            object.gid_ = objectElem.GetInt("gid");
+        }
+        else
+        {
+            XMLElement childElem = objectElem.GetChild();
+            if (childElem.GetName() == "polygon")
+                object.type_ = OT_POLYGON;
+            else if (childElem.GetName() == "polyline")
+                object.type_ = OT_POLYLINE;
+            else
+                return false;
+
+            Vector<String> points = childElem.GetAttribute("points").Split(' ');
+            object.points_.Resize(points.Size());
+            
+            for (unsigned i = 0; i < points.Size(); ++i)
+            {
+                points[i].Replace(',', ' ');
+                Vector2 point = ToVector2(points[i]) * PIXEL_SIZE;
+                point.y_ = mapHeight - point.y_;
+                object.points_[i] = point;
+            }
+        }
+    }
+
     return true;
 }
 

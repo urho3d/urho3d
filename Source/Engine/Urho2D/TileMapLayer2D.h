@@ -23,14 +23,10 @@
 #pragma once
 
 #include "Component.h"
+#include "TmxFile2D.h"
 
 namespace Urho3D
 {
-
-enum TmxLayerType2D;
-struct TmxLayer2D;
-struct TmxTileLayer2D;
-struct TmxImageLayer2D;
 
 class Node;
 
@@ -74,6 +70,8 @@ public:
 private:
     /// Set tile layer.
     void SetTileLayer(const TmxTileLayer2D* tileLayer);
+    /// Set object group.
+    void SetObjectGroup(const TmxObjectGroup2D* objectGroup);
     /// Set image layer.
     void SetImageLayer(const TmxImageLayer2D* imageLayer);
 

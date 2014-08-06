@@ -78,9 +78,6 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     for (unsigned i = 0; i < numLayers; ++i)
     {
         const TmxLayer2D* tmxLayer = tmxFile_->GetLayer(i);
-        // Dont create object group
-        if (tmxLayer->type_ == LT_OBJECT_GROUP)
-            continue;
 
         SharedPtr<Node> layerNode(GetNode()->CreateChild(tmxLayer->name_, LOCAL));
         layerNode->SetTemporary(true);
