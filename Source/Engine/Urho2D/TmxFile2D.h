@@ -171,6 +171,8 @@ public:
     const TmxLayer2D* GetLayer(unsigned index) const;
     /// Return tile sprite by gid.
     Sprite2D* GetTileSprite(int gid) const;
+    /// Return tile properties by gid.
+    const HashMap<String, String>* GetTileProperties(int gid) const;
 
 private:
     /// Load tile set.
@@ -198,6 +200,8 @@ private:
     Vector<SharedPtr<Texture2D> > tileSetTextures_;
     /// Gid to tile sprite mapping.
     HashMap<int, SharedPtr<Sprite2D> > tileSprites_;
+    /// Gid to tile properties mapping.
+    HashMap<int, HashMap<String, String> > tileProperties_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
 };

@@ -165,6 +165,15 @@ Sprite2D* TmxFile2D::GetTileSprite(int gid) const
     return i->second_;
 }
 
+const HashMap<String, String>* TmxFile2D::GetTileProperties(int gid) const
+{
+    HashMap<int, HashMap<String, String> >::ConstIterator i = tileProperties_.Find(gid);
+    if (i == tileProperties_.End())
+        return 0;
+
+    return &(i->second_);
+}
+
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
 {
     XMLElement imageElem = element.GetChild("image");
@@ -179,7 +188,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
 
     tileSetTextures_.Push(texture);
 
-    int gid = element.GetInt("firstgid");
+    int firstgid = element.GetInt("firstgid"); 
     int tileWidth = element.GetInt("tilewidth");
     int tileHeight = element.GetInt("tileheight");
     int spacing = element.GetInt("spacing");
@@ -187,6 +196,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     int imageWidth = imageElem.GetInt("width");
     int imageHeight = imageElem.GetInt("height");
 
+    int gid = firstgid;
     for (int y = margin; y < imageHeight - margin; y += tileHeight + spacing)
     {
         for (int x = margin; x < imageWidth - margin; x += tileWidth + spacing)
@@ -198,6 +208,16 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             sprite->SetHotSpot(Vector2(0.0f, 0.0f));
 
             tileSprites_[gid++] = sprite;
+        }
+    }
+
+    for (XMLElement tileElem = element.GetChild("tile"); tileElem; tileElem = tileElem.GetNext("tile"))
+    {
+        if (tileElem.HasChild("properties"))
+        {
+            HashMap<String, String> properties;
+            LoadProperties(tileElem.GetChild("properties"), properties);
+            tileProperties_[firstgid + tileElem.GetInt("id")] = properties;
         }
     }
 
