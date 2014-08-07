@@ -61,7 +61,7 @@ public:
     /// Return tile map layer at index.
     TileMapLayer2D* GetLayer(unsigned index) const;
     /// Return tile map layer by name.
-    TileMapLayer2D* GetLayer(const String& name) const;
+    TileMapLayer2D* GetLayerByName(const String& name) const;
     
     /// Set tile map file attribute.
     void SetTmxFileAttr(ResourceRef value);

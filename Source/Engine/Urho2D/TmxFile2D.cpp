@@ -38,6 +38,33 @@ namespace Urho3D
 
 extern const float PIXEL_SIZE;
 
+TmxLayer2D::TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type) :
+    tmxFile_(tmxFile),
+    type_(type)
+{
+
+}
+
+TmxLayer2D::~TmxLayer2D()
+{
+}
+
+TmxTileLayer2D::TmxTileLayer2D(TmxFile2D* tmxFile) :
+    TmxLayer2D(tmxFile, LT_TILE_LAYER)
+{
+}
+
+TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) :
+    TmxLayer2D(tmxFile, LT_OBJECT_GROUP)
+{
+}
+
+
+TmxImageLayer2D::TmxImageLayer2D(TmxFile2D* tmxFile) :
+    TmxLayer2D(tmxFile, LT_IMAGE_LAYER)
+{
+}
+
 TmxFile2D::TmxFile2D(Context* context) :
     Resource(context),
     width_(0),
@@ -154,6 +181,17 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
         return 0;
 
     return layers_[index];
+}
+
+const TmxLayer2D* TmxFile2D::GetLayerByName(const String& name) const
+{
+    for (unsigned i = 0; i < layers_.Size(); ++i)
+    {
+        if (name == layers_[i]->name_)
+            return layers_[i];
+    }
+
+    return 0;
 }
 
 Sprite2D* TmxFile2D::GetTileSprite(int gid) const
@@ -384,5 +422,6 @@ void TmxFile2D::LoadProperties(const XMLElement& element, HashMap<String, String
     for (XMLElement propertyElem = element.GetChild("property"); propertyElem; propertyElem = propertyElem.GetNext("property"))
         peoperties[propertyElem.GetAttribute("name")] = propertyElem.GetAttribute("value");
 }
+
 
 }

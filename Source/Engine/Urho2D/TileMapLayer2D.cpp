@@ -91,8 +91,12 @@ void TileMapLayer2D::SetDrawOrder(int drawOrder)
 
     for (unsigned i = 0; i < nodes_.Size(); ++i)
     {
-        if (nodes_[i])
-            nodes_[i]->GetComponent<StaticSprite2D>()->SetLayer(drawOrder_);
+        if (!nodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = nodes_[i]->GetComponent<StaticSprite2D>();
+        if (staticSprite)
+            staticSprite->SetLayer(drawOrder_);
     }
 }
 
@@ -140,6 +144,34 @@ Node* TileMapLayer2D::GetTileNode(int x, int y) const
         return 0;
 
     return nodes_[y * tileLayer->width_ + x];
+}
+
+unsigned TileMapLayer2D::GetNumObjects() const
+{
+    if (!tmxLayer_ || tmxLayer_->type_ != LT_OBJECT_GROUP)
+        return 0;
+
+    return nodes_.Size();
+}
+
+
+const TmxObject* TileMapLayer2D::GetObject(unsigned index) const
+{
+    if (!tmxLayer_ || tmxLayer_->type_ != LT_OBJECT_GROUP)
+        return 0;
+    
+    return (const TmxObject*)nodes_[index]->GetVar("ObjectData").GetVoidPtr();
+}
+
+Node* TileMapLayer2D::GetObjectNode(unsigned index) const
+{
+    if (!tmxLayer_ || tmxLayer_->type_ != LT_OBJECT_GROUP)
+        return 0;
+
+    if (index >= nodes_.Size())
+        return 0;
+
+    return nodes_[index];
 }
 
 Node* TileMapLayer2D::GetImageNode() const
@@ -197,26 +229,27 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
     for (unsigned i = 0; i < objectGroup->objects_.Size(); ++i)
     {
         const TmxObject& object = objectGroup->objects_[i];
-        if (object.type_ != OT_TILE)
-            continue;
 
-        if (object.gid_ <= 0)
-            continue;
+        SharedPtr<Node> objectNode(GetNode()->CreateChild("Object"));
+        objectNode->SetTemporary(true);
+        objectNode->SetPosition(Vector3(object.x_, object.y_, 0.0f));
 
-        Sprite2D* sprite = tmxFile->GetTileSprite(object.gid_);
-        if (!sprite)
-            continue;
+        // Set object data
+        objectNode->SetVar("ObjectData", (void*)&object);
 
-        SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
-        tileNode->SetTemporary(true);
-        tileNode->SetPosition(Vector3(object.x_, object.y_, 0.0f));
-
-        StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
-        staticSprite->SetSprite(sprite);
-        staticSprite->SetLayer(drawOrder_);
-        staticSprite->SetOrderInLayer((int)((10.0f - object.y_) * 100.0f));
-
-        nodes_.Push(tileNode);
+        if (object.type_ == OT_TILE)
+        {
+            Sprite2D* sprite = tmxFile->GetTileSprite(object.gid_);
+            if (sprite)
+            {
+                StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+                staticSprite->SetSprite(sprite);
+                staticSprite->SetLayer(drawOrder_);
+                staticSprite->SetOrderInLayer((int)((10.0f - object.y_) * 100.0f));
+            }
+        }
+        
+        nodes_.Push(objectNode);
     }
 }
 

@@ -60,10 +60,7 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     if (tmxFile_)
     {
         for (unsigned i = 0; i < layers_.Size(); ++i)
-        {
-            if (layers_[i])
-                layers_[i]->GetNode()->Remove();
-        }
+            layers_[i]->GetNode()->Remove();
         layers_.Clear();
     }
 
@@ -124,10 +121,10 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
-TileMapLayer2D* TileMap2D::GetLayer(const String& name) const
+TileMapLayer2D* TileMap2D::GetLayerByName(const String& name) const
 {
     for (unsigned i = 0; i < layers_.Size(); ++i)
-        if (layers_[i] && name == layers_[i]->GetName())
+        if (name == layers_[i]->GetName())
             return layers_[i];
 
     return 0;

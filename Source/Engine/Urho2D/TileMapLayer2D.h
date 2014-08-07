@@ -68,6 +68,12 @@ public:
 
     /// Return tile node (for tile layer only).
     Node* GetTileNode(int x, int y) const;
+    /// Return number of tile nodes (for object group only).
+    unsigned GetNumObjects() const;
+    /// Return object.
+    const TmxObject* GetObject(unsigned index) const;
+    /// Return tile node (for object group only).
+    Node* GetObjectNode(unsigned index) const;
     /// Return image node (for image layer only).
     Node* GetImageNode() const;
 

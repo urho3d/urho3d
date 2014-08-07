@@ -51,15 +51,8 @@ enum TmxLayerType2D
 /// Tmx layer.
 struct URHO3D_API TmxLayer2D
 {
-    TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type) :
-        tmxFile_(tmxFile),
-        type_(type)
-    {
-    }
-    
-    virtual ~TmxLayer2D()
-    {
-    }
+    TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type);
+    virtual ~TmxLayer2D();
 
     /// Tmx file.
     WeakPtr<TmxFile2D> tmxFile_;
@@ -80,9 +73,7 @@ struct URHO3D_API TmxLayer2D
 /// Tmx tile layer.
 struct URHO3D_API TmxTileLayer2D : TmxLayer2D
 {
-    TmxTileLayer2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_TILE_LAYER)
-    {
-    }
+    TmxTileLayer2D(TmxFile2D* tmxFile);
 
     PODVector<int> tileGids_;
 };
@@ -122,9 +113,7 @@ struct URHO3D_API TmxObject
 /// Tmx image layer.
 struct URHO3D_API TmxObjectGroup2D : TmxLayer2D
 {
-    TmxObjectGroup2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_OBJECT_GROUP)
-    {
-    }
+    TmxObjectGroup2D(TmxFile2D* tmxFile);
 
     /// Objects.
     Vector<TmxObject> objects_;
@@ -133,9 +122,7 @@ struct URHO3D_API TmxObjectGroup2D : TmxLayer2D
 /// Tmx image layer.
 struct URHO3D_API TmxImageLayer2D : TmxLayer2D
 {
-    TmxImageLayer2D(TmxFile2D* tmxFile) : TmxLayer2D(tmxFile, LT_IMAGE_LAYER)
-    {
-    }
+    TmxImageLayer2D(TmxFile2D* tmxFile);
 
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
@@ -171,6 +158,8 @@ public:
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return layer at index.
     const TmxLayer2D* GetLayer(unsigned index) const;
+    /// Return layer by name.
+    const TmxLayer2D* GetLayerByName(const String& name) const;
     /// Return tile sprite by gid.
     Sprite2D* GetTileSprite(int gid) const;
     /// Return tile properties by gid.
