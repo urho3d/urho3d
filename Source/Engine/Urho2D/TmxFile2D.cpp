@@ -229,9 +229,7 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
     TmxTileLayer2D* tileLayer = new TmxTileLayer2D(this);
     layers_.Push(tileLayer);
 
-    tileLayer->name_ = element.GetAttribute("name");
-    tileLayer->width_ = element.GetInt("width");
-    tileLayer->height_ = element.GetInt("height");
+    LoadLayerInfo(element, tileLayer);
 
     XMLElement dataElem = element.GetChild("data");
     if (!dataElem)
@@ -274,9 +272,7 @@ bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
     TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
     layers_.Push(objectGroup);
 
-    objectGroup->name_ = element.GetAttribute("name");
-    objectGroup->width_ = element.GetInt("width");
-    objectGroup->height_ = element.GetInt("height");
+    LoadLayerInfo(element, objectGroup);
 
     const float mapHeight = height_ * tileHeight_;
 
@@ -343,9 +339,7 @@ bool TmxFile2D::LoadImageLayer(const XMLElement& element)
     TmxImageLayer2D* imageLayer = new TmxImageLayer2D(this);
     layers_.Push(imageLayer);
 
-    imageLayer->name_ = element.GetAttribute("name");
-    imageLayer->width_ = element.GetInt("width");
-    imageLayer->height_ = element.GetInt("height");
+    LoadLayerInfo(element, imageLayer);
 
     XMLElement imageElem = element.GetChild("image");
     if (!imageElem)
@@ -372,6 +366,17 @@ bool TmxFile2D::LoadImageLayer(const XMLElement& element)
         LoadProperties(element.GetChild("properties"), imageLayer->properties_);
 
     return true;
+}
+
+void TmxFile2D::LoadLayerInfo(const XMLElement& element, TmxLayer2D* layer)
+{
+    layer->name_ = element.GetAttribute("name");
+    layer->width_ = element.GetInt("width");
+    layer->height_ = element.GetInt("height");
+    if (element.HasAttribute("visible"))
+        layer->visible_ = element.GetInt("visible") != 0;
+    else
+        layer->visible_ = true;
 }
 
 void TmxFile2D::LoadProperties(const XMLElement& element, HashMap<String, String>& peoperties)

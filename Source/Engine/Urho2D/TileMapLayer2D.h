@@ -47,11 +47,15 @@ public:
     void SetTmxLayer(const TmxLayer2D* tmxLayer);
     /// Set draw order
     void SetDrawOrder(int drawOrder);
+    /// Set visible.
+    void SetVisible(bool visible);
 
     /// Return tmx layer.
     const TmxLayer2D* GetTmxLayer() const { return tmxLayer_; }
     /// Return draw order.
     int GetDrawOrder() const { return drawOrder_; }
+    /// Return visible.
+    bool IsVisible() const { return visible_; }
 
     /// Return layer type.
     TmxLayerType2D GetLayerType() const;
@@ -79,6 +83,8 @@ private:
     const TmxLayer2D* tmxLayer_;
     /// Draw order.
     int drawOrder_;
+    /// Visible.
+    bool visible_;
     /// Tile or image nodes.
     Vector<SharedPtr<Node> > nodes_;
 };

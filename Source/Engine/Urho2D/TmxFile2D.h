@@ -71,6 +71,8 @@ struct URHO3D_API TmxLayer2D
     int width_;
     /// Height.
     int height_;
+    /// Visible.
+    bool visible_;
     /// Properties.
     HashMap<String, String> properties_;
 };
@@ -175,7 +177,7 @@ public:
     const HashMap<String, String>* GetTileProperties(int gid) const;
 
 private:
-    /// Load tile set.
+   /// Load tile set.
     bool LoadTileSet(const XMLElement& element);
     /// Load layer.
     bool LoadLayer(const XMLElement& element);
@@ -183,6 +185,8 @@ private:
     bool LoadObjectGroup(const XMLElement& element);
     /// Load image layer.
     bool LoadImageLayer(const XMLElement& element);
+    /// Load layer info.
+    void LoadLayerInfo(const XMLElement& element, TmxLayer2D* layer);
     /// Load properties.
     void LoadProperties(const XMLElement& element, HashMap<String, String>& peoperties);
 

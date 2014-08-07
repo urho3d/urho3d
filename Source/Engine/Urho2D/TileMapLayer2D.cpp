@@ -37,7 +37,8 @@ namespace Urho3D
 TileMapLayer2D::TileMapLayer2D(Context* context) :
     Component(context),
     tmxLayer_(0),
-    drawOrder_(0)
+    drawOrder_(0),
+    visible_(true)
 {
 }
 
@@ -77,6 +78,8 @@ void TileMapLayer2D::SetTmxLayer(const TmxLayer2D* tmxLayer)
         SetObjectGroup((const TmxObjectGroup2D*)tmxLayer_);
     else if (tmxLayer_->type_ == LT_IMAGE_LAYER)
         SetImageLayer((const TmxImageLayer2D*)tmxLayer_);
+
+    SetVisible(tmxLayer_->visible_);
 }
 
 void TileMapLayer2D::SetDrawOrder(int drawOrder)
@@ -90,6 +93,20 @@ void TileMapLayer2D::SetDrawOrder(int drawOrder)
     {
         if (nodes_[i])
             nodes_[i]->GetComponent<StaticSprite2D>()->SetLayer(drawOrder_);
+    }
+}
+
+void TileMapLayer2D::SetVisible(bool visible)
+{
+    if (visible == visible_)
+        return;
+
+    visible_ = visible;
+
+    for (unsigned i = 0; i < nodes_.Size(); ++i)
+    {
+        if (nodes_[i])
+            nodes_[i]->SetEnabled(visible_);
     }
 }
 
