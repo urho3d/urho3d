@@ -243,6 +243,9 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
         }
     }
 
+    if (element.HasChild("properties"))
+        LoadProperties(element.GetChild("properties"), tileLayer->properties_);
+
     return true;
 }
 
@@ -304,7 +307,13 @@ bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
                 object.points_[i] = point;
             }
         }
+
+        if (objectElem.HasChild("properties"))
+            LoadProperties(objectElem.GetChild("properties"), object.properties_);
     }
+
+    if (element.HasChild("properties"))
+        LoadProperties(element.GetChild("properties"), objectGroup->properties_);
 
     return true;
 }
@@ -339,7 +348,16 @@ bool TmxFile2D::LoadImageLayer(const XMLElement& element)
     
     imageLayer->sprite_ = sprite;
 
+    if (element.HasChild("properties"))
+        LoadProperties(element.GetChild("properties"), imageLayer->properties_);
+
     return true;
+}
+
+void TmxFile2D::LoadProperties(const XMLElement& element, HashMap<String, String>& peoperties)
+{
+    for (XMLElement propertyElem = element.GetChild("property"); propertyElem; propertyElem = propertyElem.GetNext("property"))
+        peoperties[propertyElem.GetAttribute("name")] = propertyElem.GetAttribute("value");
 }
 
 }
