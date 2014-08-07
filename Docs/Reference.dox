@@ -1892,6 +1892,8 @@ The server can be made to transmit needed resource \ref PackageFile "packages" t
 
 There are some things to watch out for:
 
+- When a client is assigned to a scene, the client will first remove all existing replicated scene nodes from the scene, to prepare for receiving objects from the server. This means that for example a client's camera should be created into a local node, otherwise it will be removed when connecting.
+
 - After connecting to a server, the client should not create, update or remove non-local nodes or components on its own. However, to create client-side special effects and such, the client can freely manipulate local nodes.
 
 - A node's \ref Node::GetVars "user variables" VariantMap will be automatically replicated on a per-variable basis. This can be useful in transmitting data shared by several components, for example the player's score or health.
