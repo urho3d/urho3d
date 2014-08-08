@@ -38,6 +38,19 @@ namespace Urho3D
 
 extern const float PIXEL_SIZE;
 
+bool TmxProperties2D::HasProperty(const String& name) const
+{
+    return properties_.Find(name) != properties_.End();
+}
+
+const String& TmxProperties2D::GetProperty(const String& name) const
+{
+    HashMap<String, String>::ConstIterator i = properties_.Find(name);
+    if (i == properties_.End())
+        return String::EMPTY;
+    return i->second_;
+}
+
 TmxLayer2D::TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type) :
     tmxFile_(tmxFile),
     type_(type)
@@ -49,9 +62,45 @@ TmxLayer2D::~TmxLayer2D()
 {
 }
 
+TmxTile::TmxTile() : 
+    gid_(0), 
+    properties_(0)
+{
+
+}
+
+bool TmxTile::HasProperty(const String& name) const
+{
+    if (!properties_)
+        return false;
+    return properties_->HasProperty(name);
+}
+
+const String& TmxTile::GetProperty(const String& name) const
+{
+    if (!properties_)
+        return String::EMPTY;
+
+    return properties_->GetProperty(name);
+}
+
 TmxTileLayer2D::TmxTileLayer2D(TmxFile2D* tmxFile) :
     TmxLayer2D(tmxFile, LT_TILE_LAYER)
 {
+}
+
+
+unsigned TmxObject2D::GetNumPoints() const
+{
+    return points_.Size();
+}
+
+const Vector2& TmxObject2D::GetPoint(unsigned index) const
+{
+    if (index >= points_.Size())
+        return Vector2::ZERO;
+
+    return points_[index];
 }
 
 TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) :
@@ -194,24 +243,6 @@ const TmxLayer2D* TmxFile2D::GetLayerByName(const String& name) const
     return 0;
 }
 
-Sprite2D* TmxFile2D::GetTileSprite(int gid) const
-{
-    HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = tileSprites_.Find(gid);
-    if (i == tileSprites_.End())
-        return 0;
-
-    return i->second_;
-}
-
-const HashMap<String, String>* TmxFile2D::GetTileProperties(int gid) const
-{
-    HashMap<int, HashMap<String, String> >::ConstIterator i = tileProperties_.Find(gid);
-    if (i == tileProperties_.End())
-        return 0;
-
-    return &(i->second_);
-}
-
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
 {
     XMLElement imageElem = element.GetChild("image");
@@ -253,7 +284,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     {
         if (tileElem.HasChild("properties"))
         {
-            HashMap<String, String> properties;
+            TmxProperties2D properties;
             LoadProperties(tileElem.GetChild("properties"), properties);
             tileProperties_[firstgid + tileElem.GetInt("id")] = properties;
         }
@@ -295,14 +326,35 @@ bool TmxFile2D::LoadLayer(const XMLElement& element)
 
             int gid = tileElem.GetInt("gid");
             tileElem = tileElem.GetNext("tile");
-            tileLayer->tileGids_[y * tileLayer->width_ + x] = gid;
+            TmxTile tile;
+            tile.gid_ = gid;
+            tile.sprite_ = GetTileSprite(gid);
+            tile.properties_ = GetTileProperties(gid);
+            tileLayer->tileGids_[y * tileLayer->width_ + x] = tile;
         }
     }
 
     if (element.HasChild("properties"))
-        LoadProperties(element.GetChild("properties"), tileLayer->properties_);
+        LoadProperties(element.GetChild("properties"), *tileLayer);
 
     return true;
+}
+
+Sprite2D* TmxFile2D::GetTileSprite(int gid) const
+{
+    HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = tileSprites_.Find(gid);
+    if (i == tileSprites_.End())
+        return 0;
+
+    return i->second_;
+}
+
+const TmxProperties2D* TmxFile2D::GetTileProperties(int gid) const
+{
+    HashMap<int, TmxProperties2D>::ConstIterator i = tileProperties_.Find(gid);
+    if (i == tileProperties_.End())
+        return 0;
+    return &(i->second_);
 }
 
 bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
@@ -316,8 +368,8 @@ bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
 
     for (XMLElement objectElem = element.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
     {
-        objectGroup->objects_.Push(TmxObject());
-        TmxObject& object = objectGroup->objects_.Back();
+        objectGroup->objects_.Push(TmxObject2D());
+        TmxObject2D& object = objectGroup->objects_.Back();
 
         object.x_ = objectElem.GetInt("x") * PIXEL_SIZE;
         // Flip y
@@ -339,6 +391,7 @@ bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
         {
             object.type_ = OT_TILE;
             object.gid_ = objectElem.GetInt("gid");
+            object.sprite_ = GetTileSprite(object.gid_);
         }
         else
         {
@@ -363,11 +416,11 @@ bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
         }
 
         if (objectElem.HasChild("properties"))
-            LoadProperties(objectElem.GetChild("properties"), object.properties_);
+            LoadProperties(objectElem.GetChild("properties"), object);
     }
 
     if (element.HasChild("properties"))
-        LoadProperties(element.GetChild("properties"), objectGroup->properties_);
+        LoadProperties(element.GetChild("properties"), *objectGroup);
 
     return true;
 }
@@ -401,7 +454,7 @@ bool TmxFile2D::LoadImageLayer(const XMLElement& element)
     imageLayer->sprite_ = sprite;
 
     if (element.HasChild("properties"))
-        LoadProperties(element.GetChild("properties"), imageLayer->properties_);
+        LoadProperties(element.GetChild("properties"), *imageLayer);
 
     return true;
 }
@@ -417,10 +470,10 @@ void TmxFile2D::LoadLayerInfo(const XMLElement& element, TmxLayer2D* layer)
         layer->visible_ = true;
 }
 
-void TmxFile2D::LoadProperties(const XMLElement& element, HashMap<String, String>& peoperties)
+void TmxFile2D::LoadProperties(const XMLElement& element, TmxProperties2D& properties)
 {
     for (XMLElement propertyElem = element.GetChild("property"); propertyElem; propertyElem = propertyElem.GetNext("property"))
-        peoperties[propertyElem.GetAttribute("name")] = propertyElem.GetAttribute("value");
+        properties.properties_[propertyElem.GetAttribute("name")] = propertyElem.GetAttribute("value");
 }
 
 

@@ -67,8 +67,12 @@ void TileMapLayer2D::SetTmxLayer(const TmxLayer2D* tmxLayer)
         nodes_.Clear();
     }
 
+    tileLayer_ = 0;
+    objectGroup_ = 0;
+    imageLayer_ = 0;
+    
     tmxLayer_ = tmxLayer;
-
+    
     if (!tmxLayer_)
         return;
 
@@ -114,11 +118,6 @@ void TileMapLayer2D::SetVisible(bool visible)
     }
 }
 
-TmxLayerType2D TileMapLayer2D::GetLayerType() const
-{
-    return tmxLayer_ ? tmxLayer_->type_ : LT_INVALID;
-}
-
 const String& TileMapLayer2D::GetName() const
 {
     return tmxLayer_ ? tmxLayer_->name_ : String::EMPTY;
@@ -134,44 +133,108 @@ int TileMapLayer2D::GetHeight() const
     return tmxLayer_ ? tmxLayer_->height_ : 0;
 }
 
+bool TileMapLayer2D::HasProperty(const String& name) const
+{
+    if (!tmxLayer_)
+        return false;
+
+    return tmxLayer_->HasProperty(name);
+}
+
+const String& TileMapLayer2D::GetProperty(const String& name) const
+{
+    if (!tmxLayer_)
+        return String::EMPTY;
+    return tmxLayer_->GetProperty(name);
+}
+
+TmxLayerType2D TileMapLayer2D::GetLayerType() const
+{
+    return tmxLayer_ ? tmxLayer_->type_ : LT_INVALID;
+}
+
 Node* TileMapLayer2D::GetTileNode(int x, int y) const
 {
-    if (!tmxLayer_ || tmxLayer_->type_ != LT_TILE_LAYER)
+    if (!tileLayer_)
+        return 0;
+    
+    if (x < 0 || x >= tileLayer_->width_ || y < 0 || y >= tileLayer_->height_)
+        return 0;
+    
+    return nodes_[y * tileLayer_->width_ + x];
+}
+
+const TmxTile* TileMapLayer2D::GetTile(int x, int y) const
+{
+    if (!tileLayer_)
+        return 0;
+    
+    if (x < 0 || x >= tileLayer_->width_ || y < 0 || y >= tileLayer_->height_)
         return 0;
 
-    const TmxTileLayer2D* tileLayer = (const TmxTileLayer2D*)tmxLayer_;
-    if (x < 0 || x >= tileLayer->width_ || y < 0 || y >= tileLayer->height_)
+    const TmxTile& tile = tileLayer_->tileGids_[y * tileLayer_->width_ + x];
+    return tile.gid_ == 0 ? 0 : &tile;
+}
+
+bool TileMapLayer2D::HasTileProperty(int x, int y, const String& name) const
+{
+    const TmxTile* tile = GetTile(x, y);
+    return tile && tile->HasProperty(name);
+}
+
+const String& TileMapLayer2D::GetTileProperty(int x, int y, const String& name) const
+{
+    const TmxTile* tile = GetTile(x, y);
+    if (!tile)
+        return String::EMPTY;
+
+    return tile->GetProperty(name);
+}
+
+Node* TileMapLayer2D::GetObjectNode(unsigned index) const
+{
+    if (!objectGroup_)
+        return false;
+
+    if (index >= nodes_.Size())
         return 0;
 
-    return nodes_[y * tileLayer->width_ + x];
+    return nodes_[index];
 }
 
 unsigned TileMapLayer2D::GetNumObjects() const
 {
-    if (!tmxLayer_ || tmxLayer_->type_ != LT_OBJECT_GROUP)
+    if (!objectGroup_)
         return 0;
 
     return nodes_.Size();
 }
 
 
-const TmxObject* TileMapLayer2D::GetObject(unsigned index) const
+const TmxObject2D* TileMapLayer2D::GetObject(unsigned index) const
 {
-    if (!tmxLayer_ || tmxLayer_->type_ != LT_OBJECT_GROUP)
+    if (objectGroup_)
         return 0;
-    
-    return (const TmxObject*)nodes_[index]->GetVar("ObjectData").GetVoidPtr();
+
+    return &objectGroup_->objects_[index];
 }
 
-Node* TileMapLayer2D::GetObjectNode(unsigned index) const
+bool TileMapLayer2D::HasObjectProperty(unsigned index, const String& name) const
 {
-    if (!tmxLayer_ || tmxLayer_->type_ != LT_OBJECT_GROUP)
-        return 0;
+    const TmxObject2D* object = GetObject(index);
+    if (!object)
+        return false;
 
-    if (index >= nodes_.Size())
-        return 0;
+    return object->HasProperty(name);
+}
 
-    return nodes_[index];
+const String& TileMapLayer2D::GetObjectProperty(unsigned index, const String& name) const
+{
+    const TmxObject2D* object = GetObject(index);
+    if (!object)
+        return String::EMPTY;
+
+    return object->GetProperty(name);
 }
 
 Node* TileMapLayer2D::GetImageNode() const
@@ -187,6 +250,8 @@ Node* TileMapLayer2D::GetImageNode() const
 
 void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 {
+    tmxLayer_ = tileLayer;
+
     int width = tileLayer->width_;
     int height = tileLayer->height_;
     nodes_.Resize(width * height);
@@ -199,12 +264,8 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
     {
         for (int x = 0; x < width; ++x)
         {
-            int gid = tileLayer->tileGids_[y * width + x];
-            if (gid <= 0)
-                continue;
-
-            Sprite2D* sprite = tmxFile->GetTileSprite(gid);
-            if (!sprite)
+            const TmxTile& tile = tileLayer->tileGids_[y * width + x];
+            if (tile.gid_ == 0 || !tile.sprite_)
                 continue;
 
             SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
@@ -212,7 +273,7 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
             tileNode->SetPosition(Vector3(x * tileWidth, y * tileHeight, 0.0f));
 
             StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
-            staticSprite->SetSprite(sprite);
+            staticSprite->SetSprite(tile.sprite_);
             staticSprite->SetLayer(drawOrder_);
             staticSprite->SetOrderInLayer((height - 1 - y) * width + x);
 
@@ -221,14 +282,15 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
     }
 }
 
-
 void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
 {
+    objectGroup_ = objectGroup;
+
     TmxFile2D* tmxFile = objectGroup->tmxFile_;
 
     for (unsigned i = 0; i < objectGroup->objects_.Size(); ++i)
     {
-        const TmxObject& object = objectGroup->objects_[i];
+        const TmxObject2D& object = objectGroup->objects_[i];
 
         SharedPtr<Node> objectNode(GetNode()->CreateChild("Object"));
         objectNode->SetTemporary(true);
@@ -239,11 +301,10 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
 
         if (object.type_ == OT_TILE)
         {
-            Sprite2D* sprite = tmxFile->GetTileSprite(object.gid_);
-            if (sprite)
+            if (object.gid_ && object.sprite_)
             {
                 StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
-                staticSprite->SetSprite(sprite);
+                staticSprite->SetSprite(object.sprite_);
                 staticSprite->SetLayer(drawOrder_);
                 staticSprite->SetOrderInLayer((int)((10.0f - object.y_) * 100.0f));
             }
@@ -255,6 +316,8 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
 
 void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
 {
+    imageLayer_ = imageLayer;
+
     if (!imageLayer->sprite_)
         return;
 
