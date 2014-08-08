@@ -349,3 +349,5 @@ RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 EOF" or abort 'Failed to create user private key to id_rsa'
   system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
 end
+
+# vi: set ts=2 sw=2 expandtab:

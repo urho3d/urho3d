@@ -66,3 +66,5 @@ script: rake travis_ci
 after_success:
     - bash -c "[ $SITE_UPDATE_ON_MASTER_COMMIT ]" && rake travis_ci_site_update && rake travis_ci_rebase
     - bash -c "[ $PACKAGE_UPLOAD ]" && rake travis_ci_package_upload
+
+# vi: set ts=2 sw=2 expandtab:
