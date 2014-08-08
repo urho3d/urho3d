@@ -78,7 +78,7 @@ task :travis_ci_site_update do
   # Generate and sync doxygen pages
   system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
-  system "cd doc-Build && pwd && git config user.name '$GIT_NAME' && git config user.email '$GIT_EMAIL' && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
+  system 'cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m "Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE" || true) && git push -q >/dev/null 2>&1' or abort 'Failed to update site'
   # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
   if ENV['PACKAGE_UPLOAD']
     instruction = 'skip'
@@ -86,13 +86,18 @@ task :travis_ci_site_update do
     instruction = 'package'
   end
   # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if detached HEAD is not a fast forward of remote master)
-  system "pwd && git config user.name '$GIT_NAME' && git config user.email '$GIT_EMAIL' && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API* && ( git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]' || true ) && git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
+  system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
+  if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
+    bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
+    system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or 'Failed to stage .soversion file'
+  end
+  system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
 desc 'Rebase OSX-CI mirror branch'
 task :travis_ci_rebase do
-  system "git config user.name '$GIT_NAME' && git config user.email '$GIT_EMAIL' && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1" or abort 'Failed to rebase OSX-CI mirror branch'
+  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
@@ -318,6 +323,28 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = ''
     system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return 1
   end
   return 0
+end
+
+def bump_soversion filename
+  begin
+    version = File.read(filename).split '.'
+    bump_version version, 2
+    File.open filename, 'w' do |file|
+      file.puts version.join '.'
+    end
+    return 0
+  rescue
+    nil
+  end
+end
+
+def bump_version version, index
+  if index > 0 && version[index].to_i == 255
+    version[index] = 0
+    bump_version version, index - 1
+  else
+    version[index] = version[index].to_i + 1
+  end
 end
 
 def setup_digital_keys

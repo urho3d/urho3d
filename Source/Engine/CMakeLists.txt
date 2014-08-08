@@ -96,14 +96,14 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
-if (APPLE)
-    # Apple linker only accepts 32-bit x.y.z version number in this format 0xffff.0xff.0xff so it does not accept our version number because our patch number is quite high
-    # Workaround by masking the high order byte
-    math (EXPR VERSION_PATCH "${CPACK_PACKAGE_VERSION_PATCH} & 255")
+file (READ .soversion SOVERSION)
+string (STRIP ${SOVERSION} SOVERSION)
+string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${SOVERSION})
+if (MATCHED)
+    set_target_properties (${TARGET_NAME} PROPERTIES VERSION ${MATCHED} SOVERSION ${CMAKE_MATCH_1})
 else ()
-    set (VERSION_PATCH ${CPACK_PACKAGE_VERSION_PATCH})
+    message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
 endif ()
-set_target_properties (${TARGET_NAME} PROPERTIES VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${VERSION_PATCH} SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${VERSION_PATCH})
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
