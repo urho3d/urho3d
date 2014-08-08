@@ -255,9 +255,9 @@ def makefile_travis_ci
   else
     platform_prefix = ''
   end
-  # Temporary workaround due to Travis-CI insufficient memory when building AssetImporter concurrently with other samples in 64-bit/MinGW/STATIC build configuration
+  # Temporary workaround due to Travis-CI insufficient memory in 64-bit/MinGW/STATIC build configuration, build 22_LuaIntegration separately
   if ENV['CI'] and ENV['WINDOWS'] and ENV['URHO3D_64BIT'] and ENV['URHO3D_LIB_TYPE'] == 'STATIC'
-    system "cd #{platform_prefix}Build/Tools/AssetImporter && make -j$NUMJOBS" or abort 'Failed to build or test Urho3D library'
+    system "cd #{platform_prefix}Build/Samples/22_LuaIntegration && make -j$NUMJOBS" or abort 'Failed to build or test Urho3D library'
   end
   # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
   if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
