@@ -30,28 +30,28 @@ void PS()
 
 #ifdef SIGNED_DISTANCE_FIELD
     float distance = texture2D(sDiffMap, vTexCoord).a;
-    if (distance < 0.5f)
+    if (distance < 0.5)
     {
     #ifdef TEXT_EFFECT_SHADOW
-        if (texture2D(sDiffMap, vTexCoord - cShadowOffset).a > 0.5f)
+        if (texture2D(sDiffMap, vTexCoord - cShadowOffset).a > 0.5)
             gl_FragColor = cShadowColor;
         else
     #endif
-        gl_FragColor.a = 0.0f;
+        gl_FragColor.a = 0.0;
     }
     else
     {
     #ifdef TEXT_EFFECT_STROKE
-        if (distance < 0.525f)
+        if (distance < 0.525)
             gl_FragColor.rgb = cStrokeColor.rgb;
     #endif
 
     #ifdef TEXT_EFFECT_SHADOW
-        if (texture2D(sDiffMap, vTexCoord + cShadowOffset).a < 0.5f)
+        if (texture2D(sDiffMap, vTexCoord + cShadowOffset).a < 0.5)
             gl_FragColor.a = vColor.a;
         else
     #endif
-        gl_FragColor.a = vColor.a * smoothstep(0.5f, 0.505f, distance);
+        gl_FragColor.a = vColor.a * smoothstep(0.5, 0.505, distance);
     }
 #else
     gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).a;
