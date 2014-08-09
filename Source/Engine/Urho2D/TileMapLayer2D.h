@@ -73,22 +73,14 @@ public:
     /// Return tile node (for tile layer only).
     Node* GetTileNode(int x, int y) const;
     /// Return tile (for tile layer only).
-    const TmxTile* GetTile(int x, int y) const;
-    /// Return tile has property.
-    bool HasTileProperty(int x, int y, const String& name) const;
-    /// Return tile property.
-    const String& GetTileProperty(int x, int y, const String& name) const;
+    const Tile2D* GetTile(int x, int y) const;
     
     /// Return tile node (for object group only).
     Node* GetObjectNode(unsigned index) const;
     /// Return number of tile nodes (for object group only).
     unsigned GetNumObjects() const;
     /// Return object (for object group only).
-    const TmxObject2D* GetObject(unsigned index) const;
-    /// Return object has property.
-    bool HasObjectProperty(unsigned index, const String& name) const;
-    /// Return object property.
-    const String& GetObjectProperty(unsigned index, const String& name) const;
+    const TileObject2D* GetObject(unsigned index) const;
 
     /// Return image node (for image layer only).
     Node* GetImageNode() const;

@@ -76,7 +76,7 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     {
         const TmxLayer2D* tmxLayer = tmxFile_->GetLayer(i);
 
-        SharedPtr<Node> layerNode(GetNode()->CreateChild(tmxLayer->name_, LOCAL));
+        SharedPtr<Node> layerNode(GetNode()->CreateChild(tmxLayer->GetName(), LOCAL));
         layerNode->SetTemporary(true);
 
         SharedPtr<TileMapLayer2D> layer(layerNode->CreateComponent<TileMapLayer2D>());

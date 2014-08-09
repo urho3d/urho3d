@@ -35,16 +35,106 @@ class TmxFile2D;
 class XMLElement;
 class XMLFile;
 
-/// Tmx peroperies.
-struct URHO3D_API TmxProperties2D
+/// Peroperies.
+class URHO3D_API Properties2D
 {
+public:
+    Properties2D();
+    virtual ~Properties2D();
+
+    /// Load from XML element.
+    void Load(const XMLElement& element);
     /// Return has property (use for script).
     bool HasProperty(const String& name) const;
     /// Return property value (use for script).
     const String& GetProperty(const String& name) const;
 
+protected:
     /// Properties.
     HashMap<String, String> properties_;
+};
+
+/// Tile.
+class URHO3D_API Tile2D : public RefCounted
+{
+public:
+    /// Construct.
+    Tile2D();
+
+    /// Return gid.
+    int GetGid() const { return gid_; }
+    /// Return sprite.
+    Sprite2D* GetSprite() const;
+    /// Return has property.
+    bool HasProperty(const String& name) const;
+    /// Return property.
+    const String& GetProperty(const String& name) const;
+
+private:
+    friend class TmxTileLayer2D;
+    /// Gid.
+    int gid_;
+    /// Sprite.
+    SharedPtr<Sprite2D> sprite_;
+    /// Properties.
+    const Properties2D* properties_;
+};
+
+/// Tile object type.
+enum TileObjectType2D
+{
+    /// Rectangle.
+    OT_RECTANGLE = 0,
+    /// Ellipse.
+    OT_ELLIPSE,
+    /// Polygon.
+    OT_POLYGON,
+    /// Polyline.
+    OT_POLYLINE,
+    /// Tile.
+    OT_TILE,
+};
+
+/// Tile map object.
+class URHO3D_API TileObject2D : public RefCounted
+{
+public:
+    TileObject2D();;
+    /// Return type.
+    TileObjectType2D GetType() const { return type_; }
+    /// Return position.
+    const Vector2& GetPosition() const { return position_; }
+    /// Return size (for rectangle and ellipse).
+    const Vector2& GetSize() const { return size_; }
+    /// Return number of points (use for script).
+    unsigned GetNumPoints() const;
+    /// Return point at index (use for script).
+    const Vector2& GetPoint(unsigned index) const;
+    /// Return tile Gid.
+    int GetTileGid() const { return gid_; }
+    /// Return tile sprite.
+    Sprite2D* GetTileSprite() const;
+    /// Return has property.
+    bool HasProperty(const String& name) const;
+    /// Return property value.
+    const String& GetProperty(const String& name) const;
+
+private:
+    friend class TmxObjectGroup2D;
+    /// Object type.
+    TileObjectType2D type_;
+    /// Position.
+    Vector2 position_;
+    /// Size (for rectangle and ellipse).
+    Vector2 size_;
+    /// Points(for polygon and polyline).
+    Vector<Vector2> points_;
+    /// Gid (for tile).
+    int gid_;
+    /// Sprite (for tile).
+    SharedPtr<Sprite2D> sprite_;
+    /// Properties.
+    Properties2D  properties_;
 };
 
 /// Tmx layer type.
@@ -61,10 +151,35 @@ enum TmxLayerType2D
 };
 
 /// Tmx layer.
-struct URHO3D_API TmxLayer2D : TmxProperties2D
+class TmxLayer2D : public RefCounted
 {
+public:
     TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type);
     virtual ~TmxLayer2D();
+
+    /// Return tmx file.
+    TmxFile2D* GetTmxFile() const;
+    /// Return type.
+    TmxLayerType2D GetType() const { return type_; }
+    /// Return name.
+    const String& GetName() const { return name_; }
+    /// Return width.
+    int GetWidth() const { return width_; }
+    /// Return height.
+    int GetHeight() const { return height_; }
+    /// Return is visible.
+    bool IsVisible() const { return visible_; }
+    /// Return has property (use for script).
+    bool HasProperty(const String& name) const;
+    /// Return property value (use for script).
+    const String& GetProperty(const String& name) const;
+
+
+protected:
+    /// Load layer info.
+    void LoadInfo(const XMLElement& element);
+    /// Load properties.
+    void LoadProperties(const XMLElement& element);
 
     /// Tmx file.
     WeakPtr<TmxFile2D> tmxFile_;
@@ -78,87 +193,55 @@ struct URHO3D_API TmxLayer2D : TmxProperties2D
     int height_;
     /// Visible.
     bool visible_;
-};
-
-/// Tmx tile.
-struct URHO3D_API TmxTile
-{
-    TmxTile();
-
-    /// Return has property.
-    bool HasProperty(const String& name) const;
-    /// Return property.
-    const String& GetProperty(const String& name) const;
-
-    /// Gid.
-    int gid_;
-    /// Sprite.
-    SharedPtr<Sprite2D> sprite_;
     /// Properties.
-    const TmxProperties2D* properties_;
+    Properties2D properties_;
 };
 
 /// Tmx tile layer.
-struct URHO3D_API TmxTileLayer2D : TmxLayer2D
+class TmxTileLayer2D : public TmxLayer2D
 {
+public:
     TmxTileLayer2D(TmxFile2D* tmxFile);
 
+    /// Load from xml element.
+    bool Load(const XMLElement& element);
+    /// Return tile.
+    Tile2D* GetTile(int x, int y) const;
+protected:
     /// Tile.
-    Vector<TmxTile> tileGids_;
-};
-
-/// Object type.
-enum TmxObjectType
-{
-    /// Rectangle.
-    OT_RECTANGLE = 0,
-    /// Ellipse.
-    OT_ELLIPSE,
-    /// Polygon.
-    OT_POLYGON,
-    /// Polyline.
-    OT_POLYLINE,
-    /// Tile.
-    OT_TILE,
-};
-
-/// Tmx object.
-struct URHO3D_API TmxObject2D : TmxProperties2D
-{
-    /// Return number of points (use for script).
-    unsigned GetNumPoints() const;
-    /// Return point at index (use for script).
-    const Vector2& GetPoint(unsigned index) const;
-    
-    /// Object type.
-    TmxObjectType type_;
-    /// Position.
-    float x_, y_;
-    /// Size (for rectangle and ellipse).
-    float width_, height_;
-    /// Points(for polygon and polyline).
-    Vector<Vector2> points_;
-
-    /// Gid (for tile).
-    int gid_;
-    /// Sprite (for tile).
-    SharedPtr<Sprite2D> sprite_;
+    Vector<SharedPtr<Tile2D> > tileGids_;
 };
 
 /// Tmx image layer.
-struct URHO3D_API TmxObjectGroup2D : TmxLayer2D
+class TmxObjectGroup2D : public TmxLayer2D
 {
+public:
     TmxObjectGroup2D(TmxFile2D* tmxFile);
 
+    /// Load from XML element.
+    bool Load(const XMLElement& element);
+    /// Return number of objects.
+    unsigned GetNumObjects() const { return objects_.Size(); }
+    /// Return object at index.
+    TileObject2D* GetObject(unsigned index) const;
+
+private:
     /// Objects.
-    Vector<TmxObject2D> objects_;
+    Vector<SharedPtr<TileObject2D> > objects_;
 };
 
 /// Tmx image layer.
-struct URHO3D_API TmxImageLayer2D : TmxLayer2D
+class TmxImageLayer2D : public TmxLayer2D
 {
+public:
     TmxImageLayer2D(TmxFile2D* tmxFile);
 
+    /// Load from XML element.
+    bool Load(const XMLElement& element);
+    /// Return sprite.
+    Sprite2D* GetSprite() const;
+    
+private:
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
 };
@@ -189,6 +272,10 @@ public:
     float GetTileWidth() const { return tileWidth_; }
     /// Return tile height.
     float GetTileHeight() const { return tileHeight_; }
+    /// Return tile sprite by gid.
+    Sprite2D* GetTileSprite(int gid) const;
+    /// Return tile properties by gid.
+    const Properties2D* GetTileProperties(int gid) const;
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return layer at index.
@@ -201,18 +288,10 @@ private:
     bool LoadTileSet(const XMLElement& element);
     /// Load layer.
     bool LoadLayer(const XMLElement& element);
-    /// Return tile sprite by gid.
-    Sprite2D* GetTileSprite(int gid) const;
-    /// Return tile properties by gid.
-    const TmxProperties2D* GetTileProperties(int gid) const;
     /// Load object group.
     bool LoadObjectGroup(const XMLElement& element);
     /// Load image layer.
     bool LoadImageLayer(const XMLElement& element);
-    /// Load layer info.
-    void LoadLayerInfo(const XMLElement& element, TmxLayer2D* layer);
-    /// Load properties.
-    void LoadProperties(const XMLElement& element, TmxProperties2D& peoperties);
 
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
@@ -229,7 +308,7 @@ private:
     /// Gid to tile sprite mapping.
     HashMap<int, SharedPtr<Sprite2D> > tileSprites_;
     /// Gid to tile properties mapping.
-    HashMap<int, TmxProperties2D> tileProperties_;
+    HashMap<int, Properties2D> tileProperties_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
 };
