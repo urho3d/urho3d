@@ -127,6 +127,8 @@ public:
     bool IsObject() const;
     /// Return child names (only object and array child name).
     Vector<String> GetChildNames() const;
+	/// Return member value names.
+	Vector<String> GetValueNames() const;
     /// Return int.
     int GetInt(const String& name) const;
     /// Return bool.

@@ -292,6 +292,21 @@ Vector<String> JSONValue::GetChildNames() const
     return ret;
 }
 
+Vector<String> JSONValue::GetValueNames() const
+{
+	Vector<String> ret;
+	if (!IsObject())
+		return ret;
+
+	for (Value::ConstMemberIterator i = value_->MemberBegin(); i != value_->MemberEnd(); ++i)
+	{
+		if (i->value.GetType() != kArrayType && i->value.GetType() != kObjectType)
+			ret.Push(i->name.GetString());
+	}
+
+	return ret;
+}
+
 int JSONValue::GetInt(const String& name) const
 {
     return GetMember(name).GetInt();
