@@ -491,7 +491,7 @@ void Text::UpdateText()
                         if (glyph)
                         {
                             rowWidth += glyph->advanceX_;
-                            if (i < text_.Length() - 1)
+                            if (i < unicodeText_.Size() - 1)
                                 rowWidth += face->GetKerning(c, unicodeText_[i + 1]);
                         }
                         if (rowWidth <= maxWidth)
