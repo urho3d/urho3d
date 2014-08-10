@@ -50,11 +50,11 @@ public:
     const String& GetProperty(const String& name) const;
 
 protected:
-    /// Properties.
+    /// Property name to value mapping.
     HashMap<String, String> properties_;
 };
 
-/// Tile.
+/// Tile define.
 class URHO3D_API Tile2D : public RefCounted
 {
 public:
@@ -101,7 +101,8 @@ enum TileObjectType2D
 class URHO3D_API TileObject2D : public RefCounted
 {
 public:
-    TileObject2D();;
+    TileObject2D();
+
     /// Return type.
     TileObjectType2D GetType() const { return type_; }
     /// Return position.
@@ -205,13 +206,14 @@ class TmxTileLayer2D : public TmxLayer2D
 public:
     TmxTileLayer2D(TmxFile2D* tmxFile);
 
-    /// Load from xml element.
+    /// Load from XML element.
     bool Load(const XMLElement& element);
     /// Return tile.
     Tile2D* GetTile(int x, int y) const;
+
 protected:
     /// Tile.
-    Vector<SharedPtr<Tile2D> > tileGids_;
+    Vector<SharedPtr<Tile2D> > tiles_;
 };
 
 /// Tmx image layer.
@@ -240,10 +242,14 @@ public:
 
     /// Load from XML element.
     bool Load(const XMLElement& element);
+    /// Return source.
+    const String& GetSource() const { return source_; }
     /// Return sprite.
     Sprite2D* GetSprite() const;
     
 private:
+    /// Source.
+    String source_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
 };
@@ -266,35 +272,27 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return width.
+    /// Return width in tiles.
     int GetWidth() const { return width_; }
-    /// Return height.
+    /// Return height in tiles.
     int GetHeight() const { return height_; }
     /// Return tile width.
     float GetTileWidth() const { return tileWidth_; }
     /// Return tile height.
     float GetTileHeight() const { return tileHeight_; }
-    /// Return tile sprite by gid.
+    /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
-    /// Return tile properties by gid.
+    /// Return tile properties by gid, if not exist return 0.
     Properties2D* GetTileProperties(int gid) const;
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return layer at index.
     const TmxLayer2D* GetLayer(unsigned index) const;
-    /// Return layer by name.
-    const TmxLayer2D* GetLayerByName(const String& name) const;
 
 private:
    /// Load tile set.
     bool LoadTileSet(const XMLElement& element);
-    /// Load layer.
-    bool LoadLayer(const XMLElement& element);
-    /// Load object group.
-    bool LoadObjectGroup(const XMLElement& element);
-    /// Load image layer.
-    bool LoadImageLayer(const XMLElement& element);
-
+    
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// Width.

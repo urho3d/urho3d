@@ -198,7 +198,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element)
     }
 
     XMLElement tileElem = dataElem.GetChild("tile");
-    tileGids_.Resize(width_ * height_);
+    tiles_.Resize(width_ * height_);
 
     // Flip y
     for (int y = height_ - 1; y >= 0; --y)
@@ -215,7 +215,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element)
                 tile->gid_ = gid;
                 tile->sprite_ = tmxFile_->GetTileSprite(gid);
                 tile->properties_ = tmxFile_->GetTileProperties(gid);
-                tileGids_[y * width_ + x] = tile;
+                tiles_[y * width_ + x] = tile;
             }
 
             tileElem = tileElem.GetNext("tile");
@@ -233,7 +233,7 @@ Tile2D* TmxTileLayer2D::GetTile(int x, int y) const
     if (x < 0 || x > width_ || y < 0 || y > height_)
         return 0;
 
-    return tileGids_[y * width_ + x];
+    return tiles_[y * width_ + x];
 }
 
 
@@ -331,7 +331,8 @@ bool TmxImageLayer2D::Load(const XMLElement& element)
     if (!imageElem)
         return false;
 
-    String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+    source_ = imageElem.GetAttribute("source");
+    String textureFilePath = GetParentPath(GetName()) + source_;
     ResourceCache* cache = tmxFile_->GetSubsystem<ResourceCache>();
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
@@ -450,11 +451,27 @@ bool TmxFile2D::EndLoad()
         if (name == "tileset")
             ret = LoadTileSet(childElement);
         else if (name == "layer")
-            ret = LoadLayer(childElement);
+        {
+            TmxTileLayer2D* tileLayer = new TmxTileLayer2D(this);
+            ret = tileLayer->Load(childElement);
+            
+            layers_.Push(tileLayer);
+        }
         else if (name == "objectgroup")
-            ret = LoadObjectGroup(childElement);
+        {
+            TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
+            ret = objectGroup->Load(childElement);
+            
+            layers_.Push(objectGroup);
+
+        }
         else if (name == "imagelayer")
-            ret = LoadImageLayer(childElement);
+        {
+            TmxImageLayer2D* imageLayer = new TmxImageLayer2D(this);
+            ret = imageLayer->Load(childElement);
+
+            layers_.Push(imageLayer);
+        }
 
         if (!ret)
         {
@@ -490,17 +507,6 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
         return 0;
 
     return layers_[index];
-}
-
-const TmxLayer2D* TmxFile2D::GetLayerByName(const String& name) const
-{
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-    {
-        if (name == layers_[i]->GetName())
-            return layers_[i];
-    }
-
-    return 0;
 }
 
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
@@ -553,28 +559,4 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     return true;
 }
 
-
-bool TmxFile2D::LoadLayer(const XMLElement& element)
-{
-    TmxTileLayer2D* tileLayer = new TmxTileLayer2D(this);
-    layers_.Push(tileLayer);
-
-    return tileLayer->Load(element);
-}
-
-bool TmxFile2D::LoadObjectGroup(const XMLElement& element)
-{
-    TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
-    layers_.Push(objectGroup);
-
-    return objectGroup->Load(element);
-}
-
-bool TmxFile2D::LoadImageLayer(const XMLElement& element)
-{
-    TmxImageLayer2D* imageLayer = new TmxImageLayer2D(this);
-    layers_.Push(imageLayer);
-
-    return imageLayer->Load(element);
-}
 }
