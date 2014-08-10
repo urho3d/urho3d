@@ -511,9 +511,9 @@ adhere to the current limitations:
   android-Bin and android-Lib, respectively.
   If you choose not to adhere with this build directory naming convention then
   you will have to install the Urho3D library into your local filesystem in
-  order to use the Urho3D library in your external project
-  (See http://urho3d.github.io/documentation/_building.html#Building_Library and
-  http://urho3d.github.io/documentation/_using_library.html#UsingLibraryFromSDK).
+  order to use the Urho3D library in your external project.
+  See http://urho3d.github.io/documentation/_building.html#Building_Library and
+  http://urho3d.github.io/documentation/_using_library.html#UsingLibraryFromSDK.
 - All the post-CMake workaround and/or bug fixes that are scripted in the batch
   files or shell scripts are not applied to the generated project file.
 
