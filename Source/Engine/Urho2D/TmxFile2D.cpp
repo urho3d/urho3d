@@ -68,8 +68,7 @@ const String& Properties2D::GetProperty(const String& name) const
 }
 
 Tile2D::Tile2D() : 
-    gid_(0), 
-    properties_(0)
+    gid_(0) 
 {
 }
 
@@ -93,10 +92,8 @@ const String& Tile2D::GetProperty(const String& name) const
     return properties_->GetProperty(name);
 }
 
-
 TileObject2D::TileObject2D()
 {
-
 }
 
 unsigned TileObject2D::GetNumPoints() const
@@ -119,12 +116,16 @@ Sprite2D* TileObject2D::GetTileSprite() const
 
 bool TileObject2D::HasProperty(const String& name) const
 {
-    return properties_.HasProperty(name);
+    if (!properties_)
+        return false;
+    return properties_->HasProperty(name);
 }
 
 const String& TileObject2D::GetProperty(const String& name) const
 {
-    return properties_.GetProperty(name);
+    if (!properties_)
+        return String::EMPTY;
+    return properties_->GetProperty(name);
 }
 
 TmxLayer2D::TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type) :
@@ -145,12 +146,16 @@ TmxFile2D* TmxLayer2D::GetTmxFile() const
 
 bool TmxLayer2D::HasProperty(const String& name) const
 {
-    return properties_.HasProperty(name);
+    if (!properties_)
+        return false;
+    return properties_->HasProperty(name);
 }
 
 const String& TmxLayer2D::GetProperty(const String& name) const
 {
-    return properties_.GetProperty(name);
+    if (!properties_)
+        return String::EMPTY;
+    return properties_->GetProperty(name);
 }
 
 void TmxLayer2D::LoadInfo(const XMLElement& element)
@@ -166,7 +171,8 @@ void TmxLayer2D::LoadInfo(const XMLElement& element)
 
 void TmxLayer2D::LoadProperties(const XMLElement& element)
 {
-    properties_.Load(element);
+    properties_ = new Properties2D();
+    properties_->Load(element);
 }
 
 TmxTileLayer2D::TmxTileLayer2D(TmxFile2D* tmxFile) :
@@ -289,7 +295,10 @@ bool TmxObjectGroup2D::Load(const XMLElement& element)
         }
 
         if (objectElem.HasChild("properties"))
-            object->properties_.Load(objectElem.GetChild("properties"));
+        {
+            object->properties_ = new Properties2D();
+            object->properties_->Load(objectElem.GetChild("properties"));
+        }
 
         objects_.Push(object);
     }
@@ -467,12 +476,12 @@ Sprite2D* TmxFile2D::GetTileSprite(int gid) const
     return i->second_;
 }
 
-const Properties2D* TmxFile2D::GetTileProperties(int gid) const
+Properties2D* TmxFile2D::GetTileProperties(int gid) const
 {
-    HashMap<int, Properties2D>::ConstIterator i = tileProperties_.Find(gid);
+    HashMap<int, SharedPtr<Properties2D> >::ConstIterator i = tileProperties_.Find(gid);
     if (i == tileProperties_.End())
         return 0;
-    return &(i->second_);
+    return i->second_;
 }
 
 const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
@@ -535,8 +544,8 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     {
         if (tileElem.HasChild("properties"))
         {
-            Properties2D properties;
-            properties.Load(tileElem.GetChild("properties"));
+            SharedPtr<Properties2D> properties(new Properties2D());
+            properties->Load(tileElem.GetChild("properties"));
             tileProperties_[firstgid + tileElem.GetInt("id")] = properties;
         }
     }

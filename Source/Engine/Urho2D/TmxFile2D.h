@@ -36,7 +36,7 @@ class XMLElement;
 class XMLFile;
 
 /// Peroperies.
-class URHO3D_API Properties2D
+class URHO3D_API Properties2D : public RefCounted
 {
 public:
     Properties2D();
@@ -77,7 +77,7 @@ private:
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Properties.
-    const Properties2D* properties_;
+    SharedPtr<Properties2D> properties_;
 };
 
 /// Tile object type.
@@ -93,6 +93,8 @@ enum TileObjectType2D
     OT_POLYLINE,
     /// Tile.
     OT_TILE,
+    /// Invalid.
+    OT_INVALID = 0xffff
 };
 
 /// Tile map object.
@@ -134,7 +136,7 @@ private:
     /// Sprite (for tile).
     SharedPtr<Sprite2D> sprite_;
     /// Properties.
-    Properties2D  properties_;
+    SharedPtr<Properties2D> properties_;
 };
 
 /// Tmx layer type.
@@ -147,7 +149,7 @@ enum TmxLayerType2D
     /// Image layer.
     LT_IMAGE_LAYER,
     /// Invalid.
-    LT_INVALID,
+    LT_INVALID = 0xffff
 };
 
 /// Tmx layer.
@@ -194,7 +196,7 @@ protected:
     /// Visible.
     bool visible_;
     /// Properties.
-    Properties2D properties_;
+    SharedPtr<Properties2D> properties_;
 };
 
 /// Tmx tile layer.
@@ -275,7 +277,7 @@ public:
     /// Return tile sprite by gid.
     Sprite2D* GetTileSprite(int gid) const;
     /// Return tile properties by gid.
-    const Properties2D* GetTileProperties(int gid) const;
+    Properties2D* GetTileProperties(int gid) const;
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return layer at index.
@@ -308,7 +310,7 @@ private:
     /// Gid to tile sprite mapping.
     HashMap<int, SharedPtr<Sprite2D> > tileSprites_;
     /// Gid to tile properties mapping.
-    HashMap<int, Properties2D> tileProperties_;
+    HashMap<int, SharedPtr<Properties2D> > tileProperties_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
 };
