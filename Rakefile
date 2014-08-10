@@ -42,7 +42,7 @@ task :scaffolding do
   abs_path = Pathname.new(abs_path).realpath
   puts "\nNew project created in #{abs_path}\n\n"
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
-  puts "Please see http://urho3d.github.io/documentation/a00004.html for more detail. For example:\n\n"
+  puts "Please see http://urho3d.github.io/documentation/_using_library.html for more detail. For example:\n\n"
   puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
 end
 
