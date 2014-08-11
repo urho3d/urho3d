@@ -29,9 +29,9 @@ namespace Urho3D
 {
 
 class Node;
-class Sprite2D;
 class TmxImageLayer2D;
 class TmxLayer2D;
+class TmxObjectGroup2D;
 class TmxTileLayer2D;
 
 /// Tile map component.
