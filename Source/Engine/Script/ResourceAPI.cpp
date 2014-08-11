@@ -199,6 +199,12 @@ static void DestructJSONValue(JSONValue* ptr)
     ptr->~JSONValue();
 }
 
+static CScriptArray* JSONValueGetValueNames(JSONValue* ptr)
+{
+    Vector<String> names = ptr->GetValueNames();
+    return VectorToArray<String>(names, "Array<String>");
+}
+
 static CScriptArray* JSONValueGetChildNames(JSONValue* ptr)
 {
     Vector<String> names = ptr->GetChildNames();
@@ -243,6 +249,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "void SetVariant(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void SetVariantValue(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariantValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isObject() const", asMETHOD(JSONValue, IsObject), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "Array<String>@ GetValueNames() const", asFUNCTION(JSONValueGetValueNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "Array<String>@ GetChildNames() const", asFUNCTION(JSONValueGetChildNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "int GetInt(const String&in) const", asMETHODPR(JSONValue, GetInt, (const String&) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool GetBool(const String&in) const", asMETHODPR(JSONValue, GetBool, (const String&) const, bool), asCALL_THISCALL);
