@@ -1,5 +1,11 @@
 $#include "TileMapDefs2D.h"
 
+enum Orientation2D
+{
+    O_ORTHOGONAL,
+    O_ISOMETRIC
+};
+
 enum TileMapLayerType2D
 {
     LT_TILE_LAYER,

@@ -153,6 +153,8 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
+    /// Return orientation.
+    Orientation2D GetOrientation() const { return orientation_; }
     /// Return width in tiles.
     int GetWidth() const { return width_; }
     /// Return height in tiles.
@@ -180,6 +182,8 @@ private:
     SharedPtr<XMLFile> loadXMLFile_;
     /// TSX name to XML file mapping.
     HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
+    /// Orientation type.
+    Orientation2D orientation_;
     /// Width.
     int width_;
     /// Height.

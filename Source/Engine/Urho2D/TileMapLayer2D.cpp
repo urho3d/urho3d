@@ -225,8 +225,16 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
     nodes_.Resize(width * height);
 
     TmxFile2D* tmxFile = tileLayer->GetTmxFile();
-    float tileWidth = tmxFile->GetTileWidth();
-    float tileHeight = tmxFile->GetTileHeight();
+    Orientation2D orientation = tmxFile->GetOrientation();
+
+    float scaleX = tmxFile->GetTileWidth();
+    float scaleY = tmxFile->GetTileHeight();
+    
+    if (orientation == O_ISOMETRIC)
+    {
+        scaleX *= 0.5f;
+        scaleY *= 0.5f;
+    }
 
     for (int y = 0; y < height; ++y)
     {
@@ -238,7 +246,10 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 
             SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
             tileNode->SetTemporary(true);
-            tileNode->SetPosition(Vector3((x + 0.5f) * tileWidth, (y + 0.5f) * tileHeight, 0.0f));
+            if (orientation == O_ORTHOGONAL)
+                tileNode->SetPosition(Vector3((x + 0.5f) * scaleX, (y + 0.5f) * scaleY, 0.0f));
+            else if (orientation == O_ISOMETRIC)
+                tileNode->SetPosition(Vector3(((x + y) + 0.5f) * scaleX, (height - (x - y) + 0.5f) * scaleY, 0.0f));
 
             StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(tile->GetSprite());

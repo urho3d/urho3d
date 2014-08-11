@@ -42,7 +42,7 @@ function CreateScene()
     camera.orthoSize = graphics.height * PIXEL_SIZE
 
     -- Get tmx file
-    local tmxFile = cache:GetResource("TmxFile2D", "Urho2D/Desert.tmx")
+    local tmxFile = cache:GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx")
     if tmxFile == nil then
         return
     end

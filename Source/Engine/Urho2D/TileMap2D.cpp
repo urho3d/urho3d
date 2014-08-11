@@ -92,6 +92,11 @@ TmxFile2D* TileMap2D::GetTmxFile() const
     return tmxFile_;
 }
 
+Orientation2D TileMap2D::GetOrientation() const
+{
+    return tmxFile_ ? tmxFile_->GetOrientation() : O_ORTHOGONAL;
+}
+
 int TileMap2D::GetWidth() const
 {
     return tmxFile_ ? tmxFile_->GetWidth() : 0;

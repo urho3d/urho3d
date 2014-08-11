@@ -4,6 +4,7 @@ class TileMap2D : Component
 {
     void SetTmxFile(TmxFile2D* tmxFile);
     TmxFile2D* GetTmxFile() const;
+    Orientation2D GetOrientation() const;
     int GetWidth() const;
     int GetHeight() const;
     float GetTileWidth() const;
@@ -12,6 +13,7 @@ class TileMap2D : Component
     TileMapLayer2D* GetLayer(unsigned index) const;
 
     tolua_property__get_set TmxFile2D* tmxFile;
+    tolua_readonly tolua_property__get_set Orientation2D orientation;
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set float tileWidth;

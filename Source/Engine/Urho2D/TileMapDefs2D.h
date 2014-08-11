@@ -30,6 +30,15 @@ namespace Urho3D
 
 class XMLElement;
 
+/// Orientation.
+enum Orientation2D
+{
+    /// Orthogonal.
+    O_ORTHOGONAL = 0,
+    /// Isometric.
+    O_ISOMETRIC
+};
+
 /// Tile map layer type.
 enum TileMapLayerType2D
 {

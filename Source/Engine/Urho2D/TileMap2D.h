@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Component.h"
+#include "TileMapDefs2D.h"
 
 namespace Urho3D
 {
@@ -48,6 +49,8 @@ public:
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
+    /// Return orientation.
+    Orientation2D GetOrientation() const;
     /// Return width.
     int GetWidth() const;
     /// Return height.

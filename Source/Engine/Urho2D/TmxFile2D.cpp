@@ -349,9 +349,13 @@ bool TmxFile2D::EndLoad()
     }
 
     String orientation = rootElem.GetAttribute("orientation");
-    if (orientation != "orthogonal")
+    if (orientation == "orthogonal")
+        orientation_ = O_ORTHOGONAL;
+    else if (orientation == "isometric")
+        orientation_ = O_ISOMETRIC;
+    else
     {
-        LOGERROR("Unsupported orientation now");
+        LOGERROR("Invalid orientation type " + orientation);
         return false;
     }
 
