@@ -294,17 +294,17 @@ Vector<String> JSONValue::GetChildNames() const
 
 Vector<String> JSONValue::GetValueNames() const
 {
-	Vector<String> ret;
-	if (!IsObject())
-		return ret;
+    Vector<String> ret;
+    if (!IsObject())
+        return ret;
 
-	for (Value::ConstMemberIterator i = value_->MemberBegin(); i != value_->MemberEnd(); ++i)
-	{
-		if (i->value.GetType() != kArrayType && i->value.GetType() != kObjectType)
-			ret.Push(i->name.GetString());
-	}
+    for (Value::ConstMemberIterator i = value_->MemberBegin(); i != value_->MemberEnd(); ++i)
+    {
+        if (i->value.GetType() != kArrayType && i->value.GetType() != kObjectType)
+            ret.Push(i->name.GetString());
+    }
 
-	return ret;
+    return ret;
 }
 
 int JSONValue::GetInt(const String& name) const
