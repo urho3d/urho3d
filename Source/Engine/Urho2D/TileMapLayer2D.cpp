@@ -22,12 +22,12 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Node.h"
 #include "ResourceCache.h"
+#include "StaticSprite2D.h"
+#include "TileMapLayer2D.h"
 #include "TileMapLayer2D.h"
 #include "TmxFile2D.h"
-#include "TileMapLayer2D.h"
-#include "Node.h"
-#include "StaticSprite2D.h"
 
 #include "DebugNew.h"
 
@@ -129,11 +129,6 @@ void TileMapLayer2D::SetVisible(bool visible)
     }
 }
 
-const String& TileMapLayer2D::GetName() const
-{
-    return tmxLayer_ ? tmxLayer_->GetName() : String::EMPTY;
-}
-
 int TileMapLayer2D::GetWidth() const
 {
     return tmxLayer_ ? tmxLayer_->GetWidth(): 0;
@@ -159,7 +154,7 @@ const String& TileMapLayer2D::GetProperty(const String& name) const
     return tmxLayer_->GetProperty(name);
 }
 
-TmxLayerType2D TileMapLayer2D::GetLayerType() const
+TileMapLayerType2D TileMapLayer2D::GetLayerType() const
 {
     return tmxLayer_ ? tmxLayer_->GetType() : LT_INVALID;
 }
@@ -175,7 +170,7 @@ Node* TileMapLayer2D::GetTileNode(int x, int y) const
     return nodes_[y * tileLayer_->GetWidth() + x];
 }
 
-const Tile2D* TileMapLayer2D::GetTile(int x, int y) const
+Tile2D* TileMapLayer2D::GetTile(int x, int y) const
 {
     if (!tileLayer_)
         return 0;
@@ -183,10 +178,18 @@ const Tile2D* TileMapLayer2D::GetTile(int x, int y) const
     return tileLayer_->GetTile(x, y);
 }
 
+unsigned TileMapLayer2D::GetNumObjectNodes() const
+{
+    if (!objectGroup_)
+        return 0;
+
+    return nodes_.Size();
+}
+
 Node* TileMapLayer2D::GetObjectNode(unsigned index) const
 {
     if (!objectGroup_)
-        return false;
+        return 0;
 
     if (index >= nodes_.Size())
         return 0;
@@ -202,7 +205,7 @@ unsigned TileMapLayer2D::GetNumObjects() const
     return objectGroup_->GetNumObjects();
 }
 
-const TileObject2D* TileMapLayer2D::GetObject(unsigned index) const
+TileObject2D* TileMapLayer2D::GetObject(unsigned index) const
 {
     if (objectGroup_)
         return 0;
@@ -243,7 +246,7 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 
             SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
             tileNode->SetTemporary(true);
-            tileNode->SetPosition(Vector3(x * tileWidth, y * tileHeight, 0.0f));
+            tileNode->SetPosition(Vector3((x + 0.5f) * tileWidth, (y + 0.5f) * tileHeight, 0.0f));
 
             StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(tile->GetSprite());
@@ -260,30 +263,27 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
     objectGroup_ = objectGroup;
 
     TmxFile2D* tmxFile = objectGroup->GetTmxFile();
+    nodes_.Resize(objectGroup->GetNumObjects());
 
     for (unsigned i = 0; i < objectGroup->GetNumObjects(); ++i)
     {
         const TileObject2D* object = objectGroup->GetObject(i);
 
+        // Create dummy node for all object
         SharedPtr<Node> objectNode(GetNode()->CreateChild("Object"));
         objectNode->SetTemporary(true);
         objectNode->SetPosition(object->GetPosition());
 
-        // Set object data
-        objectNode->SetVar("ObjectData", (void*)&object);
-
-        if (object->GetType() == OT_TILE)
+        // If object is tile, create static sprite component
+        if (object->GetType() == OT_TILE && object->GetTileGid() && object->GetTileSprite())
         {
-            if (object->GetTileGid() && object->GetTileSprite())
-            {
-                StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
-                staticSprite->SetSprite(object->GetTileSprite());
-                staticSprite->SetLayer(drawOrder_);
-                staticSprite->SetOrderInLayer((int)((10.0f - object->GetPosition().y_) * 100.0f));
-            }
+            StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+            staticSprite->SetSprite(object->GetTileSprite());
+            staticSprite->SetLayer(drawOrder_);
+            staticSprite->SetOrderInLayer((int)((10.0f - object->GetPosition().y_) * 100));
         }
-        
-        nodes_.Push(objectNode);
+
+        nodes_[i] = objectNode;
     }
 }
 

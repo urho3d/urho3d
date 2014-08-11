@@ -23,12 +23,16 @@
 #pragma once
 
 #include "Component.h"
-#include "TmxFile2D.h"
+#include "TileMapDefs2D.h"
 
 namespace Urho3D
 {
 
 class Node;
+class Sprite2D;
+class TmxImageLayer2D;
+class TmxLayer2D;
+class TmxTileLayer2D;
 
 /// Tile map component.
 class URHO3D_API TileMapLayer2D : public Component
@@ -56,8 +60,6 @@ public:
     int GetDrawOrder() const { return drawOrder_; }
     /// Return visible.
     bool IsVisible() const { return visible_; }
-    /// Return name.
-    const String& GetName() const;
     /// Return width.
     int GetWidth() const;
     /// Return height.
@@ -66,22 +68,23 @@ public:
     bool HasProperty(const String& name) const;
     /// Return property.
     const String& GetProperty(const String& name) const;
-
     /// Return layer type.
-    TmxLayerType2D GetLayerType() const;
+    TileMapLayerType2D GetLayerType() const;
 
     /// Return tile node (for tile layer only).
     Node* GetTileNode(int x, int y) const;
     /// Return tile (for tile layer only).
-    const Tile2D* GetTile(int x, int y) const;
-    
-    /// Return tile node (for object group only).
+    Tile2D* GetTile(int x, int y) const;
+
+    /// Return number of object nodes (for object group only).
+    unsigned GetNumObjectNodes() const;
+    /// Return object node (for object group only).
     Node* GetObjectNode(unsigned index) const;
-    /// Return number of tile nodes (for object group only).
+    /// Return number of objects (for object group only).
     unsigned GetNumObjects() const;
     /// Return object (for object group only).
-    const TileObject2D* GetObject(unsigned index) const;
-
+    TileObject2D* GetObject(unsigned index) const;
+    
     /// Return image node (for image layer only).
     Node* GetImageNode() const;
 
@@ -105,7 +108,7 @@ private:
     int drawOrder_;
     /// Visible.
     bool visible_;
-    /// Tile or image nodes.
+    /// Tile node or image nodes.
     Vector<SharedPtr<Node> > nodes_;
 };
 

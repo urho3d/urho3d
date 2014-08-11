@@ -81,7 +81,7 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
 
         SharedPtr<TileMapLayer2D> layer(layerNode->CreateComponent<TileMapLayer2D>());
         layer->SetTmxLayer(tmxLayer);
-        layer->SetDrawOrder(i);
+        layer->SetDrawOrder(i * 10);
 
         layers_[i] = layer;
     }
@@ -119,15 +119,6 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
         return 0;
 
     return layers_[index];
-}
-
-TileMapLayer2D* TileMap2D::GetLayerByName(const String& name) const
-{
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        if (name == layers_[i]->GetName())
-            return layers_[i];
-
-    return 0;
 }
 
 void TileMap2D::SetTmxFileAttr(ResourceRef value)

@@ -23,8 +23,7 @@
 #pragma once
 
 #include "Resource.h"
-#include "Ptr.h"
-#include "Sprite2D.h"
+#include "TileMapDefs2D.h"
 
 namespace Urho3D
 {
@@ -35,135 +34,17 @@ class TmxFile2D;
 class XMLElement;
 class XMLFile;
 
-/// Peroperies.
-class URHO3D_API Properties2D : public RefCounted
-{
-public:
-    Properties2D();
-    virtual ~Properties2D();
-
-    /// Load from XML element.
-    void Load(const XMLElement& element);
-    /// Return has property (use for script).
-    bool HasProperty(const String& name) const;
-    /// Return property value (use for script).
-    const String& GetProperty(const String& name) const;
-
-protected:
-    /// Property name to value mapping.
-    HashMap<String, String> properties_;
-};
-
-/// Tile define.
-class URHO3D_API Tile2D : public RefCounted
-{
-public:
-    /// Construct.
-    Tile2D();
-
-    /// Return gid.
-    int GetGid() const { return gid_; }
-    /// Return sprite.
-    Sprite2D* GetSprite() const;
-    /// Return has property.
-    bool HasProperty(const String& name) const;
-    /// Return property.
-    const String& GetProperty(const String& name) const;
-
-private:
-    friend class TmxTileLayer2D;
-    /// Gid.
-    int gid_;
-    /// Sprite.
-    SharedPtr<Sprite2D> sprite_;
-    /// Properties.
-    SharedPtr<Properties2D> properties_;
-};
-
-/// Tile object type.
-enum TileObjectType2D
-{
-    /// Rectangle.
-    OT_RECTANGLE = 0,
-    /// Ellipse.
-    OT_ELLIPSE,
-    /// Polygon.
-    OT_POLYGON,
-    /// Polyline.
-    OT_POLYLINE,
-    /// Tile.
-    OT_TILE,
-    /// Invalid.
-    OT_INVALID = 0xffff
-};
-
-/// Tile map object.
-class URHO3D_API TileObject2D : public RefCounted
-{
-public:
-    TileObject2D();
-
-    /// Return type.
-    TileObjectType2D GetType() const { return type_; }
-    /// Return position.
-    const Vector2& GetPosition() const { return position_; }
-    /// Return size (for rectangle and ellipse).
-    const Vector2& GetSize() const { return size_; }
-    /// Return number of points (use for script).
-    unsigned GetNumPoints() const;
-    /// Return point at index (use for script).
-    const Vector2& GetPoint(unsigned index) const;
-    /// Return tile Gid.
-    int GetTileGid() const { return gid_; }
-    /// Return tile sprite.
-    Sprite2D* GetTileSprite() const;
-    /// Return has property.
-    bool HasProperty(const String& name) const;
-    /// Return property value.
-    const String& GetProperty(const String& name) const;
-
-private:
-    friend class TmxObjectGroup2D;
-    /// Object type.
-    TileObjectType2D type_;
-    /// Position.
-    Vector2 position_;
-    /// Size (for rectangle and ellipse).
-    Vector2 size_;
-    /// Points(for polygon and polyline).
-    Vector<Vector2> points_;
-    /// Gid (for tile).
-    int gid_;
-    /// Sprite (for tile).
-    SharedPtr<Sprite2D> sprite_;
-    /// Properties.
-    SharedPtr<Properties2D> properties_;
-};
-
-/// Tmx layer type.
-enum TmxLayerType2D
-{
-    /// Tile layer.
-    LT_TILE_LAYER = 0,
-    /// Object group.
-    LT_OBJECT_GROUP,
-    /// Image layer.
-    LT_IMAGE_LAYER,
-    /// Invalid.
-    LT_INVALID = 0xffff
-};
-
 /// Tmx layer.
 class TmxLayer2D : public RefCounted
 {
 public:
-    TmxLayer2D(TmxFile2D* tmxFile, TmxLayerType2D type);
+    TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
     virtual ~TmxLayer2D();
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
     /// Return type.
-    TmxLayerType2D GetType() const { return type_; }
+    TileMapLayerType2D GetType() const { return type_; }
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return width.
@@ -181,13 +62,13 @@ public:
 protected:
     /// Load layer info.
     void LoadInfo(const XMLElement& element);
-    /// Load properties.
-    void LoadProperties(const XMLElement& element);
+    /// Load property set.
+    void LoadPropertySet(const XMLElement& element);
 
     /// Tmx file.
     WeakPtr<TmxFile2D> tmxFile_;
     /// Layer type.
-    TmxLayerType2D type_;
+    TileMapLayerType2D type_;
     /// Name.
     String name_;
     /// Width.
@@ -196,8 +77,8 @@ protected:
     int height_;
     /// Visible.
     bool visible_;
-    /// Properties.
-    SharedPtr<Properties2D> properties_;
+    /// Property set.
+    SharedPtr<PropertySet2D> propertySet_;
 };
 
 /// Tmx tile layer.
@@ -282,8 +163,8 @@ public:
     float GetTileHeight() const { return tileHeight_; }
     /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
-    /// Return tile properties by gid, if not exist return 0.
-    Properties2D* GetTileProperties(int gid) const;
+    /// Return tile property set by gid, if not exist return 0.
+    PropertySet2D* GetTilePropertySet(int gid) const;
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return layer at index.
@@ -306,9 +187,9 @@ private:
     /// Tile set textures.
     Vector<SharedPtr<Texture2D> > tileSetTextures_;
     /// Gid to tile sprite mapping.
-    HashMap<int, SharedPtr<Sprite2D> > tileSprites_;
-    /// Gid to tile properties mapping.
-    HashMap<int, SharedPtr<Properties2D> > tileProperties_;
+    HashMap<int, SharedPtr<Sprite2D> > gidToSpriteMapping_;
+    /// Gid to tile property set mapping.
+    HashMap<int, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
 };
