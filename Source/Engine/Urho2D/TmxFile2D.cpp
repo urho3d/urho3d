@@ -145,14 +145,10 @@ Tile2D* TmxTileLayer2D::GetTile(int x, int y) const
     return tiles_[y * width_ + x];
 }
 
-
-
-
 TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) :
     TmxLayer2D(tmxFile, LT_OBJECT_GROUP)
 {
 }
-
 
 bool TmxObjectGroup2D::Load(const XMLElement& element)
 {
@@ -309,8 +305,24 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
     {
         for (XMLElement tileSetElem = rootElem.GetChild("tileset"); tileSetElem; tileSetElem = tileSetElem.GetNext("tileset"))
         {
-            String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+            // Tile set defined in TSX file
+            if (tileSetElem.HasAttribute("source"))
+            {
+                String source = tileSetElem.GetAttribute("source");
+                SharedPtr<XMLFile> tsxXMLFile = LoadTSXFile(source);
+                if (!tsxXMLFile)
+                    return false;
+
+                tsxXMLFiles_[source] = tsxXMLFile;
+                
+                String textureFilePath = GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+            }
+            else
+            {
+                String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+            }
         }
 
         for (XMLElement imageLayerElem = rootElem.GetChild("imagelayer"); imageLayerElem; imageLayerElem = imageLayerElem.GetNext("imagelayer"))
@@ -384,11 +396,13 @@ bool TmxFile2D::EndLoad()
         if (!ret)
         {
             loadXMLFile_.Reset();
+            tsxXMLFiles_.Clear();
             return false;
         }
     }
    
     loadXMLFile_.Reset();
+    tsxXMLFiles_.Clear();
     return true;
 }
 
@@ -417,9 +431,48 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
+
+SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
+{
+    String tsxFilePath = GetParentPath(GetName()) + source;
+    SharedPtr<File> tsxFile = GetSubsystem<ResourceCache>()->GetFile(tsxFilePath);
+    SharedPtr<XMLFile> tsxXMLFile(new XMLFile(context_));
+    if (!tsxFile || !tsxXMLFile->Load(*tsxFile))
+    {
+        LOGERROR("Load TSX file failed " + tsxFilePath);
+        return SharedPtr<XMLFile>();
+    }
+
+    return tsxXMLFile;
+}
+
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
 {
-    XMLElement imageElem = element.GetChild("image");
+    int firstgid = element.GetInt("firstgid"); 
+    
+    XMLElement tileSetElem;
+    if (element.HasAttribute("source"))
+    {
+        String source = element.GetAttribute("source");
+        HashMap<String, SharedPtr<XMLFile> >::Iterator i = tsxXMLFiles_.Find(source);
+        if (i == tsxXMLFiles_.End())
+        {
+            SharedPtr<XMLFile> tsxXMLFile = LoadTSXFile(source);
+            if (!tsxXMLFile)
+                return false;
+
+            // Add to napping to avoid release
+            tsxXMLFiles_[source] = tsxXMLFile;
+
+            tileSetElem = tsxXMLFile->GetRoot("tileset");
+        }
+        else
+            tileSetElem = i->second_->GetRoot("tileset");
+    }
+    else
+        tileSetElem = element;
+    
+    XMLElement imageElem = tileSetElem.GetChild("image");
     String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
@@ -431,11 +484,10 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
 
     tileSetTextures_.Push(texture);
 
-    int firstgid = element.GetInt("firstgid"); 
-    int tileWidth = element.GetInt("tilewidth");
-    int tileHeight = element.GetInt("tileheight");
-    int spacing = element.GetInt("spacing");
-    int margin = element.GetInt("margin");
+    int tileWidth = tileSetElem.GetInt("tilewidth");
+    int tileHeight = tileSetElem.GetInt("tileheight");
+    int spacing = tileSetElem.GetInt("spacing");
+    int margin = tileSetElem.GetInt("margin");
     int imageWidth = imageElem.GetInt("width");
     int imageHeight = imageElem.GetInt("height");
 
@@ -452,7 +504,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         }
     }
 
-    for (XMLElement tileElem = element.GetChild("tile"); tileElem; tileElem = tileElem.GetNext("tile"))
+    for (XMLElement tileElem = tileSetElem.GetChild("tile"); tileElem; tileElem = tileElem.GetNext("tile"))
     {
         if (tileElem.HasChild("properties"))
         {

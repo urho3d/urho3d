@@ -171,11 +171,15 @@ public:
     const TmxLayer2D* GetLayer(unsigned index) const;
 
 private:
-   /// Load tile set.
+    /// Load TSX file.
+    SharedPtr<XMLFile> LoadTSXFile(const String& source);
+    /// Load tile set.
     bool LoadTileSet(const XMLElement& element);
     
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
+    /// TSX name to XML file mapping.
+    HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
     /// Width.
     int width_;
     /// Height.
