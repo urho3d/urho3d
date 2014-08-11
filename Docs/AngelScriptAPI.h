@@ -4577,6 +4577,7 @@ ResourceRefList GetResourceRefList(const String&) const;
 ResourceRefList GetResourceRefList(uint) const;
 String GetString(const String&) const;
 String GetString(uint) const;
+Array<String> GetValueNames() const;
 Variant GetVariant(const String&) const;
 Variant GetVariant(uint) const;
 Variant GetVariantValue(const String&, VariantType) const;

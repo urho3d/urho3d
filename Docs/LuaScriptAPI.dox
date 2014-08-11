@@ -2271,6 +2271,7 @@ Methods:
 - void SetVariantValue(const String name, const Variant& value)
 - bool IsObject() const
 - Vector<String> GetChildNames() const
+- Vector<String> GetValueNames() const
 - int GetInt(const String name) const
 - bool GetBool(const String name) const
 - float GetFloat(const String name) const
