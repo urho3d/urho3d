@@ -4,7 +4,6 @@
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling keyboard to move and zoom 2D camera
 
-
 require "LuaScripts/Utilities/Sample"
 
 function Start()

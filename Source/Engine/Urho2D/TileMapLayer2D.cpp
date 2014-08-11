@@ -129,16 +129,6 @@ void TileMapLayer2D::SetVisible(bool visible)
     }
 }
 
-int TileMapLayer2D::GetWidth() const
-{
-    return tmxLayer_ ? tmxLayer_->GetWidth(): 0;
-}
-
-int TileMapLayer2D::GetHeight() const
-{
-    return tmxLayer_ ? tmxLayer_->GetHeight(): 0;
-}
-
 bool TileMapLayer2D::HasProperty(const String& name) const
 {
     if (!tmxLayer_)
@@ -159,6 +149,24 @@ TileMapLayerType2D TileMapLayer2D::GetLayerType() const
     return tmxLayer_ ? tmxLayer_->GetType() : LT_INVALID;
 }
 
+int TileMapLayer2D::GetWidth() const
+{
+    return tmxLayer_ ? tmxLayer_->GetWidth(): 0;
+}
+
+int TileMapLayer2D::GetHeight() const
+{
+    return tmxLayer_ ? tmxLayer_->GetHeight(): 0;
+}
+
+Tile2D* TileMapLayer2D::GetTile(int x, int y) const
+{
+    if (!tileLayer_)
+        return 0;
+
+    return tileLayer_->GetTile(x, y);
+}
+
 Node* TileMapLayer2D::GetTileNode(int x, int y) const
 {
     if (!tileLayer_)
@@ -168,33 +176,6 @@ Node* TileMapLayer2D::GetTileNode(int x, int y) const
         return 0;
     
     return nodes_[y * tileLayer_->GetWidth() + x];
-}
-
-Tile2D* TileMapLayer2D::GetTile(int x, int y) const
-{
-    if (!tileLayer_)
-        return 0;
-    
-    return tileLayer_->GetTile(x, y);
-}
-
-unsigned TileMapLayer2D::GetNumObjectNodes() const
-{
-    if (!objectGroup_)
-        return 0;
-
-    return nodes_.Size();
-}
-
-Node* TileMapLayer2D::GetObjectNode(unsigned index) const
-{
-    if (!objectGroup_)
-        return 0;
-
-    if (index >= nodes_.Size())
-        return 0;
-
-    return nodes_[index];
 }
 
 unsigned TileMapLayer2D::GetNumObjects() const
@@ -211,6 +192,17 @@ TileObject2D* TileMapLayer2D::GetObject(unsigned index) const
         return 0;
 
     return objectGroup_->GetObject(index);
+}
+
+Node* TileMapLayer2D::GetObjectNode(unsigned index) const
+{
+    if (!objectGroup_)
+        return 0;
+
+    if (index >= nodes_.Size())
+        return 0;
+
+    return nodes_[index];
 }
 
 Node* TileMapLayer2D::GetImageNode() const

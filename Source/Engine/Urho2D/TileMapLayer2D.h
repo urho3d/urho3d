@@ -60,10 +60,6 @@ public:
     int GetDrawOrder() const { return drawOrder_; }
     /// Return visible.
     bool IsVisible() const { return visible_; }
-    /// Return width.
-    int GetWidth() const;
-    /// Return height.
-    int GetHeight() const;
     /// Return has property
     bool HasProperty(const String& name) const;
     /// Return property.
@@ -71,19 +67,21 @@ public:
     /// Return layer type.
     TileMapLayerType2D GetLayerType() const;
 
+    /// Return width (for tile layer only).
+    int GetWidth() const;
+    /// Return height (for tile layer only).
+    int GetHeight() const;
     /// Return tile node (for tile layer only).
     Node* GetTileNode(int x, int y) const;
     /// Return tile (for tile layer only).
     Tile2D* GetTile(int x, int y) const;
 
-    /// Return number of object nodes (for object group only).
-    unsigned GetNumObjectNodes() const;
-    /// Return object node (for object group only).
-    Node* GetObjectNode(unsigned index) const;
     /// Return number of objects (for object group only).
     unsigned GetNumObjects() const;
     /// Return object (for object group only).
     TileObject2D* GetObject(unsigned index) const;
+    /// Return object node (for object group only).
+    Node* GetObjectNode(unsigned index) const;
     
     /// Return image node (for image layer only).
     Node* GetImageNode() const;
