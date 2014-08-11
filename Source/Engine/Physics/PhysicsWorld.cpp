@@ -392,6 +392,70 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
     }
 }
 
+void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Ray& ray, float maxDistance, unsigned collisionMask)
+{
+    if (!shape || !shape->GetCollisionShape())
+    {
+        LOGERROR("Null collision shape for convex cast");
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+        return;
+    }
+    
+    ConvexCast(result, shape->GetCollisionShape(), ray, maxDistance, collisionMask);
+}
+
+void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Ray& ray, float maxDistance, unsigned collisionMask)
+{
+    if (!shape)
+    {
+        LOGERROR("Null collision shape for convex cast");
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+        return;
+    }
+    
+    if (!shape->isConvex())
+    {
+        LOGERROR("Can not use non-convex collision shape for convex cast");
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+        return;
+    }
+    
+    PROFILE(PhysicsConvexCast);
+
+    btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
+        maxDistance * ray.direction_));
+    convexCallback.m_collisionFilterGroup = (short)0xffff;
+    convexCallback.m_collisionFilterMask = collisionMask;
+
+    world_->convexSweepTest(static_cast<btConvexShape*>(shape), btTransform(btQuaternion::getIdentity(), 
+        convexCallback.m_convexFromWorld), btTransform(btQuaternion::getIdentity(), convexCallback.m_convexToWorld),
+        convexCallback);
+
+    if (convexCallback.hasHit())
+    {
+        result.body_ = static_cast<RigidBody*>(convexCallback.m_hitCollisionObject->getUserPointer());
+        result.position_ = ToVector3(convexCallback.m_hitPointWorld);
+        result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
+        result.distance_ = (result.position_ - ray.origin_).Length();
+    }
+    else
+    {
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+    }
+}
+
 void PhysicsWorld::RemoveCachedGeometry(Model* model)
 {
     for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
