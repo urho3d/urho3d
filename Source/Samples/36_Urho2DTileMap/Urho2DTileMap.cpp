@@ -85,14 +85,6 @@ void Urho2DTileMap::CreateScene()
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    // Get sprite
-    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Aster.png");
-    if (!sprite)
-        return;
-
-    float halfWidth = graphics->GetWidth() * 0.5f * PIXEL_SIZE;
-    float halfHeight = graphics->GetHeight() * 0.5f * PIXEL_SIZE;
-
     // Get tmx file
     TmxFile2D* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/Desert.tmx");
     if (!tmxFile)

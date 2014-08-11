@@ -1,0 +1,56 @@
+$#include "TileMapDefs2D.h"
+
+enum TileMapLayerType2D
+{
+    LT_TILE_LAYER,
+    LT_OBJECT_GROUP,
+    LT_IMAGE_LAYER,
+    LT_INVALID
+};
+
+enum TileObjectType2D
+{
+    OT_RECTANGLE,
+    OT_ELLIPSE,
+    OT_POLYGON,
+    OT_POLYLINE,
+    OT_TILE,
+    OT_INVALID
+};
+
+class PropertySet2D
+{
+    bool HasProperty(const String& name) const;
+    const String& GetProperty(const String& name) const;
+};
+
+class Tile2D
+{
+    int GetGid() const;
+    Sprite2D* GetSprite() const;
+    bool HasProperty(const String& name) const;
+    const String& GetProperty(const String& name) const;
+
+    tolua_readonly tolua_property__get_set int gid;
+    tolua_readonly tolua_property__get_set Sprite2D* sprite;
+};
+
+class TileObject2D
+{
+    TileObjectType2D GetType() const;
+    const Vector2& GetPosition() const;
+    const Vector2& GetSize() const;
+    unsigned GetNumPoints() const;
+    const Vector2& GetPoint(unsigned index) const;
+    int GetTileGid() const;
+    Sprite2D* GetTileSprite() const;
+    bool HasProperty(const String& name) const;
+    const String& GetProperty(const String& name) const;
+
+    tolua_readonly tolua_property__get_set TileObjectType2D type;
+    tolua_readonly tolua_property__get_set Vector2 position;
+    tolua_readonly tolua_property__get_set Vector2 size;
+    tolua_readonly tolua_property__get_set unsigned numPoints;
+    tolua_readonly tolua_property__get_set int tileGid;
+    tolua_readonly tolua_property__get_set Sprite2D* tileSprite;
+};

@@ -1,0 +1,20 @@
+$#include "TileMap2D.h"
+
+class TileMap2D : Component
+{
+    void SetTmxFile(TmxFile2D* tmxFile);
+    TmxFile2D* GetTmxFile() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    float GetTileWidth() const;
+    float GetTileHeight() const;
+    unsigned GetNumLayers() const;
+    TileMapLayer2D* GetLayer(unsigned index) const;
+
+    tolua_property__get_set TmxFile2D* tmxFile;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set float tileWidth;
+    tolua_readonly tolua_property__get_set float tileHeight;
+    tolua_readonly tolua_property__get_set unsigned numLayers;
+};

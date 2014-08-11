@@ -10,6 +10,11 @@ $pfile "Urho2D/AnimatedSprite2D.pkg"
 $pfile "Urho2D/ParticleEffect2D.pkg"
 $pfile "Urho2D/ParticleEmitter2D.pkg"
 
+$pfile "Urho2D/TileMapDefs2D.pkg"
+$pfile "Urho2D/TmxFile2D.pkg"
+$pfile "Urho2D/TileMap2D.pkg"
+$pfile "Urho2D/TileMapLayer2D.pkg"
+
 $pfile "Urho2D/RigidBody2D.pkg"
 $pfile "Urho2D/PhysicsWorld2D.pkg"
 
