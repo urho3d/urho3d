@@ -78,7 +78,7 @@ task :travis_ci_site_update do
   # Generate and sync doxygen pages
   system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
-  system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m 'Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE' || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
+  system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
   # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
   if ENV['PACKAGE_UPLOAD']
     instruction = 'skip'
@@ -145,7 +145,7 @@ task :travis_ci_package_upload do
       system "SKIP_NATIVE=1 ./cmake_gcc.sh -DANDROID_ABI=armeabi && cd #{platform_prefix}Build && make -j$NUMJOBS" or abort 'Failed to reconfigure and rebuild for armeabi'
       system "cd #{platform_prefix}Build && $ANDROID_SDK/tools/android update project -p . -t 1 && ant debug && bash -c 'mv bin/Urho3D{-debug,}.apk'" or abort 'Failed to make Android package (apk)'
     end
-    system "cd #{platform_prefix}Build && make -j$NUMJOBS package" or abort 'Failed to make binary package'
+    system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
   setup_digital_keys
@@ -153,7 +153,7 @@ task :travis_ci_package_upload do
     upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/Snapshots"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
-      system 'SNAPSHOP_VER=`git describe`; export SNAPSHOP_VER && wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.zip' or abort 'Failed to get source packages'
+      system 'SNAPSHOP_VER=`git describe $TRAVIS_COMMIT`; export SNAPSHOP_VER && wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.zip' or abort 'Failed to get source packages'
       # Only keep the snapshots from the last +/- 50 revisions
       # The package revisions and their creation time may not always be in perfect chronological order due to Travis-CI build latency, so sort the final result one more time in order to get a unique revision removal list
       system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +51 |sort |uniq
@@ -268,17 +268,20 @@ def makefile_travis_ci
   else
     platform_prefix = ''
   end
-  # Temporary workaround due to Travis-CI insufficient memory in 64-bit/MinGW/STATIC build configuration, build 21_AngelScriptIntegration separately
+  # Temporary workaround due to Travis-CI insufficient memory in 64-bit/MinGW/STATIC build configuration, build samples separately using less worker processes
   if ENV['CI'] and ENV['WINDOWS'] and ENV['URHO3D_64BIT'] and ENV['URHO3D_LIB_TYPE'] == 'STATIC'
-    system "cd #{platform_prefix}Build/Samples/21_AngelScriptIntegration && make -j$NUMJOBS" or abort 'Failed to build or test Urho3D library'
-  end
-  # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
-  if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
-    test = '&& make test'
+    system "cd #{platform_prefix}Build/Tools && make -j$NUMJOBS" or abort 'Failed to build or test Urho3D library and/or tools'
+    numjobs = [ENV['NUMJOBS'].to_i - 1, 1].max
+    system "cd #{platform_prefix}Build && make -j#{numjobs}" or abort 'Failed to build Urho3D samples'
   else
-    test = ''
+    # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
+    if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
+      test = '&& make test'
+    else
+      test = ''
+    end
+    system "cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   end
-  system "cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
