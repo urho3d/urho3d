@@ -6545,7 +6545,7 @@ class PhysicsWorld
 {
 // Methods:
 void ApplyAttributes();
-PhysicsRaycastResult ConvexCast(CollisionShape, const Ray&, float = M_INFINITY, uint = 0xffff);
+PhysicsRaycastResult ConvexCast(CollisionShape, const Vector3&, const Quaternion&, const Vector3&, const Quaternion&, uint = 0xffff);
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Variant GetAttribute(const String&) const;
