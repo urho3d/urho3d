@@ -218,7 +218,7 @@ Node* TileMapLayer2D::GetImageNode() const
 
 void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 {
-    tmxLayer_ = tileLayer;
+    tileLayer_ = tileLayer;
 
     int width = tileLayer->GetWidth();
     int height = tileLayer->GetHeight();
