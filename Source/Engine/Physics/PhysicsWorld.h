@@ -150,10 +150,10 @@ public:
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Perform a physics world swept convex test using a user-supplied collision shape and return the closest hit.
-    void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Perform a physics world swept convex test using a user-supplied Bullet collision shape and return the closest hit.
-    void ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Perform a physics world swept convex test using a user-supplied collision shape and return the first hit.
+    void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Perform a physics world swept convex test using a user-supplied Bullet collision shape and return the first hit.
+    void ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Invalidate cached collision geometry for a model.
     void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.

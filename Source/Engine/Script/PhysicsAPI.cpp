@@ -244,10 +244,10 @@ static PhysicsRaycastResult PhysicsWorldSphereCast(const Ray& ray, float radius,
     return result;
 }
 
-static PhysicsRaycastResult PhysicsWorldConvexCast(CollisionShape* shape, const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
+static PhysicsRaycastResult PhysicsWorldConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask, PhysicsWorld* ptr)
 {
     PhysicsRaycastResult result;
-    ptr->ConvexCast(result, shape, ray, maxDistance, collisionMask);
+    ptr->ConvexCast(result, shape, startPos, startRot, endPos, endRot, collisionMask);
     // Release extra ref manually due to not using an auto handle (see below)
     if (shape)
         shape->ReleaseRef();
@@ -294,7 +294,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult SphereCast(const Ray&in, float, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldSphereCast), asCALL_CDECL_OBJLAST);
     // There seems to be a bug in AngelScript resulting in a crash if we use an auto handle with this function.
     // Work around by manually releasing the CollisionShape handle
-    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult ConvexCast(CollisionShape@, const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldConvexCast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult ConvexCast(CollisionShape@, const Vector3&in, const Quaternion&in, const Vector3&in, const Quaternion&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldConvexCast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const Sphere&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetRigidBodiesBody), asCALL_CDECL_OBJLAST);
