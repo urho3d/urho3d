@@ -268,11 +268,9 @@ def makefile_travis_ci
   else
     platform_prefix = ''
   end
-  # Temporary workaround due to Travis-CI insufficient memory in 64-bit/MinGW/STATIC build configuration, build samples separately using less worker processes
+  # Temporary workaround due to Travis-CI insufficient memory in 64-bit/MinGW/STATIC build configuration, build samples separately using single worker process
   if ENV['CI'] and ENV['WINDOWS'] and ENV['URHO3D_64BIT'] and ENV['URHO3D_LIB_TYPE'] == 'STATIC'
-    system "cd #{platform_prefix}Build/Tools && make -j$NUMJOBS" or abort 'Failed to build or test Urho3D library and/or tools'
-    numjobs = [ENV['NUMJOBS'].to_i - 1, 1].max
-    system "cd #{platform_prefix}Build && make -j#{numjobs}" or abort 'Failed to build Urho3D samples'
+    system "cd #{platform_prefix}Build/Tools && make -j$NUMJOBS && cd .. && make" or abort 'Failed to build or test Urho3D library'
   else
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
     if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
