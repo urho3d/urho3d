@@ -167,7 +167,7 @@ void ParticleEmitter2D::SetParticleEffectAttr(ResourceRef value)
     SetEffect(cache->GetResource<ParticleEffect2D>(value.name_));
 }
 
-Urho3D::ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
+ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
 {
     return GetResourceRef(effect_, ParticleEffect2D::GetTypeStatic());
 }

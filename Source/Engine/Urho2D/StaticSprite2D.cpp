@@ -186,10 +186,18 @@ void StaticSprite2D::UpdateVertices()
         hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
     }
 
+#ifdef URHO3D_OPENGL
     float leftX = -width * hotSpotX;
     float rightX = width * (1.0f - hotSpotX);
     float bottomY = -height * hotSpotY;
     float topY = height * (1.0f - hotSpotY);
+#else
+    const float halfPixelOffset = 0.5f * PIXEL_SIZE;
+    float leftX = -width * hotSpotX + halfPixelOffset;
+    float rightX = width * (1.0f - hotSpotX) + halfPixelOffset;
+    float bottomY = -height * hotSpotY + halfPixelOffset;
+    float topY = height * (1.0f - hotSpotY) + halfPixelOffset;
+#endif
 
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
 
