@@ -33,7 +33,7 @@ class PhysicsWorld2D : Component
     // void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult2D PhysicsWorld2DRaycastSingle @ RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
     RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED);
-    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0);
+    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED);
     // void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside const PODVector<RigidBody2D*>& PhysicsWorld2DGetRigidBodies @ GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 

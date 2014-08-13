@@ -21,7 +21,6 @@
 //
 
 #include "Precompiled.h"
-#include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Graphics.h"
@@ -30,9 +29,11 @@
 #include "PhysicsUtils2D.h"
 #include "PhysicsWorld2D.h"
 #include "Profiler.h"
+#include "Renderer.h"
 #include "RigidBody2D.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "Viewport.h"
 
 #include "DebugNew.h"
 
@@ -517,27 +518,21 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
     return callback.GetRigidBody();
 }
 
-RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask, Camera* camera)
+RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask)
 {
-    if (!camera)
+    Renderer* renderer = GetSubsystem<Renderer>();
+    for (unsigned i = 0; i  < renderer->GetNumViewports(); ++i)
     {
-        PODVector<Camera*> cameras;
-        GetScene()->GetComponents<Camera>(cameras, true);
-        if (!cameras.Empty())
-            camera = cameras[0];
+        Viewport* viewport = renderer->GetViewport(i);
+        // Find a viewport with same scene
+        if (viewport && viewport->GetScene() == GetScene())
+        {
+            Vector3 worldPoint = viewport->ScreenToWorldPoint(screenX, screenY, 0.0f);
+            return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);
+        }
     }
 
-    if (!camera)
-    {
-        LOGWARNING("Could not find camera in scene");
-        return 0;
-    }
-
-    Graphics* graphics = GetSubsystem<Graphics>();
-    Vector3 screenPoint((float)screenX / graphics->GetWidth(), (float)screenY / graphics->GetHeight(), 0.0f);
-    Vector3 worldPoint = camera->ScreenToWorldPoint(screenPoint);
-
-    return GetRigidBody(Vector2(worldPoint.x_, worldPoint.y_), collisionMask);
+    return 0;
 }
 
 // Aabb query callback class.

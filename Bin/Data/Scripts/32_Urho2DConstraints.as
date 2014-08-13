@@ -390,7 +390,7 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     PhysicsWorld2D@ physicsWorld = scene_.GetComponent("PhysicsWorld2D");
-    RigidBody2D@ rigidBody = physicsWorld.GetRigidBody(input.mousePosition.x, input.mousePosition.y, M_MAX_UNSIGNED ,camera); // Raycast for RigidBody2Ds to pick
+    RigidBody2D@ rigidBody = physicsWorld.GetRigidBody(input.mousePosition.x, input.mousePosition.y, M_MAX_UNSIGNED); // Raycast for RigidBody2Ds to pick
     if (rigidBody !is null)
     {
         pickedNode = rigidBody.node;
@@ -442,7 +442,7 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
 void HandleTouchBegin3(StringHash eventType, VariantMap& eventData)
 {
     PhysicsWorld2D@ physicsWorld = scene_.GetComponent("PhysicsWorld2D");
-    RigidBody2D@ rigidBody = physicsWorld.GetRigidBody(eventData["X"].GetInt(), eventData["Y"].GetInt(), M_MAX_UNSIGNED ,camera); // Raycast for RigidBody2Ds to pick
+    RigidBody2D@ rigidBody = physicsWorld.GetRigidBody(eventData["X"].GetInt(), eventData["Y"].GetInt(), M_MAX_UNSIGNED); // Raycast for RigidBody2Ds to pick
     if (rigidBody !is null)
     {
         pickedNode = rigidBody.node;

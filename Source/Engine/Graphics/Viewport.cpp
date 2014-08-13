@@ -114,4 +114,74 @@ RenderPath* Viewport::GetRenderPath() const
     return renderPath_;
 }
 
+Ray Viewport::GetScreenRay(int x, int y) const
+{
+    if (!camera_)
+        return Ray();
+
+    float screenX;
+    float screenY;
+
+    if (rect_ == IntRect::ZERO)
+    {
+        Graphics* graphics = GetSubsystem<Graphics>();
+        screenX = (float)x / (float)graphics->GetWidth();
+        screenY = (float)y / (float)graphics->GetHeight();
+    }
+    else
+    {
+        screenX = float(x - rect_.left_) / (float)rect_.Width();
+        screenY = float(y - rect_.top_) / (float)rect_.Height();
+    }
+
+    return camera_->GetScreenRay(screenX, screenY);
+}
+
+IntVector2 Viewport::WorldToScreenPoint(const Vector3& worldPos) const
+{
+    if (!camera_)
+        return IntVector2::ZERO;
+
+    Vector2 screenPoint = camera_->WorldToScreenPoint(worldPos);
+
+    int x;
+    int y;
+    if (rect_ == IntRect::ZERO)
+    {
+        Graphics* graphics = GetSubsystem<Graphics>();
+        x = (int)(screenPoint.x_ * graphics->GetWidth());
+        y = (int)(screenPoint.y_ * graphics->GetHeight());
+    }
+    else
+    {
+        x = (int)(rect_.left_ + screenPoint.x_ * rect_.Width());
+        y = (int)(rect_.top_ + screenPoint.y_ * rect_.Height());
+    }
+    
+    return IntVector2(x, y);
+}
+
+Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
+{
+    if (!camera_)
+        return Vector3::ZERO;
+
+    float screenX;
+    float screenY;
+
+    if (rect_ == IntRect::ZERO)
+    {
+        Graphics* graphics = GetSubsystem<Graphics>();
+        screenX = (float)x / (float)graphics->GetWidth();
+        screenY = (float)y / (float)graphics->GetHeight();
+    }
+    else
+    {
+        screenX = float(x - rect_.left_) / (float)rect_.Width();
+        screenY = float(y - rect_.top_) / (float)rect_.Height();
+    }
+
+    return camera_->ScreenToWorldPoint(Vector3(screenX, screenY, depth));
+}
+
 }
