@@ -1772,6 +1772,9 @@ namespace Urho3D
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
+### TileMap2D
+- %Tmx %File : ResourceRef
+
 ### ToolTip
 - %Name : String
 - %Position : IntVector2
@@ -7567,7 +7570,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - RigidBody2D@[]@ GetRigidBodies(const Rect&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
-- RigidBody2D@ GetRigidBody(int, int, uint = 0xffff, Camera@ = 0)
+- RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -7667,6 +7670,19 @@ Properties:
 
 - Vector3[]@[] face // readonly
 - uint numFaces // readonly
+
+
+### PropertySet2D
+
+Methods:
+
+- bool HasProperty(const String&) const
+- const String& GetProperty(const String&) const
+
+Properties:
+
+- int refs // readonly
+- int weakRefs // readonly
 
 
 ### Quaternion
@@ -10477,6 +10493,159 @@ Properties:
 - Rect uv
 
 
+### Tile2D
+
+Methods:
+
+- bool HasProperty(const String&) const
+- const String& GetProperty(const String&) const
+
+Properties:
+
+- int gid // readonly
+- int refs // readonly
+- Sprite2D@ sprite // readonly
+- int weakRefs // readonly
+
+
+### TileMap2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- TileMapLayer2D@ GetLayer(uint) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- int height // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numLayers // readonly
+- ObjectAnimation@ objectAnimation
+- Orientation2D orientation // readonly
+- int refs // readonly
+- bool temporary
+- float tileHeight // readonly
+- float tileWidth // readonly
+- TmxFile2D@ tmxFile
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- int width // readonly
+
+
+### TileMapLayer2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- TileObject2D@ GetObject(uint) const
+- Node@ GetObjectNode(uint) const
+- Tile2D@ GetTile(int, int) const
+- Node@ GetTileNode(int, int) const
+- bool HasProperty(const String&) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- const String& GetProperty(const String&) const
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- int drawOrder // writeonly
+- bool enabled
+- bool enabledEffective // readonly
+- int height // readonly
+- uint id // readonly
+- Node@ imageNode // readonly
+- TileMapLayerType2D layerType // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numObjects // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- int rrawOrder // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- bool visible
+- int weakRefs // readonly
+- int width // readonly
+
+
+### TileObject2D
+
+Methods:
+
+- bool HasProperty(const String&) const
+- const String& GetProperty(const String&) const
+- const Vector2& GetPoint(uint) const
+
+Properties:
+
+- uint numPoints // readonly
+- Vector2 position // readonly
+- int refs // readonly
+- Vector2 size // readonly
+- int tileGid // readonly
+- Sprite2D@ tileSprite // readonly
+- TileObjectType2D type // readonly
+- int weakRefs // readonly
+
+
 ### Time
 
 Methods:
@@ -10504,6 +10673,29 @@ Methods:
 
 - uint GetMSec(bool)
 - void Reset()
+
+
+### TmxFile2D
+
+Methods:
+
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
 
 
 ### ToolTip
@@ -11240,8 +11432,11 @@ Properties:
 
 Methods:
 
+- Ray GetScreenRay(int, int) const
+- Vector3 ScreenToWorldPoint(int, int, float) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
+- Vector2 WorldToScreenPoint(const Vector3&) const
 
 Properties:
 
@@ -11852,6 +12047,12 @@ Properties:
 - O_VERTICAL
 
 
+### Orientation2D
+
+- O_ORTHOGONAL
+- O_ISOMETRIC
+
+
 ### PassLightingMode
 
 - LIGHTING_UNLIT
@@ -11987,6 +12188,24 @@ Properties:
 - TEXTURE_DYNAMIC
 - TEXTURE_RENDERTARGET
 - TEXTURE_DEPTHSTENCIL
+
+
+### TileMapLayerType2D
+
+- LT_TILE_LAYER
+- LT_OBJECT_GROUP
+- LT_IMAGE_LAYER
+- LT_INVALID
+
+
+### TileObjectType2D
+
+- OT_RECTANGLE
+- OT_ELLIPSE
+- OT_POLYGON
+- OT_POLYLINE
+- OT_TILE
+- OT_INVALID
 
 
 ### TransformSpace

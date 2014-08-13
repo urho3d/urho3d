@@ -3544,7 +3544,7 @@ Methods:
 - const PODVector<PhysicsRaycastResult2D>& Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
-- RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0)
+- RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
@@ -3645,6 +3645,14 @@ Methods:
 Properties:
 
 - bool empty (readonly)
+
+### PropertySet2D
+
+
+Methods:
+
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
 
 ### Quaternion
 
@@ -5144,6 +5152,99 @@ Properties:
 - Rect uv
 - float time
 
+### Tile2D
+
+
+Methods:
+
+- int GetGid() const
+- Sprite2D* GetSprite() const
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+
+Properties:
+
+- int gid (readonly)
+- Sprite2D* sprite (readonly)
+
+### TileMap2D : Component
+
+Methods:
+
+- void SetTmxFile(TmxFile2D* tmxFile)
+- TmxFile2D* GetTmxFile() const
+- Orientation2D GetOrientation() const
+- int GetWidth() const
+- int GetHeight() const
+- float GetTileWidth() const
+- float GetTileHeight() const
+- unsigned GetNumLayers() const
+- TileMapLayer2D* GetLayer(unsigned index) const
+
+Properties:
+
+- TmxFile2D* tmxFile
+- Orientation2D orientation (readonly)
+- int width (readonly)
+- int height (readonly)
+- float tileWidth (readonly)
+- float tileHeight (readonly)
+- unsigned numLayers (readonly)
+
+### TileMapLayer2D : Component
+
+Methods:
+
+- void SetDrawOrder(int drawOrder)
+- void SetVisible(bool visible)
+- int GetDrawOrder() const
+- bool IsVisible() const
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+- TileMapLayerType2D GetLayerType() const
+- int GetWidth() const
+- int GetHeight() const
+- Node* GetTileNode(int x, int y) const
+- Tile2D* GetTile(int x, int y) const
+- unsigned GetNumObjects() const
+- TileObject2D* GetObject(unsigned index) const
+- Node* GetObjectNode(unsigned index) const
+- Node* GetImageNode() const
+
+Properties:
+
+- int drawOrder (readonly)
+- bool visible (readonly)
+- TileMapLayerType2D layerType (readonly)
+- int width (readonly)
+- int height (readonly)
+- unsigned numObjects (readonly)
+- Node* imageNode (readonly)
+
+### TileObject2D
+
+
+Methods:
+
+- TileObjectType2D GetType() const
+- const Vector2& GetPosition() const
+- const Vector2& GetSize() const
+- unsigned GetNumPoints() const
+- const Vector2& GetPoint(unsigned index) const
+- int GetTileGid() const
+- Sprite2D* GetTileSprite() const
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+
+Properties:
+
+- TileObjectType2D type (readonly)
+- Vector2 position (readonly)
+- Vector2 size (readonly)
+- unsigned numPoints (readonly)
+- int tileGid (readonly)
+- Sprite2D* tileSprite (readonly)
+
 ### Time : Object
 
 Methods:
@@ -5162,6 +5263,8 @@ Properties:
 - float timeStep (readonly)
 - unsigned timerPeriod (readonly)
 - float elapsedTime (readonly)
+
+### TmxFile2D : Resource
 
 ### ToolTip : UIElement
 
@@ -5950,6 +6053,9 @@ Methods:
 - Camera* GetCamera() const
 - const IntRect& GetRect() const
 - RenderPath* GetRenderPath() const
+- Ray GetScreenRay(int x, int y) const
+- IntVector2 WorldToScreenPoint(const Vector3& worldPos) const
+- Vector3 ScreenToWorldPoint(int x, int y, float depth) const
 
 Properties:
 
@@ -6373,6 +6479,11 @@ Properties:
 - int O_HORIZONTAL
 - int O_VERTICAL
 
+### Orientation2D
+
+- int O_ORTHOGONAL
+- int O_ISOMETRIC
+
 ### PassLightingMode
 
 - int LIGHTING_UNLIT
@@ -6503,6 +6614,22 @@ Properties:
 - int TEXTURE_DYNAMIC
 - int TEXTURE_RENDERTARGET
 - int TEXTURE_DEPTHSTENCIL
+
+### TileMapLayerType2D
+
+- int LT_TILE_LAYER
+- int LT_OBJECT_GROUP
+- int LT_IMAGE_LAYER
+- int LT_INVALID
+
+### TileObjectType2D
+
+- int OT_RECTANGLE
+- int OT_ELLIPSE
+- int OT_POLYGON
+- int OT_POLYLINE
+- int OT_TILE
+- int OT_INVALID
 
 ### TransformSpace
 
