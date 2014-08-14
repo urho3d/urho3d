@@ -1023,10 +1023,11 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
                 dragBeginTimer_.Reset();
             }
         }
-        else if (!HasModalElement())
+        else
         {
-            // If clicked over no element, or a disabled element, lose focus
-            SetFocusElement(0);
+            // If clicked over no element, or a disabled element, lose focus (but not if there is a modal element)
+            if (!HasModalElement())
+                SetFocusElement(0);
             SendClickEvent(E_UIMOUSECLICK, element, cursorPos, button, buttons, qualifiers);
         }
 

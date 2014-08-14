@@ -208,7 +208,7 @@ private:
     /// Index buffer data for asynchronous loading.
     Vector<IndexBufferDesc> loadIBData_;
     /// Geometry definitions for asynchronous loading.
-    Vector<Vector<GeometryDesc> > loadGeometries_;
+    Vector<PODVector<GeometryDesc> > loadGeometries_;
 };
 
 }
