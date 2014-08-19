@@ -82,8 +82,13 @@ task :travis_ci_site_update do
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or 'Failed to update document version in YAML Front Matter block'
     append_new_release release, 'doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
   end
+
   # Generate and sync doxygen pages
   system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+
+  # Builds a documentation map for the documenation switcher
+  build_documentation_map release, 'doc-Build/_data/documentmap.json', 'doc-Build/documentation/' or abort 'Failed to generate document map file' 
+
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
   system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
   # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
@@ -339,6 +344,19 @@ def append_new_release release, filename
     unless urho3d_hash['releases'].last == release
       urho3d_hash['releases'] << release
     end
+    File.open filename, 'w' do |file|
+      file.puts urho3d_hash.to_json
+    end
+    return 0
+  rescue
+    nil
+  end
+end
+
+def build_documentation_map release, filename, docs_path
+  begin
+    urho3d_hash = File.exists?(filename) ? JSON.parse(File.read(filename)) : {}
+    urho3d_hash[release] = Dir["#{docs_path}/#{release}/**/*.html"].map{|x| x.gsub("#{docs_path}/#{release}/", '') }
     File.open filename, 'w' do |file|
       file.puts urho3d_hash.to_json
     end
