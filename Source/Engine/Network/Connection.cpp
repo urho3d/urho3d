@@ -70,6 +70,13 @@ Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::Me
     logStatistics_(false)
 {
     sceneState_.connection_ = this;
+    
+    // Store address and port now for accurate logging (kNet may already have destroyed the socket on disconnection,
+    // in which case we would log a zero address:port on disconnect)
+    kNet::EndPoint endPoint = connection_->RemoteEndPoint();
+    ///\todo Not IPv6-capable.
+    address_ = Urho3D::ToString("%d.%d.%d.%d", endPoint.ip[0], endPoint.ip[1], endPoint.ip[2], endPoint.ip[3]);
+    port_ = endPoint.port;
 }
 
 Connection::~Connection()
@@ -996,18 +1003,6 @@ Scene* Connection::GetScene() const
 bool Connection::IsConnected() const
 {
     return connection_->GetConnectionState() == kNet::ConnectionOK;
-}
-
-String Connection::GetAddress() const
-{
-    kNet::EndPoint endPoint = connection_->RemoteEndPoint();
-    ///\todo Not IPv6-capable.
-    return Urho3D::ToString("%d.%d.%d.%d", endPoint.ip[0], endPoint.ip[1], endPoint.ip[2], endPoint.ip[3]);
-}
-
-unsigned short Connection::GetPort() const
-{
-    return connection_->RemoteEndPoint().port;
 }
 
 String Connection::ToString() const

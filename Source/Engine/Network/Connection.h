@@ -159,9 +159,9 @@ public:
     /// Return whether to log data in/out statistics.
     bool GetLogStatistics() const { return logStatistics_; }
     /// Return remote address.
-    String GetAddress() const;
+    String GetAddress() const { return address_; }
     /// Return remote port.
-    unsigned short GetPort() const;
+    unsigned short GetPort() const { return port_; }
     /// Return an address:port string.
     String ToString() const;
     /// Return number of package downloads remaining.
@@ -238,6 +238,10 @@ private:
     String sceneFileName_;
     /// Statistics timer.
     Timer statsTimer_;
+    /// Remote endpoint address.
+    String address_;
+    /// Remote endpoint port.
+    unsigned short port_;
     /// Client connection flag.
     bool isClient_;
     /// Connection pending flag.
