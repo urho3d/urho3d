@@ -69,47 +69,40 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_site_update)
 desc 'Update site documentation to GitHub Pages'
 task :travis_ci_site_update do
-  # Pull or clone
-  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth=1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
-  # Update credits from Readme.txt to about.md
-  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.txt |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' doc-Build/about.md" or abort 'Failed to update credits'
-  # Setup doxygen to use minimal theme
+  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 --no-single-branch -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
+  system 'cd doc-Build && git co site-update' or abort 'Failed to switch to site-update branch'
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
-  release = ENV['RELEASE_TAG'] || 'HEAD'
-  unless release == 'HEAD'
-    system "mkdir -p doc-Build/documentation/#{release}" or 'Failed to create directory for new document version'
-    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or 'Failed to update document version in YAML Front Matter block'
-    append_new_release release, 'doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
-  end
-  # Generate and sync doxygen pages
-  system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
-  # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
-  system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
-  # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
-  if ENV['PACKAGE_UPLOAD']
-    instruction = 'skip'
-  else
-    instruction = 'package'
-  end
-  # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if detached HEAD is not a fast forward of remote master)
-  system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
-  if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
-    bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
-    system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or 'Failed to stage .soversion file'
-  end
-  system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
+  system 'cd doc-Build && git co master' or abort 'Failed to switch back to doc-Build master branch'
+  system "cd Build && make -j$NUMJOBS doc && ruby -i -pe 'gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/HEAD" or abort 'Failed to generate/rsync doxygen pages'
+  system 'git fetch --tags' or abort 'Failed to fetch all tags'
+  system 'git co 1.31 && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUAJIT=1' or abort 'Failed to switch to 1.31'
+  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{SHORT_NAMES} => %q{NO}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file for 1.31'
+  system 'mkdir -p doc-Build/documentation/1.31' or 'Failed to create directory for 1.31'
+  system "ruby -i -pe 'gsub(/HEAD/, %q{1.31})' Docs/minimal-header.html" or 'Failed to update document version to 1.31 in YAML Front Matter block'
+  system "rm -rf Docs/html && cd Build && make -j$NUMJOBS doc && ruby -i -pe 'gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/1.31" or abort 'Failed to generate/rsync doxygen pages for 1.31'
+  system 'git co 1.3 && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUA=1' or abort 'Failed to switch to 1.3'
+  system 'mkdir -p doc-Build/documentation/1.3' or 'Failed to create directory for 1.3'
+  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{SHORT_NAMES} => %q{NO}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Doxyfile" or abort 'Failed to setup doxygen configuration file for 1.3'
+  system 'cp Docs/minimal-* .' or abort 'Failed to copy minimal-themed template for 1.3'
+  system "ruby -i -pe 'gsub(/1.31/, %q{1.3})' minimal-header.html" or 'Failed to update document version to 1.3 in YAML Front Matter block'
+  system "rm -rf Docs/html && cd Build && make -j$NUMJOBS && ../Bin/UpdateDocument.sh -a && ruby -i -pe 'gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/1.3" or abort 'Failed to generate/rsync doxygen pages for 1.3'
+  system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: One time documentation rebuild at #{Time.now.utc}.\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
 desc 'Rebase OSX-CI mirror branch'
 task :travis_ci_rebase do
+  # No-op
+  exit 0
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
 desc 'Make binary package and upload it to a designated central hosting server'
 task :travis_ci_package_upload do
+  # No-op
+  exit 0
   if ENV['XCODE']
     $configuration = 'Release'
     $testing = 0
@@ -254,6 +247,8 @@ def makefile_travis_ci
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
   end
   system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
+  # Short-circuit
+  return 0
   if ENV['ANDROID']
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
