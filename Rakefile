@@ -76,7 +76,7 @@ task :travis_ci_site_update do
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
-  release = ENV['RELEASE_TAG'] || 'HEAD'
+  release = ENV['RELEASE_TAG'].empty? ? 'HEAD' : ENV['RELEASE_TAG'];
   unless release == 'HEAD'
     system "mkdir -p doc-Build/documentation/#{release}" or 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or 'Failed to update document version in YAML Front Matter block'
