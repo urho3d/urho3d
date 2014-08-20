@@ -1234,11 +1234,6 @@ namespace Urho3D
 - %Clear %Sel. %On %Defocus : bool
 - %Select %On %Click %End : bool
 
-### LuaScriptInstance
-- %Is %Enabled : bool
-- %Script %File : ResourceRef
-- %Script %Object %Type : String
-
 ### Menu
 - %Name : String
 - %Position : IntVector2
@@ -1963,7 +1958,210 @@ namespace Urho3D
 
 \page ScriptAPI Scripting API
 
+\section ScriptAPI_TableOfContents Table of Contents
+\ref ScriptAPI_ClassList "Class list"<br>
+\ref ScriptAPI_Classes "Classes"<br>
+\ref ScriptAPI_Enums "Enumerations"<br>
+\ref ScriptAPI_GlobalFunctions "Global functions"<br>
+\ref ScriptAPI_GlobalProperties "Global properties"<br>
+\ref ScriptAPI_GlobalConstants "Global constants"<br>
+
+\section ScriptAPI_ClassList Class List
+
+<a href="#Class_Animatable"><b>Animatable</b></a>
+<a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
+<a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
+<a href="#Class_Animation"><b>Animation</b></a>
+<a href="#Class_Animation2D"><b>Animation2D</b></a>
+<a href="#Class_AnimationController"><b>AnimationController</b></a>
+<a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
+<a href="#Class_AnimationState"><b>AnimationState</b></a>
+<a href="#Class_AnimationTriggerPoint"><b>AnimationTriggerPoint</b></a>
+<a href="#Class_Array"><b>Array</b></a>
+<a href="#Class_AttributeInfo"><b>AttributeInfo</b></a>
+<a href="#Class_Audio"><b>Audio</b></a>
+<a href="#Class_BiasParameters"><b>BiasParameters</b></a>
+<a href="#Class_Billboard"><b>Billboard</b></a>
+<a href="#Class_BillboardSet"><b>BillboardSet</b></a>
+<a href="#Class_Bone"><b>Bone</b></a>
+<a href="#Class_BorderImage"><b>BorderImage</b></a>
+<a href="#Class_BoundingBox"><b>BoundingBox</b></a>
+<a href="#Class_Button"><b>Button</b></a>
+<a href="#Class_Camera"><b>Camera</b></a>
+<a href="#Class_CascadeParameters"><b>CascadeParameters</b></a>
+<a href="#Class_CheckBox"><b>CheckBox</b></a>
+<a href="#Class_CollisionBox2D"><b>CollisionBox2D</b></a>
+<a href="#Class_CollisionChain2D"><b>CollisionChain2D</b></a>
+<a href="#Class_CollisionCircle2D"><b>CollisionCircle2D</b></a>
+<a href="#Class_CollisionEdge2D"><b>CollisionEdge2D</b></a>
+<a href="#Class_CollisionPolygon2D"><b>CollisionPolygon2D</b></a>
+<a href="#Class_CollisionShape"><b>CollisionShape</b></a>
+<a href="#Class_CollisionShape2D"><b>CollisionShape2D</b></a>
+<a href="#Class_Color"><b>Color</b></a>
+<a href="#Class_ColorFrame"><b>ColorFrame</b></a>
+<a href="#Class_Component"><b>Component</b></a>
+<a href="#Class_Connection"><b>Connection</b></a>
+<a href="#Class_Console"><b>Console</b></a>
+<a href="#Class_Constraint"><b>Constraint</b></a>
+<a href="#Class_Constraint2D"><b>Constraint2D</b></a>
+<a href="#Class_ConstraintDistance2D"><b>ConstraintDistance2D</b></a>
+<a href="#Class_ConstraintFriction2D"><b>ConstraintFriction2D</b></a>
+<a href="#Class_ConstraintGear2D"><b>ConstraintGear2D</b></a>
+<a href="#Class_ConstraintMotor2D"><b>ConstraintMotor2D</b></a>
+<a href="#Class_ConstraintMouse2D"><b>ConstraintMouse2D</b></a>
+<a href="#Class_ConstraintPrismatic2D"><b>ConstraintPrismatic2D</b></a>
+<a href="#Class_ConstraintPulley2D"><b>ConstraintPulley2D</b></a>
+<a href="#Class_ConstraintRevolute2D"><b>ConstraintRevolute2D</b></a>
+<a href="#Class_ConstraintRope2D"><b>ConstraintRope2D</b></a>
+<a href="#Class_ConstraintWeld2D"><b>ConstraintWeld2D</b></a>
+<a href="#Class_ConstraintWheel2D"><b>ConstraintWheel2D</b></a>
+<a href="#Class_Controls"><b>Controls</b></a>
+<a href="#Class_Cursor"><b>Cursor</b></a>
+<a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
+<a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
+<a href="#Class_DebugHud"><b>DebugHud</b></a>
+<a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
+<a href="#Class_DecalSet"><b>DecalSet</b></a>
+<a href="#Class_Deserializer"><b>Deserializer</b></a>
+<a href="#Class_Dictionary"><b>Dictionary</b></a>
+<a href="#Class_DictionaryValue"><b>DictionaryValue</b></a>
+<a href="#Class_Drawable"><b>Drawable</b></a>
+<a href="#Class_Drawable2D"><b>Drawable2D</b></a>
+<a href="#Class_DropDownList"><b>DropDownList</b></a>
+<a href="#Class_Engine"><b>Engine</b></a>
+<a href="#Class_File"><b>File</b></a>
+<a href="#Class_FileSelector"><b>FileSelector</b></a>
+<a href="#Class_FileSystem"><b>FileSystem</b></a>
+<a href="#Class_FocusParameters"><b>FocusParameters</b></a>
+<a href="#Class_Font"><b>Font</b></a>
+<a href="#Class_Frustum"><b>Frustum</b></a>
+<a href="#Class_Graphics"><b>Graphics</b></a>
+<a href="#Class_HttpRequest"><b>HttpRequest</b></a>
+<a href="#Class_Image"><b>Image</b></a>
+<a href="#Class_Input"><b>Input</b></a>
+<a href="#Class_IntRect"><b>IntRect</b></a>
+<a href="#Class_IntVector2"><b>IntVector2</b></a>
+<a href="#Class_JSONFile"><b>JSONFile</b></a>
+<a href="#Class_JSONValue"><b>JSONValue</b></a>
+<a href="#Class_JoystickState"><b>JoystickState</b></a>
+<a href="#Class_Light"><b>Light</b></a>
+<a href="#Class_LineEdit"><b>LineEdit</b></a>
+<a href="#Class_ListView"><b>ListView</b></a>
+<a href="#Class_Log"><b>Log</b></a>
+<a href="#Class_Material"><b>Material</b></a>
+<a href="#Class_Matrix3"><b>Matrix3</b></a>
+<a href="#Class_Matrix3x4"><b>Matrix3x4</b></a>
+<a href="#Class_Matrix4"><b>Matrix4</b></a>
+<a href="#Class_Menu"><b>Menu</b></a>
+<a href="#Class_MessageBox"><b>MessageBox</b></a>
+<a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_Navigable"><b>Navigable</b></a>
+<a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
+<a href="#Class_Network"><b>Network</b></a>
+<a href="#Class_NetworkPriority"><b>NetworkPriority</b></a>
+<a href="#Class_Node"><b>Node</b></a>
+<a href="#Class_Object"><b>Object</b></a>
+<a href="#Class_ObjectAnimation"><b>ObjectAnimation</b></a>
+<a href="#Class_Octree"><b>Octree</b></a>
+<a href="#Class_OffMeshConnection"><b>OffMeshConnection</b></a>
+<a href="#Class_PackageFile"><b>PackageFile</b></a>
+<a href="#Class_ParticleEffect"><b>ParticleEffect</b></a>
+<a href="#Class_ParticleEffect2D"><b>ParticleEffect2D</b></a>
+<a href="#Class_ParticleEmitter"><b>ParticleEmitter</b></a>
+<a href="#Class_ParticleEmitter2D"><b>ParticleEmitter2D</b></a>
+<a href="#Class_Pass"><b>Pass</b></a>
+<a href="#Class_PhysicsRaycastResult"><b>PhysicsRaycastResult</b></a>
+<a href="#Class_PhysicsRaycastResult2D"><b>PhysicsRaycastResult2D</b></a>
+<a href="#Class_PhysicsWorld"><b>PhysicsWorld</b></a>
+<a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
+<a href="#Class_Plane"><b>Plane</b></a>
+<a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
+<a href="#Class_Quaternion"><b>Quaternion</b></a>
+<a href="#Class_Ray"><b>Ray</b></a>
+<a href="#Class_RayQueryResult"><b>RayQueryResult</b></a>
+<a href="#Class_Rect"><b>Rect</b></a>
+<a href="#Class_RefCounted"><b>RefCounted</b></a>
+<a href="#Class_RenderPath"><b>RenderPath</b></a>
+<a href="#Class_RenderPathCommand"><b>RenderPathCommand</b></a>
+<a href="#Class_RenderSurface"><b>RenderSurface</b></a>
+<a href="#Class_RenderTargetInfo"><b>RenderTargetInfo</b></a>
+<a href="#Class_Renderer"><b>Renderer</b></a>
+<a href="#Class_Resource"><b>Resource</b></a>
+<a href="#Class_ResourceCache"><b>ResourceCache</b></a>
+<a href="#Class_ResourceRef"><b>ResourceRef</b></a>
+<a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RigidBody"><b>RigidBody</b></a>
+<a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
+<a href="#Class_Scene"><b>Scene</b></a>
+<a href="#Class_Script"><b>Script</b></a>
+<a href="#Class_ScriptFile"><b>ScriptFile</b></a>
+<a href="#Class_ScriptInstance"><b>ScriptInstance</b></a>
+<a href="#Class_ScriptObject"><b>ScriptObject</b></a>
+<a href="#Class_ScrollBar"><b>ScrollBar</b></a>
+<a href="#Class_ScrollView"><b>ScrollView</b></a>
+<a href="#Class_Serializable"><b>Serializable</b></a>
+<a href="#Class_Serializer"><b>Serializer</b></a>
+<a href="#Class_Skeleton"><b>Skeleton</b></a>
+<a href="#Class_Skybox"><b>Skybox</b></a>
+<a href="#Class_Slider"><b>Slider</b></a>
+<a href="#Class_SmoothedTransform"><b>SmoothedTransform</b></a>
+<a href="#Class_Sound"><b>Sound</b></a>
+<a href="#Class_SoundListener"><b>SoundListener</b></a>
+<a href="#Class_SoundSource"><b>SoundSource</b></a>
+<a href="#Class_SoundSource3D"><b>SoundSource3D</b></a>
+<a href="#Class_Sphere"><b>Sphere</b></a>
+<a href="#Class_Spline"><b>Spline</b></a>
+<a href="#Class_SplinePath"><b>SplinePath</b></a>
+<a href="#Class_Sprite"><b>Sprite</b></a>
+<a href="#Class_Sprite2D"><b>Sprite2D</b></a>
+<a href="#Class_SpriteSheet2D"><b>SpriteSheet2D</b></a>
+<a href="#Class_StaticModel"><b>StaticModel</b></a>
+<a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
+<a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_String"><b>String</b></a>
+<a href="#Class_StringHash"><b>StringHash</b></a>
+<a href="#Class_Technique"><b>Technique</b></a>
+<a href="#Class_TechniqueEntry"><b>TechniqueEntry</b></a>
+<a href="#Class_Terrain"><b>Terrain</b></a>
+<a href="#Class_TerrainPatch"><b>TerrainPatch</b></a>
+<a href="#Class_Text"><b>Text</b></a>
+<a href="#Class_Text3D"><b>Text3D</b></a>
+<a href="#Class_Texture"><b>Texture</b></a>
+<a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture3D"><b>Texture3D</b></a>
+<a href="#Class_TextureCube"><b>TextureCube</b></a>
+<a href="#Class_TextureFrame"><b>TextureFrame</b></a>
+<a href="#Class_Tile2D"><b>Tile2D</b></a>
+<a href="#Class_TileMap2D"><b>TileMap2D</b></a>
+<a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
+<a href="#Class_TileObject2D"><b>TileObject2D</b></a>
+<a href="#Class_Time"><b>Time</b></a>
+<a href="#Class_Timer"><b>Timer</b></a>
+<a href="#Class_TmxFile2D"><b>TmxFile2D</b></a>
+<a href="#Class_ToolTip"><b>ToolTip</b></a>
+<a href="#Class_TouchState"><b>TouchState</b></a>
+<a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
+<a href="#Class_Variant"><b>Variant</b></a>
+<a href="#Class_VariantMap"><b>VariantMap</b></a>
+<a href="#Class_Vector2"><b>Vector2</b></a>
+<a href="#Class_Vector3"><b>Vector3</b></a>
+<a href="#Class_Vector4"><b>Vector4</b></a>
+<a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
+<a href="#Class_View3D"><b>View3D</b></a>
+<a href="#Class_Viewport"><b>Viewport</b></a>
+<a href="#Class_WeakHandle"><b>WeakHandle</b></a>
+<a href="#Class_Window"><b>Window</b></a>
+<a href="#Class_XMLElement"><b>XMLElement</b></a>
+<a href="#Class_XMLFile"><b>XMLFile</b></a>
+<a href="#Class_XPathQuery"><b>XPathQuery</b></a>
+<a href="#Class_XPathResultSet"><b>XPathResultSet</b></a>
+<a href="#Class_Zone"><b>Zone</b></a>
+
 \section ScriptAPI_Classes Classes
+<a name="Class_Animatable"></a>
 
 ### Animatable
 
@@ -2006,6 +2204,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimatedModel"></a>
 
 ### AnimatedModel
 
@@ -2094,6 +2293,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_AnimatedSprite2D"></a>
 
 ### AnimatedSprite2D
 
@@ -2170,6 +2370,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Animation"></a>
 
 ### Animation
 
@@ -2201,6 +2402,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Animation2D"></a>
 
 ### Animation2D
 
@@ -2212,6 +2414,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationController"></a>
 
 ### AnimationController
 
@@ -2288,6 +2491,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationSet2D"></a>
 
 ### AnimationSet2D
 
@@ -2314,6 +2518,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationState"></a>
 
 ### AnimationState
 
@@ -2346,6 +2551,7 @@ Properties:
 - int weakRefs // readonly
 - float weight
 
+<a name="Class_AnimationTriggerPoint"></a>
 
 ### AnimationTriggerPoint
 
@@ -2354,6 +2560,7 @@ Properties:
 - Variant data
 - float time
 
+<a name="Class_Array"></a>
 
 ### Array
 
@@ -2381,6 +2588,7 @@ Properties:
 - bool empty // readonly
 - uint length
 
+<a name="Class_AttributeInfo"></a>
 
 ### AttributeInfo
 
@@ -2392,6 +2600,7 @@ Properties:
 - String name
 - VariantType type
 
+<a name="Class_Audio"></a>
 
 ### Audio
 
@@ -2419,6 +2628,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_BiasParameters"></a>
 
 ### BiasParameters
 
@@ -2427,6 +2637,7 @@ Properties:
 - float constantBias
 - float slopeScaledBias
 
+<a name="Class_Billboard"></a>
 
 ### Billboard
 
@@ -2439,6 +2650,7 @@ Properties:
 - Vector2 size
 - Rect uv
 
+<a name="Class_BillboardSet"></a>
 
 ### BillboardSet
 
@@ -2512,6 +2724,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_Bone"></a>
 
 ### Bone
 
@@ -2526,6 +2739,7 @@ Properties:
 - Node@ node
 - float radius
 
+<a name="Class_BorderImage"></a>
 
 ### BorderImage
 
@@ -2676,6 +2890,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_BoundingBox"></a>
 
 ### BoundingBox
 
@@ -2714,6 +2929,7 @@ Properties:
 - Vector3 min
 - Vector3 size // readonly
 
+<a name="Class_Button"></a>
 
 ### Button
 
@@ -2872,6 +3088,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Camera"></a>
 
 ### Camera
 
@@ -2950,6 +3167,7 @@ Properties:
 - int weakRefs // readonly
 - float zoom
 
+<a name="Class_CascadeParameters"></a>
 
 ### CascadeParameters
 
@@ -2962,6 +3180,7 @@ Properties:
 - float split3
 - float split4
 
+<a name="Class_CheckBox"></a>
 
 ### CheckBox
 
@@ -3115,6 +3334,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_CollisionBox2D"></a>
 
 ### CollisionBox2D
 
@@ -3178,6 +3398,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_CollisionChain2D"></a>
 
 ### CollisionChain2D
 
@@ -3242,6 +3463,7 @@ Properties:
 - uint vertexCount
 - int weakRefs // readonly
 
+<a name="Class_CollisionCircle2D"></a>
 
 ### CollisionCircle2D
 
@@ -3303,6 +3525,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_CollisionEdge2D"></a>
 
 ### CollisionEdge2D
 
@@ -3364,6 +3587,7 @@ Properties:
 - Vector2 vertex2
 - int weakRefs // readonly
 
+<a name="Class_CollisionPolygon2D"></a>
 
 ### CollisionPolygon2D
 
@@ -3427,6 +3651,7 @@ Properties:
 - uint vertexCount
 - int weakRefs // readonly
 
+<a name="Class_CollisionShape"></a>
 
 ### CollisionShape
 
@@ -3495,6 +3720,7 @@ Properties:
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 
+<a name="Class_CollisionShape2D"></a>
 
 ### CollisionShape2D
 
@@ -3553,6 +3779,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Color"></a>
 
 ### Color
 
@@ -3592,6 +3819,7 @@ Properties:
 - Vector3 rgb // readonly
 - Vector4 rgba // readonly
 
+<a name="Class_ColorFrame"></a>
 
 ### ColorFrame
 
@@ -3600,6 +3828,7 @@ Properties:
 - Color color
 - float time
 
+<a name="Class_Component"></a>
 
 ### Component
 
@@ -3648,6 +3877,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Connection"></a>
 
 ### Connection
 
@@ -3683,6 +3913,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Console"></a>
 
 ### Console
 
@@ -3715,6 +3946,7 @@ Properties:
 - bool visible
 - int weakRefs // readonly
 
+<a name="Class_Constraint"></a>
 
 ### Constraint
 
@@ -3778,6 +4010,7 @@ Properties:
 - int weakRefs // readonly
 - Vector3 worldPosition
 
+<a name="Class_Constraint2D"></a>
 
 ### Constraint2D
 
@@ -3829,6 +4062,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintDistance2D"></a>
 
 ### ConstraintDistance2D
 
@@ -3884,6 +4118,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintFriction2D"></a>
 
 ### ConstraintFriction2D
 
@@ -3938,6 +4173,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintGear2D"></a>
 
 ### ConstraintGear2D
 
@@ -3992,6 +4228,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintMotor2D"></a>
 
 ### ConstraintMotor2D
 
@@ -4048,6 +4285,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintMouse2D"></a>
 
 ### ConstraintMouse2D
 
@@ -4103,6 +4341,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintPrismatic2D"></a>
 
 ### ConstraintPrismatic2D
 
@@ -4162,6 +4401,7 @@ Properties:
 - float upperTranslation
 - int weakRefs // readonly
 
+<a name="Class_ConstraintPulley2D"></a>
 
 ### ConstraintPulley2D
 
@@ -4218,6 +4458,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintRevolute2D"></a>
 
 ### ConstraintRevolute2D
 
@@ -4276,6 +4517,7 @@ Properties:
 - float upperAngle
 - int weakRefs // readonly
 
+<a name="Class_ConstraintRope2D"></a>
 
 ### ConstraintRope2D
 
@@ -4330,6 +4572,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintWeld2D"></a>
 
 ### ConstraintWeld2D
 
@@ -4384,6 +4627,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintWheel2D"></a>
 
 ### ConstraintWheel2D
 
@@ -4442,6 +4686,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Controls"></a>
 
 ### Controls
 
@@ -4459,6 +4704,7 @@ Properties:
 - float pitch
 - float yaw
 
+<a name="Class_Cursor"></a>
 
 ### Cursor
 
@@ -4612,6 +4858,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_CustomGeometry"></a>
 
 ### CustomGeometry
 
@@ -4691,6 +4938,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_CustomGeometryVertex"></a>
 
 ### CustomGeometryVertex
 
@@ -4702,6 +4950,7 @@ Properties:
 - Vector4 tangent
 - Vector2 texCoord
 
+<a name="Class_DebugHud"></a>
 
 ### DebugHud
 
@@ -4732,6 +4981,7 @@ Properties:
 - bool useRendererStats
 - int weakRefs // readonly
 
+<a name="Class_DebugRenderer"></a>
 
 ### DebugRenderer
 
@@ -4788,6 +5038,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_DecalSet"></a>
 
 ### DecalSet
 
@@ -4861,6 +5112,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_Deserializer"></a>
 
 ### Deserializer
 
@@ -4906,6 +5158,7 @@ Properties:
 - uint position // readonly
 - uint size // readonly
 
+<a name="Class_Dictionary"></a>
 
 ### Dictionary
 
@@ -4927,9 +5180,11 @@ Properties:
 - String[]@ keys // readonly
 - uint length // readonly
 
+<a name="Class_DictionaryValue"></a>
 
 ### DictionaryValue
 
+<a name="Class_Drawable"></a>
 
 ### Drawable
 
@@ -4993,6 +5248,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Drawable2D"></a>
 
 ### Drawable2D
 
@@ -5061,6 +5317,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_DropDownList"></a>
 
 ### DropDownList
 
@@ -5238,6 +5495,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Engine"></a>
 
 ### Engine
 
@@ -5270,6 +5528,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_File"></a>
 
 ### File
 
@@ -5357,6 +5616,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_FileSelector"></a>
 
 ### FileSelector
 
@@ -5391,6 +5651,7 @@ Properties:
 - int weakRefs // readonly
 - Window@ window // readonly
 
+<a name="Class_FileSystem"></a>
 
 ### FileSystem
 
@@ -5425,6 +5686,7 @@ Properties:
 - String userDocumentsDir // readonly
 - int weakRefs // readonly
 
+<a name="Class_FocusParameters"></a>
 
 ### FocusParameters
 
@@ -5436,6 +5698,7 @@ Properties:
 - bool nonUniform
 - float quantize
 
+<a name="Class_Font"></a>
 
 ### Font
 
@@ -5462,6 +5725,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Frustum"></a>
 
 ### Frustum
 
@@ -5484,6 +5748,7 @@ Properties:
 
 - Vector3[] vertices // readonly
 
+<a name="Class_Graphics"></a>
 
 ### Graphics
 
@@ -5541,6 +5806,7 @@ Properties:
 - IntVector2 windowPosition
 - String windowTitle
 
+<a name="Class_HttpRequest"></a>
 
 ### HttpRequest
 
@@ -5594,6 +5860,7 @@ Properties:
 - String verb // readonly
 - int weakRefs // readonly
 
+<a name="Class_Image"></a>
 
 ### Image
 
@@ -5645,6 +5912,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Input"></a>
 
 ### Input
 
@@ -5706,6 +5974,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_IntRect"></a>
 
 ### IntRect
 
@@ -5724,6 +5993,7 @@ Properties:
 - int top
 - int width // readonly
 
+<a name="Class_IntVector2"></a>
 
 ### IntVector2
 
@@ -5737,6 +6007,7 @@ Properties:
 - int x
 - int y
 
+<a name="Class_JSONFile"></a>
 
 ### JSONFile
 
@@ -5762,6 +6033,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_JSONValue"></a>
 
 ### JSONValue
 
@@ -5858,6 +6130,7 @@ Properties:
 - bool notNull // readonly
 - uint size // readonly
 
+<a name="Class_JoystickState"></a>
 
 ### JoystickState
 
@@ -5874,6 +6147,7 @@ Properties:
 - uint numButtons // readonly
 - uint numHats // readonly
 
+<a name="Class_Light"></a>
 
 ### Light
 
@@ -5960,6 +6234,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_LineEdit"></a>
 
 ### LineEdit
 
@@ -6120,6 +6395,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_ListView"></a>
 
 ### ListView
 
@@ -6301,6 +6577,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Log"></a>
 
 ### Log
 
@@ -6328,6 +6605,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Material"></a>
 
 ### Material
 
@@ -6375,6 +6653,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Matrix3"></a>
 
 ### Matrix3
 
@@ -6401,6 +6680,7 @@ Properties:
 - float m21
 - float m22
 
+<a name="Class_Matrix3x4"></a>
 
 ### Matrix3x4
 
@@ -6436,6 +6716,7 @@ Properties:
 - float m22
 - float m23
 
+<a name="Class_Matrix4"></a>
 
 ### Matrix4
 
@@ -6475,6 +6756,7 @@ Properties:
 - float m32
 - float m33
 
+<a name="Class_Menu"></a>
 
 ### Menu
 
@@ -6640,6 +6922,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_MessageBox"></a>
 
 ### MessageBox
 
@@ -6659,6 +6942,7 @@ Properties:
 - int weakRefs // readonly
 - UIElement@ window // readonly
 
+<a name="Class_Model"></a>
 
 ### Model
 
@@ -6688,6 +6972,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Navigable"></a>
 
 ### Navigable
 
@@ -6737,6 +7022,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_NavigationMesh"></a>
 
 ### NavigationMesh
 
@@ -6813,6 +7099,7 @@ Properties:
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 
+<a name="Class_Network"></a>
 
 ### Network
 
@@ -6847,6 +7134,7 @@ Properties:
 - int updateFps
 - int weakRefs // readonly
 
+<a name="Class_NetworkPriority"></a>
 
 ### NetworkPriority
 
@@ -6899,6 +7187,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Node"></a>
 
 ### Node
 
@@ -7039,6 +7328,7 @@ Properties:
 - Matrix3x4 worldTransform // readonly
 - Vector3 worldUp // readonly
 
+<a name="Class_Object"></a>
 
 ### Object
 
@@ -7055,6 +7345,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ObjectAnimation"></a>
 
 ### ObjectAnimation
 
@@ -7087,6 +7378,7 @@ Properties:
 - int weakRefs // readonly
 - Variant[] wrapModes // readonly
 
+<a name="Class_Octree"></a>
 
 ### Octree
 
@@ -7147,6 +7439,7 @@ Properties:
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 
+<a name="Class_OffMeshConnection"></a>
 
 ### OffMeshConnection
 
@@ -7198,6 +7491,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_PackageFile"></a>
 
 ### PackageFile
 
@@ -7222,6 +7516,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ParticleEffect"></a>
 
 ### ParticleEffect
 
@@ -7280,6 +7575,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ParticleEffect2D"></a>
 
 ### ParticleEffect2D
 
@@ -7303,6 +7599,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ParticleEmitter"></a>
 
 ### ParticleEmitter
 
@@ -7383,6 +7680,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_ParticleEmitter2D"></a>
 
 ### ParticleEmitter2D
 
@@ -7452,6 +7750,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Pass"></a>
 
 ### Pass
 
@@ -7470,6 +7769,7 @@ Properties:
 - String vertexShaderDefines
 - int weakRefs // readonly
 
+<a name="Class_PhysicsRaycastResult"></a>
 
 ### PhysicsRaycastResult
 
@@ -7480,6 +7780,7 @@ Properties:
 - Vector3 normal
 - Vector3 position
 
+<a name="Class_PhysicsRaycastResult2D"></a>
 
 ### PhysicsRaycastResult2D
 
@@ -7490,6 +7791,7 @@ Properties:
 - Vector2 normal
 - Vector2 position
 
+<a name="Class_PhysicsWorld"></a>
 
 ### PhysicsWorld
 
@@ -7555,6 +7857,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_PhysicsWorld2D"></a>
 
 ### PhysicsWorld2D
 
@@ -7622,6 +7925,7 @@ Properties:
 - bool warmStarting
 - int weakRefs // readonly
 
+<a name="Class_Plane"></a>
 
 ### Plane
 
@@ -7648,6 +7952,7 @@ Properties:
 - Vector3 normal
 - Matrix3x4 reflectionMatrix // readonly
 
+<a name="Class_Polyhedron"></a>
 
 ### Polyhedron
 
@@ -7671,6 +7976,7 @@ Properties:
 - Vector3[]@[] face // readonly
 - uint numFaces // readonly
 
+<a name="Class_PropertySet2D"></a>
 
 ### PropertySet2D
 
@@ -7684,6 +7990,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_Quaternion"></a>
 
 ### Quaternion
 
@@ -7715,6 +8022,7 @@ Properties:
 - float yaw // readonly
 - float z
 
+<a name="Class_Ray"></a>
 
 ### Ray
 
@@ -7735,6 +8043,7 @@ Properties:
 - Vector3 direction
 - Vector3 origin
 
+<a name="Class_RayQueryResult"></a>
 
 ### RayQueryResult
 
@@ -7747,6 +8056,7 @@ Properties:
 - Vector3 position
 - uint subObject
 
+<a name="Class_Rect"></a>
 
 ### Rect
 
@@ -7775,6 +8085,7 @@ Properties:
 - Vector2 size // readonly
 - float top
 
+<a name="Class_RefCounted"></a>
 
 ### RefCounted
 
@@ -7783,6 +8094,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_RenderPath"></a>
 
 ### RenderPath
 
@@ -7812,6 +8124,7 @@ Properties:
 - Variant[] shaderParameters
 - int weakRefs // readonly
 
+<a name="Class_RenderPathCommand"></a>
 
 ### RenderPathCommand
 
@@ -7844,6 +8157,7 @@ Properties:
 - String vertexShaderDefines
 - String vertexShaderName
 
+<a name="Class_RenderSurface"></a>
 
 ### RenderSurface
 
@@ -7863,6 +8177,7 @@ Properties:
 - Viewport@[] viewports
 - int width // readonly
 
+<a name="Class_RenderTargetInfo"></a>
 
 ### RenderTargetInfo
 
@@ -7878,6 +8193,7 @@ Properties:
 - RenderTargetSizeMode sizeMode
 - String tag
 
+<a name="Class_Renderer"></a>
 
 ### Renderer
 
@@ -7931,6 +8247,7 @@ Properties:
 - Viewport@[] viewports
 - int weakRefs // readonly
 
+<a name="Class_Resource"></a>
 
 ### Resource
 
@@ -7954,6 +8271,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ResourceCache"></a>
 
 ### ResourceCache
 
@@ -8002,6 +8320,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ResourceRef"></a>
 
 ### ResourceRef
 
@@ -8010,6 +8329,7 @@ Properties:
 - String name
 - StringHash type
 
+<a name="Class_ResourceRefList"></a>
 
 ### ResourceRefList
 
@@ -8024,6 +8344,7 @@ Properties:
 - String[] names
 - StringHash type
 
+<a name="Class_RigidBody"></a>
 
 ### RigidBody
 
@@ -8112,6 +8433,7 @@ Properties:
 - bool useGravity
 - int weakRefs // readonly
 
+<a name="Class_RigidBody2D"></a>
 
 ### RigidBody2D
 
@@ -8178,6 +8500,7 @@ Properties:
 - bool useFixtureMass
 - int weakRefs // readonly
 
+<a name="Class_Scene"></a>
 
 ### Scene
 
@@ -8350,6 +8673,7 @@ Properties:
 - Matrix3x4 worldTransform // readonly
 - Vector3 worldUp // readonly
 
+<a name="Class_Script"></a>
 
 ### Script
 
@@ -8371,6 +8695,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ScriptFile"></a>
 
 ### ScriptFile
 
@@ -8399,6 +8724,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ScriptInstance"></a>
 
 ### ScriptInstance
 
@@ -8456,9 +8782,11 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ScriptObject"></a>
 
 ### ScriptObject
 
+<a name="Class_ScrollBar"></a>
 
 ### ScrollBar
 
@@ -8612,6 +8940,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_ScrollView"></a>
 
 ### ScrollView
 
@@ -8763,6 +9092,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Serializable"></a>
 
 ### Serializable
 
@@ -8797,6 +9127,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Serializer"></a>
 
 ### Serializer
 
@@ -8833,6 +9164,7 @@ Methods:
 - bool WriteVector3(const Vector3&)
 - bool WriteVector4(const Vector4&)
 
+<a name="Class_Skeleton"></a>
 
 ### Skeleton
 
@@ -8847,6 +9179,7 @@ Properties:
 - uint numBones // readonly
 - Bone@ rootBone // readonly
 
+<a name="Class_Skybox"></a>
 
 ### Skybox
 
@@ -8916,6 +9249,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_Slider"></a>
 
 ### Slider
 
@@ -9072,6 +9406,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_SmoothedTransform"></a>
 
 ### SmoothedTransform
 
@@ -9126,6 +9461,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Sound"></a>
 
 ### Sound
 
@@ -9156,6 +9492,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_SoundListener"></a>
 
 ### SoundListener
 
@@ -9204,6 +9541,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_SoundSource"></a>
 
 ### SoundSource
 
@@ -9266,6 +9604,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_SoundSource3D"></a>
 
 ### SoundSource3D
 
@@ -9335,6 +9674,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Sphere"></a>
 
 ### Sphere
 
@@ -9361,6 +9701,7 @@ Properties:
 - bool defined
 - float radius
 
+<a name="Class_Spline"></a>
 
 ### Spline
 
@@ -9379,6 +9720,7 @@ Properties:
 - Variant[] knot
 - Variant[]@ knots
 
+<a name="Class_SplinePath"></a>
 
 ### SplinePath
 
@@ -9438,6 +9780,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Sprite"></a>
 
 ### Sprite
 
@@ -9552,6 +9895,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Sprite2D"></a>
 
 ### Sprite2D
 
@@ -9579,6 +9923,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_SpriteSheet2D"></a>
 
 ### SpriteSheet2D
 
@@ -9605,6 +9950,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_StaticModel"></a>
 
 ### StaticModel
 
@@ -9676,6 +10022,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_StaticModelGroup"></a>
 
 ### StaticModelGroup
 
@@ -9751,6 +10098,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_StaticSprite2D"></a>
 
 ### StaticSprite2D
 
@@ -9823,6 +10171,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_String"></a>
 
 ### String
 
@@ -9880,6 +10229,7 @@ Properties:
 - uint length // readonly
 - uint utf8Length // readonly
 
+<a name="Class_StringHash"></a>
 
 ### StringHash
 
@@ -9891,6 +10241,7 @@ Properties:
 
 - uint value // readonly
 
+<a name="Class_Technique"></a>
 
 ### Technique
 
@@ -9919,6 +10270,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_TechniqueEntry"></a>
 
 ### TechniqueEntry
 
@@ -9928,6 +10280,7 @@ Properties:
 - int qualityLevel
 - Technique@ technique
 
+<a name="Class_Terrain"></a>
 
 ### Terrain
 
@@ -10000,6 +10353,7 @@ Properties:
 - int weakRefs // readonly
 - uint zoneMask
 
+<a name="Class_TerrainPatch"></a>
 
 ### TerrainPatch
 
@@ -10063,6 +10417,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Text"></a>
 
 ### Text
 
@@ -10226,6 +10581,7 @@ Properties:
 - int width
 - bool wordwrap
 
+<a name="Class_Text3D"></a>
 
 ### Text3D
 
@@ -10315,6 +10671,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Texture"></a>
 
 ### Texture
 
@@ -10355,6 +10712,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Texture2D"></a>
 
 ### Texture2D
 
@@ -10398,6 +10756,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Texture3D"></a>
 
 ### Texture3D
 
@@ -10441,6 +10800,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_TextureCube"></a>
 
 ### TextureCube
 
@@ -10484,6 +10844,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_TextureFrame"></a>
 
 ### TextureFrame
 
@@ -10492,6 +10853,7 @@ Properties:
 - float time
 - Rect uv
 
+<a name="Class_Tile2D"></a>
 
 ### Tile2D
 
@@ -10507,6 +10869,7 @@ Properties:
 - Sprite2D@ sprite // readonly
 - int weakRefs // readonly
 
+<a name="Class_TileMap2D"></a>
 
 ### TileMap2D
 
@@ -10563,6 +10926,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_TileMapLayer2D"></a>
 
 ### TileMapLayer2D
 
@@ -10625,6 +10989,7 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_TileObject2D"></a>
 
 ### TileObject2D
 
@@ -10645,6 +11010,7 @@ Properties:
 - TileObjectType2D type // readonly
 - int weakRefs // readonly
 
+<a name="Class_Time"></a>
 
 ### Time
 
@@ -10666,6 +11032,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Timer"></a>
 
 ### Timer
 
@@ -10674,6 +11041,7 @@ Methods:
 - uint GetMSec(bool)
 - void Reset()
 
+<a name="Class_TmxFile2D"></a>
 
 ### TmxFile2D
 
@@ -10697,6 +11065,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ToolTip"></a>
 
 ### ToolTip
 
@@ -10839,6 +11208,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_TouchState"></a>
 
 ### TouchState
 
@@ -10851,6 +11221,7 @@ Properties:
 - int touchID
 - UIElement@ touchedElement // readonly
 
+<a name="Class_UI"></a>
 
 ### UI
 
@@ -10899,6 +11270,7 @@ Properties:
 - bool useSystemClipboard
 - int weakRefs // readonly
 
+<a name="Class_UIElement"></a>
 
 ### UIElement
 
@@ -11040,6 +11412,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_ValueAnimation"></a>
 
 ### ValueAnimation
 
@@ -11068,6 +11441,7 @@ Properties:
 - VariantType valueType
 - int weakRefs // readonly
 
+<a name="Class_Variant"></a>
 
 ### Variant
 
@@ -11107,6 +11481,7 @@ Properties:
 - String typeName // readonly
 - bool zero // readonly
 
+<a name="Class_VariantMap"></a>
 
 ### VariantMap
 
@@ -11123,6 +11498,7 @@ Properties:
 - StringHash[]@ keys // readonly
 - uint length // readonly
 
+<a name="Class_Vector2"></a>
 
 ### Vector2
 
@@ -11145,6 +11521,7 @@ Properties:
 - float x
 - float y
 
+<a name="Class_Vector3"></a>
 
 ### Vector3
 
@@ -11170,6 +11547,7 @@ Properties:
 - float y
 - float z
 
+<a name="Class_Vector4"></a>
 
 ### Vector4
 
@@ -11190,6 +11568,7 @@ Properties:
 - float y
 - float z
 
+<a name="Class_VectorBuffer"></a>
 
 ### VectorBuffer
 
@@ -11268,6 +11647,7 @@ Properties:
 - uint position // readonly
 - uint size // readonly
 
+<a name="Class_View3D"></a>
 
 ### View3D
 
@@ -11427,6 +11807,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Viewport"></a>
 
 ### Viewport
 
@@ -11451,6 +11832,7 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_WeakHandle"></a>
 
 ### WeakHandle
 
@@ -11464,6 +11846,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_Window"></a>
 
 ### Window
 
@@ -11614,6 +11997,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_XMLElement"></a>
 
 ### XMLElement
 
@@ -11690,6 +12074,7 @@ Properties:
 - XMLElement parent // readonly
 - String value
 
+<a name="Class_XMLFile"></a>
 
 ### XMLFile
 
@@ -11719,6 +12104,7 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_XPathQuery"></a>
 
 ### XPathQuery
 
@@ -11740,6 +12126,7 @@ Properties:
 
 - String query
 
+<a name="Class_XPathResultSet"></a>
 
 ### XPathResultSet
 
@@ -11749,6 +12136,7 @@ Properties:
 - XMLElement firstResult // readonly
 - uint size // readonly
 
+<a name="Class_Zone"></a>
 
 ### Zone
 
