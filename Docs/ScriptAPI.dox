@@ -1234,6 +1234,11 @@ namespace Urho3D
 - %Clear %Sel. %On %Defocus : bool
 - %Select %On %Click %End : bool
 
+### LuaScriptInstance
+- %Is %Enabled : bool
+- %Script %File : ResourceRef
+- %Script %Object %Type : String
+
 ### Menu
 - %Name : String
 - %Position : IntVector2
