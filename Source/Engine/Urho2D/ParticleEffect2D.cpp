@@ -107,6 +107,9 @@ void ParticleEffect2D::RegisterObject(Context* context)
 
 bool ParticleEffect2D::BeginLoad(Deserializer& source)
 {
+    if (GetName().Empty())
+        SetName(source.GetName());
+
     loadSpriteName_.Clear();
 
     XMLFile xmlFile(context_);
