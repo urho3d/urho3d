@@ -98,8 +98,9 @@ void Urho2DTileMap::CreateScene()
     tileMap->SetTmxFile(tmxFile);
 
     // Set camera's position
-    float x = tileMap->GetWidth() * tileMap->GetTileWidth() * 0.5f;
-    float y = tileMap->GetHeight() * tileMap->GetTileHeight() * 0.5f;
+    const TileMapInfo2D& info = tileMap->GetInfo();
+    float x = info.GetMapWidth() * 0.5f;
+    float y = info.GetMapHeight() * 0.5f;
     cameraNode_->SetPosition(Vector3(x, y, -10.0f));
 }
 

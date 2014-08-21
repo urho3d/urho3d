@@ -49,16 +49,8 @@ public:
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
-    /// Return orientation.
-    Orientation2D GetOrientation() const;
-    /// Return width.
-    int GetWidth() const;
-    /// Return height.
-    int GetHeight() const;
-    /// Return tile width
-    float GetTileWidth() const;
-    /// Return tile height in pixel.
-    float GetTileHeight() const;
+    /// Return information.
+    const TileMapInfo2D& GetInfo() const { return info_; }
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return tile map layer at index.
@@ -72,6 +64,8 @@ public:
 private:
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
+    /// Tile map information.
+    TileMapInfo2D info_;
     /// Tile map layers.
     Vector<SharedPtr<TileMapLayer2D> > layers_;
 };

@@ -193,11 +193,30 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleEffect2D@+ get_effect() const", asMETHOD(ParticleEmitter2D, GetEffect), asCALL_THISCALL);
 }
 
+static void FakeAddRef(void* ptr)
+{
+}
+
+static void FakeReleaseRef(void* ptr)
+{
+}
+
 static void RegisterTileMapDefs2D(asIScriptEngine* engine)
 {
     engine->RegisterEnum("Orientation2D");
     engine->RegisterEnumValue("Orientation2D", "O_ORTHOGONAL", O_ORTHOGONAL);
     engine->RegisterEnumValue("Orientation2D", "O_ISOMETRIC", O_ISOMETRIC);
+
+    engine->RegisterObjectType("TileMapInfo2D", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("TileMapInfo2D", "Orientation2D orientation", offsetof(TileMapInfo2D, orientation_));
+    engine->RegisterObjectProperty("TileMapInfo2D", "int width", offsetof(TileMapInfo2D, width_));
+    engine->RegisterObjectProperty("TileMapInfo2D", "int height", offsetof(TileMapInfo2D, height_));
+    engine->RegisterObjectProperty("TileMapInfo2D", "float tileWidth", offsetof(TileMapInfo2D, tileWidth_));
+    engine->RegisterObjectProperty("TileMapInfo2D", "float tileHeight", offsetof(TileMapInfo2D, tileHeight_));
+    engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapWidth() const", asMETHOD(TileMapInfo2D, GetMapWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapHeight() const", asMETHOD(TileMapInfo2D, GetMapHeight), asCALL_THISCALL);
 
     engine->RegisterEnum("TileMapLayerType2D");
     engine->RegisterEnumValue("TileMapLayerType2D", "LT_TILE_LAYER", LT_TILE_LAYER);
@@ -271,11 +290,7 @@ static void RegisterTileMap2D(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("TileMap2D", "void set_tmxFile(TmxFile2D@)", asMETHOD(TileMap2D, SetTmxFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMap2D", "TmxFile2D@ get_tmxFile() const", asMETHOD(TileMap2D, GetTmxFile), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMap2D", "Orientation2D get_orientation() const", asMETHOD(TileMap2D, GetOrientation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMap2D", "int get_width() const", asMETHOD(TileMap2D, GetWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMap2D", "int get_height() const", asMETHOD(TileMap2D, GetHeight), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMap2D", "float get_tileWidth() const", asMETHOD(TileMap2D, GetTileWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMap2D", "float get_tileHeight() const", asMETHOD(TileMap2D, GetTileHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMap2D", "TileMapInfo2D@ get_info() const", asMETHOD(TileMap2D, GetInfo), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMap2D", "uint get_numLayers() const", asMETHOD(TileMap2D, GetNumLayers), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMap2D", "TileMapLayer2D@ GetLayer(uint) const", asMETHOD(TileMap2D, GetLayer), asCALL_THISCALL);
 }

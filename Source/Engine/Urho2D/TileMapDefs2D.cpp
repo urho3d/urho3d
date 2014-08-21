@@ -119,4 +119,30 @@ const String& TileObject2D::GetProperty(const String& name) const
     return propertySet_->GetProperty(name);
 }
 
+Vector2 IndexToPosition2D(int x, int y, const TileMapInfo2D& tileMapInfo)
+{
+    if (tileMapInfo.orientation_ == O_ORTHOGONAL)
+        return Vector2((x + 0.5f) * tileMapInfo.tileWidth_, (y + 0.5f) * tileMapInfo.tileHeight_);
+    else
+        return Vector2(((x + y) + 0.5f) * tileMapInfo.tileWidth_ * 0.5f, (tileMapInfo.height_ - (x - y) + 0.5f) * tileMapInfo.tileHeight_ * 0.5f);
+}
+
+bool PositionToIndex2D(int& x, int& y, const Vector2& position, const TileMapInfo2D& tileMapInfo)
+{
+    if (tileMapInfo.orientation_ == O_ORTHOGONAL)
+    {
+        x = (int)(position.x_ / tileMapInfo.tileWidth_);
+        y = (int)(position.y_ / tileMapInfo.tileHeight_);
+    }
+    else
+    {
+        int sum = (int)(position.x_ * 2.0f / tileMapInfo.tileWidth_);
+        int dif = (int)(tileMapInfo.height_ - position.y_ * 2.0f / tileMapInfo.tileHeight_);
+        x = (sum + dif) / 2;
+        y = (sum - dif) / 2;
+    }
+
+    return x >= 0 && x < tileMapInfo.width_ && y >= 0 && y < tileMapInfo.height_;
+}
+
 }

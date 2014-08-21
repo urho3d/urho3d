@@ -29,6 +29,7 @@ namespace Urho3D
 {
 
 class Node;
+class TileMap2D;
 class TmxImageLayer2D;
 class TmxLayer2D;
 class TmxObjectGroup2D;
@@ -47,13 +48,15 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set tmx layer.
-    void SetTmxLayer(const TmxLayer2D* tmxLayer);
+    /// Initialize with tile map and tmx layer.
+    void Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer);
     /// Set draw order
     void SetDrawOrder(int drawOrder);
     /// Set visible.
     void SetVisible(bool visible);
 
+    /// Return tile map.
+    TileMap2D* GetTileMap() const;
     /// Return tmx layer.
     const TmxLayer2D* GetTmxLayer() const { return tmxLayer_; }
     /// Return draw order.
@@ -94,6 +97,8 @@ private:
     /// Set image layer.
     void SetImageLayer(const TmxImageLayer2D* imageLayer);
 
+    /// Tile map.
+    WeakPtr<TileMap2D> tileMap_;
     /// Tmx layer.
     const TmxLayer2D* tmxLayer_;
     /// Tile layer.

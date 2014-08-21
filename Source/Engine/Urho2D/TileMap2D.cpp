@@ -65,9 +65,10 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     }
 
     tmxFile_ = tmxFile;
-    
     if (!tmxFile_)
         return;
+
+    info_ = tmxFile_->GetInfo();
 
     unsigned numLayers = tmxFile_->GetNumLayers();
     layers_.Resize(numLayers);
@@ -80,7 +81,7 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
         layerNode->SetTemporary(true);
 
         SharedPtr<TileMapLayer2D> layer(layerNode->CreateComponent<TileMapLayer2D>());
-        layer->SetTmxLayer(tmxLayer);
+        layer->Initialize(this, tmxLayer);
         layer->SetDrawOrder(i * 10);
 
         layers_[i] = layer;
@@ -90,32 +91,6 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
 TmxFile2D* TileMap2D::GetTmxFile() const
 {
     return tmxFile_;
-}
-
-Orientation2D TileMap2D::GetOrientation() const
-{
-    return tmxFile_ ? tmxFile_->GetOrientation() : O_ORTHOGONAL;
-}
-
-int TileMap2D::GetWidth() const
-{
-    return tmxFile_ ? tmxFile_->GetWidth() : 0;
-}
-
-int TileMap2D::GetHeight() const
-{
-    return tmxFile_ ? tmxFile_->GetHeight() : 0;
-
-}
-
-float TileMap2D::GetTileWidth() const
-{
-    return tmxFile_ ? tmxFile_->GetTileWidth() : 0.0f;
-}
-
-float TileMap2D::GetTileHeight() const
-{
-    return tmxFile_ ? tmxFile_->GetTileHeight() : 0.0f;
 }
 
 TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const

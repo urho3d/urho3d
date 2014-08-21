@@ -39,6 +39,26 @@ enum Orientation2D
     O_ISOMETRIC
 };
 
+/// Tile map infomation.
+struct URHO3D_API TileMapInfo2D
+{
+    /// Orientation.
+    Orientation2D orientation_;
+    /// Width.
+    int width_;
+    /// Height.
+    int height_;
+    /// Tile width.
+    float tileWidth_;
+    /// Tile height.
+    float tileHeight_;
+
+    /// Return map width.
+    float GetMapWidth() const { return width_ * tileWidth_; }
+    /// return map height.
+    float GetMapHeight() const { return height_ * tileHeight_;}
+};
+
 /// Tile map layer type.
 enum TileMapLayerType2D
 {
@@ -159,5 +179,9 @@ private:
     SharedPtr<PropertySet2D> propertySet_;
 };
 
+/// Convert index to position.
+URHO3D_API Vector2 IndexToPosition2D(int x, int y, const TileMapInfo2D& tileMapInfo);
+/// Convert position to index, if out of range return false.
+URHO3D_API bool PositionToIndex2D(int& x, int& y, const Vector2& position, const TileMapInfo2D& tileMapInfo);
 
 }
