@@ -2139,6 +2139,7 @@ namespace Urho3D
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
 <a href="#Class_Tile2D"><b>Tile2D</b></a>
 <a href="#Class_TileMap2D"><b>TileMap2D</b></a>
+<a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
 <a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
 <a href="#Class_TileObject2D"><b>TileObject2D</b></a>
 <a href="#Class_Time"><b>Time</b></a>
@@ -10914,22 +10915,32 @@ Properties:
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
-- int height // readonly
 - uint id // readonly
+- TileMapInfo2D@ info // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numLayers // readonly
 - ObjectAnimation@ objectAnimation
-- Orientation2D orientation // readonly
 - int refs // readonly
 - bool temporary
-- float tileHeight // readonly
-- float tileWidth // readonly
 - TmxFile2D@ tmxFile
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
-- int width // readonly
+
+<a name="Class_TileMapInfo2D"></a>
+
+### TileMapInfo2D
+
+Properties:
+
+- int height
+- float mapHeight // readonly
+- float mapWidth // readonly
+- Orientation2D orientation
+- float tileHeight
+- float tileWidth
+- int width
 
 <a name="Class_TileMapLayer2D"></a>
 

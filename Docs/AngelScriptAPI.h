@@ -10130,9 +10130,9 @@ bool enabled;
 /* readonly */
 bool enabledEffective;
 /* readonly */
-int height;
-/* readonly */
 uint id;
+/* readonly */
+TileMapInfo2D info;
 /* readonly */
 Node node;
 /* readonly */
@@ -10141,14 +10141,8 @@ uint numAttributes;
 uint numLayers;
 ObjectAnimation objectAnimation;
 /* readonly */
-Orientation2D orientation;
-/* readonly */
 int refs;
 bool temporary;
-/* readonly */
-float tileHeight;
-/* readonly */
-float tileWidth;
 TmxFile2D tmxFile;
 /* readonly */
 StringHash type;
@@ -10156,7 +10150,20 @@ StringHash type;
 String typeName;
 /* readonly */
 int weakRefs;
+};
+
+class TileMapInfo2D
+{
+
+// Properties:
+int height;
 /* readonly */
+float mapHeight;
+/* readonly */
+float mapWidth;
+Orientation2D orientation;
+float tileHeight;
+float tileWidth;
 int width;
 };
 

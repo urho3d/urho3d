@@ -175,6 +175,7 @@ namespace Urho3D
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
 <a href="#Class_Tile2D"><b>Tile2D</b></a>
 <a href="#Class_TileMap2D"><b>TileMap2D</b></a>
+<a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
 <a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
 <a href="#Class_TileObject2D"><b>TileObject2D</b></a>
 <a href="#Class_Time"><b>Time</b></a>
@@ -5526,23 +5527,34 @@ Methods:
 
 - void SetTmxFile(TmxFile2D* tmxFile)
 - TmxFile2D* GetTmxFile() const
-- Orientation2D GetOrientation() const
-- int GetWidth() const
-- int GetHeight() const
-- float GetTileWidth() const
-- float GetTileHeight() const
+- const TileMapInfo2D& GetInfo() const
 - unsigned GetNumLayers() const
 - TileMapLayer2D* GetLayer(unsigned index) const
 
 Properties:
 
 - TmxFile2D* tmxFile
-- Orientation2D orientation (readonly)
-- int width (readonly)
-- int height (readonly)
-- float tileWidth (readonly)
-- float tileHeight (readonly)
+- TileMapInfo2D& info (readonly)
 - unsigned numLayers (readonly)
+
+<a name="Class_TileMapInfo2D"></a>
+### TileMapInfo2D
+
+
+Methods:
+
+- float GetMapWidth() const
+- float GetMapHeight() const
+
+Properties:
+
+- Orientation2D orientation
+- int width
+- int height
+- float tileWidth
+- float tileHeight
+- float mapWidth (readonly)
+- float mapHeight (readonly)
 
 <a name="Class_TileMapLayer2D"></a>
 ### TileMapLayer2D : Component
