@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#ifdef URHO3D_PHYSICS
 #include "APITemplates.h"
 #include "CollisionShape.h"
 #include "Constraint.h"
@@ -325,3 +326,4 @@ void RegisterPhysicsAPI(asIScriptEngine* engine)
 }
 
 }
+#endif

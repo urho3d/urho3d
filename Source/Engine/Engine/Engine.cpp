@@ -32,10 +32,14 @@
 #include "Input.h"
 #include "InputEvents.h"
 #include "Log.h"
+#ifdef URHO3D_NAVIGATION
 #include "NavigationMesh.h"
+#endif
 #include "Network.h"
 #include "PackageFile.h"
+#ifdef URHO3D_PHYSICS
 #include "PhysicsWorld.h"
+#endif
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Renderer.h"
@@ -115,8 +119,14 @@ Engine::Engine(Context* context) :
 
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
+
+#ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
+#endif
+    
+#ifdef URHO3D_NAVIGATION
     RegisterNavigationLibrary(context_);
+#endif
 
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
 }
