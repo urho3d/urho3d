@@ -153,16 +153,8 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return orientation.
-    Orientation2D GetOrientation() const { return orientation_; }
-    /// Return width in tiles.
-    int GetWidth() const { return width_; }
-    /// Return height in tiles.
-    int GetHeight() const { return height_; }
-    /// Return tile width.
-    float GetTileWidth() const { return tileWidth_; }
-    /// Return tile height.
-    float GetTileHeight() const { return tileHeight_; }
+    /// Return information.
+    const TileMapInfo2D& GetInfo() const { return info_; }
     /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
     /// Return tile property set by gid, if not exist return 0.
@@ -182,16 +174,8 @@ private:
     SharedPtr<XMLFile> loadXMLFile_;
     /// TSX name to XML file mapping.
     HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
-    /// Orientation type.
-    Orientation2D orientation_;
-    /// Width.
-    int width_;
-    /// Height.
-    int height_;
-    /// Tile width.
-    float tileWidth_;
-    /// Tile height.
-    float tileHeight_;
+    /// Tile map information.
+    TileMapInfo2D info_;
     /// Tile set textures.
     Vector<SharedPtr<Texture2D> > tileSetTextures_;
     /// Gid to tile sprite mapping.

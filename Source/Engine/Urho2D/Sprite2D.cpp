@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Deserializer.h"
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "Texture2D.h"
@@ -51,6 +52,9 @@ void Sprite2D::RegisterObject(Context* context)
 
 bool Sprite2D::BeginLoad(Deserializer& source)
 {
+    if (GetName().Empty())
+        SetName(source.GetName());
+    
     loadTexture_ = new Texture2D(context_);
     loadTexture_->SetName(GetName());
     // In case we're async loading, only call BeginLoad() for the texture (load image but do not upload to GPU)

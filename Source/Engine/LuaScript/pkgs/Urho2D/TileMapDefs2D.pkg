@@ -6,6 +6,21 @@ enum Orientation2D
     O_ISOMETRIC
 };
 
+struct TileMapInfo2D
+{
+    Orientation2D orientation_ @ orientation;
+    int width_ @ width;
+    int height_ @ height;
+    float tileWidth_ @ tileWidth;
+    float tileHeight_ @ tileHeight;
+
+    float GetMapWidth() const;
+    float GetMapHeight() const;
+
+    tolua_readonly tolua_property__get_set float mapWidth;
+    tolua_readonly tolua_property__get_set float mapHeight;
+};
+
 enum TileMapLayerType2D
 {
     LT_TILE_LAYER,

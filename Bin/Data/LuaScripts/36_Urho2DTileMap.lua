@@ -54,8 +54,9 @@ function CreateScene()
     tileMap.tmxFile = tmxFile
 
     -- Set camera's position
-    local x = tileMap.width * tileMap.tileWidth * 0.5
-    local y = tileMap.height * tileMap.tileHeight * 0.5
+    local info = tileMap.info
+    local x = info.mapWidth * 0.5
+    local y = info.mapHeight * 0.5
     cameraNode.position = Vector3(x, y, -10.0)
 end
 

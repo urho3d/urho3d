@@ -56,6 +56,9 @@ void SpriteSheet2D::RegisterObject(Context* context)
 
 bool SpriteSheet2D::BeginLoad(Deserializer& source)
 {
+    if (GetName().Empty())
+        SetName(source.GetName());
+
     loadTextureName_.Clear();
     spriteMapping_.Clear();
 

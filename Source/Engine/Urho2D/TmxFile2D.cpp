@@ -154,7 +154,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element)
 {
     LoadInfo(element);
    
-    const float mapHeight = height_ * tmxFile_->GetTileHeight();
+    const float mapHeight = height_ * tmxFile_->GetInfo().tileHeight_;
 
     for (XMLElement objectElem = element.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
     {
@@ -263,11 +263,7 @@ Sprite2D* TmxImageLayer2D::GetSprite() const
 }
 
 TmxFile2D::TmxFile2D(Context* context) :
-    Resource(context),
-    width_(0),
-    height_(0),
-    tileWidth_(0.0f),
-    tileHeight_(0.0f)
+    Resource(context)
 {
 }
 
@@ -284,6 +280,9 @@ void TmxFile2D::RegisterObject(Context* context)
 
 bool TmxFile2D::BeginLoad(Deserializer& source)
 {
+    if (GetName().Empty())
+        SetName(source.GetName());
+
     loadXMLFile_ = new XMLFile(context_);
     if (!loadXMLFile_->Load(source))
     {
@@ -350,19 +349,19 @@ bool TmxFile2D::EndLoad()
 
     String orientation = rootElem.GetAttribute("orientation");
     if (orientation == "orthogonal")
-        orientation_ = O_ORTHOGONAL;
+        info_.orientation_ = O_ORTHOGONAL;
     else if (orientation == "isometric")
-        orientation_ = O_ISOMETRIC;
+        info_.orientation_ = O_ISOMETRIC;
     else
     {
         LOGERROR("Invalid orientation type " + orientation);
         return false;
     }
 
-    width_ = rootElem.GetInt("width");
-    height_ = rootElem.GetInt("height");
-    tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
-    tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
+    info_.width_ = rootElem.GetInt("width");
+    info_.height_ = rootElem.GetInt("height");
+    info_.tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
+    info_.tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
     for (unsigned i = 0; i < layers_.Size(); ++i)
         delete layers_[i];

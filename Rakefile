@@ -21,6 +21,7 @@
 #
 
 require 'pathname'
+require 'json'
 if ENV['XCODE']
   require 'xcodeproj'
 end
@@ -75,8 +76,14 @@ task :travis_ci_site_update do
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
+  release = ENV['RELEASE_TAG'].empty? ? 'HEAD' : ENV['RELEASE_TAG'];
+  unless release == 'HEAD'
+    system "mkdir -p doc-Build/documentation/#{release}" or 'Failed to create directory for new document version'
+    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or 'Failed to update document version in YAML Front Matter block'
+    append_new_release release, 'doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
+  end
   # Generate and sync doxygen pages
-  system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation" or abort 'Failed to generate/rsync doxygen pages'
+  system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
   system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
   # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
@@ -324,6 +331,21 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = ''
     system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return 1
   end
   return 0
+end
+
+def append_new_release release, filename
+  begin
+    urho3d_hash = JSON.parse File.read filename
+    unless urho3d_hash['releases'].last == release
+      urho3d_hash['releases'] << release
+    end
+    File.open filename, 'w' do |file|
+      file.puts urho3d_hash.to_json
+    end
+    return 0
+  rescue
+    nil
+  end
 end
 
 def bump_soversion filename
