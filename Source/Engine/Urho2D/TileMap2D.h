@@ -55,6 +55,10 @@ public:
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return tile map layer at index.
     TileMapLayer2D* GetLayer(unsigned index) const;
+    /// Convert index to position.
+    Vector2 IndexToPosition(int x, int y) const;
+    /// Convert position to index, if out of map return false.
+    bool PositionToIndex(int& x, int& y, const Vector2& position) const;
 
     /// Set tile map file attribute.
     void SetTmxFileAttr(ResourceRef value);

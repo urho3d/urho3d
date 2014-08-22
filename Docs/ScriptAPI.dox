@@ -10889,10 +10889,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
+- Vector2 IndexToPosition(int, int) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
+- bool PositionToIndex(int&, int&, const Vector2&) const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()

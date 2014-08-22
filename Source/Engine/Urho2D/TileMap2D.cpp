@@ -101,6 +101,16 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
+Vector2 TileMap2D::IndexToPosition(int x, int y) const
+{
+    return IndexToPosition2D(x, y, info_);
+}
+
+bool TileMap2D::PositionToIndex(int& x, int& y, const Vector2& position) const
+{
+    return PositionToIndex2D(x, y, position, info_);
+}
+
 void TileMap2D::SetTmxFileAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

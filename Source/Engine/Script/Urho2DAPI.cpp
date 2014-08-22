@@ -293,6 +293,8 @@ static void RegisterTileMap2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMap2D", "TileMapInfo2D@ get_info() const", asMETHOD(TileMap2D, GetInfo), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMap2D", "uint get_numLayers() const", asMETHOD(TileMap2D, GetNumLayers), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMap2D", "TileMapLayer2D@ GetLayer(uint) const", asMETHOD(TileMap2D, GetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMap2D", "Vector2 IndexToPosition(int, int) const", asMETHOD(TileMap2D, IndexToPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMap2D", "bool PositionToIndex(int&out x, int &out y, const Vector2&in) const", asMETHOD(TileMap2D, PositionToIndex), asCALL_THISCALL);
 }
 
 static void RegisterRigidBody2D(asIScriptEngine* engine)

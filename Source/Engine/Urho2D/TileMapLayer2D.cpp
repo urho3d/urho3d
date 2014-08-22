@@ -230,9 +230,6 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
     int height = tileLayer->GetHeight();
     nodes_.Resize(width * height);
 
-    TmxFile2D* tmxFile = tileLayer->GetTmxFile();
-    const TileMapInfo2D& info = tmxFile->GetInfo();
-
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
@@ -243,7 +240,7 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 
             SharedPtr<Node> tileNode(GetNode()->CreateChild("Tile"));
             tileNode->SetTemporary(true);
-            tileNode->SetPosition(IndexToPosition2D(x, y, info));
+            tileNode->SetPosition(tileMap_->IndexToPosition(x, y));
 
             StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(tile->GetSprite());
