@@ -5530,6 +5530,8 @@ Methods:
 - const TileMapInfo2D& GetInfo() const
 - unsigned GetNumLayers() const
 - TileMapLayer2D* GetLayer(unsigned index) const
+- Vector2 IndexToPosition(int x, int y) const
+- bool PositionToIndex(const Vector2& position, int x = 0, int y = 0) const
 
 Properties:
 
