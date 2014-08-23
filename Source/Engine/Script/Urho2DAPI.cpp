@@ -243,7 +243,9 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHOD(Tile2D, HasProperty), asCALL_THISCALL);
 
     RegisterRefCounted<TileObject2D>(engine, "TileObject2D");
-    engine->RegisterObjectMethod("TileObject2D", "TileObjectType2D get_type() const", asMETHOD(TileObject2D, GetType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileObject2D", "TileObjectType2D get_objectType() const", asMETHOD(TileObject2D, GetObjectType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileObject2D", "const String& get_name() const", asMETHOD(TileObject2D, GetName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileObject2D", "const String& get_type() const", asMETHOD(TileObject2D, GetType), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileObject2D", "const Vector2& get_position() const", asMETHOD(TileObject2D, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileObject2D", "const Vector2& get_size() const", asMETHOD(TileObject2D, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileObject2D", "uint get_numPoints() const", asMETHOD(TileObject2D, GetNumPoints), asCALL_THISCALL);

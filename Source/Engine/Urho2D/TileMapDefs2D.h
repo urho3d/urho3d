@@ -142,7 +142,11 @@ public:
     TileObject2D();
 
     /// Return type.
-    TileObjectType2D GetType() const { return type_; }
+    TileObjectType2D GetObjectType() const { return objectType_; }
+    /// Return name.
+    const String& GetName() const { return name_; }
+    /// Return type.
+    const String& GetType() const { return type_; }
     /// Return position.
     const Vector2& GetPosition() const { return position_; }
     /// Return size (for rectangle and ellipse).
@@ -164,7 +168,11 @@ private:
     friend class TmxObjectGroup2D;
 
     /// Object type.
-    TileObjectType2D type_;
+    TileObjectType2D objectType_;
+    /// Name.
+    String name_;
+    /// Type.
+    String type_;
     /// Position.
     Vector2 position_;
     /// Size (for rectangle and ellipse).
