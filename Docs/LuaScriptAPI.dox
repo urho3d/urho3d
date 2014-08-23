@@ -5595,7 +5595,9 @@ Properties:
 
 Methods:
 
-- TileObjectType2D GetType() const
+- TileObjectType2D GetObjectType() const
+- const String GetName() const
+- const String GetType() const
 - const Vector2& GetPosition() const
 - const Vector2& GetSize() const
 - unsigned GetNumPoints() const
@@ -5607,7 +5609,9 @@ Methods:
 
 Properties:
 
-- TileObjectType2D type (readonly)
+- TileObjectType2D objectType (readonly)
+- String name (readonly)
+- String type (readonly)
 - Vector2 position (readonly)
 - Vector2 size (readonly)
 - unsigned numPoints (readonly)

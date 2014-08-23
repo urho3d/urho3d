@@ -10257,7 +10257,11 @@ const Vector2& GetPoint(uint) const;
 
 // Properties:
 /* readonly */
+String name;
+/* readonly */
 uint numPoints;
+/* readonly */
+TileObjectType2D objectType;
 /* readonly */
 Vector2 position;
 /* readonly */
@@ -10269,7 +10273,7 @@ int tileGid;
 /* readonly */
 Sprite2D tileSprite;
 /* readonly */
-TileObjectType2D type;
+String type;
 /* readonly */
 int weakRefs;
 };
