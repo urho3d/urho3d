@@ -62,8 +62,8 @@ PackageUpload::PackageUpload() :
 
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
-    position_(Vector3::ZERO),
     connection_(connection),
+    sendMode_(OPSM_NONE),
     isClient_(isClient),
     connectPending_(false),
     sceneLoaded_(false),
@@ -206,6 +206,15 @@ void Connection::SetControls(const Controls& newControls)
 void Connection::SetPosition(const Vector3& position)
 {
     position_ = position;
+    if (sendMode_ == OPSM_NONE)
+        sendMode_ = OPSM_POSITION;
+}
+
+void Connection::SetRotation(const Quaternion& rotation)
+{
+    rotation_ = rotation;
+    if (sendMode_ != OPSM_POSITION_ROTATION)
+        sendMode_ = OPSM_POSITION_ROTATION;
 }
 
 void Connection::SetConnectPending(bool connectPending)
@@ -255,7 +264,10 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.yaw_);
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
-    msg_.WriteVector3(position_);
+    if (sendMode_ >= OPSM_POSITION)
+        msg_.WriteVector3(position_);
+    if (sendMode_ >= OPSM_POSITION_ROTATION)
+        msg_.WritePackedQuaternion(rotation_);
     SendMessage(MSG_CONTROLS, false, false, msg_, CONTROLS_CONTENT_ID);
 }
 
@@ -907,7 +919,11 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
     newControls.extraData_ = msg.ReadVariantMap();
     
     SetControls(newControls);
-    SetPosition(msg.ReadVector3());
+    // Client may or may not send observer position & rotation for interest management
+    if (!msg.IsEof())
+        position_ = msg.ReadVector3();
+    if (!msg.IsEof())
+        rotation_ = msg.ReadPackedQuaternion();
 }
 
 void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
