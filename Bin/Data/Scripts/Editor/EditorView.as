@@ -1142,11 +1142,16 @@ void UpdateView(float timeStep)
             }
         }
     }
-
+	
     // Rotate/orbit/pan camera
+	// setting input.mouseVisible to false allows us to continuously rotate/orbit/pan the camera without it stopping at the edges
+	// we also hide the cursor (more or less because its more visually appealing that way)
     if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
     {
+		input.mouseVisible = false;
+		ui.cursor.visible = false;
         IntVector2 mouseMove = input.mouseMove;
+		
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
             if (input.keyDown[KEY_LSHIFT] && input.mouseButtonDown[MOUSEB_MIDDLE])
@@ -1178,8 +1183,11 @@ void UpdateView(float timeStep)
             input.mouseGrabbed = true;
         }
     }
-    else
+    else{
+		input.mouseVisible = true;
+		ui.cursor.visible = true;
         input.mouseGrabbed = false;
+	}
 
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
