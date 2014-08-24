@@ -2021,6 +2021,7 @@ uint16 port;
 Vector3 position;
 /* readonly */
 int refs;
+Quaternion rotation;
 Scene scene;
 /* readonly */
 bool sceneLoaded;

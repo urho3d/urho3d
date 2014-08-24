@@ -3913,6 +3913,7 @@ Properties:
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
+- Quaternion rotation
 - Scene@ scene
 - bool sceneLoaded // readonly
 - StringHash type // readonly
