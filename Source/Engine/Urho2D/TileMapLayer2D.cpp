@@ -269,7 +269,7 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
         objectNode->SetPosition(object->GetPosition());
 
         // If object is tile, create static sprite component
-        if (object->GetType() == OT_TILE && object->GetTileGid() && object->GetTileSprite())
+        if (object->GetObjectType() == OT_TILE && object->GetTileGid() && object->GetTileSprite())
         {
             StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(object->GetTileSprite());

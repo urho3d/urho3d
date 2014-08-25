@@ -58,7 +58,9 @@ class Tile2D
 
 class TileObject2D
 {
-    TileObjectType2D GetType() const;
+    TileObjectType2D GetObjectType() const;
+    const String GetName() const;
+    const String GetType() const;
     const Vector2& GetPosition() const;
     const Vector2& GetSize() const;
     unsigned GetNumPoints() const;
@@ -68,7 +70,9 @@ class TileObject2D
     bool HasProperty(const String& name) const;
     const String& GetProperty(const String& name) const;
 
-    tolua_readonly tolua_property__get_set TileObjectType2D type;
+    tolua_readonly tolua_property__get_set TileObjectType2D objectType;
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set String type;
     tolua_readonly tolua_property__get_set Vector2 position;
     tolua_readonly tolua_property__get_set Vector2 size;
     tolua_readonly tolua_property__get_set unsigned numPoints;

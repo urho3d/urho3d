@@ -3913,6 +3913,7 @@ Properties:
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
+- Quaternion rotation
 - Scene@ scene
 - bool sceneLoaded // readonly
 - StringHash type // readonly
@@ -11019,13 +11020,15 @@ Methods:
 
 Properties:
 
+- String name // readonly
 - uint numPoints // readonly
+- TileObjectType2D objectType // readonly
 - Vector2 position // readonly
 - int refs // readonly
 - Vector2 size // readonly
 - int tileGid // readonly
 - Sprite2D@ tileSprite // readonly
-- TileObjectType2D type // readonly
+- String type // readonly
 - int weakRefs // readonly
 
 <a name="Class_Time"></a>

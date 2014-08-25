@@ -23,6 +23,7 @@ class Connection : public Object
     void SetIdentity(const VariantMap& identity);
     void SetControls(const Controls& newControls);
     void SetPosition(const Vector3& position);
+    void SetRotation(const Quaternion& rotation);
     void SetConnectPending(bool connectPending);
     void SetLogStatistics(bool enable);
     void Disconnect(int waitMSec = 0);
@@ -37,6 +38,7 @@ class Connection : public Object
     Scene* GetScene() const;
     const Controls& GetControls() const;
     const Vector3& GetPosition() const;
+    const Quaternion& GetRotation() const;
     bool IsClient() const;
     bool IsConnected() const;
     bool IsConnectPending() const;
@@ -53,6 +55,7 @@ class Connection : public Object
     tolua_property__get_set Scene* scene;
     tolua_property__get_set Controls& controls;
     tolua_property__get_set Vector3& position;
+    tolua_property__get_set Quaternion& rotation;
     tolua_readonly tolua_property__is_set bool client;
     tolua_readonly tolua_property__is_set bool connected;
     tolua_property__is_set bool connectPending;

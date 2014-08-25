@@ -159,21 +159,26 @@ bool TmxObjectGroup2D::Load(const XMLElement& element)
     for (XMLElement objectElem = element.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
     {
         SharedPtr<TileObject2D> object(new TileObject2D());
+
+        if (objectElem.HasAttribute("name"))
+            object->name_ = objectElem.GetAttribute("name");
+        if (objectElem.HasAttribute("type"))
+            object->type_ = objectElem.GetAttribute("type");
         
         object->position_ = Vector2(objectElem.GetInt("x") * PIXEL_SIZE, mapHeight - objectElem.GetInt("y") * PIXEL_SIZE);
         if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
         {
             if (!objectElem.HasChild("ellipse"))
-                object->type_ = OT_RECTANGLE;
+                object->objectType_ = OT_RECTANGLE;
             else
-                object->type_ = OT_ELLIPSE;
+                object->objectType_ = OT_ELLIPSE;
 
             object->size_ = Vector2(objectElem.GetInt("width") * PIXEL_SIZE, objectElem.GetInt("height") * PIXEL_SIZE);
             object->position_.y_ -= object->size_.y_;
         }
         else if (objectElem.HasAttribute("gid"))
         {
-            object->type_ = OT_TILE;
+            object->objectType_ = OT_TILE;
             object->gid_ = objectElem.GetInt("gid");
             object->sprite_ = tmxFile_->GetTileSprite(object->gid_);
         }
@@ -181,9 +186,9 @@ bool TmxObjectGroup2D::Load(const XMLElement& element)
         {
             XMLElement childElem = objectElem.GetChild();
             if (childElem.GetName() == "polygon")
-                object->type_ = OT_POLYGON;
+                object->objectType_ = OT_POLYGON;
             else if (childElem.GetName() == "polyline")
-                object->type_ = OT_POLYLINE;
+                object->objectType_ = OT_POLYLINE;
             else
                 return false;
 

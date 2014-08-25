@@ -1926,7 +1926,8 @@ A current priority value is calculated on each server update as "base priority -
 
 The default values are base priority 100.0, distance factor 0.0, and minimum priority 0.0. This means that by default an update is always sent (which is also the case if the node has no NetworkPriority component.) Additionally, there is a rule that the node's owner connection always receives updates at full frequency. This rule can be controlled by calling \ref NetworkPriority::SetAlwaysUpdateOwner "SetAlwaysUpdateOwner()".
 
-Calculating the distance requires the client to tell its current observer position (typically, either the camera's or the player character's world position.) This is accomplished by the client code calling \ref Connection::SetPosition "SetPosition()" on the server connection.
+Calculating the distance requires the client to tell its current observer position (typically, either the camera's or the player character's world position.) This is accomplished by the client code calling \ref Connection::SetPosition "SetPosition()" on the server connection. The client can also tell its current observer rotation by
+calling \ref Connection::SetRotation "SetRotation()" but that will only be useful for custom logic, as it is not used by the NetworkPriority component.
 
 For now, creation and removal of nodes is always sent immediately, without consulting interest management. This is based on the assumption that nodes' motion updates consume the most bandwidth.
 

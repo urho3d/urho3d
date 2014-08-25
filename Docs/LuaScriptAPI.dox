@@ -1140,6 +1140,7 @@ Methods:
 - void SetIdentity(const VariantMap& identity)
 - void SetControls(const Controls& newControls)
 - void SetPosition(const Vector3& position)
+- void SetRotation(const Quaternion& rotation)
 - void SetConnectPending(bool connectPending)
 - void SetLogStatistics(bool enable)
 - void Disconnect(int waitMSec = 0)
@@ -1153,6 +1154,7 @@ Methods:
 - Scene* GetScene() const
 - const Controls& GetControls() const
 - const Vector3& GetPosition() const
+- const Quaternion& GetRotation() const
 - bool IsClient() const
 - bool IsConnected() const
 - bool IsConnectPending() const
@@ -1171,6 +1173,7 @@ Properties:
 - Scene* scene
 - Controls& controls
 - Vector3& position
+- Quaternion& rotation
 - bool client (readonly)
 - bool connected (readonly)
 - bool connectPending
@@ -5595,7 +5598,9 @@ Properties:
 
 Methods:
 
-- TileObjectType2D GetType() const
+- TileObjectType2D GetObjectType() const
+- const String GetName() const
+- const String GetType() const
 - const Vector2& GetPosition() const
 - const Vector2& GetSize() const
 - unsigned GetNumPoints() const
@@ -5607,7 +5612,9 @@ Methods:
 
 Properties:
 
-- TileObjectType2D type (readonly)
+- TileObjectType2D objectType (readonly)
+- String name (readonly)
+- String type (readonly)
 - Vector2 position (readonly)
 - Vector2 size (readonly)
 - unsigned numPoints (readonly)
