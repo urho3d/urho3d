@@ -1142,11 +1142,12 @@ void UpdateView(float timeStep)
             }
         }
     }
-
+	
     // Rotate/orbit/pan camera
     if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
     {
         IntVector2 mouseMove = input.mouseMove;
+		
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
             if (input.keyDown[KEY_LSHIFT] && input.mouseButtonDown[MOUSEB_MIDDLE])
@@ -1490,8 +1491,21 @@ void ViewRaycast(bool mouseClick)
                     drawable.DrawDebugGeometry(debug, false);
                 }
             }
-            else if (drawable.node.parent !is null)
-                selectedComponent = drawable.node.parent.GetComponent("Terrain");
+			else if (drawable.node.parent !is null){
+				Terrain@ terrainComponent = drawable.node.parent.GetComponent("Terrain");
+				selectedComponent = terrainComponent;
+			
+				if(selectedComponent is terrainComponent && input.mouseButtonDown[MOUSEB_LEFT])
+				{
+					selectedComponent = terrainComponent;
+					IntVector2 pos = terrainComponent.WorldToHeightMap(result.position);
+					terrainEditor.Work(terrainComponent, terrainComponent.heightMap, pos);
+				}
+				else
+				{
+					terrainEditor.targetColorSelected = false;
+				}
+			}
         }
     }
     else

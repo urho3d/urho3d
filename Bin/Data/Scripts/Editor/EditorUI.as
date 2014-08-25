@@ -54,6 +54,8 @@ float uiMinOpacity = 0.3;
 float uiMaxOpacity = 0.7;
 bool uiHidden = false;
 
+TerrainEditor terrainEditor;
+
 void CreateUI()
 {
     // Remove all existing UI content in case we are reloading the editor script
@@ -81,6 +83,8 @@ void CreateUI()
     CreateDebugHud();
     CreateResourceBrowser();
     CreateCamera();
+	
+	terrainEditor.Create();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
@@ -413,6 +417,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Resource browser", @ShowResourceBrowserWindow, 'B', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Material editor", @ShowMaterialEditor));
+        popup.AddChild(CreateMenuItem("Terrain editor", TerrainEditorShowCallback(terrainEditor.Show)));
         popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
@@ -1329,6 +1334,7 @@ void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
 void UpdateDirtyUI()
 {
     UpdateDirtyToolBar();
+	terrainEditor.UpdateDirty();
 
     // Perform hierarchy selection latently after the new selections are finalized (used in undo/redo action)
     if (!hierarchyUpdateSelections.empty)

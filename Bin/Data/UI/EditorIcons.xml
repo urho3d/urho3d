@@ -359,4 +359,28 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="112 16 126 30" />
     </element>
+	<element type="RaiseLowerHeight">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="0 224 30 254" />
+    </element>
+	<element type="SetHeight">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="32 224 62 254" />
+    </element>
+	<element type="SmoothHeight">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="64 224 94 254" />
+    </element>
+	<element type="PaintBrush">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="96 224 126 254" />
+    </element>
+	<element type="PaintTrees">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="128 224 158 254" />
+    </element>
+	<element type="PaintFoliage">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 224 190 254" />
+    </element>
 </elements>
