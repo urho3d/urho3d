@@ -1498,8 +1498,21 @@ void ViewRaycast(bool mouseClick)
                     drawable.DrawDebugGeometry(debug, false);
                 }
             }
-            else if (drawable.node.parent !is null)
-                selectedComponent = drawable.node.parent.GetComponent("Terrain");
+			else if (drawable.node.parent !is null){
+				Terrain@ terrainComponent = drawable.node.parent.GetComponent("Terrain");
+				selectedComponent = terrainComponent;
+			
+				if(selectedComponent is terrainComponent && input.mouseButtonDown[MOUSEB_LEFT])
+				{
+					selectedComponent = terrainComponent;
+					IntVector2 pos = terrainComponent.WorldToHeightMap(result.position);
+					terrainEditor.Work(terrainComponent, terrainComponent.heightMap, pos);
+				}
+				else
+				{
+					terrainEditor.targetColorSelected = false;
+				}
+			}
         }
     }
     else

@@ -1,0 +1,21 @@
+<element type="Window">
+    <attribute name="Name" value="TerrainWindow" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="6 6 6 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
+	<element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Text">
+            <attribute name="Text" value="Terrain editor" />
+        </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
+    </element>
+	<element type="BorderImage" style="EditorDivider" />
+</element>

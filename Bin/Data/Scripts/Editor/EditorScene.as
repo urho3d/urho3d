@@ -237,6 +237,9 @@ bool SaveScene(const String&in fileName)
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
     bool success = (extension != ".xml" ? editorScene.Save(file) : editorScene.SaveXML(file));
+	
+	// Save all the terrains we've modified
+	terrainEditor.Save();
 
     editorScene.updateEnabled = false;
 
