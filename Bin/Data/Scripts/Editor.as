@@ -15,6 +15,7 @@
 #include "Scripts/Editor/EditorImport.as"
 #include "Scripts/Editor/EditorResourceBrowser.as"
 #include "Scripts/Editor/EditorSpawn.as"
+#include "Scripts/Editor/EditorTerrain.as"
 
 String configFileName;
 
