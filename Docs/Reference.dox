@@ -1779,7 +1779,7 @@ Both are rendered using StaticSprite2D class (Drawable component):
 - StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
-Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spritehelper/), TexturePacker (http://www.codeandweb.com/texturepacker), ...
+Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
