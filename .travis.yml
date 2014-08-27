@@ -50,7 +50,7 @@ before_install:
     - bash -c "[ '$TRAVIS_BRANCH' == 'master' ] && [ '$TRAVIS_PULL_REQUEST' == 'false' ]" && export ON_MASTER_COMMIT=1 && bash -c "[ $SITE_UPDATE ]" && export SITE_UPDATE_ON_MASTER_COMMIT=1 || true
     - bash -c "[ $ON_MASTER_COMMIT ]" && export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT) && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]' && git fetch --depth=2000 --tags origin $TRAVIS_BRANCH && export PACKAGE_UPLOAD=1 || true
     - bash -c "[ $ON_MASTER_COMMIT ]" && export RELEASE_TAG=$(git describe --tags --exact-match $TRAVIS_COMMIT 2>/dev/null) && bash -c "[ $RELEASE_TAG ]" && export PACKAGE_UPLOAD=1 || true
-    - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9d-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk && bash -c "[ $PACKAGE_UPLOAD ]" && wget -q http://dl.google.com/android/android-sdk_r22.6.1-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && export ANDROID_SDK=$(pwd)/android-sdk || true
+    - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk64-r10-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk && bash -c "[ $PACKAGE_UPLOAD ]" && wget -q http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && export ANDROID_SDK=$(pwd)/android-sdk || true
     - bash -c "[ $RPI ]" && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && git clone --depth=1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot && export RASPI_ROOT=$(pwd)/rpi-sysroot || true
     - bash -c "( [ $SITE_UPDATE_ON_MASTER_COMMIT ] || [ $PACKAGE_UPLOAD ] )" && travis_retry sudo add-apt-repository ppa:george-edison55/precise-backports -y || true
     - travis_retry sudo apt-get update -q -y
@@ -60,7 +60,7 @@ install:
     - bash -c "( [ $SITE_UPDATE_ON_MASTER_COMMIT ] || [ $PACKAGE_UPLOAD ] )" && travis_retry sudo apt-get install -q -y --no-install-recommends doxygen graphviz || true
     - bash -c "[ $WINDOWS ]" && travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32 || true
     - bash -c "( [ $LINUX ] || [ $RPI ] ) && [ $PACKAGE_UPLOAD ]" && travis_retry sudo apt-get install -q -y rpm || true
-    - bash -c "[ $ANDROID ] && [ $PACKAGE_UPLOAD ]" && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-19.0.3,android-19,system-image,extra-android-support || true
+    - bash -c "[ $ANDROID ] && [ $PACKAGE_UPLOAD ]" && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-20.0.0,android-19,system-image,extra-android-support || true
     - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
 after_success:
