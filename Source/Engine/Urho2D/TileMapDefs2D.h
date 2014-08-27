@@ -54,9 +54,15 @@ struct URHO3D_API TileMapInfo2D
     float tileHeight_;
 
     /// Return map width.
-    float GetMapWidth() const { return width_ * tileWidth_; }
+    float GetMapWidth() const;
     /// return map height.
-    float GetMapHeight() const { return height_ * tileHeight_;}
+    float GetMapHeight() const;
+    /// Convert tmx position to Urho position.
+    Vector2 ConvertPosition(const Vector2& position) const;
+    /// Convert tile index to position.
+    Vector2 TileIndexToPosition(int x, int y) const;
+    /// Convert position to tile index, if out of map return false.
+    bool PositionToTileIndex(int& x, int& y, const Vector2& positon) const;
 };
 
 /// Tile map layer type.
@@ -186,10 +192,5 @@ private:
     /// Property set.
     SharedPtr<PropertySet2D> propertySet_;
 };
-
-/// Convert index to position.
-URHO3D_API Vector2 IndexToPosition2D(int x, int y, const TileMapInfo2D& tileMapInfo);
-/// Convert position to index, if out of range return false.
-URHO3D_API bool PositionToIndex2D(int& x, int& y, const Vector2& position, const TileMapInfo2D& tileMapInfo);
 
 }

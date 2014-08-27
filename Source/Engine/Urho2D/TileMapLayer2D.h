@@ -28,6 +28,7 @@
 namespace Urho3D
 {
 
+class DebugRenderer;
 class Node;
 class TileMap2D;
 class TmxImageLayer2D;
@@ -47,6 +48,9 @@ public:
     ~TileMapLayer2D();
     /// Register object factory.
     static void RegisterObject(Context* context);
+
+    /// Add debug geometry to the debug renderer.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     /// Initialize with tile map and tmx layer.
     void Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer);
@@ -85,7 +89,7 @@ public:
     TileObject2D* GetObject(unsigned index) const;
     /// Return object node (for object group only).
     Node* GetObjectNode(unsigned index) const;
-    
+
     /// Return image node (for image layer only).
     Node* GetImageNode() const;
 

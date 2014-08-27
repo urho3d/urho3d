@@ -44,8 +44,13 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
     /// Set tmx file.
     void SetTmxFile(TmxFile2D* tmxFile);
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry();
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;

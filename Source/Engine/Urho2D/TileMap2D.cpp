@@ -22,8 +22,10 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "DebugRenderer.h"
 #include "Node.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "TileMap2D.h"
 #include "TileMapLayer2D.h"
 #include "TmxFile2D.h"
@@ -48,8 +50,44 @@ TileMap2D::~TileMap2D()
 void TileMap2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<TileMap2D>(URHO2D_CATEGORY);
-
     ACCESSOR_ATTRIBUTE(TileMap2D, VAR_RESOURCEREF, "Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()), AM_DEFAULT);
+}
+
+void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    const Color& color = Color::RED;
+    float mapW = info_.GetMapWidth();
+    float mapH = info_.GetMapHeight();
+    if (info_.orientation_ == O_ORTHOGONAL)
+    {
+        debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
+        debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
+        debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
+        debug->AddLine(Vector2(0.0f, mapH), Vector2(0.0f, 0.0f), color);
+    }
+    else
+    {
+        debug->AddLine(Vector2(0.0f, mapH * 0.5f), Vector2(mapW * 0.5f, 0.0f), color);
+        debug->AddLine(Vector2(mapW * 0.5f, 0.0f), Vector2(mapW, mapH * 0.5f), color);
+        debug->AddLine(Vector2(mapW, mapH * 0.5f), Vector2(mapW * 0.5f, mapH), color);
+        debug->AddLine(Vector2(mapW * 0.5f, mapH), Vector2(0.0f, mapH * 0.5f), color);
+    }
+
+    for (unsigned i = 0; i < layers_.Size(); ++i)
+        layers_[i]->DrawDebugGeometry(debug, depthTest);
+}
+
+void TileMap2D::DrawDebugGeometry()
+{
+    Scene* scene = GetScene();
+    if (!scene)
+        return;
+
+    DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+    if (!debug)
+        return;
+
+    DrawDebugGeometry(debug, false);
 }
 
 void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
@@ -103,13 +141,14 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
 
 Vector2 TileMap2D::IndexToPosition(int x, int y) const
 {
-    return IndexToPosition2D(x, y, info_);
+    return info_.TileIndexToPosition(x, y);
 }
 
 bool TileMap2D::PositionToIndex(int& x, int& y, const Vector2& position) const
 {
-    return PositionToIndex2D(x, y, position, info_);
+    return info_.PositionToTileIndex(x, y, position);
 }
+
 
 void TileMap2D::SetTmxFileAttr(ResourceRef value)
 {
