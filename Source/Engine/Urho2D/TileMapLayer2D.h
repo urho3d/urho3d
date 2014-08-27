@@ -83,10 +83,10 @@ public:
     /// Return tile (for tile layer only).
     Tile2D* GetTile(int x, int y) const;
 
-    /// Return number of objects (for object group only).
+    /// Return number of tile map objects (for object group only).
     unsigned GetNumObjects() const;
-    /// Return object (for object group only).
-    TileObject2D* GetObject(unsigned index) const;
+    /// Return tile map object (for object group only).
+    TileMapObject2D* GetObject(unsigned index) const;
     /// Return object node (for object group only).
     Node* GetObjectNode(unsigned index) const;
 

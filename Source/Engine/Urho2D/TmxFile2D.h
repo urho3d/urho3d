@@ -107,12 +107,12 @@ public:
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
     /// Return number of objects.
     unsigned GetNumObjects() const { return objects_.Size(); }
-    /// Return object at index.
-    TileObject2D* GetObject(unsigned index) const;
+    /// Return tile map object at index.
+    TileMapObject2D* GetObject(unsigned index) const;
 
 private:
     /// Objects.
-    Vector<SharedPtr<TileObject2D> > objects_;
+    Vector<SharedPtr<TileMapObject2D> > objects_;
 };
 
 /// Tmx image layer.

@@ -139,16 +139,15 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
-Vector2 TileMap2D::IndexToPosition(int x, int y) const
+Vector2 TileMap2D::TileIndexToPosition(int x, int y) const
 {
     return info_.TileIndexToPosition(x, y);
 }
 
-bool TileMap2D::PositionToIndex(int& x, int& y, const Vector2& position) const
+bool TileMap2D::PositionToTileIndex(int& x, int& y, const Vector2& position) const
 {
     return info_.PositionToTileIndex(x, y, position);
 }
-
 
 void TileMap2D::SetTmxFileAttr(ResourceRef value)
 {

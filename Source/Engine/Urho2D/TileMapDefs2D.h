@@ -78,8 +78,8 @@ enum TileMapLayerType2D
     LT_INVALID = 0xffff
 };
 
-/// Tile object type.
-enum TileObjectType2D
+/// Tile map object type.
+enum TileMapObjectType2D
 {
     /// Rectangle.
     OT_RECTANGLE = 0,
@@ -142,13 +142,13 @@ private:
 };
 
 /// Tile map object.
-class URHO3D_API TileObject2D : public RefCounted
+class URHO3D_API TileMapObject2D : public RefCounted
 {
 public:
-    TileObject2D();
+    TileMapObject2D();
 
     /// Return type.
-    TileObjectType2D GetObjectType() const { return objectType_; }
+    TileMapObjectType2D GetObjectType() const { return objectType_; }
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return type.
@@ -174,7 +174,7 @@ private:
     friend class TmxObjectGroup2D;
 
     /// Object type.
-    TileObjectType2D objectType_;
+    TileMapObjectType2D objectType_;
     /// Name.
     String name_;
     /// Type.

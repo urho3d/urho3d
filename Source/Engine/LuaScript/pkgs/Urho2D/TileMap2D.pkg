@@ -7,8 +7,8 @@ class TileMap2D : Component
     const TileMapInfo2D& GetInfo() const;
     unsigned GetNumLayers() const;
     TileMapLayer2D* GetLayer(unsigned index) const;
-    Vector2 IndexToPosition(int x, int y) const;
-    tolua_outside bool TileMap2DPositionToIndex @ PositionToIndex(const Vector2& position, int* x = 0, int* y = 0) const;
+    Vector2 TileIndexToPosition(int x, int y) const;
+    tolua_outside bool TileMap2DPositionToTileIndex @ PositionToTileIndex(const Vector2& position, int* x = 0, int* y = 0) const;
 
     tolua_property__get_set TmxFile2D* tmxFile;
     tolua_readonly tolua_property__get_set TileMapInfo2D& info;
@@ -16,8 +16,8 @@ class TileMap2D : Component
 };
 
 ${
-static bool TileMap2DPositionToIndex(const TileMap2D* tileMap, const Vector2& position, int* x, int* y)
+static bool TileMap2DPositionToTileIndex(const TileMap2D* tileMap, const Vector2& position, int* x, int* y)
 {
-    return tileMap->PositionToIndex(*x, *y, position);
+    return tileMap->PositionToTileIndex(*x, *y, position);
 }
 $}

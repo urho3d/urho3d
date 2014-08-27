@@ -61,7 +61,7 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         for (unsigned i = 0; i < objectGroup_->GetNumObjects(); ++i)
         {
-            TileObject2D* object = objectGroup_->GetObject(i);
+            TileMapObject2D* object = objectGroup_->GetObject(i);
             const Color& color = Color::YELLOW;
 
             switch (object->GetObjectType())
@@ -250,7 +250,7 @@ unsigned TileMapLayer2D::GetNumObjects() const
     return objectGroup_->GetNumObjects();
 }
 
-TileObject2D* TileMapLayer2D::GetObject(unsigned index) const
+TileMapObject2D* TileMapLayer2D::GetObject(unsigned index) const
 {
     if (!objectGroup_)
         return 0;
@@ -320,7 +320,7 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
 
     for (unsigned i = 0; i < objectGroup->GetNumObjects(); ++i)
     {
-        const TileObject2D* object = objectGroup->GetObject(i);
+        const TileMapObject2D* object = objectGroup->GetObject(i);
 
         // Create dummy node for all object
         SharedPtr<Node> objectNode(GetNode()->CreateChild("Object"));

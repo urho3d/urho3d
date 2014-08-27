@@ -155,7 +155,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
 
     for (XMLElement objectElem = element.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
     {
-        SharedPtr<TileObject2D> object(new TileObject2D());
+        SharedPtr<TileMapObject2D> object(new TileMapObject2D());
 
         if (objectElem.HasAttribute("name"))
             object->name_ = objectElem.GetAttribute("name");
@@ -219,7 +219,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
     return true;
 }
 
-TileObject2D* TmxObjectGroup2D::GetObject(unsigned index) const
+TileMapObject2D* TmxObjectGroup2D::GetObject(unsigned index) const
 {
     if (index >= objects_.Size())
         return 0;
@@ -360,7 +360,7 @@ bool TmxFile2D::EndLoad()
         info_.orientation_ = O_ISOMETRIC;
     else
     {
-        LOGERROR("Invalid orientation type " + orientation);
+        LOGERROR("Unsupported orientation type " + orientation);
         return false;
     }
 

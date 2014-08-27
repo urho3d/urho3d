@@ -4,7 +4,7 @@
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
-// to use, copy, mox_sub_yy, merge, publish, distribute, sublicense, and/or sell
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
@@ -130,16 +130,16 @@ const String& Tile2D::GetProperty(const String& name) const
     return propertySet_->GetProperty(name);
 }
 
-TileObject2D::TileObject2D()
+TileMapObject2D::TileMapObject2D()
 {
 }
 
-unsigned TileObject2D::GetNumPoints() const
+unsigned TileMapObject2D::GetNumPoints() const
 {
     return points_.Size();
 }
 
-const Vector2& TileObject2D::GetPoint(unsigned index) const
+const Vector2& TileMapObject2D::GetPoint(unsigned index) const
 {
     if (index >= points_.Size())
         return Vector2::ZERO;
@@ -147,19 +147,19 @@ const Vector2& TileObject2D::GetPoint(unsigned index) const
     return points_[index];
 }
 
-Sprite2D* TileObject2D::GetTileSprite() const
+Sprite2D* TileMapObject2D::GetTileSprite() const
 {
     return sprite_;
 }
 
-bool TileObject2D::HasProperty(const String& name) const
+bool TileMapObject2D::HasProperty(const String& name) const
 {
     if (!propertySet_)
         return false;
     return propertySet_->HasProperty(name);
 }
 
-const String& TileObject2D::GetProperty(const String& name) const
+const String& TileMapObject2D::GetProperty(const String& name) const
 {
     if (!propertySet_)
         return String::EMPTY;
