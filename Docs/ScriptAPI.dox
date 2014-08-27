@@ -2141,7 +2141,7 @@ namespace Urho3D
 <a href="#Class_TileMap2D"><b>TileMap2D</b></a>
 <a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
 <a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
-<a href="#Class_TileObject2D"><b>TileObject2D</b></a>
+<a href="#Class_TileMapObject2D"><b>TileMapObject2D</b></a>
 <a href="#Class_Time"><b>Time</b></a>
 <a href="#Class_Timer"><b>Timer</b></a>
 <a href="#Class_TmxFile2D"><b>TmxFile2D</b></a>
@@ -10890,12 +10890,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
-- Vector2 IndexToPosition(int, int) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
-- bool PositionToIndex(int&, int&, const Vector2&) const
+- bool PositionToTileIndex(int&, int&, const Vector2&) const
 - void Remove()
 - void RemoveInstanceDefault()
 - void ResetToDefault()
@@ -10907,6 +10906,7 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- Vector2 TileIndexToPosition(int, int) const
 
 Properties:
 
@@ -10958,7 +10958,7 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- TileObject2D@ GetObject(uint) const
+- TileMapObject2D@ GetObject(uint) const
 - Node@ GetObjectNode(uint) const
 - Tile2D@ GetTile(int, int) const
 - Node@ GetTileNode(int, int) const
@@ -11008,9 +11008,9 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
-<a name="Class_TileObject2D"></a>
+<a name="Class_TileMapObject2D"></a>
 
-### TileObject2D
+### TileMapObject2D
 
 Methods:
 

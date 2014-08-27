@@ -177,7 +177,7 @@ namespace Urho3D
 <a href="#Class_TileMap2D"><b>TileMap2D</b></a>
 <a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
 <a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
-<a href="#Class_TileObject2D"><b>TileObject2D</b></a>
+<a href="#Class_TileMapObject2D"><b>TileMapObject2D</b></a>
 <a href="#Class_Time"><b>Time</b></a>
 <a href="#Class_TmxFile2D"><b>TmxFile2D</b></a>
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
@@ -5533,8 +5533,8 @@ Methods:
 - const TileMapInfo2D& GetInfo() const
 - unsigned GetNumLayers() const
 - TileMapLayer2D* GetLayer(unsigned index) const
-- Vector2 IndexToPosition(int x, int y) const
-- bool PositionToIndex(const Vector2& position, int x = 0, int y = 0) const
+- Vector2 TileIndexToPosition(int x, int y) const
+- bool PositionToTileIndex(const Vector2& position, int x = 0, int y = 0) const
 
 Properties:
 
@@ -5578,7 +5578,7 @@ Methods:
 - Node* GetTileNode(int x, int y) const
 - Tile2D* GetTile(int x, int y) const
 - unsigned GetNumObjects() const
-- TileObject2D* GetObject(unsigned index) const
+- TileMapObject2D* GetObject(unsigned index) const
 - Node* GetObjectNode(unsigned index) const
 - Node* GetImageNode() const
 
@@ -5592,13 +5592,13 @@ Properties:
 - unsigned numObjects (readonly)
 - Node* imageNode (readonly)
 
-<a name="Class_TileObject2D"></a>
-### TileObject2D
+<a name="Class_TileMapObject2D"></a>
+### TileMapObject2D
 
 
 Methods:
 
-- TileObjectType2D GetObjectType() const
+- TileMapObjectType2D GetObjectType() const
 - const String GetName() const
 - const String GetType() const
 - const Vector2& GetPosition() const
@@ -5612,7 +5612,7 @@ Methods:
 
 Properties:
 
-- TileObjectType2D objectType (readonly)
+- TileMapObjectType2D objectType (readonly)
 - String name (readonly)
 - String type (readonly)
 - Vector2 position (readonly)
@@ -7017,7 +7017,7 @@ Properties:
 - int LT_IMAGE_LAYER
 - int LT_INVALID
 
-### TileObjectType2D
+### TileMapObjectType2D
 
 - int OT_RECTANGLE
 - int OT_ELLIPSE
