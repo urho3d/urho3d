@@ -78,7 +78,6 @@ namespace Urho3D
 <a href="#Class_FileSelector"><b>FileSelector</b></a>
 <a href="#Class_FileSelectorEntry"><b>FileSelectorEntry</b></a>
 <a href="#Class_FileSystem"><b>FileSystem</b></a>
-<a href="#Class_FileWatcher"><b>FileWatcher</b></a>
 <a href="#Class_FocusParameters"><b>FocusParameters</b></a>
 <a href="#Class_Font"><b>Font</b></a>
 <a href="#Class_Frustum"><b>Frustum</b></a>
@@ -2152,16 +2151,6 @@ Methods:
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
 - String GetAppPreferencesDir(const String org, const String app) const
-
-<a name="Class_FileWatcher"></a>
-### FileWatcher : Object
-
-Methods:
-
-- bool StartWatching(const String pathName, bool watchSubDirs)
-- void StopWatching()
-- void AddChange(const String fileName)
-- const String GetPath() const
 
 <a name="Class_FocusParameters"></a>
 ### FocusParameters
