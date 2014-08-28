@@ -11851,6 +11851,7 @@ enum Orientation2D
 {
 O_ORTHOGONAL,
 O_ISOMETRIC,
+O_STAGGERED,
 };
 
 enum PassLightingMode
