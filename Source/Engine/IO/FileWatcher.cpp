@@ -49,6 +49,7 @@ static const unsigned BUFFERSIZE = 4096;
 FileWatcher::FileWatcher(Context* context) :
     Object(context),
     fileSystem_(GetSubsystem<FileSystem>()),
+    delay_(1.0f),
     watchSubDirs_(false)
 {
 #if defined(URHO3D_FILEWATCHER)
@@ -214,6 +215,11 @@ void FileWatcher::StopWatching()
     }
 }
 
+void FileWatcher::SetDelay(float interval)
+{
+    delay_ = Max(interval, 0.0f);
+}
+
 void FileWatcher::ThreadFunction()
 {
 #if defined(URHO3D_FILEWATCHER)
@@ -307,22 +313,31 @@ void FileWatcher::AddChange(const String& fileName)
 {
     MutexLock lock(changesMutex_);
     
-    // If we have 2 unprocessed modifies in a row into the same file, only record the first
-    if (changes_.Empty() || changes_.Back() != fileName)
-        changes_.Push(fileName);
+    // Reset the timer associated with the filename. Will be notified once timer exceeds the delay
+    changes_[fileName].Reset();
 }
 
 bool FileWatcher::GetNextChange(String& dest)
 {
     MutexLock lock(changesMutex_);
     
+    unsigned delayMsec = (unsigned)(delay_ * 1000.0f);
+    
     if (changes_.Empty())
         return false;
     else
     {
-        dest = changes_.Front();
-        changes_.Erase(changes_.Begin());
-        return true;
+        for (HashMap<String, Timer>::Iterator i = changes_.Begin(); i != changes_.End(); ++i)
+        {
+            if (i->second_.GetMSec(false) >= delayMsec)
+            {
+                dest = i->first_;
+                changes_.Erase(i);
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
 
