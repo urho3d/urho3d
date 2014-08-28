@@ -350,10 +350,10 @@ set( ANDROID_SUPPORTED_ABIS_arm "armeabi-v7a;armeabi;armeabi-v7a with NEON;armea
 set( ANDROID_SUPPORTED_ABIS_x86 "x86" )
 set( ANDROID_SUPPORTED_ABIS_mipsel "mips" )
 
-# Urho3D: default to API 9
-set( ANDROID_DEFAULT_NDK_API_LEVEL 9 )
-set( ANDROID_DEFAULT_NDK_API_LEVEL_x86 9 )
-set( ANDROID_DEFAULT_NDK_API_LEVEL_mips 9 )
+# Urho3D: default to API 12
+set( ANDROID_DEFAULT_NDK_API_LEVEL 12 )
+set( ANDROID_DEFAULT_NDK_API_LEVEL_x86 12 )
+set( ANDROID_DEFAULT_NDK_API_LEVEL_mips 12 )
 
 
 macro( __LIST_FILTER listvar regex )
