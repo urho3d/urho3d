@@ -249,6 +249,8 @@ def makefile_travis_ci
     system 'MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0' or abort 'Failed to configure native build for tolua++ target'
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
     ENV['SKIP_NATIVE'] = '1'
+    # Temporary workaround due to Travis-CI insufficient memory in MinGW/STATIC build configuration, always use Release configuration.
+    $configuration = 'Release'
   else
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
