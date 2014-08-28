@@ -86,7 +86,8 @@ void Urho2DTileMap::CreateScene()
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // Get tmx file
-    TmxFile2D* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx");
+    // TmxFile2D* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx");
+    TmxFile2D* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/staggered_grass_and_water.tmx");
     if (!tmxFile)
         return;
 

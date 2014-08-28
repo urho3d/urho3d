@@ -3,7 +3,8 @@ $#include "TileMapDefs2D.h"
 enum Orientation2D
 {
     O_ORTHOGONAL,
-    O_ISOMETRIC
+    O_ISOMETRIC,
+    O_STAGGERED
 };
 
 struct TileMapInfo2D

@@ -358,6 +358,8 @@ bool TmxFile2D::EndLoad()
         info_.orientation_ = O_ORTHOGONAL;
     else if (orientation == "isometric")
         info_.orientation_ = O_ISOMETRIC;
+    else if (orientation == "staggered")
+        info_.orientation_ = O_STAGGERED;
     else
     {
         LOGERROR("Unsupported orientation type " + orientation);
