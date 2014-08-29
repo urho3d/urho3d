@@ -1,3 +1,4 @@
+$pfile "IO/Compression.pkg"
 $pfile "IO/Deserializer.pkg"
 $pfile "IO/File.pkg"
 $pfile "IO/FileSystem.pkg"
