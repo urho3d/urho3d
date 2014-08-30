@@ -44,8 +44,13 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
     /// Set tmx file.
     void SetTmxFile(TmxFile2D* tmxFile);
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry();
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
@@ -55,10 +60,10 @@ public:
     unsigned GetNumLayers() const { return layers_.Size(); }
     /// Return tile map layer at index.
     TileMapLayer2D* GetLayer(unsigned index) const;
-    /// Convert index to position.
-    Vector2 IndexToPosition(int x, int y) const;
-    /// Convert position to index, if out of map return false.
-    bool PositionToIndex(int& x, int& y, const Vector2& position) const;
+    /// Convert tile index to position.
+    Vector2 TileIndexToPosition(int x, int y) const;
+    /// Convert position to tile index, if out of map return false.
+    bool PositionToTileIndex(int& x, int& y, const Vector2& position) const;
 
     /// Set tile map file attribute.
     void SetTmxFileAttr(ResourceRef value);

@@ -33,7 +33,9 @@
 #include "Material.h"
 #include "Model.h"
 #include "Octree.h"
+#ifdef URHO3D_PHYSICS
 #include "PhysicsWorld.h"
+#endif
 #include "ProcessUtils.h"
 #include "Quaternion.h"
 #include "ResourceCache.h"
@@ -247,7 +249,9 @@ void Run(const Vector<String>& arguments)
     context_->RegisterSubsystem(new WorkQueue(context_));
     RegisterSceneLibrary(context_);
     RegisterGraphicsLibrary(context_);
+#ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
+#endif
     
     String command = arguments[0].ToLower();
     String rootNodeName;
@@ -1309,8 +1313,10 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
     
     if (!asPrefab)
     {
+        #ifdef URHO3D_PHYSICS
         /// \todo Make the physics properties configurable
         outScene->CreateComponent<PhysicsWorld>();
+        #endif
     
         /// \todo Make the octree properties configurable, or detect from the scene contents
         outScene->CreateComponent<Octree>();

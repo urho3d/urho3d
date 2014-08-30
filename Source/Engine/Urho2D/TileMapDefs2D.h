@@ -36,7 +36,9 @@ enum Orientation2D
     /// Orthogonal.
     O_ORTHOGONAL = 0,
     /// Isometric.
-    O_ISOMETRIC
+    O_ISOMETRIC,
+    /// Staggered.
+    O_STAGGERED
 };
 
 /// Tile map infomation.
@@ -54,9 +56,15 @@ struct URHO3D_API TileMapInfo2D
     float tileHeight_;
 
     /// Return map width.
-    float GetMapWidth() const { return width_ * tileWidth_; }
+    float GetMapWidth() const;
     /// return map height.
-    float GetMapHeight() const { return height_ * tileHeight_;}
+    float GetMapHeight() const;
+    /// Convert tmx position to Urho position.
+    Vector2 ConvertPosition(const Vector2& position) const;
+    /// Convert tile index to position.
+    Vector2 TileIndexToPosition(int x, int y) const;
+    /// Convert position to tile index, if out of map return false.
+    bool PositionToTileIndex(int& x, int& y, const Vector2& positon) const;
 };
 
 /// Tile map layer type.
@@ -72,8 +80,8 @@ enum TileMapLayerType2D
     LT_INVALID = 0xffff
 };
 
-/// Tile object type.
-enum TileObjectType2D
+/// Tile map object type.
+enum TileMapObjectType2D
 {
     /// Rectangle.
     OT_RECTANGLE = 0,
@@ -136,13 +144,13 @@ private:
 };
 
 /// Tile map object.
-class URHO3D_API TileObject2D : public RefCounted
+class URHO3D_API TileMapObject2D : public RefCounted
 {
 public:
-    TileObject2D();
+    TileMapObject2D();
 
     /// Return type.
-    TileObjectType2D GetObjectType() const { return objectType_; }
+    TileMapObjectType2D GetObjectType() const { return objectType_; }
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return type.
@@ -168,7 +176,7 @@ private:
     friend class TmxObjectGroup2D;
 
     /// Object type.
-    TileObjectType2D objectType_;
+    TileMapObjectType2D objectType_;
     /// Name.
     String name_;
     /// Type.
@@ -186,10 +194,5 @@ private:
     /// Property set.
     SharedPtr<PropertySet2D> propertySet_;
 };
-
-/// Convert index to position.
-URHO3D_API Vector2 IndexToPosition2D(int x, int y, const TileMapInfo2D& tileMapInfo);
-/// Convert position to index, if out of range return false.
-URHO3D_API bool PositionToIndex2D(int& x, int& y, const Vector2& position, const TileMapInfo2D& tileMapInfo);
 
 }

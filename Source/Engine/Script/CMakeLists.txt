@@ -24,5 +24,8 @@
 define_source_files (PARENT_SCOPE)
 
 # Define dependency libs
-set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/AngelScript/include ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)
-
+if (URHO3D_PHYSICS)
+    set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/AngelScript/include ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)
+else ()
+    set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/AngelScript/include ../ThirdParty/kNet/include PARENT_SCOPE)
+endif ()

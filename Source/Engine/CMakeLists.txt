@@ -62,10 +62,19 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-set (SOURCES Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene UI Urho2D)
+set (SOURCES Audio Container Core Engine Graphics Input IO Math Network Resource Scene UI Urho2D)
 if (URHO3D_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
+
+if (URHO3D_NAVIGATION)
+    list (APPEND SOURCES Navigation)
+endif ()
+
+if (URHO3D_PHYSICS)
+    list (APPEND SOURCES Physics)
+endif ()
+
 foreach (SOURCE ${SOURCES})
     add_subdirectory (${SOURCE})
     install (DIRECTORY ${SOURCE}/ DESTINATION ${DEST_INCLUDE_DIR} ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)    # Note: the trailing slash is significant
@@ -96,13 +105,15 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
-file (READ .soversion SOVERSION)
-string (STRIP ${SOVERSION} SOVERSION)
-string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${SOVERSION})
-if (MATCHED)
-    set_target_properties (${TARGET_NAME} PROPERTIES VERSION ${MATCHED} SOVERSION ${CMAKE_MATCH_1})
-else ()
-    message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
+if (NOT ANDROID)
+    file (READ .soversion SOVERSION)
+    string (STRIP ${SOVERSION} SOVERSION)
+    string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${SOVERSION})
+    if (MATCHED)
+        set_target_properties (${TARGET_NAME} PROPERTIES VERSION ${MATCHED} SOVERSION ${CMAKE_MATCH_1})
+    else ()
+        message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
+    endif ()
 endif ()
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 if (NOT GIT_EXIT_CODE EQUAL 0)

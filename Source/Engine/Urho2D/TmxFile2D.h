@@ -88,7 +88,7 @@ public:
     TmxTileLayer2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
-    bool Load(const XMLElement& element);
+    bool Load(const XMLElement& element, const TileMapInfo2D& info);
     /// Return tile.
     Tile2D* GetTile(int x, int y) const;
 
@@ -104,15 +104,15 @@ public:
     TmxObjectGroup2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
-    bool Load(const XMLElement& element);
+    bool Load(const XMLElement& element, const TileMapInfo2D& info);
     /// Return number of objects.
     unsigned GetNumObjects() const { return objects_.Size(); }
-    /// Return object at index.
-    TileObject2D* GetObject(unsigned index) const;
+    /// Return tile map object at index.
+    TileMapObject2D* GetObject(unsigned index) const;
 
 private:
     /// Objects.
-    Vector<SharedPtr<TileObject2D> > objects_;
+    Vector<SharedPtr<TileMapObject2D> > objects_;
 };
 
 /// Tmx image layer.
@@ -122,13 +122,17 @@ public:
     TmxImageLayer2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
-    bool Load(const XMLElement& element);
+    bool Load(const XMLElement& element, const TileMapInfo2D& info);
+    /// Return position.
+    const Vector2& GetPosition() const { return position_; }
     /// Return source.
     const String& GetSource() const { return source_; }
     /// Return sprite.
     Sprite2D* GetSprite() const;
-    
+
 private:
+    /// Position.
+    Vector2 position_;
     /// Source.
     String source_;
     /// Sprite.
@@ -145,7 +149,7 @@ public:
     TmxFile2D(Context* context);
     /// Destruct.
     virtual ~TmxFile2D();
-    /// Register object factory. 
+    /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -169,7 +173,7 @@ private:
     SharedPtr<XMLFile> LoadTSXFile(const String& source);
     /// Load tile set.
     bool LoadTileSet(const XMLElement& element);
-    
+
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// TSX name to XML file mapping.

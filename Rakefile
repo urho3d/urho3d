@@ -249,6 +249,8 @@ def makefile_travis_ci
     system 'MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0' or abort 'Failed to configure native build for tolua++ target'
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
     ENV['SKIP_NATIVE'] = '1'
+    # Temporary workaround due to Travis-CI insufficient memory in MinGW/STATIC build configuration, always use Release configuration.
+    $configuration = 'Release'
   else
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
@@ -275,9 +277,9 @@ def makefile_travis_ci
   else
     platform_prefix = ''
   end
-  # Temporary workaround due to Travis-CI insufficient memory in 64-bit/MinGW/STATIC build configuration, build samples separately using single worker process
-  if ENV['CI'] and ENV['WINDOWS'] and ENV['URHO3D_64BIT'] and ENV['URHO3D_LIB_TYPE'] == 'STATIC'
-    system "cd #{platform_prefix}Build/Tools && make -j$NUMJOBS && cd .. && make" or abort 'Failed to build or test Urho3D library'
+  # Temporary workaround due to Travis-CI insufficient memory in MinGW/STATIC build configuration, build samples separately and retry build for 3 times from where it fails
+  if ENV['CI'] and ENV['WINDOWS'] and ENV['URHO3D_LIB_TYPE'] == 'STATIC'
+    system "cd #{platform_prefix}Build/Tools && make -j$NUMJOBS && cd .. && (make -j$NUMJOBS || make || make)" or abort 'Failed to build or test Urho3D library'
   else
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
     if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])

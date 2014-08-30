@@ -29,8 +29,10 @@
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
 #include "MemoryBuffer.h"
+#ifdef URHO3D_PHYSICS
 #include "PhysicsEvents.h"
 #include "PhysicsWorld.h"
+#endif
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -594,7 +596,6 @@ void LuaScriptInstance::FindScriptObjectMethodRefs()
 void LuaScriptInstance::SubscribeToScriptMethodEvents()
 {
     Scene* scene = GetScene();
-    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
 
     if (scene && scriptObjectMethods_[LSOM_UPDATE])
         SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
@@ -602,11 +603,15 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
     if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LuaScriptInstance, HandlePostUpdate));
 
+#ifdef URHO3D_PHYSICS
+    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
+
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
         SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, HANDLER(LuaScriptInstance, HandleFixedUpdate));
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
         SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+#endif
 
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
         node_->AddListener(this);
@@ -615,19 +620,21 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
 void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
 {
     Scene* scene = GetScene();
-    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
-
     if (scene && scriptObjectMethods_[LSOM_UPDATE])
         UnsubscribeFromEvent(scene, E_SCENEUPDATE);
 
     if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
 
+#ifdef URHO3D_PHYSICS
+    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
+
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
         UnsubscribeFromEvent(physicsWorld, E_PHYSICSPRESTEP);
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
         UnsubscribeFromEvent(physicsWorld, E_PHYSICSPOSTSTEP);
+#endif
 
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
         node_->RemoveListener(this);
@@ -659,6 +666,7 @@ void LuaScriptInstance::HandlePostUpdate(StringHash eventType, VariantMap& event
     }
 }
 
+#ifdef URHO3D_PHYSICS
 void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPreStep;
@@ -684,6 +692,7 @@ void LuaScriptInstance::HandlePostFixedUpdate(StringHash eventType, VariantMap& 
         function->EndCall();
     }
 }
+#endif
 
 void LuaScriptInstance::HandleEvent(StringHash eventType, VariantMap& eventData)
 {

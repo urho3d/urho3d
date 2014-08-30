@@ -78,7 +78,6 @@ namespace Urho3D
 <a href="#Class_FileSelector"><b>FileSelector</b></a>
 <a href="#Class_FileSelectorEntry"><b>FileSelectorEntry</b></a>
 <a href="#Class_FileSystem"><b>FileSystem</b></a>
-<a href="#Class_FileWatcher"><b>FileWatcher</b></a>
 <a href="#Class_FocusParameters"><b>FocusParameters</b></a>
 <a href="#Class_Font"><b>Font</b></a>
 <a href="#Class_Frustum"><b>Frustum</b></a>
@@ -177,7 +176,7 @@ namespace Urho3D
 <a href="#Class_TileMap2D"><b>TileMap2D</b></a>
 <a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
 <a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
-<a href="#Class_TileObject2D"><b>TileObject2D</b></a>
+<a href="#Class_TileMapObject2D"><b>TileMapObject2D</b></a>
 <a href="#Class_Time"><b>Time</b></a>
 <a href="#Class_TmxFile2D"><b>TmxFile2D</b></a>
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
@@ -2152,16 +2151,6 @@ Methods:
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
 - String GetAppPreferencesDir(const String org, const String app) const
-
-<a name="Class_FileWatcher"></a>
-### FileWatcher : Object
-
-Methods:
-
-- bool StartWatching(const String pathName, bool watchSubDirs)
-- void StopWatching()
-- void AddChange(const String fileName)
-- const String GetPath() const
 
 <a name="Class_FocusParameters"></a>
 ### FocusParameters
@@ -5533,8 +5522,8 @@ Methods:
 - const TileMapInfo2D& GetInfo() const
 - unsigned GetNumLayers() const
 - TileMapLayer2D* GetLayer(unsigned index) const
-- Vector2 IndexToPosition(int x, int y) const
-- bool PositionToIndex(const Vector2& position, int x = 0, int y = 0) const
+- Vector2 TileIndexToPosition(int x, int y) const
+- bool PositionToTileIndex(const Vector2& position, int x = 0, int y = 0) const
 
 Properties:
 
@@ -5578,7 +5567,7 @@ Methods:
 - Node* GetTileNode(int x, int y) const
 - Tile2D* GetTile(int x, int y) const
 - unsigned GetNumObjects() const
-- TileObject2D* GetObject(unsigned index) const
+- TileMapObject2D* GetObject(unsigned index) const
 - Node* GetObjectNode(unsigned index) const
 - Node* GetImageNode() const
 
@@ -5592,13 +5581,13 @@ Properties:
 - unsigned numObjects (readonly)
 - Node* imageNode (readonly)
 
-<a name="Class_TileObject2D"></a>
-### TileObject2D
+<a name="Class_TileMapObject2D"></a>
+### TileMapObject2D
 
 
 Methods:
 
-- TileObjectType2D GetObjectType() const
+- TileMapObjectType2D GetObjectType() const
 - const String GetName() const
 - const String GetType() const
 - const Vector2& GetPosition() const
@@ -5612,7 +5601,7 @@ Methods:
 
 Properties:
 
-- TileObjectType2D objectType (readonly)
+- TileMapObjectType2D objectType (readonly)
 - String name (readonly)
 - String type (readonly)
 - Vector2 position (readonly)
@@ -6878,6 +6867,7 @@ Properties:
 
 - int O_ORTHOGONAL
 - int O_ISOMETRIC
+- int O_STAGGERED
 
 ### PassLightingMode
 
@@ -7017,7 +7007,7 @@ Properties:
 - int LT_IMAGE_LAYER
 - int LT_INVALID
 
-### TileObjectType2D
+### TileMapObjectType2D
 
 - int OT_RECTANGLE
 - int OT_ELLIPSE
@@ -7116,7 +7106,9 @@ Properties:
 - float Atan2(float y, float x)
 - float Clamp(float value, float min, float max)
 - int ClampInt(int value, int min, int max)
+- VectorBuffer CompressVectorBuffer(VectorBuffer& src)
 - float Cos(float angle)
+- VectorBuffer DecompressVectorBuffer(VectorBuffer& src)
 - bool Equals(float lhs, float rhs)
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
@@ -7165,11 +7157,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random()
-- float Random(float min, float max)
 - float Random(float range)
-- int RandomInt(int range)
+- float Random(float min, float max)
+- float Random()
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7180,8 +7172,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(const String eventName, const String functionName)
 - void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void SubscribeToEvent(const String eventName, const String functionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)

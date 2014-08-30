@@ -10100,12 +10100,11 @@ float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 TileMapLayer2D GetLayer(uint) const;
-Vector2 IndexToPosition(int, int) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
-bool PositionToIndex(int&, int&, const Vector2&) const;
+bool PositionToTileIndex(int&, int&, const Vector2&) const;
 void Remove();
 void RemoveInstanceDefault();
 void ResetToDefault();
@@ -10117,6 +10116,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+Vector2 TileIndexToPosition(int, int) const;
 
 // Properties:
 bool animationEnabled;
@@ -10180,7 +10180,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-TileObject2D GetObject(uint) const;
+TileMapObject2D GetObject(uint) const;
 Node GetObjectNode(uint) const;
 Tile2D GetTile(int, int) const;
 Node GetTileNode(int, int) const;
@@ -10249,7 +10249,7 @@ int weakRefs;
 int width;
 };
 
-class TileObject2D
+class TileMapObject2D
 {
 // Methods:
 bool HasProperty(const String&) const;
@@ -11851,6 +11851,7 @@ enum Orientation2D
 {
 O_ORTHOGONAL,
 O_ISOMETRIC,
+O_STAGGERED,
 };
 
 enum PassLightingMode
@@ -12072,7 +12073,9 @@ float Ceil(float);
 float Clamp(float, float, float);
 int Clamp(int, int, int);
 void ClearDelayedExecute(const String& = String ( ));
+VectorBuffer CompressVectorBuffer(VectorBuffer&);
 float Cos(float);
+VectorBuffer DecompressVectorBuffer(VectorBuffer&);
 void DelayedExecute(float, bool, const String&);
 void DelayedExecute(float, bool, const String&, const Array<Variant>);
 bool Equals(float, float);

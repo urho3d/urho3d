@@ -49,10 +49,14 @@ void RegisterAudioAPI(asIScriptEngine* engine);
 void RegisterUIAPI(asIScriptEngine* engine);
 /// Register the Network library to script.
 void RegisterNetworkAPI(asIScriptEngine* engine);
+#ifdef URHO3D_PHYSICS
 /// Register the Physics library to script.
 void RegisterPhysicsAPI(asIScriptEngine* engine);
+#endif
+#ifdef URHO3D_NAVIGATION
 /// Register the Navigation library to script.
 void RegisterNavigationAPI(asIScriptEngine* engine);
+#endif
 /// Register the Urho2D library to script.
 void RegisterUrho2DAPI(asIScriptEngine* engine);
 /// Register the Script library to script.

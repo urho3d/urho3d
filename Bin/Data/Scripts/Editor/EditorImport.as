@@ -122,6 +122,7 @@ void ImportTundraScene(const String&in fileName)
     ResetScene();
 
     // Set standard gravity
+    editorScene.CreateComponent("PhysicsWorld");
     editorScene.physicsWorld.gravity = Vector3(0, -9.81, 0);
 
     // Create zone & global light

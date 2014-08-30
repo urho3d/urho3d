@@ -3,7 +3,8 @@ $#include "TileMapDefs2D.h"
 enum Orientation2D
 {
     O_ORTHOGONAL,
-    O_ISOMETRIC
+    O_ISOMETRIC,
+    O_STAGGERED
 };
 
 struct TileMapInfo2D
@@ -29,7 +30,7 @@ enum TileMapLayerType2D
     LT_INVALID
 };
 
-enum TileObjectType2D
+enum TileMapObjectType2D
 {
     OT_RECTANGLE,
     OT_ELLIPSE,
@@ -56,9 +57,9 @@ class Tile2D
     tolua_readonly tolua_property__get_set Sprite2D* sprite;
 };
 
-class TileObject2D
+class TileMapObject2D
 {
-    TileObjectType2D GetObjectType() const;
+    TileMapObjectType2D GetObjectType() const;
     const String GetName() const;
     const String GetType() const;
     const Vector2& GetPosition() const;
@@ -70,7 +71,7 @@ class TileObject2D
     bool HasProperty(const String& name) const;
     const String& GetProperty(const String& name) const;
 
-    tolua_readonly tolua_property__get_set TileObjectType2D objectType;
+    tolua_readonly tolua_property__get_set TileMapObjectType2D objectType;
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set String type;
     tolua_readonly tolua_property__get_set Vector2 position;
