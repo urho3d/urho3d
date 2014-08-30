@@ -1749,7 +1749,7 @@ You can chose from animated sprites, 2D particle emitters and static sprites.
 
 \section Urho2D_Animated Animated sprites
 
-Workflow for creating animated sprites in Urho2D relies on Spriter (c). 
+Workflow for creating animated sprites in Urho2D relies on Spriter (c).
 Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see details below on how to generate this file). Keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
 A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
@@ -1842,6 +1842,92 @@ To set the background color for the scene, use \ref Renderer::GetDefaultZone "Ge
 You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange thir display order.
 
 Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
+
+\section Urho2D_TileMap Tile Maps
+
+Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be inpredictables.
+
+Check example 36_Urho2DTileMap for a basic demonstration.
+
+You can use tile maps for the design of the whole scene/level, or in adjunction to other 2D resources.
+
+\section Urho2D_LoadingTMX "Loading" a Tile Map file
+
+A tmx file is loaded using \ref TmxFile2D "TmxFile2D resource class" and rendered using \ref TileMap2D "TileMap2D component class".
+You just have to create a \ref TileMap2D "TileMap2D" component inside a node and then assign the tmx resource file to it.
+
+C++:
+\code
+SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap")); // Create a standard Urho3D node
+tileMapNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
+TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>(); // Create the TileMap2D component
+tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx")); // Assign tmx resource file to component
+\endcode
+
+AngelScript:
+\code
+Node@ tileMapNode = scene_.CreateChild("TileMap"); // Create a standard Urho3D node
+tileMapNode.position = Vector3(0.0f, 0.0f, -1.0f);
+TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D"); // Create the TileMap2D component
+tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx"); // Assign the tmx resource file to component
+\endcode
+
+Lua:
+\code
+local tileMapNode = scene_:CreateChild("TileMap") -- Create a standard Urho3D node
+tileMapNode.position = Vector3(0, 0, -1)
+local tileMap = tileMapNode:CreateComponent("TileMap2D") -- Create the TileMap2D component
+tileMap.tmxFile = cache:GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx") -- Assign tmx resource file to component
+\endcode
+
+Note that currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Map Properties to set 'Layer Format' to 'XML'.
+
+\section Urho2D_TMX_maps Tile Maps
+
+Once a tmx file is loaded in Urho, use \ref TileMap2D::GetInfo "GetInfo()" to access the map properties through \ref TileMapInfo2D class.
+
+A map is defined by its:
+- orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (returns 0 for ortho, 1 for iso and 2 for staggered).
+- width and height expressed as a number of tiles in the map:  use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
+- width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are usefull to set the camera's position for example
+- tile width and tile height as the size in pixels of the tiles in the map (expressed a percentage): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
+
+Two convenient functions are provided to convert Tiled index to/from Urho2D space:
+- \ref TileMapInfo2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
+- \ref TileMapInfo2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map) 
+
+\section Urho2D_TMX_layers Tile Map Layers
+
+A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers".
+
+Accessing layers : from a \ref TileMap2D "TileMap2D component", layers are accessed by their index from bottom to top using \ref TileMap2D::GetLayer "GetLayer()" function.  \ref TileMap2D::GetNumLayers "GetNumLayers()" returns the number of layers contained in the tmx file. \ref TileMapLayer2D::GetLayerType "GetLayerType()" returns the type of layer (Tile, Object or Image).
+
+A layer is characterized by its:
+- name: currently not accessible
+- width and height expressed as a number of tiles: use \ref TileMapLayer2D::GetWidth "GetWidth()" and \ref TileMapLayer2D::GetHeight "GetHeight()" to access these values
+
+Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()")
+
+\section Urho2D_TMX_Objects Tile Map Objects
+
+Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionables in the tile map.
+
+Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
+
+Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature (TileMapObjectType2D) of the selected object.
+
+Objects' properties (Name and Type) can be accessed using respectively \ref TileMapObject2D::GetName "GetName()" and \ref TileMapObject2D::GetType "GetType()". Type can be usefull to flag categories of objects in Tiled.
+
+Except Tile, object layers are not visible. They can be used:
+- to easily design polygon sprites and Box2D shapes using the object's vertices: use \ref TileMapObject2D::GetNumPoints "GetNumPoints()" to get the number of vertices and \ref TileMapObject2D::GetPoint "GetPoint()" to iterate through the vertices
+- as placeholders to easily set the position and size of entities in the world, using \ref TileMapObject2D::GetPosition "GetPosition()" and \ref TileMapObject2D::GetSize "GetSize()"
+- to display Tile objects as sprites
+- to create a background from Tile sprites
+- ...
+
+Additionaly \ref Sprite2D "Sprite2D" resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()"
+
+If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
 
 \page Serialization Serialization
 
