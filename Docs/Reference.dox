@@ -1845,7 +1845,7 @@ Finally, note that you can easily mix both 2D and 3D resources. 3D assets' posit
 
 \section Urho2D_TileMap Tile Maps
 
-Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be inpredictables.
+Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be unpredictable.
 
 Check example 36_Urho2DTileMap for a basic demonstration.
 
@@ -1889,7 +1889,7 @@ Once a tmx file is loaded in Urho, use \ref TileMap2D::GetInfo "GetInfo()" to ac
 A map is defined by its:
 - orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (returns 0 for ortho, 1 for iso and 2 for staggered).
 - width and height expressed as a number of tiles in the map:  use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
-- width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are usefull to set the camera's position for example
+- width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are useful to set the camera's position for example
 - tile width and tile height as the size in pixels of the tiles in the map (expressed a percentage): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
 
 Two convenient functions are provided to convert Tiled index to/from Urho2D space:
@@ -1910,13 +1910,13 @@ Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisibl
 
 \section Urho2D_TMX_Objects Tile Map Objects
 
-Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionables in the tile map.
+Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
 
 Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
 
 Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature (TileMapObjectType2D) of the selected object.
 
-Objects' properties (Name and Type) can be accessed using respectively \ref TileMapObject2D::GetName "GetName()" and \ref TileMapObject2D::GetType "GetType()". Type can be usefull to flag categories of objects in Tiled.
+Objects' properties (Name and Type) can be accessed using respectively \ref TileMapObject2D::GetName "GetName()" and \ref TileMapObject2D::GetType "GetType()". Type can be useful to flag categories of objects in Tiled.
 
 Except Tile, object layers are not visible. They can be used:
 - to easily design polygon sprites and Box2D shapes using the object's vertices: use \ref TileMapObject2D::GetNumPoints "GetNumPoints()" to get the number of vertices and \ref TileMapObject2D::GetPoint "GetPoint()" to iterate through the vertices
