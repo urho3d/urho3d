@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "Profiler.h"
 
+#include <cstdlib>
 #include <cstring>
 #include <stb_image.h>
 #include <stb_image_write.h>
@@ -35,6 +36,8 @@
 #include <SDL_surface.h>
 
 #include "DebugNew.h"
+
+extern "C" unsigned char *stbi_write_png_to_mem(unsigned char *pixels, int stride_bytes, int x, int y, int n, int *out_len);
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
@@ -49,12 +52,14 @@
 namespace Urho3D
 {
 
+/// DirectDraw color key definition.
 struct DDColorKey
 {
     unsigned dwColorSpaceLowValue_;
     unsigned dwColorSpaceHighValue_;
 };
 
+/// DirectDraw pixel format definition.
 struct DDPixelFormat
 {
     unsigned dwSize_;
@@ -108,6 +113,7 @@ struct DDPixelFormat
     };
 };
 
+/// DirectDraw surface capabilities.
 struct DDSCaps2
 {
     unsigned dwCaps_;
@@ -120,6 +126,7 @@ struct DDSCaps2
     };
 };
 
+/// DirectDraw surface description.
 struct DDSurfaceDesc2
 {
     unsigned dwSize_;
@@ -479,6 +486,30 @@ bool Image::BeginLoad(Deserializer& source)
 
     return true;
 }
+
+bool Image::Save(Serializer& dest) const
+{
+    PROFILE(SaveImage);
+
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image " + GetName());
+        return false;
+    }
+
+    if (!data_)
+    {
+        LOGERROR("Can not save zero-sized image " + GetName());
+        return false;
+    }
+
+    int len;
+    unsigned char *png = stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
+    bool success = dest.Write(png, len) == (unsigned)len;
+    free(png);
+    return success;
+}
+
 
 bool Image::SetSize(int width, int height, unsigned components)
 {
