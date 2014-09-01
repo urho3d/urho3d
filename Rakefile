@@ -50,7 +50,7 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
-  if ENV['PACKAGE_UPLOAD']
+  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && ENV['WINDOWS']) # Temporary workaround due to Travis-CI insufficient memory in MinGW build, always use Release configuration
     $configuration = 'Release'
     $testing = 0
   else
@@ -249,8 +249,6 @@ def makefile_travis_ci
     system 'MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0' or abort 'Failed to configure native build for tolua++ target'
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
     ENV['SKIP_NATIVE'] = '1'
-    # Temporary workaround due to Travis-CI insufficient memory in MinGW/STATIC build configuration, always use Release configuration.
-    $configuration = 'Release'
   else
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
@@ -277,18 +275,13 @@ def makefile_travis_ci
   else
     platform_prefix = ''
   end
-  # Temporary workaround due to Travis-CI insufficient memory in MinGW/STATIC build configuration, build samples separately and retry build for 3 times from where it fails
-  if ENV['CI'] and ENV['WINDOWS'] and ENV['URHO3D_LIB_TYPE'] == 'STATIC'
-    system "cd #{platform_prefix}Build/Tools && make -j$NUMJOBS && cd .. && (make -j$NUMJOBS || make || make)" or abort 'Failed to build or test Urho3D library'
+  # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
+  if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
+    test = '&& make test'
   else
-    # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
-    if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
-      test = '&& make test'
-    else
-      test = ''
-    end
-    system "cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
+    test = ''
   end
+  system "cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
