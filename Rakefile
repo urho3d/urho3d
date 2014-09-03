@@ -50,12 +50,14 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
-  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && ENV['WINDOWS']) # Temporary workaround due to Travis-CI insufficient memory in MinGW build, always use Release configuration
+  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW build)
+  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && ENV['WINDOWS'])
     $configuration = 'Release'
     $testing = 0
   else
     $configuration = 'Debug'
-    $testing = 1
+    # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
+    $testing = (ENV['URHO3D_64BIT'] && ENV['WINDOWS'].to_i != 1) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
   end
   if ENV['XCODE']
     # xctool or xcodebuild
@@ -70,7 +72,7 @@ end
 desc 'Update site documentation to GitHub Pages'
 task :travis_ci_site_update do
   # Pull or clone
-  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth=1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
+  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
   # Update credits from Readme.txt to about.md
   system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.txt |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' doc-Build/about.md" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
@@ -78,8 +80,8 @@ task :travis_ci_site_update do
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
   release = ENV['TRAVIS_TAG'].empty? ? 'HEAD' : ENV['TRAVIS_TAG'];
   unless release == 'HEAD'
-    system "mkdir -p doc-Build/documentation/#{release}" or 'Failed to create directory for new document version'
-    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or 'Failed to update document version in YAML Front Matter block'
+    system "mkdir -p doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
+    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
     append_new_release release, 'doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
@@ -96,7 +98,7 @@ task :travis_ci_site_update do
   system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
   if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
     bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
-    system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or 'Failed to stage .soversion file'
+    system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
   end
   system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
@@ -150,7 +152,7 @@ task :travis_ci_package_upload do
       # Build Android package consisting of both armeabi-v7a and armeabi ABIs
       system 'echo Reconfigure and rebuild Urho3D project using armeabi ABI'
       system "SKIP_NATIVE=1 ./cmake_gcc.sh -DANDROID_ABI=armeabi && cd #{platform_prefix}Build && make -j$NUMJOBS" or abort 'Failed to reconfigure and rebuild for armeabi'
-      system "cd #{platform_prefix}Build && $ANDROID_SDK/tools/android update project -p . -t 1 && ant debug && bash -c 'mv bin/Urho3D{-debug,}.apk'" or abort 'Failed to make Android package (apk)'
+      system "cd #{platform_prefix}Build && $ANDROID_SDK/tools/android update project -p . -t $( $ANDROID_SDK/tools/android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug && bash -c 'mv bin/Urho3D{-debug,}.apk'" or abort 'Failed to make Android package (apk)'
     end
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
@@ -275,8 +277,7 @@ def makefile_travis_ci
   else
     platform_prefix = ''
   end
-  # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment are capable to run tests
-  if $testing == 1 and (ENV['URHO3D_64BIT'] and ENV['WINDOWS'].to_i != 1 or ENV['OSX'])
+  if $testing == 1
     test = '&& make test'
   else
     test = ''
@@ -312,8 +313,8 @@ end
 def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = '')
   if autosave
     # Save auto-created schemes from Xcode project file
-    system "ruby -i -pe 'gsub(/refType = 0; /, %q{})' #{project}/project.pbxproj" or 'Failed to remove legacy refType attributes from the generated Xcode project file'
-    system "ruby -i -e 'puts ARGF.read.gsub(/buildSettings = \\{\n\s*?\\};\n\s*?buildStyles = \(.*?\);/m, %q{})' #{project}/project.pbxproj" or 'Failed to remove unsupported PBXProject attributes from the generated Xcode project file'
+    system "ruby -i -pe 'gsub(/refType = 0; /, %q{})' #{project}/project.pbxproj" or abort 'Failed to remove legacy refType attributes from the generated Xcode project file'
+    system "ruby -i -e 'puts ARGF.read.gsub(/buildSettings = \\{\n\s*?\\};\n\s*?buildStyles = \(.*?\);/m, %q{})' #{project}/project.pbxproj" or abort 'Failed to remove unsupported PBXProject attributes from the generated Xcode project file'
     xcproj = Xcodeproj::Project.open(project)
     xcproj.recreate_user_schemes
     xcproj.save     # There is a bug in this gem, it does not appear to exit with proper exit status (assume always success for now)
@@ -321,7 +322,7 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = ''
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
   # Use xctool when building as its output is nicer
   system "xctool -project #{project} -scheme #{scheme} -configuration #{$configuration} #{sdk} #{extras}" or return 1
-  if $testing == 1 and ios.to_i != 1 and scheme == 'ALL_BUILD'     # Disable testing for IOS as we don't have unit tests for IOS platform yet
+  if $testing == 1 && scheme == 'ALL_BUILD'     # Disable testing for other schemes such as 'doc', 'package', etc
     # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
     system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return 1
   end

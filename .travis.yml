@@ -35,8 +35,8 @@ env:
     - LINUX=1                              URHO3D_LIB_TYPE=SHARED
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=STATIC
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=SHARED
-    - ANDROID=1                            URHO3D_LIB_TYPE=STATIC
-    - ANDROID=1                            URHO3D_LIB_TYPE=SHARED
+    - ANDROID=1 API=19                     URHO3D_LIB_TYPE=STATIC
+    - ANDROID=1 API=19                     URHO3D_LIB_TYPE=SHARED
     - RPI=1                                URHO3D_LIB_TYPE=STATIC
     - RPI=1                                URHO3D_LIB_TYPE=SHARED
 matrix:
@@ -47,7 +47,7 @@ matrix:
 language: cpp
 compiler: gcc
 before_install:
-  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export SITE_UPDATE_ON_MASTER_COMMIT=$SITE_UPDATE; export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); if echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'; then git fetch --depth=2000 --tags origin $TRAVIS_BRANCH && export PACKAGE_UPLOAD=1; elif [ $TRAVIS_TAG ]; then export PACKAGE_UPLOAD=1; fi; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export SITE_UPDATE_ON_MASTER_COMMIT=$SITE_UPDATE; export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); if echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'; then git fetch --depth 2000 --tags origin $TRAVIS_BRANCH && export PACKAGE_UPLOAD=1; elif [ $TRAVIS_TAG ]; then export PACKAGE_UPLOAD=1; fi; fi
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo add-apt-repository ppa:george-edison55/precise-backports -y; fi
   - travis_retry sudo apt-get update -q -y
 install:
@@ -56,7 +56,7 @@ install:
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo apt-get install -q -y --no-install-recommends doxygen graphviz; fi
   - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - if [ $PACKAGE_UPLOAD ] && [ "$LINUX" -o "$RPI" ]; then travis_retry sudo apt-get install -q -y rpm; fi
-  - if [ $ANDROID ]; then wget -q http://dl.google.com/android/ndk/android-ndk32-r10-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk; if [ $PACKAGE_UPLOAD ]; then wget -q http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && export ANDROID_SDK=$(pwd)/android-sdk && (while :; do echo 'y'; sleep 1; done) |android-sdk/tools/android update sdk --no-ui --filter platform-tool,build-tools-20.0.0,android-19,extra-android-support; fi; fi
+  - if [ $ANDROID ]; then wget -q http://dl.google.com/android/ndk/android-ndk32-r10-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk; if [ $PACKAGE_UPLOAD ]; then wget -q http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && export ANDROID_SDK=$(pwd)/android-sdk && (while :; do echo 'y'; sleep 1; done) |$ANDROID_SDK/tools/android update sdk --no-ui --filter platform-tool,build-tools-20.0.0,android-$API,extra-android-support; fi; fi
   - if [ $RPI ]; then travis_retry bash -c 'if [ -d rpi-tools ]; then rm -rf rpi-tools && sleep 60; fi && free -m && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools' && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && travis_retry bash -c 'if [ -d rpi-sysroot ]; then rm -rf rpi-sysroot && sleep 60; fi && free -m && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot' && export RASPI_ROOT=$(pwd)/rpi-sysroot; fi
   - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
