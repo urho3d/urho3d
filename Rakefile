@@ -57,7 +57,7 @@ task :travis_ci do
   else
     $configuration = 'Debug'
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
-    $testing = (ENV['URHO3D_64BIT'] && ENV['WINDOWS'].to_i != 1) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
+    $testing = (ENV['OSX'].to_i != 1 && ENV['URHO3D_64BIT'] && ENV['WINDOWS'].to_i != 1) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
   end
   if ENV['XCODE']
     # xctool or xcodebuild
@@ -321,10 +321,10 @@ def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = ''
   end
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
   # Use xctool when building as its output is nicer
-  system "xctool -project #{project} -scheme #{scheme} -configuration #{$configuration} #{sdk} #{extras}" or return 1
+  system "xctool -project #{project} -scheme #{scheme} -configuration #{$configuration} #{sdk} #{extras}" or return nil
   if $testing == 1 && scheme == 'ALL_BUILD'     # Disable testing for other schemes such as 'doc', 'package', etc
     # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
-    system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return 1
+    system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return nil
   end
   return 0
 end
