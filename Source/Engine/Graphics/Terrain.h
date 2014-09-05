@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 class Image;
+class IndexBuffer;
 class Material;
 class Node;
 class TerrainPatch;
