@@ -56,10 +56,9 @@ install:
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo apt-get install -q -y --no-install-recommends doxygen graphviz; fi
   - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - if [ $PACKAGE_UPLOAD ] && [ "$LINUX" -o "$RPI" ]; then travis_retry sudo apt-get install -q -y rpm; fi
-  - if [ $ANDROID ]; then wget -q http://dl.google.com/android/ndk/android-ndk32-r10-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk; if [ $PACKAGE_UPLOAD ]; then wget -q http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && export ANDROID_SDK=$(pwd)/android-sdk && (while :; do echo 'y'; sleep 1; done) |$ANDROID_SDK/tools/android update sdk --no-ui --filter platform-tool,build-tools-20.0.0,android-$API,extra-android-support; fi; fi
-  - bash -e /etc/init.d/xvfb start
-before_script:
+  - if [ $ANDROID ]; then wget -q http://dl.google.com/android/ndk/android-ndk32-r10-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk; if [ $PACKAGE_UPLOAD ]; then wget -q http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz && tar xzf *.tgz && rm *.tgz && ln -s android-sdk* android-sdk && export PATH=$PATH:$(pwd)/android-sdk/tools:$(pwd)/android-sdk/platform-tools && (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --filter platform-tool,build-tools-20.0.0,android-$API,extra-android-support; fi; fi
   - if [ $RPI ]; then free -m && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && free -m && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot && export RASPI_ROOT=$(pwd)/rpi-sysroot; fi
+  - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
 after_success:
   - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake travis_ci_site_update && rake travis_ci_rebase; fi

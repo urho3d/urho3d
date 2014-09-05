@@ -32,10 +32,10 @@ task :sync do
   system "cwb=`git symbolic-ref -q --short HEAD || git rev-parse --short HEAD`; export cwb && git fetch upstream && git checkout master && git pull && git merge -m 'Sync at #{Time.now.localtime}.' upstream/master && git push && git checkout $cwb"
 end
 
-# Usage: rake scaffolding dir=/path/to/new/project/root [project=your-project-name] [target=your-target-name]
+# Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
 desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
-  abort 'Usage: rake scaffolding dir=/path/to/new/project/root [project=your-project-name] [target=your-target-name]' unless ENV['dir']
+  abort 'Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]' unless ENV['dir']
   abs_path = ENV['dir'][0, 1] == '/' ? ENV['dir'] : "#{Dir.pwd}/#{ENV['dir']}"
   project = ENV['project'] || 'Scaffolding'
   target = ENV['target'] || 'Main'
@@ -45,6 +45,20 @@ task :scaffolding do
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
   puts "Please see http://urho3d.github.io/documentation/_using_library.html for more detail. For example:\n\n"
   puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
+end
+
+# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19]
+desc 'Test run installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
+task :android do
+  intent = ENV['intent'] || '.SampleLauncher'
+  package = ENV['package'] || 'com.github.urho3d'
+  success_indicator = ENV['success_indicator'] || (intent == '.SampleLauncher' ? 'Initialized engine' : '')
+  payload = ENV['payload'] || (intent == '.SampleLauncher' ? 'input tap 10 200' : '')
+  timeout = ENV['timeout'] || 30
+  api = ENV['api'] || 19
+  android_prepare_device api or abort 'Failed to prepare Android (virtual) device for test run'
+  android_wait_for_device # or die
+  android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}"
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
@@ -152,7 +166,7 @@ task :travis_ci_package_upload do
       # Build Android package consisting of both armeabi-v7a and armeabi ABIs
       system 'echo Reconfigure and rebuild Urho3D project using armeabi ABI'
       system "SKIP_NATIVE=1 ./cmake_gcc.sh -DANDROID_ABI=armeabi && cd #{platform_prefix}Build && make -j$NUMJOBS" or abort 'Failed to reconfigure and rebuild for armeabi'
-      system "cd #{platform_prefix}Build && $ANDROID_SDK/tools/android update project -p . -t $( $ANDROID_SDK/tools/android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug && bash -c 'mv bin/Urho3D{-debug,}.apk'" or abort 'Failed to make Android package (apk)'
+      system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     end
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
   end
@@ -257,6 +271,11 @@ def makefile_travis_ci
   end
   system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
+    # The AVD on Travis-CI does not have enough memory for STATIC lib installation, so only prepare device for SHARED lib test run
+    android_test = !ENV['PACKAGE_UPLOAD'] && (ENV['URHO3D_LIB_TYPE'] == 'SHARED' || !ENV['CI'])
+    if android_test
+      android_prepare_device ENV['API'] or abort 'Failed to prepare Android (virtual) device for test run'
+    end
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
     system "cd Build/ThirdParty/LuaJIT/generated/buildvm-android && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
@@ -286,6 +305,60 @@ def makefile_travis_ci
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  # Make, deploy, and test run Android APK in an Android (virtual) device
+  if android_test
+    system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
+    android_wait_for_device # or die
+    system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
+    android_test_run or abort 'Failed to test run Urho3D Samples APK'
+  end
+end
+
+def android_prepare_device api, name = 'test'
+  if `adb devices |tail -n +2 |head -1`.chomp.empty?
+    # Don't have any attached then force create a new virtual one and start it
+    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim'; fi && echo 'no' |android create avd --force -n #{name} -t android-#{api} && emulator -avd #{name} -gpu on $OPTS &"
+  else
+    # Otherwise, try to unlock it just in case it is locked
+    system "adb shell 'input keyevent 82; input keyevent 4'"
+  end
+end
+
+def android_wait_for_device package='com.android.launcher', seconds = 10
+  # We either success or die trying, killed by Travis-CI due 10 minutes no-output timeout which is perfect for this case
+  puts "\nWaiting for device...\n\n"
+  system "adb wait-for-device shell 'until ps |grep -c #{package} 1>/dev/null; do sleep #{seconds}; done'"
+end
+
+def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Initialized engine', payload = 'input tap 10 200', timeout = 30
+  # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
+  begin
+    IO.popen("adb shell <<EOF
+# Clear the log
+logcat -c
+# Start the app
+am start -a android.intent.action.MAIN -n #{package}/#{intent}
+# Wait until the process is running
+until ps |grep -c #{package} 1>/dev/null; do sleep 1; done
+# Make sure the app is on the foreground
+sleep 3 && am start -n #{package}/#{intent} && sleep 3
+# Execute the payload, the default payload is a single tap to launch Urho3DPlayer which in turn runs NinjaSnowWar.as
+#{payload}
+# Let it runs for a while
+sleep #{timeout}
+# Exit and stop the app
+input keyevent 4 && am force-stop #{package}
+# Dump the log
+logcat -d
+# Bye bye
+exit
+##
+EOF") { |stdout| echo = false; while output = stdout.gets do if echo && /#\s#/ !~ output then puts output else echo = true if /^##/ =~ output end; return nil if /^error/i =~ output end }
+    # Result of the test run is determined based on the presence of the success indicator string in the log
+    system "adb logcat -d |grep -cq '#{success_indicator}'"
+  rescue
+    nil
+  end
 end
 
 def xcode_travis_ci

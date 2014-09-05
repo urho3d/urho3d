@@ -387,6 +387,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     frameTimer_.Reset();
 
+    LOGINFO("Initialized engine");
     initialized_ = true;
     return true;
 }
