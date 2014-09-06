@@ -47,8 +47,8 @@ task :scaffolding do
   puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
 end
 
-# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19]
-desc 'Test run installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
+# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [avd=test] [retries=60] [retry_interval=10]
+desc 'Test run already installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
   intent = ENV['intent'] || '.SampleLauncher'
   package = ENV['package'] || 'com.github.urho3d'
@@ -56,8 +56,11 @@ task :android do
   payload = ENV['payload'] || (intent == '.SampleLauncher' ? 'input tap 10 200' : '')
   timeout = ENV['timeout'] || 30
   api = ENV['api'] || 19
-  android_prepare_device api or abort 'Failed to prepare Android (virtual) device for test run'
-  android_wait_for_device # or die
+  avd = ENV['avd'] || 'test'
+  retries = ENV['retries'] || 60 # Roughly equals to 10 minutes wait with 10 seconds interval
+  retry_interval = ENV['retry_interval'] || 10 # seconds
+  android_prepare_device api, avd or abort 'Failed to prepare Android (virtual) device for test run'
+  android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
   android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}"
 end
 
@@ -118,9 +121,10 @@ task :travis_ci_site_update do
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
-desc 'Rebase OSX-CI mirror branch'
+desc 'Rebase Android-CI and OSX-CI mirror branches'
 task :travis_ci_rebase do
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
@@ -308,13 +312,14 @@ def makefile_travis_ci
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if android_test
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
-    android_wait_for_device # or die
+    android_wait_for_device # We either success or die trying, killed by Travis-CI due 10 minutes no-output timeout which is perfect for this case
     system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
     android_test_run or abort 'Failed to test run Urho3D Samples APK'
   end
 end
 
 def android_prepare_device api, name = 'test'
+  system 'if ! ps |grep -cq adb; then adb start-server; fi'
   if `adb devices |tail -n +2 |head -1`.chomp.empty?
     # Don't have any attached then force create a new virtual one and start it
     system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim'; fi && echo 'no' |android create avd --force -n #{name} -t android-#{api} && emulator -avd #{name} -gpu on $OPTS &"
@@ -324,10 +329,11 @@ def android_prepare_device api, name = 'test'
   end
 end
 
-def android_wait_for_device package='com.android.launcher', seconds = 10
-  # We either success or die trying, killed by Travis-CI due 10 minutes no-output timeout which is perfect for this case
+def android_wait_for_device retries = -1, retry_interval = 10, package = 'com.android.launcher'
+  # Wait until the indicator process is running or it is killed externally by Travis-CI or by user via Ctrl+C or when it exceeds the number of retries (if given)
   puts "\nWaiting for device...\n\n"
-  system "adb wait-for-device shell 'until ps |grep -c #{package} 1>/dev/null; do sleep #{seconds}; done'"
+  # Capture adb's stdout and interpret it because adb does not return exit code from its last shell command
+  return /timeout/ =~ `adb wait-for-device shell 'retries=#{retries}; until [ $retries -eq 0 ] || ps |grep -c #{package} 1>/dev/null; do sleep #{retry_interval}; if [ $retries -gt 0 ]; then let retries=retries-1; fi; done; if [ $retries -eq 0 ]; then echo timeout; fi'` ? nil : 0;
 end
 
 def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Initialized engine', payload = 'input tap 10 200', timeout = 30
