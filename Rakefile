@@ -322,7 +322,7 @@ def android_prepare_device api, name = 'test'
   system 'if ! ps |grep -cq adb; then adb start-server; fi'
   if `adb devices |tail -n +2 |head -1`.chomp.empty?
     # Don't have any attached then force create a new virtual one and start it
-    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim'; fi && echo 'no' |android create avd --force -n #{name} -t android-#{api} && emulator -avd #{name} -gpu on $OPTS &"
+    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim'; else export OPTS='-gpu on'; fi && echo 'no' |android create avd --force -n #{name} -t android-#{api} && emulator -avd #{name} $OPTS &"
   else
     # Otherwise, try to unlock it just in case it is locked
     system "adb shell 'input keyevent 82; input keyevent 4'"
@@ -336,7 +336,7 @@ def android_wait_for_device retries = -1, retry_interval = 10, package = 'com.an
   return /timeout/ =~ `adb wait-for-device shell 'retries=#{retries}; until [ $retries -eq 0 ] || ps |grep -c #{package} 1>/dev/null; do sleep #{retry_interval}; if [ $retries -gt 0 ]; then let retries=retries-1; fi; done; if [ $retries -eq 0 ]; then echo timeout; fi'` ? nil : 0;
 end
 
-def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Initialized engine', payload = 'input tap 10 200', timeout = 30
+def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'input tap 10 200', timeout = 30
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
   begin
     IO.popen("adb shell <<EOF
