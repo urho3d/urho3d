@@ -61,7 +61,7 @@ task :android do
   retry_interval = ENV['retry_interval'] || 10 # seconds
   android_prepare_device api, avd or abort 'Failed to prepare Android (virtual) device for test run'
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
-  android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}"
+  android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)

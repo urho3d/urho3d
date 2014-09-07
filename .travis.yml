@@ -40,8 +40,7 @@ env:
 matrix:
   fast_finish: true
 #  allow_failures:
-#    - env: RPI=1 URHO3D_LIB_TYPE=STATIC
-#    - env: RPI=1 URHO3D_LIB_TYPE=SHARED
+#    - env: whitespace is important
 language: cpp
 compiler: gcc
 before_install:
