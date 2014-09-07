@@ -21,11 +21,11 @@
 //
 
 #include "Precompiled.h"
-#include "ArrayPtr.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "FileSystem.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Script.h"
@@ -72,7 +72,7 @@ class ByteCodeDeserializer : public asIBinaryStream
 {
 public:
     /// Construct.
-    ByteCodeDeserializer(Deserializer& source) :
+    ByteCodeDeserializer(MemoryBuffer& source) :
         source_(source)
     {
     }
@@ -90,7 +90,7 @@ public:
     
 private:
     /// Source stream.
-    Deserializer& source_;
+    MemoryBuffer& source_;
 };
 
 ScriptFile::ScriptFile(Context* context) :
@@ -112,58 +112,80 @@ void ScriptFile::RegisterObject(Context* context)
     context->RegisterFactory<ScriptFile>();
 }
 
-bool ScriptFile::Load(Deserializer& source)
+bool ScriptFile::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadScript);
-    
     ReleaseModule();
+    loadByteCode_.Reset();
     
-    // Create the module. Discard previous module if there was one
     asIScriptEngine* engine = script_->GetScriptEngine();
-    scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
-    if (!scriptModule_)
+    
     {
-        LOGERROR("Failed to create script module " + GetName());
-        return false;
+        MutexLock lock(script_->GetModuleMutex());
+    
+        // Create the module. Discard previous module if there was one
+        scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
+        if (!scriptModule_)
+        {
+            LOGERROR("Failed to create script module " + GetName());
+            return false;
+        }
     }
     
     // Check if this file is precompiled bytecode
     if (source.ReadFileID() == "ASBC")
     {
-        ByteCodeDeserializer deserializer = ByteCodeDeserializer(source);
-        if (scriptModule_->LoadByteCode(&deserializer) >= 0)
-        {
-            LOGINFO("Loaded script module " + GetName() + " from bytecode");
-            compiled_ = true;
-            // Map script module to script resource with userdata
-            scriptModule_->SetUserData(this);
-            
-            return true;
-        }
-        else
-            return false;
+        // Perform actual parsing in EndLoad(); read data now
+        loadByteCodeSize_ = source.GetSize() - source.GetPosition();
+        loadByteCode_ = new unsigned char[loadByteCodeSize_];
+        source.Read(loadByteCode_.Get(), loadByteCodeSize_);
+        return true;
     }
     else
         source.Seek(0);
     
-    // Not bytecode: add the initial section and check for includes
-    if (!AddScriptSection(engine, source))
-        return false;
-    
-    // Compile
-    int result = scriptModule_->Build();
-    if (result < 0)
+    // Not bytecode: add the initial section and check for includes.
+    // Perform actual building during EndLoad(), as AngelScript can not multithread module compilation,
+    // and static initializers may access arbitrary engine functionality which may not be thread-safe
+    return AddScriptSection(engine, source);
+}
+
+bool ScriptFile::EndLoad()
+{
+    bool success = false;
+
+    // Load from bytecode if available, else compile
+    if (loadByteCode_)
     {
-        LOGERROR("Failed to compile script module " + GetName());
-        return false;
+        MemoryBuffer buffer(loadByteCode_.Get(), loadByteCodeSize_);
+        ByteCodeDeserializer deserializer = ByteCodeDeserializer(buffer);
+
+        if (scriptModule_->LoadByteCode(&deserializer) >= 0)
+        {
+            LOGINFO("Loaded script module " + GetName() + " from bytecode");
+            success = true;
+        }
+    }
+    else
+    {
+        int result = scriptModule_->Build();
+        if (result >= 0)
+        {
+            LOGINFO("Compiled script module " + GetName());
+            success = true;
+        }
+        else
+            LOGERROR("Failed to compile script module " + GetName());
     }
     
-    LOGINFO("Compiled script module " + GetName());
-    compiled_ = true;
-    // Map script module to script resource with userdata
-    scriptModule_->SetUserData(this);
-    
-    return true;
+    if (success)
+    {
+        compiled_ = true;
+        // Map script module to script resource with userdata
+        scriptModule_->SetUserData(this);
+    }
+
+    loadByteCode_.Reset();
+    return success;
 }
 
 void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName)
@@ -645,9 +667,10 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
     unsigned paramCount = function->GetParamCount();
     for (unsigned i = 0; i < parameters.Size() && i < paramCount; ++i)
     {
-        int paramType = function->GetParamTypeId(i);
+        int paramTypeId;
+        function->GetParam(i, &paramTypeId);
         
-        switch (paramType)
+        switch (paramTypeId)
         {
         case asTYPEID_BOOL:
             context->SetArgByte(i, (unsigned char)parameters[i].GetBool());
@@ -673,7 +696,7 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
             break;
             
         default:
-            if (paramType & asTYPEID_APPOBJECT)
+            if (paramTypeId & asTYPEID_APPOBJECT)
             {
                 switch (parameters[i].GetType())
                 {
@@ -718,8 +741,6 @@ void ScriptFile::ReleaseModule()
 {
     if (scriptModule_)
     {
-        script_->ClearObjectTypeCache();
-        
         // Clear search caches and event handlers
         includeFiles_.Clear();
         validClasses_.Clear();
@@ -728,10 +749,17 @@ void ScriptFile::ReleaseModule()
         delayedCalls_.Clear();
         eventInvokers_.Clear();
         
-        // Remove the module
-        scriptModule_->SetUserData(0);
         asIScriptEngine* engine = script_->GetScriptEngine();
-        engine->DiscardModule(GetName().CString());
+        scriptModule_->SetUserData(0);
+        
+        // Remove the module
+        {
+            MutexLock lock(script_->GetModuleMutex());
+            
+            script_->ClearObjectTypeCache();
+            engine->DiscardModule(GetName().CString());
+        }
+        
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);

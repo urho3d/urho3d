@@ -10,7 +10,7 @@ local numSprites = 100
 local sprites = {}
 
 -- Custom variable identifier for storing sprite velocity within the UI element
-local VAR_VELOCITY = ShortStringHash("Velocity")
+local VAR_VELOCITY = StringHash("Velocity")
 
 function Start()
     -- Execute the common startup for samples

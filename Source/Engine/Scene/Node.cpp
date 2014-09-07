@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -485,7 +485,7 @@ bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space
         break;
     }
 
-    Vector3 lookDir = target - GetWorldPosition();
+    Vector3 lookDir = worldSpaceTarget - GetWorldPosition();
     // Check if target is very close, in that case can not reliably calculate lookat direction
     if (lookDir.Equals(Vector3::ZERO))
         return false;
@@ -589,9 +589,6 @@ void Node::SetOwner(Connection* owner)
 
 void Node::MarkDirty()
 {
-    if (dirty_)
-        return;
-
     dirty_ = true;
 
     // Notify listener components first, then mark child nodes
@@ -706,7 +703,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
         MarkReplicationDirty();
 }
 
-Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
+Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
     // Check that creation succeeds and that the object in fact is a component
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
@@ -720,7 +717,7 @@ Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned
     return newComponent;
 }
 
-Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
+Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
@@ -794,7 +791,7 @@ void Node::RemoveComponent(Component* component)
     }
 }
 
-void Node::RemoveComponent(ShortStringHash type)
+void Node::RemoveComponent(StringHash type)
 {
     for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -885,7 +882,7 @@ void Node::SetParent(Node* parent)
     }
 }
 
-void Node::SetVar(ShortStringHash key, const Variant& value)
+void Node::SetVar(StringHash key, const Variant& value)
 {
     vars_[key] = value;
     MarkNetworkUpdate();
@@ -980,7 +977,7 @@ void Node::GetChildren(PODVector<Node*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
-void Node::GetChildrenWithComponent(PODVector<Node*>& dest, ShortStringHash type, bool recursive) const
+void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
 
@@ -1041,7 +1038,7 @@ unsigned Node::GetNumNetworkComponents() const
     return num;
 }
 
-void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool recursive) const
+void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
 
@@ -1057,7 +1054,7 @@ void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool
         GetComponentsRecursive(dest, type);
 }
 
-bool Node::HasComponent(ShortStringHash type) const
+bool Node::HasComponent(StringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -1067,13 +1064,13 @@ bool Node::HasComponent(ShortStringHash type) const
     return false;
 }
 
-const Variant& Node::GetVar(ShortStringHash key) const
+const Variant& Node::GetVar(StringHash key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
     return i != vars_.End() ? i->second_ : Variant::EMPTY;
 }
 
-Component* Node::GetComponent(ShortStringHash type) const
+Component* Node::GetComponent(StringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -1209,7 +1206,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
     for (unsigned i = 0; i < numComponents; ++i)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
-        ShortStringHash compType = compBuffer.ReadShortStringHash();
+        StringHash compType = compBuffer.ReadStringHash();
         unsigned compID = compBuffer.ReadUInt();
 
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
@@ -1253,7 +1250,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = SafeCreateComponent(typeName, ShortStringHash(typeName),
+        Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
@@ -1503,6 +1500,13 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
+void Node::SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+{
+    position_ = position;
+    rotation_ = rotation;
+    scale_ = scale;
+}
+
 void Node::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInfos_.Size() == 1)
@@ -1515,7 +1519,73 @@ void Node::OnAttributeAnimationRemoved()
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
+void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+{
+    Vector<String> names = name.Split('/');
+    // Only attribute name
+    if (names.Size() == 1)
+        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    else
+    {
+        // Name must in following format: "#0/#1/@component#0/attribute"
+        Node* node = this;
+        unsigned i = 0;
+        for (; i < names.Size() - 1; ++i)
+        {
+            if (names[i].Front() != '#')
+                break;
+
+            unsigned index = ToInt(names[i].Substring(1, names[i].Length() - 1));
+            node = node->GetChild(index);
+            if (!node)
+            {
+                LOGERROR("Could not find node by name " + name);
+                return;
+            }
+        }
+        
+        if (i == names.Size() - 1)
+        {
+            node->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+            return;
+        }
+
+        if (i != names.Size() - 2 || names[i].Front() != '@')
+        {
+            LOGERROR("Invalid name " + name);
+            return;
+        }
+
+        String componentName = names[i].Substring(1, names[i].Length() - 1);
+        Vector<String> componentNames = componentName.Split('#');
+        if (componentNames.Size() == 1)
+        {
+            Component* component = node->GetComponent(StringHash(componentNames.Front()));
+            if (!component)
+            {
+                LOGERROR("Could not find component by name " + name);
+                return;
+            }
+
+            component->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+        }
+        else
+        {
+            unsigned index = ToInt(componentNames[1]);
+            PODVector<Component*> components;
+            node->GetComponents(components, StringHash(componentNames.Front()));
+            if (index >= components.Size())
+            {
+                LOGERROR("Could not find component by name " + name);
+                return;
+            }
+
+            components[index]->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+        }
+    }
+}
+
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
 {
     // First check if factory for type exists
     if (!context_->GetTypeName(type).Empty())
@@ -1586,7 +1656,7 @@ void Node::GetChildrenRecursive(PODVector<Node*>& dest) const
     }
 }
 
-void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const
+void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const
 {
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -1598,7 +1668,7 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortString
     }
 }
 
-void Node::GetComponentsRecursive(PODVector<Component*>& dest, ShortStringHash type) const
+void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {

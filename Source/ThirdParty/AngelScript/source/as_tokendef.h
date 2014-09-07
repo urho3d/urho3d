@@ -172,7 +172,8 @@ enum eTokenType
 	ttCast,                // cast
 	ttPrivate,             // private
 	ttNamespace,           // namespace
-	ttMixin                // mixin
+	ttMixin,               // mixin
+	ttAuto                 // auto
 };
 
 struct sTokenWord
@@ -239,6 +240,7 @@ sTokenWord const tokenWords[] =
 	asTokenDef("!is"       , ttNotIs),
 	asTokenDef("@"         , ttHandle),
 	asTokenDef("and"       , ttAnd),
+	asTokenDef("auto"      , ttAuto),
 	asTokenDef("bool"      , ttBool),
 	asTokenDef("break"     , ttBreak),
 	asTokenDef("case"      , ttCase), 
@@ -306,6 +308,7 @@ const char * const FINAL_TOKEN    = "final";
 const char * const OVERRIDE_TOKEN = "override";
 const char * const GET_TOKEN      = "get";
 const char * const SET_TOKEN      = "set";
+const char * const ABSTRACT_TOKEN = "abstract";
 
 END_AS_NAMESPACE
 

@@ -38,7 +38,7 @@ public:
     static void RegisterObject(Context* context);
     
     /// Return type of the stored component.
-    virtual ShortStringHash GetType() const { return typeHash_; }
+    virtual StringHash GetType() const { return typeHash_; }
     /// Return type name of the stored component.
     virtual const String& GetTypeName() const { return typeName_; }
     /// Return attribute descriptions, or null if none defined.
@@ -55,7 +55,7 @@ public:
     /// Initialize the type name. Called by Node when loading.
     void SetTypeName(const String& typeName);
    /// Initialize the type hash only when type name not known. Called by Node when loading.
-    void SetType(ShortStringHash typeHash);
+    void SetType(StringHash typeHash);
     
     /// Return the XML format attributes. Empty when loaded with binary serialization.
     const Vector<String>& GetXMLAttributes() const { return xmlAttributes_; }
@@ -65,13 +65,13 @@ public:
     bool GetUseXML() const { return useXML_; }
     
     /// Return static type.
-    static Urho3D::ShortStringHash GetTypeStatic() { static const ShortStringHash typeStatic("UnknownComponent"); return typeStatic; } \
+    static Urho3D::StringHash GetTypeStatic() { static const StringHash typeStatic("UnknownComponent"); return typeStatic; } \
     /// Return static type name.
     static const Urho3D::String& GetTypeNameStatic() { static const String typeNameStatic("UnknownComponent"); return typeNameStatic; } \
     
 private:
     /// Type of stored component.
-    ShortStringHash typeHash_;
+    StringHash typeHash_;
     /// Type name of the stored component.
     String typeName_;
     /// XML format attribute infos.

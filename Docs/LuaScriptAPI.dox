@@ -4,8 +4,202 @@ namespace Urho3D
 /**
 \page LuaScriptAPI Lua Scripting API
 
+\section LuaScriptAPI_TableOfContents Table of Contents
+
+\ref LuaScriptAPI_ClassList "Class list"<br>
+\ref LuaScriptAPI_Classes "Classes"<br>
+\ref LuaScriptAPI_Enums "Enumerations"<br>
+\ref LuaScriptAPI_GlobalFunctions "Global functions"<br>
+\ref LuaScriptAPI_GlobalProperties "Global properties"<br>
+\ref LuaScriptAPI_GlobalConstants "Global constants"<br>
+
+\section LuaScriptAPI_ClassList Class list
+
+<a href="#Class_Animatable"><b>Animatable</b></a>
+<a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
+<a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
+<a href="#Class_Animation"><b>Animation</b></a>
+<a href="#Class_Animation2D"><b>Animation2D</b></a>
+<a href="#Class_AnimationControl"><b>AnimationControl</b></a>
+<a href="#Class_AnimationController"><b>AnimationController</b></a>
+<a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
+<a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
+<a href="#Class_AnimationState"><b>AnimationState</b></a>
+<a href="#Class_Audio"><b>Audio</b></a>
+<a href="#Class_BiasParameters"><b>BiasParameters</b></a>
+<a href="#Class_Billboard"><b>Billboard</b></a>
+<a href="#Class_BillboardSet"><b>BillboardSet</b></a>
+<a href="#Class_Bone"><b>Bone</b></a>
+<a href="#Class_BorderImage"><b>BorderImage</b></a>
+<a href="#Class_BoundingBox"><b>BoundingBox</b></a>
+<a href="#Class_Button"><b>Button</b></a>
+<a href="#Class_Camera"><b>Camera</b></a>
+<a href="#Class_CascadeParameters"><b>CascadeParameters</b></a>
+<a href="#Class_CheckBox"><b>CheckBox</b></a>
+<a href="#Class_CollisionBox2D"><b>CollisionBox2D</b></a>
+<a href="#Class_CollisionChain2D"><b>CollisionChain2D</b></a>
+<a href="#Class_CollisionCircle2D"><b>CollisionCircle2D</b></a>
+<a href="#Class_CollisionEdge2D"><b>CollisionEdge2D</b></a>
+<a href="#Class_CollisionPolygon2D"><b>CollisionPolygon2D</b></a>
+<a href="#Class_CollisionShape"><b>CollisionShape</b></a>
+<a href="#Class_CollisionShape2D"><b>CollisionShape2D</b></a>
+<a href="#Class_Color"><b>Color</b></a>
+<a href="#Class_ColorFrame"><b>ColorFrame</b></a>
+<a href="#Class_Component"><b>Component</b></a>
+<a href="#Class_Connection"><b>Connection</b></a>
+<a href="#Class_Console"><b>Console</b></a>
+<a href="#Class_Constraint"><b>Constraint</b></a>
+<a href="#Class_Constraint2D"><b>Constraint2D</b></a>
+<a href="#Class_ConstraintDistance2D"><b>ConstraintDistance2D</b></a>
+<a href="#Class_ConstraintFriction2D"><b>ConstraintFriction2D</b></a>
+<a href="#Class_ConstraintGear2D"><b>ConstraintGear2D</b></a>
+<a href="#Class_ConstraintMotor2D"><b>ConstraintMotor2D</b></a>
+<a href="#Class_ConstraintMouse2D"><b>ConstraintMouse2D</b></a>
+<a href="#Class_ConstraintPrismatic2D"><b>ConstraintPrismatic2D</b></a>
+<a href="#Class_ConstraintPulley2D"><b>ConstraintPulley2D</b></a>
+<a href="#Class_ConstraintRevolute2D"><b>ConstraintRevolute2D</b></a>
+<a href="#Class_ConstraintRope2D"><b>ConstraintRope2D</b></a>
+<a href="#Class_ConstraintWeld2D"><b>ConstraintWeld2D</b></a>
+<a href="#Class_ConstraintWheel2D"><b>ConstraintWheel2D</b></a>
+<a href="#Class_Context"><b>Context</b></a>
+<a href="#Class_Controls"><b>Controls</b></a>
+<a href="#Class_Cursor"><b>Cursor</b></a>
+<a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
+<a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
+<a href="#Class_DebugHud"><b>DebugHud</b></a>
+<a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
+<a href="#Class_DecalSet"><b>DecalSet</b></a>
+<a href="#Class_Deserializer"><b>Deserializer</b></a>
+<a href="#Class_Drawable"><b>Drawable</b></a>
+<a href="#Class_Drawable2D"><b>Drawable2D</b></a>
+<a href="#Class_DropDownList"><b>DropDownList</b></a>
+<a href="#Class_Engine"><b>Engine</b></a>
+<a href="#Class_File"><b>File</b></a>
+<a href="#Class_FileSelector"><b>FileSelector</b></a>
+<a href="#Class_FileSelectorEntry"><b>FileSelectorEntry</b></a>
+<a href="#Class_FileSystem"><b>FileSystem</b></a>
+<a href="#Class_FocusParameters"><b>FocusParameters</b></a>
+<a href="#Class_Font"><b>Font</b></a>
+<a href="#Class_Frustum"><b>Frustum</b></a>
+<a href="#Class_Graphics"><b>Graphics</b></a>
+<a href="#Class_HttpRequest"><b>HttpRequest</b></a>
+<a href="#Class_Image"><b>Image</b></a>
+<a href="#Class_Input"><b>Input</b></a>
+<a href="#Class_IntRect"><b>IntRect</b></a>
+<a href="#Class_IntVector2"><b>IntVector2</b></a>
+<a href="#Class_JSONFile"><b>JSONFile</b></a>
+<a href="#Class_JSONValue"><b>JSONValue</b></a>
+<a href="#Class_JoystickState"><b>JoystickState</b></a>
+<a href="#Class_Light"><b>Light</b></a>
+<a href="#Class_LineEdit"><b>LineEdit</b></a>
+<a href="#Class_ListView"><b>ListView</b></a>
+<a href="#Class_Log"><b>Log</b></a>
+<a href="#Class_LuaScriptInstance"><b>LuaScriptInstance</b></a>
+<a href="#Class_Material"><b>Material</b></a>
+<a href="#Class_Matrix3"><b>Matrix3</b></a>
+<a href="#Class_Matrix3x4"><b>Matrix3x4</b></a>
+<a href="#Class_Matrix4"><b>Matrix4</b></a>
+<a href="#Class_Menu"><b>Menu</b></a>
+<a href="#Class_MessageBox"><b>MessageBox</b></a>
+<a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_Navigable"><b>Navigable</b></a>
+<a href="#Class_NavigationGeometryInfo"><b>NavigationGeometryInfo</b></a>
+<a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
+<a href="#Class_Network"><b>Network</b></a>
+<a href="#Class_NetworkPriority"><b>NetworkPriority</b></a>
+<a href="#Class_Node"><b>Node</b></a>
+<a href="#Class_Object"><b>Object</b></a>
+<a href="#Class_ObjectAnimation"><b>ObjectAnimation</b></a>
+<a href="#Class_Octree"><b>Octree</b></a>
+<a href="#Class_OctreeQueryResult"><b>OctreeQueryResult</b></a>
+<a href="#Class_OffMeshConnection"><b>OffMeshConnection</b></a>
+<a href="#Class_PackageEntry"><b>PackageEntry</b></a>
+<a href="#Class_PackageFile"><b>PackageFile</b></a>
+<a href="#Class_ParticleEffect"><b>ParticleEffect</b></a>
+<a href="#Class_ParticleEffect2D"><b>ParticleEffect2D</b></a>
+<a href="#Class_ParticleEmitter"><b>ParticleEmitter</b></a>
+<a href="#Class_ParticleEmitter2D"><b>ParticleEmitter2D</b></a>
+<a href="#Class_Pass"><b>Pass</b></a>
+<a href="#Class_PhysicsRaycastResult"><b>PhysicsRaycastResult</b></a>
+<a href="#Class_PhysicsRaycastResult2D"><b>PhysicsRaycastResult2D</b></a>
+<a href="#Class_PhysicsWorld"><b>PhysicsWorld</b></a>
+<a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
+<a href="#Class_Plane"><b>Plane</b></a>
+<a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
+<a href="#Class_Quaternion"><b>Quaternion</b></a>
+<a href="#Class_Ray"><b>Ray</b></a>
+<a href="#Class_RayQueryResult"><b>RayQueryResult</b></a>
+<a href="#Class_Rect"><b>Rect</b></a>
+<a href="#Class_RemoteEvent"><b>RemoteEvent</b></a>
+<a href="#Class_RenderPath"><b>RenderPath</b></a>
+<a href="#Class_RenderSurface"><b>RenderSurface</b></a>
+<a href="#Class_Renderer"><b>Renderer</b></a>
+<a href="#Class_Resource"><b>Resource</b></a>
+<a href="#Class_ResourceCache"><b>ResourceCache</b></a>
+<a href="#Class_ResourceRef"><b>ResourceRef</b></a>
+<a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RigidBody"><b>RigidBody</b></a>
+<a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
+<a href="#Class_Scene"><b>Scene</b></a>
+<a href="#Class_ScrollBar"><b>ScrollBar</b></a>
+<a href="#Class_ScrollView"><b>ScrollView</b></a>
+<a href="#Class_Serializable"><b>Serializable</b></a>
+<a href="#Class_Serializer"><b>Serializer</b></a>
+<a href="#Class_Skeleton"><b>Skeleton</b></a>
+<a href="#Class_Skybox"><b>Skybox</b></a>
+<a href="#Class_Slider"><b>Slider</b></a>
+<a href="#Class_Sound"><b>Sound</b></a>
+<a href="#Class_SoundListener"><b>SoundListener</b></a>
+<a href="#Class_SoundSource"><b>SoundSource</b></a>
+<a href="#Class_SoundSource3D"><b>SoundSource3D</b></a>
+<a href="#Class_Sphere"><b>Sphere</b></a>
+<a href="#Class_Spline"><b>Spline</b></a>
+<a href="#Class_SplinePath"><b>SplinePath</b></a>
+<a href="#Class_Sprite"><b>Sprite</b></a>
+<a href="#Class_Sprite2D"><b>Sprite2D</b></a>
+<a href="#Class_SpriteSheet2D"><b>SpriteSheet2D</b></a>
+<a href="#Class_StaticModel"><b>StaticModel</b></a>
+<a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
+<a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_StringHash"><b>StringHash</b></a>
+<a href="#Class_Technique"><b>Technique</b></a>
+<a href="#Class_Terrain"><b>Terrain</b></a>
+<a href="#Class_TerrainPatch"><b>TerrainPatch</b></a>
+<a href="#Class_Text"><b>Text</b></a>
+<a href="#Class_Text3D"><b>Text3D</b></a>
+<a href="#Class_Texture"><b>Texture</b></a>
+<a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_TextureCube"><b>TextureCube</b></a>
+<a href="#Class_TextureFrame"><b>TextureFrame</b></a>
+<a href="#Class_Tile2D"><b>Tile2D</b></a>
+<a href="#Class_TileMap2D"><b>TileMap2D</b></a>
+<a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
+<a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
+<a href="#Class_TileMapObject2D"><b>TileMapObject2D</b></a>
+<a href="#Class_Time"><b>Time</b></a>
+<a href="#Class_TmxFile2D"><b>TmxFile2D</b></a>
+<a href="#Class_ToolTip"><b>ToolTip</b></a>
+<a href="#Class_TouchState"><b>TouchState</b></a>
+<a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
+<a href="#Class_Variant"><b>Variant</b></a>
+<a href="#Class_VariantMap"><b>VariantMap</b></a>
+<a href="#Class_Vector2"><b>Vector2</b></a>
+<a href="#Class_Vector3"><b>Vector3</b></a>
+<a href="#Class_Vector4"><b>Vector4</b></a>
+<a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
+<a href="#Class_View3D"><b>View3D</b></a>
+<a href="#Class_Viewport"><b>Viewport</b></a>
+<a href="#Class_Window"><b>Window</b></a>
+<a href="#Class_XMLElement"><b>XMLElement</b></a>
+<a href="#Class_XMLFile"><b>XMLFile</b></a>
+<a href="#Class_Zone"><b>Zone</b></a>
+
 \section LuaScriptAPI_Classes Classes
 
+<a name="Class_Animatable"></a>
 ### Animatable : Serializable
 
 Methods:
@@ -26,6 +220,7 @@ Properties:
 - bool animationEnabled
 - ObjectAnimation* objectAnimation
 
+<a name="Class_AnimatedModel"></a>
 ### AnimatedModel : StaticModel
 
 Methods:
@@ -68,6 +263,7 @@ Properties:
 - unsigned numMorphs (readonly)
 - bool master (readonly)
 
+<a name="Class_AnimatedSprite2D"></a>
 ### AnimatedSprite2D : Drawable
 
 Methods:
@@ -108,6 +304,7 @@ Properties:
 - AnimationSet2D* animationSet
 - LoopMode2D loopMode
 
+<a name="Class_Animation"></a>
 ### Animation : Resource
 
 Methods:
@@ -129,6 +326,7 @@ Properties:
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
 
+<a name="Class_Animation2D"></a>
 ### Animation2D : RefCounted
 
 Methods:
@@ -143,6 +341,7 @@ Properties:
 - float length (readonly)
 - bool looped (readonly)
 
+<a name="Class_AnimationControl"></a>
 ### AnimationControl
 
 
@@ -166,6 +365,7 @@ Properties:
 - char setTimeRev_
 - char setWeightRev_
 
+<a name="Class_AnimationController"></a>
 ### AnimationController : Component
 
 Methods:
@@ -201,6 +401,7 @@ Methods:
 - AnimationState* GetAnimationState(const String name) const
 - AnimationState* GetAnimationState(StringHash nameHash) const
 
+<a name="Class_AnimationKeyFrame"></a>
 ### AnimationKeyFrame
 
 
@@ -211,6 +412,7 @@ Properties:
 - Quaternion rotation
 - Vector3 scale
 
+<a name="Class_AnimationSet2D"></a>
 ### AnimationSet2D : Resource
 
 Methods:
@@ -223,6 +425,7 @@ Properties:
 
 - unsigned numAnimations (readonly)
 
+<a name="Class_AnimationState"></a>
 ### AnimationState
 
 
@@ -268,6 +471,7 @@ Properties:
 - float length (readonly)
 - char layer
 
+<a name="Class_Audio"></a>
 ### Audio : Object
 
 Methods:
@@ -302,6 +506,7 @@ Properties:
 - bool initialized (readonly)
 - SoundListener* listener
 
+<a name="Class_BiasParameters"></a>
 ### BiasParameters
 
 
@@ -313,6 +518,7 @@ Methods:
 - BiasParameters* new(float constantBias, float slopeScaledBias)
 - void delete()
 
+<a name="Class_Billboard"></a>
 ### Billboard
 
 
@@ -326,6 +532,7 @@ Properties:
 - bool enabled
 - float sortDistance
 
+<a name="Class_BillboardSet"></a>
 ### BillboardSet : Drawable
 
 Methods:
@@ -357,6 +564,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 - float animationLodBias
 
+<a name="Class_Bone"></a>
 ### Bone
 
 
@@ -381,6 +589,7 @@ Properties:
 - BoundingBox boundingBox
 - Node* node
 
+<a name="Class_BorderImage"></a>
 ### BorderImage : UIElement
 
 Methods:
@@ -415,6 +624,7 @@ Properties:
 - BlendMode blendMode
 - bool tiled
 
+<a name="Class_BoundingBox"></a>
 ### BoundingBox
 
 
@@ -477,6 +687,7 @@ Properties:
 - Vector3 size (readonly)
 - Vector3 halfSize (readonly)
 
+<a name="Class_Button"></a>
 ### Button : BorderImage
 
 Methods:
@@ -505,6 +716,7 @@ Properties:
 - float repeatRate
 - bool pressed (readonly)
 
+<a name="Class_Camera"></a>
 ### Camera : Component
 
 Methods:
@@ -588,6 +800,7 @@ Properties:
 - bool projectionValid (readonly)
 - Matrix3x4 effectiveWorldTransform (readonly)
 
+<a name="Class_CascadeParameters"></a>
 ### CascadeParameters
 
 
@@ -599,6 +812,7 @@ Methods:
 - CascadeParameters* new(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
 - void delete()
 
+<a name="Class_CheckBox"></a>
 ### CheckBox : BorderImage
 
 Methods:
@@ -617,6 +831,7 @@ Properties:
 - bool checked
 - IntVector2& checkedOffset
 
+<a name="Class_CollisionBox2D"></a>
 ### CollisionBox2D : CollisionShape2D
 
 Methods:
@@ -636,6 +851,7 @@ Properties:
 - Vector2& center
 - float angle
 
+<a name="Class_CollisionChain2D"></a>
 ### CollisionChain2D : CollisionShape2D
 
 Methods:
@@ -653,6 +869,7 @@ Properties:
 - bool loop
 - unsigned vertexCount
 
+<a name="Class_CollisionCircle2D"></a>
 ### CollisionCircle2D : CollisionShape2D
 
 Methods:
@@ -668,6 +885,7 @@ Properties:
 - float radius
 - Vector2& center
 
+<a name="Class_CollisionEdge2D"></a>
 ### CollisionEdge2D : CollisionShape2D
 
 Methods:
@@ -683,6 +901,7 @@ Properties:
 - Vector2& vertex1
 - Vector2& vertex2
 
+<a name="Class_CollisionPolygon2D"></a>
 ### CollisionPolygon2D : CollisionShape2D
 
 Methods:
@@ -697,6 +916,7 @@ Properties:
 
 - unsigned vertexCount
 
+<a name="Class_CollisionShape"></a>
 ### CollisionShape : Component
 
 Methods:
@@ -767,6 +987,7 @@ Properties:
 - BoundingBox worldBoundingBox (readonly)
 - ResourceRef modelAttr
 
+<a name="Class_CollisionShape2D"></a>
 ### CollisionShape2D : Component
 
 Methods:
@@ -802,6 +1023,7 @@ Properties:
 - float inertia (readonly)
 - Vector2 massCenter (readonly)
 
+<a name="Class_Color"></a>
 ### Color
 
 
@@ -864,6 +1086,7 @@ Properties:
 - const Color YELLOW
 - const Color TRANSPARENT
 
+<a name="Class_ColorFrame"></a>
 ### ColorFrame
 
 
@@ -883,6 +1106,7 @@ Properties:
 - Color color
 - float time
 
+<a name="Class_Component"></a>
 ### Component : Animatable
 
 Methods:
@@ -894,9 +1118,10 @@ Methods:
 - Scene* GetScene() const
 - bool IsEnabled() const
 - bool IsEnabledEffective() const
-- Component* GetComponent(ShortStringHash type) const
+- Component* GetComponent(StringHash type) const
 - Component* GetComponent(const String type) const
 
+<a name="Class_Connection"></a>
 ### Connection : Object
 
 Methods:
@@ -914,6 +1139,7 @@ Methods:
 - void SetIdentity(const VariantMap& identity)
 - void SetControls(const Controls& newControls)
 - void SetPosition(const Vector3& position)
+- void SetRotation(const Quaternion& rotation)
 - void SetConnectPending(bool connectPending)
 - void SetLogStatistics(bool enable)
 - void Disconnect(int waitMSec = 0)
@@ -927,6 +1153,7 @@ Methods:
 - Scene* GetScene() const
 - const Controls& GetControls() const
 - const Vector3& GetPosition() const
+- const Quaternion& GetRotation() const
 - bool IsClient() const
 - bool IsConnected() const
 - bool IsConnectPending() const
@@ -945,6 +1172,7 @@ Properties:
 - Scene* scene
 - Controls& controls
 - Vector3& position
+- Quaternion& rotation
 - bool client (readonly)
 - bool connected (readonly)
 - bool connectPending
@@ -956,6 +1184,7 @@ Properties:
 - String downloadName (readonly)
 - float downloadProgress (readonly)
 
+<a name="Class_Console"></a>
 ### Console : Object
 
 Methods:
@@ -1000,6 +1229,7 @@ Properties:
 - unsigned historyPosition (readonly)
 - bool focusOnShow
 
+<a name="Class_Constraint"></a>
 ### Constraint : Component
 
 Methods:
@@ -1052,6 +1282,7 @@ Properties:
 - float CFM
 - bool disableCollision
 
+<a name="Class_Constraint2D"></a>
 ### Constraint2D : Component
 
 Methods:
@@ -1068,6 +1299,7 @@ Properties:
 - RigidBody2D* otherBody
 - bool collideConnected
 
+<a name="Class_ConstraintDistance2D"></a>
 ### ConstraintDistance2D : Constraint2D
 
 Methods:
@@ -1088,6 +1320,7 @@ Properties:
 - float frequencyHz
 - float dampingRatio
 
+<a name="Class_ConstraintFriction2D"></a>
 ### ConstraintFriction2D : Constraint2D
 
 Methods:
@@ -1105,6 +1338,7 @@ Properties:
 - float maxForce
 - float maxTorque
 
+<a name="Class_ConstraintGear2D"></a>
 ### ConstraintGear2D : Constraint2D
 
 Methods:
@@ -1122,6 +1356,7 @@ Properties:
 - Constraint2D* otherConstraint
 - float ratio
 
+<a name="Class_ConstraintMotor2D"></a>
 ### ConstraintMotor2D : Constraint2D
 
 Methods:
@@ -1145,6 +1380,7 @@ Properties:
 - float maxTorque
 - float correctionFactor
 
+<a name="Class_ConstraintMouse2D"></a>
 ### ConstraintMouse2D : Constraint2D
 
 Methods:
@@ -1165,6 +1401,7 @@ Properties:
 - float frequencyHz
 - float dampingRatio
 
+<a name="Class_ConstraintPrismatic2D"></a>
 ### ConstraintPrismatic2D : Constraint2D
 
 Methods:
@@ -1197,6 +1434,7 @@ Properties:
 - float maxMotorForce
 - float motorSpeed
 
+<a name="Class_ConstraintPulley2D"></a>
 ### ConstraintPulley2D : Constraint2D
 
 Methods:
@@ -1220,6 +1458,7 @@ Properties:
 - Vector2& otherBodyAnchor
 - float ratio
 
+<a name="Class_ConstraintRevolute2D"></a>
 ### ConstraintRevolute2D : Constraint2D
 
 Methods:
@@ -1249,6 +1488,7 @@ Properties:
 - float motorSpeed
 - float maxMotorTorque
 
+<a name="Class_ConstraintRope2D"></a>
 ### ConstraintRope2D : Constraint2D
 
 Methods:
@@ -1266,6 +1506,7 @@ Properties:
 - Vector2& otherBodyAnchor
 - float maxLength
 
+<a name="Class_ConstraintWeld2D"></a>
 ### ConstraintWeld2D : Constraint2D
 
 Methods:
@@ -1283,6 +1524,7 @@ Properties:
 - float frequencyHz
 - float dampingRatio
 
+<a name="Class_ConstraintWheel2D"></a>
 ### ConstraintWheel2D : Constraint2D
 
 Methods:
@@ -1312,6 +1554,7 @@ Properties:
 - float frequencyHz
 - float dampingRatio
 
+<a name="Class_Context"></a>
 ### Context
 
 
@@ -1319,8 +1562,9 @@ Methods:
 
 - Object* GetEventSender() const
 - EventHandler* GetEventHandler() const
-- const String GetTypeName(ShortStringHash objectType) const
+- const String GetTypeName(StringHash objectType) const
 
+<a name="Class_Controls"></a>
 ### Controls
 
 
@@ -1341,6 +1585,7 @@ Properties:
 - float pitch
 - VariantMap extraData
 
+<a name="Class_Cursor"></a>
 ### Cursor : BorderImage
 
 Methods:
@@ -1359,29 +1604,49 @@ Properties:
 - CursorShape shape
 - bool useSystemShapes
 
+<a name="Class_CustomGeometry"></a>
 ### CustomGeometry : Drawable
 
 Methods:
 
 - void Clear()
 - void SetNumGeometries(unsigned num)
+- void SetDynamic(bool enable)
 - void BeginGeometry(unsigned index, PrimitiveType type)
 - void DefineVertex(const Vector3& position)
 - void DefineNormal(const Vector3& normal)
 - void DefineTangent(const Vector4& tangent)
 - void DefineColor(const Color& color)
 - void DefineTexCoord(const Vector2& texCoord)
+- void DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords, bool hasTangents)
 - void Commit()
 - void SetMaterial(Material* material)
 - bool SetMaterial(unsigned index, Material* material)
-- unsigned GetNumGeometries()
+- unsigned GetNumGeometries() const
+- unsigned GetNumVertices(unsigned index) const
+- bool IsDynamic() const
 - Material* GetMaterial(unsigned index = 0)
+- CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum)
 
 Properties:
 
 - Material* material
 - unsigned numGeometries
+- bool dynamic
 
+<a name="Class_CustomGeometryVertex"></a>
+### CustomGeometryVertex
+
+
+Properties:
+
+- Vector3 position
+- Vector3 normal
+- unsigned color
+- Vector2 texCoord
+- Vector4 tangent
+
+<a name="Class_DebugHud"></a>
 ### DebugHud : Object
 
 Methods:
@@ -1417,6 +1682,7 @@ Properties:
 - float profilerInterval
 - bool useRendererStats
 
+<a name="Class_DebugRenderer"></a>
 ### DebugRenderer : Component
 
 Methods:
@@ -1446,6 +1712,7 @@ Properties:
 - Matrix4& projection (readonly)
 - Frustum& frustum (readonly)
 
+<a name="Class_DecalSet"></a>
 ### DecalSet : Drawable
 
 Methods:
@@ -1472,6 +1739,7 @@ Properties:
 - unsigned maxVertices
 - unsigned maxIndices
 
+<a name="Class_Deserializer"></a>
 ### Deserializer
 
 
@@ -1509,7 +1777,6 @@ Methods:
 - String ReadString()
 - String ReadFileID()
 - StringHash ReadStringHash()
-- ShortStringHash ReadShortStringHash()
 - VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
@@ -1529,6 +1796,7 @@ Properties:
 - unsigned size (readonly)
 - bool eof (readonly)
 
+<a name="Class_Drawable"></a>
 ### Drawable : Component
 
 Methods:
@@ -1581,6 +1849,7 @@ Properties:
 - bool inView (readonly)
 - Zone* zone (readonly)
 
+<a name="Class_Drawable2D"></a>
 ### Drawable2D : Drawable
 
 Methods:
@@ -1606,6 +1875,7 @@ Properties:
 - BlendMode blendMode
 - Material* material
 
+<a name="Class_DropDownList"></a>
 ### DropDownList : Menu
 
 Methods:
@@ -1641,6 +1911,7 @@ Properties:
 - String placeholderText
 - bool resizePopup
 
+<a name="Class_Engine"></a>
 ### Engine : Object
 
 Methods:
@@ -1656,7 +1927,7 @@ Methods:
 - void SetAutoExit(bool enable)
 - void Exit()
 - void DumpProfiler()
-- void DumpResources()
+- void DumpResources(bool dumpFileName = false)
 - void DumpMemory()
 - int GetMinFps() const
 - int GetMaxFps() const
@@ -1680,6 +1951,7 @@ Properties:
 - bool exiting (readonly)
 - bool headless (readonly)
 
+<a name="Class_File"></a>
 ### File : Object
 
 Methods:
@@ -1732,7 +2004,6 @@ Methods:
 - String ReadString()
 - String ReadFileID()
 - StringHash ReadStringHash()
-- ShortStringHash ReadShortStringHash()
 - VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
@@ -1769,7 +2040,6 @@ Methods:
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
 - bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
@@ -1792,6 +2062,7 @@ Properties:
 - unsigned size (readonly)
 - bool eof (readonly)
 
+<a name="Class_FileSelector"></a>
 ### FileSelector : Object
 
 Methods:
@@ -1843,6 +2114,7 @@ Properties:
 - unsigned filterIndex (readonly)
 - bool directoryMode
 
+<a name="Class_FileSelectorEntry"></a>
 ### FileSelectorEntry
 
 
@@ -1851,6 +2123,7 @@ Properties:
 - String name
 - bool directory
 
+<a name="Class_FileSystem"></a>
 ### FileSystem : Object
 
 Methods:
@@ -1879,15 +2152,7 @@ Methods:
 - String GetUserDocumentsDir() const
 - String GetAppPreferencesDir(const String org, const String app) const
 
-### FileWatcher : Object
-
-Methods:
-
-- bool StartWatching(const String pathName, bool watchSubDirs)
-- void StopWatching()
-- void AddChange(const String fileName)
-- const String GetPath() const
-
+<a name="Class_FocusParameters"></a>
 ### FocusParameters
 
 
@@ -1899,8 +2164,10 @@ Methods:
 - FocusParameters* new(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
 - void delete()
 
+<a name="Class_Font"></a>
 ### Font : Resource
 
+<a name="Class_Frustum"></a>
 ### Frustum
 
 
@@ -1932,6 +2199,7 @@ Methods:
 - Rect Projected(const Matrix4& transform) const
 - void UpdatePlanes()
 
+<a name="Class_Graphics"></a>
 ### Graphics : Object
 
 Methods:
@@ -2018,6 +2286,7 @@ Properties:
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
 
+<a name="Class_HttpRequest"></a>
 ### HttpRequest : Deserializer
 
 Methods:
@@ -2038,6 +2307,7 @@ Properties:
 - unsigned availableSize (readonly)
 - bool open (readonly)
 
+<a name="Class_Image"></a>
 ### Image : Resource
 
 Methods:
@@ -2049,17 +2319,22 @@ Methods:
 - bool SetSize(int width, int height, int depth, unsigned components)
 - void SetPixel(int x, int y, const Color& color)
 - void SetPixel(int x, int y, int z, const Color& color)
+- void SetPixelInt(int x, int y, unsigned uintColor)
+- void SetPixelInt(int x, int y, int z, unsigned uintColor)
 - bool LoadColorLUT(Deserializer& source)
 - bool LoadColorLUT(const String fileName)
 - void FlipVertical()
 - bool Resize(int width, int height)
 - void Clear(const Color& color)
+- void ClearInt(unsigned uintColor)
 - bool SaveBMP(const String fileName) const
 - bool SavePNG(const String fileName) const
 - bool SaveTGA(const String fileName) const
 - bool SaveJPG(const String fileName, int quality) const
 - Color GetPixel(int x, int y) const
 - Color GetPixel(int x, int y, int z) const
+- unsigned GetPixelInt(int x, int y) const
+- unsigned GetPixelInt(int x, int y, int z) const
 - Color GetPixelBilinear(float x, float y) const
 - Color GetPixelTrilinear(float x, float y, float z) const
 - int GetWidth() const
@@ -2082,6 +2357,7 @@ Properties:
 - CompressedFormat compressedFormat (readonly)
 - unsigned numCompressedLevels (readonly)
 
+<a name="Class_Input"></a>
 ### Input : Object
 
 Methods:
@@ -2157,6 +2433,7 @@ Properties:
 - bool focus (readonly)
 - bool minimized (readonly)
 
+<a name="Class_IntRect"></a>
 ### IntRect
 
 
@@ -2184,6 +2461,7 @@ Properties:
 - int width (readonly)
 - int height (readonly)
 
+<a name="Class_IntVector2"></a>
 ### IntVector2
 
 
@@ -2211,6 +2489,7 @@ Properties:
 - int y
 - const IntVector2 ZERO
 
+<a name="Class_JSONFile"></a>
 ### JSONFile : Resource
 
 Methods:
@@ -2221,6 +2500,7 @@ Methods:
 - JSONValue CreateRoot(JSONValueType valueType = JSON_OBJECT)
 - JSONValue GetRoot(JSONValueType valueType = JSON_ANY)
 
+<a name="Class_JSONValue"></a>
 ### JSONValue
 
 
@@ -2252,6 +2532,7 @@ Methods:
 - void SetVariantValue(const String name, const Variant& value)
 - bool IsObject() const
 - Vector<String> GetChildNames() const
+- Vector<String> GetValueNames() const
 - int GetInt(const String name) const
 - bool GetBool(const String name) const
 - float GetFloat(const String name) const
@@ -2323,6 +2604,7 @@ Properties:
 - bool object (readonly)
 - bool array (readonly)
 
+<a name="Class_JoystickState"></a>
 ### JoystickState
 
 
@@ -2346,6 +2628,7 @@ Properties:
 - unsigned numAxes (readonly)
 - unsigned numHats (readonly)
 
+<a name="Class_Light"></a>
 ### Light : Drawable
 
 Methods:
@@ -2418,6 +2701,7 @@ Properties:
 - Color effectiveColor (readonly)
 - float effectiveSpecularIntensity (readonly)
 
+<a name="Class_LineEdit"></a>
 ### LineEdit : BorderImage
 
 Methods:
@@ -2457,6 +2741,7 @@ Properties:
 - Text* textElement (readonly)
 - BorderImage* cursor (readonly)
 
+<a name="Class_ListView"></a>
 ### ListView : ScrollView
 
 Methods:
@@ -2514,6 +2799,7 @@ Properties:
 - bool hierarchyMode
 - int baseIndent
 
+<a name="Class_Log"></a>
 ### Log : Object
 
 Methods:
@@ -2536,6 +2822,7 @@ Properties:
 - bool timeStamp
 - bool quiet
 
+<a name="Class_LuaScriptInstance"></a>
 ### LuaScriptInstance : Component
 
 Methods:
@@ -2558,6 +2845,7 @@ Properties:
 - const LuaFile* scriptFile
 - const String scriptObjectType
 
+<a name="Class_Material"></a>
 ### Material : Resource
 
 Methods:
@@ -2605,6 +2893,7 @@ Properties:
 - bool occlusion (readonly)
 - bool specular (readonly)
 
+<a name="Class_Matrix3"></a>
 ### Matrix3
 
 
@@ -2646,6 +2935,7 @@ Properties:
 - const Matrix3 ZERO
 - const Matrix3 IDENTITY
 
+<a name="Class_Matrix3x4"></a>
 ### Matrix3x4
 
 
@@ -2706,6 +2996,7 @@ Properties:
 - const Matrix3x4 ZERO
 - const Matrix3x4 IDENTITY
 
+<a name="Class_Matrix4"></a>
 ### Matrix4
 
 
@@ -2763,6 +3054,7 @@ Properties:
 - const Matrix4 ZERO
 - const Matrix4 IDENTITY
 
+<a name="Class_Menu"></a>
 ### Menu : Button
 
 Methods:
@@ -2789,6 +3081,7 @@ Properties:
 - int acceleratorKey (readonly)
 - int acceleratorQualifiers (readonly)
 
+<a name="Class_MessageBox"></a>
 ### MessageBox : Object
 
 Methods:
@@ -2808,10 +3101,12 @@ Properties:
 - String message
 - UIElement* window (readonly)
 
+<a name="Class_Model"></a>
 ### Model : Resource
 
 Methods:
 
+- Model* Clone(const String cloneName = String::EMPTY) const
 - const BoundingBox& GetBoundingBox() const
 - Skeleton& GetSkeleton()
 - unsigned GetNumGeometries() const
@@ -2831,6 +3126,7 @@ Properties:
 - unsigned numGeometries (readonly)
 - unsigned numMorphs (readonly)
 
+<a name="Class_Navigable"></a>
 ### Navigable : Component
 
 Methods:
@@ -2842,6 +3138,7 @@ Properties:
 
 - bool recursive
 
+<a name="Class_NavigationGeometryInfo"></a>
 ### NavigationGeometryInfo
 
 
@@ -2852,6 +3149,7 @@ Properties:
 - Matrix3x4 transform
 - BoundingBox boundingBox
 
+<a name="Class_NavigationMesh"></a>
 ### NavigationMesh : Component
 
 Methods:
@@ -2926,6 +3224,7 @@ Properties:
 - BoundingBox worldBoundingBox (readonly)
 - IntVector2 numTiles (readonly)
 
+<a name="Class_Network"></a>
 ### Network
 
 
@@ -2971,6 +3270,7 @@ Properties:
 - bool serverRunning (readonly)
 - String packageCacheDir
 
+<a name="Class_NetworkPriority"></a>
 ### NetworkPriority : Component
 
 Methods:
@@ -2992,6 +3292,7 @@ Properties:
 - float minPriority
 - bool alwaysUpdateOwner
 
+<a name="Class_Node"></a>
 ### Node : Animatable
 
 Methods:
@@ -3057,14 +3358,14 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
 - void RemoveComponent(Component* component)
-- void RemoveComponent(ShortStringHash type)
+- void RemoveComponent(StringHash type)
 - void RemoveComponent(const String type)
 - void RemoveAllComponents()
 - void RemoveComponents(bool removeReplicated, bool removeLocal)
 - Node* Clone(CreateMode mode = REPLICATED)
 - void Remove()
 - void SetParent(Node* parent)
-- void SetVar(ShortStringHash key, const Variant& value)
+- void SetVar(StringHash key, const Variant& value)
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
 - Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
@@ -3114,9 +3415,9 @@ Methods:
 - Node* GetChild(unsigned index) const
 - unsigned GetNumComponents() const
 - unsigned GetNumNetworkComponents() const
-- bool HasComponent(ShortStringHash type) const
+- bool HasComponent(StringHash type) const
 - bool HasComponent(const String type) const
-- const Variant& GetVar(ShortStringHash key) const
+- const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - Component* GetComponent(const String type) const
 - void SetID(unsigned id)
@@ -3160,23 +3461,25 @@ Properties:
 - unsigned numComponents (readonly)
 - unsigned numNetworkComponents (readonly)
 
+<a name="Class_Object"></a>
 ### Object : RefCounted
 
 Methods:
 
-- ShortStringHash GetType() const
-- ShortStringHash GetBaseType() const
+- StringHash GetType() const
+- StringHash GetBaseType() const
 - const String GetTypeName() const
 - const String GetCategory() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
 
 Properties:
 
-- ShortStringHash type (readonly)
-- ShortStringHash baseType (readonly)
+- StringHash type (readonly)
+- StringHash baseType (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
 
+<a name="Class_ObjectAnimation"></a>
 ### ObjectAnimation : Resource
 
 Methods:
@@ -3191,6 +3494,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
 
+<a name="Class_Octree"></a>
 ### Octree : Component
 
 Methods:
@@ -3203,8 +3507,8 @@ Methods:
 - const PODVector<OctreeQueryResult>& GetDrawables(const BoundingBox& box, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<OctreeQueryResult>& GetDrawables(const Frustum& frustum, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<OctreeQueryResult>& GetDrawables(const Sphere& sphere, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
-- RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags) const
+- const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const
+- RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
 - void DrawDebugGeometry(bool depthTest)
@@ -3213,6 +3517,7 @@ Properties:
 
 - unsigned numLevels (readonly)
 
+<a name="Class_OctreeQueryResult"></a>
 ### OctreeQueryResult
 
 
@@ -3227,6 +3532,7 @@ Properties:
 - Drawable* drawable
 - Node* node
 
+<a name="Class_OffMeshConnection"></a>
 ### OffMeshConnection : Component
 
 Methods:
@@ -3244,6 +3550,7 @@ Properties:
 - float radius
 - bool bidirectional
 
+<a name="Class_PackageEntry"></a>
 ### PackageEntry
 
 
@@ -3253,6 +3560,7 @@ Properties:
 - unsigned size
 - unsigned checksum
 
+<a name="Class_PackageFile"></a>
 ### PackageFile : Object
 
 Methods:
@@ -3282,117 +3590,136 @@ Properties:
 - unsigned checksum (readonly)
 - bool compressed (readonly)
 
-### ParticleEffect2D : Resource
-
-### ParticleEmitter : BillboardSet
+<a name="Class_ParticleEffect"></a>
+### ParticleEffect : Resource
 
 Methods:
 
-- bool Load(XMLFile* file)
-- bool Save(XMLFile* file)
+- void SetMaterial(Material* material)
 - void SetNumParticles(unsigned num)
-- void SetEmissionRate(float rate)
-- void SetMinEmissionRate(float rate)
-- void SetMaxEmissionRate(float rate)
+- void SetUpdateInvisible(bool enable)
+- void SetRelative(bool enable)
+- void SetScaled(bool enable)
+- void SetSorted(bool enable)
+- void SetAnimationLodBias(float lodBias)
 - void SetEmitterType(EmitterType type)
 - void SetEmitterSize(const Vector3& size)
-- void SetActiveTime(float time)
-- void SetInactiveTime(float time)
-- void SetEmitting(bool enable)
-- void SetUpdateInvisible(bool enable)
-- void SetTimeToLive(float time)
-- void SetMinTimeToLive(float time)
-- void SetMaxTimeToLive(float time)
-- void SetParticleSize(const Vector2& size)
-- void SetMinParticleSize(const Vector2& size)
-- void SetMaxParticleSize(const Vector2& size)
 - void SetMinDirection(const Vector3& direction)
 - void SetMaxDirection(const Vector3& direction)
-- void SetVelocity(float velocity)
-- void SetMinVelocity(float velocity)
-- void SetMaxVelocity(float velocity)
-- void SetRotation(float rotation)
-- void SetMinRotation(float rotation)
-- void SetMaxRotation(float rotation)
-- void SetRotationSpeed(float speed)
-- void SetMinRotationSpeed(float speed)
-- void SetMaxRotationSpeed(float speed)
 - void SetConstantForce(const Vector3& force)
 - void SetDampingForce(float force)
+- void SetActiveTime(float time)
+- void SetInactiveTime(float time)
+- void SetMinEmissionRate(float rate)
+- void SetMaxEmissionRate(float rate)
+- void SetMinParticleSize(const Vector2& size)
+- void SetMaxParticleSize(const Vector2& size)
+- void SetMinTimeToLive(float time)
+- void SetMaxTimeToLive(float time)
+- void SetMinVelocity(float velocity)
+- void SetMaxVelocity(float velocity)
+- void SetMinRotation(float rotation)
+- void SetMaxRotation(float rotation)
+- void SetMinRotationSpeed(float speed)
+- void SetMaxRotationSpeed(float speed)
 - void SetSizeAdd(float sizeAdd)
 - void SetSizeMul(float sizeMul)
-- void SetColor(const Color& color)
-- void SetNumColors(unsigned num)
-- void SetNumTextureFrames(unsigned num)
-- void ResetEmissionTimer()
-- void RemoveAllParticles()
-- void Reset()
+- void SetColorFrame(unsigned index, const ColorFrame& colorFrame)
+- void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
+- Material* GetMaterial() const
 - unsigned GetNumParticles() const
-- bool IsEmitting() const
 - bool GetUpdateInvisible() const
-- float GetMinEmissionRate() const
-- float GetMaxEmissionRate() const
+- bool IsRelative() const
+- bool IsScaled() const
+- bool IsSorted() const
+- float GetAnimationLodBias() const
 - EmitterType GetEmitterType() const
 - const Vector3& GetEmitterSize() const
-- float GetActiveTime() const
-- float GetInactiveTime() const
-- float GetMinTimeToLive() const
-- float GetMaxTimeToLive() const
-- const Vector2& GetMinParticleSize() const
-- const Vector2& GetMaxParticleSize() const
 - const Vector3& GetMinDirection() const
 - const Vector3& GetMaxDirection() const
+- const Vector3& GetConstantForce() const
+- float GetDampingForce() const
+- float GetActiveTime() const
+- float GetInactiveTime() const
+- float GetMinEmissionRate() const
+- float GetMaxEmissionRate() const
+- const Vector2& GetMinParticleSize() const
+- const Vector2& GetMaxParticleSize() const
+- float GetMinTimeToLive() const
+- float GetMaxTimeToLive() const
 - float GetMinVelocity() const
 - float GetMaxVelocity() const
 - float GetMinRotation() const
 - float GetMaxRotation() const
 - float GetMinRotationSpeed() const
 - float GetMaxRotationSpeed() const
-- const Vector3& GetConstantForce() const
-- float GetDampingForce() const
 - float GetSizeAdd() const
 - float GetSizeMul() const
-- unsigned GetNumColors() const
-- ColorFrame* GetColor(unsigned index)
+- unsigned GetNumColorFrames() const
+- const ColorFrame* GetColorFrame(unsigned index) const
 - unsigned GetNumTextureFrames() const
-- TextureFrame* GetTextureFrame(unsigned index)
+- const TextureFrame* GetTextureFrame(unsigned index) const
 
 Properties:
 
+- Material* material
 - unsigned numParticles
-- float emissionRate
-- bool emitting
 - bool updateInvisible
-- float minEmissionRate
-- float maxEmissionRate
+- bool relative
+- bool scaled
+- bool sorted
+- float animationLodBias
 - EmitterType emitterType
-- Vector3& emitterSize
+- const Vector3& emitterSize
+- const Vector3& minDirection
+- const Vector3& maxDirection
+- const Vector3& constantForce
+- float dampingForce
 - float activeTime
 - float inactiveTime
-- float timeToLive
+- float minEmissionRate
+- float maxEmissionRate
+- const Vector2& minParticleSize
+- const Vector2& maxParticleSize
 - float minTimeToLive
 - float maxTimeToLive
-- Vector2& particleSize
-- Vector2& minParticleSize
-- Vector2& maxParticleSize
-- Vector3& minDirection
-- Vector3& maxDirection
-- float velocity
 - float minVelocity
 - float maxVelocity
-- float rotation
 - float minRotation
 - float maxRotation
-- float rotationSpeed
 - float minRotationSpeed
 - float maxRotationSpeed
-- Vector3& constantForce
-- float dampingForce
 - float sizeAdd
 - float sizeMul
-- unsigned numColors
+- unsigned numColorFrames
 - unsigned numTextureFrames
 
+<a name="Class_ParticleEffect2D"></a>
+### ParticleEffect2D : Resource
+
+<a name="Class_ParticleEmitter"></a>
+### ParticleEmitter : BillboardSet
+
+Methods:
+
+- void SetEffect(ParticleEffect* effect)
+- void SetNumParticles(unsigned num)
+- void SetEmitting(bool enable)
+- void ResetEmissionTimer()
+- void RemoveAllParticles()
+- void Reset()
+- void ApplyEffect()
+- ParticleEffect* GetEffect() const
+- unsigned GetNumParticles() const
+- bool IsEmitting() const
+
+Properties:
+
+- ParticleEffect* effect
+- unsigned numParticles
+- bool emitting
+
+<a name="Class_ParticleEmitter2D"></a>
 ### ParticleEmitter2D : Drawable2D
 
 Methods:
@@ -3404,6 +3731,7 @@ Properties:
 
 - ParticleEffect2D* effect
 
+<a name="Class_Pass"></a>
 ### Pass : RefCounted
 
 Methods:
@@ -3414,6 +3742,7 @@ Properties:
 
 - bool SM3 (readonly)
 
+<a name="Class_PhysicsRaycastResult"></a>
 ### PhysicsRaycastResult
 
 
@@ -3430,6 +3759,7 @@ Properties:
 - float distance
 - RigidBody* body
 
+<a name="Class_PhysicsRaycastResult2D"></a>
 ### PhysicsRaycastResult2D
 
 
@@ -3446,6 +3776,7 @@ Properties:
 - float distance
 - RigidBody2D* body
 
+<a name="Class_PhysicsWorld"></a>
 ### PhysicsWorld : Component
 
 Methods:
@@ -3462,6 +3793,7 @@ Methods:
 - const PODVector<PhysicsRaycastResult>& Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult ConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const RigidBody* body)
@@ -3486,6 +3818,7 @@ Properties:
 - float maxNetworkAngularVelocity
 - bool applyingTransforms
 
+<a name="Class_PhysicsWorld2D"></a>
 ### PhysicsWorld2D : Component
 
 Methods:
@@ -3507,7 +3840,7 @@ Methods:
 - const PODVector<PhysicsRaycastResult2D>& Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
 - RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
-- RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED, Camera* camera = 0)
+- RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
@@ -3539,6 +3872,7 @@ Properties:
 - int velocityIterations
 - int positionIterations
 
+<a name="Class_Plane"></a>
 ### Plane
 
 
@@ -3577,6 +3911,7 @@ Properties:
 - float d
 - const Plane UP
 
+<a name="Class_Polyhedron"></a>
 ### Polyhedron
 
 
@@ -3609,6 +3944,16 @@ Properties:
 
 - bool empty (readonly)
 
+<a name="Class_PropertySet2D"></a>
+### PropertySet2D
+
+
+Methods:
+
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+
+<a name="Class_Quaternion"></a>
 ### Quaternion
 
 
@@ -3674,6 +4019,7 @@ Properties:
 - float z
 - const Quaternion IDENTITY
 
+<a name="Class_Ray"></a>
 ### Ray
 
 
@@ -3703,6 +4049,7 @@ Properties:
 - Vector3 origin
 - Vector3 direction
 
+<a name="Class_RayQueryResult"></a>
 ### RayQueryResult
 
 
@@ -3721,6 +4068,7 @@ Properties:
 - Node* node
 - unsigned subObject
 
+<a name="Class_Rect"></a>
 ### Rect
 
 
@@ -3764,6 +4112,7 @@ Properties:
 - Vector2 size (readonly)
 - Vector2 halfSize (readonly)
 
+<a name="Class_RemoteEvent"></a>
 ### RemoteEvent
 
 
@@ -3774,6 +4123,7 @@ Properties:
 - VariantMap eventData
 - bool inOrder
 
+<a name="Class_RenderPath"></a>
 ### RenderPath
 
 
@@ -3799,6 +4149,7 @@ Methods:
 - unsigned GetNumCommands() const
 - const Variant& GetShaderParameter(const String name) const
 
+<a name="Class_RenderSurface"></a>
 ### RenderSurface
 
 
@@ -3835,6 +4186,7 @@ Properties:
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
 
+<a name="Class_Renderer"></a>
 ### Renderer
 
 
@@ -3933,6 +4285,7 @@ Properties:
 - Texture2D* defaultLightRamp (readonly)
 - Texture2D* defaultLightSpot (readonly)
 
+<a name="Class_Resource"></a>
 ### Resource
 
 
@@ -3952,6 +4305,7 @@ Properties:
 - StringHash nameHash (readonly)
 - unsigned memoryUse (readonly)
 
+<a name="Class_ResourceCache"></a>
 ### ResourceCache
 
 
@@ -3959,21 +4313,25 @@ Methods:
 
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
-- void SetMemoryBudget(ShortStringHash type, unsigned budget)
+- void SetMemoryBudget(StringHash type, unsigned budget)
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
 - void SetReturnFailedResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
+- void SetFinishBackgroundResourcesMs(int ms)
 - File* GetFile(const String name)
-- Resource* GetResource(const String type, const String name, bool SendEventOnFailure = true)
+- Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true)
+- bool BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true)
+- unsigned GetNumBackgroundLoadResources() const
 - bool Exists(const String name) const
-- unsigned GetMemoryBudget(ShortStringHash type) const
-- unsigned GetMemoryUse(ShortStringHash type) const
+- unsigned GetMemoryBudget(StringHash type) const
+- unsigned GetMemoryUse(StringHash type) const
 - unsigned GetTotalMemoryUse() const
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
 - bool GetReturnFailedResources() const
 - bool GetSearchPackagesFirst() const
+- int GetFinishBackgroundResourcesMs() const
 - String GetPreferredResourceDir(const String path) const
 - String SanitateResourceName(const String name) const
 - String SanitateResourceDirName(const String name) const
@@ -3981,10 +4339,13 @@ Methods:
 Properties:
 
 - unsigned totalMemoryUse (readonly)
-- bool autoReloadResources (readonly)
-- bool returnFailedResources (readonly)
-- bool searchPackagesFirst (readonly)
+- bool autoReloadResources
+- bool returnFailedResources
+- bool searchPackagesFirst
+- unsigned numBackgroundLoadResources (readonly)
+- int finishBackgroundResourcesMs
 
+<a name="Class_ResourceRef"></a>
 ### ResourceRef
 
 
@@ -3992,10 +4353,10 @@ Methods:
 
 - ResourceRef() (GC)
 - ResourceRef* new()
-- ResourceRef(ShortStringHash type) (GC)
-- ResourceRef* new(ShortStringHash type)
-- ResourceRef(ShortStringHash type, String name) (GC)
-- ResourceRef* new(ShortStringHash type, String name)
+- ResourceRef(StringHash type) (GC)
+- ResourceRef* new(StringHash type)
+- ResourceRef(StringHash type, String name) (GC)
+- ResourceRef* new(StringHash type, String name)
 - ResourceRef(const ResourceRef& rhs) (GC)
 - ResourceRef* new(const ResourceRef& rhs)
 - void delete()
@@ -4003,9 +4364,10 @@ Methods:
 
 Properties:
 
-- ShortStringHash type
+- StringHash type
 - String name
 
+<a name="Class_ResourceRefList"></a>
 ### ResourceRefList
 
 
@@ -4013,15 +4375,16 @@ Methods:
 
 - ResourceRefList() (GC)
 - ResourceRefList* new()
-- ResourceRefList(ShortStringHash type) (GC)
-- ResourceRefList* new(ShortStringHash type)
+- ResourceRefList(StringHash type) (GC)
+- ResourceRefList* new(StringHash type)
 - void delete()
 - bool operator==(const ResourceRefList& rhs) const
 
 Properties:
 
-- ShortStringHash type
+- StringHash type
 
+<a name="Class_RigidBody"></a>
 ### RigidBody : Component
 
 Methods:
@@ -4123,6 +4486,7 @@ Properties:
 - unsigned collisionMask
 - CollisionEventMode collisionEventMode
 
+<a name="Class_RigidBody2D"></a>
 ### RigidBody2D : Component
 
 Methods:
@@ -4178,6 +4542,7 @@ Properties:
 - Vector2 linearVelocity
 - float angularVelocity
 
+<a name="Class_Scene"></a>
 ### Scene : Node
 
 Methods:
@@ -4197,10 +4562,10 @@ Methods:
 - Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
-- bool LoadAsync(File* file)
-- bool LoadAsyncXML(File* file)
-- bool LoadAsync(const String fileName)
-- bool LoadAsyncXML(const String fileName)
+- bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsync(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsyncXML(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
 - void StopAsyncLoading()
 - void Clear(bool clearReplicated = true, bool clearLocal = true)
 - void SetUpdateEnabled(bool enable)
@@ -4208,17 +4573,20 @@ Methods:
 - void SetElapsedTime(float time)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
+- void SetAsyncLoadingMs(int ms)
 - Node* GetNode(unsigned id) const
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
 - float GetAsyncProgress() const
+- LoadMode GetAsyncLoadMode() const
 - const String GetFileName() const
 - unsigned GetChecksum() const
 - float GetTimeScale() const
 - float GetElapsedTime() const
 - float GetSmoothingConstant() const
 - float GetSnapThreshold() const
-- const String GetVarName(ShortStringHash hash) const
+- int GetAsyncLoadingMs() const
+- const String GetVarName(StringHash hash) const
 - void Update(float timeStep)
 - void BeginThreadedUpdate()
 - void EndThreadedUpdate()
@@ -4243,15 +4611,18 @@ Properties:
 - bool updateEnabled
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
+- LoadMode asyncLoadMode (readonly)
 - const String fileName
 - unsigned checksum (readonly)
 - float timeScale
 - float elapsedTime
 - float smoothingConstant
 - float snapThreshold
+- int asyncLoadingMs
 - bool threadedUpdate (readonly)
 - String varNamesAttr
 
+<a name="Class_ScrollBar"></a>
 ### ScrollBar : UIElement
 
 Methods:
@@ -4289,6 +4660,7 @@ Properties:
 - Button* forwardButton (readonly)
 - Slider* slider (readonly)
 
+<a name="Class_ScrollView"></a>
 ### ScrollView : UIElement
 
 Methods:
@@ -4323,6 +4695,7 @@ Properties:
 - float scrollStep
 - float pageStep
 
+<a name="Class_Serializable"></a>
 ### Serializable : Object
 
 Methods:
@@ -4334,6 +4707,7 @@ Properties:
 
 - bool temporary
 
+<a name="Class_Serializer"></a>
 ### Serializer
 
 
@@ -4365,7 +4739,6 @@ Methods:
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
 - bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
@@ -4377,33 +4750,7 @@ Methods:
 - bool WriteNetID(unsigned value)
 - bool WriteLine(const String value)
 
-### ShortStringHash
-
-
-Methods:
-
-- ShortStringHash() (GC)
-- ShortStringHash* new()
-- ShortStringHash(const ShortStringHash& rhs) (GC)
-- ShortStringHash* new(const ShortStringHash& rhs)
-- ShortStringHash(const StringHash& rhs) (GC)
-- ShortStringHash* new(const StringHash& rhs)
-- ShortStringHash(short value) (GC)
-- ShortStringHash* new(short value)
-- ShortStringHash(const String str) (GC)
-- ShortStringHash* new(const String str)
-- void delete()
-- ShortStringHash operator+(const ShortStringHash& rhs) const
-- bool operator==(const ShortStringHash& rhs) const
-- bool operator<(const ShortStringHash& rhs) const
-- short Value() const
-- short Calculate(const char* str)
-
-Properties:
-
-- const ShortStringHash ZERO
-- short value (readonly)
-
+<a name="Class_Skeleton"></a>
 ### Skeleton
 
 
@@ -4419,8 +4766,10 @@ Properties:
 - unsigned numBones (readonly)
 - Bone* rootBone (readonly)
 
+<a name="Class_Skybox"></a>
 ### Skybox : StaticModel
 
+<a name="Class_Slider"></a>
 ### Slider : BorderImage
 
 Methods:
@@ -4447,6 +4796,7 @@ Properties:
 - BorderImage* knob (readonly)
 - float repeatRate
 
+<a name="Class_Sound"></a>
 ### Sound : Resource
 
 Methods:
@@ -4488,8 +4838,10 @@ Properties:
 - bool stereo (readonly)
 - bool compressed (readonly)
 
+<a name="Class_SoundListener"></a>
 ### SoundListener : Component
 
+<a name="Class_SoundSource"></a>
 ### SoundSource : Component
 
 Methods:
@@ -4527,6 +4879,7 @@ Properties:
 - bool autoRemove
 - bool playing (readonly)
 
+<a name="Class_SoundSource3D"></a>
 ### SoundSource3D : SoundSource
 
 Methods:
@@ -4553,6 +4906,7 @@ Properties:
 - float outerAngle
 - float rolloffFactor
 
+<a name="Class_Sphere"></a>
 ### Sphere
 
 
@@ -4596,6 +4950,7 @@ Properties:
 - float radius
 - bool defined
 
+<a name="Class_Spline"></a>
 ### Spline
 
 
@@ -4622,6 +4977,7 @@ Properties:
 
 - InterpolationMode interpolationMode
 
+<a name="Class_SplinePath"></a>
 ### SplinePath : Component
 
 Methods:
@@ -4643,6 +4999,7 @@ Properties:
 - float speed
 - Node* controlledNode
 
+<a name="Class_Sprite"></a>
 ### Sprite : UIElement
 
 Methods:
@@ -4682,6 +5039,7 @@ Properties:
 - BlendMode blendMode
 - Matrix3x4& transform (readonly)
 
+<a name="Class_Sprite2D"></a>
 ### Sprite2D : Resource
 
 Methods:
@@ -4705,6 +5063,7 @@ Properties:
 - IntVector2 offset
 - SpriteSheet2D* spriteSheet
 
+<a name="Class_SpriteSheet2D"></a>
 ### SpriteSheet2D : Resource
 
 Methods:
@@ -4715,6 +5074,7 @@ Methods:
 - void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
 - void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& originSize)
 
+<a name="Class_StaticModel"></a>
 ### StaticModel : Drawable
 
 Methods:
@@ -4739,6 +5099,7 @@ Properties:
 - unsigned numGeometries (readonly)
 - unsigned occlusionLodLevel
 
+<a name="Class_StaticModelGroup"></a>
 ### StaticModelGroup : StaticModel
 
 Methods:
@@ -4753,6 +5114,7 @@ Properties:
 
 - unsigned numInstanceNodes (readonly)
 
+<a name="Class_StaticSprite2D"></a>
 ### StaticSprite2D : Drawable2D
 
 Methods:
@@ -4771,6 +5133,7 @@ Properties:
 - bool flipY
 - Color& color
 
+<a name="Class_StringHash"></a>
 ### StringHash
 
 
@@ -4799,6 +5162,7 @@ Properties:
 - const StringHash ZERO
 - unsigned value (readonly)
 
+<a name="Class_Technique"></a>
 ### Technique : Resource
 
 Methods:
@@ -4811,6 +5175,7 @@ Properties:
 
 - bool SM3 (readonly)
 
+<a name="Class_Terrain"></a>
 ### Terrain : Component
 
 Methods:
@@ -4831,6 +5196,7 @@ Methods:
 - void SetCastShadows(bool enable)
 - void SetOccluder(bool enable)
 - void SetOccludee(bool enable)
+- void ApplyHeightMap()
 - int GetPatchSize() const
 - const Vector3& GetSpacing() const
 - const IntVector2& GetNumVertices() const
@@ -4842,6 +5208,7 @@ Methods:
 - TerrainPatch* GetPatch(int x, int z) const
 - float GetHeight(const Vector3& worldPosition) const
 - Vector3 GetNormal(const Vector3& worldPosition) const
+- IntVector2 WorldToHeightMap(const Vector3& worldPosition) const
 - SharedArrayPtr<float> GetHeightData() const
 - float GetDrawDistance() const
 - float GetShadowDistance() const
@@ -4878,6 +5245,7 @@ Properties:
 - bool occluder
 - bool occludee
 
+<a name="Class_TerrainPatch"></a>
 ### TerrainPatch : Drawable
 
 Methods:
@@ -4918,6 +5286,7 @@ Properties:
 - unsigned lodLevel (readonly)
 - float occlusionOffset
 
+<a name="Class_Text"></a>
 ### Text : UIElement
 
 Methods:
@@ -4976,6 +5345,7 @@ Properties:
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 
+<a name="Class_Text3D"></a>
 ### Text3D : Drawable
 
 Methods:
@@ -5046,6 +5416,7 @@ Properties:
 - float opacity
 - FaceCameraMode faceCameraMode
 
+<a name="Class_Texture"></a>
 ### Texture : Resource
 
 Methods:
@@ -5087,6 +5458,7 @@ Properties:
 - Texture* backupTexture
 - TextureUsage usage (readonly)
 
+<a name="Class_Texture2D"></a>
 ### Texture2D : Texture
 
 Methods:
@@ -5095,19 +5467,21 @@ Methods:
 - Texture2D* new()
 - void delete()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
-- bool Load(Image* image, bool useAlpha = false)
+- bool SetData(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
 
 Properties:
 
 - RenderSurface* renderSurface (readonly)
 
+<a name="Class_TextureCube"></a>
 ### TextureCube : Texture
 
 Methods:
 
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
+<a name="Class_TextureFrame"></a>
 ### TextureFrame
 
 
@@ -5122,6 +5496,121 @@ Properties:
 - Rect uv
 - float time
 
+<a name="Class_Tile2D"></a>
+### Tile2D
+
+
+Methods:
+
+- int GetGid() const
+- Sprite2D* GetSprite() const
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+
+Properties:
+
+- int gid (readonly)
+- Sprite2D* sprite (readonly)
+
+<a name="Class_TileMap2D"></a>
+### TileMap2D : Component
+
+Methods:
+
+- void SetTmxFile(TmxFile2D* tmxFile)
+- TmxFile2D* GetTmxFile() const
+- const TileMapInfo2D& GetInfo() const
+- unsigned GetNumLayers() const
+- TileMapLayer2D* GetLayer(unsigned index) const
+- Vector2 TileIndexToPosition(int x, int y) const
+- bool PositionToTileIndex(const Vector2& position, int x = 0, int y = 0) const
+
+Properties:
+
+- TmxFile2D* tmxFile
+- TileMapInfo2D& info (readonly)
+- unsigned numLayers (readonly)
+
+<a name="Class_TileMapInfo2D"></a>
+### TileMapInfo2D
+
+
+Methods:
+
+- float GetMapWidth() const
+- float GetMapHeight() const
+
+Properties:
+
+- Orientation2D orientation
+- int width
+- int height
+- float tileWidth
+- float tileHeight
+- float mapWidth (readonly)
+- float mapHeight (readonly)
+
+<a name="Class_TileMapLayer2D"></a>
+### TileMapLayer2D : Component
+
+Methods:
+
+- void SetDrawOrder(int drawOrder)
+- void SetVisible(bool visible)
+- int GetDrawOrder() const
+- bool IsVisible() const
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+- TileMapLayerType2D GetLayerType() const
+- int GetWidth() const
+- int GetHeight() const
+- Node* GetTileNode(int x, int y) const
+- Tile2D* GetTile(int x, int y) const
+- unsigned GetNumObjects() const
+- TileMapObject2D* GetObject(unsigned index) const
+- Node* GetObjectNode(unsigned index) const
+- Node* GetImageNode() const
+
+Properties:
+
+- int drawOrder (readonly)
+- bool visible (readonly)
+- TileMapLayerType2D layerType (readonly)
+- int width (readonly)
+- int height (readonly)
+- unsigned numObjects (readonly)
+- Node* imageNode (readonly)
+
+<a name="Class_TileMapObject2D"></a>
+### TileMapObject2D
+
+
+Methods:
+
+- TileMapObjectType2D GetObjectType() const
+- const String GetName() const
+- const String GetType() const
+- const Vector2& GetPosition() const
+- const Vector2& GetSize() const
+- unsigned GetNumPoints() const
+- const Vector2& GetPoint(unsigned index) const
+- int GetTileGid() const
+- Sprite2D* GetTileSprite() const
+- bool HasProperty(const String name) const
+- const String GetProperty(const String name) const
+
+Properties:
+
+- TileMapObjectType2D objectType (readonly)
+- String name (readonly)
+- String type (readonly)
+- Vector2 position (readonly)
+- Vector2 size (readonly)
+- unsigned numPoints (readonly)
+- int tileGid (readonly)
+- Sprite2D* tileSprite (readonly)
+
+<a name="Class_Time"></a>
 ### Time : Object
 
 Methods:
@@ -5141,6 +5630,10 @@ Properties:
 - unsigned timerPeriod (readonly)
 - float elapsedTime (readonly)
 
+<a name="Class_TmxFile2D"></a>
+### TmxFile2D : Resource
+
+<a name="Class_ToolTip"></a>
 ### ToolTip : UIElement
 
 Methods:
@@ -5155,6 +5648,7 @@ Properties:
 
 - float delay
 
+<a name="Class_TouchState"></a>
 ### TouchState
 
 
@@ -5171,6 +5665,7 @@ Properties:
 - float pressure
 - UIElement* touchedElement (readonly)
 
+<a name="Class_UI"></a>
 ### UI : Object
 
 Methods:
@@ -5242,6 +5737,7 @@ Properties:
 - bool forceAutoHint
 - bool modalElement (readonly)
 
+<a name="Class_UIElement"></a>
 ### UIElement : Animatable
 
 Methods:
@@ -5318,7 +5814,7 @@ Methods:
 - void Remove()
 - unsigned FindChild(UIElement* element) const
 - void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED)
-- void SetVar(ShortStringHash key, const Variant& value)
+- void SetVar(StringHash key, const Variant& value)
 - void SetInternal(bool enable)
 - void SetTraversalMode(TraversalMode traversalMode)
 - void SetElementEventSender(bool flag)
@@ -5370,7 +5866,7 @@ Methods:
 - UIElement* GetParent() const
 - UIElement* GetRoot() const
 - const Color& GetDerivedColor() const
-- const Variant& GetVar(ShortStringHash key) const
+- const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - IntVector2 ScreenToElement(const IntVector2& screenPosition)
 - IntVector2 ElementToScreen(const IntVector2& position)
@@ -5446,6 +5942,7 @@ Properties:
 - TraversalMode traversalMode
 - bool elementEventSender
 
+<a name="Class_ValueAnimation"></a>
 ### ValueAnimation : Resource
 
 Methods:
@@ -5469,6 +5966,7 @@ Properties:
 - float splineTension
 - VariantType valueType
 
+<a name="Class_Variant"></a>
 ### Variant
 
 
@@ -5482,8 +5980,6 @@ Methods:
 - Variant* new(unsigned value)
 - Variant(const StringHash& value) (GC)
 - Variant* new(const StringHash& value)
-- Variant(const ShortStringHash& value) (GC)
-- Variant* new(const ShortStringHash& value)
 - Variant(bool value) (GC)
 - Variant* new(bool value)
 - Variant(float value) (GC)
@@ -5542,14 +6038,12 @@ Methods:
 - bool operator==(const IntRect& rhs) const
 - bool operator==(const IntVector2& rhs) const
 - bool operator==(const StringHash& rhs) const
-- bool operator==(const ShortStringHash& rhs) const
 - bool operator==(const Matrix3& rhs) const
 - bool operator==(const Matrix3x4& rhs) const
 - bool operator==(const Matrix4& rhs) const
 - void SetInt(int value)
 - void SetUint(unsigned value)
 - void SetStringHash(const StringHash& value)
-- void SetShortStringHash(const ShortStringHash& value)
 - void SetBool(bool value)
 - void SetFloat(float value)
 - void SetVector2(const Vector2& value)
@@ -5569,7 +6063,6 @@ Methods:
 - int GetInt() const
 - int GetUInt() const
 - StringHash GetStringHash()
-- ShortStringHash GetShortStringHash()
 - bool GetBool() const
 - float GetFloat() const
 - const Vector2& GetVector2() const
@@ -5599,6 +6092,7 @@ Properties:
 - bool zero (readonly)
 - bool empty (readonly)
 
+<a name="Class_VariantMap"></a>
 ### VariantMap
 
 
@@ -5610,7 +6104,6 @@ Methods:
 - void SetInt(const String key, int value)
 - void SetUInt(const String key, unsigned value)
 - void SetStringHash(const String key, const StringHash& value)
-- void SetShortStringHash(const String key, const ShortStringHash& value)
 - void SetBool(const String key, bool value)
 - void SetFloat(const String key, float value)
 - void SetVector2(const String key, const Vector2 value)
@@ -5631,7 +6124,6 @@ Methods:
 - int GetInt(const String key)
 - int GetUInt(const String key)
 - StringHash GetStringHash(const String key)
-- ShortStringHash GetShortStringHash(const String key)
 - bool GetBool(const String key)
 - float GetFloat(const String key)
 - const Vector2& GetVector2(const String key)
@@ -5650,6 +6142,7 @@ Methods:
 - const Matrix3x4& GetMatrix3x4(const String key)
 - const Matrix4& GetMatrix4(const String key)
 
+<a name="Class_Vector2"></a>
 ### Vector2
 
 
@@ -5694,6 +6187,7 @@ Properties:
 - const Vector2 DOWN
 - const Vector2 ONE
 
+<a name="Class_Vector3"></a>
 ### Vector3
 
 
@@ -5748,6 +6242,7 @@ Properties:
 - const Vector3 BACK
 - const Vector3 ONE
 
+<a name="Class_Vector4"></a>
 ### Vector4
 
 
@@ -5788,6 +6283,7 @@ Properties:
 - const Vector4 ZERO
 - const Vector4 ONE
 
+<a name="Class_VectorBuffer"></a>
 ### VectorBuffer
 
 
@@ -5835,7 +6331,6 @@ Methods:
 - String ReadString()
 - String ReadFileID()
 - StringHash ReadStringHash()
-- ShortStringHash ReadShortStringHash()
 - VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
@@ -5872,7 +6367,6 @@ Methods:
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
 - bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
 - bool WriteBuffer(const VectorBuffer& buffer)
 - bool WriteResourceRef(const ResourceRef& value)
 - bool WriteResourceRefList(const ResourceRefList& value)
@@ -5892,6 +6386,7 @@ Properties:
 - unsigned size (readonly)
 - bool eof (readonly)
 
+<a name="Class_View3D"></a>
 ### View3D : Window
 
 Methods:
@@ -5916,6 +6411,7 @@ Properties:
 - unsigned format
 - bool autoUpdate
 
+<a name="Class_Viewport"></a>
 ### Viewport
 
 
@@ -5937,6 +6433,9 @@ Methods:
 - Camera* GetCamera() const
 - const IntRect& GetRect() const
 - RenderPath* GetRenderPath() const
+- Ray GetScreenRay(int x, int y) const
+- IntVector2 WorldToScreenPoint(const Vector3& worldPos) const
+- Vector3 ScreenToWorldPoint(int x, int y, float depth) const
 
 Properties:
 
@@ -5945,6 +6444,7 @@ Properties:
 - IntRect& rect
 - RenderPath* renderPath
 
+<a name="Class_Window"></a>
 ### Window : BorderImage
 
 Methods:
@@ -5983,6 +6483,7 @@ Properties:
 - Color& modalFrameColor
 - IntVector2& modalFrameSize
 
+<a name="Class_XMLElement"></a>
 ### XMLElement
 
 
@@ -6067,6 +6568,7 @@ Properties:
 - unsigned numAttributes (readonly)
 - XMLFile* file (readonly)
 
+<a name="Class_XMLFile"></a>
 ### XMLFile : Resource
 
 Methods:
@@ -6080,6 +6582,7 @@ Methods:
 - void Patch(XMLFile* patchFile)
 - void Patch(XMLElement patchElement)
 
+<a name="Class_Zone"></a>
 ### Zone : Drawable
 
 Methods:
@@ -6095,6 +6598,7 @@ Methods:
 - void SetHeightFog(bool enable)
 - void SetOverride(bool enable)
 - void SetAmbientGradient(bool enable)
+- void SetZoneTexture(Texture* texture)
 - const Matrix3x4& GetInverseWorldTransform() const
 - const Color& GetAmbientColor() const
 - const Color& GetAmbientStartColor()
@@ -6108,6 +6612,7 @@ Methods:
 - bool GetHeightFog() const
 - bool GetOverride() const
 - bool GetAmbientGradient() const
+- Texture* GetZoneTexture() const
 - bool IsInside(const Vector3& point) const
 
 Properties:
@@ -6126,6 +6631,7 @@ Properties:
 - bool heightFog
 - bool override
 - bool ambientGradient
+- Texture* zoneTexture
 
 \section LuaScriptAPI_Enums Enumerations
 
@@ -6333,6 +6839,12 @@ Properties:
 - int LIGHT_SPOT
 - int LIGHT_POINT
 
+### LoadMode
+
+- int LOAD_RESOURCES_ONLY
+- int LOAD_SCENE
+- int LOAD_SCENE_AND_RESOURCES
+
 ### LockState
 
 - int LOCK_NONE
@@ -6351,6 +6863,12 @@ Properties:
 - int O_HORIZONTAL
 - int O_VERTICAL
 
+### Orientation2D
+
+- int O_ORTHOGONAL
+- int O_ISOMETRIC
+- int O_STAGGERED
+
 ### PassLightingMode
 
 - int LIGHTING_UNLIT
@@ -6361,6 +6879,10 @@ Properties:
 
 - int TRIANGLE_LIST
 - int LINE_LIST
+- int POINT_LIST
+- int TRIANGLE_STRIP
+- int LINE_STRIP
+- int TRIANGLE_FAN
 
 ### RayQueryLevel
 
@@ -6468,6 +6990,7 @@ Properties:
 - int TU_DEPTHBUFFER
 - int TU_LIGHTBUFFER
 - int TU_VOLUMEMAP
+- int TU_ZONE
 - int MAX_TEXTURE_UNITS
 
 ### TextureUsage
@@ -6476,6 +6999,22 @@ Properties:
 - int TEXTURE_DYNAMIC
 - int TEXTURE_RENDERTARGET
 - int TEXTURE_DEPTHSTENCIL
+
+### TileMapLayerType2D
+
+- int LT_TILE_LAYER
+- int LT_OBJECT_GROUP
+- int LT_IMAGE_LAYER
+- int LT_INVALID
+
+### TileMapObjectType2D
+
+- int OT_RECTANGLE
+- int OT_ELLIPSE
+- int OT_POLYGON
+- int OT_POLYLINE
+- int OT_TILE
+- int OT_INVALID
 
 ### TransformSpace
 
@@ -6567,7 +7106,9 @@ Properties:
 - float Atan2(float y, float x)
 - float Clamp(float value, float min, float max)
 - int ClampInt(int value, int min, int max)
+- VectorBuffer CompressVectorBuffer(VectorBuffer& src)
 - float Cos(float angle)
+- VectorBuffer DecompressVectorBuffer(VectorBuffer& src)
 - bool Equals(float lhs, float rhs)
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
@@ -6616,11 +7157,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random()
-- float Random(float min, float max)
 - float Random(float range)
-- int RandomInt(int range)
+- float Random(float min, float max)
+- float Random()
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -6631,8 +7172,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(const String eventName, const String functionName)
 - void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void SubscribeToEvent(const String eventName, const String functionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)

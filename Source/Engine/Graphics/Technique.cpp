@@ -172,10 +172,8 @@ void Technique::RegisterObject(Context* context)
     context->RegisterFactory<Technique>();
 }
 
-bool Technique::Load(Deserializer& source)
+bool Technique::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadTechnique);
-    
     passes_.Clear();
     SetMemoryUse(sizeof(Technique));
     

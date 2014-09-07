@@ -229,11 +229,16 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
             float v = direction_.DotProduct(q);
             if (v >= 0.0f && u + v <= det)
             {
-                // There is an intersection, so calculate distance & optional normal
-                if (outNormal)
-                    *outNormal = edge1.CrossProduct(edge2);
-                
-                return edge2.DotProduct(q) / det;
+                float distance = edge2.DotProduct(q) / det;
+                // Discard hits behind the ray
+                if (distance >= 0.0f)
+                {
+                    // There is an intersection, so calculate distance & optional normal
+                    if (outNormal)
+                        *outNormal = edge1.CrossProduct(edge2);
+                    
+                    return distance;
+                }
             }
         }
     }

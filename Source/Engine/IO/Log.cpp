@@ -22,11 +22,13 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "File.h"
 #include "IOEvents.h"
 #include "Log.h"
 #include "Mutex.h"
 #include "ProcessUtils.h"
+#include "Thread.h"
 #include "Timer.h"
 
 #include <cstdio>
@@ -66,6 +68,8 @@ Log::Log(Context* context) :
     quiet_(false)
 {
     logInstance = this;
+    
+    SubscribeToEvent(E_ENDFRAME, HANDLER(Log, HandleEndFrame));
 }
 
 Log::~Log()
@@ -129,6 +133,18 @@ void Log::Write(int level, const String& message)
 {
     assert(level >= LOG_DEBUG && level < LOG_NONE);
 
+    // If not in the main thread, store message for later processing
+    if (!Thread::IsMainThread())
+    {
+        if (logInstance)
+        {
+            MutexLock lock(logInstance->logMutex_);
+            logInstance->threadMessages_.Push(StoredLogMessage(message, level, false));
+        }
+        
+        return;
+    }
+
     // Do not log if message level excluded or if currently sending a log event
     if (!logInstance || logInstance->level_ > level || logInstance->inWrite_)
         return;
@@ -176,6 +192,18 @@ void Log::Write(int level, const String& message)
 
 void Log::WriteRaw(const String& message, bool error)
 {
+    // If not in the main thread, store message for later processing
+    if (!Thread::IsMainThread())
+    {
+        if (logInstance)
+        {
+            MutexLock lock(logInstance->logMutex_);
+            logInstance->threadMessages_.Push(StoredLogMessage(message, LOG_RAW, error));
+        }
+        
+        return;
+    }
+    
     // Prevent recursion during log event
     if (!logInstance || logInstance->inWrite_)
         return;
@@ -219,6 +247,24 @@ void Log::WriteRaw(const String& message, bool error)
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
 
     logInstance->inWrite_ = false;
+}
+
+void Log::HandleEndFrame(StringHash eventType, VariantMap& eventData)
+{
+    MutexLock lock(logMutex_);
+    
+    // Process messages accumulated from other threads (if any)
+    while (!threadMessages_.Empty())
+    {
+        const StoredLogMessage& stored = threadMessages_.Front();
+        
+        if (stored.level_ != LOG_RAW)
+            Write(stored.level_, stored.message_);
+        else
+            WriteRaw(stored.message_, stored.error_);
+        
+        threadMessages_.PopFront();
+    }
 }
 
 }

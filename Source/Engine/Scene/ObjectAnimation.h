@@ -45,8 +45,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Load from XML data. Return true if successful.
@@ -54,9 +54,9 @@ public:
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
 
-    /// Add attribute animation.
+    /// Add attribute animation, attribute name can in following format: "attribute" or "#0/#1/attribute" or ""#0/#1/@component#1/attribute.
     void AddAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
-    /// Remove attribute animation.
+    /// Remove attribute animation, attribute name can in following format: "attribute" or "#0/#1/attribute" or ""#0/#1/@component#1/attribute.
     void RemoveAttributeAnimation(const String& name);
     /// Remove attribute animation.
     void RemoveAttributeAnimation(ValueAnimation* attributeAnimation);

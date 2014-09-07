@@ -244,10 +244,10 @@ void Script::DumpAPI(DumpMode mode)
         
         Log::WriteRaw("\n\\page AttributeList Attribute list\n");
         
-        const HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
+        const HashMap<StringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
 
         Vector<String> objectTypes;
-        for (HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End();
+        for (HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End();
             ++i)
             objectTypes.Push(context_->GetTypeName(i->first_));
         
@@ -308,11 +308,6 @@ void Script::DumpAPI(DumpMode mode)
             "#define uint64 unsigned long\n"
             "#define null 0\n");
 
-    if (mode == DOXYGEN)
-        Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
-    else if (mode == C_HEADER)
-        Log::WriteRaw("\n// Classes\n");
-
     unsigned types = scriptEngine_->GetObjectTypeCount();
     Vector<Pair<String, unsigned> > sortedTypes;
     for (unsigned i = 0; i < types; ++i)
@@ -326,6 +321,33 @@ void Script::DumpAPI(DumpMode mode)
     }
     Sort(sortedTypes.Begin(), sortedTypes.End());
     
+    if (mode == DOXYGEN)
+    {
+        Log::WriteRaw("\\section ScriptAPI_TableOfContents Table of Contents\n"
+            "\\ref ScriptAPI_ClassList \"Class list\"<br>\n"
+            "\\ref ScriptAPI_Classes \"Classes\"<br>\n"
+            "\\ref ScriptAPI_Enums \"Enumerations\"<br>\n"
+            "\\ref ScriptAPI_GlobalFunctions \"Global functions\"<br>\n"
+            "\\ref ScriptAPI_GlobalProperties \"Global properties\"<br>\n"
+            "\\ref ScriptAPI_GlobalConstants \"Global constants\"<br>\n\n");
+
+        Log::WriteRaw("\\section ScriptAPI_ClassList Class List\n\n");
+        
+        for (unsigned i = 0; i < sortedTypes.Size(); ++i)
+        {
+            asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
+            if (type)
+            {
+                String typeName(type->GetName());
+                Log::WriteRaw("<a href=\"#Class_" + typeName + "\"><b>" + typeName + "</b></a>\n");
+            }
+        }
+        
+        Log::WriteRaw("\n\\section ScriptAPI_Classes Classes\n");
+    }
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Classes\n");
+
     for (unsigned i = 0; i < sortedTypes.Size(); ++i)
     {
         asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
@@ -336,7 +358,10 @@ void Script::DumpAPI(DumpMode mode)
             Vector<PropertyInfo> propertyInfos;
 
             if (mode == DOXYGEN)
+            {
+                Log::WriteRaw("<a name=\"Class_" + typeName + "\"></a>\n");
                 Log::WriteRaw("\n### " + typeName + "\n");
+            }
             else if (mode == C_HEADER)
             {
                 ///\todo Find a cleaner way to do this instead of hardcoding

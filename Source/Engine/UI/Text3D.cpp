@@ -55,6 +55,7 @@ Text3D::Text3D(Context* context) :
     textDirty_(true),
     geometryDirty_(true)
 {
+    text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
@@ -159,7 +160,7 @@ void Text3D::SetMaterial(Material* material)
 bool Text3D::SetFont(const String& fontName, int size)
 {
     bool success = text_.SetFont(fontName, size);
-    
+
     // Changing font requires materials to be re-evaluated. Material evaluation can not be done in worker threads,
     // so UI batches must be brought up-to-date immediately
     MarkTextDirty();
@@ -172,7 +173,7 @@ bool Text3D::SetFont(const String& fontName, int size)
 bool Text3D::SetFont(Font* font, int size)
 {
     bool success = text_.SetFont(font, size);
-    
+
     MarkTextDirty();
     UpdateTextBatches();
     UpdateTextMaterials();
@@ -237,6 +238,7 @@ void Text3D::SetTextEffect(TextEffect textEffect)
     text_.SetTextEffect(textEffect);
     
     MarkTextDirty();
+    UpdateTextMaterials(true);
 }
 
 void Text3D::SetEffectColor(const Color& effectColor)
@@ -244,6 +246,7 @@ void Text3D::SetEffectColor(const Color& effectColor)
     text_.SetEffectColor(effectColor);
     
     MarkTextDirty();
+    UpdateTextMaterials();
 }
 
 void Text3D::SetEffectDepthBias(float bias)
@@ -521,10 +524,27 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Material* material = new Material(context_);
                 Technique* tech = new Technique(context_);
                 Pass* pass = tech->CreatePass(PASS_ALPHA);
-                pass->SetVertexShader("Basic");
-                pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
-                pass->SetPixelShader("Basic");
-                pass->SetPixelShaderDefines("ALPHAMAP VERTEXCOLOR");
+                pass->SetVertexShader("Text");
+                pass->SetPixelShader("Text");
+
+                if (GetFont()->IsSDFFont())
+                {
+                    switch (GetTextEffect())
+                    {
+                    case TE_NONE:
+                        pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD");
+                        break;
+
+                    case TE_SHADOW:
+                        pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD TEXT_EFFECT_SHADOW");
+                        break;
+
+                    case TE_STROKE:
+                        pass->SetPixelShaderDefines("SIGNED_DISTANCE_FIELD TEXT_EFFECT_STROKE");
+                        break;
+                    }
+                }
+
                 pass->SetBlendMode(BLEND_ALPHA);
                 pass->SetDepthWrite(false);
                 material->SetTechnique(0, tech);
@@ -536,9 +556,31 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
         }
         
         Material* material = batches_[i].material_;
-        material->SetTexture(TU_DIFFUSE, uiBatches_[i].texture_);
+        Texture* texture = uiBatches_[i].texture_;
+        material->SetTexture(TU_DIFFUSE, texture);
+
+        if (GetFont()->IsSDFFont())
+        {
+            switch (GetTextEffect())
+            {
+            case TE_SHADOW:
+                if (texture)
+                {
+                    Vector2 shadowOffset(0.5f / texture->GetWidth(), 0.5f / texture->GetHeight());
+                    material->SetShaderParameter("ShadowOffset", shadowOffset);
+                }
+                material->SetShaderParameter("ShadowColor", GetEffectColor());
+                break;
+
+            case TE_STROKE:
+                material->SetShaderParameter("StrokeColor", GetEffectColor());
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 }
-
 
 }

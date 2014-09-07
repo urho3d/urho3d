@@ -945,49 +945,6 @@ bool SceneRebuildNavigation()
     return success;
 }
 
-bool LoadParticleData(const String&in fileName)
-{
-    if (fileName.empty)
-        return false;
-
-    XMLFile xmlFile;
-    if (!xmlFile.Load(File(fileName, FILE_READ)))
-        return false;
-
-    bool needRefresh = false;
-
-    for (uint i = 0; i < editComponents.length; ++i)
-    {
-        ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[i]);
-        if (emitter !is null)
-        {
-            emitter.Load(xmlFile);
-            needRefresh = true;
-        }
-    }
-    
-    if (needRefresh)
-        UpdateAttributeInspector();
-
-    return true;
-}
-
-bool SaveParticleData(const String&in fileName)
-{
-    if (fileName.empty || editComponents.length != 1)
-        return false;
-
-    ParticleEmitter@ emitter = cast<ParticleEmitter>(editComponents[0]);
-    if (emitter !is null)
-    {
-        XMLFile xmlFile;
-        emitter.Save(xmlFile);
-        return xmlFile.Save(File(fileName, FILE_WRITE));
-    }
-
-    return false;
-}
-
 void AssignMaterial(StaticModel@ model, String materialPath)
 {
     Material@ material = cache.GetResource("Material", materialPath);

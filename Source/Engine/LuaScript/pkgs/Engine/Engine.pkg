@@ -15,7 +15,7 @@ class Engine : public Object
     void SetAutoExit(bool enable);
     void Exit();
     void DumpProfiler();
-    void DumpResources();
+    void DumpResources(bool dumpFileName = false);
     void DumpMemory();
 
     int GetMinFps() const;

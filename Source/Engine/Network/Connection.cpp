@@ -62,14 +62,21 @@ PackageUpload::PackageUpload() :
 
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
-    position_(Vector3::ZERO),
     connection_(connection),
+    sendMode_(OPSM_NONE),
     isClient_(isClient),
     connectPending_(false),
     sceneLoaded_(false),
     logStatistics_(false)
 {
     sceneState_.connection_ = this;
+    
+    // Store address and port now for accurate logging (kNet may already have destroyed the socket on disconnection,
+    // in which case we would log a zero address:port on disconnect)
+    kNet::EndPoint endPoint = connection_->RemoteEndPoint();
+    ///\todo Not IPv6-capable.
+    address_ = Urho3D::ToString("%d.%d.%d.%d", endPoint.ip[0], endPoint.ip[1], endPoint.ip[2], endPoint.ip[3]);
+    port_ = endPoint.port;
 }
 
 Connection::~Connection()
@@ -199,6 +206,15 @@ void Connection::SetControls(const Controls& newControls)
 void Connection::SetPosition(const Vector3& position)
 {
     position_ = position;
+    if (sendMode_ == OPSM_NONE)
+        sendMode_ = OPSM_POSITION;
+}
+
+void Connection::SetRotation(const Quaternion& rotation)
+{
+    rotation_ = rotation;
+    if (sendMode_ != OPSM_POSITION_ROTATION)
+        sendMode_ = OPSM_POSITION_ROTATION;
 }
 
 void Connection::SetConnectPending(bool connectPending)
@@ -248,7 +264,10 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.yaw_);
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
-    msg_.WriteVector3(position_);
+    if (sendMode_ >= OPSM_POSITION)
+        msg_.WriteVector3(position_);
+    if (sendMode_ >= OPSM_POSITION_ROTATION)
+        msg_.WritePackedQuaternion(rotation_);
     SendMessage(MSG_CONTROLS, false, false, msg_, CONTROLS_CONTENT_ID);
 }
 
@@ -557,7 +576,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             unsigned numVars = msg.ReadVLE();
             while (numVars)
             {
-                ShortStringHash key = msg.ReadShortStringHash();
+                StringHash key = msg.ReadStringHash();
                 node->SetVar(key, msg.ReadVariant());
                 --numVars;
             }
@@ -568,7 +587,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             {
                 --numComponents;
                 
-                ShortStringHash type = msg.ReadShortStringHash();
+                StringHash type = msg.ReadStringHash();
                 unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
@@ -606,7 +625,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 unsigned changedVars = msg.ReadVLE();
                 while (changedVars)
                 {
-                    ShortStringHash key = msg.ReadShortStringHash();
+                    StringHash key = msg.ReadStringHash();
                     node->SetVar(key, msg.ReadVariant());
                     --changedVars;
                 }
@@ -652,7 +671,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Node* node = scene_->GetNode(nodeID);
             if (node)
             {
-                ShortStringHash type = msg.ReadShortStringHash();
+                StringHash type = msg.ReadStringHash();
                 unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
@@ -900,7 +919,11 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
     newControls.extraData_ = msg.ReadVariantMap();
     
     SetControls(newControls);
-    SetPosition(msg.ReadVector3());
+    // Client may or may not send observer position & rotation for interest management
+    if (!msg.IsEof())
+        position_ = msg.ReadVector3();
+    if (!msg.IsEof())
+        rotation_ = msg.ReadPackedQuaternion();
 }
 
 void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
@@ -996,18 +1019,6 @@ Scene* Connection::GetScene() const
 bool Connection::IsConnected() const
 {
     return connection_->GetConnectionState() == kNet::ConnectionOK;
-}
-
-String Connection::GetAddress() const
-{
-    kNet::EndPoint endPoint = connection_->RemoteEndPoint();
-    ///\todo Not IPv6-capable.
-    return Urho3D::ToString("%d.%d.%d.%d", endPoint.ip[0], endPoint.ip[1], endPoint.ip[2], endPoint.ip[3]);
-}
-
-unsigned short Connection::GetPort() const
-{
-    return connection_->RemoteEndPoint().port;
 }
 
 String Connection::ToString() const
@@ -1117,7 +1128,7 @@ void Connection::ProcessNewNode(Node* node)
     msg_.WriteVLE(vars.Size());
     for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)
     {
-        msg_.WriteShortStringHash(i->first_);
+        msg_.WriteStringHash(i->first_);
         msg_.WriteVariant(i->second_);
     }
     
@@ -1137,7 +1148,7 @@ void Connection::ProcessNewNode(Node* node)
         componentState.component_ = component;
         component->AddReplicationState(&componentState);
         
-        msg_.WriteShortStringHash(component->GetType());
+        msg_.WriteStringHash(component->GetType());
         msg_.WriteNetID(component->GetID());
         component->WriteInitialDeltaUpdate(msg_);
     }
@@ -1205,19 +1216,19 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
             // Write changed variables
             msg_.WriteVLE(nodeState.dirtyVars_.Size());
             const VariantMap& vars = node->GetVars();
-            for (HashSet<ShortStringHash>::ConstIterator i = nodeState.dirtyVars_.Begin(); i != nodeState.dirtyVars_.End(); ++i)
+            for (HashSet<StringHash>::ConstIterator i = nodeState.dirtyVars_.Begin(); i != nodeState.dirtyVars_.End(); ++i)
             {
                 VariantMap::ConstIterator j = vars.Find(*i);
                 if (j != vars.End())
                 {
-                    msg_.WriteShortStringHash(j->first_);
+                    msg_.WriteStringHash(j->first_);
                     msg_.WriteVariant(j->second_);
                 }
                 else
                 {
                     // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
                     LOGWARNING("Sending dummy user variable as original value was removed");
-                    msg_.WriteShortStringHash(ShortStringHash());
+                    msg_.WriteStringHash(StringHash());
                     msg_.WriteVariant(Variant::EMPTY);
                 }
             }
@@ -1311,7 +1322,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 
                 msg_.Clear();
                 msg_.WriteNetID(node->GetID());
-                msg_.WriteShortStringHash(component->GetType());
+                msg_.WriteStringHash(component->GetType());
                 msg_.WriteNetID(component->GetID());
                 component->WriteInitialDeltaUpdate(msg_);
                 

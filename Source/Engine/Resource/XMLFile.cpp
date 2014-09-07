@@ -79,10 +79,8 @@ void XMLFile::RegisterObject(Context* context)
     context->RegisterFactory<XMLFile>();
 }
 
-bool XMLFile::Load(Deserializer& source)
+bool XMLFile::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadXMLFile);
-
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {

@@ -302,6 +302,7 @@ template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const ch
     return 1;
 }
 
+#ifdef URHO3D_PHYSICS
 template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const char*)
 {
     const PODVector<RigidBody*>& vector = *((const PODVector<RigidBody*>*)data);
@@ -313,6 +314,7 @@ template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const ch
     }
     return 1;
 }
+#endif
 
 template<> int ToluaPushPODVector<RigidBody2D*>(lua_State* L, void* data, const char*)
 {
@@ -356,10 +358,12 @@ template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, c
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<OctreeQueryResult>*)data), "OctreeQueryResult");
 }
 
+#ifdef URHO3D_PHYSICS
 template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<PhysicsRaycastResult>*)data), "PhysicsRaycastResult");
 }
+#endif
 
 template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char*)
 {

@@ -40,7 +40,7 @@
 #include "DebugNew.h"
 
 // Custom variable identifier for storing sound effect name within the UI element
-static const ShortStringHash VAR_SOUNDRESOURCE("SoundResource");
+static const StringHash VAR_SOUNDRESOURCE("SoundResource");
 static const unsigned NUM_SOUNDS = 3;
 
 static String soundNames[] = {

@@ -40,7 +40,6 @@ ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     Drawable2D(context),
     numParticles_(0), 
     emissionTime_(0.0f),
-    emissionRate_(1.0f),
     emitParticleTime_(0.0f),
     boundingBoxMinPoint_(Vector3::ZERO),
     boundingBoxMaxPoint_(Vector3::ZERO)
@@ -106,13 +105,13 @@ void ParticleEmitter2D::Update(const FrameInfo& frame)
     {
         float worldAngle = GetNode()->GetWorldRotation().RollAngle();
         
-        float timeBetweenParticles = 1.0f / emissionRate_;
+        float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
         emitParticleTime_ += timeStep;
 
-        while (emitParticleTime_ > 0)
+        while (emitParticleTime_ > 0.0f)
         {
             if (EmitParticle(worldPosition, worldAngle, worldScale))
-                UpdateParticle(particles_[numParticles_ - 1], timeStep, worldPosition, worldScale);
+                UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
 
             emitParticleTime_ -= timeBetweenParticles;
         }
@@ -139,14 +138,20 @@ void ParticleEmitter2D::SetEffect(ParticleEffect2D* model)
 
     SetSprite(effect_->GetSprite());
     SetBlendMode(effect_->GetBlendMode());
+    SetMaxParticles(effect_->GetMaxParticles());
 
-    numParticles_ = Min((int)effect_->GetMaxParticles(), (int)numParticles_);    
-    particles_.Resize(effect_->GetMaxParticles());
-    vertices_.Reserve(effect_->GetMaxParticles() * 4);
-    
     emitParticleTime_ = 0.0f;
     emissionTime_ = effect_->GetDuration();
-    emissionRate_ = effect_->GetMaxParticles() / Max(0.01f, effect_->GetParticleLifeSpan());
+}
+
+void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
+{
+    maxParticles = Max(maxParticles, 1);
+    
+    particles_.Resize(maxParticles);
+    vertices_.Reserve(maxParticles * 4);
+
+    numParticles_ = Min(maxParticles, numParticles_);
 }
 
 ParticleEffect2D* ParticleEmitter2D::GetEffect() const
@@ -162,7 +167,7 @@ void ParticleEmitter2D::SetParticleEffectAttr(ResourceRef value)
     SetEffect(cache->GetResource<ParticleEffect2D>(value.name_));
 }
 
-Urho3D::ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
+ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
 {
     return GetResourceRef(effect_, ParticleEffect2D::GetTypeStatic());
 }
@@ -269,8 +274,10 @@ bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAn
     particle.velocity_.x_ = speed * Cos(angle);
     particle.velocity_.y_ = speed * Sin(angle);
 
-    particle.emitRadius_ = worldScale * (effect_->GetMaxRadius() + effect_->GetMaxRadiusVariance() * Random(-1.0f, 1.0f));
-    particle.emitRadiusDelta_ = worldScale * (effect_->GetMinRadius() - effect_->GetMaxRadius()) * invLifespan;
+    float maxRadius = Max(0.0f, worldScale * (effect_->GetMaxRadius() + effect_->GetMaxRadiusVariance() * Random(-1.0f, 1.0f)));
+    float minRadius = Max(0.0f, worldScale * (effect_->GetMinRadius() + effect_->GetMinRadiusVariance() * Random(-1.0f, 1.0f)));
+    particle.emitRadius_ = maxRadius;
+    particle.emitRadiusDelta_ = (minRadius - maxRadius) * invLifespan;
     particle.emitRotation_ = worldAngle + effect_->GetAngle() + effect_->GetAngleVariance() * Random(-1.0f, 1.0f);
     particle.emitRotationDelta_ = effect_->GetRotatePerSecond() + effect_->GetRotatePerSecondVariance() * Random(-1.0f, 1.0f);
     particle.radialAcceleration_ = worldScale * (effect_->GetRadialAcceleration() + effect_->GetRadialAccelVariance() * Random(-1.0f, 1.0f));
@@ -304,11 +311,8 @@ void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep, con
         particle.emitRotation_ += particle.emitRotationDelta_ * timeStep;
         particle.emitRadius_ += particle.emitRadiusDelta_ * timeStep;
 
-        particle.position_.x_ = worldPosition.x_ - Cos(particle.emitRotation_) * particle.emitRadius_;
-        particle.position_.y_ = worldPosition.y_ + Sin(particle.emitRotation_) * particle.emitRadius_;
-
-        if (particle.emitRadius_ < effect_->GetMinRadius() * worldScale)
-            particle.timeToLive_ = 0.0f;
+        particle.position_.x_ = particle.startPos_.x_ - Cos(particle.emitRotation_) * particle.emitRadius_;
+        particle.position_.y_ = particle.startPos_.y_ + Sin(particle.emitRotation_) * particle.emitRadius_;
     }
     else
     {

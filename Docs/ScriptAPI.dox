@@ -327,7 +327,12 @@ namespace Urho3D
 - %ResourceName : String
 
 ### UnknownResourceType
-- %ResourceType : ShortStringHash
+- %ResourceType : StringHash
+
+### ResourceBackgroundLoaded
+- %ResourceName : String
+- %Success : bool
+- %Resource : Resource pointer
 
 ## %Scene events
 
@@ -364,6 +369,8 @@ namespace Urho3D
 - %Progress : float
 - %LoadedNodes : int
 - %TotalNodes : int
+- %LoadedResources : int
+- %TotalResources : int
 
 ### AsyncLoadFinished
 - %Scene : Scene pointer
@@ -1030,6 +1037,7 @@ namespace Urho3D
 
 ### CustomGeometry
 - %Is %Enabled : bool
+- %Dynamic %Vertex %Buffer : bool
 - %Materials : ResourceRefList
 - %Is %Occluder : bool
 - %Can %Be %Occluded : bool
@@ -1323,45 +1331,19 @@ namespace Urho3D
 
 ### ParticleEmitter
 - %Is %Enabled : bool
-- %Material : ResourceRef
-- %Max %Particles : int
-- %Emission %Rate %Min : float
-- %Emission %Rate %Max : float
-- %Emitter %Type : int
-- %Emitter %Size : Vector3
-- %Active %Time : float
-- %Inactive %Time : float
-- %Is %Emitting : bool
-- %Update %When %Invisible : bool
-- %Relative %Position : bool
-- %Relative %Scale : bool
-- %Sort %By %Distance : bool
+- %Effect : ResourceRef
 - %Face %Camera %Mode : int
-- %Time %To %Live %Min : float
-- %Time %To %Live %Max : float
-- %Particle %Size %Min : Vector2
-- %Particle %Size %Max : Vector2
-- %Direction %Min : Vector3
-- %Direction %Max : Vector3
-- %Velocity %Min : float
-- %Velocity %Max : float
-- %Rotation %Min : float
-- %Rotation %Max : float
-- %Rotation %Speed %Min : float
-- %Rotation %Speed %Max : float
-- %Constant %Force : Vector3
-- %Damping %Force : float
-- %Size %Add : float
-- %Size %Mul : float
-- %Particle %Colors : VariantVector
-- %UV %Animation : VariantVector
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Draw %Distance : float
 - %Shadow %Distance : float
 - %Animation %LOD %Bias : float
-- %Period %Timer : float
-- %Emission %Timer : float
+- %Is %Emitting : bool
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
 
 ### ParticleEmitter2D
 - %Particle %Effect : ResourceRef
@@ -1790,6 +1772,9 @@ namespace Urho3D
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
+### TileMap2D
+- %Tmx %File : ResourceRef
+
 ### ToolTip
 - %Name : String
 - %Position : IntVector2
@@ -1970,6 +1955,7 @@ namespace Urho3D
 - %Override %Mode : bool
 - %Ambient %Gradient : bool
 - %Priority : int
+- %Zone %Texture : ResourceRef
 - %Light %Mask : int
 - %Shadow %Mask : int
 - %Zone %Mask : int
@@ -1977,7 +1963,211 @@ namespace Urho3D
 
 \page ScriptAPI Scripting API
 
+\section ScriptAPI_TableOfContents Table of Contents
+\ref ScriptAPI_ClassList "Class list"<br>
+\ref ScriptAPI_Classes "Classes"<br>
+\ref ScriptAPI_Enums "Enumerations"<br>
+\ref ScriptAPI_GlobalFunctions "Global functions"<br>
+\ref ScriptAPI_GlobalProperties "Global properties"<br>
+\ref ScriptAPI_GlobalConstants "Global constants"<br>
+
+\section ScriptAPI_ClassList Class List
+
+<a href="#Class_Animatable"><b>Animatable</b></a>
+<a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
+<a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
+<a href="#Class_Animation"><b>Animation</b></a>
+<a href="#Class_Animation2D"><b>Animation2D</b></a>
+<a href="#Class_AnimationController"><b>AnimationController</b></a>
+<a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
+<a href="#Class_AnimationState"><b>AnimationState</b></a>
+<a href="#Class_AnimationTriggerPoint"><b>AnimationTriggerPoint</b></a>
+<a href="#Class_Array"><b>Array</b></a>
+<a href="#Class_AttributeInfo"><b>AttributeInfo</b></a>
+<a href="#Class_Audio"><b>Audio</b></a>
+<a href="#Class_BiasParameters"><b>BiasParameters</b></a>
+<a href="#Class_Billboard"><b>Billboard</b></a>
+<a href="#Class_BillboardSet"><b>BillboardSet</b></a>
+<a href="#Class_Bone"><b>Bone</b></a>
+<a href="#Class_BorderImage"><b>BorderImage</b></a>
+<a href="#Class_BoundingBox"><b>BoundingBox</b></a>
+<a href="#Class_Button"><b>Button</b></a>
+<a href="#Class_Camera"><b>Camera</b></a>
+<a href="#Class_CascadeParameters"><b>CascadeParameters</b></a>
+<a href="#Class_CheckBox"><b>CheckBox</b></a>
+<a href="#Class_CollisionBox2D"><b>CollisionBox2D</b></a>
+<a href="#Class_CollisionChain2D"><b>CollisionChain2D</b></a>
+<a href="#Class_CollisionCircle2D"><b>CollisionCircle2D</b></a>
+<a href="#Class_CollisionEdge2D"><b>CollisionEdge2D</b></a>
+<a href="#Class_CollisionPolygon2D"><b>CollisionPolygon2D</b></a>
+<a href="#Class_CollisionShape"><b>CollisionShape</b></a>
+<a href="#Class_CollisionShape2D"><b>CollisionShape2D</b></a>
+<a href="#Class_Color"><b>Color</b></a>
+<a href="#Class_ColorFrame"><b>ColorFrame</b></a>
+<a href="#Class_Component"><b>Component</b></a>
+<a href="#Class_Connection"><b>Connection</b></a>
+<a href="#Class_Console"><b>Console</b></a>
+<a href="#Class_Constraint"><b>Constraint</b></a>
+<a href="#Class_Constraint2D"><b>Constraint2D</b></a>
+<a href="#Class_ConstraintDistance2D"><b>ConstraintDistance2D</b></a>
+<a href="#Class_ConstraintFriction2D"><b>ConstraintFriction2D</b></a>
+<a href="#Class_ConstraintGear2D"><b>ConstraintGear2D</b></a>
+<a href="#Class_ConstraintMotor2D"><b>ConstraintMotor2D</b></a>
+<a href="#Class_ConstraintMouse2D"><b>ConstraintMouse2D</b></a>
+<a href="#Class_ConstraintPrismatic2D"><b>ConstraintPrismatic2D</b></a>
+<a href="#Class_ConstraintPulley2D"><b>ConstraintPulley2D</b></a>
+<a href="#Class_ConstraintRevolute2D"><b>ConstraintRevolute2D</b></a>
+<a href="#Class_ConstraintRope2D"><b>ConstraintRope2D</b></a>
+<a href="#Class_ConstraintWeld2D"><b>ConstraintWeld2D</b></a>
+<a href="#Class_ConstraintWheel2D"><b>ConstraintWheel2D</b></a>
+<a href="#Class_Controls"><b>Controls</b></a>
+<a href="#Class_Cursor"><b>Cursor</b></a>
+<a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
+<a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
+<a href="#Class_DebugHud"><b>DebugHud</b></a>
+<a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
+<a href="#Class_DecalSet"><b>DecalSet</b></a>
+<a href="#Class_Deserializer"><b>Deserializer</b></a>
+<a href="#Class_Dictionary"><b>Dictionary</b></a>
+<a href="#Class_DictionaryValue"><b>DictionaryValue</b></a>
+<a href="#Class_Drawable"><b>Drawable</b></a>
+<a href="#Class_Drawable2D"><b>Drawable2D</b></a>
+<a href="#Class_DropDownList"><b>DropDownList</b></a>
+<a href="#Class_Engine"><b>Engine</b></a>
+<a href="#Class_File"><b>File</b></a>
+<a href="#Class_FileSelector"><b>FileSelector</b></a>
+<a href="#Class_FileSystem"><b>FileSystem</b></a>
+<a href="#Class_FocusParameters"><b>FocusParameters</b></a>
+<a href="#Class_Font"><b>Font</b></a>
+<a href="#Class_Frustum"><b>Frustum</b></a>
+<a href="#Class_Graphics"><b>Graphics</b></a>
+<a href="#Class_HttpRequest"><b>HttpRequest</b></a>
+<a href="#Class_Image"><b>Image</b></a>
+<a href="#Class_Input"><b>Input</b></a>
+<a href="#Class_IntRect"><b>IntRect</b></a>
+<a href="#Class_IntVector2"><b>IntVector2</b></a>
+<a href="#Class_JSONFile"><b>JSONFile</b></a>
+<a href="#Class_JSONValue"><b>JSONValue</b></a>
+<a href="#Class_JoystickState"><b>JoystickState</b></a>
+<a href="#Class_Light"><b>Light</b></a>
+<a href="#Class_LineEdit"><b>LineEdit</b></a>
+<a href="#Class_ListView"><b>ListView</b></a>
+<a href="#Class_Log"><b>Log</b></a>
+<a href="#Class_Material"><b>Material</b></a>
+<a href="#Class_Matrix3"><b>Matrix3</b></a>
+<a href="#Class_Matrix3x4"><b>Matrix3x4</b></a>
+<a href="#Class_Matrix4"><b>Matrix4</b></a>
+<a href="#Class_Menu"><b>Menu</b></a>
+<a href="#Class_MessageBox"><b>MessageBox</b></a>
+<a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_Navigable"><b>Navigable</b></a>
+<a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
+<a href="#Class_Network"><b>Network</b></a>
+<a href="#Class_NetworkPriority"><b>NetworkPriority</b></a>
+<a href="#Class_Node"><b>Node</b></a>
+<a href="#Class_Object"><b>Object</b></a>
+<a href="#Class_ObjectAnimation"><b>ObjectAnimation</b></a>
+<a href="#Class_Octree"><b>Octree</b></a>
+<a href="#Class_OffMeshConnection"><b>OffMeshConnection</b></a>
+<a href="#Class_PackageFile"><b>PackageFile</b></a>
+<a href="#Class_ParticleEffect"><b>ParticleEffect</b></a>
+<a href="#Class_ParticleEffect2D"><b>ParticleEffect2D</b></a>
+<a href="#Class_ParticleEmitter"><b>ParticleEmitter</b></a>
+<a href="#Class_ParticleEmitter2D"><b>ParticleEmitter2D</b></a>
+<a href="#Class_Pass"><b>Pass</b></a>
+<a href="#Class_PhysicsRaycastResult"><b>PhysicsRaycastResult</b></a>
+<a href="#Class_PhysicsRaycastResult2D"><b>PhysicsRaycastResult2D</b></a>
+<a href="#Class_PhysicsWorld"><b>PhysicsWorld</b></a>
+<a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
+<a href="#Class_Plane"><b>Plane</b></a>
+<a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
+<a href="#Class_Quaternion"><b>Quaternion</b></a>
+<a href="#Class_Ray"><b>Ray</b></a>
+<a href="#Class_RayQueryResult"><b>RayQueryResult</b></a>
+<a href="#Class_Rect"><b>Rect</b></a>
+<a href="#Class_RefCounted"><b>RefCounted</b></a>
+<a href="#Class_RenderPath"><b>RenderPath</b></a>
+<a href="#Class_RenderPathCommand"><b>RenderPathCommand</b></a>
+<a href="#Class_RenderSurface"><b>RenderSurface</b></a>
+<a href="#Class_RenderTargetInfo"><b>RenderTargetInfo</b></a>
+<a href="#Class_Renderer"><b>Renderer</b></a>
+<a href="#Class_Resource"><b>Resource</b></a>
+<a href="#Class_ResourceCache"><b>ResourceCache</b></a>
+<a href="#Class_ResourceRef"><b>ResourceRef</b></a>
+<a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RigidBody"><b>RigidBody</b></a>
+<a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
+<a href="#Class_Scene"><b>Scene</b></a>
+<a href="#Class_Script"><b>Script</b></a>
+<a href="#Class_ScriptFile"><b>ScriptFile</b></a>
+<a href="#Class_ScriptInstance"><b>ScriptInstance</b></a>
+<a href="#Class_ScriptObject"><b>ScriptObject</b></a>
+<a href="#Class_ScrollBar"><b>ScrollBar</b></a>
+<a href="#Class_ScrollView"><b>ScrollView</b></a>
+<a href="#Class_Serializable"><b>Serializable</b></a>
+<a href="#Class_Serializer"><b>Serializer</b></a>
+<a href="#Class_Skeleton"><b>Skeleton</b></a>
+<a href="#Class_Skybox"><b>Skybox</b></a>
+<a href="#Class_Slider"><b>Slider</b></a>
+<a href="#Class_SmoothedTransform"><b>SmoothedTransform</b></a>
+<a href="#Class_Sound"><b>Sound</b></a>
+<a href="#Class_SoundListener"><b>SoundListener</b></a>
+<a href="#Class_SoundSource"><b>SoundSource</b></a>
+<a href="#Class_SoundSource3D"><b>SoundSource3D</b></a>
+<a href="#Class_Sphere"><b>Sphere</b></a>
+<a href="#Class_Spline"><b>Spline</b></a>
+<a href="#Class_SplinePath"><b>SplinePath</b></a>
+<a href="#Class_Sprite"><b>Sprite</b></a>
+<a href="#Class_Sprite2D"><b>Sprite2D</b></a>
+<a href="#Class_SpriteSheet2D"><b>SpriteSheet2D</b></a>
+<a href="#Class_StaticModel"><b>StaticModel</b></a>
+<a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
+<a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_String"><b>String</b></a>
+<a href="#Class_StringHash"><b>StringHash</b></a>
+<a href="#Class_Technique"><b>Technique</b></a>
+<a href="#Class_TechniqueEntry"><b>TechniqueEntry</b></a>
+<a href="#Class_Terrain"><b>Terrain</b></a>
+<a href="#Class_TerrainPatch"><b>TerrainPatch</b></a>
+<a href="#Class_Text"><b>Text</b></a>
+<a href="#Class_Text3D"><b>Text3D</b></a>
+<a href="#Class_Texture"><b>Texture</b></a>
+<a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture3D"><b>Texture3D</b></a>
+<a href="#Class_TextureCube"><b>TextureCube</b></a>
+<a href="#Class_TextureFrame"><b>TextureFrame</b></a>
+<a href="#Class_Tile2D"><b>Tile2D</b></a>
+<a href="#Class_TileMap2D"><b>TileMap2D</b></a>
+<a href="#Class_TileMapInfo2D"><b>TileMapInfo2D</b></a>
+<a href="#Class_TileMapLayer2D"><b>TileMapLayer2D</b></a>
+<a href="#Class_TileMapObject2D"><b>TileMapObject2D</b></a>
+<a href="#Class_Time"><b>Time</b></a>
+<a href="#Class_Timer"><b>Timer</b></a>
+<a href="#Class_TmxFile2D"><b>TmxFile2D</b></a>
+<a href="#Class_ToolTip"><b>ToolTip</b></a>
+<a href="#Class_TouchState"><b>TouchState</b></a>
+<a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
+<a href="#Class_Variant"><b>Variant</b></a>
+<a href="#Class_VariantMap"><b>VariantMap</b></a>
+<a href="#Class_Vector2"><b>Vector2</b></a>
+<a href="#Class_Vector3"><b>Vector3</b></a>
+<a href="#Class_Vector4"><b>Vector4</b></a>
+<a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
+<a href="#Class_View3D"><b>View3D</b></a>
+<a href="#Class_Viewport"><b>Viewport</b></a>
+<a href="#Class_WeakHandle"><b>WeakHandle</b></a>
+<a href="#Class_Window"><b>Window</b></a>
+<a href="#Class_XMLElement"><b>XMLElement</b></a>
+<a href="#Class_XMLFile"><b>XMLFile</b></a>
+<a href="#Class_XPathQuery"><b>XPathQuery</b></a>
+<a href="#Class_XPathResultSet"><b>XPathResultSet</b></a>
+<a href="#Class_Zone"><b>Zone</b></a>
+
 \section ScriptAPI_Classes Classes
+<a name="Class_Animatable"></a>
 
 ### Animatable
 
@@ -2010,16 +2200,17 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimatedModel"></a>
 
 ### AnimatedModel
 
@@ -2069,7 +2260,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -2099,7 +2290,7 @@ Properties:
 - uint shadowMask
 - Skeleton@ skeleton // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool updateInvisible
 - uint viewMask
@@ -2108,6 +2299,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_AnimatedSprite2D"></a>
 
 ### AnimatedSprite2D
 
@@ -2148,7 +2340,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -2177,13 +2369,14 @@ Properties:
 - uint shadowMask
 - float speed
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Animation"></a>
 
 ### Animation
 
@@ -2201,7 +2394,7 @@ Methods:
 Properties:
 
 - String animationName // readonly
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - float length // readonly
 - uint memoryUse // readonly
@@ -2210,11 +2403,12 @@ Properties:
 - uint numTriggers
 - int refs // readonly
 - AnimationTriggerPoint@[] triggers // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Animation2D"></a>
 
 ### Animation2D
 
@@ -2226,6 +2420,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationController"></a>
 
 ### AnimationController
 
@@ -2288,7 +2483,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -2298,10 +2493,11 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationSet2D"></a>
 
 ### AnimationSet2D
 
@@ -2317,17 +2513,18 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - uint numAnimations // readonly
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationState"></a>
 
 ### AnimationState
 
@@ -2360,6 +2557,7 @@ Properties:
 - int weakRefs // readonly
 - float weight
 
+<a name="Class_AnimationTriggerPoint"></a>
 
 ### AnimationTriggerPoint
 
@@ -2368,6 +2566,7 @@ Properties:
 - Variant data
 - float time
 
+<a name="Class_Array"></a>
 
 ### Array
 
@@ -2377,9 +2576,12 @@ Methods:
 - void Erase(uint)
 - int Find(const T&) const
 - int Find(uint, const T&) const
+- int FindByRef(const T&) const
+- int FindByRef(uint, const T&) const
 - void Insert(uint, const T&)
 - void Pop()
 - void Push(const T&)
+- void Reserve(uint)
 - void Resize(uint)
 - void Reverse()
 - void Sort()
@@ -2392,6 +2594,7 @@ Properties:
 - bool empty // readonly
 - uint length
 
+<a name="Class_AttributeInfo"></a>
 
 ### AttributeInfo
 
@@ -2403,6 +2606,7 @@ Properties:
 - String name
 - VariantType type
 
+<a name="Class_Audio"></a>
 
 ### Audio
 
@@ -2415,7 +2619,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool initialized // readonly
 - bool interpolation // readonly
@@ -2426,10 +2630,11 @@ Properties:
 - int refs // readonly
 - uint sampleSize // readonly
 - bool stereo // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_BiasParameters"></a>
 
 ### BiasParameters
 
@@ -2438,6 +2643,7 @@ Properties:
 - float constantBias
 - float slopeScaledBias
 
+<a name="Class_Billboard"></a>
 
 ### Billboard
 
@@ -2450,6 +2656,7 @@ Properties:
 - Vector2 size
 - Rect uv
 
+<a name="Class_BillboardSet"></a>
 
 ### BillboardSet
 
@@ -2487,7 +2694,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -2515,7 +2722,7 @@ Properties:
 - uint shadowMask
 - bool sorted
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
@@ -2523,6 +2730,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_Bone"></a>
 
 ### Bone
 
@@ -2537,6 +2745,7 @@ Properties:
 - Node@ node
 - float radius
 
+<a name="Class_BorderImage"></a>
 
 ### BorderImage
 
@@ -2555,8 +2764,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -2606,7 +2815,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -2614,7 +2823,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -2678,7 +2887,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -2687,6 +2896,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_BoundingBox"></a>
 
 ### BoundingBox
 
@@ -2725,6 +2935,7 @@ Properties:
 - Vector3 min
 - Vector3 size // readonly
 
+<a name="Class_Button"></a>
 
 ### Button
 
@@ -2743,8 +2954,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -2797,7 +3008,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -2805,7 +3016,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -2874,7 +3085,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -2883,6 +3094,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Camera"></a>
 
 ### Camera
 
@@ -2926,7 +3138,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoAspectRatio
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Plane clipPlane
 - Matrix3x4 effectiveWorldTransform // readonly
@@ -2950,7 +3162,7 @@ Properties:
 - Plane reflectionPlane
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useClipping
 - bool useReflection
@@ -2961,6 +3173,7 @@ Properties:
 - int weakRefs // readonly
 - float zoom
 
+<a name="Class_CascadeParameters"></a>
 
 ### CascadeParameters
 
@@ -2973,6 +3186,7 @@ Properties:
 - float split3
 - float split4
 
+<a name="Class_CheckBox"></a>
 
 ### CheckBox
 
@@ -2991,8 +3205,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -3043,7 +3257,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -3051,7 +3265,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3117,7 +3331,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -3126,6 +3340,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_CollisionBox2D"></a>
 
 ### CollisionBox2D
 
@@ -3163,7 +3378,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - Vector2 center
@@ -3185,10 +3400,11 @@ Properties:
 - Vector2 size
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_CollisionChain2D"></a>
 
 ### CollisionChain2D
 
@@ -3227,7 +3443,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3248,11 +3464,12 @@ Properties:
 - float restitution
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint vertexCount
 - int weakRefs // readonly
 
+<a name="Class_CollisionCircle2D"></a>
 
 ### CollisionCircle2D
 
@@ -3288,7 +3505,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - Vector2 center
@@ -3310,10 +3527,11 @@ Properties:
 - float restitution
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_CollisionEdge2D"></a>
 
 ### CollisionEdge2D
 
@@ -3349,7 +3567,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3369,12 +3587,13 @@ Properties:
 - float restitution
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - Vector2 vertex1
 - Vector2 vertex2
 - int weakRefs // readonly
 
+<a name="Class_CollisionPolygon2D"></a>
 
 ### CollisionPolygon2D
 
@@ -3413,7 +3632,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3433,11 +3652,12 @@ Properties:
 - float restitution
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint vertexCount
 - int weakRefs // readonly
 
+<a name="Class_CollisionShape"></a>
 
 ### CollisionShape
 
@@ -3484,7 +3704,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -3501,11 +3721,12 @@ Properties:
 - ShapeType shapeType
 - Vector3 size
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 
+<a name="Class_CollisionShape2D"></a>
 
 ### CollisionShape2D
 
@@ -3540,7 +3761,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3560,10 +3781,11 @@ Properties:
 - float restitution
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Color"></a>
 
 ### Color
 
@@ -3603,6 +3825,7 @@ Properties:
 - Vector3 rgb // readonly
 - Vector4 rgba // readonly
 
+<a name="Class_ColorFrame"></a>
 
 ### ColorFrame
 
@@ -3611,6 +3834,7 @@ Properties:
 - Color color
 - float time
 
+<a name="Class_Component"></a>
 
 ### Component
 
@@ -3645,7 +3869,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -3655,10 +3879,11 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Connection"></a>
 
 ### Connection
 
@@ -3674,7 +3899,7 @@ Methods:
 Properties:
 
 - String address // readonly
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool client // readonly
 - bool connectPending // readonly
@@ -3688,12 +3913,14 @@ Properties:
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
+- Quaternion rotation
 - Scene@ scene
 - bool sceneLoaded // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Console"></a>
 
 ### Console
 
@@ -3708,7 +3935,7 @@ Properties:
 
 - bool autoVisibleOnError
 - BorderImage@ background // readonly
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Button@ closeButton // readonly
 - String commandInterpreter
@@ -3721,11 +3948,12 @@ Properties:
 - uint numHistoryRows
 - uint numRows
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool visible
 - int weakRefs // readonly
 
+<a name="Class_Constraint"></a>
 
 ### Constraint
 
@@ -3761,7 +3989,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector3 axis // writeonly
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - float cfm
 - ConstraintType constraintType
@@ -3784,11 +4012,12 @@ Properties:
 - int refs // readonly
 - Quaternion rotation
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 - Vector3 worldPosition
 
+<a name="Class_Constraint2D"></a>
 
 ### Constraint2D
 
@@ -3823,7 +4052,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -3836,10 +4065,11 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintDistance2D"></a>
 
 ### ConstraintDistance2D
 
@@ -3874,7 +4104,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -3891,10 +4121,11 @@ Properties:
 - Vector2 ownerBodyAnchor
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintFriction2D"></a>
 
 ### ConstraintFriction2D
 
@@ -3930,7 +4161,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -3945,10 +4176,11 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintGear2D"></a>
 
 ### ConstraintGear2D
 
@@ -3983,7 +4215,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -3999,10 +4231,11 @@ Properties:
 - float ratio
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintMotor2D"></a>
 
 ### ConstraintMotor2D
 
@@ -4038,7 +4271,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float correctionFactor
@@ -4055,10 +4288,11 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintMouse2D"></a>
 
 ### ConstraintMouse2D
 
@@ -4093,7 +4327,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4110,10 +4344,11 @@ Properties:
 - int refs // readonly
 - Vector2 target
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintPrismatic2D"></a>
 
 ### ConstraintPrismatic2D
 
@@ -4150,7 +4385,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector2 axis
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enableLimit
@@ -4168,11 +4403,12 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - float upperTranslation
 - int weakRefs // readonly
 
+<a name="Class_ConstraintPulley2D"></a>
 
 ### ConstraintPulley2D
 
@@ -4207,7 +4443,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4225,10 +4461,11 @@ Properties:
 - float ratio
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintRevolute2D"></a>
 
 ### ConstraintRevolute2D
 
@@ -4264,7 +4501,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enableLimit
@@ -4282,11 +4519,12 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - float upperAngle
 - int weakRefs // readonly
 
+<a name="Class_ConstraintRope2D"></a>
 
 ### ConstraintRope2D
 
@@ -4321,7 +4559,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4337,10 +4575,11 @@ Properties:
 - Vector2 ownerBodyAnchor
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintWeld2D"></a>
 
 ### ConstraintWeld2D
 
@@ -4376,7 +4615,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4391,10 +4630,11 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ConstraintWheel2D"></a>
 
 ### ConstraintWheel2D
 
@@ -4431,7 +4671,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector2 axis
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4449,10 +4689,11 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Controls"></a>
 
 ### Controls
 
@@ -4470,6 +4711,7 @@ Properties:
 - float pitch
 - float yaw
 
+<a name="Class_Cursor"></a>
 
 ### Cursor
 
@@ -4489,8 +4731,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -4540,7 +4782,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -4548,7 +4790,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -4613,7 +4855,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - bool useSystemShapes
@@ -4623,6 +4865,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_CustomGeometry"></a>
 
 ### CustomGeometry
 
@@ -4633,6 +4876,7 @@ Methods:
 - void Clear()
 - void Commit()
 - void DefineColor(const Color&)
+- void DefineGeometry(uint, PrimitiveType, uint, bool, bool, bool, bool)
 - void DefineNormal(const Vector3&)
 - void DefineTangent(const Vector4&)
 - void DefineTexCoord(const Vector2&)
@@ -4643,6 +4887,7 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- CustomGeometryVertex@ GetVertex(uint, uint)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -4666,11 +4911,12 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
 - float drawDistance
+- bool dynamic
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -4683,6 +4929,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numGeometries
+- uint[] numVertices // readonly
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
@@ -4690,7 +4937,7 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
@@ -4698,6 +4945,19 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_CustomGeometryVertex"></a>
+
+### CustomGeometryVertex
+
+Properties:
+
+- uint color
+- Vector3 normal
+- Vector3 position
+- Vector4 tangent
+- Vector2 texCoord
+
+<a name="Class_DebugHud"></a>
 
 ### DebugHud
 
@@ -4713,7 +4973,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - XMLFile@ defaultStyle
 - uint mode
@@ -4723,11 +4983,12 @@ Properties:
 - Text@ profilerText // readonly
 - int refs // readonly
 - Text@ statsText // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useRendererStats
 - int weakRefs // readonly
 
+<a name="Class_DebugRenderer"></a>
 
 ### DebugRenderer
 
@@ -4770,7 +5031,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -4780,10 +5041,11 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_DecalSet"></a>
 
 ### DecalSet
 
@@ -4822,7 +5084,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -4849,7 +5111,7 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
@@ -4857,6 +5119,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_Deserializer"></a>
 
 ### Deserializer
 
@@ -4881,7 +5144,6 @@ Methods:
 - Vector3 ReadPackedVector3(float)
 - Quaternion ReadQuaternion()
 - int16 ReadShort()
-- ShortStringHash ReadShortStringHash()
 - String ReadString()
 - StringHash ReadStringHash()
 - uint8 ReadUByte()
@@ -4903,6 +5165,7 @@ Properties:
 - uint position // readonly
 - uint size // readonly
 
+<a name="Class_Dictionary"></a>
 
 ### Dictionary
 
@@ -4914,9 +5177,9 @@ Methods:
 - bool Get(const String&, ?&) const
 - bool Get(const String&, double&) const
 - bool Get(const String&, int64&) const
-- void Set(const String&, ?&)
-- void Set(const String&, double&)
-- void Set(const String&, int64&)
+- void Set(const String&, const ?&)
+- void Set(const String&, const double&)
+- void Set(const String&, const int64&)
 
 Properties:
 
@@ -4924,6 +5187,11 @@ Properties:
 - String[]@ keys // readonly
 - uint length // readonly
 
+<a name="Class_DictionaryValue"></a>
+
+### DictionaryValue
+
+<a name="Class_Drawable"></a>
 
 ### Drawable
 
@@ -4959,7 +5227,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -4980,13 +5248,14 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Drawable2D"></a>
 
 ### Drawable2D
 
@@ -5022,7 +5291,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -5048,13 +5317,14 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_DropDownList"></a>
 
 ### DropDownList
 
@@ -5074,8 +5344,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - UIElement@[]@ GetItems() const
@@ -5134,7 +5404,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 - UIElement@ getPopup() const
 
 Properties:
@@ -5145,7 +5415,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -5223,7 +5493,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -5232,6 +5502,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Engine"></a>
 
 ### Engine
 
@@ -5241,7 +5512,7 @@ Methods:
 - DebugHud@ CreateDebugHud()
 - void DumpMemory()
 - void DumpProfiler()
-- void DumpResources()
+- void DumpResources(bool = false)
 - void Exit()
 - void RunFrame()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -5249,7 +5520,7 @@ Methods:
 Properties:
 
 - bool autoExit
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool exiting // readonly
 - bool headless // readonly
@@ -5260,10 +5531,11 @@ Properties:
 - bool pauseMinimized
 - int refs // readonly
 - int timeStepSmoothing
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_File"></a>
 
 ### File
 
@@ -5290,7 +5562,6 @@ Methods:
 - Vector3 ReadPackedVector3(float)
 - Quaternion ReadQuaternion()
 - int16 ReadShort()
-- ShortStringHash ReadShortStringHash()
 - String ReadString()
 - StringHash ReadStringHash()
 - uint8 ReadUByte()
@@ -5323,7 +5594,6 @@ Methods:
 - bool WritePackedVector3(const Vector3&, float)
 - bool WriteQuaternion(const Quaternion&)
 - bool WriteShort(int16)
-- bool WriteShortStringHash(const ShortStringHash&)
 - bool WriteString(const String&)
 - bool WriteStringHash(const StringHash&)
 - bool WriteUByte(uint8)
@@ -5338,7 +5608,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - bool eof // readonly
@@ -5349,10 +5619,11 @@ Properties:
 - uint position // readonly
 - int refs // readonly
 - uint size // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_FileSelector"></a>
 
 ### FileSelector
 
@@ -5365,7 +5636,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Button@ cancelButton // readonly
 - String category // readonly
 - XMLFile@ defaultStyle
@@ -5382,11 +5653,12 @@ Properties:
 - int refs // readonly
 - String title
 - Text@ titleText // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 - Window@ window // readonly
 
+<a name="Class_FileSystem"></a>
 
 ### FileSystem
 
@@ -5410,17 +5682,18 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - String currentDir
 - bool executeConsoleCommands
 - String programDir // readonly
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - String userDocumentsDir // readonly
 - int weakRefs // readonly
 
+<a name="Class_FocusParameters"></a>
 
 ### FocusParameters
 
@@ -5432,6 +5705,7 @@ Properties:
 - bool nonUniform
 - float quantize
 
+<a name="Class_Font"></a>
 
 ### Font
 
@@ -5448,16 +5722,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Frustum"></a>
 
 ### Frustum
 
@@ -5480,6 +5755,7 @@ Properties:
 
 - Vector3[] vertices // readonly
 
+<a name="Class_Graphics"></a>
 
 ### Graphics
 
@@ -5501,7 +5777,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool borderless // readonly
 - String category // readonly
 - bool deferredSupport // readonly
@@ -5528,7 +5804,7 @@ Properties:
 - bool sRGBWriteSupport // readonly
 - bool sm3Support // readonly
 - bool tripleBuffer // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool vsync // readonly
 - int weakRefs // readonly
@@ -5537,6 +5813,7 @@ Properties:
 - IntVector2 windowPosition
 - String windowTitle
 
+<a name="Class_HttpRequest"></a>
 
 ### HttpRequest
 
@@ -5561,7 +5838,6 @@ Methods:
 - Vector3 ReadPackedVector3(float)
 - Quaternion ReadQuaternion()
 - int16 ReadShort()
-- ShortStringHash ReadShortStringHash()
 - String ReadString()
 - StringHash ReadStringHash()
 - uint8 ReadUByte()
@@ -5591,16 +5867,20 @@ Properties:
 - String verb // readonly
 - int weakRefs // readonly
 
+<a name="Class_Image"></a>
 
 ### Image
 
 Methods:
 
 - void Clear(const Color&)
+- void ClearInt(uint)
 - void FlipVertical()
 - Color GetPixel(int, int) const
 - Color GetPixel(int, int, int) const
 - Color GetPixelBilinear(float, float) const
+- uint GetPixelInt(int, int) const
+- uint GetPixelInt(int, int, int) const
 - Color GetPixelTrilinear(float, float, float) const
 - Image@ GetSubimage(const IntRect&) const
 - bool Load(File@)
@@ -5617,12 +5897,14 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetPixel(int, int, const Color&)
 - void SetPixel(int, int, int, const Color&)
+- void SetPixelInt(int, int, int, uint)
+- void SetPixelInt(int, int, uint)
 - bool SetSize(int, int, int, uint)
 - bool SetSize(int, int, uint)
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint components // readonly
 - bool compressed // readonly
@@ -5631,12 +5913,13 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Input"></a>
 
 ### Input
 
@@ -5663,7 +5946,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool focus // readonly
 - JoystickState@[] joysticks // readonly
@@ -5694,10 +5977,11 @@ Properties:
 - bool toggleFullscreen
 - bool touchEmulation
 - TouchState@[] touches // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_IntRect"></a>
 
 ### IntRect
 
@@ -5716,6 +6000,7 @@ Properties:
 - int top
 - int width // readonly
 
+<a name="Class_IntVector2"></a>
 
 ### IntVector2
 
@@ -5729,6 +6014,7 @@ Properties:
 - int x
 - int y
 
+<a name="Class_JSONFile"></a>
 
 ### JSONFile
 
@@ -5744,16 +6030,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_JSONValue"></a>
 
 ### JSONValue
 
@@ -5809,6 +6096,7 @@ Methods:
 - ResourceRefList GetResourceRefList(uint) const
 - String GetString(const String&) const
 - String GetString(uint) const
+- String[]@ GetValueNames() const
 - Variant GetVariant(const String&) const
 - Variant GetVariant(uint) const
 - Variant GetVariantValue(const String&, VariantType) const
@@ -5849,6 +6137,7 @@ Properties:
 - bool notNull // readonly
 - uint size // readonly
 
+<a name="Class_JoystickState"></a>
 
 ### JoystickState
 
@@ -5865,6 +6154,7 @@ Properties:
 - uint numButtons // readonly
 - uint numHats // readonly
 
+<a name="Class_Light"></a>
 
 ### Light
 
@@ -5901,7 +6191,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - float brightness
 - bool castShadows
@@ -5944,13 +6234,14 @@ Properties:
 - Texture@ shapeTexture
 - float specularIntensity
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_LineEdit"></a>
 
 ### LineEdit
 
@@ -5969,8 +6260,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -6020,7 +6311,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -6028,7 +6319,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -6102,7 +6393,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -6111,6 +6402,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_ListView"></a>
 
 ### ListView
 
@@ -6136,8 +6428,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - UIElement@[]@ GetItems() const
@@ -6198,7 +6490,7 @@ Methods:
 - void ToggleExpand(uint, bool = false)
 - void ToggleSelection(uint)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -6207,7 +6499,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - int baseIndent
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -6281,7 +6573,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -6292,6 +6584,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Log"></a>
 
 ### Log
 
@@ -6308,17 +6601,18 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - String lastMessage // readonly
 - int level
 - bool quiet
 - int refs // readonly
 - bool timeStamp
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Material"></a>
 
 ### Material
 
@@ -6346,7 +6640,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - CullMode cullMode
 - BiasParameters depthBias
@@ -6361,11 +6655,12 @@ Properties:
 - TechniqueEntry[] techniqueEntries // readonly
 - Technique@[] techniques // readonly
 - Texture@[] textures
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Matrix3"></a>
 
 ### Matrix3
 
@@ -6392,6 +6687,7 @@ Properties:
 - float m21
 - float m22
 
+<a name="Class_Matrix3x4"></a>
 
 ### Matrix3x4
 
@@ -6427,6 +6723,7 @@ Properties:
 - float m22
 - float m23
 
+<a name="Class_Matrix4"></a>
 
 ### Matrix4
 
@@ -6466,6 +6763,7 @@ Properties:
 - float m32
 - float m33
 
+<a name="Class_Menu"></a>
 
 ### Menu
 
@@ -6484,8 +6782,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -6540,7 +6838,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -6550,7 +6848,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -6622,7 +6920,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -6631,6 +6929,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_MessageBox"></a>
 
 ### MessageBox
 
@@ -6640,21 +6939,23 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - String message
 - int refs // readonly
 - String title
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 - UIElement@ window // readonly
 
+<a name="Class_Model"></a>
 
 ### Model
 
 Methods:
 
+- Model@ Clone(const String& = String ( )) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -6663,7 +6964,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - String category // readonly
 - uint memoryUse // readonly
@@ -6673,11 +6974,12 @@ Properties:
 - uint numMorphs // readonly
 - int refs // readonly
 - Skeleton@ skeleton // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Navigable"></a>
 
 ### Navigable
 
@@ -6712,7 +7014,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -6723,10 +7025,11 @@ Properties:
 - bool recursive
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_NavigationMesh"></a>
 
 ### NavigationMesh
 
@@ -6775,7 +7078,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - String category // readonly
 - float cellHeight
@@ -6798,11 +7101,12 @@ Properties:
 - float regionMinSize
 - bool temporary
 - int tileSize
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 
+<a name="Class_Network"></a>
 
 ### Network
 
@@ -6825,18 +7129,19 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Connection@[]@ clientConnections // readonly
 - String packageCacheDir
 - int refs // readonly
 - Connection@ serverConnection // readonly
 - bool serverRunning // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int updateFps
 - int weakRefs // readonly
 
+<a name="Class_NetworkPriority"></a>
 
 ### NetworkPriority
 
@@ -6873,7 +7178,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - float basePriority
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - float distanceFactor
 - bool enabled
@@ -6885,10 +7190,11 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Node"></a>
 
 ### Node
 
@@ -6986,7 +7292,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Node@[] children // readonly
 - Component@[] components // readonly
@@ -7013,7 +7319,7 @@ Properties:
 - ScriptObject@ scriptObject // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - Vector3 up // readonly
 - VariantMap vars // readonly
@@ -7029,6 +7335,7 @@ Properties:
 - Matrix3x4 worldTransform // readonly
 - Vector3 worldUp // readonly
 
+<a name="Class_Object"></a>
 
 ### Object
 
@@ -7038,13 +7345,14 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ObjectAnimation"></a>
 
 ### ObjectAnimation
 
@@ -7065,18 +7373,19 @@ Methods:
 Properties:
 
 - Variant[] attributeAnimations // readonly
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
 - Variant[] speeds // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 - Variant[] wrapModes // readonly
 
+<a name="Class_Octree"></a>
 
 ### Octree
 
@@ -7121,7 +7430,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -7132,11 +7441,12 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 
+<a name="Class_OffMeshConnection"></a>
 
 ### OffMeshConnection
 
@@ -7171,7 +7481,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bidirectional
 - String category // readonly
 - bool enabled
@@ -7184,10 +7494,11 @@ Properties:
 - float radius
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_PackageFile"></a>
 
 ### PackageFile
 
@@ -7201,17 +7512,77 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - String name // readonly
 - uint numFiles // readonly
 - int refs // readonly
 - uint totalSize // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ParticleEffect"></a>
+
+### ParticleEffect
+
+Methods:
+
+- ColorFrame@ GetColorFrame(uint) const
+- TextureFrame@ GetTextureFrame(uint) const
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetColorFrame(uint, ColorFrame@) const
+- void SetTextureFrame(uint, TextureFrame@) const
+
+Properties:
+
+- float activeTime
+- float animationLodBias
+- StringHash baseType // readonly
+- String category // readonly
+- Vector3 constantForce
+- float dampingForce
+- Vector3 emitterSize
+- EmitterType emitterType
+- float inactiveTime
+- Material@ material
+- Vector3 maxDirection
+- float maxEmissionRate
+- Vector3 maxParticleSize
+- float maxRotation
+- float maxRotationSpeed
+- float maxTimeToLive
+- float maxVelocity
+- uint memoryUse // readonly
+- Vector3 minDirection
+- float minEmissionRate
+- Vector2 minParticleSize
+- float minRotation
+- float minRotationSpeed
+- float minTimeToLive
+- float minVelocity
+- String name
+- uint numColorFrames // readonly
+- uint numParticles
+- uint numTextureFrames // readonly
+- int refs // readonly
+- bool relative
+- bool scaled
+- float sizeAdd
+- float sizeMul
+- bool sorted
+- StringHash type // readonly
+- String typeName // readonly
+- bool updateInvisible
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+<a name="Class_ParticleEffect2D"></a>
 
 ### ParticleEffect2D
 
@@ -7225,22 +7596,25 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ParticleEmitter"></a>
 
 ### ParticleEmitter
 
 Methods:
 
 - void ApplyAttributes()
+- void ApplyEffect()
+- void Commit()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
@@ -7250,7 +7624,6 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
-- bool Load(XMLFile@)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -7261,91 +7634,60 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool Save(XMLFile@)
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetColor(const Color&)
 
 Properties:
 
-- float activeTime
 - bool animationEnabled
 - float animationLodBias
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
+- Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
-- ColorFrame@[] colors // readonly
-- Vector3 constantForce
-- float dampingForce
 - float drawDistance
-- float emissionRate // writeonly
-- Vector3 emitterSize
-- EmitterType emitterType
+- ParticleEffect@ effect
 - bool emitting
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
 - uint id // readonly
 - bool inView // readonly
-- float inactiveTime
 - uint lightMask
 - float lodBias
 - Material@ material
-- Vector3 maxDirection
-- float maxEmissionRate
 - uint maxLights
-- Vector3 maxParticleSize
-- float maxRotation
-- float maxRotationSpeed
-- float maxTimeToLive
-- float maxVelocity
-- Vector3 minDirection
-- float minEmissionRate
-- Vector2 minParticleSize
-- float minRotation
-- float minRotationSpeed
-- float minTimeToLive
-- float minVelocity
 - Node@ node // readonly
 - uint numAttributes // readonly
-- uint numColors
+- uint numBillboards
 - uint numParticles
-- uint numTextureFrames
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
-- Vector2 particleSize // writeonly
 - int refs // readonly
 - bool relative
-- float rotation // writeonly
-- float rotationSpeed // writeonly
 - bool scaled
 - float shadowDistance
 - uint shadowMask
-- float sizeAdd
-- float sizeMul
 - bool sorted
 - bool temporary
-- TextureFrame@[] textureFrames // readonly
-- float timeToLive // writeonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
-- bool updateInvisible
-- float velocity // writeonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_ParticleEmitter2D"></a>
 
 ### ParticleEmitter2D
 
@@ -7381,7 +7723,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -7408,13 +7750,14 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Pass"></a>
 
 ### Pass
 
@@ -7433,6 +7776,7 @@ Properties:
 - String vertexShaderDefines
 - int weakRefs // readonly
 
+<a name="Class_PhysicsRaycastResult"></a>
 
 ### PhysicsRaycastResult
 
@@ -7443,6 +7787,7 @@ Properties:
 - Vector3 normal
 - Vector3 position
 
+<a name="Class_PhysicsRaycastResult2D"></a>
 
 ### PhysicsRaycastResult2D
 
@@ -7453,12 +7798,14 @@ Properties:
 - Vector2 normal
 - Vector2 position
 
+<a name="Class_PhysicsWorld"></a>
 
 ### PhysicsWorld
 
 Methods:
 
 - void ApplyAttributes()
+- PhysicsRaycastResult ConvexCast(CollisionShape@, const Vector3&, const Quaternion&, const Vector3&, const Quaternion&, uint = 0xffff)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Variant GetAttribute(const String&) const
@@ -7497,7 +7844,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -7513,10 +7860,11 @@ Properties:
 - int refs // readonly
 - bool splitImpulse
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_PhysicsWorld2D"></a>
 
 ### PhysicsWorld2D
 
@@ -7532,7 +7880,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - RigidBody2D@[]@ GetRigidBodies(const Rect&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
-- RigidBody2D@ GetRigidBody(int, int, uint = 0xffff, Camera@ = 0)
+- RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -7559,7 +7907,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoClearForces
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool continuousPhysics
 - bool drawAabb
@@ -7578,12 +7926,13 @@ Properties:
 - int refs // readonly
 - bool subStepping
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint velocityIterations
 - bool warmStarting
 - int weakRefs // readonly
 
+<a name="Class_Plane"></a>
 
 ### Plane
 
@@ -7610,6 +7959,7 @@ Properties:
 - Vector3 normal
 - Matrix3x4 reflectionMatrix // readonly
 
+<a name="Class_Polyhedron"></a>
 
 ### Polyhedron
 
@@ -7633,6 +7983,21 @@ Properties:
 - Vector3[]@[] face // readonly
 - uint numFaces // readonly
 
+<a name="Class_PropertySet2D"></a>
+
+### PropertySet2D
+
+Methods:
+
+- bool HasProperty(const String&) const
+- const String& GetProperty(const String&) const
+
+Properties:
+
+- int refs // readonly
+- int weakRefs // readonly
+
+<a name="Class_Quaternion"></a>
 
 ### Quaternion
 
@@ -7664,6 +8029,7 @@ Properties:
 - float yaw // readonly
 - float z
 
+<a name="Class_Ray"></a>
 
 ### Ray
 
@@ -7684,6 +8050,7 @@ Properties:
 - Vector3 direction
 - Vector3 origin
 
+<a name="Class_RayQueryResult"></a>
 
 ### RayQueryResult
 
@@ -7696,6 +8063,7 @@ Properties:
 - Vector3 position
 - uint subObject
 
+<a name="Class_Rect"></a>
 
 ### Rect
 
@@ -7724,6 +8092,7 @@ Properties:
 - Vector2 size // readonly
 - float top
 
+<a name="Class_RefCounted"></a>
 
 ### RefCounted
 
@@ -7732,6 +8101,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_RenderPath"></a>
 
 ### RenderPath
 
@@ -7761,6 +8131,7 @@ Properties:
 - Variant[] shaderParameters
 - int weakRefs // readonly
 
+<a name="Class_RenderPathCommand"></a>
 
 ### RenderPathCommand
 
@@ -7793,6 +8164,7 @@ Properties:
 - String vertexShaderDefines
 - String vertexShaderName
 
+<a name="Class_RenderSurface"></a>
 
 ### RenderSurface
 
@@ -7812,6 +8184,7 @@ Properties:
 - Viewport@[] viewports
 - int width // readonly
 
+<a name="Class_RenderTargetInfo"></a>
 
 ### RenderTargetInfo
 
@@ -7827,6 +8200,7 @@ Properties:
 - RenderTargetSizeMode sizeMode
 - String tag
 
+<a name="Class_Renderer"></a>
 
 ### Renderer
 
@@ -7839,7 +8213,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Material@ defaultLightRamp // readonly
 - Material@ defaultLightSpot // readonly
@@ -7875,11 +8249,12 @@ Properties:
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
 - int textureQuality
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - Viewport@[] viewports
 - int weakRefs // readonly
 
+<a name="Class_Resource"></a>
 
 ### Resource
 
@@ -7893,16 +8268,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ResourceCache"></a>
 
 ### ResourceCache
 
@@ -7911,15 +8287,16 @@ Methods:
 - bool AddManualResource(Resource@)
 - void AddPackageFile(PackageFile@, uint = M_MAX_UNSIGNED)
 - bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED)
+- bool BackgroundLoadResource(const String&, const String&, bool = true)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&) const
-- Resource@ GetResource(ShortStringHash, const String&, bool = true)
+- Resource@ GetResource(StringHash, const String&, bool = true)
 - Resource@ GetResource(const String&, const String&, bool = true)
 - String GetResourceFileName(const String&) const
 - void ReleaseAllResources(bool = false)
 - void ReleaseResource(const String&, const String&, bool = false)
-- void ReleaseResources(ShortStringHash, bool = false)
+- void ReleaseResources(StringHash, bool = false)
 - void ReleaseResources(const String&, bool = false)
 - void ReleaseResources(const String&, const String&, bool = false)
 - bool ReloadResource(Resource@)
@@ -7933,10 +8310,12 @@ Methods:
 Properties:
 
 - bool autoReloadResources
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
+- int finishBackgroundResourcesMs
 - uint[] memoryBudget
 - uint[] memoryUse // readonly
+- uint numBackgroundLoadResources // readonly
 - PackageFile@[]@ packageFiles // readonly
 - int refs // readonly
 - String[]@ resourceDirs // readonly
@@ -7944,18 +8323,20 @@ Properties:
 - bool seachPackagesFirst // readonly
 - bool searchPackagesFirst // writeonly
 - uint totalMemoryUse // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ResourceRef"></a>
 
 ### ResourceRef
 
 Properties:
 
 - String name
-- ShortStringHash type
+- StringHash type
 
+<a name="Class_ResourceRefList"></a>
 
 ### ResourceRefList
 
@@ -7968,8 +8349,9 @@ Properties:
 - bool empty // readonly
 - uint length // readonly
 - String[] names
-- ShortStringHash type
+- StringHash type
 
+<a name="Class_RigidBody"></a>
 
 ### RigidBody
 
@@ -8022,7 +8404,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - float ccdMotionThreshold
 - float ccdRadius
@@ -8053,11 +8435,12 @@ Properties:
 - Quaternion rotation
 - bool temporary
 - bool trigger
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useGravity
 - int weakRefs // readonly
 
+<a name="Class_RigidBody2D"></a>
 
 ### RigidBody2D
 
@@ -8100,7 +8483,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool awake
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BodyType2D bodyType
 - bool bullet
 - String category // readonly
@@ -8119,11 +8502,12 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useFixtureMass
 - int weakRefs // readonly
 
+<a name="Class_Scene"></a>
 
 ### Scene
 
@@ -8167,8 +8551,8 @@ Methods:
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
-- bool LoadAsync(File@)
-- bool LoadAsyncXML(File@)
+- bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadAsyncXML(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -8223,7 +8607,7 @@ Methods:
 - void SetWorldTransform2D(const Vector2&, float, const Vector2&)
 - void SetWorldTransform2D(const Vector2&, float, float)
 - void StopAsyncLoading()
-- const String& GetVarName(ShortStringHash) const
+- const String& GetVarName(StringHash) const
 - void Translate(const Vector3&, TransformSpace = TS_LOCAL)
 - void Translate2D(const Vector2&, TransformSpace = TS_LOCAL)
 - void UnregisterAllVars(const String&)
@@ -8237,12 +8621,14 @@ Methods:
 Properties:
 
 - bool animationEnabled
+- LoadMode asyncLoadMode // readonly
 - bool asyncLoading // readonly
+- int asyncLoadingMs
 - float asyncProgress // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - Node@[] children // readonly
@@ -8277,7 +8663,7 @@ Properties:
 - bool temporary
 - float timeScale
 - Matrix3x4 transform // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - Vector3 up // readonly
 - bool updateEnabled
@@ -8294,6 +8680,7 @@ Properties:
 - Matrix3x4 worldTransform // readonly
 - Vector3 worldUp // readonly
 
+<a name="Class_Script"></a>
 
 ### Script
 
@@ -8305,16 +8692,17 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Scene@ defaultScene
 - ScriptFile@ defaultScriptFile
 - bool executeConsoleCommands
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ScriptFile"></a>
 
 ### ScriptFile
 
@@ -8332,17 +8720,18 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool compiled // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_ScriptInstance"></a>
 
 ### ScriptInstance
 
@@ -8383,7 +8772,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - String className
 - bool enabled
@@ -8396,13 +8785,15 @@ Properties:
 - ScriptFile@ scriptFile
 - ScriptObject@ scriptObject // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_ScriptObject"></a>
 
 ### ScriptObject
 
+<a name="Class_ScrollBar"></a>
 
 ### ScrollBar
 
@@ -8422,8 +8813,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -8473,7 +8864,7 @@ Methods:
 - void StepBack()
 - void StepForward()
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -8482,7 +8873,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Button@ backButton // readonly
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -8546,7 +8937,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - float value
@@ -8556,6 +8947,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_ScrollView"></a>
 
 ### ScrollView
 
@@ -8574,8 +8966,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -8625,7 +9017,7 @@ Methods:
 - bool SetStyleAuto(XMLFile@ = null)
 - void SetViewPosition(int, int)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -8633,7 +9025,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -8696,7 +9088,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -8707,6 +9099,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Serializable"></a>
 
 ### Serializable
 
@@ -8732,15 +9125,16 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint numAttributes // readonly
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Serializer"></a>
 
 ### Serializer
 
@@ -8765,7 +9159,6 @@ Methods:
 - bool WritePackedVector3(const Vector3&, float)
 - bool WriteQuaternion(const Quaternion&)
 - bool WriteShort(int16)
-- bool WriteShortStringHash(const ShortStringHash&)
 - bool WriteString(const String&)
 - bool WriteStringHash(const StringHash&)
 - bool WriteUByte(uint8)
@@ -8778,17 +9171,7 @@ Methods:
 - bool WriteVector3(const Vector3&)
 - bool WriteVector4(const Vector4&)
 
-
-### ShortStringHash
-
-Methods:
-
-- String ToString() const
-
-Properties:
-
-- uint16 value // readonly
-
+<a name="Class_Skeleton"></a>
 
 ### Skeleton
 
@@ -8803,6 +9186,7 @@ Properties:
 - uint numBones // readonly
 - Bone@ rootBone // readonly
 
+<a name="Class_Skybox"></a>
 
 ### Skybox
 
@@ -8839,7 +9223,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -8864,7 +9248,7 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
@@ -8872,6 +9256,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_Slider"></a>
 
 ### Slider
 
@@ -8891,8 +9276,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -8942,7 +9327,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -8950,7 +9335,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -9018,7 +9403,7 @@ Properties:
 - Texture@ texture
 - bool tiled
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - float value
@@ -9028,6 +9413,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_SmoothedTransform"></a>
 
 ### SmoothedTransform
 
@@ -9063,7 +9449,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -9078,10 +9464,11 @@ Properties:
 - Vector3 targetWorldPosition
 - Quaternion targetWorldRotation
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Sound"></a>
 
 ### Sound
 
@@ -9095,7 +9482,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool compressed // readonly
 - float frequency // readonly
@@ -9107,11 +9494,12 @@ Properties:
 - uint sampleSize // readonly
 - bool sixteenBit // readonly
 - bool stereo // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_SoundListener"></a>
 
 ### SoundListener
 
@@ -9146,7 +9534,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -9156,10 +9544,11 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_SoundSource"></a>
 
 ### SoundSource
 
@@ -9201,7 +9590,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -9218,10 +9607,11 @@ Properties:
 - SoundType soundType
 - bool temporary
 - float timePosition // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_SoundSource3D"></a>
 
 ### SoundSource3D
 
@@ -9265,7 +9655,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -9287,10 +9677,11 @@ Properties:
 - SoundType soundType
 - bool temporary
 - float timePosition // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Sphere"></a>
 
 ### Sphere
 
@@ -9317,6 +9708,7 @@ Properties:
 - bool defined
 - float radius
 
+<a name="Class_Spline"></a>
 
 ### Spline
 
@@ -9335,6 +9727,7 @@ Properties:
 - Variant[] knot
 - Variant[]@ knots
 
+<a name="Class_SplinePath"></a>
 
 ### SplinePath
 
@@ -9375,7 +9768,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Node@ controlledNode
 - bool enabled
@@ -9390,10 +9783,11 @@ Properties:
 - int refs // readonly
 - float speed
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Sprite"></a>
 
 ### Sprite
 
@@ -9409,8 +9803,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -9457,7 +9851,7 @@ Methods:
 - bool SetStyle(const String&, XMLFile@ = null)
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -9465,7 +9859,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - bool bringToBack
 - bool bringToFront
@@ -9499,7 +9893,7 @@ Properties:
 - String style
 - bool temporary
 - Texture@ texture
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -9508,6 +9902,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Sprite2D"></a>
 
 ### Sprite2D
 
@@ -9521,7 +9916,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - Vector2 hotSpot
 - uint memoryUse // readonly
@@ -9530,11 +9925,12 @@ Properties:
 - IntRect rectangle
 - int refs // readonly
 - Texture2D@ texture
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_SpriteSheet2D"></a>
 
 ### SpriteSheet2D
 
@@ -9550,17 +9946,18 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
 - Texture2D@ texture // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_StaticModel"></a>
 
 ### StaticModel
 
@@ -9599,7 +9996,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -9625,13 +10022,14 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_StaticModelGroup"></a>
 
 ### StaticModelGroup
 
@@ -9671,7 +10069,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -9699,7 +10097,7 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
@@ -9707,6 +10105,7 @@ Properties:
 - Zone@ zone // readonly
 - uint zoneMask
 
+<a name="Class_StaticSprite2D"></a>
 
 ### StaticSprite2D
 
@@ -9743,7 +10142,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -9772,13 +10171,14 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_String"></a>
 
 ### String
 
@@ -9836,6 +10236,7 @@ Properties:
 - uint length // readonly
 - uint utf8Length // readonly
 
+<a name="Class_StringHash"></a>
 
 ### StringHash
 
@@ -9847,6 +10248,7 @@ Properties:
 
 - uint value // readonly
 
+<a name="Class_Technique"></a>
 
 ### Technique
 
@@ -9863,18 +10265,19 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - Pass@[] passes // readonly
 - int refs // readonly
 - bool sm3
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_TechniqueEntry"></a>
 
 ### TechniqueEntry
 
@@ -9884,12 +10287,14 @@ Properties:
 - int qualityLevel
 - Technique@ technique
 
+<a name="Class_Terrain"></a>
 
 ### Terrain
 
 Methods:
 
 - void ApplyAttributes()
+- void ApplyHeightMap()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
@@ -9914,6 +10319,7 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- IntVector2 WorldToHeightMap(const Vector3&) const
 
 Properties:
 
@@ -9921,7 +10327,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool castShadows
 - String category // readonly
 - float drawDistance
@@ -9948,12 +10354,13 @@ Properties:
 - bool smoothing
 - Vector3 spacing
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - uint zoneMask
 
+<a name="Class_TerrainPatch"></a>
 
 ### TerrainPatch
 
@@ -9989,7 +10396,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -10010,13 +10417,14 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Text"></a>
 
 ### Text
 
@@ -10036,8 +10444,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -10088,7 +10496,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -10096,7 +10504,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -10170,7 +10578,7 @@ Properties:
 - HorizontalAlignment textAlignment
 - TextEffect textEffect
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -10180,6 +10588,7 @@ Properties:
 - int width
 - bool wordwrap
 
+<a name="Class_Text3D"></a>
 
 ### Text3D
 
@@ -10218,7 +10627,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -10259,7 +10668,7 @@ Properties:
 - String text
 - HorizontalAlignment textAlignment
 - TextEffect textEffect
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - VerticalAlignment verticalAlignment
 - uint viewMask
@@ -10269,6 +10678,7 @@ Properties:
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
 
+<a name="Class_Texture"></a>
 
 ### Texture
 
@@ -10286,7 +10696,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - bool compressed // readonly
@@ -10302,13 +10712,14 @@ Properties:
 - String name
 - int refs // readonly
 - bool sRGB
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - TextureUsage usage // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Texture2D"></a>
 
 ### Texture2D
 
@@ -10316,11 +10727,11 @@ Methods:
 
 - void ClearDataLost()
 - bool Load(File@)
-- bool Load(Image@, bool = false)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
 - bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
 
@@ -10328,7 +10739,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - bool compressed // readonly
@@ -10345,13 +10756,14 @@ Properties:
 - int refs // readonly
 - RenderSurface@ renderSurface // readonly
 - bool sRGB
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - TextureUsage usage // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Texture3D"></a>
 
 ### Texture3D
 
@@ -10359,11 +10771,11 @@ Methods:
 
 - void ClearDataLost()
 - bool Load(File@)
-- bool Load(Image@, bool = false)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
 - bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
 
@@ -10371,7 +10783,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - bool compressed // readonly
@@ -10388,25 +10800,26 @@ Properties:
 - int refs // readonly
 - RenderSurface@ renderSurface // readonly
 - bool sRGB
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - TextureUsage usage // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_TextureCube"></a>
 
 ### TextureCube
 
 Methods:
 
 - void ClearDataLost()
-- bool Load(CubeMapFace, Image@, bool = false)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(CubeMapFace, Image@, bool = false)
 - void SetNumLevels(uint)
 - bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC)
 
@@ -10414,7 +10827,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - bool compressed // readonly
@@ -10431,13 +10844,14 @@ Properties:
 - int refs // readonly
 - RenderSurface@[] renderSurfaces // readonly
 - bool sRGB
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - TextureUsage usage // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_TextureFrame"></a>
 
 ### TextureFrame
 
@@ -10446,6 +10860,178 @@ Properties:
 - float time
 - Rect uv
 
+<a name="Class_Tile2D"></a>
+
+### Tile2D
+
+Methods:
+
+- bool HasProperty(const String&) const
+- const String& GetProperty(const String&) const
+
+Properties:
+
+- int gid // readonly
+- int refs // readonly
+- Sprite2D@ sprite // readonly
+- int weakRefs // readonly
+
+<a name="Class_TileMap2D"></a>
+
+### TileMap2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- TileMapLayer2D@ GetLayer(uint) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- bool PositionToTileIndex(int&, int&, const Vector2&) const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- Vector2 TileIndexToPosition(int, int) const
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- TileMapInfo2D@ info // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numLayers // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- TmxFile2D@ tmxFile
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+<a name="Class_TileMapInfo2D"></a>
+
+### TileMapInfo2D
+
+Properties:
+
+- int height
+- float mapHeight // readonly
+- float mapWidth // readonly
+- Orientation2D orientation
+- float tileHeight
+- float tileWidth
+- int width
+
+<a name="Class_TileMapLayer2D"></a>
+
+### TileMapLayer2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- TileMapObject2D@ GetObject(uint) const
+- Node@ GetObjectNode(uint) const
+- Tile2D@ GetTile(int, int) const
+- Node@ GetTileNode(int, int) const
+- bool HasProperty(const String&) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- const String& GetProperty(const String&) const
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- int drawOrder // writeonly
+- bool enabled
+- bool enabledEffective // readonly
+- int height // readonly
+- uint id // readonly
+- Node@ imageNode // readonly
+- TileMapLayerType2D layerType // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- uint numObjects // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- int rrawOrder // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- bool visible
+- int weakRefs // readonly
+- int width // readonly
+
+<a name="Class_TileMapObject2D"></a>
+
+### TileMapObject2D
+
+Methods:
+
+- bool HasProperty(const String&) const
+- const String& GetProperty(const String&) const
+- const Vector2& GetPoint(uint) const
+
+Properties:
+
+- String name // readonly
+- uint numPoints // readonly
+- TileObjectType2D objectType // readonly
+- Vector2 position // readonly
+- int refs // readonly
+- Vector2 size // readonly
+- int tileGid // readonly
+- Sprite2D@ tileSprite // readonly
+- String type // readonly
+- int weakRefs // readonly
+
+<a name="Class_Time"></a>
 
 ### Time
 
@@ -10455,7 +11041,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - float elapsedTime // readonly
 - uint frameNumber // readonly
@@ -10463,10 +11049,11 @@ Properties:
 - uint systemTime // readonly
 - String timeStamp // readonly
 - float timeStep // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_Timer"></a>
 
 ### Timer
 
@@ -10475,6 +11062,31 @@ Methods:
 - uint GetMSec(bool)
 - void Reset()
 
+<a name="Class_TmxFile2D"></a>
+
+### TmxFile2D
+
+Methods:
+
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- uint memoryUse // readonly
+- String name
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+
+<a name="Class_ToolTip"></a>
 
 ### ToolTip
 
@@ -10493,8 +11105,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -10542,7 +11154,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -10550,7 +11162,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -10608,7 +11220,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -10617,6 +11229,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_TouchState"></a>
 
 ### TouchState
 
@@ -10629,6 +11242,7 @@ Properties:
 - int touchID
 - UIElement@ touchedElement // readonly
 
+<a name="Class_UI"></a>
 
 ### UI
 
@@ -10652,7 +11266,7 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - String clipBoardText
 - Cursor@ cursor
@@ -10670,13 +11284,14 @@ Properties:
 - bool nonFocusedMouseWheel
 - int refs // readonly
 - UIElement@ root // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useMutableGlyphs
 - bool useScreenKeyboard
 - bool useSystemClipboard
 - int weakRefs // readonly
 
+<a name="Class_UIElement"></a>
 
 ### UIElement
 
@@ -10695,8 +11310,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -10744,7 +11359,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -10752,7 +11367,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -10809,7 +11424,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -10818,6 +11433,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_ValueAnimation"></a>
 
 ### ValueAnimation
 
@@ -10833,19 +11449,20 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - InterpMethod interpolationMethod
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
 - float splineTension
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - VariantType valueType
 - int weakRefs // readonly
 
+<a name="Class_Variant"></a>
 
 ### Variant
 
@@ -10860,7 +11477,6 @@ Methods:
 - float GetFloat() const
 - int GetInt() const
 - RefCounted@ GetPtr() const
-- ShortStringHash GetShortStringHash() const
 - StringHash GetStringHash() const
 - uint GetUInt() const
 - Variant[]@ GetVariantVector() const
@@ -10886,22 +11502,24 @@ Properties:
 - String typeName // readonly
 - bool zero // readonly
 
+<a name="Class_VariantMap"></a>
 
 ### VariantMap
 
 Methods:
 
 - void Clear()
-- bool Contains(ShortStringHash) const
+- bool Contains(StringHash) const
 - bool Contains(const String&) const
-- bool Erase(ShortStringHash)
+- bool Erase(StringHash)
 - bool Erase(const String&)
 
 Properties:
 
-- ShortStringHash[]@ keys // readonly
+- StringHash[]@ keys // readonly
 - uint length // readonly
 
+<a name="Class_Vector2"></a>
 
 ### Vector2
 
@@ -10924,6 +11542,7 @@ Properties:
 - float x
 - float y
 
+<a name="Class_Vector3"></a>
 
 ### Vector3
 
@@ -10949,6 +11568,7 @@ Properties:
 - float y
 - float z
 
+<a name="Class_Vector4"></a>
 
 ### Vector4
 
@@ -10969,6 +11589,7 @@ Properties:
 - float y
 - float z
 
+<a name="Class_VectorBuffer"></a>
 
 ### VectorBuffer
 
@@ -10994,7 +11615,6 @@ Methods:
 - Vector3 ReadPackedVector3(float)
 - Quaternion ReadQuaternion()
 - int16 ReadShort()
-- ShortStringHash ReadShortStringHash()
 - String ReadString()
 - StringHash ReadStringHash()
 - uint8 ReadUByte()
@@ -11028,7 +11648,6 @@ Methods:
 - bool WritePackedVector3(const Vector3&, float)
 - bool WriteQuaternion(const Quaternion&)
 - bool WriteShort(int16)
-- bool WriteShortStringHash(const ShortStringHash&)
 - bool WriteString(const String&)
 - bool WriteStringHash(const StringHash&)
 - bool WriteUByte(uint8)
@@ -11049,6 +11668,7 @@ Properties:
 - uint position // readonly
 - uint size // readonly
 
+<a name="Class_View3D"></a>
 
 ### View3D
 
@@ -11067,8 +11687,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -11118,7 +11738,7 @@ Methods:
 - bool SetStyleAuto(XMLFile@ = null)
 - void SetView(Scene@, Camera@)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -11127,7 +11747,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoUpdate
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - Node@ cameraNode // readonly
@@ -11198,7 +11818,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -11208,27 +11828,32 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Viewport"></a>
 
 ### Viewport
 
 Methods:
 
+- Ray GetScreenRay(int, int) const
+- Vector3 ScreenToWorldPoint(int, int, float) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
+- Vector2 WorldToScreenPoint(const Vector3&) const
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - Camera@ camera
 - String category // readonly
 - IntRect rect
 - int refs // readonly
 - RenderPath@ renderPath
 - Scene@ scene
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_WeakHandle"></a>
 
 ### WeakHandle
 
@@ -11242,6 +11867,7 @@ Properties:
 - int refs // readonly
 - int weakRefs // readonly
 
+<a name="Class_Window"></a>
 
 ### Window
 
@@ -11260,8 +11886,8 @@ Methods:
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - uint GetNumChildren(bool) const
@@ -11309,7 +11935,7 @@ Methods:
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
 - void UpdateLayout()
-- const Variant& GetVar(const ShortStringHash&)
+- const Variant& GetVar(const StringHash&)
 
 Properties:
 
@@ -11317,7 +11943,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -11383,7 +12009,7 @@ Properties:
 - String style
 - bool temporary
 - TraversalMode traversalMode
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
 - VariantMap vars // readonly
@@ -11392,6 +12018,7 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_XMLElement"></a>
 
 ### XMLElement
 
@@ -11468,6 +12095,7 @@ Properties:
 - XMLElement parent // readonly
 - String value
 
+<a name="Class_XMLFile"></a>
 
 ### XMLFile
 
@@ -11486,17 +12114,18 @@ Methods:
 
 Properties:
 
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
 - XMLElement root // readonly
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_XPathQuery"></a>
 
 ### XPathQuery
 
@@ -11518,6 +12147,7 @@ Properties:
 
 - String query
 
+<a name="Class_XPathResultSet"></a>
 
 ### XPathResultSet
 
@@ -11527,6 +12157,7 @@ Properties:
 - XMLElement firstResult // readonly
 - uint size // readonly
 
+<a name="Class_Zone"></a>
 
 ### Zone
 
@@ -11566,7 +12197,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- ShortStringHash baseType // readonly
+- StringHash baseType // readonly
 - BoundingBox boundingBox
 - bool castShadows
 - String category // readonly
@@ -11596,12 +12227,13 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- ShortStringHash type // readonly
+- StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
 - uint zoneMask
+- Texture@ zoneTexture
 
 \section ScriptAPI_Enums Enumerations
 
@@ -11804,6 +12436,13 @@ Properties:
 - LIGHT_POINT
 
 
+### LoadMode
+
+- LOAD_RESOURCES_ONLY
+- LOAD_SCENE
+- LOAD_SCENE_AND_RESOURCES
+
+
 ### LoopMode2D
 
 - LM_DEFAULT
@@ -11817,6 +12456,13 @@ Properties:
 - O_VERTICAL
 
 
+### Orientation2D
+
+- O_ORTHOGONAL
+- O_ISOMETRIC
+- O_STAGGERED
+
+
 ### PassLightingMode
 
 - LIGHTING_UNLIT
@@ -11828,6 +12474,10 @@ Properties:
 
 - TRIANGLE_LIST
 - LINE_LIST
+- POINT_LIST
+- TRIANGLE_STRIP
+- LINE_STRIP
+- TRIANGLE_FAN
 
 
 ### RayQueryLevel
@@ -11937,6 +12587,7 @@ Properties:
 - TU_DEPTHBUFFER
 - TU_LIGHTBUFFER
 - TU_VOLUMEMAP
+- TU_ZONE
 - MAX_MATERIAL_TEXTURE_UNITS
 - MAX_TEXTURE_UNITS
 
@@ -11947,6 +12598,24 @@ Properties:
 - TEXTURE_DYNAMIC
 - TEXTURE_RENDERTARGET
 - TEXTURE_DEPTHSTENCIL
+
+
+### TileMapLayerType2D
+
+- LT_TILE_LAYER
+- LT_OBJECT_GROUP
+- LT_IMAGE_LAYER
+- LT_INVALID
+
+
+### TileObjectType2D
+
+- OT_RECTANGLE
+- OT_ELLIPSE
+- OT_POLYGON
+- OT_POLYLINE
+- OT_TILE
+- OT_INVALID
 
 
 ### TransformSpace
@@ -12012,7 +12681,9 @@ Properties:
 - float Clamp(float, float, float)
 - int Clamp(int, int, int)
 - void ClearDelayedExecute(const String& = String ( ))
+- VectorBuffer CompressVectorBuffer(VectorBuffer&)
 - float Cos(float)
+- VectorBuffer DecompressVectorBuffer(VectorBuffer&)
 - void DelayedExecute(float, bool, const String&)
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - bool Equals(float, float)
@@ -12089,7 +12760,7 @@ Properties:
 - float Sin(float)
 - float SmoothStep(float, float, float)
 - float Sqrt(float)
-- const String& GetTypeName(ShortStringHash)
+- const String& GetTypeName(StringHash)
 - void SubscribeToEvent(Object@, const String&, const String&)
 - void SubscribeToEvent(const String&, const String&)
 - float Tan(float)

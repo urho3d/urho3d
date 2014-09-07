@@ -50,6 +50,7 @@ extern const char* UI_CATEGORY;
 
 Text::Text(Context* context) :
     UIElement(context),
+    usedInText3D_(false),
     fontSize_(DEFAULT_FONT_SIZE),
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
@@ -174,6 +175,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     }
 
     // Text batch
+    TextEffect textEffect = font_->IsSDFFont() ? TE_NONE : textEffect_;
     const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
     for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)
     {
@@ -182,7 +184,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
         const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
 
-        switch (textEffect_)
+        switch (textEffect)
         {
         case TE_NONE:
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
@@ -321,6 +323,11 @@ void Text::SetTextEffect(TextEffect textEffect)
 void Text::SetEffectColor(const Color& effectColor)
 {
     effectColor_ = effectColor;
+}
+
+void Text::SetUsedInText3D(bool usedInText3D)
+{
+    usedInText3D_ = usedInText3D;
 }
 
 void Text::SetEffectDepthBias(float bias)
@@ -491,7 +498,7 @@ void Text::UpdateText()
                         if (glyph)
                         {
                             rowWidth += glyph->advanceX_;
-                            if (i < text_.Length() - 1)
+                            if (i < unicodeText_.Size() - 1)
                                 rowWidth += face->GetKerning(c, unicodeText_[i + 1]);
                         }
                         if (rowWidth <= maxWidth)

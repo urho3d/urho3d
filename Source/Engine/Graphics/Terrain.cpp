@@ -59,11 +59,14 @@ Terrain::Terrain(Context* context) :
     Component(context),
     indexBuffer_(new IndexBuffer(context)),
     spacing_(DEFAULT_SPACING),
+    lastSpacing_(Vector3::ZERO),
     patchWorldOrigin_(Vector2::ZERO),
     patchWorldSize_(Vector2::ZERO),
     numVertices_(IntVector2::ZERO),
+    lastNumVertices_(IntVector2::ZERO),
     numPatches_(IntVector2::ZERO),
     patchSize_(DEFAULT_PATCH_SIZE),
+    lastPatchSize_(0),
     numLodLevels_(1),
     smoothing_(false),
     visible_(true),
@@ -324,6 +327,12 @@ void Terrain::SetOccludee(bool enable)
     MarkNetworkUpdate();
 }
 
+void Terrain::ApplyHeightMap()
+{
+    if (heightMap_)
+        CreateGeometry();
+}
+
 Image* Terrain::GetHeightMap() const
 {
     return heightMap_;
@@ -414,6 +423,20 @@ Vector3 Terrain::GetNormal(const Vector3& worldPosition) const
         return Vector3::UP;
 }
 
+IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
+{
+    if (!node_)
+        return IntVector2::ZERO;
+    
+    Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
+    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_);
+    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_);
+    Clamp(xPos, 0, numVertices_.x_);
+    Clamp(zPos, 0, numVertices_.y_);
+    
+    return IntVector2(xPos, numVertices_.y_ - zPos);
+}
+
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
     PROFILE(CreatePatchGeometry);
@@ -437,15 +460,15 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     {
         const IntVector2& coords = patch->GetCoordinates();
 
-        for (int z1 = 0; z1 <= patchSize_; ++z1)
+        for (int z = 0; z <= patchSize_; ++z)
         {
-            for (int x1 = 0; x1 <= patchSize_; ++x1)
+            for (int x = 0; x <= patchSize_; ++x)
             {
-                int xPos = coords.x_ * patchSize_ + x1;
-                int zPos = coords.y_ * patchSize_ + z1;
+                int xPos = coords.x_ * patchSize_ + x;
+                int zPos = coords.y_ * patchSize_ + z;
 
                 // Position
-                Vector3 position((float)x1 * spacing_.x_, GetRawHeight(xPos, zPos), (float)z1 * spacing_.z_);
+                Vector3 position((float)x * spacing_.x_, GetRawHeight(xPos, zPos), (float)z * spacing_.z_);
                 *vertexData++ = position.x_;
                 *vertexData++ = position.y_;
                 *vertexData++ = position.z_;
@@ -567,7 +590,7 @@ ResourceRef Terrain::GetHeightMapAttr() const
 void Terrain::CreateGeometry()
 {
     recreateTerrain_ = false;
-
+    
     if (!node_)
         return;
 
@@ -586,13 +609,30 @@ void Terrain::CreateGeometry()
 
     // Determine total terrain size
     patchWorldSize_ = Vector2(spacing_.x_ * (float)patchSize_, spacing_.z_ * (float)patchSize_);
+    bool updateAll = false;
+    
     if (heightMap_)
     {
         numPatches_ = IntVector2((heightMap_->GetWidth() - 1) / patchSize_, (heightMap_->GetHeight() - 1) / patchSize_);
         numVertices_ = IntVector2(numPatches_.x_ * patchSize_ + 1, numPatches_.y_ * patchSize_ + 1);
         patchWorldOrigin_ = Vector2(-0.5f * (float)numPatches_.x_ * patchWorldSize_.x_, -0.5f * (float)numPatches_.y_ *
             patchWorldSize_.y_);
-        heightData_ = new float[numVertices_.x_ * numVertices_.y_];
+        if (numVertices_ != lastNumVertices_ || lastSpacing_ != spacing_ || patchSize_ != lastPatchSize_ )
+            updateAll = true;
+        unsigned newDataSize = numVertices_.x_ * numVertices_.y_;
+        
+        // Create new height data if terrain size changed
+        if (!heightData_ || updateAll)
+            heightData_ = new float[newDataSize];
+        
+        // Ensure that the source (unsmoothed) data exists if smoothing is active
+        if (smoothing_ && (!sourceHeightData_ || updateAll))
+        {
+            sourceHeightData_ = new float[newDataSize];
+            updateAll = true;
+        }
+        else if (!smoothing_)
+            sourceHeightData_.Reset();
     }
     else
     {
@@ -600,114 +640,223 @@ void Terrain::CreateGeometry()
         numVertices_ = IntVector2::ZERO;
         patchWorldOrigin_ = Vector2::ZERO;
         heightData_.Reset();
+        sourceHeightData_.Reset();
     }
 
+    lastNumVertices_ = numVertices_;
+    lastPatchSize_ = patchSize_;
+    lastSpacing_ = spacing_;
+    
     // Remove old patch nodes which are not needed
-    PODVector<Node*> oldPatchNodes;
-    node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
-    for (PODVector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
+    if (updateAll)
     {
-        bool nodeOk = false;
-        Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
-        if (coords.Size() == 2)
+        PROFILE(RemoveOldPatches);
+        
+        PODVector<Node*> oldPatchNodes;
+        node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
+        for (PODVector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
         {
-            int x = ToInt(coords[0]);
-            int z = ToInt(coords[1]);
-            if (x < numPatches_.x_ && z < numPatches_.y_)
-                nodeOk = true;
-        }
+            bool nodeOk = false;
+            Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
+            if (coords.Size() == 2)
+            {
+                int x = ToInt(coords[0]);
+                int z = ToInt(coords[1]);
+                if (x < numPatches_.x_ && z < numPatches_.y_)
+                    nodeOk = true;
+            }
 
-        if (!nodeOk)
-            node_->RemoveChild(*i);
+            if (!nodeOk)
+                node_->RemoveChild(*i);
+        }
     }
 
+    // Keep track of which patches actually need an update
+    PODVector<bool> dirtyPatches(numPatches_.x_ * numPatches_.y_);
+    for (unsigned i = 0; i < dirtyPatches.Size(); ++i)
+        dirtyPatches[i] = updateAll;
+    
     patches_.Clear();
 
     if (heightMap_)
     {
         // Copy heightmap data
         const unsigned char* src = heightMap_->GetData();
-        float* dest = heightData_;
+        float* dest = smoothing_ ? sourceHeightData_ : heightData_;
         unsigned imgComps = heightMap_->GetComponents();
         unsigned imgRow = heightMap_->GetWidth() * imgComps;
 
         if (imgComps == 1)
         {
+            PROFILE(CopyHeightData);
+            
             for (int z = 0; z < numVertices_.y_; ++z)
             {
                 for (int x = 0; x < numVertices_.x_; ++x)
-                    *dest++ = (float)src[imgRow * (numVertices_.y_ - 1 - z) + x] * spacing_.y_;
+                {
+                    float newHeight = (float)src[imgRow * (numVertices_.y_ - 1 - z) + x] * spacing_.y_;
+                    
+                    if (updateAll)
+                        *dest = newHeight;
+                    else
+                    {
+                        if (*dest != newHeight)
+                        {
+                            if (!smoothing_)
+                                MarkPatchesDirty(dirtyPatches, x, z);
+                            else
+                            {
+                                for (int z1 = z - 1; z1 <= z + 1; ++z1)
+                                    for (int x1 = x - 1; x1 <= z + 1; ++x1)
+                                        MarkPatchesDirty(dirtyPatches, x1, z1);
+                            }
+                            
+                            *dest = newHeight;
+                        }
+                    }
+                    
+                    ++dest;
+                }
             }
         }
         else
         {
+            PROFILE(CopyHeightData);
+            
             // If more than 1 component, use the green channel for more accuracy
             for (int z = 0; z < numVertices_.y_; ++z)
             {
                 for (int x = 0; x < numVertices_.x_; ++x)
-                    *dest++ = ((float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x] + (float)src[imgRow *
+                {
+                    float newHeight = ((float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x] + (float)src[imgRow *
                         (numVertices_.y_ - 1 - z) + imgComps * x + 1] / 256.0f) * spacing_.y_;
+                        
+                    if (updateAll)
+                        *dest = newHeight;
+                    else
+                    {
+                        if (*dest != newHeight)
+                        {
+                            if (!smoothing_)
+                                MarkPatchesDirty(dirtyPatches, x, z);
+                            else
+                            {
+                                for (int z1 = z - 1; z1 <= z + 1; ++z1)
+                                    for (int x1 = x - 1; x1 <= z + 1; ++x1)
+                                        MarkPatchesDirty(dirtyPatches, x1, z1);
+                            }
+                            
+                            *dest = newHeight;
+                        }
+                    }
+                    
+                    ++dest;
+                }
             }
         }
 
-        if (smoothing_)
-            SmoothHeightMap();
-        
         patches_.Reserve(numPatches_.x_ * numPatches_.y_);
 
         bool enabled = IsEnabledEffective();
 
-        // Create patches and set node transforms
-        for (int z = 0; z < numPatches_.y_; ++z)
         {
-            for (int x = 0; x < numPatches_.x_; ++x)
+            PROFILE(CreatePatches);
+            
+            // Create patches and set node transforms
+            for (int z = 0; z < numPatches_.y_; ++z)
             {
-                String nodeName = "Patch_" + String(x) + "_" + String(z);
-                Node* patchNode = node_->GetChild(nodeName);
-                
-                if (!patchNode)
+                for (int x = 0; x < numPatches_.x_; ++x)
                 {
-                    // Create the patch scene node as local and temporary so that it is not unnecessarily serialized to either
-                    // file or replicated over the network
-                    patchNode = node_->CreateChild(nodeName, LOCAL);
-                    patchNode->SetTemporary(true);
+                    String nodeName = "Patch_" + String(x) + "_" + String(z);
+                    Node* patchNode = node_->GetChild(nodeName);
+                    
+                    if (!patchNode)
+                    {
+                        // Create the patch scene node as local and temporary so that it is not unnecessarily serialized to either
+                        // file or replicated over the network
+                        patchNode = node_->CreateChild(nodeName, LOCAL);
+                        patchNode->SetTemporary(true);
+                    }
+                    
+                    patchNode->SetPosition(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f, patchWorldOrigin_.y_ +
+                        (float)z * patchWorldSize_.y_));
+
+                    TerrainPatch* patch = patchNode->GetComponent<TerrainPatch>();
+                    if (!patch)
+                    {
+                        patch = patchNode->CreateComponent<TerrainPatch>();
+                        patch->SetOwner(this);
+                        patch->SetCoordinates(IntVector2(x, z));
+
+                        // Copy initial drawable parameters
+                        patch->SetEnabled(enabled);
+                        patch->SetMaterial(material_);
+                        patch->SetDrawDistance(drawDistance_);
+                        patch->SetShadowDistance(shadowDistance_);
+                        patch->SetLodBias(lodBias_);
+                        patch->SetViewMask(viewMask_);
+                        patch->SetLightMask(lightMask_);
+                        patch->SetShadowMask(shadowMask_);
+                        patch->SetZoneMask(zoneMask_);
+                        patch->SetMaxLights(maxLights_);
+                        patch->SetCastShadows(castShadows_);
+                        patch->SetOccluder(occluder_);
+                        patch->SetOccludee(occludee_);
+                    }
+
+                    patches_.Push(WeakPtr<TerrainPatch>(patch));
                 }
-                
-                patchNode->SetPosition(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f, patchWorldOrigin_.y_ +
-                    (float)z * patchWorldSize_.y_));
-
-                TerrainPatch* patch = patchNode->GetOrCreateComponent<TerrainPatch>();
-                patch->SetOwner(this);
-                patch->SetCoordinates(IntVector2(x, z));
-
-                // Copy initial drawable parameters
-                patch->SetEnabled(enabled);
-                patch->SetMaterial(material_);
-                patch->SetDrawDistance(drawDistance_);
-                patch->SetShadowDistance(shadowDistance_);
-                patch->SetLodBias(lodBias_);
-                patch->SetViewMask(viewMask_);
-                patch->SetLightMask(lightMask_);
-                patch->SetShadowMask(shadowMask_);
-                patch->SetZoneMask(zoneMask_);
-                patch->SetMaxLights(maxLights_);
-                patch->SetCastShadows(castShadows_);
-                patch->SetOccluder(occluder_);
-                patch->SetOccludee(occludee_);
-
-                patches_.Push(WeakPtr<TerrainPatch>(patch));
             }
         }
-
+        
         // Create the shared index data
-        CreateIndexData();
+        if (updateAll)
+            CreateIndexData();
 
-        // Create vertex data for patches
-        for (Vector<WeakPtr<TerrainPatch> >::Iterator i = patches_.Begin(); i != patches_.End(); ++i)
+        // Create vertex data for patches. First update smoothing to ensure normals are calculated correctly across patch borders
+        if (smoothing_)
         {
-            CreatePatchGeometry(*i);
-            CalculateLodErrors(*i);
-            SetNeighbors(*i);
+            PROFILE(UpdateSmoothing);
+            
+            for (unsigned i = 0; i < patches_.Size(); ++i)
+            {
+                if (dirtyPatches[i])
+                {
+                    TerrainPatch* patch = patches_[i];
+                    const IntVector2& coords = patch->GetCoordinates();
+                    int startX = coords.x_ * patchSize_;
+                    int endX = startX + patchSize_;
+                    int startZ = coords.y_ * patchSize_;
+                    int endZ = startZ + patchSize_;
+                    
+                    for (int z = startZ; z <= endZ; ++z)
+                    {
+                        for (int x = startX; x <= endX; ++x)
+                        {
+                            float smoothedHeight = (
+                                GetSourceHeight(x - 1, z - 1) + GetSourceHeight(x, z - 1) * 2.0f + GetSourceHeight(x + 1, z - 1) +
+                                GetSourceHeight(x - 1, z) * 2.0f + GetSourceHeight(x, z) * 4.0f + GetSourceHeight(x + 1, z) * 2.0f +
+                                GetSourceHeight(x - 1, z + 1) + GetSourceHeight(x, z + 1) * 2.0f + GetSourceHeight(x + 1, z + 1)
+                            ) / 16.0f;
+                            
+                            heightData_[z * numVertices_.x_ + x] = smoothedHeight;
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (unsigned i = 0; i < patches_.Size(); ++i)
+        {
+            TerrainPatch* patch = patches_[i];
+            
+            if (dirtyPatches[i])
+            {
+                CreatePatchGeometry(patch);
+                CalculateLodErrors(patch);
+            }
+            
+            SetNeighbors(patch);
         }
     }
 
@@ -720,29 +869,6 @@ void Terrain::CreateGeometry()
         eventData[P_NODE] = node_;
         node_->SendEvent(E_TERRAINCREATED, eventData);
     }
-}
-
-void Terrain::SmoothHeightMap()
-{
-    PROFILE(SmoothHeightMap);
-    
-    SharedArrayPtr<float> newHeightData(new float[numVertices_.x_* numVertices_.y_]);
-    
-    for (int z = 0; z < numVertices_.y_; ++z)
-    {
-        for (int x = 0; x < numVertices_.x_; ++x)
-        {
-            float smoothedHeight = (
-                GetRawHeight(x - 1, z - 1) + GetRawHeight(x, z - 1) * 2.0f + GetRawHeight(x + 1, z - 1) +
-                GetRawHeight(x - 1, z) * 2.0f + GetRawHeight(x, z) * 4.0f + GetRawHeight(x + 1, z) * 2.0f +
-                GetRawHeight(x - 1, z + 1) + GetRawHeight(x, z + 1) * 2.0f + GetRawHeight(x + 1, z + 1)
-            ) / 16.0f;
-            
-            newHeightData[z * numVertices_.x_ + x] = smoothedHeight;
-        }
-    }
-    
-    heightData_ = newHeightData;
 }
 
 void Terrain::CreateIndexData()
@@ -902,12 +1028,7 @@ void Terrain::CreateIndexData()
     }
 
     indexBuffer_->SetSize(indices.Size(), false);
-    unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indices.Size());
-    if (indexData)
-    {
-        memcpy(indexData, &indices[0], indices.Size() * sizeof(unsigned short));
-        indexBuffer_->Unlock();
-    }
+    indexBuffer_->SetData(&indices[0]);
 }
 
 float Terrain::GetRawHeight(int x, int z) const
@@ -918,6 +1039,16 @@ float Terrain::GetRawHeight(int x, int z) const
     x = Clamp(x, 0, numVertices_.x_ - 1);
     z = Clamp(z, 0, numVertices_.y_ - 1);
     return heightData_[z * numVertices_.x_ + x];
+}
+
+float Terrain::GetSourceHeight(int x, int z) const
+{
+    if (!sourceHeightData_)
+        return 0.0f;
+
+    x = Clamp(x, 0, numVertices_.x_ - 1);
+    z = Clamp(z, 0, numVertices_.y_ - 1);
+    return sourceHeightData_[z * numVertices_.x_ + x];
 }
 
 float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
@@ -1044,6 +1175,26 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
 void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     CreateGeometry();
+}
+
+void Terrain::MarkPatchesDirty(PODVector<bool>& dirtyPatches, int x, int z)
+{
+    x = Clamp(x, 0, numVertices_.x_);
+    z = Clamp(z, 0, numVertices_.y_);
+    
+    // A point on the heightmap can potentially belong to multiple patches; dirty all that are applicable
+    int pZ = z / patchSize_;
+    int vZ = z % patchSize_;
+    int pX = x / patchSize_;
+    int vX = x % patchSize_;
+    if (pZ < numPatches_.y_ && pX < numPatches_.x_)
+        dirtyPatches[pZ * numPatches_.x_ + pX] = true;
+    if (vX == 0 && pX > 0 && pZ < numPatches_.y_)
+        dirtyPatches[pZ * numPatches_.x_ + pX - 1] = true;
+    if (vZ == 0 && pZ > 0 && pX < numPatches_.y_)
+        dirtyPatches[(pZ - 1) * numPatches_.x_ + pX] = true;
+    if (vX == 0 && vZ == 0 && pX > 0 && pZ > 0)
+        dirtyPatches[(pZ - 1) * numPatches_.x_ + pX - 1] = true;
 }
 
 }

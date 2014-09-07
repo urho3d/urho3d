@@ -20,6 +20,19 @@
 # THE SOFTWARE.
 #
 
+# Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+if (MINGW AND NOT DEFINED URHO3D_SSE)
+    execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (GCC_VERSION VERSION_LESS 4.9.1)
+        message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+        set (URHO3D_DEFAULT_SSE FALSE)
+    else ()
+        set (URHO3D_DEFAULT_SSE TRUE)
+    endif ()
+else ()
+    set (URHO3D_DEFAULT_SSE TRUE)
+endif ()
+
 # Define all supported build options
 include (CMakeDependentOption)
 option (ANDROID "Setup build for Android platform")
@@ -31,7 +44,9 @@ option (URHO3D_64BIT "Enable 64-bit build")
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support")
 option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)")
-option (URHO3D_SSE "Enable SSE instruction set" TRUE)
+option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
+option (URHO3D_PHYSICS "Enable physics support" TRUE)
+option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE})
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT AND NOT URHO3D_AMALG" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua scripting only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
@@ -193,13 +208,31 @@ if (URHO3D_LUA)
     add_definitions (-DURHO3D_LUA)
 endif ()
 
-# Find DirectX SDK include & library directories if applicable
-# Note: if a recent Windows SDK is installed instead, it will be possible to compile without;
-# therefore do not log a fatal error in that case
-if (WIN32)
+# Add definition for Navigation
+if (URHO3D_NAVIGATION)
+    add_definitions (-DURHO3D_NAVIGATION)
+endif ()
+
+# Add definition for Physics
+if (URHO3D_PHYSICS)
+    add_definitions (-DURHO3D_PHYSICS)
+endif ()
+
+# Default library type is STATIC
+if (URHO3D_LIB_TYPE)
+    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
+endif ()
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+    set (URHO3D_LIB_TYPE STATIC)
+    add_definitions (-DURHO3D_STATIC_DEFINE)
+endif ()
+
+# Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
+# without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
+# incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
+if (MSVC)
     find_package (Direct3D)
-    if (MSVC AND DIRECT3D_FOUND)
-        # The headers in the SDK will be incompatible with MinGW, so only add the include directories when using Visual Studio
+    if (DIRECT3D_FOUND)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
 endif ()
@@ -318,22 +351,15 @@ else ()
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
                 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
                 if (URHO3D_SSE)
-                    if (NOT WIN32)
-                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
-                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
-                    else ()
-                        message (STATUS "Using SSE2 instead of SSE because SSE fails on some Windows ports of GCC")
-                        message (STATUS "Disable SSE with the CMake option -DURHO3D_SSE=0 if this is not desired")
-                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
-                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-                    endif ()
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
                 endif ()
             endif ()
         endif ()
         # MinGW-specific setup
-        if (WIN32)
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc")
+        if (MINGW)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
             # Additional compiler flags for Windows ports of GCC
             set (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
@@ -572,21 +598,19 @@ endmacro ()
 macro (add_android_native_init)
     # This source file could not be added when building SDL static library because it needs SDL_Main() which is not yet available at library building time
     # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-        list (APPEND SOURCE_FILES ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-        # Use Urho3D source installation
-        list (APPEND SOURCE_FILES ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS ${CMAKE_PREFIX_PATH}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on non-default installation location (PATH_SUFFIX variable is set in FindUrho3D.cmake module)
-        list (APPEND SOURCE_FILES ${CMAKE_PREFIX_PATH}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
-    elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on system default installation location
-        list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
+    if (URHO3D_HOME)
+        # Search using project source directory which for sure is not rooted
+        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATHS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android DOC "Path to SDL_android_main.c" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    else ()
+        # Search using Urho3D SDK installation location which could be rooted
+        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c")
+    endif ()
+    if (ANDROID_MAIN_C_PATH)
+        list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
     else ()
         message (FATAL_ERROR
             "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
-            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For searching in a non-default Urho3D SDK installation, use 'CMAKE_PREFIX_PATH' environment variable to specify the prefix path of the installation location. "
             "For searching in a source tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
     endif ()
 endmacro ()

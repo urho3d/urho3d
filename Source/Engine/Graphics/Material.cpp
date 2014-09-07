@@ -57,6 +57,7 @@ static const char* textureUnitNames[] =
     "depth",
     "light",
     "volume",
+    "zone",
     0
 };
 
@@ -164,25 +165,72 @@ void Material::RegisterObject(Context* context)
     context->RegisterFactory<Material>();
 }
 
-bool Material::Load(Deserializer& source)
+bool Material::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadMaterial);
-
     // In headless mode, do not actually load the material, just return success
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
-    SharedPtr<XMLFile> xml(new XMLFile(context_));
-    if (!xml->Load(source))
+    loadXMLFile_ = new XMLFile(context_);
+    if (loadXMLFile_->Load(source))
+    {
+        // If async loading, scan the XML content beforehand for technique & texture resources
+        // and request them to also be loaded. Can not do anything else at this point
+        if (GetAsyncLoadState() == ASYNC_LOADING)
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            XMLElement rootElem = loadXMLFile_->GetRoot();
+            XMLElement techniqueElem = rootElem.GetChild("technique");
+            while (techniqueElem)
+            {
+                cache->BackgroundLoadResource<Technique>(techniqueElem.GetAttribute("name"), true, this);
+                techniqueElem = techniqueElem.GetNext("technique");
+            }
+
+            XMLElement textureElem = rootElem.GetChild("texture");
+            while (textureElem)
+            {
+                String name = textureElem.GetAttribute("name");
+                // Detect cube maps by file extension: they are defined by an XML file
+                /// \todo Differentiate with 3D textures by actually reading the XML content
+                if (GetExtension(name) == ".xml")
+                    cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                else
+                    cache->BackgroundLoadResource<Texture2D>(name, true, this);
+                textureElem = textureElem.GetNext("texture");
+            }
+        }
+
+        return true;
+    }
+    else
     {
         ResetToDefaults();
+        loadXMLFile_.Reset();
         return false;
     }
-
-    XMLElement rootElem = xml->GetRoot();
-    return Load(rootElem);
 }
+
+bool Material::EndLoad()
+{
+    // In headless mode, do not actually load the material, just return success
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return true;
+
+    bool success = false;
+    if (loadXMLFile_)
+    {
+        // If async loading, get the techniques / textures which should be ready now
+        XMLElement rootElem = loadXMLFile_->GetRoot();
+        success = Load(rootElem);
+    }
+
+    loadXMLFile_.Reset();
+    return success;
+}
+
 
 bool Material::Save(Serializer& dest) const
 {
@@ -207,6 +255,7 @@ bool Material::Load(const XMLElement& source)
 
     XMLElement techniqueElem = source.GetChild("technique");
     techniques_.Clear();
+    
     while (techniqueElem)
     {
         Technique* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
@@ -220,6 +269,7 @@ bool Material::Load(const XMLElement& source)
                 newTechnique.lodDistance_ = techniqueElem.GetFloat("loddistance");
             techniques_.Push(newTechnique);
         }
+
         techniqueElem = techniqueElem.GetNext("technique");
     }
 
@@ -235,6 +285,7 @@ bool Material::Load(const XMLElement& source)
         {
             String name = textureElem.GetAttribute("name");
             // Detect cube maps by file extension: they are defined by an XML file
+            /// \todo Differentiate with 3D textures by actually reading the XML content
             if (GetExtension(name) == ".xml")
                 SetTexture(unit, cache->GetResource<TextureCube>(name));
             else
@@ -661,6 +712,10 @@ void Material::CheckOcclusion()
 
 void Material::ResetToDefaults()
 {
+    // Needs to be a no-op when async loading, as this does a GetResource() which is not allowed from worker threads
+    if (!Thread::IsMainThread())
+        return;
+
     SetNumTechniques(1);
     SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 

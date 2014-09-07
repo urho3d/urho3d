@@ -48,16 +48,18 @@ public:
     ParticleEffect2D(Context* context);
     /// Destruct.
     ~ParticleEffect2D();
-    /// Register object factory. drawable2d must be registered first.
+    /// Register object factory. Drawable2D must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
     /// Set sprite.
-    void SetSprite(const String& sprite);
+    void SetSprite(Sprite2D* sprite);
     /// Set source position variance.
     void SetSourcePositionVariance(const Vector2& sourcePositionVariance);
     /// Set speed.
@@ -110,6 +112,8 @@ public:
     void SetMaxRadiusVariance(float maxRadiusVariance);
     /// Set min radius.
     void SetMinRadius(float minRadius);
+    /// Set min radius variance.
+    void SetMinRadiusVariance(float minRadiusVariance);
     /// Set rotate per second.
     void SetRotatePerSecond(float rotatePerSecond);
     /// Set rotate per second variance.
@@ -179,6 +183,8 @@ public:
     float GetMaxRadiusVariance() const { return maxRadiusVariance_; }
     /// Return min radius.
     float GetMinRadius() const { return minRadius_; }
+    /// Return min radius variance.
+    float GetMinRadiusVariance() const { return minRadiusVariance_; }
     /// Return rotate per second.
     float GetRotatePerSecond() const { return rotatePerSecond_; }
     /// Return rotate per second variance.
@@ -195,11 +201,23 @@ public:
     float GetRotationEndVariance() const { return rotationEndVariance_; }
 
 private:
+    /// Read integer.
+    int ReadInt(const XMLElement& element, const String& name) const;
+    /// Read float.
+    float ReadFloat(const XMLElement& element, const String& name) const;
     /// Read Color.
-    Color ReadColor(const XMLElement& element) const;
+    Color ReadColor(const XMLElement& element, const String& name) const;
     /// Read Vector2.
-    Vector2 ReadVector2(const XMLElement& element) const;
-    
+    Vector2 ReadVector2(const XMLElement& element, const String& name) const;
+    /// Write integer.
+    void WriteInt(XMLElement& element, const String& name, int value) const;
+    /// Write float.
+    void WriteFloat(XMLElement& element, const String& name, float value) const;
+    /// Write Color.
+    void WriteColor(XMLElement& element, const String& name, const Color& color) const;
+    /// Write Vector2.
+    void WriteVector2(XMLElement& element, const String& name, const Vector2& value) const;
+
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Source position variance.
@@ -254,6 +272,8 @@ private:
     float maxRadiusVariance_;
     /// Min radius.
     float minRadius_;
+    /// Min radius variance.
+    float minRadiusVariance_;
     /// Rotate per second.
     float rotatePerSecond_;
     /// Rotate per second variance.
@@ -268,8 +288,8 @@ private:
     float rotationEnd_;
     /// Rotation end variance.
     float rotationEndVariance_;
-
-
+    /// Sprite name acquired during BeginLoad().
+    String loadSpriteName_;
 };
 
 }

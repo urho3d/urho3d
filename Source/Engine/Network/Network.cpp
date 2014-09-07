@@ -166,11 +166,11 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, kNet::SocketOverUDP, this);
     if (connection)
     {
-        LOGINFO("Connecting to server " + address + ":" + String(port));
         serverConnection_ = new Connection(context_, false, connection);
         serverConnection_->SetScene(scene);
         serverConnection_->SetIdentity(identity);
         serverConnection_->SetConnectPending(true);
+        LOGINFO("Connecting to server " + serverConnection_->ToString());
         return true;
     }
     else

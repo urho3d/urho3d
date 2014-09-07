@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "Compression.h"
 #include "FileSystem.h"
 #include "Log.h"
 #include "PackageFile.h"
@@ -321,6 +322,10 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asFUNCTION(VariantAssignBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asFUNCTION(VariantGetBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asFUNCTION(VariantEqualsBuffer), asCALL_CDECL_OBJLAST);
+    
+    // Register VectorBuffer compression functions
+    engine->RegisterGlobalFunction("VectorBuffer CompressVectorBuffer(VectorBuffer&in)", asFUNCTION(CompressVectorBuffer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("VectorBuffer DecompressVectorBuffer(VectorBuffer&in)", asFUNCTION(DecompressVectorBuffer), asCALL_CDECL);
 }
 
 void RegisterFileSystem(asIScriptEngine* engine)

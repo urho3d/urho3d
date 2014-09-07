@@ -130,7 +130,7 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
     if (!info.texture_)
     {
         Texture2D* texture = new Texture2D(context_);
-        texture->Load(SharedPtr<Image>(image));
+        texture->SetData(SharedPtr<Image>(image));
         info.texture_ = texture;
     }
 

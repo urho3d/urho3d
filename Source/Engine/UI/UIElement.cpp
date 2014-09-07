@@ -1107,7 +1107,7 @@ void UIElement::BringToFront()
     }
 }
 
-UIElement* UIElement::CreateChild(ShortStringHash type, const String& name, unsigned index)
+UIElement* UIElement::CreateChild(StringHash type, const String& name, unsigned index)
 {
     // Check that creation succeeds and that the object in fact is a UI element
     SharedPtr<UIElement> newElement = DynamicCast<UIElement>(context_->CreateObject(type));
@@ -1278,7 +1278,7 @@ void UIElement::SetParent(UIElement* parent, unsigned index)
         parent->InsertChild(index, this);
 }
 
-void UIElement::SetVar(ShortStringHash key, const Variant& value)
+void UIElement::SetVar(StringHash key, const Variant& value)
 {
     vars_[key] = value;
 }
@@ -1398,7 +1398,7 @@ UIElement* UIElement::GetChild(const String& name, bool recursive) const
     return 0;
 }
 
-UIElement* UIElement::GetChild(const ShortStringHash& key, const Variant& value, bool recursive) const
+UIElement* UIElement::GetChild(const StringHash& key, const Variant& value, bool recursive) const
 {
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -1439,7 +1439,7 @@ const Color& UIElement::GetDerivedColor() const
     return derivedColor_;
 }
 
-const Variant& UIElement::GetVar(const ShortStringHash& key) const
+const Variant& UIElement::GetVar(const StringHash& key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
     return i != vars_.End() ? i->second_ : Variant::EMPTY;
@@ -1592,6 +1592,37 @@ void UIElement::OnAttributeAnimationRemoved()
 {
     if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(E_POSTUPDATE);
+}
+
+void UIElement::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+{
+    Vector<String> names = name.Split('/');
+    // Only attribute name
+    if (names.Size() == 1)
+        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    else
+    {
+        // Name must in following format: "#0/#1/attribute"
+        UIElement* element = this;
+        for (unsigned i = 0; i < names.Size() - 1; ++i)
+        {
+            if (names[i].Front() != '#')
+            {
+                LOGERROR("Invalid name " + name);
+                return;
+            }
+
+            unsigned index = ToInt(names[i].Substring(1, names[i].Length() - 1));
+            element = element->GetChild(index);
+            if (!element)
+            {
+                LOGERROR("Could not find element by name " + name);
+                return;
+            }
+        }
+
+        element->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+    }
 }
 
 void UIElement::MarkDirty()

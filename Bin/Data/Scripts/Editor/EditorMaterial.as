@@ -351,7 +351,7 @@ void EditMaterialName(StringHash eventType, VariantMap& eventData)
 
 void PickEditMaterial()
 {
-    @resourcePicker = GetResourcePicker(ShortStringHash("Material"));
+    @resourcePicker = GetResourcePicker(StringHash("Material"));
     if (resourcePicker is null)
         return;
 
@@ -417,7 +417,7 @@ void SaveMaterialAs()
     if (editMaterial is null)
         return;
 
-    @resourcePicker = GetResourcePicker(ShortStringHash("Material"));
+    @resourcePicker = GetResourcePicker(StringHash("Material"));
     if (resourcePicker is null)
         return;
 
@@ -552,7 +552,7 @@ void PickMaterialTexture(StringHash eventType, VariantMap& eventData)
     UIElement@ button = eventData["Element"].GetPtr();
     resourcePickIndex = button.vars["Index"].GetUInt();
 
-    @resourcePicker = GetResourcePicker(ShortStringHash("Texture2D"));
+    @resourcePicker = GetResourcePicker(StringHash("Texture2D"));
     if (resourcePicker is null)
         return;
 
@@ -577,9 +577,6 @@ void PickMaterialTextureDone(StringHash eventType, VariantMap& eventData)
     String resourceName = eventData["FileName"].GetString();
     Resource@ res = GetPickedResource(resourceName);
 
-    Print("INDEX");
-    Print(resourcePickIndex);
-    
     if (res !is null && editMaterial !is null)
     {
         BeginMaterialEdit();
@@ -646,7 +643,7 @@ void PickMaterialTechnique(StringHash eventType, VariantMap& eventData)
     UIElement@ button = eventData["Element"].GetPtr();
     resourcePickIndex = button.vars["Index"].GetUInt();
 
-    @resourcePicker = GetResourcePicker(ShortStringHash("Technique"));
+    @resourcePicker = GetResourcePicker(StringHash("Technique"));
     if (resourcePicker is null)
         return;
 

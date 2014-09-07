@@ -24,6 +24,7 @@
 
 #include "ArrayPtr.h"
 #include "BoundingBox.h"
+#include "GraphicsDefs.h"
 #include "Skeleton.h"
 #include "Resource.h"
 #include "Ptr.h"
@@ -43,6 +44,8 @@ struct VertexBufferMorph
     unsigned elementMask_;
     /// Number of vertices.
     unsigned vertexCount_;
+    /// Morphed vertices data size as bytes.
+    unsigned dataSize_;
     /// Morphed vertices. Stored packed as <index, data> pairs.
     SharedArrayPtr<unsigned char> morphData_;
 };
@@ -60,6 +63,47 @@ struct ModelMorph
     HashMap<unsigned, VertexBufferMorph> buffers_;
 };
 
+/// Description of vertex buffer data for asynchronous loading.
+struct VertexBufferDesc
+{
+    /// Vertex count.
+    unsigned vertexCount_;
+    /// Element mask.
+    unsigned elementMask_;
+    /// Vertex data size.
+    unsigned dataSize_;
+    /// Vertex data.
+    SharedArrayPtr<unsigned char> data_;
+};
+
+/// Description of index buffer data for asynchronous loading.
+struct IndexBufferDesc
+{
+    /// Index count.
+    unsigned indexCount_;
+    /// Index size.
+    unsigned indexSize_;
+    /// Index data size.
+    unsigned dataSize_;
+    /// Index data.
+    SharedArrayPtr<unsigned char> data_;
+};
+
+/// Description of a geometry for asynchronous loading.
+struct GeometryDesc
+{
+    /// Primitive type.
+    PrimitiveType type_;
+    /// Vertex buffer ref.
+    unsigned vbRef_;
+    /// Index buffer ref.
+    unsigned ibRef_;
+    /// Index start.
+    unsigned indexStart_;
+    /// Index count.
+    unsigned indexCount_;
+};
+
 /// 3D model resource.
 class URHO3D_API Model : public Resource
 {
@@ -73,8 +117,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     
@@ -98,6 +144,8 @@ public:
     void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
     /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
+    /// Clone the model. The geometry data is deep-copied and can be modified in the clone without affecting the original.
+    SharedPtr<Model> Clone(const String& cloneName = String::EMPTY) const;
     
     /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
@@ -155,6 +203,12 @@ private:
     PODVector<unsigned> morphRangeStarts_;
     /// Vertex buffer morph range vertex count.
     PODVector<unsigned> morphRangeCounts_;
+    /// Vertex buffer data for asynchronous loading.
+    Vector<VertexBufferDesc> loadVBData_;
+    /// Index buffer data for asynchronous loading.
+    Vector<IndexBufferDesc> loadIBData_;
+    /// Geometry definitions for asynchronous loading.
+    Vector<PODVector<GeometryDesc> > loadGeometries_;
 };
 
 }

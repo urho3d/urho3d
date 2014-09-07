@@ -92,6 +92,14 @@ struct PackageUpload
     unsigned totalFragments_;
 };
 
+/// Send modes for observer position/rotation. Activated by the client setting either position or rotation.
+enum ObserverPositionSendMode
+{
+    OPSM_NONE = 0,
+    OPSM_POSITION,
+    OPSM_POSITION_ROTATION
+};
+
 /// %Connection to a remote network host.
 class URHO3D_API Connection : public Object
 {
@@ -117,8 +125,10 @@ public:
     void SetIdentity(const VariantMap& identity);
     /// Set new controls.
     void SetControls(const Controls& newControls);
-    /// Set the observer position for interest management.
+    /// Set the observer position for interest management, to be sent to the server.
     void SetPosition(const Vector3& position);
+    /// Set the observer rotation for interest management, to be sent to the server. Note: not used by the NetworkPriority component.
+    void SetRotation(const Quaternion& rotation);
     /// Set the connection pending status. Called by Network.
     void SetConnectPending(bool connectPending);
     /// Set whether to log data in/out statistics.
@@ -146,8 +156,10 @@ public:
     Scene* GetScene() const;
     /// Return the client controls of this connection.
     const Controls& GetControls() const { return controls_; }
-    /// Return the observer position for interest management.
+    /// Return the observer position sent by the client for interest management.
     const Vector3& GetPosition() const { return position_; }
+    /// Return the observer rotation sent by the client for interest management.
+    const Quaternion& GetRotation() const { return rotation_; }
     /// Return whether is a client connection.
     bool IsClient() const { return isClient_; }
     /// Return whether is fully connected.
@@ -159,9 +171,9 @@ public:
     /// Return whether to log data in/out statistics.
     bool GetLogStatistics() const { return logStatistics_; }
     /// Return remote address.
-    String GetAddress() const;
+    String GetAddress() const { return address_; }
     /// Return remote port.
-    unsigned short GetPort() const;
+    unsigned short GetPort() const { return port_; }
     /// Return an address:port string.
     String ToString() const;
     /// Return number of package downloads remaining.
@@ -171,8 +183,6 @@ public:
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
     
-    /// Observer position for interest management.
-    Vector3 position_;
     /// Current controls.
     Controls controls_;
     /// Identity map.
@@ -238,6 +248,16 @@ private:
     String sceneFileName_;
     /// Statistics timer.
     Timer statsTimer_;
+    /// Remote endpoint address.
+    String address_;
+    /// Remote endpoint port.
+    unsigned short port_;
+    /// Observer position for interest management.
+    Vector3 position_;
+    /// Observer rotation for interest management.
+    Quaternion rotation_;
+    /// Send mode for the observer position & rotation.
+    ObserverPositionSendMode sendMode_;
     /// Client connection flag.
     bool isClient_;
     /// Connection pending flag.

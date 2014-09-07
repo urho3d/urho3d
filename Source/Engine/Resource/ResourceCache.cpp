@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "BackgroundLoader.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "FileSystem.h"
@@ -29,8 +30,10 @@
 #include "JSONFile.h"
 #include "Log.h"
 #include "PackageFile.h"
+#include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
+#include "WorkQueue.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -63,18 +66,29 @@ ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false),
     returnFailedResources_(false),
-    searchPackagesFirst_(true)
+    searchPackagesFirst_(true),
+    finishBackgroundResourcesMs_(5)
 {
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
+    
+    // Create resource background loader. Its thread will start on the first background request
+    backgroundLoader_ = new BackgroundLoader(this);
+    
+    // Subscribe BeginFrame for handling directory watchers and background loaded resource finalization
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
 }
 
 ResourceCache::~ResourceCache()
 {
+    // Shut down the background loader first
+    backgroundLoader_.Reset();
 }
 
 bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority)
 {
+    MutexLock lock(resourceMutex_);
+    
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem || !fileSystem->DirExists(pathName))
     {
@@ -112,6 +126,8 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority
 
 void ResourceCache::AddPackageFile(PackageFile* package, unsigned int priority)
 {
+    MutexLock lock(resourceMutex_);
+    
     // Do not add packages that failed to load
     if (!package || !package->GetNumFiles())
         return;
@@ -148,6 +164,8 @@ bool ResourceCache::AddManualResource(Resource* resource)
 
 void ResourceCache::RemoveResourceDir(const String& pathName)
 {
+    MutexLock lock(resourceMutex_);
+    
     String fixedPath = SanitateResourceDirName(pathName);
     
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
@@ -172,6 +190,8 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
 
 void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResources, bool forceRelease)
 {
+    MutexLock lock(resourceMutex_);
+    
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (*i == package)
@@ -187,6 +207,8 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
 
 void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResources, bool forceRelease)
 {
+    MutexLock lock(resourceMutex_);
+
     // Compare the name and extension only, not the path
     String fileNameNoPath = GetFileNameAndExtension(fileName);
     
@@ -203,7 +225,7 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
     }
 }
 
-void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bool force)
+void ResourceCache::ReleaseResource(StringHash type, const String& name, bool force)
 {
     StringHash nameHash(name);
     const SharedPtr<Resource>& existingRes = FindResource(type, nameHash);
@@ -218,11 +240,11 @@ void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bo
     }
 }
 
-void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
+void ResourceCache::ReleaseResources(StringHash type, bool force)
 {
     bool released = false;
     
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
         for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
@@ -242,11 +264,11 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
         UpdateResourceGroup(type);
 }
 
-void ResourceCache::ReleaseResources(ShortStringHash type, const String& partialName, bool force)
+void ResourceCache::ReleaseResources(StringHash type, const String& partialName, bool force)
 {
     bool released = false;
     
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
         for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
@@ -277,7 +299,7 @@ void ResourceCache::ReleaseResources(const String& partialName, bool force)
     
     while (repeat--)
     {
-        for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+        for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         {
             bool released = false;
             
@@ -307,7 +329,7 @@ void ResourceCache::ReleaseAllResources(bool force)
     
     while (repeat--)
     {
-        for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
+        for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
             i != resourceGroups_.End(); ++i)
         {
             bool released = false;
@@ -355,7 +377,7 @@ bool ResourceCache::ReloadResource(Resource* resource)
     return false;
 }
 
-void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
+void ResourceCache::SetMemoryBudget(StringHash type, unsigned budget)
 {
     resourceGroups_[type].memoryBudget_ = budget;
 }
@@ -372,14 +394,9 @@ void ResourceCache::SetAutoReloadResources(bool enable)
                 watcher->StartWatching(resourceDirs_[i], true);
                 fileWatchers_.Push(watcher);
             }
-
-            SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
         }
         else
-        {
-            UnsubscribeFromEvent(E_BEGINFRAME);
             fileWatchers_.Clear();
-        }
         
         autoReloadResources_ = enable;
     }
@@ -392,6 +409,8 @@ void ResourceCache::SetReturnFailedResources(bool enable)
 
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
 {
+    MutexLock lock(resourceMutex_);
+    
     String name = SanitateResourceName(nameIn);
     File* file = 0;
 
@@ -415,30 +434,38 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     {
         LOGERROR("Could not find resource " + name);
 
-        using namespace ResourceNotFound;
+        if (Thread::IsMainThread())
+        {
+            using namespace ResourceNotFound;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_RESOURCENAME] = name;
-        SendEvent(E_RESOURCENOTFOUND, eventData);
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCENAME] = name;
+            SendEvent(E_RESOURCENOTFOUND, eventData);
+        }
     }
 
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure)
-{
-    return GetResource(type, name.CString(), sendEventOnFailure);
-}
-
-Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);
+    
+    if (!Thread::IsMainThread())
+    {
+        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        return 0;
+    }
     
     // If empty name, return null pointer immediately
     if (name.Empty())
         return 0;
     
     StringHash nameHash(name);
+
+    // Check if the resource is being background loaded but is now needed immediately
+    backgroundLoader_->WaitForResource(type, nameHash);
+
     const SharedPtr<Resource>& existing = FindResource(type, nameHash);
     if (existing)
         return existing;
@@ -450,12 +477,15 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     {
         LOGERROR("Could not load unknown resource type " + String(type));
 
-        using namespace UnknownResourceType;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_RESOURCETYPE] = type;
-        SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
-
+        if (sendEventOnFailure)
+        {
+            using namespace UnknownResourceType;
+            
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCETYPE] = type;
+            SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
+        }
+        
         return 0;
     }
     
@@ -470,12 +500,15 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     if (!resource->Load(*(file.Get())))
     {
         // Error should already been logged by corresponding resource descendant class
-        using namespace LoadFailed;
+        if (sendEventOnFailure)
+        {
+            using namespace LoadFailed;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_RESOURCENAME] = name;
-        SendEvent(E_LOADFAILED, eventData);
-
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCENAME] = name;
+            SendEvent(E_LOADFAILED, eventData);
+        }
+        
         if (!returnFailedResources_)
             return 0;
     }
@@ -488,10 +521,83 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const char* nameIn, b
     return resource;
 }
 
-void ResourceCache::GetResources(PODVector<Resource*>& result, ShortStringHash type) const
+bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn, bool sendEventOnFailure, Resource* caller)
+{
+    // If empty name, fail immediately
+    String name = SanitateResourceName(nameIn);
+    if (name.Empty())
+        return false;
+    
+    // First check if already exists as a loaded resource
+    StringHash nameHash(name);
+    if (FindResource(type, nameHash) != noResource)
+        return false;
+    
+    return backgroundLoader_->QueueResource(type, name, sendEventOnFailure, caller);
+}
+
+SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+{
+    String name = SanitateResourceName(nameIn);
+    
+    // If empty name, return null pointer immediately
+    if (name.Empty())
+        return SharedPtr<Resource>();
+    
+    SharedPtr<Resource> resource;
+    // Make sure the pointer is non-null and is a Resource subclass
+    resource = DynamicCast<Resource>(context_->CreateObject(type));
+    if (!resource)
+    {
+        LOGERROR("Could not load unknown resource type " + String(type));
+
+        if (sendEventOnFailure)
+        {
+            using namespace UnknownResourceType;
+            
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCETYPE] = type;
+            SendEvent(E_UNKNOWNRESOURCETYPE, eventData);
+        }
+        
+        return SharedPtr<Resource>();
+    }
+    
+    // Attempt to load the resource
+    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
+    if (!file)
+        return SharedPtr<Resource>();  // Error is already logged
+
+    LOGDEBUG("Loading temporary resource " + name);
+    resource->SetName(file->GetName());
+
+    if (!resource->Load(*(file.Get())))
+    {
+        // Error should already been logged by corresponding resource descendant class
+        if (sendEventOnFailure)
+        {
+            using namespace LoadFailed;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_RESOURCENAME] = name;
+            SendEvent(E_LOADFAILED, eventData);
+        }
+        
+        return SharedPtr<Resource>();
+    }
+    
+    return resource;
+}
+
+unsigned ResourceCache::GetNumBackgroundLoadResources() const
+{
+    return backgroundLoader_->GetNumQueuedResources();
+}
+
+void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
 {
     result.Clear();
-    HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
         for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = i->second_.resources_.Begin();
@@ -502,6 +608,8 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, ShortStringHash t
 
 bool ResourceCache::Exists(const String& nameIn) const
 {
+    MutexLock lock(resourceMutex_);
+    
     String name = SanitateResourceName(nameIn);
     if (name.Empty())
         return false;
@@ -526,18 +634,18 @@ bool ResourceCache::Exists(const String& nameIn) const
     return false;
 }
 
-unsigned ResourceCache::GetMemoryBudget(ShortStringHash type) const
+unsigned ResourceCache::GetMemoryBudget(StringHash type) const
 {
-    HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
         return i->second_.memoryBudget_;
     else
         return 0;
 }
 
-unsigned ResourceCache::GetMemoryUse(ShortStringHash type) const
+unsigned ResourceCache::GetMemoryUse(StringHash type) const
 {
-    HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
         return i->second_.memoryUse_;
     else
@@ -547,13 +655,15 @@ unsigned ResourceCache::GetMemoryUse(ShortStringHash type) const
 unsigned ResourceCache::GetTotalMemoryUse() const
 {
     unsigned total = 0;
-    for (HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+    for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         total += i->second_.memoryUse_;
     return total;
 }
 
 String ResourceCache::GetResourceFileName(const String& name) const
 {
+    MutexLock lock(resourceMutex_);
+    
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
@@ -649,6 +759,8 @@ void ResourceCache::StoreResourceDependency(Resource* resource, const String& de
     if (!resource || !autoReloadResources_)
         return;
     
+    MutexLock lock(resourceMutex_);
+    
     StringHash nameHash(resource->GetName());
     HashSet<StringHash>& dependents = dependentResources_[dependency];
     dependents.Insert(nameHash);
@@ -658,6 +770,8 @@ void ResourceCache::ResetDependencies(Resource* resource)
 {
     if (!resource || !autoReloadResources_)
         return;
+    
+    MutexLock lock(resourceMutex_);
     
     StringHash nameHash(resource->GetName());
     
@@ -673,9 +787,11 @@ void ResourceCache::ResetDependencies(Resource* resource)
     }
 }
 
-const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, StringHash nameHash)
+const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHash nameHash)
 {
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    MutexLock lock(resourceMutex_);
+
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return noResource;
     HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
@@ -687,7 +803,9 @@ const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, Str
 
 const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 {
-    for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+    MutexLock lock(resourceMutex_);
+
+    for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
     {
         HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
         if (j != i->second_.resources_.End())
@@ -699,7 +817,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 
 void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
 {
-    HashSet<ShortStringHash> affectedGroups;
+    HashSet<StringHash> affectedGroups;
     
     const HashMap<String, PackageEntry>& entries = package->GetEntries();
     for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
@@ -707,7 +825,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         StringHash nameHash(i->first_);
         
         // We do not know the actual resource type, so search all type containers
-        for (HashMap<ShortStringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin();
+        for (HashMap<StringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin();
             j != resourceGroups_.End(); ++j)
         {
             HashMap<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(nameHash);
@@ -724,13 +842,13 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         }
     }
     
-    for (HashSet<ShortStringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
+    for (HashSet<StringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
         UpdateResourceGroup(*i);
 }
 
-void ResourceCache::UpdateResourceGroup(ShortStringHash type)
+void ResourceCache::UpdateResourceGroup(StringHash type)
 {
-    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return;
     
@@ -818,6 +936,12 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
             eventData[P_RESOURCENAME] = fileName;
             SendEvent(E_FILECHANGED, eventData);
         }
+    }
+    
+    // Check for background loaded resources that can be finished
+    {
+        PROFILE(FinishBackgroundResources);
+        backgroundLoader_->FinishResources(finishBackgroundResourcesMs_);
     }
 }
 

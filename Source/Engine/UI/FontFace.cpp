@@ -114,7 +114,7 @@ SharedPtr<Texture2D> FontFace::CreateFaceTexture()
 SharedPtr<Texture2D> FontFace::LoadFaceTexture(SharedPtr<Image> image)
 {
     SharedPtr<Texture2D> texture = CreateFaceTexture();
-    if (!texture->Load(image, true))
+    if (!texture->SetData(image, true))
     {
         LOGERROR("Could not load texture from image resource");
         return SharedPtr<Texture2D>();

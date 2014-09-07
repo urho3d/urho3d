@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Mutex.h"
 #include "Object.h"
 
 class asIObjectType;
@@ -92,6 +93,8 @@ public:
     void ClearObjectTypeCache();
     /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
     asIObjectType* GetObjectType(const char* declaration);
+    /// Return the script module create/delete mutex.
+    Mutex& GetModuleMutex() { return moduleMutex_; }
 
 private:
     /// Increase script nesting level.
@@ -119,6 +122,8 @@ private:
     Vector<asIScriptContext*> scriptFileContexts_;
     /// Search cache for inbuilt object types.
     HashMap<const char*, asIObjectType*> objectTypes_;
+    /// Script module create/delete mutex.
+    Mutex moduleMutex_;
     /// Current script execution nesting level.
     unsigned scriptNestingLevel_;
     /// Flag for executing engine console commands as script code. Default to true.

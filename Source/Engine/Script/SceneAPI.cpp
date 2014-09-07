@@ -194,19 +194,19 @@ static CScriptArray* GetObjectCategories()
 
 static CScriptArray* GetObjectsByCategory(const String& category)
 {
-    const HashMap<String, Vector<ShortStringHash> >& categories = GetScriptContext()->GetObjectCategories();
+    const HashMap<String, Vector<StringHash> >& categories = GetScriptContext()->GetObjectCategories();
     Vector<String> components;
 
-    HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Find(category);
+    HashMap<String, Vector<StringHash> >::ConstIterator i = categories.Find(category);
     if (i != categories.End())
     {
-        const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
-        const Vector<ShortStringHash>& factoryHashes = i->second_;
+        const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
+        const Vector<StringHash>& factoryHashes = i->second_;
         components.Reserve(factoryHashes.Size());
 
         for (unsigned j = 0; j < factoryHashes.Size(); ++j)
         {
-            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator k = factories.Find(factoryHashes[j]);
+            HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator k = factories.Find(factoryHashes[j]);
             if (k != factories.End())
                 components.Push(k->second_->GetTypeName());
         }
@@ -253,6 +253,11 @@ static void RegisterSplinePath(asIScriptEngine* engine)
 
 static void RegisterScene(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("LoadMode");
+    engine->RegisterEnumValue("LoadMode", "LOAD_RESOURCES_ONLY", LOAD_RESOURCES_ONLY);
+    engine->RegisterEnumValue("LoadMode", "LOAD_SCENE", LOAD_SCENE);
+    engine->RegisterEnumValue("LoadMode", "LOAD_SCENE_AND_RESOURCES", LOAD_SCENE_AND_RESOURCES);
+    
     engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
@@ -265,8 +270,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "bool LoadXML(VectorBuffer&)", asFUNCTION(SceneLoadXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool SaveXML(File@+)", asFUNCTION(SceneSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool SaveXML(VectorBuffer&)", asFUNCTION(SceneSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+)", asMETHOD(Scene, LoadAsync), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+)", asMETHOD(Scene, LoadAsyncXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+, LoadMode mode = LOAD_SCENE_AND_RESOURCES)", asMETHOD(Scene, LoadAsync), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+, LoadMode mode = LOAD_SCENE_AND_RESOURCES)", asMETHOD(Scene, LoadAsyncXML), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHOD(Scene, StopAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiate), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateVectorBuffer), asCALL_CDECL_OBJLAST);
@@ -282,7 +287,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void UnregisterAllVars(const String&in)", asMETHOD(Scene, UnregisterAllVars), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint)", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint)", asMETHOD(Scene, GetNode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const String& GetVarName(ShortStringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& GetVarName(StringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHOD(Scene, SetUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_updateEnabled() const", asMETHOD(Scene, IsUpdateEnabled), asCALL_THISCALL);
@@ -296,6 +301,9 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "float get_snapThreshold() const", asMETHOD(Scene, GetSnapThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_asyncLoading() const", asMETHOD(Scene, IsAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float get_asyncProgress() const", asMETHOD(Scene, GetAsyncProgress), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "LoadMode get_asyncLoadMode() const", asMETHOD(Scene, GetAsyncLoadMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_asyncLoadingMs(int)", asMETHOD(Scene, SetAsyncLoadingMs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "int get_asyncLoadingMs() const", asMETHOD(Scene, GetAsyncLoadingMs), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "uint get_checksum() const", asMETHOD(Scene, GetChecksum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "const String& get_fileName() const", asMETHOD(Scene, GetFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ get_requiredPackageFiles() const", asFUNCTION(SceneGetRequiredPackageFiles), asCALL_CDECL_OBJLAST);

@@ -39,6 +39,17 @@ static const unsigned LAST_REPLICATED_ID = 0xffffff;
 static const unsigned FIRST_LOCAL_ID = 0x01000000;
 static const unsigned LAST_LOCAL_ID = 0xffffffff;
 
+/// Asynchronous scene loading mode.
+enum LoadMode
+{
+    /// Preload resources used by a scene or object prefab file, but do not load any scene content.
+    LOAD_RESOURCES_ONLY = 0,
+    /// Load scene content without preloading. Resources will be requested synchronously when encountered.
+    LOAD_SCENE,
+    /// Default mode: preload resources used by the scene first, then load the scene content.
+    LOAD_SCENE_AND_RESOURCES
+};
+
 /// Asynchronous loading progress of a scene.
 struct AsyncProgress
 {
@@ -48,6 +59,14 @@ struct AsyncProgress
     SharedPtr<XMLFile> xmlFile_;
     /// Current XML element for XML mode.
     XMLElement xmlElement_;
+    /// Current load mode.
+    LoadMode mode_;
+    /// Resource name hashes left to load.
+    HashSet<StringHash> resources_;
+    /// Loaded resources.
+    unsigned loadedResources_;
+    /// Total resources.
+    unsigned totalResources_;
     /// Loaded root-level nodes.
     unsigned loadedNodes_;
     /// Total root-level nodes.
@@ -85,10 +104,10 @@ public:
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest) const;
-    /// Load from a binary file asynchronously. Return true if started successfully.
-    bool LoadAsync(File* file);
-    /// Load from an XML file asynchronously. Return true if started successfully.
-    bool LoadAsyncXML(File* file);
+    /// Load from a binary file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
+    bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    /// Load from an XML file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
+    bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
     /// Stop asynchronous loading.
     void StopAsyncLoading();
     /// Instantiate scene content from binary data. Return root node if successful.
@@ -109,6 +128,8 @@ public:
     void SetSmoothingConstant(float constant);
     /// Set network client motion smoothing snap threshold.
     void SetSnapThreshold(float threshold);
+    /// Set maximum milliseconds per frame to spend on async scene loading.
+    void SetAsyncLoadingMs(int ms);
     /// Add a required package file for networking. To be called on the server.
     void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files.
@@ -130,6 +151,8 @@ public:
     bool IsAsyncLoading() const { return asyncLoading_; }
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
     float GetAsyncProgress() const;
+    /// Return the load mode of the current asynchronous loading operation.
+    LoadMode GetAsyncLoadMode() const { return asyncProgress_.mode_; }
     /// Return source file name.
     const String& GetFileName() const { return fileName_; }
     /// Return source file checksum.
@@ -142,10 +165,12 @@ public:
     float GetSmoothingConstant() const { return smoothingConstant_; }
     /// Return motion smoothing snap threshold.
     float GetSnapThreshold() const { return snapThreshold_; }
+    /// Return maximum milliseconds per frame to spend on async loading.
+    int GetAsyncLoadingMs() const { return asyncLoadingMs_; }
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return a node user variable name, or empty if not registered.
-    const String& GetVarName(ShortStringHash hash) const;
+    const String& GetVarName(StringHash hash) const;
 
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
@@ -187,6 +212,8 @@ public:
 private:
     /// Handle the logic update event to update the scene, if active.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle a background loaded resource completing.
+    void HandleResourceBackgroundLoaded(StringHash eventType, VariantMap& eventData);
     /// Update asynchronous loading.
     void UpdateAsyncLoading();
     /// Finish asynchronous loading.
@@ -195,6 +222,10 @@ private:
     void FinishLoading(Deserializer* source);
     /// Finish saving. Sets the scene filename and checksum.
     void FinishSaving(Serializer* dest) const;
+    /// Preload resources from a binary scene or object prefab file.
+    void PreloadResources(File* file, bool isSceneFile);
+    /// Preload resources from an XML scene or object prefab file.
+    void PreloadResourcesXML(const XMLElement& element);
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;
@@ -213,7 +244,7 @@ private:
     /// Required package files for networking.
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
-    HashMap<ShortStringHash, String> varNames_;
+    HashMap<StringHash, String> varNames_;
     /// Nodes to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateNodes_;
     /// Components to check for attribute changes on the next network update.
@@ -234,6 +265,8 @@ private:
     unsigned localComponentID_;
     /// Scene source file checksum.
     mutable unsigned checksum_;
+    /// Maximum milliseconds per frame to spend on async scene loading.
+    int asyncLoadingMs_;
     /// Scene update time scale.
     float timeScale_;
     /// Elapsed time accumulator.

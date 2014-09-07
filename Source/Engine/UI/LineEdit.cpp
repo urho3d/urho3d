@@ -33,7 +33,7 @@
 namespace Urho3D
 {
 
-ShortStringHash VAR_DRAGDROPCONTENT("DragDropContent");
+StringHash VAR_DRAGDROPCONTENT("DragDropContent");
 
 extern const char* UI_CATEGORY;
 
@@ -159,7 +159,7 @@ bool LineEdit::OnDragDropTest(UIElement* source)
 {
     if (source)
     {
-        ShortStringHash sourceType = source->GetType();
+        StringHash sourceType = source->GetType();
         return sourceType == LineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
     }
 
@@ -177,7 +177,7 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
             return true;
         }
         
-        ShortStringHash sourceType = source->GetType();
+        StringHash sourceType = source->GetType();
         if (sourceType == LineEdit::GetTypeStatic())
         {
             LineEdit* sourceLineEdit = static_cast<LineEdit*>(source);

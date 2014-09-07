@@ -64,7 +64,15 @@ EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
 /// Unknown resource type.
 EVENT(E_UNKNOWNRESOURCETYPE, UnknownResourceType)
 {
-    PARAM(P_RESOURCETYPE, ResourceType);            // ShortStringHash
+    PARAM(P_RESOURCETYPE, ResourceType);            // StringHash
+}
+
+/// Resource background loading finished.
+EVENT(E_RESOURCEBACKGROUNDLOADED, ResourceBackgroundLoaded)
+{
+    PARAM(P_RESOURCENAME, ResourceName);            // String
+    PARAM(P_SUCCESS, Success);                      // bool
+    PARAM(P_RESOURCE, Resource);                    // Resource pointer
 }
 
 }

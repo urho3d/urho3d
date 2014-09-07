@@ -33,15 +33,15 @@ class EventHandler;
 
 #define OBJECT(typeName) \
     public: \
-        virtual Urho3D::ShortStringHash GetType() const { return GetTypeStatic(); } \
-        virtual Urho3D::ShortStringHash GetBaseType() const { return GetBaseTypeStatic(); } \
+        virtual Urho3D::StringHash GetType() const { return GetTypeStatic(); } \
+        virtual Urho3D::StringHash GetBaseType() const { return GetBaseTypeStatic(); } \
         virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static Urho3D::ShortStringHash GetTypeStatic() { static const Urho3D::ShortStringHash typeStatic(#typeName); return typeStatic; } \
+        static Urho3D::StringHash GetTypeStatic() { static const Urho3D::StringHash typeStatic(#typeName); return typeStatic; } \
         static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
 
 #define BASEOBJECT(typeName) \
     public: \
-        static Urho3D::ShortStringHash GetBaseTypeStatic() { static const Urho3D::ShortStringHash baseTypeStatic(#typeName); return baseTypeStatic; } \
+        static Urho3D::StringHash GetBaseTypeStatic() { static const Urho3D::StringHash baseTypeStatic(#typeName); return baseTypeStatic; } \
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
 class URHO3D_API Object : public RefCounted
@@ -57,9 +57,9 @@ public:
     virtual ~Object();
     
     /// Return type hash.
-    virtual ShortStringHash GetType() const = 0;
+    virtual StringHash GetType() const = 0;
     /// Return base class type hash.
-    virtual ShortStringHash GetBaseType() const = 0;
+    virtual StringHash GetBaseType() const = 0;
     /// Return type name.
     virtual const String& GetTypeName() const = 0;
     /// Handle event.
@@ -89,7 +89,7 @@ public:
     /// Return execution context.
     Context* GetContext() const { return context_; }
     /// Return subsystem by type.
-    Object* GetSubsystem(ShortStringHash type) const;
+    Object* GetSubsystem(StringHash type) const;
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
     /// Return active event handler. Null outside event handling.
@@ -142,9 +142,9 @@ public:
     /// Return execution context.
     Context* GetContext() const { return context_; }
     /// Return type hash of objects created by this factory.
-    ShortStringHash GetType() const { return type_; }
+    StringHash GetType() const { return type_; }
     /// Return base type hash of objects created by this factory.
-    ShortStringHash GetBaseType() const { return baseType_; }
+    StringHash GetBaseType() const { return baseType_; }
     /// Return type name of objects created by this factory.
     const String& GetTypeName() const { return typeName_; }
     
@@ -152,9 +152,9 @@ protected:
     /// Execution context.
     Context* context_;
     /// Object type.
-    ShortStringHash type_;
+    StringHash type_;
     /// Object base type.
-    ShortStringHash baseType_;
+    StringHash baseType_;
     /// Object type name.
     String typeName_;
 };
@@ -266,7 +266,7 @@ private:
 };
 
 #define EVENT(eventID, eventName) static const Urho3D::StringHash eventID(#eventName); namespace eventName
-#define PARAM(paramID, paramName) static const Urho3D::ShortStringHash paramID(#paramName)
+#define PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
 #define HANDLER(className, function) (new Urho3D::EventHandlerImpl<className>(this, &className::function))
 #define HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
 

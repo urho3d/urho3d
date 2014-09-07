@@ -148,17 +148,13 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
 bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
 {
     Vector3 forward = direction.Normalized();
-    Vector3 v = forward.CrossProduct(upDirection).Normalized(); 
+    Vector3 v = forward.CrossProduct(upDirection).Normalized();
     Vector3 up = v.CrossProduct(forward);
     Vector3 right = up.CrossProduct(forward);
 
     Quaternion ret;
-    ret.w_ = sqrtf(1.0f + right.x_ + up.y_ + forward.z_) * 0.5f;
-    float w4Recip = 1.0f / (4.0f * ret.w_);
-    ret.x_ = (up.z_ - forward.y_) * w4Recip;
-    ret.y_ = (forward.x_ - right.z_) * w4Recip;
-    ret.z_ = (right.y_ - up.x_) * w4Recip;
-
+    ret.FromAxes(right, up, forward);
+    
     if (!ret.IsNaN())
     {
         (*this) = ret;

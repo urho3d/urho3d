@@ -102,8 +102,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
@@ -139,7 +141,7 @@ public:
     void RemoveShaderParameter(const String& name);
     /// Reset all shader pointers.
     void ReleaseShaders();
-    /// Clone material.
+    /// Clone the material.
     SharedPtr<Material> Clone(const String& cloneName = String::EMPTY) const;
     /// Ensure that material techniques are listed in correct order.
     void SortTechniques();
@@ -222,6 +224,8 @@ private:
     bool specular_;
     /// Last animation update frame number.
     unsigned animationFrameNumber_;
+    /// XML file used while loading.
+    SharedPtr<XMLFile> loadXMLFile_;
 };
 
 }

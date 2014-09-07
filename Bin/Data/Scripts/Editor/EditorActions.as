@@ -362,7 +362,7 @@ class ResetAttributesAction : EditAction
         {
             // Special handling for UIElement to preserve the internal variables containing the element's generated ID among others
             UIElement@ element = target;
-            Array<ShortStringHash> keys = element.vars.keys;
+            Array<StringHash> keys = element.vars.keys;
             for (uint i = 0; i < keys.length; ++i)
             {
                 // If variable name is empty (or unregistered) then it is an internal variable and should be preserved
@@ -391,7 +391,7 @@ class ResetAttributesAction : EditAction
     void SetInternalVars(UIElement@ element)
     {
         // Revert back internal variables
-        Array<ShortStringHash> keys = internalVars.keys;
+        Array<StringHash> keys = internalVars.keys;
         for (uint i = 0; i < keys.length; ++i)
             element.vars[keys[i]] = internalVars[keys[i]];
 

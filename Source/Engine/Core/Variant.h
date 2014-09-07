@@ -103,13 +103,13 @@ struct URHO3D_API ResourceRef
     }
 
     /// Construct with type only and empty id.
-    ResourceRef(ShortStringHash type) :
+    ResourceRef(StringHash type) :
         type_(type)
     {
     }
 
     /// Construct with type and resource name.
-    ResourceRef(ShortStringHash type, const String& name) :
+    ResourceRef(StringHash type, const String& name) :
         type_(type),
         name_(name)
     {
@@ -123,7 +123,7 @@ struct URHO3D_API ResourceRef
     }
 
     /// Object type.
-    ShortStringHash type_;
+    StringHash type_;
     /// Object name.
     String name_;
 
@@ -142,19 +142,19 @@ struct URHO3D_API ResourceRefList
     }
 
     /// Construct with type only.
-    ResourceRefList(ShortStringHash type) :
+    ResourceRefList(StringHash type) :
         type_(type)
     {
     }
     /// Construct with type and id list.
-    ResourceRefList(ShortStringHash type, const Vector<String>& names) :
+    ResourceRefList(StringHash type, const Vector<String>& names) :
         type_(type),
         names_(names)
     {
     }
 
     /// Object type.
-    ShortStringHash type_;
+    StringHash type_;
     /// List of object names.
     Vector<String> names_;
 
@@ -170,7 +170,7 @@ class Variant;
 typedef Vector<Variant> VariantVector;
 
 /// Map of variants.
-typedef HashMap<ShortStringHash, Variant> VariantMap;
+typedef HashMap<StringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types.
 class URHO3D_API Variant
@@ -198,13 +198,6 @@ public:
 
     /// Construct from a string hash (convert to integer).
     Variant(const StringHash& value) :
-        type_(VAR_NONE)
-    {
-        *this = (int)value.Value();
-    }
-
-    /// Construct from a short string hash (convert to integer.)
-    Variant(const ShortStringHash& value) :
         type_(VAR_NONE)
     {
         *this = (int)value.Value();
@@ -431,14 +424,6 @@ public:
         return *this;
     }
 
-    /// Assign from a ShortStringHash (convert to integer)
-    Variant& operator = (const ShortStringHash& rhs)
-    {
-        SetType(VAR_INT);
-        value_.int_ = (int)rhs.Value();
-        return *this;
-    }
-
     /// Assign from a bool.
     Variant& operator = (bool rhs)
     {
@@ -657,8 +642,6 @@ public:
     bool operator == (const IntVector2& rhs) const { return type_ == VAR_INTVECTOR2 ? *(reinterpret_cast<const IntVector2*>(&value_)) == rhs : false; }
     /// Test for equality with a StringHash. To return true, both the type and value must match.
     bool operator == (const StringHash& rhs) const { return type_ == VAR_INT ? (unsigned)value_.int_ == rhs.Value() : false; }
-    /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
-    bool operator == (const ShortStringHash& rhs) const { return type_ == VAR_INT ? value_.int_ == rhs.Value() : false; }
     
     /// Test for equality with a RefCounted pointer. To return true, both the type and value must match, with the exception that void pointer is also allowed.
     bool operator == (RefCounted* rhs) const
@@ -716,8 +699,6 @@ public:
     bool operator != (const IntVector2& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a StringHash.
     bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a ShortStringHash.
-    bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a RefCounted pointer.
     bool operator != (RefCounted* rhs) const { return !(*this == rhs); }
     /// Test for inequality with a Matrix3.
@@ -744,8 +725,6 @@ public:
     int GetUInt() const { return type_ == VAR_INT ? (unsigned)value_.int_ : 0; }
     /// Return StringHash or zero on type mismatch.
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
-    /// Return ShortStringHash or zero on type mismatch.
-    ShortStringHash GetShortStringHash() const { return ShortStringHash(GetUInt()); }
     /// Return bool or false on type mismatch.
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
     /// Return float or zero on type mismatch.

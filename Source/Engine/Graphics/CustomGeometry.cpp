@@ -49,7 +49,8 @@ CustomGeometry::CustomGeometry(Context* context) :
     vertexBuffer_(new VertexBuffer(context)),
     elementMask_(MASK_POSITION),
     geometryIndex_(0),
-    materialsAttr_(Material::GetTypeStatic())
+    materialsAttr_(Material::GetTypeStatic()),
+    dynamic_(false)
 {
     vertexBuffer_->SetShadowed(true);
     SetNumGeometries(1);
@@ -64,6 +65,7 @@ void CustomGeometry::RegisterObject(Context* context)
     context->RegisterFactory<CustomGeometry>(GEOMETRY_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATTRIBUTE(CustomGeometry, VAR_BOOL, "Dynamic Vertex Buffer", dynamic_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BUFFER, "Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
@@ -220,6 +222,13 @@ void CustomGeometry::SetNumGeometries(unsigned num)
     }
 }
 
+void CustomGeometry::SetDynamic(bool enable)
+{
+    dynamic_ = enable;
+
+    MarkNetworkUpdate();
+}
+
 void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
 {
     if (index > geometries_.Size())
@@ -231,6 +240,10 @@ void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
     geometryIndex_ = index;
     primitiveTypes_[index] = type;
     vertices_[index].Clear();
+
+    // If beginning the first geometry, reset the element mask
+    if (!index)
+        elementMask_ = MASK_POSITION;
 }
 
 void CustomGeometry::DefineVertex(const Vector3& position)
@@ -278,6 +291,31 @@ void CustomGeometry::DefineTangent(const Vector4& tangent)
     elementMask_ |= MASK_TANGENT;
 }
 
+void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords, bool hasTangents)
+{
+    if (index > geometries_.Size())
+    {
+        LOGERROR("Geometry index out of bounds");
+        return;
+    }
+
+    geometryIndex_ = index;
+    primitiveTypes_[index] = type;
+    vertices_[index].Resize(numVertices);
+
+    // If defining the first geometry, reset the element mask
+    if (!index)
+        elementMask_ = MASK_POSITION;
+    if (hasNormals)
+        elementMask_ |= MASK_NORMAL;
+    if (hasColors)
+        elementMask_ |= MASK_COLOR;
+    if (hasTexCoords)
+        elementMask_ |= MASK_TEXCOORD1;
+    if (hasTangents)
+        elementMask_ |= MASK_TANGENT;
+}
+
 void CustomGeometry::Commit()
 {
     PROFILE(CommitCustomGeometry);
@@ -293,8 +331,11 @@ void CustomGeometry::Commit()
             boundingBox_.Merge(vertices_[i][j].position_);
     }
     
-    vertexBuffer_->SetSize(totalVertices, elementMask_);
-    
+    // Resize (recreate) the vertex buffer only if necessary
+    if (vertexBuffer_->GetVertexCount() != totalVertices || vertexBuffer_->GetElementMask() != elementMask_ ||
+        vertexBuffer_->IsDynamic() != dynamic_)
+        vertexBuffer_->SetSize(totalVertices, elementMask_, dynamic_);
+
     if (totalVertices)
     {
         unsigned char* dest = (unsigned char*)vertexBuffer_->Lock(0, totalVertices, true);
@@ -378,9 +419,20 @@ bool CustomGeometry::SetMaterial(unsigned index, Material* material)
     return true;
 }
 
+unsigned CustomGeometry::GetNumVertices(unsigned index) const
+{
+    return index < vertices_.Size() ? vertices_[index].Size() : 0;
+}
+
 Material* CustomGeometry::GetMaterial(unsigned index) const
 {
     return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
+}
+
+CustomGeometryVertex* CustomGeometry::GetVertex(unsigned geometryIndex, unsigned vertexNum)
+{
+    return (geometryIndex < vertices_.Size() && vertexNum < vertices_[geometryIndex].Size()) ?
+        &vertices_[geometryIndex][vertexNum] : (CustomGeometryVertex*)0;
 }
 
 void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> value)

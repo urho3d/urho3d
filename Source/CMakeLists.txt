@@ -29,7 +29,11 @@ cmake_minimum_required (VERSION 2.8.6)
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        cmake_policy (SET CMP0022 NEW)
+        cmake_policy (SET CMP0022 NEW) # INTERFACE_LINK_LIBRARIES defines the link interface
+    endif ()
+    if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
+        cmake_policy (SET CMP0026 OLD) # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        cmake_policy (SET CMP0042 NEW) # MACOSX_RPATH is enabled by default
     endif ()
 endif ()
 
@@ -121,18 +125,49 @@ if ("$ENV{RELEASE_TAG}" STREQUAL "")
 endif ()
 include (CPack)
 
+# Setup RPATH settings
+if (NOT WIN32)
+    if (APPLE AND (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12))
+        set (CMAKE_MACOSX_RPATH TRUE)
+        # Note for older version CMake users, you may need to use DYLD_LIBRARY_PATH environment variable to specify the path where Urho3D shared library is being installed
+        # when attempting to execute the samples or tools installed by Urho3D SDK with SHARED lib type
+    endif ()
+    set (CMAKE_SKIP_BUILD_RPATH FALSE)
+    set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
+    if (isSystemDir STREQUAL -1)
+        # If SDK installation location is not in the system default search paths then add the library installation location to target's RPATH
+        set (CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
+        # Note for Linux users, you should not need to use LD_LIBRARY_PATH environment variable pointing to Urho3D shared library path anymore when executing installed targets
+        # even when the shared library is installed on a non-default installation location
+    endif ()
+endif ()
+
 # Add targets
-foreach (TARGET Box2D Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
+foreach (TARGET Box2D Civetweb FreeType JO kNet LZ4 PugiXml SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
+
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
 endif ()
+
 if (URHO3D_LUA)
     add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
+
+if (URHO3D_NAVIGATION)
+    add_subdirectory (ThirdParty/Detour)
+    add_subdirectory (ThirdParty/Recast)
+endif ()
+
+if (URHO3D_PHYSICS)
+    add_subdirectory (ThirdParty/Bullet)
+endif ()
+
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)

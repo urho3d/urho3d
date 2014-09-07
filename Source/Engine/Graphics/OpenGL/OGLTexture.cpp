@@ -393,26 +393,16 @@ unsigned Texture::GetDataType(unsigned format)
     #endif
 }
 
-void Texture::LoadParameters()
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
-    
-    XMLFile* file = cache->GetResource<XMLFile>(xmlName, false);
-    if (file)
-        LoadParameters(file);
-}
-
-void Texture::LoadParameters(XMLFile* file)
+void Texture::SetParameters(XMLFile* file)
 {
     if (!file)
         return;
     
     XMLElement rootElem = file->GetRoot();
-    LoadParameters(rootElem);
+    SetParameters(rootElem);
 }
 
-void Texture::LoadParameters(const XMLElement& elem)
+void Texture::SetParameters(const XMLElement& elem)
 {
     XMLElement paramElem = elem.GetChild();
     while (paramElem)
@@ -491,7 +481,7 @@ unsigned Texture::GetSRGBFormat(unsigned format)
     #endif
 }
 
-void Texture::CheckTextureBudget(ShortStringHash type)
+void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     unsigned textureBudget = cache->GetMemoryBudget(type);

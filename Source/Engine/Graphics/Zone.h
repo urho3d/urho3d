@@ -24,11 +24,12 @@
 
 #include "Color.h"
 #include "Drawable.h"
+#include "Texture.h"
 
 namespace Urho3D
 {
 
-/// %Component that describes global rendering properties
+/// %Component that describes global rendering properties.
 class URHO3D_API Zone : public Drawable
 {
     OBJECT(Zone);
@@ -64,10 +65,12 @@ public:
     void SetPriority(int priority);
     /// Set height fog mode.
     void SetHeightFog(bool enable);
-    /// Set override mode. If camera is inside an override zone, it will also be used for all drawables.
+    /// Set override mode. If camera is inside an override zone, that zone will be used for all rendered objects instead of their own zone.
     void SetOverride(bool enable);
     /// Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
     void SetAmbientGradient(bool enable);
+    /// Set zone texture. This will be bound to the zone texture unit when rendering objects inside the zone. Note that the default shaders do not use it.
+    void SetZoneTexture(Texture* texture);
     
     /// Return inverse world transform.
     const Matrix3x4& GetInverseWorldTransform() const;
@@ -95,9 +98,15 @@ public:
     bool GetOverride() const { return override_; }
     /// Return whether ambient gradient mode is enabled.
     bool GetAmbientGradient() const { return ambientGradient_; }
+    /// Return zone texture.
+    Texture* GetZoneTexture() const { return zoneTexture_; }
     
     /// Check whether a point is inside.
     bool IsInside(const Vector3& point) const;
+    /// Set zone texture attribute.
+    void SetZoneTextureAttr(ResourceRef value);
+    /// Return zone texture attribute.
+    ResourceRef GetZoneTextureAttr() const;
     
 protected:
     /// Handle node transform being dirtied.
@@ -141,6 +150,8 @@ protected:
     float fogHeightScale_;
     /// Zone priority.
     int priority_;
+    /// Zone texture.
+    SharedPtr<Texture> zoneTexture_;
     /// Last zone used for ambient gradient start color.
     WeakPtr<Zone> lastAmbientStartZone_;
     /// Last zone used for ambient gradient end color.

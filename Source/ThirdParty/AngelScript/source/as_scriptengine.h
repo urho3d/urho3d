@@ -100,17 +100,18 @@ public:
 	// Type registration
 	virtual int            RegisterObjectType(const char *obj, int byteSize, asDWORD flags);
 	virtual int            RegisterObjectProperty(const char *obj, const char *declaration, int byteOffset);
-	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
+	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
 	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
 	virtual int            RegisterInterface(const char *name);
 	virtual int            RegisterInterfaceMethod(const char *intf, const char *declaration);
 	virtual asUINT         GetObjectTypeCount() const;
 	virtual asIObjectType *GetObjectTypeByIndex(asUINT index) const;
 	virtual asIObjectType *GetObjectTypeByName(const char *name) const;
+	virtual asIObjectType *GetObjectTypeByDecl(const char *decl) const;
 
 	// String factory
 	virtual int RegisterStringFactory(const char *datatype, const asSFuncPtr &factoryFunc, asDWORD callConv, void *objForThiscall = 0);
-	virtual int GetStringFactoryReturnTypeId() const;
+	virtual int GetStringFactoryReturnTypeId(asDWORD *flags) const;
 
 	// Default array type
 	virtual int RegisterDefaultArrayType(const char *type);
@@ -160,47 +161,43 @@ public:
 	virtual int            GetSizeOfPrimitiveType(int typeId) const;
 
 	// Script execution
-	virtual asIScriptContext  *CreateContext();
-#ifdef AS_DEPRECATED
-// Deprecated since 2.27.0, 2013-07-18
-	virtual void              *CreateScriptObject(int typeId);
-	virtual void              *CreateScriptObjectCopy(void *obj, int typeId);
-	virtual void              *CreateUninitializedScriptObject(int typeId);
-	virtual void               AssignScriptObject(void *dstObj, void *srcObj, int typeId);
-	virtual void               ReleaseScriptObject(void *obj, int typeId);
-	virtual void               AddRefScriptObject(void *obj, int typeId);
-#endif
-	virtual void              *CreateScriptObject(const asIObjectType *type);
-	virtual void              *CreateScriptObjectCopy(void *obj, const asIObjectType *type);
-	virtual void              *CreateUninitializedScriptObject(const asIObjectType *type);
-	virtual asIScriptFunction *CreateDelegate(asIScriptFunction *func, void *obj);
-	virtual void               AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type);
-	virtual void               ReleaseScriptObject(void *obj, const asIObjectType *type);
-	virtual void               AddRefScriptObject(void *obj, const asIObjectType *type);
+	virtual asIScriptContext      *CreateContext();
+	virtual void                  *CreateScriptObject(const asIObjectType *type);
+	virtual void                  *CreateScriptObjectCopy(void *obj, const asIObjectType *type);
+	virtual void                  *CreateUninitializedScriptObject(const asIObjectType *type);
+	virtual asIScriptFunction     *CreateDelegate(asIScriptFunction *func, void *obj);
+	virtual void                   AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type);
+	virtual void                   ReleaseScriptObject(void *obj, const asIObjectType *type);
+	virtual void                   AddRefScriptObject(void *obj, const asIObjectType *type);
 	// TODO: interface: Should have a method void *CastObject(void *obj, asIObjectType *fromType, asIObjectType *toType); 
 	//                  For script objects it should simply check if the object implements or derives from the toType
 	//                  For application objects it should look for ref cast behaviours and call the matching one
 	//                  Once implemented the IsHandleCompatibleWithObject should be removed from the engine
-	virtual bool               IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const;
-	asILockableSharedBool     *GetWeakRefFlagOfScriptObject(void *obj, const asIObjectType *type) const;
+	virtual bool                   IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const;
+	virtual asILockableSharedBool *GetWeakRefFlagOfScriptObject(void *obj, const asIObjectType *type) const;
+
+	// Context pooling
+	virtual asIScriptContext *RequestContext();
+	virtual void              ReturnContext(asIScriptContext *ctx);
+	virtual int               SetContextCallbacks(asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, void *param = 0);
 
 	// String interpretation
 	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, int *tokenLength = 0) const;
 
 	// Garbage collection
-	virtual int  GarbageCollect(asDWORD flags = asGC_FULL_CYCLE);
+	virtual int  GarbageCollect(asDWORD flags = asGC_FULL_CYCLE, asUINT numIterations = 1);
 	virtual void GetGCStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected, asUINT *newObjects, asUINT *totalNewDestroyed) const;
 	virtual int  NotifyGarbageCollectorOfNewObject(void *obj, asIObjectType *type);
 	virtual int  GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj = 0, asIObjectType **type = 0);
 	virtual void GCEnumCallback(void *reference);
 
 	// User data
-	virtual void *SetUserData(void *data, asPWORD type = 0);
-	virtual void *GetUserData(asPWORD type = 0) const;
-	virtual void  SetEngineUserDataCleanupCallback(asCLEANENGINEFUNC_t callback, asPWORD type = 0);
-	virtual void  SetModuleUserDataCleanupCallback(asCLEANMODULEFUNC_t callback);
-	virtual void  SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback);
-	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback);
+	virtual void *SetUserData(void *data, asPWORD type);
+	virtual void *GetUserData(asPWORD type) const;
+	virtual void  SetEngineUserDataCleanupCallback(asCLEANENGINEFUNC_t callback, asPWORD type);
+	virtual void  SetModuleUserDataCleanupCallback(asCLEANMODULEFUNC_t callback, asPWORD type);
+	virtual void  SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback, asPWORD type);
+	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback, asPWORD type);
 	virtual void  SetObjectTypeUserDataCleanupCallback(asCLEANOBJECTTYPEFUNC_t callback, asPWORD type);
 
 //===========================================================
@@ -220,12 +217,12 @@ public:
 	friend class asCByteCode;
 	friend int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *internal, asCScriptEngine *engine);
 
-	int RegisterMethodToObjectType(asCObjectType *objectType, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
+	int RegisterMethodToObjectType(asCObjectType *objectType, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
 	int RegisterBehaviourToObjectType(asCObjectType *objectType, asEBehaviours behaviour, const char *decl, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall);
 
 	int VerifyVarTypeNotInFunction(asCScriptFunction *func);
 
-	void *CallAlloc(asCObjectType *objType) const;
+	void *CallAlloc(const asCObjectType *objType) const;
 	void  CallFree(void *obj) const;
 
 	void *CallGlobalFunctionRetPtr(int func) const;
@@ -346,7 +343,7 @@ public:
 
 	// Store information about template types
 	// This list will contain all instances of templates, both registered specialized 
-	// types and those automacially instanciated from scripts
+	// types and those automacially instantiated from scripts
 	asCArray<asCObjectType *>      templateInstanceTypes;
 
 	// Store information about list patterns
@@ -378,7 +375,7 @@ public:
 	bool                   isBuilding;
 	bool                   deferValidationOfTemplateTypes;
 
-	// Tokenizer is instanciated once to share resources
+	// Tokenizer is instantiated once to share resources
 	asCTokenizer tok;
 
 	// Stores script declared object types
@@ -409,7 +406,17 @@ public:
 	bool                        msgCallback;
 	asSSystemFunctionInterface  msgCallbackFunc;
 	void                       *msgCallbackObj;
+	struct preMessage_t
+	{
+		preMessage_t() { isSet = false; }
+		bool      isSet;
+		asCString message;
+		asCString scriptname;
+		int       r;
+		int       c;
+	} preMessage;
 
+	// JIt compilation
 	asIJITCompiler             *jitCompiler;
 
 	// Namespaces
@@ -423,16 +430,24 @@ public:
 	asCArray<asCString*>          stringConstants;
 	asCMap<asCStringPointer, int> stringToIdMap;
 
+	// Callbacks for context pooling
+	asREQUESTCONTEXTFUNC_t  requestCtxFunc;
+	asRETURNCONTEXTFUNC_t   returnCtxFunc;
+	void                   *ctxCallbackParam;
+
 	// User data
 	asCArray<asPWORD>       userData;
 
-	struct SEngineClean { asPWORD type; asCLEANENGINEFUNC_t cleanFunc; };
-	asCArray<SEngineClean>  cleanEngineFuncs;
-	asCLEANMODULEFUNC_t     cleanModuleFunc;
-	asCLEANCONTEXTFUNC_t    cleanContextFunc;
-	asCLEANFUNCTIONFUNC_t   cleanFunctionFunc;
-	struct SObjTypeClean { asPWORD type; asCLEANOBJECTTYPEFUNC_t cleanFunc; };
-	asCArray<SObjTypeClean> cleanObjectTypeFuncs;
+	struct SEngineClean   { asPWORD type; asCLEANENGINEFUNC_t     cleanFunc; };
+	asCArray<SEngineClean>   cleanEngineFuncs;
+	struct SModuleClean   { asPWORD type; asCLEANMODULEFUNC_t     cleanFunc; };
+	asCArray<SModuleClean>   cleanModuleFuncs;
+	struct SContextClean  { asPWORD type; asCLEANCONTEXTFUNC_t    cleanFunc; };
+	asCArray<SContextClean>  cleanContextFuncs;
+	struct SFunctionClean { asPWORD type; asCLEANFUNCTIONFUNC_t   cleanFunc; };
+	asCArray<SFunctionClean> cleanFunctionFuncs;
+	struct SObjTypeClean  { asPWORD type; asCLEANOBJECTTYPEFUNC_t cleanFunc; };
+	asCArray<SObjTypeClean>  cleanObjectTypeFuncs;
 
 	// Synchronization for threads
 	DECLAREREADWRITELOCK(mutable engineRWLock)
@@ -460,6 +475,7 @@ public:
 		bool   alwaysImplDefaultConstruct;
 		int    compilerWarnings;
 		bool   disallowValueAssignForRefType;
+		int    alterSyntaxNamedArgs;
 	} ep;
 
 	// This flag is to allow a quicker shutdown when releasing the engine

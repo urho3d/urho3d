@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2012-2013 Andreas Jonsson
+   Copyright (c) 2012-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -125,7 +125,7 @@ public:
 
 	const asCArray<unsigned int> &GetIndexes(const asSNameSpace *ns, const asCString &name) const;
 
-	int          Put(T* entry);
+	int      Put(T* entry);
 
 	unsigned int GetSize() const;
 
@@ -355,19 +355,7 @@ bool asCSymbolTable<T>::Erase(unsigned idx)
 	if( !entry )
 		return false;
 
-	if( idx == m_entries.GetLength() - 1 )
-	{
-		m_entries.PopLast();
-
-		// TODO: Should remove all trailing empty slots
-	}
-	else
-	{
-		// TODO: Must pack or reuse empty slots
-		m_entries[idx] = 0;
-	}
-	m_size--;
-
+	// Remove the symbol from the lookup map
 	asSNameSpaceNamePair key;
 	GetKey(entry, key);
 
@@ -381,6 +369,28 @@ bool asCSymbolTable<T>::Erase(unsigned idx)
 	}
 	else
 		asASSERT(false);
+
+	// Remove the symbol from the indexed array
+	if( idx == m_entries.GetLength() - 1 )
+		m_entries.PopLast();
+	else
+	{
+		// Must keep the array packed
+		int prevIdx = int(m_entries.GetLength()-1);
+		m_entries[idx] = m_entries.PopLast();
+		
+		// Update the index in the lookup map
+		entry = m_entries[idx];
+		GetKey(entry, key);
+		if( m_map.MoveTo(&cursor, key) )
+		{
+			asCArray<unsigned int> &arr = m_map.GetValue(cursor);
+			arr[arr.IndexOf(prevIdx)] = idx;
+		}
+		else
+			asASSERT(false);
+	}
+	m_size--;
 
 	return true;
 }

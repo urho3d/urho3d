@@ -401,9 +401,9 @@ void AnimationState::ApplyToModel()
             continue;
         
         if (Equals(finalWeight, 1.0f))
-            ApplyTrackFullWeight(stateTrack);
+            ApplyTrackFullWeightSilent(stateTrack);
         else
-            ApplyTrackBlended(stateTrack, finalWeight);
+            ApplyTrackBlendedSilent(stateTrack, finalWeight);
     }
 }
 
@@ -470,7 +470,63 @@ void AnimationState::ApplyTrackFullWeight(AnimationStateTrack& stateTrack)
     }
 }
 
-void AnimationState::ApplyTrackBlended(AnimationStateTrack& stateTrack, float weight)
+void AnimationState::ApplyTrackFullWeightSilent(AnimationStateTrack& stateTrack)
+{
+    const AnimationTrack* track = stateTrack.track_;
+    Node* node = stateTrack.node_;
+
+    if (track->keyFrames_.Empty() || !node)
+        return;
+
+    unsigned& frame = stateTrack.keyFrame_;
+    track->GetKeyFrameIndex(time_, frame);
+
+    // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
+    unsigned nextFrame = frame + 1;
+    bool interpolate = true;
+    if (nextFrame >= track->keyFrames_.Size())
+    {
+        if (!looped_)
+        {
+            nextFrame = frame;
+            interpolate = false;
+        }
+        else
+            nextFrame = 0;
+    }
+
+    const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
+    unsigned char channelMask = track->channelMask_;
+
+    if (!interpolate)
+    {
+        // No interpolation, full weight
+        if (channelMask & CHANNEL_POSITION)
+            node->SetPositionSilent(keyFrame->position_);
+        if (channelMask & CHANNEL_ROTATION)
+            node->SetRotationSilent(keyFrame->rotation_);
+        if (channelMask & CHANNEL_SCALE)
+            node->SetScaleSilent(keyFrame->scale_);
+    }
+    else
+    {
+        const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
+        float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
+        if (timeInterval < 0.0f)
+            timeInterval += animation_->GetLength();
+        float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
+
+        // Interpolation, full weight
+        if (channelMask & CHANNEL_POSITION)
+            node->SetPositionSilent(keyFrame->position_.Lerp(nextKeyFrame->position_, t));
+        if (channelMask & CHANNEL_ROTATION)
+            node->SetRotationSilent(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
+        if (channelMask & CHANNEL_SCALE)
+            node->SetScaleSilent(keyFrame->scale_.Lerp(nextKeyFrame->scale_, t));
+    }
+}
+
+void AnimationState::ApplyTrackBlendedSilent(AnimationStateTrack& stateTrack, float weight)
 {
     const AnimationTrack* track = stateTrack.track_;
     Node* node = stateTrack.node_;
@@ -502,11 +558,11 @@ void AnimationState::ApplyTrackBlended(AnimationStateTrack& stateTrack, float we
     {
         // No interpolation, blend between old transform & animation
         if (channelMask & CHANNEL_POSITION)
-            node->SetPosition(node->GetPosition().Lerp(keyFrame->position_, weight));
+            node->SetPositionSilent(node->GetPosition().Lerp(keyFrame->position_, weight));
         if (channelMask & CHANNEL_ROTATION)
-            node->SetRotation(node->GetRotation().Slerp(keyFrame->rotation_, weight));
+            node->SetRotationSilent(node->GetRotation().Slerp(keyFrame->rotation_, weight));
         if (channelMask & CHANNEL_SCALE)
-            node->SetScale(node->GetScale().Lerp(keyFrame->scale_, weight));
+            node->SetScaleSilent(node->GetScale().Lerp(keyFrame->scale_, weight));
     }
     else
     {
@@ -519,17 +575,17 @@ void AnimationState::ApplyTrackBlended(AnimationStateTrack& stateTrack, float we
         // Interpolation, blend between old transform & animation
         if (channelMask & CHANNEL_POSITION)
         {
-            node->SetPosition(node->GetPosition().Lerp(
+            node->SetPositionSilent(node->GetPosition().Lerp(
                 keyFrame->position_.Lerp(nextKeyFrame->position_, t), weight));
         }
         if (channelMask & CHANNEL_ROTATION)
         {
-            node->SetRotation(node->GetRotation().Slerp(
+            node->SetRotationSilent(node->GetRotation().Slerp(
                 keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight));
         }
         if (channelMask & CHANNEL_SCALE)
         {
-            node->SetScale(node->GetScale().Lerp(
+            node->SetScaleSilent(node->GetScale().Lerp(
                 keyFrame->scale_.Lerp(nextKeyFrame->scale_, t), weight));
         }
     }

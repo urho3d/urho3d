@@ -25,14 +25,12 @@
 #include "Color.h"
 #include "Drawable.h"
 #include "Frustum.h"
+#include "Texture.h"
 
 namespace Urho3D
 {
 
 class Camera;
-class Texture;
-class Texture2D;
-class TextureCube;
 struct LightBatchQueue;
 
 /// %Light types.

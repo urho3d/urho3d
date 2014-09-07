@@ -150,7 +150,7 @@ void Urho2DConstraints::CreateScene()
     boxBody->SetLinearDamping(0.0f);
     boxBody->SetAngularDamping(0.0f);
     CollisionBox2D* shape = box->CreateComponent<CollisionBox2D>(); // Create box shape
-    shape->SetSize(Vector2(0.32, 0.32)); // Set size
+    shape->SetSize(Vector2(0.32f, 0.32f)); // Set size
     shape->SetDensity(1.0f); // Set shape density (kilograms per meter squared)
     shape->SetFriction(0.5f); // Set friction
     shape->SetRestitution(0.1f); // Set restitution (slight bounce)
@@ -505,7 +505,7 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
 {
     Input* input = GetSubsystem<Input>();
     PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
-    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(input->GetMousePosition().x_, input->GetMousePosition().y_, M_MAX_UNSIGNED, camera_); // Raycast for RigidBody2Ds to pick
+    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(input->GetMousePosition().x_, input->GetMousePosition().y_, M_MAX_UNSIGNED); // Raycast for RigidBody2Ds to pick
     if (rigidBody)
     {
         pickedNode = rigidBody->GetNode();
@@ -562,7 +562,7 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
     Graphics* graphics = GetSubsystem<Graphics>();
     PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
     using namespace TouchBegin;
-    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(Vector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt())); // Raycast for RigidBody2Ds to pick
+    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(Vector2((float)eventData[P_X].GetInt(), (float)eventData[P_Y].GetInt())); // Raycast for RigidBody2Ds to pick
     if (rigidBody)
     {
         pickedNode = rigidBody->GetNode();

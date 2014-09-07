@@ -18,7 +18,7 @@ The classes in question are String, Vector, PODVector, List, HashSet and HashMap
 
 The list, set and map classes use a fixed-size allocator internally. This can also be used by the application, either by using the procedural functions AllocatorInitialize(), AllocatorUninitialize(), AllocatorReserve() and AllocatorFree(), or through the template class Allocator.
 
-In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<ShortStringHash, Variant>.
+In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<StringHash, Variant>.
 
 
 \page ObjectTypes %Object types and factories
@@ -27,7 +27,7 @@ Classes that derive from Object contain type-identification, they can be created
 
 %Object factory registration and object creation through factories are directly accessible only in C++, not in script.
 
-The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 16-bit hash of the type name (GetType() or GetTypeStatic()).
+The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
 
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
@@ -35,7 +35,7 @@ To register an object factory for a specific type, call the \ref Context::Regist
 context_->RegisterFactory<MyClass>();
 \endcode
 
-To create an object using a factory, call Context's \ref Context::CreateObject "CreateObject()" function. This takes the 16-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
+To create an object using a factory, call Context's \ref Context::CreateObject "CreateObject()" function. This takes the 32-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
 
 \code
 SharedPtr<Object> newComponent = context_->CreateObject(type));
@@ -76,7 +76,7 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
-Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 16-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
 
 When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
 
@@ -310,7 +310,7 @@ Scenes can be loaded and saved in either binary or XML format; see the functions
 
 Nodes and components that are marked temporary will not be saved. See \ref Serializable::SetTemporary "SetTemporary()".
 
-To be able to track the progress of loading a (large) scene without having the program stall for the duration of the loading, a scene can also be loaded asynchronously. This means that on each frame the scene loads child nodes until a certain amount of milliseconds has been exceeded. See \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()". Use the functions \ref Scene::IsAsyncLoading "IsAsyncLoading()" and \ref Scene::GetAsyncProgress "GetAsyncProgress()" to track the loading progress; the latter returns a float value between 0 and 1, where 1 is fully loaded. The scene will not update or render before it is fully loaded.
+To be able to track the progress of loading a (large) scene without having the program stall for the duration of the loading, a scene can also be loaded asynchronously. This means that on each frame the scene loads resources and child nodes until a certain amount of milliseconds has been exceeded. See \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()". Use the functions \ref Scene::IsAsyncLoading "IsAsyncLoading()" and \ref Scene::GetAsyncProgress "GetAsyncProgress()" to track the loading progress; the latter returns a float value between 0 and 1, where 1 is fully loaded. The scene will not update or render before it is fully loaded.
 
 \section SceneModel_Instantiation Object prefabs
 
@@ -334,15 +334,17 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Image
 - Model
 - Material
+- ParticleEffect
 - ScriptFile
 - Shader
 - Sound
 - Technique
 - Texture2D
+- Texture3D
 - TextureCube
 - XMLFile
 
-They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
+They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 32-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
 The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, the engine registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist.
 
@@ -364,6 +366,22 @@ Resources can also be created manually and stored to the resource cache as if th
 
 Memory budgets can be set per resource type: if resources consume more memory than allowed, the oldest resources will be removed from the cache if not in use anymore. By default the memory budgets are set to unlimited.
 
+\section Resources_Background Background loading of resources
+
+Normally, when requesting resources using \ref ResourceCache::GetResource "GetResource()", they are loaded immediately in the main thread, which may take several milliseconds for all the required steps (load file from disk,
+parse data, upload to GPU if necessary) and can therefore result in framerate drops.
+
+If you know in advance what resources you need, you can request them to be loaded in a background thread by calling \ref ResourceCache::BackgroundLoadResource "BackgroundLoadResource()". The event E_RESOURCEBACKGROUNDLOADED will be sent after the loading is complete; it will tell if the loading actually was a success or a failure. Depending on the resource, only a part of the loading process may be moved to a background thread, for example the finishing GPU upload step always needs to happen in the main thread. Note that if you call GetResource() for a resource that is queued for background loading, the main thread will stall until its loading is complete.
+
+The asynchronous scene loading functionality \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()" has the option to background load the resources first before proceeding to load the scene content. It can also be used to only load the resources without modifying the scene, by specifying the LOAD_RESOURCES_ONLY mode. This allows to prepare a scene or object prefab file for fast instantiation.
+
+Finally the maximum time (in milliseconds) spent each frame on finishing background loaded resources can be configured, see \ref ResourceCache::SetFinishBackgroundResourcesMs "SetFinishBackgroundResourcesMs()".
+
+\section Resources_BackgroundImplementation Implementing background loading
+
+When writing new resource types, the background loading mechanism requires implementing two functions: \ref Resource::BeginLoad "BeginLoad()" and \ref Resource::EndLoad "EndLoad()". BeginLoad() is potentially called in a background thread and should do as much work (such as file I/O) as possible without violating the \ref Multithreading "multithreading" rules. EndLoad() should perform the main thread finishing step, such as GPU upload. Either step can return false to indicate failure to load the resource.
+
+If a resource depends on other resources, writing efficient threaded loading for it can be hard, as calling GetResource() is not allowed inside BeginLoad() when background loading. There are a few options: it is allowed to queue new background load requests by calling BackgroundLoadResource() within BeginLoad(), or if the needed resource does not need to be permanently stored in the cache and is safe to load outside the main thread (for example Image or XMLFile, which do not possess any GPU-side data), \ref ResourceCache::GetTempResource "GetTempResource()" can be called inside BeginLoad.
 
 \page Scripting Scripting
 
@@ -432,7 +450,7 @@ The Start() and Stop() methods do not have direct counterparts in C++ components
 
 When a scene node hierarchy with script objects is instantiated (such as when loading a scene) any child nodes may not have been created yet when Start() is executed, and can thus not be relied upon for initialization. The DelayedStart() method can be used in this case instead: if defined, it is called immediately before any of the Update() calls.
 
-TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function. Due to an optimization mechanism for repeated scene graph updates, you need to "undirty" the scene node by for example reading its world position to get further transform changed notifications.
+TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function.
 
 Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an instantiated script object, the ScriptInstance becomes the event receiver on the C++ side, and calls the specified handler method when the event arrives. If called from a function, the ScriptFile will be the event receiver and the handler must be a free function in the same script file. The third case is if the event is subscribed to from a script object that does not belong to a ScriptInstance. In that case the ScriptFile will create a proxy C++ object on demand to be able to forward the event to the script object.
 
@@ -504,7 +522,7 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Printing raw output to the log is simply called Print(). The rest of the logging functions are accessed by calling log.Debug(), log.Info(), log.Warning() and log.Error().
 
-- Functions that would take a StringHash or ShortStringHash parameter usually take a string instead. For example sending events, requesting resources and accessing components.
+- Functions that would take a StringHash parameter usually take a string instead. For example sending events, requesting resources and accessing components.
 
 - Most of StringUtils have been exposed as methods of the string class. For example String.ToBool().
 
@@ -1289,11 +1307,9 @@ Like with skeletal animations, there are two ways to play back node animations:
 
 \page Particles %Particle systems
 
-The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically.
+The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically. 
 
-The particle system's properties can also be set through a XML description file, see \ref ParticleEmitter::Load "Load()".
-
-Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
+The parameters of the particle system are stored in a ParticleEffect resource class, which uses XML format. Call \ref ParticleEmitter::SetEffect "SetEffect()" to assign the effect resource to the emitter. Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
 
 \code
 <particleemitter>
@@ -1343,8 +1359,9 @@ Zones have three special flags: height fog mode, override mode and ambient gradi
 - If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect.
 - When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors. To ensure objects use the gradient zone when inside it, the gradient zone should have higher priority than the neighbor zones. The gradient is always oriented along the gradient zone's local Z axis.
 
-Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
+Like lights, zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 
+Finally, zones can optionally define a texture, see \ref Zone::SetZoneTexture "SetZoneTexture()". This should be either a cube or 3D texture that will be bound to the zone texture unit (TU_ZONE) when rendering objects within the zone. This could be used to achieve for example precomputed environment reflections, ambient lighting or ambient occlusion in custom shaders; the default shaders do not use this texture. Due to texture unit limitations it is not available on OpenGL ES 2.0.
 
 \page AuxiliaryViews Auxiliary views
 
@@ -1732,7 +1749,7 @@ You can chose from animated sprites, 2D particle emitters and static sprites.
 
 \section Urho2D_Animated Animated sprites
 
-Workflow for creating animated sprites in Urho2D relies on Spriter (c). 
+Workflow for creating animated sprites in Urho2D relies on Spriter (c).
 Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see details below on how to generate this file). Keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
 A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
@@ -1762,7 +1779,7 @@ Both are rendered using StaticSprite2D class (Drawable component):
 - StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
-Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spritehelper/), TexturePacker (http://www.codeandweb.com/texturepacker), ...
+Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
@@ -1826,6 +1843,92 @@ You can use different layers in order to simulate perspective. In this case you 
 
 Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
 
+\section Urho2D_TileMap Tile Maps
+
+Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be unpredictable.
+
+Check example 36_Urho2DTileMap for a basic demonstration.
+
+You can use tile maps for the design of the whole scene/level, or in adjunction to other 2D resources.
+
+\section Urho2D_LoadingTMX "Loading" a Tile Map file
+
+A tmx file is loaded using \ref TmxFile2D "TmxFile2D resource class" and rendered using \ref TileMap2D "TileMap2D component class".
+You just have to create a \ref TileMap2D "TileMap2D" component inside a node and then assign the tmx resource file to it.
+
+C++:
+\code
+SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap")); // Create a standard Urho3D node
+tileMapNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
+TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>(); // Create the TileMap2D component
+tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx")); // Assign tmx resource file to component
+\endcode
+
+AngelScript:
+\code
+Node@ tileMapNode = scene_.CreateChild("TileMap"); // Create a standard Urho3D node
+tileMapNode.position = Vector3(0.0f, 0.0f, -1.0f);
+TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D"); // Create the TileMap2D component
+tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx"); // Assign the tmx resource file to component
+\endcode
+
+Lua:
+\code
+local tileMapNode = scene_:CreateChild("TileMap") -- Create a standard Urho3D node
+tileMapNode.position = Vector3(0, 0, -1)
+local tileMap = tileMapNode:CreateComponent("TileMap2D") -- Create the TileMap2D component
+tileMap.tmxFile = cache:GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx") -- Assign tmx resource file to component
+\endcode
+
+Note that currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Map Properties to set 'Layer Format' to 'XML'.
+
+\section Urho2D_TMX_maps Tile Maps
+
+Once a tmx file is loaded in Urho, use \ref TileMap2D::GetInfo "GetInfo()" to access the map properties through \ref TileMapInfo2D class.
+
+A map is defined by its:
+- orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (returns 0 for ortho, 1 for iso and 2 for staggered).
+- width and height expressed as a number of tiles in the map:  use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
+- width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are useful to set the camera's position for example
+- tile width and tile height as the size in pixels of the tiles in the map (expressed a percentage): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
+
+Two convenient functions are provided to convert Tiled index to/from Urho2D space:
+- \ref TileMapInfo2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
+- \ref TileMapInfo2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map) 
+
+\section Urho2D_TMX_layers Tile Map Layers
+
+A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers".
+
+Accessing layers : from a \ref TileMap2D "TileMap2D component", layers are accessed by their index from bottom to top using \ref TileMap2D::GetLayer "GetLayer()" function.  \ref TileMap2D::GetNumLayers "GetNumLayers()" returns the number of layers contained in the tmx file. \ref TileMapLayer2D::GetLayerType "GetLayerType()" returns the type of layer (Tile, Object or Image).
+
+A layer is characterized by its:
+- name: currently not accessible
+- width and height expressed as a number of tiles: use \ref TileMapLayer2D::GetWidth "GetWidth()" and \ref TileMapLayer2D::GetHeight "GetHeight()" to access these values
+
+Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()")
+
+\section Urho2D_TMX_Objects Tile Map Objects
+
+Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
+
+Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
+
+Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature (TileMapObjectType2D) of the selected object.
+
+Objects' properties (Name and Type) can be accessed using respectively \ref TileMapObject2D::GetName "GetName()" and \ref TileMapObject2D::GetType "GetType()". Type can be useful to flag categories of objects in Tiled.
+
+Except Tile, object layers are not visible. They can be used:
+- to easily design polygon sprites and Box2D shapes using the object's vertices: use \ref TileMapObject2D::GetNumPoints "GetNumPoints()" to get the number of vertices and \ref TileMapObject2D::GetPoint "GetPoint()" to iterate through the vertices
+- as placeholders to easily set the position and size of entities in the world, using \ref TileMapObject2D::GetPosition "GetPosition()" and \ref TileMapObject2D::GetSize "GetSize()"
+- to display Tile objects as sprites
+- to create a background from Tile sprites
+- ...
+
+Additionaly \ref Sprite2D "Sprite2D" resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()"
+
+If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
+
 \page Serialization Serialization
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
@@ -1875,6 +1978,8 @@ The server can be made to transmit needed resource \ref PackageFile "packages" t
 
 There are some things to watch out for:
 
+- When a client is assigned to a scene, the client will first remove all existing replicated scene nodes from the scene, to prepare for receiving objects from the server. This means that for example a client's camera should be created into a local node, otherwise it will be removed when connecting.
+
 - After connecting to a server, the client should not create, update or remove non-local nodes or components on its own. However, to create client-side special effects and such, the client can freely manipulate local nodes.
 
 - A node's \ref Node::GetVars "user variables" VariantMap will be automatically replicated on a per-variable basis. This can be useful in transmitting data shared by several components, for example the player's score or health.
@@ -1907,7 +2012,8 @@ A current priority value is calculated on each server update as "base priority -
 
 The default values are base priority 100.0, distance factor 0.0, and minimum priority 0.0. This means that by default an update is always sent (which is also the case if the node has no NetworkPriority component.) Additionally, there is a rule that the node's owner connection always receives updates at full frequency. This rule can be controlled by calling \ref NetworkPriority::SetAlwaysUpdateOwner "SetAlwaysUpdateOwner()".
 
-Calculating the distance requires the client to tell its current observer position (typically, either the camera's or the player character's world position.) This is accomplished by the client code calling \ref Connection::SetPosition "SetPosition()" on the server connection.
+Calculating the distance requires the client to tell its current observer position (typically, either the camera's or the player character's world position.) This is accomplished by the client code calling \ref Connection::SetPosition "SetPosition()" on the server connection. The client can also tell its current observer rotation by
+calling \ref Connection::SetRotation "SetRotation()" but that will only be useful for custom logic, as it is not used by the NetworkPriority component.
 
 For now, creation and removal of nodes is always sent immediately, without consulting interest management. This is based on the assumption that nodes' motion updates consume the most bandwidth.
 
@@ -1970,21 +2076,21 @@ void WorkFunction(const WorkItem* item, unsigned threadIndex)
 
 The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
 
-Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
+Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not. Additionally there are dedicated threads for audio mixing and background loading of resources.
 
-When making your own work functions, observe that the following things are (at least currently) unsafe and will result in undefined behavior and crashes, if done outside the main thread:
+When making your own work functions or threads, observe that the following things are unsafe and will result in undefined behavior and crashes, if done outside the main thread:
 
-- Sending events
-- Using profiler blocks
-- Modifying scene or UI content
+- Modifying scene or %UI content
 - Modifying GPU resources
-- Requesting resources from ResourceCache
 - Executing script functions
+- Pointing SharedPtr's or WeakPtr's to the same RefCounted object from multiple threads simultaneously
+
+Using the Profiler is treated as a no-op when called from outside the main thread. Trying to send an event or get a resource from the ResourceCache when not in the main thread will cause an error to be logged. %Log messages from other threads are collected and handled in the main thread at the end of the frame.
 
 \page AttributeAnimation %Attribute animation
-Attribute animation is a new system for Urho3D, With it user can apply animation to object’s attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
+Attribute animation is a new system for Urho3D, With it user can apply animation to object's attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
 
-These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object’s attribute. Here is a simple code for light color animation:
+These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object's attribute. Here is a simple code for light color animation:
 \code
 SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
@@ -1994,7 +2100,7 @@ colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
 \endcode
 
-On above code, we first create an ValueAnimation object call colorAnimation, and set it’s key frame value, then apply it to light’s color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+On above code, we first create an ValueAnimation object call colorAnimation, and set its key frame value, then apply it to light's color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
 
 Another way is load attribute animation from resource, here is a simple sample:
 \code
@@ -2005,7 +2111,7 @@ light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 These are three kind of wrap mode for attribute animation:
 - WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
 - WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
-- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame’s value.
+- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame's value.
 
 These is another argument call speed the animation play speed, the default value is 1.0f, user can change the value to control the animation play speed. User can also change animation’s wrap mode and speed on fly.
 

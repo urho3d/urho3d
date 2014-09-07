@@ -24,7 +24,9 @@
 
 #include "Context.h"
 #include "OctreeQuery.h"
+#ifdef URHO3D_PHYSICS
 #include "PhysicsWorld.h"
+#endif
 #include "PhysicsWorld2D.h"
 #include "Vector2.h"
 #include "Vector3.h"
@@ -117,8 +119,10 @@ template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char
 template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<UIElement*> to Lua as a table.
 template<> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char* type);
+#ifdef URHO3D_PHYSICS
 /// Push PODVector<RigidBody*> to Lua as a table.
 template<> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const char* type);
+#endif
 /// Push PODVector<RigidBody2D*> to Lua as a table.
 template<> int ToluaPushPODVector<RigidBody2D*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<Vector3> to Lua as a table.
@@ -127,8 +131,10 @@ template<> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char*
 template<> int ToluaPushPODVector<IntVector2>(lua_State* L, void* data, const char* type);
 /// Push PODVector<OctreeQueryResult> to Lua as a table.
 template<> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, const char* type);
+#ifdef URHO3D_PHYSICS
 /// Push PODVector<PhysicsRaycastResult> to Lua as a table.
 template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char* type);
+#endif
 /// Push PODVector<PhysicsRaycastResult2D> to Lua as a table.
 template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.

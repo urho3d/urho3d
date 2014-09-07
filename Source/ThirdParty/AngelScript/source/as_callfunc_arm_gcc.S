@@ -687,6 +687,12 @@ nomoreargsarmFuncR0R1:
 
     pop {r4-r8, r10, r11, pc}
 
+#endif /* hard float abi */
+
+#if defined(__linux__) && defined(__ELF__)
+/* ref: http://hardened.gentoo.org/gnu-stack.xml */
+.section .note.GNU-stack,"",%progbits
 #endif
 
-#endif
+#endif /* arm */
+

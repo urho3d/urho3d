@@ -33,7 +33,9 @@
 #include "Material.h"
 #include "Model.h"
 #include "Octree.h"
+#ifdef URHO3D_PHYSICS
 #include "PhysicsWorld.h"
+#endif
 #include "ProcessUtils.h"
 #include "Quaternion.h"
 #include "ResourceCache.h"
@@ -129,9 +131,9 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
 
-void ExportModel(const String& outName);
+void ExportModel(const String& outName, bool animationOnly);
 void CollectMeshes(OutModel& model, aiNode* node);
-void CollectBones(OutModel& model);
+void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
@@ -247,7 +249,9 @@ void Run(const Vector<String>& arguments)
     context_->RegisterSubsystem(new WorkQueue(context_));
     RegisterSceneLibrary(context_);
     RegisterGraphicsLibrary(context_);
+#ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
+#endif
     
     String command = arguments[0].ToLower();
     String rootNodeName;
@@ -424,7 +428,7 @@ void Run(const Vector<String>& arguments)
         }
         
         if (command == "model")
-            ExportModel(outFile);
+            ExportModel(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
         
         if (command == "scene" || command == "node")
         {
@@ -508,7 +512,7 @@ void DumpNodes(aiNode* rootNode, unsigned level)
         DumpNodes(rootNode->mChildren[i], level + 1);
 }
 
-void ExportModel(const String& outName)
+void ExportModel(const String& outName, bool animationOnly)
 {
     if (outName.Empty())
         ErrorExit("No output file defined");
@@ -518,7 +522,7 @@ void ExportModel(const String& outName)
     model.outName_ = outName;
     
     CollectMeshes(model, model.rootNode_);
-    CollectBones(model);
+    CollectBones(model, animationOnly);
     BuildBoneCollisionInfo(model);
     BuildAndSaveModel(model);
     if (!noAnimations_)
@@ -557,7 +561,7 @@ void CollectMeshes(OutModel& model, aiNode* node)
         CollectMeshes(model, node->mChildren[i]);
 }
 
-void CollectBones(OutModel& model)
+void CollectBones(OutModel& model, bool animationOnly)
 {
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
@@ -582,7 +586,7 @@ void CollectBones(OutModel& model)
             for (;;)
             {
                 boneNode = boneNode->mParent;
-                if (!boneNode || boneNode == meshNode || boneNode == meshParentNode)
+                if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
                     break;
                 rootNode = boneNode;
                 necessary.Insert(boneNode);
@@ -984,23 +988,42 @@ void BuildAndSaveAnimations(OutModel* model)
     for (unsigned i = 0; i < animations.Size(); ++i)
     {
         aiAnimation* anim = animations[i];
+        
+        float duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
+        String animOutName;
+        
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
-        String animOutName;
         if (model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
-            
-        SharedPtr<Animation> outAnim(new Animation(context_));
+        
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
         if (ticksPerSecond < M_EPSILON)
             ticksPerSecond = defaultTicksPerSecond_;
         float tickConversion = 1.0f / ticksPerSecond;
+        
+        // Find out the start time of animation from each channel's first keyframe for adjusting the keyframe times
+        // to start from zero
+        float startTime = duration;
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+            aiNodeAnim* channel = anim->mChannels[j];
+            if (channel->mNumPositionKeys > 0)
+                startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
+            if (channel->mNumRotationKeys > 0)
+                startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
+            if (channel->mScalingKeys > 0)
+                startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
+        }
+        duration -= startTime;
+
+        SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
-        outAnim->SetLength((float)anim->mDuration * tickConversion);
+        outAnim->SetLength(duration * tickConversion);
         
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
@@ -1090,13 +1113,16 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.rotation_ = Quaternion::IDENTITY;
                 kf.scale_ = Vector3::ONE;
                 
-                // Get time for the keyframe
+                // Get time for the keyframe. Adjust with animation's start time
                 if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
-                    kf.time_ = (float)channel->mPositionKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
                 else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
-                    kf.time_ = (float)channel->mRotationKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
                 else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
-                    kf.time_ = (float)channel->mScalingKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
+                
+                // Make sure time stays positive
+                kf.time_ = Max(kf.time_, 0.0f);
                 
                 // Start with the bone's base transform
                 aiMatrix4x4 boneTransform = boneNode->mTransformation;
@@ -1287,8 +1313,10 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
     
     if (!asPrefab)
     {
+        #ifdef URHO3D_PHYSICS
         /// \todo Make the physics properties configurable
         outScene->CreateComponent<PhysicsWorld>();
+        #endif
     
         /// \todo Make the octree properties configurable, or detect from the scene contents
         outScene->CreateComponent<Octree>();

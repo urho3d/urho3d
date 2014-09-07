@@ -42,8 +42,8 @@
 
 // Number of static sprites to draw
 static const unsigned NUM_SPRITES = 200;
-static const ShortStringHash VAR_MOVESPEED("MoveSpeed");
-static const ShortStringHash VAR_ROTATESPEED("RotateSpeed");
+static const StringHash VAR_MOVESPEED("MoveSpeed");
+static const StringHash VAR_ROTATESPEED("RotateSpeed");
 
 DEFINE_APPLICATION_MAIN(Urho2DSprite)
 

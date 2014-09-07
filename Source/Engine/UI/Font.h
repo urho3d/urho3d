@@ -54,12 +54,15 @@ public:
     virtual ~Font();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false);
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(int pointSize);
+    /// Is signed distance field font.
+    bool IsSDFFont() const { return sdfFont_; }
     
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
@@ -78,6 +81,8 @@ private:
     unsigned fontDataSize_;
     /// Font type.
     FONT_TYPE fontType_;
+    /// Signed distance field font.
+    bool sdfFont_;
 };
 
 }

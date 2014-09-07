@@ -85,6 +85,7 @@ ParticleEffect2D::ParticleEffect2D(Context* context) :
     maxRadius_(100.0f),
     maxRadiusVariance_(0.0f),
     minRadius_(0.0f),
+    minRadiusVariance_(0.0f),
     rotatePerSecond_(0.0f),
     rotatePerSecondVariance_(0.0f),
     blendMode_(BLEND_ALPHA),
@@ -104,8 +105,13 @@ void ParticleEffect2D::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEffect2D>();
 }
 
-bool ParticleEffect2D::Load(Deserializer& source)
+bool ParticleEffect2D::BeginLoad(Deserializer& source)
 {
+    if (GetName().Empty())
+        SetName(source.GetName());
+
+    loadSpriteName_.Clear();
+
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))
         return false;
@@ -115,67 +121,66 @@ bool ParticleEffect2D::Load(Deserializer& source)
         return false;
 
     String texture = rootElem.GetChild("texture").GetAttribute("name");
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    sprite_= cache->GetResource<Sprite2D>(GetParentPath(GetName()) + texture);
-    if (!sprite_)
-    {
-        LOGERROR("Could not load sprite " + GetParentPath(GetName()) + texture);
-        return false;
-    }
+    loadSpriteName_ = GetParentPath(GetName()) + texture;
+    // If async loading, request the sprite beforehand
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+        GetSubsystem<ResourceCache>()->BackgroundLoadResource<Sprite2D>(loadSpriteName_, true, this);
 
-    sourcePositionVariance_ = ReadVector2(rootElem.GetChild("sourcePositionVariance"));
+    sourcePositionVariance_ = ReadVector2(rootElem, "sourcePositionVariance");
 
-    speed_ = rootElem.GetChild("speed").GetFloat("value");
-    speedVariance_ = rootElem.GetChild("speedVariance").GetFloat("value");
-    
-    particleLifeSpan_ = Max(0.01f, rootElem.GetChild("particleLifeSpan").GetFloat("value"));
-    particleLifespanVariance_ = rootElem.GetChild("particleLifespanVariance").GetFloat("value");
-    
-    angle_ = rootElem.GetChild("angle").GetFloat("value");
-    angleVariance_ = rootElem.GetChild("angleVariance").GetFloat("value");
-    
-    gravity_ = ReadVector2(rootElem.GetChild("gravity"));
+    speed_ = ReadFloat(rootElem, "speed");
+    speedVariance_ = ReadFloat(rootElem, "speedVariance");
 
-    radialAcceleration_ = rootElem.GetChild("radialAcceleration").GetFloat("value");
-    tangentialAcceleration_ = rootElem.GetChild("tangentialAcceleration").GetFloat("value");
-    
-    radialAccelVariance_ = rootElem.GetChild("radialAccelVariance").GetFloat("value");
-    tangentialAccelVariance_ = rootElem.GetChild("tangentialAccelVariance").GetFloat("value");
+    particleLifeSpan_ = Max(0.01f, ReadFloat(rootElem, "particleLifeSpan"));
+    particleLifespanVariance_ = ReadFloat(rootElem, "particleLifespanVariance");
 
-    startColor_ = ReadColor(rootElem.GetChild("startColor"));
-    startColorVariance_ = ReadColor(rootElem.GetChild("startColorVariance"));
-    
-    finishColor_ = ReadColor(rootElem.GetChild("finishColor"));
-    finishColorVariance_ = ReadColor(rootElem.GetChild("finishColorVariance"));
+    angle_ = ReadFloat(rootElem, "angle");
+    angleVariance_ = ReadFloat(rootElem, "angleVariance");
 
-    maxParticles_ = rootElem.GetChild("maxParticles").GetInt("value");
-    
-    startParticleSize_ = rootElem.GetChild("startParticleSize").GetFloat("value");
-    startParticleSizeVariance_ = rootElem.GetChild("startParticleSizeVariance").GetFloat("value");
-    
-    finishParticleSize_ = rootElem.GetChild("finishParticleSize").GetFloat("value");
-    FinishParticleSizeVariance_ = rootElem.GetChild("FinishParticleSizeVariance").GetFloat("value");
-    
+    gravity_ = ReadVector2(rootElem, "gravity");
+
+    radialAcceleration_ = ReadFloat(rootElem, "radialAcceleration");
+    tangentialAcceleration_ = ReadFloat(rootElem, "tangentialAcceleration");
+
+    radialAccelVariance_ = ReadFloat(rootElem, "radialAccelVariance");
+    tangentialAccelVariance_ = ReadFloat(rootElem, "tangentialAccelVariance");
+
+    startColor_ = ReadColor(rootElem, "startColor");
+    startColorVariance_ = ReadColor(rootElem, "startColorVariance");
+
+    finishColor_ = ReadColor(rootElem, "finishColor");
+    finishColorVariance_ = ReadColor(rootElem, "finishColorVariance");
+
+    maxParticles_ = ReadInt(rootElem, "maxParticles");
+
+    startParticleSize_ = ReadFloat(rootElem, "startParticleSize");
+    startParticleSizeVariance_ = ReadFloat(rootElem, "startParticleSizeVariance");
+
+    finishParticleSize_ = ReadFloat(rootElem, "finishParticleSize");
+    // Typo in pex file
+    FinishParticleSizeVariance_ = ReadFloat(rootElem, "FinishParticleSizeVariance");
+
     duration_ = M_INFINITY;
     if (rootElem.HasChild("duration"))
     {
-        float duration = rootElem.GetChild("duration").GetFloat("value");
+        float duration = ReadFloat(rootElem, "duration");
         if (duration > 0.0f)
             duration_ = duration;
     }
 
 
-    emitterType_ = (EmitterType2D)rootElem.GetChild("emitterType").GetInt("value");
-    
-    maxRadius_ = rootElem.GetChild("maxRadius").GetFloat("value");
-    maxRadiusVariance_ = rootElem.GetChild("maxRadiusVariance").GetFloat("value");
-    minRadius_ = rootElem.GetChild("minRadius").GetFloat("value");
+    emitterType_ = (EmitterType2D)ReadInt(rootElem, "emitterType");
 
-    rotatePerSecond_ = rootElem.GetChild("rotatePerSecond").GetFloat("value");
-    rotatePerSecondVariance_ = rootElem.GetChild("rotatePerSecondVariance").GetFloat("value");
-    
-    int blendFuncSource = rootElem.GetChild("blendFuncSource").GetInt("value");
-    int blendFuncDestination = rootElem.GetChild("blendFuncDestination").GetInt("value");
+    maxRadius_ = ReadFloat(rootElem, "maxRadius");
+    maxRadiusVariance_ = ReadFloat(rootElem, "maxRadiusVariance");
+    minRadius_ = ReadFloat(rootElem, "minRadius");
+    minRadiusVariance_ = ReadFloat(rootElem, "minRadiusVariance");
+
+    rotatePerSecond_ = ReadFloat(rootElem, "rotatePerSecond");
+    rotatePerSecondVariance_ = ReadFloat(rootElem, "rotatePerSecondVariance");
+
+    int blendFuncSource = ReadInt(rootElem, "blendFuncSource");
+    int blendFuncDestination = ReadInt(rootElem, "blendFuncDestination");
     blendMode_ = BLEND_ALPHA;
     for (int i = 0; i < MAX_BLENDMODES; ++i)
     {
@@ -186,18 +191,106 @@ bool ParticleEffect2D::Load(Deserializer& source)
         }
     }
 
-    rotationStart_ = rootElem.GetChild("rotationStart").GetFloat("value");
-    rotationStartVariance_ = rootElem.GetChild("rotationStartVariance").GetFloat("value");
-    
-    rotationEnd_ = rootElem.GetChild("rotationEnd").GetFloat("value");
-    rotationEndVariance_ = rootElem.GetChild("rotationEndVariance").GetFloat("value");
+    rotationStart_ = ReadFloat(rootElem, "rotationStart");
+    rotationStartVariance_ = ReadFloat(rootElem, "rotationStartVariance");
 
+    rotationEnd_ = ReadFloat(rootElem, "rotationEnd");
+    rotationEndVariance_ = ReadFloat(rootElem, "rotationEndVariance");
+
+    return true;
+}
+
+bool ParticleEffect2D::EndLoad()
+{
+    // Apply the sprite now
+    if (!loadSpriteName_.Empty())
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
+        if (!sprite_)
+            LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
+
+        loadSpriteName_.Clear();
+    }
+    
     return true;
 }
 
 bool ParticleEffect2D::Save(Serializer& dest) const
 {
-    return false;
+    if (!sprite_)
+        return false;
+
+    XMLFile xmlFile(context_);
+    XMLElement rootElem = xmlFile.CreateRoot("particleEmitterConfig");
+
+    String fileName = GetFileNameAndExtension(sprite_->GetName());
+    rootElem.CreateChild("texture").SetAttribute("name", fileName);
+
+    WriteVector2(rootElem, "sourcePosition", Vector2::ZERO);
+    WriteVector2(rootElem, "sourcePositionVariance", sourcePositionVariance_);
+
+    WriteFloat(rootElem, "speed", speed_);
+    WriteFloat(rootElem, "speedVariance", speedVariance_);
+
+    WriteFloat(rootElem, "particleLifeSpan", particleLifeSpan_);
+    WriteFloat(rootElem, "particleLifespanVariance", particleLifespanVariance_);
+
+    WriteFloat(rootElem, "angle", angle_);
+    WriteFloat(rootElem, "angleVariance", angleVariance_);
+
+    WriteVector2(rootElem, "gravity", gravity_);
+
+    WriteFloat(rootElem, "radialAcceleration", radialAcceleration_);
+    WriteFloat(rootElem, "tangentialAcceleration", tangentialAcceleration_);
+
+    WriteFloat(rootElem, "radialAccelVariance", radialAccelVariance_);
+    WriteFloat(rootElem, "tangentialAccelVariance", tangentialAccelVariance_);
+
+    WriteColor(rootElem, "startColor", startColor_);
+    WriteColor(rootElem, "startColorVariance", startColorVariance_);
+
+    WriteColor(rootElem, "finishColor", finishColor_);
+    WriteColor(rootElem, "finishColorVariance", finishColorVariance_);
+
+    WriteInt(rootElem, "maxParticles", maxParticles_);
+
+    WriteFloat(rootElem, "startParticleSize", startParticleSize_);
+    WriteFloat(rootElem, "startParticleSizeVariance", startParticleSizeVariance_);
+
+    WriteFloat(rootElem, "finishParticleSize", finishParticleSize_);
+    // Typo in pex file
+    WriteFloat(rootElem, "FinishParticleSizeVariance", FinishParticleSizeVariance_);
+
+    float duration = duration_;
+    if (duration == M_INFINITY)
+        duration = -1.0f;
+    WriteFloat(rootElem, "duration", duration);
+    WriteInt(rootElem, "emitterType", (int)emitterType_);
+
+    WriteFloat(rootElem, "maxRadius", maxRadius_);
+    WriteFloat(rootElem, "maxRadiusVariance", maxRadiusVariance_);
+    WriteFloat(rootElem, "minRadius", minRadius_);
+    WriteFloat(rootElem, "minRadiusVariance", minRadiusVariance_);
+
+    WriteFloat(rootElem, "rotatePerSecond", rotatePerSecond_);
+    WriteFloat(rootElem, "rotatePerSecondVariance", rotatePerSecondVariance_);
+
+    WriteInt(rootElem, "blendFuncSource", srcBlendFuncs[blendMode_]);
+    WriteInt(rootElem, "blendFuncDestination", destBlendFuncs[blendMode_]);
+
+    WriteFloat(rootElem, "rotationStart", rotationStart_);
+    WriteFloat(rootElem, "rotationStartVariance", rotationStartVariance_);
+
+    WriteFloat(rootElem, "rotationEnd", rotationEnd_);
+    WriteFloat(rootElem, "rotationEndVariance", rotationEndVariance_);
+
+	return xmlFile.Save(dest);
+}
+
+void ParticleEffect2D::SetSprite(Sprite2D* sprite)
+{
+    sprite_ = sprite;
 }
 
 void ParticleEffect2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance)
@@ -330,6 +423,11 @@ void ParticleEffect2D::SetMinRadius(float minRadius)
     minRadius_ = minRadius;
 }
 
+void ParticleEffect2D::SetMinRadiusVariance(float minRadiusVariance)
+{
+    minRadiusVariance_ = minRadiusVariance;
+}
+
 void ParticleEffect2D::SetRotatePerSecond(float rotatePerSecond)
 {
     rotatePerSecond_ = rotatePerSecond;
@@ -365,19 +463,54 @@ void ParticleEffect2D::SetRotationEndVariance(float rotationEndVariance)
     rotationEndVariance_ = rotationEndVariance;
 }
 
-Color ParticleEffect2D::ReadColor(const XMLElement& element) const
+int ParticleEffect2D::ReadInt(const XMLElement& element, const String& name) const
 {
-    Color color;
-    color.r_ = element.GetFloat("red");
-    color.g_ = element.GetFloat("green");
-    color.b_ = element.GetFloat("blue");
-    color.a_ = element.GetFloat("alpha");
-    return color;
+    return element.GetChild(name).GetInt("value");
 }
 
-Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element) const
+float ParticleEffect2D::ReadFloat(const XMLElement& element, const String& name) const
 {
-    return Vector2(element.GetFloat("x"), element.GetFloat("y"));
+    return element.GetChild(name).GetFloat("value");
+}
+
+Color ParticleEffect2D::ReadColor(const XMLElement& element, const String& name) const
+{
+    XMLElement child = element.GetChild(name);
+    return Color(child.GetFloat("red"), child.GetFloat("green"), child.GetFloat("blue"), child.GetFloat("alpha"));
+}
+
+Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element, const String& name) const
+{
+    XMLElement child = element.GetChild(name);
+    return Vector2(child.GetFloat("x"), child.GetFloat("y"));
+}
+
+void ParticleEffect2D::WriteInt(XMLElement& element, const String& name, int value) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetInt("value", value);
+}
+
+void ParticleEffect2D::WriteFloat(XMLElement& element, const String& name, float value) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetFloat("value", value);
+}
+
+void ParticleEffect2D::WriteColor(XMLElement& element, const String& name, const Color& color) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetFloat("red", color.r_);
+	child.SetFloat("green", color.g_);
+	child.SetFloat("blue", color.b_);
+	child.SetFloat("alpha", color.a_);
+}
+
+void ParticleEffect2D::WriteVector2(XMLElement& element,const String& name,const Vector2& value) const
+{
+	XMLElement child = element.CreateChild(name);
+	child.SetFloat("x", value.x_);
+	child.SetFloat("y", value.y_);
 }
 
 }

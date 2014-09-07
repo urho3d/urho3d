@@ -588,6 +588,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             graphics->SetTexture(TU_LIGHTSHAPE, shapeTexture);
         }
     }
+    
+    // Set zone texture if necessary
+    if (zone_ && graphics->HasTextureUnit(TU_ZONE))
+        graphics->SetTexture(TU_ZONE, zone_->GetZoneTexture());
 }
 
 void Batch::Draw(View* view) const

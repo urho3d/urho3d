@@ -448,6 +448,7 @@ function printElementDescription(className, classScope, line, description)
 end
 
 function writeClass(file, class)
+  file:write("<a name=\"Class_" .. class.name .. "\"></a>\n")
   if class.base == "" then
     file:write("### " .. class.name .. "\n\n")
   else
@@ -471,12 +472,30 @@ function writeClass(file, class)
   file:write("\n")
 end
 
-function writeClasses(file)
+function writeTableOfContents(file)
+  file:write("\n\\section LuaScriptAPI_TableOfContents Table of Contents\n\n")
+  file:write("\\ref LuaScriptAPI_ClassList \"Class list\"<br>\n")
+  file:write("\\ref LuaScriptAPI_Classes \"Classes\"<br>\n")
+  file:write("\\ref LuaScriptAPI_Enums \"Enumerations\"<br>\n")
+  file:write("\\ref LuaScriptAPI_GlobalFunctions \"Global functions\"<br>\n")
+  file:write("\\ref LuaScriptAPI_GlobalProperties \"Global properties\"<br>\n")
+  file:write("\\ref LuaScriptAPI_GlobalConstants \"Global constants\"<br>\n")
+end
+
+function writeClassList(file)
   sortByName(classes)
+  file:write("\n\\section LuaScriptAPI_ClassList Class list\n\n")
+
+  for i, class in ipairs(classes) do
+    file:write("<a href=\"#Class_" .. class.name .. "\"><b>" .. class.name .. "</b></a>\n")
+  end
+end
+
+function writeClasses(file)
   file:write("\n\\section LuaScriptAPI_Classes Classes\n\n")
 
   for i, class in ipairs(classes) do
-    writeClass(file, class)    
+    writeClass(file, class)
   end
 
 end
@@ -597,6 +616,8 @@ function classPackage:print()
   end
   printDescriptionsFromPackageFile(flags.f)
 
+  writeTableOfContents(file)
+  writeClassList(file)
   writeClasses(file)
   writeEnumerates(file)
   writeGlobalFunctions(file)

@@ -17,6 +17,10 @@ class Viewport
     Camera* GetCamera() const;
     const IntRect& GetRect() const;
     RenderPath* GetRenderPath() const;
+    Ray GetScreenRay(int x, int y) const;
+    IntVector2 WorldToScreenPoint(const Vector3& worldPos) const;
+    Vector3 ScreenToWorldPoint(int x, int y, float depth) const;
+    
     
     tolua_property__get_set Scene* scene;
     tolua_property__get_set Camera* camera;

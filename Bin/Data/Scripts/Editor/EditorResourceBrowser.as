@@ -40,7 +40,7 @@ const int RESOURCE_TYPE_TEXTURE = 8;
 const int RESOURCE_TYPE_FONT = 9;
 const int RESOURCE_TYPE_PREFAB = 10;
 const int RESOURCE_TYPE_TECHNIQUE = 11;
-const int RESOURCE_TYPE_PARTICLEEMITTER = 12;
+const int RESOURCE_TYPE_PARTICLEEFFECT = 12;
 const int RESOURCE_TYPE_UIELEMENT = 13;
 const int RESOURCE_TYPE_UIELEMENTS = 14;
 const int RESOURCE_TYPE_ANIMATION_SETTINGS = 15;
@@ -49,54 +49,56 @@ const int RESOURCE_TYPE_TEXTURE_ATLAS = 17;
 const int RESOURCE_TYPE_2D_PARTICLE_EFFECT = 18;
 const int RESOURCE_TYPE_TEXTURE_3D = 19;
 const int RESOURCE_TYPE_CUBEMAP = 20;
+const int RESOURCE_TYPE_PARTICLEEMITTER = 21;
 
-const ShortStringHash XML_TYPE_SCENE("scene");
-const ShortStringHash XML_TYPE_NODE("node");
-const ShortStringHash XML_TYPE_MATERIAL("material");
-const ShortStringHash XML_TYPE_TECHNIQUE("technique");
-const ShortStringHash XML_TYPE_PARTICLEEMITTER("particleemitter");
-const ShortStringHash XML_TYPE_TEXTURE("texture");
-const ShortStringHash XML_TYPE_ELEMENT("element");
-const ShortStringHash XML_TYPE_ELEMENTS("elements");
-const ShortStringHash XML_TYPE_ANIMATION_SETTINGS("animation");
-const ShortStringHash XML_TYPE_RENDERPATH("renderpath");
-const ShortStringHash XML_TYPE_TEXTURE_ATLAS("TextureAtlas");
-const ShortStringHash XML_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
-const ShortStringHash XML_TYPE_TEXTURE_3D("texture3d");
-const ShortStringHash XML_TYPE_CUBEMAP("cubemap");
+const StringHash XML_TYPE_SCENE("scene");
+const StringHash XML_TYPE_NODE("node");
+const StringHash XML_TYPE_MATERIAL("material");
+const StringHash XML_TYPE_TECHNIQUE("technique");
+const StringHash XML_TYPE_PARTICLEEFFECT("particleeffect");
+const StringHash XML_TYPE_PARTICLEEMITTER("particleemitter");
+const StringHash XML_TYPE_TEXTURE("texture");
+const StringHash XML_TYPE_ELEMENT("element");
+const StringHash XML_TYPE_ELEMENTS("elements");
+const StringHash XML_TYPE_ANIMATION_SETTINGS("animation");
+const StringHash XML_TYPE_RENDERPATH("renderpath");
+const StringHash XML_TYPE_TEXTURE_ATLAS("TextureAtlas");
+const StringHash XML_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
+const StringHash XML_TYPE_TEXTURE_3D("texture3d");
+const StringHash XML_TYPE_CUBEMAP("cubemap");
 
-const ShortStringHash BINARY_TYPE_SCENE("USCN");
-const ShortStringHash BINARY_TYPE_PACKAGE("UPAK");
-const ShortStringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
-const ShortStringHash BINARY_TYPE_ANGLESCRIPT("ASBC");
-const ShortStringHash BINARY_TYPE_MODEL("UMDL");
-const ShortStringHash BINARY_TYPE_SHADER("USHD");
-const ShortStringHash BINARY_TYPE_ANIMATION("UANI");
+const StringHash BINARY_TYPE_SCENE("USCN");
+const StringHash BINARY_TYPE_PACKAGE("UPAK");
+const StringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
+const StringHash BINARY_TYPE_ANGLESCRIPT("ASBC");
+const StringHash BINARY_TYPE_MODEL("UMDL");
+const StringHash BINARY_TYPE_SHADER("USHD");
+const StringHash BINARY_TYPE_ANIMATION("UANI");
 
-const ShortStringHash EXTENSION_TYPE_TTF(".ttf");
-const ShortStringHash EXTENSION_TYPE_OGG(".ogg");
-const ShortStringHash EXTENSION_TYPE_WAV(".wav");
-const ShortStringHash EXTENSION_TYPE_DDS(".dds");
-const ShortStringHash EXTENSION_TYPE_PNG(".png");
-const ShortStringHash EXTENSION_TYPE_JPG(".jpg");
-const ShortStringHash EXTENSION_TYPE_JPEG(".jpeg");
-const ShortStringHash EXTENSION_TYPE_TGA(".tga");
-const ShortStringHash EXTENSION_TYPE_OBJ(".obj");
-const ShortStringHash EXTENSION_TYPE_FBX(".fbx");
-const ShortStringHash EXTENSION_TYPE_COLLADA(".dae");
-const ShortStringHash EXTENSION_TYPE_BLEND(".blend");
-const ShortStringHash EXTENSION_TYPE_ANGELSCRIPT(".as");
-const ShortStringHash EXTENSION_TYPE_LUASCRIPT(".lua");
-const ShortStringHash EXTENSION_TYPE_HLSL(".hlsl");
-const ShortStringHash EXTENSION_TYPE_GLSL(".glsl");
-const ShortStringHash EXTENSION_TYPE_FRAGMENTSHADER(".frag");
-const ShortStringHash EXTENSION_TYPE_VERTEXSHADER(".vert");
-const ShortStringHash EXTENSION_TYPE_HTML(".html");
+const StringHash EXTENSION_TYPE_TTF(".ttf");
+const StringHash EXTENSION_TYPE_OGG(".ogg");
+const StringHash EXTENSION_TYPE_WAV(".wav");
+const StringHash EXTENSION_TYPE_DDS(".dds");
+const StringHash EXTENSION_TYPE_PNG(".png");
+const StringHash EXTENSION_TYPE_JPG(".jpg");
+const StringHash EXTENSION_TYPE_JPEG(".jpeg");
+const StringHash EXTENSION_TYPE_TGA(".tga");
+const StringHash EXTENSION_TYPE_OBJ(".obj");
+const StringHash EXTENSION_TYPE_FBX(".fbx");
+const StringHash EXTENSION_TYPE_COLLADA(".dae");
+const StringHash EXTENSION_TYPE_BLEND(".blend");
+const StringHash EXTENSION_TYPE_ANGELSCRIPT(".as");
+const StringHash EXTENSION_TYPE_LUASCRIPT(".lua");
+const StringHash EXTENSION_TYPE_HLSL(".hlsl");
+const StringHash EXTENSION_TYPE_GLSL(".glsl");
+const StringHash EXTENSION_TYPE_FRAGMENTSHADER(".frag");
+const StringHash EXTENSION_TYPE_VERTEXSHADER(".vert");
+const StringHash EXTENSION_TYPE_HTML(".html");
 
-const ShortStringHash TEXT_VAR_FILE_ID("browser_file_id");
-const ShortStringHash TEXT_VAR_DIR_ID("browser_dir_id");
-const ShortStringHash TEXT_VAR_RESOURCE_TYPE("resource_type");
-const ShortStringHash TEXT_VAR_RESOURCE_DIR_ID("resource_dir_id");
+const StringHash TEXT_VAR_FILE_ID("browser_file_id");
+const StringHash TEXT_VAR_DIR_ID("browser_dir_id");
+const StringHash TEXT_VAR_RESOURCE_TYPE("resource_type");
+const StringHash TEXT_VAR_RESOURCE_DIR_ID("resource_dir_id");
 
 const int BROWSER_FILE_SOURCE_RESOURCE_DIR = 1;
 
@@ -226,7 +228,7 @@ void CreateResourceFilterUI()
 
     UIElement@ col1 = browserFilterWindow.GetChild("TypeFilterColumn1", true);
     UIElement@ col2 = browserFilterWindow.GetChild("TypeFilterColumn2", true);
-    for (int i=-2; i < 21; ++i)
+    for (int i=-2; i < 22; ++i)
     {
         if (i == RESOURCE_TYPE_NOTSET)
             continue;
@@ -247,7 +249,8 @@ void CreateResourceFilterUI()
         checkbox.SetStyleAuto();
         checkbox.vars[TEXT_VAR_RESOURCE_TYPE] = i;
         checkbox.checked = true;
-        SubscribeToEvent(checkbox, "Toggled", "HandleResourceTypeFilterToggled");
+        SubscribeToEvent(checkbox, "Toggled", "HandleResourceTypeFilterToggled");
+
 
         resourceTypeHolder.AddChild(checkbox);
         resourceTypeHolder.AddChild(label);
@@ -307,7 +310,7 @@ void InitializeBrowserFileListRow(Text@ fileText, BrowserFile@ file)
 
     if (file.resourceType == RESOURCE_TYPE_MATERIAL || 
             file.resourceType == RESOURCE_TYPE_MODEL ||
-            file.resourceType == RESOURCE_TYPE_PARTICLEEMITTER ||
+            file.resourceType == RESOURCE_TYPE_PARTICLEEFFECT ||
             file.resourceType == RESOURCE_TYPE_PREFAB
         )
     {
@@ -526,7 +529,7 @@ void PopulateResourceDirFilters()
     UIElement@ resourceDirs = browserFilterWindow.GetChild("DirFilters", true);
     resourceDirs.RemoveAllChildren();
     activeResourceDirFilters.Clear();
-    for (int i=0; i < cache.resourceDirs.length; ++i)
+    for (uint i=0; i < cache.resourceDirs.length; ++i)
     {
         UIElement@ resourceDirHolder = UIElement();
         resourceDirs.AddChild(resourceDirHolder);
@@ -542,7 +545,8 @@ void PopulateResourceDirFilters()
         checkbox.SetStyleAuto();
         checkbox.vars[TEXT_VAR_RESOURCE_DIR_ID] = i;
         checkbox.checked = true;
-        SubscribeToEvent(checkbox, "Toggled", "HandleResourceDirFilterToggled");
+        SubscribeToEvent(checkbox, "Toggled", "HandleResourceDirFilterToggled");
+
 
         resourceDirHolder.AddChild(checkbox);
         resourceDirHolder.AddChild(label);
@@ -980,11 +984,11 @@ Menu@ CreateBrowserFileActionMenu(String text, String handler, BrowserFile@ brow
 
 int GetResourceType(String path)
 {
-    ShortStringHash fileType;
+    StringHash fileType;
     return GetResourceType(path, fileType);
 }
 
-int GetResourceType(String path, ShortStringHash &out fileType, bool useCache = false)
+int GetResourceType(String path, StringHash &out fileType, bool useCache = false)
 {
     if (GetExtensionType(path, fileType) || GetBinaryType(path, fileType, useCache) || GetXmlType(path, fileType, useCache))
         return GetResourceType(fileType);
@@ -993,7 +997,7 @@ int GetResourceType(String path, ShortStringHash &out fileType, bool useCache = 
 }
 
 
-int GetResourceType(ShortStringHash fileType)
+int GetResourceType(StringHash fileType)
 {
     // binary fileTypes
     if (fileType == BINARY_TYPE_SCENE)
@@ -1020,6 +1024,8 @@ int GetResourceType(ShortStringHash fileType)
         return RESOURCE_TYPE_MATERIAL;
     else if(fileType == XML_TYPE_TECHNIQUE)
         return RESOURCE_TYPE_TECHNIQUE;
+    else if(fileType == XML_TYPE_PARTICLEEFFECT)
+        return RESOURCE_TYPE_PARTICLEEFFECT;
     else if(fileType == XML_TYPE_PARTICLEEMITTER)
         return RESOURCE_TYPE_PARTICLEEMITTER;
     else if(fileType == XML_TYPE_TEXTURE)
@@ -1084,9 +1090,9 @@ int GetResourceType(ShortStringHash fileType)
     return RESOURCE_TYPE_UNKNOWN;
 }
 
-bool GetExtensionType(String path, ShortStringHash &out fileType)
+bool GetExtensionType(String path, StringHash &out fileType)
 {
-    ShortStringHash type = ShortStringHash(GetExtension(path));
+    StringHash type = StringHash(GetExtension(path));
     if (type == EXTENSION_TYPE_TTF)
         fileType = EXTENSION_TYPE_TTF;
     else if (type == EXTENSION_TYPE_OGG)
@@ -1131,9 +1137,9 @@ bool GetExtensionType(String path, ShortStringHash &out fileType)
     return true;
 }
 
-bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = false)
+bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
 {   
-    ShortStringHash type;
+    StringHash type;
     if (useCache)
     {
         File@ file = cache.GetFile(path);
@@ -1143,7 +1149,7 @@ bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = f
         if (file.size == 0)
             return false;
 
-        type = ShortStringHash(file.ReadFileID());
+        type = StringHash(file.ReadFileID());
     }
     else
     {
@@ -1154,7 +1160,7 @@ bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = f
         if (file.size == 0)
             return false;
 
-        type = ShortStringHash(file.ReadFileID());
+        type = StringHash(file.ReadFileID());
     }
 
     if (type == BINARY_TYPE_SCENE)
@@ -1177,7 +1183,7 @@ bool GetBinaryType(String path, ShortStringHash &out fileType, bool useCache = f
     return true;
 }
 
-bool GetXmlType(String path, ShortStringHash &out fileType, bool useCache = false)
+bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
 {
     String name;
     if (useCache)
@@ -1208,7 +1214,7 @@ bool GetXmlType(String path, ShortStringHash &out fileType, bool useCache = fals
     if (!name.empty)
     {
         found = true;
-        ShortStringHash type = ShortStringHash(name);
+        StringHash type = StringHash(name);
         if (type == XML_TYPE_SCENE)
             fileType = XML_TYPE_SCENE;
         else if (type == XML_TYPE_NODE)
@@ -1217,6 +1223,8 @@ bool GetXmlType(String path, ShortStringHash &out fileType, bool useCache = fals
             fileType = XML_TYPE_MATERIAL;
         else if(type == XML_TYPE_TECHNIQUE)
             fileType = XML_TYPE_TECHNIQUE;
+        else if(type == XML_TYPE_PARTICLEEFFECT)
+            fileType = XML_TYPE_PARTICLEEFFECT;
         else if(type == XML_TYPE_PARTICLEEMITTER)
             fileType = XML_TYPE_PARTICLEEMITTER;
         else if(type == XML_TYPE_TEXTURE)
@@ -1273,6 +1281,8 @@ String ResourceTypeName(int resourceType)
         return "Prefab";
     else if (resourceType == RESOURCE_TYPE_TECHNIQUE)
         return "Render Technique";
+    else if (resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
+        return "Particle Effect";
     else if (resourceType == RESOURCE_TYPE_PARTICLEEMITTER)
         return "Particle Emitter";
     else if (resourceType == RESOURCE_TYPE_UIELEMENT)
@@ -1335,7 +1345,7 @@ class BrowserFile
     String name;
     String fullname;
     String extension;
-    ShortStringHash fileType;
+    StringHash fileType;
     int resourceType = 0;
     int sourceType = 0;
     int sortScore = 0;
@@ -1442,7 +1452,7 @@ void CreateResourcePreview(String path, Node@ previewNode)
                 staticModel.model = cache.GetResource("Model", "Models/Editor/ImagePlane.mdl");
                 Material@ material =  cache.GetResource("Material", "Materials/Editor/TexturedUnlit.xml");
                 Texture2D@ texture = Texture2D();
-                texture.Load(@image, true);
+                texture.SetData(@image, true);
                 material.textures[0] = texture;
                 staticModel.material = material;
                 return;
@@ -1472,7 +1482,7 @@ void CreateResourcePreview(String path, Node@ previewNode)
     Material@ material =  cache.GetResource("Material", "Materials/Editor/TexturedUnlit.xml");
     Texture2D@ texture = Texture2D();
     Image@ noPreviewImage = cache.GetResource("Image", "Textures/Editor/NoPreviewAvailable.png");
-    texture.Load(noPreviewImage, false);
+    texture.SetData(noPreviewImage, false);
     material.textures[0] = texture;
     staticModel.material = material;
 

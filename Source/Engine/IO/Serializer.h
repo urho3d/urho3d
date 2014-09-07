@@ -98,8 +98,6 @@ public:
     bool WriteFileID(const String& value);
     /// Write a 32-bit StringHash.
     bool WriteStringHash(const StringHash& value);
-    /// Write a 16-bit ShortStringHash.
-    bool WriteShortStringHash(const ShortStringHash& value);
     /// Write a buffer, with size encoded as VLE.
     bool WriteBuffer(const PODVector<unsigned char>& buffer);
     /// Write a resource reference.

@@ -292,7 +292,7 @@ public:
     /// Bring UI element to front.
     void BringToFront();
     /// Create and add a child element and return it.
-    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
     /// Add a child element.
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
@@ -310,7 +310,7 @@ public:
     /// Set parent element. Same as parent->InsertChild(index, this).
     void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
     /// Set a user variable.
-    void SetVar(ShortStringHash key, const Variant& value);
+    void SetVar(StringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
     void SetInternal(bool enable);
     /// Set traversal mode for rendering. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
@@ -412,7 +412,7 @@ public:
     /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
     /// Return child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
-    UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
+    UIElement* GetChild(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
     /// Return immediate child elements.
     const Vector<SharedPtr<UIElement> >& GetChildren() const { return children_; }
     /// Return child elements either recursively or non-recursively.
@@ -424,7 +424,7 @@ public:
     /// Return derived color. Only valid when no gradient.
     const Color& GetDerivedColor() const;
     /// Return a user variable.
-    const Variant& GetVar(const ShortStringHash& key) const;
+    const Variant& GetVar(const StringHash& key) const;
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
 
@@ -472,6 +472,8 @@ protected:
     virtual void OnAttributeAnimationAdded();
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved();
+    /// Set object attribute animation internal.
+    virtual void SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.

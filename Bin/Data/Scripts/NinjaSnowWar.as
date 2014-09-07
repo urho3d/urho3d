@@ -197,7 +197,6 @@ void InitNetworking()
         SubscribeToEvent("UpdateScore", "HandleUpdateScore");
         SubscribeToEvent("UpdateHiscores", "HandleUpdateHiscores");
         SubscribeToEvent("NetworkUpdateSent", "HandleNetworkUpdateSent");
-        SubscribeToEvent("ParticleEffect", "HandleParticleEffect");
     }
 }
 
@@ -644,14 +643,6 @@ void HandleNetworkUpdateSent()
         network.serverConnection.controls.Set(CTRL_ALL, false);
 }
 
-void HandleParticleEffect(StringHash eventType, VariantMap& eventData)
-{
-    Vector3 position = eventData["Position"].GetVector3();
-    String effectName = eventData["EffectName"].GetString();
-    float duration = eventData["Duration"].GetFloat();
-    SpawnParticleEffect(position, effectName, duration, LOCAL);
-}
-
 int FindPlayerIndex(uint nodeID)
 {
     for (uint i = 0; i < players.length; ++i)
@@ -759,23 +750,15 @@ Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const
 
 Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration, CreateMode mode = REPLICATED)
 {
-    if (runServer && mode == REPLICATED)
-    {
-        VariantMap eventData;
-        eventData["Position"] = position;
-        eventData["EffectName"] = effectName;
-        eventData["Duration"] = duration;
-        network.BroadcastRemoteEvent(gameScene, "ParticleEffect", false, eventData);
-    }
-
-    Node@ newNode = scene.CreateChild("Effect", LOCAL);
+    Node@ newNode = scene.CreateChild("Effect", mode);
     newNode.position = position;
 
     // Create the particle emitter
     ParticleEmitter@ emitter = newNode.CreateComponent("ParticleEmitter");
-    emitter.Load(cache.GetResource("XMLFile", effectName));
+    emitter.effect = cache.GetResource("ParticleEffect", effectName);
 
-    // Create a GameObject for managing the effect lifetime
+    // Create a GameObject for managing the effect lifetime. This is always local, so for server-controlled effects it
+    // exists only on the server
     GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
     object.duration = duration;
 

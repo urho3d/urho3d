@@ -41,7 +41,7 @@ public:
     ~Context();
 
     /// Create an object by type hash. Return pointer to it or null if no factory found.
-    SharedPtr<Object> CreateObject(ShortStringHash objectType);
+    SharedPtr<Object> CreateObject(StringHash objectType);
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
     /// Register a factory for an object type and specify the object category.
@@ -49,18 +49,18 @@ public:
     /// Register a subsystem.
     void RegisterSubsystem(Object* subsystem);
     /// Remove a subsystem.
-    void RemoveSubsystem(ShortStringHash objectType);
+    void RemoveSubsystem(StringHash objectType);
     /// Register object attribute.
-    void RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr);
+    void RegisterAttribute(StringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute.
-    void RemoveAttribute(ShortStringHash objectType, const char* name);
+    void RemoveAttribute(StringHash objectType, const char* name);
     /// Update object attribute's default value.
-    void UpdateAttributeDefaultValue(ShortStringHash objectType, const char* name, const Variant& defaultValue);
+    void UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap();
-    
+
     /// Copy base class attributes to derived class.
-    void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
+    void CopyBaseAttributes(StringHash baseType, StringHash derivedType);
     /// Template version of registering an object factory.
     template <class T> void RegisterFactory();
     /// Template version of registering an object factory with category.
@@ -77,42 +77,42 @@ public:
     template <class T> void UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue);
 
     /// Return subsystem by type.
-    Object* GetSubsystem(ShortStringHash type) const;
+    Object* GetSubsystem(StringHash type) const;
     /// Return all subsystems.
-    const HashMap<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
+    const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
     /// Return all object factories.
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+    const HashMap<StringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
     /// Return all object categories.
-    const HashMap<String, Vector<ShortStringHash> >& GetObjectCategories() const { return objectCategories_; }
+    const HashMap<String, Vector<StringHash> >& GetObjectCategories() const { return objectCategories_; }
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
     /// Return active event handler. Set by Object. Null outside event handling.
     EventHandler* GetEventHandler() const { return eventHandler_; }
     /// Return object type name from hash, or empty if unknown.
-    const String& GetTypeName(ShortStringHash objectType) const;
+    const String& GetTypeName(StringHash objectType) const;
     /// Return a specific attribute description for an object, or null if not found.
-    AttributeInfo* GetAttribute(ShortStringHash objectType, const char* name);
+    AttributeInfo* GetAttribute(StringHash objectType, const char* name);
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
     /// Template version of returning a specific attribute description.
     template <class T> AttributeInfo* GetAttribute(const char* name);
 
     /// Return attribute descriptions for an object type, or null if none defined.
-    const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
+    const Vector<AttributeInfo>* GetAttributes(StringHash type) const
     {
-        HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
+        HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
         return i != attributes_.End() ? &i->second_ : 0;
     }
 
     /// Return network replication attribute descriptions for an object type, or null if none defined.
-    const Vector<AttributeInfo>* GetNetworkAttributes(ShortStringHash type) const
+    const Vector<AttributeInfo>* GetNetworkAttributes(StringHash type) const
     {
-        HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
+        HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
         return i != networkAttributes_.End() ? &i->second_ : 0;
     }
 
     /// Return all registered attributes.
-    const HashMap<ShortStringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
+    const HashMap<StringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
 
     /// Return event receivers for a sender and event type, or null if they do not exist.
     HashSet<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
@@ -153,13 +153,13 @@ private:
     void EndSendEvent() { eventSenders_.Pop(); }
 
     /// Object factories.
-    HashMap<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
+    HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;
     /// Subsystems.
-    HashMap<ShortStringHash, SharedPtr<Object> > subsystems_;
+    HashMap<StringHash, SharedPtr<Object> > subsystems_;
     /// Attribute descriptions per object type.
-    HashMap<ShortStringHash, Vector<AttributeInfo> > attributes_;
+    HashMap<StringHash, Vector<AttributeInfo> > attributes_;
     /// Network replication attribute descriptions per object type.
-    HashMap<ShortStringHash, Vector<AttributeInfo> > networkAttributes_;
+    HashMap<StringHash, Vector<AttributeInfo> > networkAttributes_;
     /// Event receivers for non-specific events.
     HashMap<StringHash, HashSet<Object*> > eventReceivers_;
     /// Event receivers for specific senders' events.
@@ -171,7 +171,7 @@ private:
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     EventHandler* eventHandler_;
     /// Object categories.
-    HashMap<String, Vector<ShortStringHash> > objectCategories_;
+    HashMap<String, Vector<StringHash> > objectCategories_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

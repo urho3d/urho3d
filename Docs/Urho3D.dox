@@ -2,9 +2,9 @@ namespace Urho3D
 {
 
 /**
-\mainpage Urho3D - cross-platform rendering and game engine
+\mainpage Urho3D - cross-platform 2D and 3D game engine
 
-Urho3D (http://urho3d.github.io/) is a lightweight, cross-platform rendering and game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
+Urho3D (http://urho3d.github.io/) is a lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
 
 For getting started, see:
 
@@ -37,18 +37,18 @@ For further reference, see:
 \ref Serialization "Serialization" <br>
 \ref Network "Networking" <br>
 \ref Multithreading "Multithreading" <br>
-\ref AttributeAnimation "Attribute Animation" <br>
+\ref AttributeAnimation "Attribute animation" <br>
 \ref Tools "Tools" <br>
 \ref Unicode "Unicode support" <br>
 \ref FileFormats "Custom file formats" <br>
 \ref CodingConventions "Coding conventions" <br>
 \ref ContributionChecklist "Contribution checklist" <br>
 \ref ScriptAPI "Scripting API (generated)" <br>
-\ref LuaScriptAPI "Lua Scripting API (generated)" <br>
+\ref LuaScriptAPI "Lua scripting API (generated)" <br>
 \ref EventList "Event list (generated)" <br>
 \ref AttributeList "Attribute list (generated)" <br>
 
-For Urho3D related links and projects, see \ref ExternalLinks "External Links".
+For Urho3D related links and projects, see \ref ExternalLinks "External links".
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 
@@ -93,7 +93,10 @@ Urho3D development, contributions and bugfixes by:
 - andmar1x
 - amadeus_osa
 - atship
+- att
 - mightyCelu
+- ninjastone
+- rasteron
 - reattiva
 - skaiware
 - szamq
@@ -113,7 +116,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 
 Urho3D uses the following third-party libraries:
 
-- AngelScript 2.28.1 (http://www.angelcode.com/angelscript/)
+- AngelScript 2.29.1 (http://www.angelcode.com/angelscript/)
 - Box2D 2.3.0 (http://box2d.org/)
 - Bullet 2.82 (http://www.bulletphysics.org/)
 - Civetweb (http://sourceforge.net/projects/civetweb/)
@@ -310,7 +313,7 @@ V1.0
 
 - Original release.
 
-\page ExternalLinks External Links
+\page ExternalLinks External links
 
 Related projects:
 

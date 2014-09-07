@@ -61,6 +61,8 @@ public:
     virtual void Setup();
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
     virtual void Start();
+    /// Cleanup after the main loop. Called by Application.
+    virtual void Stop();
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.

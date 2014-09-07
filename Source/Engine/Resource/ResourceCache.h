@@ -24,11 +24,14 @@
 
 #include "File.h"
 #include "HashSet.h"
+#include "List.h"
+#include "Mutex.h"
 #include "Resource.h"
 
 namespace Urho3D
 {
 
+class BackgroundLoader;
 class FileWatcher;
 class PackageFile;
 
@@ -77,11 +80,11 @@ public:
     /// Remove a package file by name. Optionally release the resources loaded from it.
     void RemovePackageFile(const String& fileName, bool releaseResources = true, bool forceRelease = false);
     /// Release a resource by name.
-    void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
+    void ReleaseResource(StringHash type, const String& name, bool force = false);
     /// Release all resources of a specific type.
-    void ReleaseResources(ShortStringHash type, bool force = false);
+    void ReleaseResources(StringHash type, bool force = false);
     /// Release resources of a specific type and partial name.
-    void ReleaseResources(ShortStringHash type, const String& partialName, bool force = false);
+    void ReleaseResources(StringHash type, const String& partialName, bool force = false);
     /// Release resources of all types by partial name.
     void ReleaseResources(const String& partialName, bool force = false);
     /// Release all resources. When called with the force flag false, releases all currently unused resources.
@@ -89,40 +92,48 @@ public:
     /// Reload a resource. Return true on success. The resource will not be removed from the cache in case of failure.
     bool ReloadResource(Resource* resource);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
-    void SetMemoryBudget(ShortStringHash type, unsigned budget);
+    void SetMemoryBudget(StringHash type, unsigned budget);
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
     void SetReturnFailedResources(bool enable);
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
+    /// Set how many milliseconds maximum per frame to spend on finishing background loaded resources.
+    void SetFinishBackgroundResourcesMs(int ms) { finishBackgroundResourcesMs_ = Max(ms, 1); }
 
-    /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
+    /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
-    Resource* GetResource(ShortStringHash type, const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called.
-    Resource* GetResource(ShortStringHash type, const char* name, bool sendEventOnFailure = true);
+    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
+    Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
+    /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)
+    SharedPtr<Resource> GetTempResource(StringHash type, const String& name, bool sendEventOnFailure = true);
+    /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Can be called from outside the main thread.
+    bool BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure = true, Resource* caller = 0);
+    /// Return number of pending background-loaded resources.
+    unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
-    void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
+    void GetResources(PODVector<Resource*>& result, StringHash type) const;
     /// Return all loaded resources.
-    const HashMap<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
+    const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load directories.
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
     /// Return added package files.
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
-    /// Template version of returning a resource by name.
-    template <class T> T* GetResource(const char* name, bool sendEventOnFailure = true);
+    /// Template version of loading a resource without storing it to the cache.
+    template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
+    /// Template version of queueing a resource background load.
+    template <class T> bool BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists by name.
     bool Exists(const String& name) const;
     /// Return memory budget for a resource type.
-    unsigned GetMemoryBudget(ShortStringHash type) const;
+    unsigned GetMemoryBudget(StringHash type) const;
     /// Return total memory use for a resource type.
-    unsigned GetMemoryUse(ShortStringHash type) const;
+    unsigned GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
     unsigned GetTotalMemoryUse() const;
     /// Return full absolute file name of resource if possible.
@@ -131,8 +142,10 @@ public:
     bool GetAutoReloadResources() const { return autoReloadResources_; }
     /// Return whether resources that failed to load are returned.
     bool GetReturnFailedResources() const { return returnFailedResources_; }
-    /// Define whether when getting resources should check package files or directories first.
+    /// Return whether when getting resources should check package files or directories first.
     bool GetSearchPackagesFirst() const { return searchPackagesFirst_; }
+    /// Return how many milliseconds maximum to spend on finishing background loaded resources.
+    int GetFinishBackgroundResourcesMs() const { return finishBackgroundResourcesMs_; }
 
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
@@ -147,54 +160,66 @@ public:
     
 private:
     /// Find a resource.
-    const SharedPtr<Resource>& FindResource(ShortStringHash type, StringHash nameHash);
+    const SharedPtr<Resource>& FindResource(StringHash type, StringHash nameHash);
     /// Find a resource by name only. Searches all type groups.
     const SharedPtr<Resource>& FindResource(StringHash nameHash);
     /// Release resources loaded from a package file.
     void ReleasePackageResources(PackageFile* package, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
-    void UpdateResourceGroup(ShortStringHash type);
-    /// Handle begin frame event. Automatic resource reloads are processed here.
+    void UpdateResourceGroup(StringHash type);
+    /// Handle begin frame event. Automatic resource reloads and the finalization of background loaded resources are processed here.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
-    /// Search FileSystem for File.
+    /// Search FileSystem for file.
     File* SearchResourceDirs(const String& nameIn);
-    /// Search Packages for File.
+    /// Search resource packages for file.
     File* SearchPackages(const String& nameIn);
     
+    /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
+    mutable Mutex resourceMutex_;
     /// Resources by type.
-    HashMap<ShortStringHash, ResourceGroup> resourceGroups_;
+    HashMap<StringHash, ResourceGroup> resourceGroups_;
     /// Resource load directories.
     Vector<String> resourceDirs_;
     /// File watchers for resource directories, if automatic reloading enabled.
     Vector<SharedPtr<FileWatcher> > fileWatchers_;
     /// Package files.
     Vector<SharedPtr<PackageFile> > packages_;
-    /// Dependent resources.
+    /// Dependent resources. Only used with automatic reload to eg. trigger reload of a cube texture when any of its faces change.
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
+    /// Resource background loader.
+    SharedPtr<BackgroundLoader> backgroundLoader_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.
     bool returnFailedResources_;
     /// Search priority flag.
     bool searchPackagesFirst_;
+    /// How many milliseconds maximum per frame to spend on finishing background loaded resources.
+    int finishBackgroundResourcesMs_;
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
 {
-    ShortStringHash type = T::GetTypeStatic();
+    StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
-template <class T> T* ResourceCache::GetResource(const char* name, bool sendEventOnFailure)
+template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure)
 {
-    ShortStringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
+    StringHash type = T::GetTypeStatic();
+    return StaticCast<T>(GetTempResource(type, name, sendEventOnFailure));
+}
+
+template <class T> bool ResourceCache::BackgroundLoadResource(const String& name, bool sendEventOnFailure, Resource* caller)
+{
+    StringHash type = T::GetTypeStatic();
+    return BackgroundLoadResource(type, name, sendEventOnFailure, caller);
 }
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
     PODVector<Resource*>& resources = reinterpret_cast<PODVector<Resource*>&>(result);
-    ShortStringHash type = T::GetTypeStatic();
+    StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
     
     // Perform conversion of the returned pointers

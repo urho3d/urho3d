@@ -14,9 +14,9 @@ class Octree : public Component
     tolua_outside const PODVector<OctreeQueryResult>& OctreeGetDrawablesSphere @ GetDrawables(const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
 
     // void Raycast(RayOctreeQuery& query) const;
-    tolua_outside const PODVector<RayQueryResult>& OctreeRaycast @ Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
+    tolua_outside const PODVector<RayQueryResult>& OctreeRaycast @ Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const;
     // void RaycastSingle(RayOctreeQuery& query) const;
-    tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
+    tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const;
     
     unsigned GetNumLevels() const;
     
@@ -91,10 +91,10 @@ static const PODVector<OctreeQueryResult>& OctreeGetDrawablesSphere(const Octree
     return result;
 }
 
-static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
+static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK)
 {
     PODVector<RayQueryResult> result;
-    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags);
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
     octree->RaycastSingle(query);
     if (!query.result_.Empty())
         return query.result_[0];
@@ -109,11 +109,11 @@ static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, 
     }
 }
 
-static const PODVector<RayQueryResult>& OctreeRaycast(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
+static const PODVector<RayQueryResult>& OctreeRaycast(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK)
 {
     static PODVector<RayQueryResult> result;
     result.Clear();
-    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags);
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
     octree->Raycast(query);
     return result;
 }

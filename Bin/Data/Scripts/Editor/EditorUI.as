@@ -11,18 +11,18 @@ FileSelector@ uiFileSelector;
 String consoleCommandInterpreter;
 Window@ contextMenu;
 
-const ShortStringHash UI_ELEMENT_TYPE("UIElement");
-const ShortStringHash WINDOW_TYPE("Window");
-const ShortStringHash MENU_TYPE("Menu");
-const ShortStringHash TEXT_TYPE("Text");
-const ShortStringHash CURSOR_TYPE("Cursor");
+const StringHash UI_ELEMENT_TYPE("UIElement");
+const StringHash WINDOW_TYPE("Window");
+const StringHash MENU_TYPE("Menu");
+const StringHash TEXT_TYPE("Text");
+const StringHash CURSOR_TYPE("Cursor");
 
 const String AUTO_STYLE("");    // Empty string means auto style, i.e. applying style according to UI-element's type automatically
 const String TEMP_SCENE_NAME("_tempscene_.xml");
-const ShortStringHash CALLBACK_VAR("Callback");
-const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
+const StringHash CALLBACK_VAR("Callback");
+const StringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 
-const ShortStringHash VAR_CONTEXT_MENU_HANDLER("ContextMenuHandler");
+const StringHash VAR_CONTEXT_MENU_HANDLER("ContextMenuHandler");
 
 const int SHOW_POPUP_INDICATOR = -1;
 const uint MAX_QUICK_MENU_ITEMS = 10;
@@ -334,8 +334,6 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
-        popup.AddChild(CreateMenuItem("Load particle data", @PickFile));
-        popup.AddChild(CreateMenuItem("Save particle data", @PickFile));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -546,35 +544,6 @@ bool PickFile()
         CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
         uiFileSelector.directoryMode = true;
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
-    }
-    else if (action == "Load particle data")
-    {
-        bool hasParticleEmitter = false;
-        for (uint i = 0; i < editComponents.length; ++i)
-        {
-            if (editComponents[i].typeName == "ParticleEmitter")
-            {
-                hasParticleEmitter = true;
-                break;
-            }
-        }
-        if (hasParticleEmitter)
-        {
-            CreateFileSelector("Load particle data", "Load", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadParticleData");
-        }
-        else
-            MessageBox("Need to have a selected ParticleEmitter component to load particle data.");
-    }
-    else if (action == "Save particle data")
-    {
-        if (editComponents.length == 1 && editComponents[0].typeName == "ParticleEmitter")
-        {
-            CreateFileSelector("Save particle data", "Save", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveParticleData");
-        }
-        else
-            MessageBox("Need to have a selected ParticleEmitter component to save particle data.");
     }
     // UI-element
     else if (action == "Open UI-layout...")
@@ -1046,17 +1015,6 @@ void HandleImportScene(StringHash eventType, VariantMap& eventData)
     ImportScene(ExtractFileName(eventData));
 }
 
-void HandleLoadParticleData(StringHash eventType, VariantMap& eventData)
-{
-    CloseFileSelector(uiParticleFilter, uiParticlePath);
-    LoadParticleData(ExtractFileName(eventData));
-}
-
-void HandleSaveParticleData(StringHash eventType, VariantMap& eventData)
-{
-    CloseFileSelector(uiParticleFilter, uiParticlePath);
-    SaveParticleData(ExtractFileName(eventData, true));
-}
 
 void ExecuteScript(const String&in fileName)
 {

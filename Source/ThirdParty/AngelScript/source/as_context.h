@@ -122,8 +122,8 @@ public:
 	asIScriptFunction *GetSystemFunction();
 
 	// User data
-	void *SetUserData(void *data);
-	void *GetUserData() const;
+	void *SetUserData(void *data, asPWORD type);
+	void *GetUserData(asPWORD type) const;
 
 public:
 	// Internal public functions
@@ -204,7 +204,7 @@ public:
 	asSSystemFunctionInterface m_exceptionCallbackFunc;
 	void *                     m_exceptionCallbackObj;
 
-	void *m_userData;
+	asCArray<asPWORD> m_userData;
 
 	// Registers available to JIT compiler functions
 	asSVMRegisters m_regs;

@@ -61,7 +61,7 @@ static const unsigned short SERVER_PORT = 2345;
 // Identifier for our custom remote event we use to tell the client which object they control
 static const StringHash E_CLIENTOBJECTID("ClientObjectID");
 // Identifier for the node ID parameter in the event data
-static const ShortStringHash P_ID("ID");
+static const StringHash P_ID("ID");
 
 // Control bits we define
 static const unsigned CTRL_FORWARD = 1;
@@ -143,6 +143,10 @@ void SceneReplication::CreateScene()
     }
     
     // Create the camera. Limit far clip distance to match the fog
+    // The camera needs to be created into a local node so that each client can retain its own camera, that is unaffected by
+    // network messages. Furthermore, because the client removes all replicated scene nodes when connecting to a server scene,
+    // the screen would become blank if the camera node was replicated (as only the locally created camera is assigned to a
+    // viewport in SetupViewports() below)
     cameraNode_ = scene_->CreateChild("Camera", LOCAL);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);

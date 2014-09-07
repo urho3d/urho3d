@@ -244,11 +244,6 @@ StringHash Deserializer::ReadStringHash()
     return StringHash(ReadUInt());
 }
 
-ShortStringHash Deserializer::ReadShortStringHash()
-{
-    return ShortStringHash(ReadUShort());
-}
-
 PODVector<unsigned char> Deserializer::ReadBuffer()
 {
     PODVector<unsigned char> ret(ReadVLE());
@@ -260,7 +255,7 @@ PODVector<unsigned char> Deserializer::ReadBuffer()
 ResourceRef Deserializer::ReadResourceRef()
 {
     ResourceRef ret;
-    ret.type_ = ReadShortStringHash();
+    ret.type_ = ReadStringHash();
     ret.name_ = ReadString();
     return ret;
 }
@@ -268,7 +263,7 @@ ResourceRef Deserializer::ReadResourceRef()
 ResourceRefList Deserializer::ReadResourceRefList()
 {
     ResourceRefList ret;
-    ret.type_ = ReadShortStringHash();
+    ret.type_ = ReadStringHash();
     ret.names_.Resize(ReadVLE());
     for (unsigned i = 0; i < ret.names_.Size(); ++i)
         ret.names_[i] = ReadString();
@@ -368,7 +363,7 @@ VariantMap Deserializer::ReadVariantMap()
     
     for (unsigned i = 0; i < num; ++i)
     {
-        ShortStringHash key = ReadShortStringHash();
+        StringHash key = ReadStringHash();
         ret[key] = ReadVariant();
     }
     

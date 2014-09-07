@@ -98,8 +98,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Save the image to a stream. Regardless of original format, the image is saved as png. Compressed image data is not supported. Return true if successful.
+    virtual bool Save(Serializer& dest) const;
 
     /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
     bool SetSize(int width, int height, unsigned components);
@@ -111,6 +113,10 @@ public:
     void SetPixel(int x, int y, const Color& color);
     /// Set a 3D pixel.
     void SetPixel(int x, int y, int z, const Color& color);
+    /// Set a 2D pixel with an integer color. R component is in the 8 lowest bits.
+    void SetPixelInt(int x, int y, unsigned uintColor);
+    /// Set a 3D pixel with an integer color. R component is in the 8 lowest bits.
+    void SetPixelInt(int x, int y, int z, unsigned uintColor);
     /// Load as color LUT. Return true if successful.
     bool LoadColorLUT(Deserializer& source);
     /// Flip image vertically.
@@ -119,6 +125,8 @@ public:
     bool Resize(int width, int height);
     /// Clear the image with a color.
     void Clear(const Color& color);
+    /// Clear the image with an integer color. R component is in the 8 lowest bits.
+    void ClearInt(unsigned uintColor);
     /// Save in BMP format. Return true if successful.
     bool SaveBMP(const String& fileName) const;
     /// Save in PNG format. Return true if successful.
@@ -132,6 +140,10 @@ public:
     Color GetPixel(int x, int y) const;
     /// Return a 3D pixel color.
     Color GetPixel(int x, int y, int z) const;
+    /// Return a 2D pixel integer color. R component is in the 8 lowest bits.
+    unsigned GetPixelInt(int x, int y) const;
+    /// Return a 3D pixel integer color. R component is in the 8 lowest bits.
+    unsigned GetPixelInt(int x, int y, int z) const;
     /// Return a bilinearly sampled 2D pixel color. X and Y have the range 0-1.
     Color GetPixelBilinear(float x, float y) const;
     /// Return a trilinearly sampled 3D pixel color. X, Y and Z have the range 0-1.
@@ -160,6 +172,8 @@ public:
     Image* GetSubimage(const IntRect& rect) const;
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
+    /// Precalculate the mip levels. Used by asynchronous texture loading.
+    void PrecalculateLevels();
 
 private:
     /// Decode an image using stb_image.
@@ -181,6 +195,8 @@ private:
     CompressedFormat compressedFormat_;
     /// Pixel data.
     SharedArrayPtr<unsigned char> data_;
+    /// Precalculated mip level image.
+    SharedPtr<Image> nextLevel_;
 };
 
 }

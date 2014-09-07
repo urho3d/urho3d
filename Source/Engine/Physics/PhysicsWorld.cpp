@@ -39,6 +39,7 @@
 #include "Sort.h"
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
+#include <BulletCollision/BroadphaseCollision/btBroadphaseProxy.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
@@ -382,6 +383,84 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
         result.position_ = ToVector3(convexCallback.m_hitPointWorld);
         result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
         result.distance_ = (result.position_ - ray.origin_).Length();
+    }
+    else
+    {
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+    }
+}
+
+void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask)
+{
+    if (!shape || !shape->GetCollisionShape())
+    {
+        LOGERROR("Null collision shape for convex cast");
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+        return;
+    }
+    
+    // If shape is attached in a rigidbody, set its collision group temporarily to 0 to make sure it is not returned in the sweep result
+    RigidBody* bodyComp = shape->GetComponent<RigidBody>();
+    btRigidBody* body = bodyComp ? bodyComp->GetBody() : (btRigidBody*)0;
+    btBroadphaseProxy* proxy = body ? body->getBroadphaseProxy() : (btBroadphaseProxy*)0;
+    short group = 0;
+    if (proxy)
+    {
+        group = proxy->m_collisionFilterGroup;
+        proxy->m_collisionFilterGroup = 0;
+    }
+
+    ConvexCast(result, shape->GetCollisionShape(), startPos, startRot, endPos, endRot, collisionMask);
+
+    // Restore the collision group
+    if (proxy)
+        proxy->m_collisionFilterGroup = group;
+}
+
+void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask)
+{
+    if (!shape)
+    {
+        LOGERROR("Null collision shape for convex cast");
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+        return;
+    }
+    
+    if (!shape->isConvex())
+    {
+        LOGERROR("Can not use non-convex collision shape for convex cast");
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+        return;
+    }
+    
+    PROFILE(PhysicsConvexCast);
+
+    btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(startPos), ToBtVector3(endPos));
+    convexCallback.m_collisionFilterGroup = (short)0xffff;
+    convexCallback.m_collisionFilterMask = collisionMask;
+
+    world_->convexSweepTest(static_cast<btConvexShape*>(shape), btTransform(ToBtQuaternion(startRot),
+        convexCallback.m_convexFromWorld), btTransform(ToBtQuaternion(endRot), convexCallback.m_convexToWorld),
+        convexCallback);
+
+    if (convexCallback.hasHit())
+    {
+        result.body_ = static_cast<RigidBody*>(convexCallback.m_hitCollisionObject->getUserPointer());
+        result.position_ = ToVector3(convexCallback.m_hitPointWorld);
+        result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
+        result.distance_ = (result.position_ - startPos).Length();
     }
     else
     {

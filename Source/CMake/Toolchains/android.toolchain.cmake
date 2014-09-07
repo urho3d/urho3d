@@ -1,5 +1,5 @@
 # Copyright (c) 2010-2011, Ethan Rublee
-# Copyright (c) 2011-2013, Andrey Kamaev
+# Copyright (c) 2011-2014, Andrey Kamaev
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -12,9 +12,9 @@
 #     this list of conditions and the following disclaimer in the documentation
 #     and/or other materials provided with the distribution.
 #
-# 3.  The name of the copyright holders may be used to endorse or promote
-#     products derived from this software without specific prior written
-#     permission.
+# 3.  Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from this
+#     software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -297,6 +297,12 @@
 #     [+] updated for NDK r9
 #   - November 2013
 #     [+] updated for NDK r9b
+#   - December 2013
+#     [+] updated for NDK r9c
+#   - January 2014
+#     [~] fix copying of shared STL
+#   - April 2014
+#     [+] updated for NDK r9d
 # ------------------------------------------------------------------------------
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
@@ -325,7 +331,8 @@ set( CMAKE_SYSTEM_VERSION 1 )
 # rpath makes low sence for Android
 set( CMAKE_SKIP_RPATH TRUE CACHE BOOL "If set, runtime paths are not added when using shared libraries." )
 
-set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
+# Urho3D: updated for NDK r10
+set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r10 -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
 if(NOT DEFINED ANDROID_NDK_SEARCH_PATHS)
  if( CMAKE_HOST_WIN32 )
   file( TO_CMAKE_PATH "$ENV{PROGRAMFILES}" ANDROID_NDK_SEARCH_PATHS )
@@ -343,10 +350,10 @@ set( ANDROID_SUPPORTED_ABIS_arm "armeabi-v7a;armeabi;armeabi-v7a with NEON;armea
 set( ANDROID_SUPPORTED_ABIS_x86 "x86" )
 set( ANDROID_SUPPORTED_ABIS_mipsel "mips" )
 
-# Urho3D: default to API 9
-set( ANDROID_DEFAULT_NDK_API_LEVEL 9 )
-set( ANDROID_DEFAULT_NDK_API_LEVEL_x86 9 )
-set( ANDROID_DEFAULT_NDK_API_LEVEL_mips 9 )
+# Urho3D: default to API 12
+set( ANDROID_DEFAULT_NDK_API_LEVEL 12 )
+set( ANDROID_DEFAULT_NDK_API_LEVEL_x86 12 )
+set( ANDROID_DEFAULT_NDK_API_LEVEL_mips 12 )
 
 
 macro( __LIST_FILTER listvar regex )
@@ -472,7 +479,7 @@ endif()
 
 
 # detect current host platform
-if( NOT DEFINED ANDROID_NDK_HOST_X64 AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64|x86_64|AMD64")
+if( NOT DEFINED ANDROID_NDK_HOST_X64 AND (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64|x86_64|AMD64" OR CMAKE_HOST_APPLE) )
  set( ANDROID_NDK_HOST_X64 1 CACHE BOOL "Try to use 64-bit compiler toolchain" )
  mark_as_advanced( ANDROID_NDK_HOST_X64 )
 endif()
@@ -1138,15 +1145,7 @@ endif()
 # case of shared STL linkage
 if( ANDROID_STL MATCHES "shared" AND DEFINED __libstl )
  string( REPLACE "_static.a" "_shared.so" __libstl "${__libstl}" )
- if( NOT _CMAKE_IN_TRY_COMPILE AND __libstl MATCHES "[.]so$" )
-  get_filename_component( __libstlname "${__libstl}" NAME )
-  execute_process( COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${__libstl}" "${LIBRARY_OUTPUT_PATH}/${__libstlname}" RESULT_VARIABLE __fileCopyProcess )
-  if( NOT __fileCopyProcess EQUAL 0 OR NOT EXISTS "${LIBRARY_OUTPUT_PATH}/${__libstlname}")
-   message( SEND_ERROR "Failed copying of ${__libstl} to the ${LIBRARY_OUTPUT_PATH}/${__libstlname}" )
-  endif()
-  unset( __fileCopyProcess )
-  unset( __libstlname )
- endif()
+ # TODO: check if .so file exists before the renaming
 endif()
 
 
@@ -1512,7 +1511,8 @@ endif()
 
 # global includes and link directories
 include_directories( SYSTEM "${ANDROID_SYSROOT}/usr/include" ${ANDROID_STL_INCLUDE_DIRS} )
-link_directories( "${CMAKE_INSTALL_PREFIX}/libs/${ANDROID_NDK_ABI_NAME}" )
+get_filename_component(__android_install_path "${CMAKE_INSTALL_PREFIX}/libs/${ANDROID_NDK_ABI_NAME}" ABSOLUTE) # avoid CMP0015 policy warning
+link_directories( "${__android_install_path}" )
 
 # detect if need link crtbegin_so.o explicitly
 if( NOT DEFINED ANDROID_EXPLICIT_CRT_LINK )
@@ -1564,6 +1564,18 @@ if(NOT _CMAKE_IN_TRY_COMPILE)
  # Urho3D: All libraries are first generated in CMake default binary directory and only the main target library is later copied to below output path by Urho3D own build script
  set( ANDROID_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" FORCE )
 endif()
+
+# copy shared stl library to build directory
+if( NOT _CMAKE_IN_TRY_COMPILE AND __libstl MATCHES "[.]so$" )
+ get_filename_component( __libstlname "${__libstl}" NAME )
+ execute_process( COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${__libstl}" "${LIBRARY_OUTPUT_PATH}/${__libstlname}" RESULT_VARIABLE __fileCopyProcess )
+ if( NOT __fileCopyProcess EQUAL 0 OR NOT EXISTS "${LIBRARY_OUTPUT_PATH}/${__libstlname}")
+  message( SEND_ERROR "Failed copying of ${__libstl} to the ${LIBRARY_OUTPUT_PATH}/${__libstlname}" )
+ endif()
+ unset( __fileCopyProcess )
+ unset( __libstlname )
+endif()
+
 
 # set these global flags for cmake client scripts to change behavior
 set( ANDROID True )
@@ -1740,7 +1752,7 @@ endif()
 #   BUILD_WITH_STANDALONE_TOOLCHAIN : TRUE if standalone toolchain is used
 #   ANDROID_NDK_HOST_SYSTEM_NAME : "windows", "linux-x86" or "darwin-x86" depending on host platform
 #   ANDROID_NDK_ABI_NAME : "armeabi", "armeabi-v7a", "x86" or "mips" depending on ANDROID_ABI
-#   ANDROID_NDK_RELEASE : one of r5, r5b, r5c, r6, r6b, r7, r7b, r7c, r8, r8b, r8c, r8d, r8e, r9, r9b; set only for NDK
+#   ANDROID_NDK_RELEASE : one of r5, r5b, r5c, r6, r6b, r7, r7b, r7c, r8, r8b, r8c, r8d, r8e, r9, r9b, r9c, r9d, r10; set only for NDK
 #   ANDROID_ARCH_NAME : "arm" or "x86" or "mips" depending on ANDROID_ABI
 #   ANDROID_SYSROOT : path to the compiler sysroot
 #   TOOL_OS_SUFFIX : "" or ".exe" depending on host platform

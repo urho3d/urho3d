@@ -21,7 +21,9 @@
 //
 
 #include "Precompiled.h"
+#ifdef URHO3D_PHYSICS
 #include "CollisionShape.h"
+#endif
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Drawable.h"
@@ -799,6 +801,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     
     Matrix3x4 inverse = node_->GetWorldTransform().Inverse();
     
+#ifdef URHO3D_PHYSICS
     // Prefer compatible physics collision shapes (triangle mesh, convex hull, box) if found.
     // Then fallback to visible geometry
     PODVector<CollisionShape*> collisionShapes;
@@ -825,8 +828,8 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
             collisionShapeFound = true;
         }
     }
-    
     if (!collisionShapeFound)
+#endif
     {
         PODVector<Drawable*> drawables;
         node->GetDerivedComponents<Drawable>(drawables);
@@ -884,11 +887,13 @@ void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<Navigati
                 build.offMeshRadii_.Push(connection->GetRadius());
                 /// \todo Allow to define custom flags
                 build.offMeshFlags_.Push(0x1);
+
                 build.offMeshAreas_.Push(0);
                 build.offMeshDir_.Push(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0);
                 continue;
             }
-            
+
+#ifdef URHO3D_PHYSICS
             CollisionShape* shape = dynamic_cast<CollisionShape*>(geometryList[i].component_);
             if (shape)
             {
@@ -953,7 +958,7 @@ void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<Navigati
                 
                 continue;
             }
-            
+#endif
             Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
             if (drawable)
             {

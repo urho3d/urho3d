@@ -107,6 +107,8 @@ protected:
     virtual void OnAttributeAnimationAdded() = 0;
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved() = 0;
+    /// Set object attribute animation internal.
+    virtual void SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
     /// Handle object animation added.
     void OnObjectAnimationAdded(ObjectAnimation* objectAnimation);
     /// Handle object animation removed.

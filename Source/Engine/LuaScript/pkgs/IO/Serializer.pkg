@@ -30,7 +30,6 @@ class Serializer
     bool WriteString(const String value);
     bool WriteFileID(const String value);
     bool WriteStringHash(const StringHash& value);
-    bool WriteShortStringHash(const ShortStringHash& value);
     
     // bool WriteBuffer(const PODVector<unsigned char>& buffer);
     tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);

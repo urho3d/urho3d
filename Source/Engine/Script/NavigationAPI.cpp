@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#ifdef URHO3D_NAVIGATION
 #include "APITemplates.h"
 #include "Navigable.h"
 #include "NavigationMesh.h"
@@ -109,3 +110,4 @@ void RegisterNavigationAPI(asIScriptEngine* engine)
 }
 
 }
+#endif

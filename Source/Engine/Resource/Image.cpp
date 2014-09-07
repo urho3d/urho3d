@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "Profiler.h"
 
+#include <cstdlib>
 #include <cstring>
 #include <stb_image.h>
 #include <stb_image_write.h>
@@ -35,6 +36,8 @@
 #include <SDL_surface.h>
 
 #include "DebugNew.h"
+
+extern "C" unsigned char *stbi_write_png_to_mem(unsigned char *pixels, int stride_bytes, int x, int y, int n, int *out_len);
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
@@ -49,12 +52,14 @@
 namespace Urho3D
 {
 
+/// DirectDraw color key definition.
 struct DDColorKey
 {
     unsigned dwColorSpaceLowValue_;
     unsigned dwColorSpaceHighValue_;
 };
 
+/// DirectDraw pixel format definition.
 struct DDPixelFormat
 {
     unsigned dwSize_;
@@ -108,6 +113,7 @@ struct DDPixelFormat
     };
 };
 
+/// DirectDraw surface capabilities.
 struct DDSCaps2
 {
     unsigned dwCaps_;
@@ -120,6 +126,7 @@ struct DDSCaps2
     };
 };
 
+/// DirectDraw surface description.
 struct DDSurfaceDesc2
 {
     unsigned dwSize_;
@@ -210,10 +217,8 @@ void Image::RegisterObject(Context* context)
     context->RegisterFactory<Image>();
 }
 
-bool Image::Load(Deserializer& source)
+bool Image::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadImage);
-
     // Check for DDS, KTX or PVR compressed format
     String fileID = source.ReadFileID();
 
@@ -482,6 +487,30 @@ bool Image::Load(Deserializer& source)
     return true;
 }
 
+bool Image::Save(Serializer& dest) const
+{
+    PROFILE(SaveImage);
+
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image " + GetName());
+        return false;
+    }
+
+    if (!data_)
+    {
+        LOGERROR("Can not save zero-sized image " + GetName());
+        return false;
+    }
+
+    int len;
+    unsigned char *png = stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
+    bool success = dest.Write(png, len) == (unsigned)len;
+    free(png);
+    return success;
+}
+
+
 bool Image::SetSize(int width, int height, unsigned components)
 {
     return SetSize(width, height, 1, components);
@@ -508,6 +537,7 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
     components_ = components;
     compressedFormat_ = CF_NONE;
     numCompressedLevels_ = 0;
+    nextLevel_.Reset();
 
     SetMemoryUse(width * height * depth * components);
     return true;
@@ -515,15 +545,24 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
 
 void Image::SetPixel(int x, int y, const Color& color)
 {
-    SetPixel(x, y, 0, color);
+    SetPixelInt(x, y, 0, color.ToUInt());
 }
 
 void Image::SetPixel(int x, int y, int z, const Color& color)
 {
+    SetPixelInt(x, y, z, color.ToUInt());
+}
+
+void Image::SetPixelInt(int x, int y, unsigned uintColor)
+{
+    SetPixelInt(x, y, 0, uintColor);
+}
+
+void Image::SetPixelInt(int x, int y, int z, unsigned uintColor)
+{
     if (!data_ || x < 0 || x >= width_ || y < 0 || y >= height_ || z < 0 || z >= depth_ || IsCompressed())
         return;
 
-    unsigned uintColor = color.ToUInt();
     unsigned char* dest = data_ + (z * width_ * height_ + y * width_ + x) * components_;
     unsigned char* src = (unsigned char*)&uintColor;
 
@@ -549,7 +588,14 @@ void Image::SetData(const unsigned char* pixelData)
     if (!data_)
         return;
 
+    if (IsCompressed())
+    {
+        LOGERROR("Can not set new pixel data for a compressed image");
+        return;
+    }
+
     memcpy(data_.Get(), pixelData, width_ * height_ * depth_ * components_);
+    nextLevel_.Reset();
 }
 
 bool Image::LoadColorLUT(Deserializer& source)
@@ -688,6 +734,11 @@ bool Image::Resize(int width, int height)
 
 void Image::Clear(const Color& color)
 {
+    ClearInt(color.ToUInt());
+}
+
+void Image::ClearInt(unsigned uintColor)
+{
     PROFILE(ClearImage);
 
     if (!data_)
@@ -699,7 +750,6 @@ void Image::Clear(const Color& color)
         return;
     }
 
-    unsigned uintColor = color.ToUInt();
     unsigned char* src = (unsigned char*)&uintColor;
     for (unsigned i = 0; i < width_ * height_ * depth_ * components_; ++i)
         data_[i] = src[i % components_];
@@ -832,6 +882,45 @@ Color Image::GetPixel(int x, int y, int z) const
     return ret;
 }
 
+unsigned Image::GetPixelInt(int x, int y) const
+{
+    return GetPixelInt(x, y, 0);
+}
+
+unsigned Image::GetPixelInt(int x, int y, int z) const
+{
+    if (!data_ || z < 0 || z >= depth_ || IsCompressed())
+        return 0xff000000;
+    x = Clamp(x, 0, width_ - 1);
+    y = Clamp(y, 0, height_ - 1);
+
+    unsigned char* src = data_ + (z * width_ * height_ + y * width_ + x) * components_;
+    unsigned ret = 0;
+    if (components_ < 4)
+        ret |= 0xff000000;
+
+    switch (components_)
+    {
+    case 4:
+        ret |= (unsigned)src[3] << 24;
+        // Fall through
+    case 3:
+        ret |= (unsigned)src[2] << 16;
+        // Fall through
+    case 2:
+        ret |= (unsigned)src[1] << 8;
+        ret |= (unsigned)src[0];
+        break;
+    default:
+        ret |= (unsigned)src[0] << 16;
+        ret |= (unsigned)src[0] << 8;
+        ret |= (unsigned)src[0];
+        break;
+    }
+
+    return ret;
+}
+
 Color Image::GetPixelBilinear(float x, float y) const
 {
     x = Clamp(x * width_ - 0.5f, 0.0f, (float)(width_ - 1));
@@ -886,6 +975,11 @@ SharedPtr<Image> Image::GetNextLevel() const
         LOGERROR("Illegal number of image components for mip level generation");
         return SharedPtr<Image>();
     }
+
+    if (nextLevel_)
+        return nextLevel_;
+
+    PROFILE(CalculateImageMipLevel);
 
     int widthOut = width_ / 2;
     int heightOut = height_ / 2;
@@ -1322,6 +1416,27 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
         LOGERROR("Failed to create SDL surface from image " + GetName());
 
     return surface;
+}
+
+void Image::PrecalculateLevels()
+{
+    if (!data_ || IsCompressed())
+        return;
+
+    PROFILE(PrecalculateImageMipLevels);
+
+    nextLevel_.Reset();
+
+    if (width_ > 1 || height_ > 1)
+    {
+        SharedPtr<Image> current = GetNextLevel();
+        nextLevel_ = current;
+        while (current && (current->width_ > 1 || current->height_ > 1))
+        {
+            current->nextLevel_ = current->GetNextLevel();
+            current = current->nextLevel_;
+        }
+    }
 }
 
 unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components)

@@ -22,6 +22,8 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Log.h"
+#include "Thread.h"
 
 #include "DebugNew.h"
 
@@ -222,6 +224,12 @@ void Object::SendEvent(StringHash eventType)
 
 void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
+    if (!Thread::IsMainThread())
+    {
+        LOGERROR("Sending events is only supported from the main thread");
+        return;
+    }
+    
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
@@ -324,7 +332,7 @@ VariantMap& Object::GetEventDataMap() const
     return context_->GetEventDataMap();
 }
 
-Object* Object::GetSubsystem(ShortStringHash type) const
+Object* Object::GetSubsystem(StringHash type) const
 {
     return context_->GetSubsystem(type);
 }
@@ -354,8 +362,8 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 
 const String& Object::GetCategory() const
 {
-    const HashMap<String, Vector<ShortStringHash> >& objectCategories = context_->GetObjectCategories();
-    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
+    const HashMap<String, Vector<StringHash> >& objectCategories = context_->GetObjectCategories();
+    for (HashMap<String, Vector<StringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
     {
         if (i->second_.Contains(GetType()))
             return i->first_;

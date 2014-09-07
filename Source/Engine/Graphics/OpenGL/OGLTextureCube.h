@@ -45,8 +45,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
     /// Mark the GPU resource destroyed on context destruction.
     virtual void OnDeviceLost();
     /// Recreate the GPU resource and restore data if applicable.
@@ -58,10 +60,10 @@ public:
     bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC);
     /// Set data either partially or fully on a face's mip level. Return true if successful.
     bool SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
-    /// Load one face from a stream. Return true if successful.
-    bool Load(CubeMapFace face, Deserializer& source);
-    /// Load one face from an image. Return true if successful. Optionally make a single channel image alpha-only.
-    bool Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha = false);
+    /// Set data of one face from a stream. Return true if successful.
+    bool SetData(CubeMapFace face, Deserializer& source);
+    /// Set data of one face from an image. Return true if successful. Optionally make a single channel image alpha-only.
+    bool SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlpha = false);
     
     /// Get data from a face's mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(CubeMapFace face, unsigned level, void* dest) const;
@@ -80,6 +82,10 @@ private:
     SharedPtr<RenderSurface> renderSurfaces_[MAX_CUBEMAP_FACES];
     /// Memory use per face.
     unsigned faceMemoryUse_[MAX_CUBEMAP_FACES];
+    /// Face image files acquired during BeginLoad.
+    Vector<SharedPtr<Image> > loadImages_;
+    /// Parameter file acquired during BeginLoad.
+    SharedPtr<XMLFile> loadParameters_;
 };
 
 }

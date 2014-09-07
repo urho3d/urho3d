@@ -26,6 +26,7 @@
 #include "Mutex.h"
 #include "Object.h"
 #include "Thread.h"
+#include "Timer.h"
 
 namespace Urho3D
 {
@@ -50,6 +51,8 @@ public:
     bool StartWatching(const String& pathName, bool watchSubDirs);
     /// Stop watching the directory.
     void StopWatching();
+    /// Set the delay in seconds before file changes are notified. This (hopefully) avoids notifying when a file save is still in progress. Default 1 second.
+    void SetDelay(float interval);
     /// Add a file change into the changes queue.
     void AddChange(const String& fileName);
     /// Return a file change (true if was found, false if not.)
@@ -57,16 +60,20 @@ public:
     
     /// Return the path being watched, or empty if not watching.
     const String& GetPath() const { return path_; }
+    /// Return the delay in seconds for notifying file changes.
+    float GetDelay() const { return delay_;}
     
 private:
     /// Filesystem.
     SharedPtr<FileSystem> fileSystem_;
     /// The path being watched.
     String path_;
-    /// Buffered file changes.
-    List<String> changes_;
+    /// Pending changes. These will be returned and removed from the list when their timer has exceeded the delay.
+    HashMap<String, Timer> changes_;
     /// Mutex for the change buffer.
     Mutex changesMutex_;
+    /// Delay in seconds for notifying changes.
+    float delay_;
     /// Watch subdirectories flag.
     bool watchSubDirs_;
 

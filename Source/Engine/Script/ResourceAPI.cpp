@@ -40,7 +40,7 @@ void RegisterResource(asIScriptEngine* engine)
 
 static Resource* ResourceCacheGetResource(const String& type, const String& name, bool sendEventOnFailure, ResourceCache* ptr)
 {
-    return ptr->GetResource(ShortStringHash(type), name, sendEventOnFailure);
+    return ptr->GetResource(StringHash(type), name, sendEventOnFailure);
 }
 
 static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
@@ -93,6 +93,11 @@ static CScriptArray* ResourceCacheGetPackageFiles(ResourceCache* ptr)
     return VectorToHandleArray<PackageFile>(ptr->GetPackageFiles(), "Array<PackageFile@>");
 }
 
+static bool ResourceCacheBackgroundLoadResource(const String& type, const String& name, bool sendEventOnFailure, ResourceCache* ptr)
+{
+    return ptr->BackgroundLoadResource(type, name, sendEventOnFailure);
+}
+
 static void RegisterResourceCache(asIScriptEngine* engine)
 {
     RegisterObject<ResourceCache>(engine, "ResourceCache");
@@ -103,7 +108,7 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(const String&in, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (const String&, bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResource(const String&in, const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResource), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(ShortStringHash, bool force = false)", asMETHODPR(ResourceCache, ReleaseResources, (ShortStringHash, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(StringHash, bool force = false)", asMETHODPR(ResourceCache, ReleaseResources, (StringHash, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResourcesPartial), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, bool force = false)", asMETHODPR(ResourceCache, ReleaseResources, (const String&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseAllResources(bool force = false)", asMETHOD(ResourceCache, ReleaseAllResources), asCALL_THISCALL);
@@ -115,7 +120,8 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "String SanitateResourceDirName(const String&in) const", asMETHOD(ResourceCache, SanitateResourceDirName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "String GetResourceFileName(const String&in) const", asMETHOD(ResourceCache, GetResourceFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in, bool sendEventOnFailure = true)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(ShortStringHash, const String&in, bool sendEventOnFailure = true)", asMETHODPR(ResourceCache, GetResource, (ShortStringHash, const String&, bool), Resource*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(StringHash, const String&in, bool sendEventOnFailure = true)", asMETHODPR(ResourceCache, GetResource, (StringHash, const String&, bool), Resource*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "bool BackgroundLoadResource(const String&in, const String&in, bool sendEventOnFailure = true)", asFUNCTION(ResourceCacheBackgroundLoadResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryBudget(const String&in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryUse(const String&in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
@@ -128,6 +134,9 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "bool get_autoReloadResources() const", asMETHOD(ResourceCache, GetAutoReloadResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_returnFailedResources(bool)", asMETHOD(ResourceCache, SetReturnFailedResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool get_returnFailedResources() const", asMETHOD(ResourceCache, GetReturnFailedResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void set_finishBackgroundResourcesMs(int)", asMETHOD(ResourceCache, SetFinishBackgroundResourcesMs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "int get_finishBackgroundResourcesMs() const", asMETHOD(ResourceCache, GetFinishBackgroundResourcesMs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "uint get_numBackgroundLoadResources() const", asMETHOD(ResourceCache, GetNumBackgroundLoadResources), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
 }
@@ -149,17 +158,22 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SetPixel(int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SetPixel(int, int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, int, const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, uint)", asMETHODPR(Image, SetPixelInt, (int, int, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, int, uint)", asMETHODPR(Image, SetPixelInt, (int, int, int, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool LoadColorLUT(File@+)", asFUNCTION(ImageLoadColorLUT), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Image", "bool LoadColorLUT(VectorBuffer&)", asFUNCTION(ImageLoadColorLUTVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Image", "void FlipVertical()", asMETHOD(Image, FlipVertical), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void Resize(int, int)", asMETHOD(Image, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void Clear(const Color&in)", asMETHOD(Image, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void ClearInt(uint)", asMETHOD(Image, ClearInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in) const", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SavePNG(const String&in) const", asMETHOD(Image, SavePNG), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveTGA(const String&in) const", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveJPG(const String&in, int) const", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", asMETHODPR(Image, GetPixel, (int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", asMETHODPR(Image, GetPixel, (int, int, int) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int) const", asMETHODPR(Image, GetPixelInt, (int, int) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int, int) const", asMETHODPR(Image, GetPixelInt, (int, int, int) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixelBilinear(float, float) const", asMETHODPR(Image, GetPixelBilinear, (float, float) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixelTrilinear(float, float, float) const", asMETHODPR(Image, GetPixelTrilinear, (float, float, float) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "int get_width() const", asMETHOD(Image, GetWidth), asCALL_THISCALL);
@@ -183,6 +197,12 @@ static void ConstructJSONValueCopy(const JSONValue& value, JSONValue* ptr)
 static void DestructJSONValue(JSONValue* ptr)
 {
     ptr->~JSONValue();
+}
+
+static CScriptArray* JSONValueGetValueNames(JSONValue* ptr)
+{
+    Vector<String> names = ptr->GetValueNames();
+    return VectorToArray<String>(names, "Array<String>");
 }
 
 static CScriptArray* JSONValueGetChildNames(JSONValue* ptr)
@@ -229,6 +249,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "void SetVariant(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void SetVariantValue(const String&in, const Variant&in)", asMETHOD(JSONValue, SetVariantValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isObject() const", asMETHOD(JSONValue, IsObject), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "Array<String>@ GetValueNames() const", asFUNCTION(JSONValueGetValueNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "Array<String>@ GetChildNames() const", asFUNCTION(JSONValueGetChildNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "int GetInt(const String&in) const", asMETHODPR(JSONValue, GetInt, (const String&) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool GetBool(const String&in) const", asMETHODPR(JSONValue, GetBool, (const String&) const, bool), asCALL_THISCALL);

@@ -41,7 +41,8 @@ static const int MAX_POINT_SIZE = 96;
 Font::Font(Context* context) :
     Resource(context),
     fontDataSize_(0),
-    fontType_(FONT_NONE)
+    fontType_(FONT_NONE),
+    sdfFont_(false)
 {
 }
 
@@ -57,10 +58,8 @@ void Font::RegisterObject(Context* context)
     context->RegisterFactory<Font>();
 }
 
-bool Font::Load(Deserializer& source)
+bool Font::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadFont);
-
     // In headless mode, do not actually load, just return success
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
@@ -85,8 +84,10 @@ bool Font::Load(Deserializer& source)
     String ext = GetExtension(GetName());
     if (ext == ".ttf" || ext == ".otf" || ext == ".woff")
         fontType_ = FONT_FREETYPE;
-    else if (ext == ".xml" || ext == ".fnt")
+    else if (ext == ".xml" || ext == ".fnt" || ext == ".sdf")
         fontType_ = FONT_BITMAP;
+
+    sdfFont_ = ext == ".sdf";
 
     SetMemoryUse(fontDataSize_);
     return true;

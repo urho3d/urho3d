@@ -24,8 +24,10 @@
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#ifdef URHO3D_PHYSICS
 #include "PhysicsEvents.h"
 #include "PhysicsWorld.h"
+#endif
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
@@ -580,13 +582,13 @@ void ScriptInstance::GetScriptAttributes()
         else
         {
             // For a handle type, check if it's an Object subclass with a registered factory
-            ShortStringHash typeHash(typeName);
-            const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
+            StringHash typeHash(typeName);
+            const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+            HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
             if (j != factories.End())
             {
                 // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
-                ShortStringHash baseType = j->second_->GetBaseType();
+                StringHash baseType = j->second_->GetBaseType();
                 if (baseType == Node::GetTypeStatic())
                 {
                     info.mode_ |= AM_NODEID;
@@ -634,6 +636,7 @@ void ScriptInstance::UpdateEventSubscription()
             if (methods_[METHOD_POSTUPDATE])
                 SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
 
+#ifdef URHO3D_PHYSICS
             if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
             {
                 PhysicsWorld* world = scene->GetOrCreateComponent<PhysicsWorld>();
@@ -647,7 +650,7 @@ void ScriptInstance::UpdateEventSubscription()
                 else
                     LOGERROR("No physics world, can not subscribe script object to fixed update events");
             }
-
+#endif
             subscribedPostFixed_ = true;
         }
 
@@ -665,13 +668,14 @@ void ScriptInstance::UpdateEventSubscription()
         if (subscribedPostFixed_)
         {
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-
+#ifdef URHO3D_PHYSICS
             PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
             if (world)
             {
                 UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
                 UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
             }
+#endif
 
             subscribedPostFixed_ = false;
         }
@@ -740,6 +744,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
 }
 
+#ifdef URHO3D_PHYSICS
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
     if (!scriptObject_)
@@ -763,7 +768,7 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
 }
-
+#endif
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)

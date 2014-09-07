@@ -81,10 +81,8 @@ void Shader::RegisterObject(Context* context)
     context->RegisterFactory<Shader>();
 }
 
-bool Shader::Load(Deserializer& source)
+bool Shader::BeginLoad(Deserializer& source)
 {
-    PROFILE(LoadShader);
-    
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return false;
@@ -108,13 +106,18 @@ bool Shader::Load(Deserializer& source)
     psSourceCode_.Replace("attribute ", "// attribute ");
     #endif
     
+    RefreshMemoryUse();
+    return true;
+}
+
+bool Shader::EndLoad()
+{
     // If variations had already been created, release them and require recompile
     for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Begin(); i != vsVariations_.End(); ++i)
         i->second_->Release();
     for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Begin(); i != psVariations_.End(); ++i)
         i->second_->Release();
     
-    RefreshMemoryUse();
     return true;
 }
 

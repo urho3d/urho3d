@@ -37,6 +37,7 @@
 #include "Log.h"
 #include "Material.h"
 #include "Octree.h"
+#include "ParticleEffect.h"
 #include "ParticleEmitter.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
@@ -196,6 +197,42 @@ static unsigned GetD3DColor(const Color& color)
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
 }
 
+static void GetD3DPrimitiveType(unsigned elementCount, PrimitiveType type, unsigned& primitiveCount, D3DPRIMITIVETYPE& d3dPrimitiveType)
+{
+    switch (type)
+    {
+    case TRIANGLE_LIST:
+        primitiveCount = elementCount / 3;
+        d3dPrimitiveType = D3DPT_TRIANGLELIST;
+        break;
+        
+    case LINE_LIST:
+        primitiveCount = elementCount / 2;
+        d3dPrimitiveType = D3DPT_LINELIST;
+        break;
+
+    case POINT_LIST:
+        primitiveCount = elementCount;
+        d3dPrimitiveType = D3DPT_POINTLIST;
+        break;
+        
+    case TRIANGLE_STRIP:
+        primitiveCount = elementCount - 2;
+        d3dPrimitiveType = D3DPT_TRIANGLESTRIP;
+        break;
+        
+    case LINE_STRIP:
+        primitiveCount = elementCount - 1;
+        d3dPrimitiveType = D3DPT_LINESTRIP;
+        break;
+        
+    case TRIANGLE_FAN:
+        primitiveCount = elementCount - 2;
+        d3dPrimitiveType = D3DPT_TRIANGLEFAN;
+        break;
+    }
+}
+
 static HWND GetWindowHandle(SDL_Window* window)
 {
     SDL_SysWMinfo sysInfo;
@@ -251,11 +288,15 @@ Graphics::Graphics(Context* context) :
 
 Graphics::~Graphics()
 {
-    // Release all GPU objects that still exist
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->Release();
-    gpuObjects_.Clear();
-    
+    {
+        MutexLock lock(gpuObjectMutex_);
+
+        // Release all GPU objects that still exist
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->Release();
+        gpuObjects_.Clear();
+    }
+
     vertexDeclarations_.Clear();
     
     if (impl_->defaultColorSurface_)
@@ -404,7 +445,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
-                unsigned error = Abs(resolutions[i].x_ - width) * Abs(resolutions[i].y_ - height);
+                unsigned error = Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height);
                 if (error < bestError)
                 {
                     best = i;
@@ -830,20 +871,11 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     
     ResetStreamFrequencies();
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = vertexCount / 3;
-        impl_->device_->DrawPrimitive(D3DPT_TRIANGLELIST, vertexStart, primitiveCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = vertexCount / 2;
-        impl_->device_->DrawPrimitive(D3DPT_LINELIST, vertexStart, primitiveCount);
-        break;
-    }
+    GetD3DPrimitiveType(vertexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawPrimitive(d3dPrimitiveType, vertexStart, primitiveCount);
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -856,20 +888,11 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     
     ResetStreamFrequencies();
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_LINELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-    }
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -893,20 +916,11 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         }
     }
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        impl_->device_->DrawIndexedPrimitive(D3DPT_LINELIST, 0, minVertex, vertexCount, indexStart, primitiveCount);
-        break;
-    }
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
     
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
@@ -2217,11 +2231,15 @@ void Graphics::Minimize()
 
 void Graphics::AddGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+
     gpuObjects_.Push(object);
 }
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+
     gpuObjects_.Remove(object);
 }
 
@@ -2664,14 +2682,22 @@ void Graphics::OnDeviceLost()
         impl_->frameQuery_ = 0;
     }
     
-    for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
-        gpuObjects_[i]->OnDeviceLost();
+    {
+        MutexLock lock(gpuObjectMutex_);
+
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceLost();
+    }
 }
 
 void Graphics::OnDeviceReset()
 {
-    for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
-        gpuObjects_[i]->OnDeviceReset();
+    {
+        MutexLock lock(gpuObjectMutex_);
+
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceReset();
+    }
     
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
@@ -2765,6 +2791,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
+    textureUnits_["ZoneCubeMap"] = TU_ZONE;
+    textureUnits_["ZoneVolumeMap"] = TU_ZONE;
 }
 
 void RegisterGraphicsLibrary(Context* context)
@@ -2786,6 +2814,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimatedModel::RegisterObject(context);
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
+    ParticleEffect::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
     CustomGeometry::RegisterObject(context);
     DecalSet::RegisterObject(context);

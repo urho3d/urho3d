@@ -1,4 +1,5 @@
 $#include "Variant.h"
+$#include "VectorBuffer.h"
 
 enum VariantType
 {
@@ -30,12 +31,12 @@ enum VariantType
 struct ResourceRef
 {
     ResourceRef();
-    ResourceRef(ShortStringHash type);
-    ResourceRef(ShortStringHash type, String name);
+    ResourceRef(StringHash type);
+    ResourceRef(StringHash type, String name);
     ResourceRef(const ResourceRef& rhs);
     ~ResourceRef();
 
-    ShortStringHash type_ @ type;
+    StringHash type_ @ type;
     String name_ @ name;
 
     bool operator == (const ResourceRef& rhs) const;
@@ -44,10 +45,10 @@ struct ResourceRef
 struct ResourceRefList
 {
     ResourceRefList();
-    ResourceRefList(ShortStringHash type);
+    ResourceRefList(StringHash type);
     ~ResourceRefList();
 
-    ShortStringHash type_ @ type;
+    StringHash type_ @ type;
 
     bool operator == (const ResourceRefList& rhs) const;
 };
@@ -58,7 +59,6 @@ class Variant
     Variant(int value);
     Variant(unsigned value);
     Variant(const StringHash& value);
-    Variant(const ShortStringHash& value);
     Variant(bool value);
     Variant(float value);
     Variant(const Vector2& value);
@@ -99,7 +99,6 @@ class Variant
     bool operator == (const IntRect& rhs) const;
     bool operator == (const IntVector2& rhs) const;
     bool operator == (const StringHash& rhs) const;
-    bool operator == (const ShortStringHash& rhs) const;
     bool operator == (const Matrix3& rhs) const;
     bool operator == (const Matrix3x4& rhs) const;
     bool operator == (const Matrix4& rhs) const;
@@ -107,7 +106,6 @@ class Variant
     tolua_outside void VariantSetInt @ SetInt(int value);
     tolua_outside void VariantSetUint @ SetUint(unsigned value);
     tolua_outside void VariantSetStringHash @ SetStringHash(const StringHash& value);
-    tolua_outside void VariantSetShortStringHash @ SetShortStringHash(const ShortStringHash& value);
     tolua_outside void VariantSetBool @ SetBool(bool value);
     tolua_outside void VariantSetFloat @ SetFloat(float value);
     tolua_outside void VariantSetVector2 @ SetVector2(const Vector2& value);
@@ -128,7 +126,6 @@ class Variant
     int GetInt() const;
     int GetUInt() const;
     StringHash GetStringHash();
-    ShortStringHash GetShortStringHash();
     bool GetBool() const;
     float GetFloat() const;
     const Vector2& GetVector2() const;
@@ -166,7 +163,6 @@ class VariantMap
     tolua_outside void VariantMapSetInt @ SetInt(const String key, int value);
     tolua_outside void VariantMapSetUInt @ SetUInt(const String key, unsigned value);
     tolua_outside void VariantMapSetStringHash @ SetStringHash(const String key, const StringHash& value);
-    tolua_outside void VariantMapSetShortStringHash @ SetShortStringHash(const String key, const ShortStringHash& value);
     tolua_outside void VariantMapSetBool @ SetBool(const String key, bool value);
     tolua_outside void VariantMapSetFloat @ SetFloat(const String key, float value);
     tolua_outside void VariantMapSetVector2 @ SetVector2(const String key, const Vector2 value);
@@ -188,7 +184,6 @@ class VariantMap
     tolua_outside int VariantMapGetInt @ GetInt(const String key);
     tolua_outside int VariantMapGetUInt @ GetUInt(const String key);
     tolua_outside StringHash VariantMapGetStringHash @ GetStringHash(const String key);
-    tolua_outside ShortStringHash VariantMapGetShortStringHash @ GetShortStringHash(const String key);
     tolua_outside bool VariantMapGetBool @ GetBool(const String key);
     tolua_outside float VariantMapGetFloat @ GetFloat(const String key);
     tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const String key);
@@ -220,11 +215,6 @@ static void VariantSetUint(Variant* variant, unsigned value)
 }
 
 static void VariantSetStringHash(Variant* variant, const StringHash& value)
-{
-    *variant = value;
-}
-
-static void VariantSetShortStringHash(Variant* variant, const ShortStringHash& value)
 {
     *variant = value;
 }
@@ -316,112 +306,107 @@ static VectorBuffer VariantGetBuffer(const Variant* variant)
 
 static void VariantMapSetInt(VariantMap* vmap, const String& key, int value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetUInt(VariantMap* vmap, const String& key, unsigned value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetStringHash(VariantMap* vmap, const String& key, const StringHash& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-static void VariantMapSetShortStringHash(VariantMap* vmap, const String& key, const ShortStringHash& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetBool(VariantMap* vmap, const String& key, bool value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetFloat(VariantMap* vmap, const String& key, float value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetVector2(VariantMap* vmap, const String& key, const Vector2& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetVector3(VariantMap* vmap, const String& key, const Vector3& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetVector4(VariantMap* vmap, const String& key, const Vector4& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetQuaternion(VariantMap* vmap, const String& key, const Quaternion& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetColor(VariantMap* vmap, const String& key, const Color& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetString(VariantMap* vmap, const String& key, const String& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetBuffer(VariantMap* vmap, const String& key, const VectorBuffer& value)
 {
-    (*vmap)[ShortStringHash(key)] = value.GetData();
+    (*vmap)[StringHash(key)] = value.GetData();
 }
 
 static void VariantMapSetResourceRef(VariantMap* vmap, const String& key, const ResourceRef& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetResourceRefList(VariantMap* vmap, const String& key, const ResourceRefList& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetIntRect(VariantMap* vmap, const String& key, const IntRect& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetIntVector2(VariantMap* vmap, const String& key, const IntVector2& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetPtr(VariantMap* vmap, const String& key, void* value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetMatrix3(VariantMap* vmap, const String& key, const Matrix3& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetMatrix3x4(VariantMap* vmap, const String& key, const Matrix3x4& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static void VariantMapSetMatrix4(VariantMap* vmap, const String& key, const Matrix4& value)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+    (*vmap)[StringHash(key)] = value;
 }
 
 static const Variant& FindVariant(const VariantMap* vmap, const String& key)
 {
-    VariantMap::ConstIterator i = vmap->Find(ShortStringHash(key));
+    VariantMap::ConstIterator i = vmap->Find(StringHash(key));
     return i != vmap->End() ? i->second_ : Variant::EMPTY;
 }
 
@@ -438,11 +423,6 @@ static unsigned VariantMapGetUInt(const VariantMap* vmap, const String& key)
 static StringHash VariantMapGetStringHash(const VariantMap* vmap, const String& key)
 {
     return FindVariant(vmap, key).GetStringHash();
-}
-
-static ShortStringHash VariantMapGetShortStringHash(const VariantMap* vmap, const String& key)
-{
-    return FindVariant(vmap, key).GetShortStringHash();
 }
 
 static bool VariantMapGetBool(const VariantMap* vmap, const String& key)

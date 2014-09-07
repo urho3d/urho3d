@@ -62,6 +62,7 @@ extern "C" const char* SDL_Android_GetFilesDir();
 #endif
 #ifdef IOS
 extern "C" const char* SDL_IOS_GetResourceDir();
+extern "C" const char* SDL_IOS_GetDocumentsDir();
 #endif
 
 #include "DebugNew.h"
@@ -683,7 +684,7 @@ String FileSystem::GetUserDocumentsDir() const
     #if defined(ANDROID)
     return AddTrailingSlash(SDL_Android_GetFilesDir());
     #elif defined(IOS)
-    return AddTrailingSlash(SDL_IOS_GetResourceDir());
+    return AddTrailingSlash(SDL_IOS_GetDocumentsDir());
     #elif defined(WIN32)
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;

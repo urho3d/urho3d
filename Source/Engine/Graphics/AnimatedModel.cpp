@@ -77,6 +77,14 @@ AnimatedModel::AnimatedModel(Context* context) :
 
 AnimatedModel::~AnimatedModel()
 {
+    // When being destroyed, remove the bone hierarchy if appropriate (last AnimatedModel in the node)
+    Bone* rootBone = skeleton_.GetRootBone();
+    if (rootBone && rootBone->node_)
+    {
+        Node* parent = rootBone->node_->GetParent();
+        if (parent && !parent->GetComponent<AnimatedModel>())
+            RemoveRootBone();
+    }
 }
 
 void AnimatedModel::RegisterObject(Context* context)
@@ -858,12 +866,6 @@ void AnimatedModel::OnNodeSet(Node* node)
         // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
         isMaster_ = GetComponent<AnimatedModel>() == this;
     }
-    else
-    {
-        // When AnimatedModel parent node is cleared, we are being detached from the scene.
-        // Remove the bone hierarchy now
-        RemoveRootBone();
-    }
 }
 
 void AnimatedModel::OnMarkedDirty(Node* node)
@@ -887,6 +889,9 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
         // Non-master animated models get the bounding box from the master
         /// \todo If it's a skinned attachment that does not cover the whole body, it will have unnecessarily large bounds
         AnimatedModel* master = node_->GetComponent<AnimatedModel>();
+        // Check if we've become the new master model in case the original was deleted
+        if (master == this)
+            isMaster_ = true;
         if (master)
             worldBoundingBox_ = master->GetWorldBoundingBox();
     }
@@ -1134,10 +1139,13 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     // (first AnimatedModel in a node)
     if (isMaster_)
     {
-        skeleton_.Reset();
+        skeleton_.ResetSilent();
         for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
             (*i)->Apply();
         
+        // Skeleton reset and animations apply the node transforms "silently" to avoid repeated marking dirty. Mark dirty now
+        node_->MarkDirty();
+
         // Calculate new bone bounding box
         UpdateBoneBoundingBox();
     }

@@ -105,8 +105,6 @@ public:
     String ReadFileID();
     /// Read a 32-bit StringHash.
     StringHash ReadStringHash();
-    /// Read a 16-bit ShortStringHash.
-    ShortStringHash ReadShortStringHash();
     /// Read a buffer with size encoded as VLE.
     PODVector<unsigned char> ReadBuffer();
     /// Read a resource reference.

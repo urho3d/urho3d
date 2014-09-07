@@ -34,26 +34,24 @@ env:
     - LINUX=1                              URHO3D_LIB_TYPE=SHARED
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=STATIC
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=SHARED
-    - ANDROID=1                            URHO3D_LIB_TYPE=STATIC
-    - ANDROID=1                            URHO3D_LIB_TYPE=SHARED
     - RPI=1                                URHO3D_LIB_TYPE=STATIC
     - RPI=1                                URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
 #  allow_failures:
-#    - env: RPI=1 URHO3D_LIB_TYPE=STATIC
-#    - env: RPI=1 URHO3D_LIB_TYPE=SHARED
+#    - env: whitespace is important
 language: cpp
 compiler: gcc
 before_install:
-    - bash -c "[ '$TRAVIS_BRANCH' == 'master' ] && [ '$TRAVIS_PULL_REQUEST' == 'false' ]" && export ON_MASTER_COMMIT=1 && bash -c "[ $SITE_UPDATE ]" && export SITE_UPDATE_ON_MASTER_COMMIT=1 || true
-    - bash -c "[ $ANDROID ]" && wget -q http://dl.google.com/android/ndk/android-ndk-r9d-linux-x86_64.tar.bz2 && tar xjf *.bz2 && rm *.bz2 && ln -s android-ndk* android-ndk && export ANDROID_NDK=$(pwd)/android-ndk || true
-    - bash -c "[ $RPI ]" && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && git clone --depth=1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot && export RASPI_ROOT=$(pwd)/rpi-sysroot || true
-    - sudo apt-get update -q -y
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export SITE_UPDATE_ON_MASTER_COMMIT=$SITE_UPDATE; fi
+  - travis_retry sudo apt-get update -q -y
 install:
-    - sudo apt-get install -q -y --no-install-recommends libasound2-dev
-    - bash -c "[ x$URHO3D_64BIT == 'x' ]" && sudo apt-get remove -q -y gvfs-daemons && sudo apt-get install -q -y libxrandr-dev:i386 libglapi-mesa:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu || true
-    - bash -c "[ $WINDOWS ]" && sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32 || true
-    - bash -e /etc/init.d/xvfb start
+  - travis_retry sudo apt-get install -q -y --no-install-recommends libasound2-dev
+  - if [ ! $URHO3D_64BIT ]; then travis_retry sudo apt-get remove -q -y gvfs-daemons && travis_retry sudo apt-get install -q -y libxrandr-dev:i386 libglapi-mesa:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; fi
+  - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
+  - if [ $RPI ]; then free -m && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && free -m && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot && export RASPI_ROOT=$(pwd)/rpi-sysroot; fi
+  - bash -e /etc/init.d/xvfb start
 script: rake travis_ci
-after_success: bash -c "[ $SITE_UPDATE_ON_MASTER_COMMIT ]" && rake travis_ci_rebase
+after_success: if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake travis_ci_rebase; fi
+
+# vi: set ts=2 sw=2 expandtab:

@@ -186,11 +186,6 @@ bool Serializer::WriteStringHash(const StringHash& value)
     return WriteUInt(value.Value());
 }
 
-bool Serializer::WriteShortStringHash(const ShortStringHash& value)
-{
-    return WriteUShort(value.Value());
-}
-
 bool Serializer::WriteBuffer(const PODVector<unsigned char>& value)
 {
     bool success = true;
@@ -205,7 +200,7 @@ bool Serializer::WriteBuffer(const PODVector<unsigned char>& value)
 bool Serializer::WriteResourceRef(const ResourceRef& value)
 {
     bool success = true;
-    success &= WriteShortStringHash(value.type_);
+    success &= WriteStringHash(value.type_);
     success &= WriteString(value.name_);
     return success;
 }
@@ -215,7 +210,7 @@ bool Serializer::WriteResourceRefList(const ResourceRefList& value)
     bool success = true;
     unsigned size = value.names_.Size() * sizeof(StringHash);
     
-    success &= WriteShortStringHash(value.type_);
+    success &= WriteStringHash(value.type_);
     success &= WriteVLE(value.names_.Size());
     for (unsigned i = 0; i < value.names_.Size(); ++i)
         success &= WriteString(value.names_[i]);
@@ -322,7 +317,7 @@ bool Serializer::WriteVariantMap(const VariantMap& value)
     success &= WriteVLE(value.Size());
     for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        WriteShortStringHash(i->first_);
+        WriteStringHash(i->first_);
         WriteVariant(i->second_);
     }
     return success;

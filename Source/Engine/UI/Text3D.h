@@ -54,9 +54,9 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
     
-    /// Set font and font size. Return true if successful.
+    /// Set font and font size and use signed distance field font. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size. Return true if successful.
+    /// Set font and font size and use signed distance field font. Return true if successful.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     /// Set material.
     void SetMaterial(Material* material);

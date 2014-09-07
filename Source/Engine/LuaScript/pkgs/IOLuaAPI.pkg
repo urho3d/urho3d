@@ -1,7 +1,7 @@
+$pfile "IO/Compression.pkg"
 $pfile "IO/Deserializer.pkg"
 $pfile "IO/File.pkg"
 $pfile "IO/FileSystem.pkg"
-$pfile "IO/FileWatcher.pkg"
 $pfile "IO/Log.pkg"
 $pfile "IO/PackageFile.pkg"
 $pfile "IO/Serializer.pkg"

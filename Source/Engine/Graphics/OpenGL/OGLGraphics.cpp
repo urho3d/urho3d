@@ -39,6 +39,7 @@
 #include "Material.h"
 #include "Mutex.h"
 #include "Octree.h"
+#include "ParticleEffect.h"
 #include "ParticleEmitter.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
@@ -179,6 +180,41 @@ bool CheckExtension(String& extensions, const String& name)
     return extensions.Contains(name);
 }
 
+static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsigned& primitiveCount, GLenum& glPrimitiveType)
+{
+    switch (type)
+    {
+    case TRIANGLE_LIST:
+        primitiveCount = elementCount / 3;
+        glPrimitiveType = GL_TRIANGLES;
+        break;
+        
+    case LINE_LIST:
+        primitiveCount = elementCount / 2;
+        glPrimitiveType = GL_LINES;
+        break;
+
+    case POINT_LIST:
+        primitiveCount = elementCount;
+        glPrimitiveType = GL_POINTS;
+        break;
+        
+    case TRIANGLE_STRIP:
+        primitiveCount = elementCount - 2;
+        glPrimitiveType = GL_TRIANGLE_STRIP;
+        break;
+        
+    case LINE_STRIP:
+        primitiveCount = elementCount - 1;
+        glPrimitiveType = GL_LINE_STRIP;
+        break;
+        
+    case TRIANGLE_FAN:
+        primitiveCount = elementCount - 2;
+        glPrimitiveType = GL_TRIANGLE_FAN;
+        break;
+    }
+}
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
@@ -329,7 +365,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
-                unsigned error = Abs(resolutions[i].x_ - width) * Abs(resolutions[i].y_ - height);
+                unsigned error = Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height);
                 if (error < bestError)
                 {
                     best = i;
@@ -729,20 +765,11 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
-    unsigned primitiveCount = 0;
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = vertexCount / 3;
-        glDrawArrays(GL_TRIANGLES, vertexStart, vertexCount);
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = vertexCount / 2;
-        glDrawArrays(GL_LINES, vertexStart, vertexCount);
-        break;
-    }
+    GetGLPrimitiveType(vertexCount, type, primitiveCount, glPrimitiveType);
+    glDrawArrays(glPrimitiveType, vertexStart, vertexCount);
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -756,27 +783,15 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
-    unsigned primitiveCount = 0;
     unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
     
-    switch (type)
-    {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        if (indexSize == sizeof(unsigned short))
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        else
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        if (indexSize == sizeof(unsigned short))
-            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        else
-            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-        break;
-    }
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    if (indexSize == sizeof(unsigned short))
+        glDrawElements(glPrimitiveType, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
+    else
+        glDrawElements(glPrimitiveType, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -791,38 +806,20 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
-    unsigned primitiveCount = 0;
     unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
     
-    switch (type)
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    if (indexSize == sizeof(unsigned short))
     {
-    case TRIANGLE_LIST:
-        primitiveCount = indexCount / 3;
-        if (indexSize == sizeof(unsigned short))
-        {
-            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        else
-        {
-            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        break;
-        
-    case LINE_LIST:
-        primitiveCount = indexCount / 2;
-        if (indexSize == sizeof(unsigned short))
-        {
-            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        else
-        {
-            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-                instanceCount);
-        }
-        break;
+        glDrawElementsInstancedARB(glPrimitiveType, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+            instanceCount);
+    }
+    else
+    {
+        glDrawElementsInstancedARB(glPrimitiveType, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+            instanceCount);
     }
     
     numPrimitives_ += instanceCount * primitiveCount;
@@ -1536,6 +1533,8 @@ void Graphics::SetTextureAnisotropy(unsigned level)
 
 void Graphics::SetTextureParametersDirty()
 {
+    MutexLock lock(gpuObjectMutex_);
+    
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
         Texture* texture = dynamic_cast<Texture*>(*i);
@@ -2171,11 +2170,15 @@ void Graphics::WindowResized()
 
 void Graphics::AddGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+    
     gpuObjects_.Push(object);
 }
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
+    MutexLock lock(gpuObjectMutex_);
+    
     gpuObjects_.Remove(object);
 }
 
@@ -2256,18 +2259,22 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     
     releasingGPUObjects_ = true;
     
-    if (clearGPUObjects)
     {
-        // Shutting down: release all GPU objects that still exist
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-            (*i)->Release();
-        gpuObjects_.Clear();
-    }
-    else
-    {
-        // We are not shutting down, but recreating the context: mark GPU objects lost
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-            (*i)->OnDeviceLost();
+        MutexLock lock(gpuObjectMutex_);
+        
+        if (clearGPUObjects)
+        {
+            // Shutting down: release all GPU objects that still exist
+            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+                (*i)->Release();
+            gpuObjects_.Clear();
+        }
+        else
+        {
+            // We are not shutting down, but recreating the context: mark GPU objects lost
+            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+                (*i)->OnDeviceLost();
+        }
     }
     
     releasingGPUObjects_ = false;
@@ -2338,8 +2345,12 @@ void Graphics::Restore()
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->OnDeviceReset();
+    {
+        MutexLock lock(gpuObjectMutex_);
+        
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceReset();
+    }
 }
 
 void Graphics::Maximize()
@@ -2953,6 +2964,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
     textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
+    textureUnits_["ZoneCubeMap"] = TU_ZONE;
+    textureUnits_["ZoneVolumeMap"] = TU_ZONE;
 }
 
 void RegisterGraphicsLibrary(Context* context)
@@ -2974,6 +2987,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimatedModel::RegisterObject(context);
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
+    ParticleEffect::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
     CustomGeometry::RegisterObject(context);
     DecalSet::RegisterObject(context);

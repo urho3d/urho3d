@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "HashSet.h"
 #include "Resource.h"
 #include "ScriptEventListener.h"
@@ -54,8 +55,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
 
     /// Add a scripted event handler.
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
@@ -132,6 +135,10 @@ private:
     Vector<DelayedCall> delayedCalls_;
     /// Event helper objects for handling procedural or non-ScriptInstance script events
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> > eventInvokers_;
+    /// Byte code for asynchronous loading.
+    SharedArrayPtr<unsigned char> loadByteCode_;
+    /// Byte code size for asynchronous loading.
+    unsigned loadByteCodeSize_;
 };
 
 /// Helper class for forwarding events to script objects that are not part of a scene.
