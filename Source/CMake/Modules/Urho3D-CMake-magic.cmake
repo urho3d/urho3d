@@ -508,6 +508,13 @@ macro (setup_main_executable)
         add_android_native_init ()
         # Setup shared library output path
         set_output_directories (${ANDROID_LIBRARY_OUTPUT_PATH} LIBRARY)
+        # Finalize amalgamated source collection
+        set (AMALG_FINAL_TARGET 1)
+        if (AMALG_EXCLUDES)
+            set (AMALG_EXCLUDES "(${AMALG_EXCLUDES}|SDL_android_main)")
+        else ()
+            set (AMALG_EXCLUDES SDL_android_main)
+        endif ()
         # Setup target as main shared library
         define_dependency_libs (Urho3D)
         setup_library (SHARED)
