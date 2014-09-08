@@ -64,9 +64,9 @@ task :android do
   android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
+# Usage: NOT intended to be used manually (if you insist then try: rake ci)
 desc 'Configure, build, and test Urho3D project'
-task :travis_ci do
+task :ci do
   # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW build)
   if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && ENV['WINDOWS'])
     $configuration = 'Release'
@@ -78,16 +78,16 @@ task :travis_ci do
   end
   if ENV['XCODE']
     # xctool or xcodebuild
-    xcode_travis_ci
+    xcode_ci
   else
     # GCC or Clang
-    makefile_travis_ci
+    makefile_ci
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_site_update)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_site_update)
 desc 'Update site documentation to GitHub Pages'
-task :travis_ci_site_update do
+task :ci_site_update do
   # Pull or clone
   system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
   # Update credits from Readme.txt to about.md
@@ -120,16 +120,17 @@ task :travis_ci_site_update do
   system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
 desc 'Rebase Android-CI and OSX-CI mirror branches'
-task :travis_ci_rebase do
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
+task :ci_rebase do
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
+# Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
 desc 'Make binary package and upload it to a designated central hosting server'
-task :travis_ci_package_upload do
+task :ci_package_upload do
   if ENV['XCODE']
     $configuration = 'Release'
     $testing = 0
@@ -181,9 +182,9 @@ task :travis_ci_package_upload do
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
       system 'SNAPSHOP_VER=`git describe $TRAVIS_COMMIT`; export SNAPSHOP_VER && wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.zip' or abort 'Failed to get source packages'
-      # Only keep the snapshots from the last +/- 50 revisions
+      # Only keep the snapshots from the last +/- 100 revisions
       # The package revisions and their creation time may not always be in perfect chronological order due to Travis-CI build latency, so sort the final result one more time in order to get a unique revision removal list
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +51 |sort |uniq
+      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +101 |sort |uniq
 cd #{upload_dir}
 ls -1t
 bye
@@ -260,7 +261,7 @@ add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_Physic
 EOF" or abort 'Failed to create new project using Urho3D as external library'
 end
 
-def makefile_travis_ci
+def makefile_ci
   if ENV['WINDOWS']
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
@@ -367,7 +368,7 @@ EOF") { |stdout| echo = false; while output = stdout.gets do if echo && /#\s#/ !
   end
 end
 
-def xcode_travis_ci
+def xcode_ci
   if ENV['IOS']
     # IOS platform does not support LuaJIT
     jit = ''

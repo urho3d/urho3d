@@ -35,12 +35,8 @@ env:
     - LINUX=1                              URHO3D_LIB_TYPE=SHARED
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=STATIC
     - WINDOWS=1 ARCH=i686                  URHO3D_LIB_TYPE=SHARED
-    - RPI=1                                URHO3D_LIB_TYPE=STATIC
-    - RPI=1                                URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
-#  allow_failures:
-#    - env: whitespace is important
 language: cpp
 compiler: gcc
 before_install:
@@ -53,11 +49,10 @@ install:
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo apt-get install -q -y --no-install-recommends doxygen graphviz; fi
   - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - if [ $PACKAGE_UPLOAD ] && [ "$LINUX" -o "$RPI" ]; then travis_retry sudo apt-get install -q -y rpm; fi
-  - if [ $RPI ]; then free -m && git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RASPI_TOOL=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin && free -m && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git rpi-sysroot && export RASPI_ROOT=$(pwd)/rpi-sysroot; fi
-  - bash -e /etc/init.d/xvfb start
-script: rake travis_ci
+  - if [ "$LINUX" -a "$URHO3D_64BIT" ]; then bash -e /etc/init.d/xvfb start; fi
+script: rake ci
 after_success:
-  - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake travis_ci_site_update && rake travis_ci_rebase; fi
-  - if [ $PACKAGE_UPLOAD ]; then rake travis_ci_package_upload; fi
+  - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake ci_site_update && rake ci_rebase; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
 
 # vi: set ts=2 sw=2 expandtab:
