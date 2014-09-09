@@ -1,5 +1,5 @@
-﻿Urho3D - cross-platform rendering and game engine
--------------------------------------------------
+Urho3D - cross-platform 2D and 3D game engine
+---------------------------------------------
 
 http://urho3d.github.io/
 
