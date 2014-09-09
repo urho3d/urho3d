@@ -22,7 +22,13 @@
 
 # Get Urho3D library revision number
 
-execute_process (COMMAND git describe --always --tags --dirty RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_VARIABLE LIB_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+if ($ENV{CI} AND $ENV{RELEASE_TAG})
+    # Use the release tag provided by the CI server, this is important because git describe command will be off by one commit in the CI mirror branches
+    set (LIB_REVISION $ENV{RELEASE_TAG})
+    set (GIT_EXIT_CODE 0)
+else ()
+    execute_process (COMMAND git describe --always --tags --dirty RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_VARIABLE LIB_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif ()
 if (NOT GIT_EXIT_CODE EQUAL 0)
     # No GIT command line tool or not a GIT repository
     set (LIB_REVISION Unversioned)

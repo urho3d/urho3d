@@ -67,14 +67,18 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: rake ci)
 desc 'Configure, build, and test Urho3D project'
 task :ci do
-  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW build)
-  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && ENV['WINDOWS'])
+  # Unshallow the clone's history when necessary
+  if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && ENV['RELEASE_TAG'].empty?
+    system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
+  end
+  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW and Android build)
+  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && (ENV['WINDOWS'] || ENV['ANDROID']))
     $configuration = 'Release'
     $testing = 0
   else
     $configuration = 'Debug'
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
-    $testing = (ENV['OSX'].to_i != 1 && ENV['URHO3D_64BIT'] && ENV['WINDOWS'].to_i != 1) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
+    $testing = (ENV['LINUX'] && ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
   end
   if ENV['XCODE']
     # xctool or xcodebuild
@@ -95,7 +99,7 @@ task :ci_site_update do
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
-  release = ENV['TRAVIS_TAG'].empty? ? 'HEAD' : ENV['TRAVIS_TAG'];
+  release = ENV['RELEASE_TAG'].empty? ? 'HEAD' : ENV['RELEASE_TAG'];
   unless release == 'HEAD'
     system "mkdir -p doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
@@ -124,8 +128,8 @@ end
 desc 'Rebase Android-CI and OSX-CI mirror branches'
 task :ci_rebase do
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
@@ -177,7 +181,7 @@ task :ci_package_upload do
   end
   # Determine the upload location
   setup_digital_keys
-  if ENV['TRAVIS_TAG'].empty?
+  if ENV['RELEASE_TAG'].empty?
     upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/Snapshots"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
@@ -192,10 +196,10 @@ EOF
 ); do echo rm #{upload_dir}/${v}*; done |sftp -b - urho-travis-ci@frs.sourceforge.net" or abort 'Failed to housekeep snapshots'
     end
   else
-    upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/#{ENV['TRAVIS_TAG']}"
+    upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/#{ENV['RELEASE_TAG']}"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
-      system 'wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$TRAVIS_TAG.tar.gz -O Urho3D-$TRAVIS_TAG-Source.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$TRAVIS_TAG.zip -O Urho3D-$TRAVIS_TAG-Source.zip' or abort 'Failed to get source packages'
+      system 'wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.tar.gz -O Urho3D-$RELEASE_TAG-Source.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.zip -O Urho3D-$RELEASE_TAG-Source.zip' or abort 'Failed to get source packages'
     end
     # Make sure the release directory exists remotely, do this in all the build jobs as we don't know which one would start uploading first
     system "sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
