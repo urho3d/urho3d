@@ -22,7 +22,7 @@
 
 # Get Urho3D library revision number
 
-if ($ENV{CI} AND $ENV{RELEASE_TAG})
+if (DEFINED $ENV{CI} AND DEFINED $ENV{RELEASE_TAG})
     # Use the release tag provided by the CI server, this is important because git describe command will be off by one commit in the CI mirror branches
     set (LIB_REVISION $ENV{RELEASE_TAG})
     set (GIT_EXIT_CODE 0)
