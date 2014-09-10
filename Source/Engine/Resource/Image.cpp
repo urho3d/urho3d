@@ -1326,36 +1326,107 @@ Image* Image::GetSubimage(const IntRect& rect) const
     if (!data_)
         return 0;
 
-    if (IsCompressed())
+    if (depth_ > 1)
     {
-        LOGERROR("Can not get subimage from compressed image " + GetName());
+        LOGERROR("Subimage not supported for 3D images");
         return 0;
     }
-
-    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ >= width_ || rect.bottom_ >= height_)
+    
+    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
     {
         LOGERROR("Can not get subimage from image " + GetName() + " with invalid region");
         return 0;
     }
-
-    int x = rect.left_;
-    int y = rect.top_;
-    int width = rect.Width();
-    int height = rect.Height();
-
-    Image* image = new Image(context_);
-    image->SetSize(width, height, components_);
-
-    unsigned char* dest = image->GetData();
-    unsigned char* source = data_.Get() + (y * width_ + x) * components_;
-    for (int i = 0; i < height; ++i)
+    
+    if (!IsCompressed())
     {
-        memcpy(dest, source, width * components_);
-        dest += width * components_;
-        source += width_ * components_;
-    }
+        int x = rect.left_;
+        int y = rect.top_;
+        int width = rect.Width();
+        int height = rect.Height();
 
-    return image;
+        Image* image = new Image(context_);
+        image->SetSize(width, height, components_);
+
+        unsigned char* dest = image->GetData();
+        unsigned char* src = data_.Get() + (y * width_ + x) * components_;
+        for (int i = 0; i < height; ++i)
+        {
+            memcpy(dest, src, width * components_);
+            dest += width * components_;
+            src += width_ * components_;
+        }
+    
+        return image;
+    }
+    else
+    {
+        // Pad the region to be a multiple of block size
+        IntRect paddedRect = rect;
+        paddedRect.left_ = (rect.left_ / 4) * 4;
+        paddedRect.top_ = (rect.top_ / 4) * 4;
+        paddedRect.right_ = (rect.right_ / 4) * 4;
+        paddedRect.bottom_ = (rect.bottom_ / 4) * 4;
+        IntRect currentRect = paddedRect;
+        
+        PODVector<unsigned char> subimageData;
+        unsigned subimageLevels = 0;
+        
+        // Save as many mips as possible until the next mip would cross a block boundary
+        for (unsigned i = 0; i < numCompressedLevels_; ++i)
+        {
+            CompressedLevel level = GetCompressedLevel(i);
+            if (!level.data_)
+                break;
+
+            // Mips are stored continuously
+            unsigned destStartOffset = subimageData.Size();
+            unsigned destRowSize = currentRect.Width() / 4 * level.blockSize_;
+            unsigned destSize = currentRect.Height() / 4 * destRowSize;
+            if (!destSize)
+                break;
+            
+            subimageData.Resize(destStartOffset + destSize);
+            unsigned char* dest = &subimageData[destStartOffset];
+            
+            for (int y = currentRect.top_; y < currentRect.bottom_; y += 4)
+            {
+                unsigned char* src = level.data_ + level.rowSize_ * (y / 4) + currentRect.left_ / 4 * level.blockSize_;
+                memcpy(dest, src, destRowSize);
+                dest += destRowSize;
+            }
+            
+            ++subimageLevels;
+            if ((currentRect.left_ & 4) || (currentRect.right_ & 4) || (currentRect.top_ & 4) || (currentRect.bottom_ & 4))
+                break;
+            else
+            {
+                currentRect.left_ /= 2;
+                currentRect.right_ /= 2;
+                currentRect.top_ /= 2;
+                currentRect.bottom_ /= 2;
+            }
+        }
+        
+        if (!subimageLevels)
+        {
+            LOGERROR("Subimage region from compressed image " + GetName() + " did not produce any data");
+            return 0;
+        }
+        
+        Image* image = new Image(context_);
+        image->width_ = paddedRect.Width();
+        image->height_ = paddedRect.Height();
+        image->depth_ = 1;
+        image->compressedFormat_ = compressedFormat_;
+        image->numCompressedLevels_ = subimageLevels;
+        image->components_ = components_;
+        image->data_ = new unsigned char[subimageData.Size()];
+        memcpy(image->data_.Get(), &subimageData[0], subimageData.Size());
+        image->SetMemoryUse(subimageData.Size());
+        
+        return image;
+    }
 }
 
 SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
@@ -1363,6 +1434,12 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
     if (!data_)
         return 0;
 
+    if (depth_ > 1)
+    {
+        LOGERROR("Can not get SDL surface from 3D image");
+        return 0;
+    }
+    
     if (IsCompressed())
     {
         LOGERROR("Can not get SDL surface from compressed image " + GetName());
