@@ -666,6 +666,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../Source/Engine \
+                         ../Source/ThirdParty/rapidjson/include/rapidjson \
                          .
 
 # This tag can be used to specify the character encoding of the source files 
