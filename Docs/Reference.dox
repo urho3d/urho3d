@@ -1763,7 +1763,7 @@ One interesting feature is the ability to flip/mirror animations on both axes, u
 
 For a demonstration, check examples 33_Urho2DSpriterAnimation and 24_Urho2DSprite.
 
-\section Urho2D_Particle Particle Emitters
+\section Urho2D_Particle Particle emitters
 A 2D particle emitter is built from a *.pex file (a format used by many 2D engines).
 A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
@@ -1772,7 +1772,7 @@ A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered usin
 
 For a demonstration, check example 25_Urho2DParticle.
 
-\section Urho2D_Static_Sprites Static Sprites
+\section Urho2D_Static_Sprites Static sprites
 Static sprites are built from single image files or from spritesheets/texture atlases.
 Single image files are loaded using Sprite2D class (Resource) and spritesheets/texture atlases are loaded using SpriteSheet2D class (Resource).
 Both are rendered using StaticSprite2D class (Drawable component):
@@ -1836,14 +1836,14 @@ See 32_Urho2DConstraints sample for detailed examples and to help selecting the 
 - ConstraintWeld2D: defines 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
 - ConstraintWheel2D: defines 2D physics wheel constraint. This constraint restricts a point on bodyB (\ref ConstraintWheel2D::SetAnchor() "SetAnchor()") to a line on bodyA (\ref ConstraintWheel2D::SetAxis "SetAxis()"). It also provides a suspension spring.
 
-\section Urho2D_Background_and_Layers Background and Layers
+\section Urho2D_Background_and_Layers Background and layers
 To set the background color for the scene, use \ref Renderer::GetDefaultZone "GetDefaultZone()".fogColor
 
 You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange thir display order.
 
 Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
 
-\section Urho2D_TileMap Tile Maps
+\section Urho2D_TileMap Tile maps
 
 Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be unpredictable.
 
@@ -1851,7 +1851,7 @@ Check example 36_Urho2DTileMap for a basic demonstration.
 
 You can use tile maps for the design of the whole scene/level, or in adjunction to other 2D resources.
 
-\section Urho2D_LoadingTMX "Loading" a Tile Map file
+\subsection Urho2D_LoadingTMX "Loading" a TMX tile map file
 
 A tmx file is loaded using \ref TmxFile2D "TmxFile2D resource class" and rendered using \ref TileMap2D "TileMap2D component class".
 You just have to create a \ref TileMap2D "TileMap2D" component inside a node and then assign the tmx resource file to it.
@@ -1882,7 +1882,7 @@ tileMap.tmxFile = cache:GetResource("TmxFile2D", "Urho2D/isometric_grass_and_wat
 
 Note that currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Map Properties to set 'Layer Format' to 'XML'.
 
-\section Urho2D_TMX_maps Tile Maps
+\subsection Urho2D_TMX_maps TMX tile maps
 
 Once a tmx file is loaded in Urho, use \ref TileMap2D::GetInfo "GetInfo()" to access the map properties through \ref TileMapInfo2D class.
 
@@ -1896,7 +1896,7 @@ Two convenient functions are provided to convert Tiled index to/from Urho2D spac
 - \ref TileMapInfo2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
 - \ref TileMapInfo2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map) 
 
-\section Urho2D_TMX_layers Tile Map Layers
+\subsection Urho2D_TMX_layers TMX tile map layers
 
 A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers".
 
@@ -1908,7 +1908,7 @@ A layer is characterized by its:
 
 Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()")
 
-\section Urho2D_TMX_Objects Tile Map Objects
+\subsection Urho2D_TMX_Objects TMX tile map objects
 
 Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
 
@@ -1923,9 +1923,9 @@ Except Tile, object layers are not visible. They can be used:
 - as placeholders to easily set the position and size of entities in the world, using \ref TileMapObject2D::GetPosition "GetPosition()" and \ref TileMapObject2D::GetSize "GetSize()"
 - to display Tile objects as sprites
 - to create a background from Tile sprites
-- ...
+- etc.
 
-Additionaly \ref Sprite2D "Sprite2D" resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()"
+Additionaly \ref Sprite2D "Sprite2D" resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
 
 If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
 
