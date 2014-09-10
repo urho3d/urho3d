@@ -2,9 +2,9 @@ namespace Urho3D
 {
 
 /**
-\page LuaScriptAPI Lua Scripting API
+\page LuaScriptAPI Lua scripting API
 
-\section LuaScriptAPI_TableOfContents Table of Contents
+\section LuaScriptAPI_TableOfContents Table of contents
 
 \ref LuaScriptAPI_ClassList "Class list"<br>
 \ref LuaScriptAPI_Classes "Classes"<br>
