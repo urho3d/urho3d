@@ -128,8 +128,8 @@ end
 desc 'Rebase Android-CI and OSX-CI mirror branches'
 task :ci_rebase do
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
@@ -186,9 +186,8 @@ task :ci_package_upload do
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
       system 'SNAPSHOP_VER=`git describe $TRAVIS_COMMIT`; export SNAPSHOP_VER && wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.zip' or abort 'Failed to get source packages'
-      # Only keep the snapshots from the last +/- 100 revisions
-      # The package revisions and their creation time may not always be in perfect chronological order due to Travis-CI build latency, so sort the final result one more time in order to get a unique revision removal list
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +101 |sort |uniq
+      # Only keep the snapshots from the last 30 revisions
+      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31
 cd #{upload_dir}
 ls -1t
 bye
