@@ -649,15 +649,15 @@ bool Image::LoadColorLUT(Deserializer& source)
     return true;
 }
 
-void Image::FlipVertical()
+bool Image::FlipVertical()
 {
     if (!data_)
-        return;
+        return false;
 
     if (depth_ > 1)
     {
         LOGERROR("FlipVertical not supported for 3D images");
-        return;
+        return false;
     }
 
     if (!IsCompressed())
@@ -675,7 +675,7 @@ void Image::FlipVertical()
         if (compressedFormat_ > CF_DXT5)
         {
             LOGERROR("FlipVertical not yet implemented for other compressed formats than DXT1,3,5");
-            return;
+            return false;
         }
         
         // Memory use = combined size of the compressed mip levels
@@ -688,7 +688,7 @@ void Image::FlipVertical()
             if (!level.data_)
             {
                 LOGERROR("Got compressed level with no data, aborting vertical flip");
-                return;
+                return false;
             }
             
             for (unsigned y = 0; y < level.rows_; ++y)
@@ -705,6 +705,8 @@ void Image::FlipVertical()
         
         data_ = newData;
     }
+    
+    return true;
 }
 
 bool Image::Resize(int width, int height)

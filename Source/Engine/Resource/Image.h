@@ -119,8 +119,8 @@ public:
     void SetPixelInt(int x, int y, int z, unsigned uintColor);
     /// Load as color LUT. Return true if successful.
     bool LoadColorLUT(Deserializer& source);
-    /// Flip image vertically.
-    void FlipVertical();
+    /// Flip image vertically. Return true if successful.
+    bool FlipVertical();
     /// Resize image by bilinear resampling. Return true if successful.
     bool Resize(int width, int height);
     /// Clear the image with a color.
