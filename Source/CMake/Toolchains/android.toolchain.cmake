@@ -309,6 +309,12 @@
 
 cmake_minimum_required( VERSION 2.6.3 )
 
+# Urho3D: on Windows Cygwin-based NDK tools may fail in the linking phase with too long command line. Turn on response files to avoid this
+if( CMAKE_HOST_WIN32 )
+ set( CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
+ set( CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
+endif()
+
 if( DEFINED CMAKE_CROSSCOMPILING )
  # subsequent toolchain loading is not really needed
  return()
