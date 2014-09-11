@@ -943,4 +943,57 @@ void DecompressImagePVRTC(unsigned char* dest, const void *blocks, int width, in
     }
 }
 
+void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat format)
+{
+    switch (format)
+    {
+    case CF_DXT1:
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            dest[i] = src[i];
+            dest[i + 4] = src[7 - i];
+        }
+        break;
+        
+    case CF_DXT3:
+        for (unsigned i = 0; i < 8; i += 2)
+        {
+            dest[i] = src[6 - i];
+            dest[i + 1] = src[6 - i + 1];
+        }
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            dest[i + 8] = src[i + 8];
+            dest[i + 12] = src[15 - i];
+        }
+        break;
+        
+    case CF_DXT5:
+        dest[0] = src[0];
+        dest[1] = src[1];
+        {
+            unsigned a1 = src[2] | ((unsigned)src[3] << 8) | ((unsigned)src[4] << 16);
+            unsigned a2 = src[5] | ((unsigned)src[6] << 8) | ((unsigned)src[7] << 16);
+            unsigned b1 = ((a1 & 0x000fff) << 12) | (a1 & 0xfff000) >> 12;
+            unsigned b2 = ((a2 & 0x000fff) << 12) | (a2 & 0xfff000) >> 12;
+            dest[2] = b2 & 0xff;
+            dest[3] = (b2 >> 8) & 0xff;
+            dest[4] = (b2 >> 16) & 0xff;
+            dest[5] = b1 & 0xff;
+            dest[6] = (b1 >> 8) & 0xff;
+            dest[7] = (b1 >> 16) & 0xff;
+        }
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            dest[i + 8] = src[i + 8];
+            dest[i + 12] = src[15 - i];
+        }
+        break;
+        
+    default:
+        /// ETC1 & PVRTC not yet implemented
+        break;
+    }
+}
+
 }

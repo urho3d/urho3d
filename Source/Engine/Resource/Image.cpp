@@ -654,25 +654,57 @@ void Image::FlipVertical()
     if (!data_)
         return;
 
-    if (IsCompressed())
-    {
-        LOGERROR("FlipVertical not supported for compressed images");
-        return;
-    }
-
     if (depth_ > 1)
     {
         LOGERROR("FlipVertical not supported for 3D images");
         return;
     }
 
-    SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
-    unsigned rowSize = width_ * components_;
+    if (!IsCompressed())
+    {
+        SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
+        unsigned rowSize = width_ * components_;
 
-    for (int y = 0; y < height_; ++y)
-        memcpy(&newData[(height_ - y - 1) * rowSize], &data_[y * rowSize], rowSize);
+        for (int y = 0; y < height_; ++y)
+            memcpy(&newData[(height_ - y - 1) * rowSize], &data_[y * rowSize], rowSize);
 
-    data_ = newData;
+        data_ = newData;
+    }
+    else
+    {
+        if (compressedFormat_ > CF_DXT5)
+        {
+            LOGERROR("FlipVertical not yet implemented for other compressed formats than DXT1,3,5");
+            return;
+        }
+        
+        // Memory use = combined size of the compressed mip levels
+        SharedArrayPtr<unsigned char> newData(new unsigned char[GetMemoryUse()]);
+        unsigned dataOffset = 0;
+        
+        for (unsigned i = 0; i < numCompressedLevels_; ++i)
+        {
+            CompressedLevel level = GetCompressedLevel(i);
+            if (!level.data_)
+            {
+                LOGERROR("Got compressed level with no data, aborting vertical flip");
+                return;
+            }
+            
+            for (unsigned y = 0; y < level.rows_; ++y)
+            {
+                unsigned char* src = level.data_ + y * level.rowSize_;
+                unsigned char* dest = newData.Get() + dataOffset + (level.rows_ - y - 1) * level.rowSize_;
+                
+                for (unsigned x = 0; x < level.rowSize_; x += level.blockSize_)
+                    FlipBlockVertical(dest + x, src + x, compressedFormat_);
+            }
+            
+            dataOffset += level.dataSize_;
+        }
+        
+        data_ = newData;
+    }
 }
 
 bool Image::Resize(int width, int height)
