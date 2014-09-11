@@ -2323,7 +2323,7 @@ Methods:
 - void SetPixelInt(int x, int y, int z, unsigned uintColor)
 - bool LoadColorLUT(Deserializer& source)
 - bool LoadColorLUT(const String fileName)
-- void FlipVertical()
+- bool FlipVertical()
 - bool Resize(int width, int height)
 - void Clear(const Color& color)
 - void ClearInt(unsigned uintColor)
