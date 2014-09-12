@@ -40,6 +40,7 @@ matrix:
 language: cpp
 compiler: gcc
 before_install:
+  - free -tm
   - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export SITE_UPDATE_ON_MASTER_COMMIT=$SITE_UPDATE; export RELEASE_TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); if [ $RELEASE_TAG ] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'; then export PACKAGE_UPLOAD=1; fi; fi
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo add-apt-repository ppa:george-edison55/precise-backports -y; fi
   - travis_retry sudo apt-get update -q -y
@@ -50,6 +51,7 @@ install:
   - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - if [ $PACKAGE_UPLOAD ] && [ "$LINUX" -o "$RPI" ]; then travis_retry sudo apt-get install -q -y rpm; fi
   - if [ "$LINUX" -a "$URHO3D_64BIT" ]; then bash -e /etc/init.d/xvfb start; fi
+  - free -tm
 script: rake ci
 after_success:
   - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake ci_site_update && rake ci_rebase; fi

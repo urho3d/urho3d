@@ -127,9 +127,9 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
 desc 'Rebase Android-CI and OSX-CI mirror branches'
 task :ci_rebase do
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
@@ -325,8 +325,11 @@ end
 def android_prepare_device api, name = 'test'
   system 'if ! ps |grep -cq adb; then adb start-server; fi'
   if `adb devices |tail -n +2 |head -1`.chomp.empty?
-    # Don't have any attached then force create a new virtual one and start it
-    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim'; else export OPTS='-gpu on'; fi && echo 'no' |android create avd --force -n #{name} -t android-#{api} && emulator -avd #{name} $OPTS &"
+    # Don't have any (virtual) device attached, try to attach the named device (create the named device as AVD if necessary)
+    if !system "android list avd |grep -cq 'Name: #{name}$'"
+      system "echo 'no' |android create avd -n #{name} -t android-#{api}" or abort "Failed to create '#{name}' Android virtual device"
+    end
+    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
   else
     # Otherwise, try to unlock it just in case it is locked
     system "adb shell 'input keyevent 82; input keyevent 4'"
