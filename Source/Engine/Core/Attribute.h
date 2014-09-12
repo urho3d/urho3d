@@ -49,14 +49,14 @@ static const unsigned AM_NODEIDVECTOR = 0x40;
 
 class Serializable;
 
-/// Internal helper class for invoking attribute accessors.
+/// Abstract base class for invoking attribute accessors.
 class URHO3D_API AttributeAccessor : public RefCounted
 {
 public:
     /// Get the attribute.
-    virtual void Get(const Serializable* ptr, Variant& dest) const {}
+    virtual void Get(const Serializable* ptr, Variant& dest) const = 0;
     /// Set the attribute.
-    virtual void Set(Serializable* ptr, const Variant& src) {}
+    virtual void Set(Serializable* ptr, const Variant& src) = 0;
 };
 
 /// Description of an automatically serializable variable.
