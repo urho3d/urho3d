@@ -185,7 +185,7 @@ task :ci_package_upload do
     upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/Snapshots"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
-      system 'SNAPSHOP_VER=`git describe $TRAVIS_COMMIT`; export SNAPSHOP_VER && wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.zip' or abort 'Failed to get source packages'
+      system "export SNAPSHOT_VER=$(git describe $TRAVIS_COMMIT |ruby -pe 'gsub(/-(?!g)/s, %q{.})'); wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.zip" or abort 'Failed to get source packages'
       # Only keep the snapshots from the last 30 revisions
       system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31
 cd #{upload_dir}
@@ -206,8 +206,6 @@ mkdir #{upload_dir}
 bye
 EOF" or abort 'Failed to create release directory remotely'
   end
-  # Upload the package
-  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
   if ENV['SITE_UPDATE']
     # Upload the source package
     system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload source package'
@@ -215,6 +213,8 @@ EOF" or abort 'Failed to create release directory remotely'
     system 'for f in Readme.txt License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
     system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
   end
+  # Upload the package
+  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
