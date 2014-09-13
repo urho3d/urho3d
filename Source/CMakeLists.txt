@@ -127,20 +127,24 @@ include (CPack)
 
 # Setup RPATH settings
 if (NOT WIN32)
-    if (APPLE AND (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12))
-        set (CMAKE_MACOSX_RPATH TRUE)
-        # Note for older version CMake users, you may need to use DYLD_LIBRARY_PATH environment variable to specify the path where Urho3D shared library is being installed
-        # when attempting to execute the samples or tools installed by Urho3D SDK with SHARED lib type
-    endif ()
+    # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
+    # But don't set them yet in the build tree
     set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    if (APPLE)
+        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
+            set (CMAKE_MACOSX_RPATH TRUE)
+        endif ()
+        set (ORIGIN @loader_path)
+    else ()
+        set (ORIGIN $ORIGIN)
+    endif ()
+    # When installing set the first RPATH entry to the library location relative to the executable
+    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../../../lib${LIB_SUFFIX}/Urho3D)    # The library location is based on SDK install destination as defined above
+    # The second entry to the install destination of the library, if the destination location is not in the system default search path
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
     if (isSystemDir STREQUAL -1)
-        # If SDK installation location is not in the system default search paths then add the library installation location to target's RPATH
-        set (CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
-        # Note for Linux users, you should not need to use LD_LIBRARY_PATH environment variable pointing to Urho3D shared library path anymore when executing installed targets
-        # even when the shared library is installed on a non-default installation location
+        list (APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
     endif ()
 endif ()
 
