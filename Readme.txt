@@ -442,10 +442,10 @@ cmake_xxxx batch files or shell scripts.
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check      |
 |                     | | LuaJIT's CMakeLists.txt for more options)            |
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)         |
-|URHO3D_PHYSICS       |1|Enable Physics support                                |
-|URHO3D_NAVIGATION    |1|Enable Navigation support                             |
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua        |
 |                     | | scripting support is enabled only)                   |
+|URHO3D_PHYSICS       |1|Enable Physics support                                |
+|URHO3D_NAVIGATION    |1|Enable Navigation support                             |
 |URHO3D_SAMPLES       |0|Build sample applications                             |
 |URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only;         |
 |                     | | on Android only build Lua standalone tools)          |
