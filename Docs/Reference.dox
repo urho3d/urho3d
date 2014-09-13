@@ -950,8 +950,34 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 </texture>
 \endcode
 
-The sRGB flag controls both whether the texture should be sampled with sRGB to linear conversion, and if used as a rendertarget, pixels should be converted back to sRGB when writing to it.
-To control whether the backbuffer should use sRGB conversion on write, call \ref Graphics::SetSRGB "SetSRGB()" on the Graphics subsystem.
+The sRGB flag controls both whether the texture should be sampled with sRGB to linear conversion, and if used as a rendertarget, pixels should be converted back to sRGB when writing to it. To control whether the backbuffer should use sRGB conversion on write, call \ref Graphics::SetSRGB "SetSRGB()" on the Graphics subsystem.
+
+\section Materials_CubeMapTextures Cube map textures
+
+Using cube map textures requires an XML file to define the cube map face textures or layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
+
+Individual face textures are defined in the XML like this: (see Bin/Data/Textures/Skybox.xml for an example)
+
+\code
+<cubemap>
+    <face name="PositiveX_TextureName" />
+    <face name="NegativeX_TextureName" />
+    <face name="PositiveY_TextureName" />
+    <face name="NegativeY_TextureName" />
+    <face name="PositiveZ_TextureName" />
+    <face name="NegativeZ_TextureName" />
+</cubemap>
+\endcode
+
+Using a single image texture and a layout is used like this:
+
+\code
+<cubemap>
+    <image name="TextureName" layout="horizontal|horizontalnvidia|horizontalcross|verticalcross|blender" />
+</cubemap>
+\endcode
+
+For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
 
 \section Materials_Techniques Techniques and passes
 

@@ -186,6 +186,16 @@ enum CubeMapFace
     MAX_CUBEMAP_FACES
 };
 
+/// Cubemap single image layout modes.
+enum CubeMapLayout
+{
+    CML_HORIZONTAL = 0,
+    CML_HORIZONTALNVIDIA,
+    CML_HORIZONTALCROSS,
+    CML_VERTICALCROSS,
+    CML_BLENDER
+};
+
 /// Update mode for render surface viewports.
 enum RenderSurfaceUpdateMode
 {
