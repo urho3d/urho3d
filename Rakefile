@@ -380,7 +380,7 @@ def xcode_ci
     jit = ''
     amalg = ''
     platform_prefix = 'ios-'
-    deployment_target = ''
+    deployment_target = "-DIPHONEOS_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
     # Lua on IOS build requires tolua++ tool to be built natively first
     system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
     xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
@@ -394,7 +394,7 @@ def xcode_ci
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh #{deployment_target} -DIOS=$IOS -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 
