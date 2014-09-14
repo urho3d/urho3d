@@ -139,7 +139,7 @@ if (NOT WIN32)
     else ()
         set (ORIGIN $ORIGIN)
     endif ()
-    # When installing set the first RPATH entry to the library location relative to the executable
+    # When installing/packaging set the first RPATH entry to the library location relative to the executable
     set (CMAKE_INSTALL_RPATH ${ORIGIN}/../../../lib${LIB_SUFFIX}/Urho3D)    # The library location is based on SDK install destination as defined above
     # The second entry to the install destination of the library, if the destination location is not in the system default search path
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
