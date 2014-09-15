@@ -48,7 +48,7 @@ install:
   - travis_retry sudo apt-get install -q -y --no-install-recommends libasound2-dev
   - if [ $LINUX ] && [ ! $URHO3D_64BIT ]; then travis_retry sudo apt-get remove -q -y gvfs-daemons && travis_retry sudo apt-get install -q -y libxrandr-dev:i386 libglapi-mesa:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; fi
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo apt-get install -q -y --no-install-recommends doxygen graphviz; fi
-  - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
+  - if [ $WINDOWS ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 binutils-mingw-w64 binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 g++-multilib && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - if [ $PACKAGE_UPLOAD ] && [ "$LINUX" -o "$RPI" ]; then travis_retry sudo apt-get install -q -y rpm; fi
   - if [ "$LINUX" -a "$URHO3D_64BIT" ]; then bash -e /etc/init.d/xvfb start; fi
   - free -tm
