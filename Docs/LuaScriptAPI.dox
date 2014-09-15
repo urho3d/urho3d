@@ -2,9 +2,9 @@ namespace Urho3D
 {
 
 /**
-\page LuaScriptAPI Lua Scripting API
+\page LuaScriptAPI Lua scripting API
 
-\section LuaScriptAPI_TableOfContents Table of Contents
+\section LuaScriptAPI_TableOfContents Table of contents
 
 \ref LuaScriptAPI_ClassList "Class list"<br>
 \ref LuaScriptAPI_Classes "Classes"<br>
@@ -2323,7 +2323,8 @@ Methods:
 - void SetPixelInt(int x, int y, int z, unsigned uintColor)
 - bool LoadColorLUT(Deserializer& source)
 - bool LoadColorLUT(const String fileName)
-- void FlipVertical()
+- bool FlipHorizontal()
+- bool FlipVertical()
 - bool Resize(int width, int height)
 - void Clear(const Color& color)
 - void ClearInt(unsigned uintColor)

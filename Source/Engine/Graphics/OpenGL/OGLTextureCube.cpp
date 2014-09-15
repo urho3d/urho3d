@@ -42,6 +42,20 @@
 namespace Urho3D
 {
 
+static const char* cubeMapLayoutNames[] = {
+    "horizontal",
+    "horizontalnvidia",
+    "horizontalcross",
+    "verticalcross",
+    "blender",
+    0
+};
+
+static SharedPtr<Image> GetTileImage(Image* src, int tileX, int tileY, int tileWidth, int tileHeight)
+{
+    return SharedPtr<Image>(src->GetSubimage(IntRect(tileX * tileWidth, tileY * tileHeight, (tileX + 1) * tileWidth, (tileY + 1) * tileHeight)));
+}
+
 TextureCube::TextureCube(Context* context) :
     Texture(context)
 {
@@ -97,23 +111,101 @@ bool TextureCube::BeginLoad(Deserializer& source)
     loadImages_.Clear();
 
     XMLElement textureElem = loadParameters_->GetRoot();
-    XMLElement faceElem = textureElem.GetChild("face");
-    while (faceElem)
+    XMLElement imageElem = textureElem.GetChild("image");
+    // Single image and multiple faces with layout
+    if (imageElem)
     {
-        String name = faceElem.GetAttribute("name");
-        
-        String faceTexPath, faceTexName, faceTexExt;
-        SplitPath(name, faceTexPath, faceTexName, faceTexExt);
+        String name = imageElem.GetAttribute("name");
         // If path is empty, add the XML file path
-        if (faceTexPath.Empty())
+        if (GetPath(name).Empty())
             name = texPath + name;
         
-        loadImages_.Push(cache->GetTempResource<Image>(name));
-        cache->StoreResourceDependency(this, name);
+        CubeMapLayout layout = (CubeMapLayout)GetStringListIndex(imageElem.GetAttribute("layout").CString(), cubeMapLayoutNames, CML_HORIZONTAL);
+        SharedPtr<Image> image = cache->GetTempResource<Image>(name);
+        if (!image)
+            return false;
         
-        faceElem = faceElem.GetNext("face");
+        int faceWidth, faceHeight;
+        loadImages_.Resize(MAX_CUBEMAP_FACES);
+        
+        switch (layout)
+        {
+        case CML_HORIZONTAL:
+            faceWidth = image->GetWidth() / MAX_CUBEMAP_FACES;
+            faceHeight = image->GetHeight();
+            loadImages_[FACE_POSITIVE_Z] = GetTileImage(image, 0, 0, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_X] = GetTileImage(image, 1, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Z] = GetTileImage(image, 2, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_X] = GetTileImage(image, 3, 0, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_Y] = GetTileImage(image, 4, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Y] = GetTileImage(image, 5, 0, faceWidth, faceHeight);
+            break;
+            
+        case CML_HORIZONTALNVIDIA:
+            faceWidth = image->GetWidth() / MAX_CUBEMAP_FACES;
+            faceHeight = image->GetHeight();
+            for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+                loadImages_[i] = GetTileImage(image, i, 0, faceWidth, faceHeight);
+            break;
+            
+        case CML_HORIZONTALCROSS:
+            faceWidth = image->GetWidth() / 4;
+            faceHeight = image->GetHeight() / 3;
+            loadImages_[FACE_POSITIVE_Y] = GetTileImage(image, 1, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_X] = GetTileImage(image, 0, 1, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_Z] = GetTileImage(image, 1, 1, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_X] = GetTileImage(image, 2, 1, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Z] = GetTileImage(image, 3, 1, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Y] = GetTileImage(image, 1, 2, faceWidth, faceHeight);
+            break;
+            
+        case CML_VERTICALCROSS:
+            faceWidth = image->GetWidth() / 3;
+            faceHeight = image->GetHeight() / 4;
+            loadImages_[FACE_POSITIVE_Y] = GetTileImage(image, 1, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_X] = GetTileImage(image, 0, 1, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_Z] = GetTileImage(image, 1, 1, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_X] = GetTileImage(image, 2, 1, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Y] = GetTileImage(image, 1, 2, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Z] = GetTileImage(image, 1, 3, faceWidth, faceHeight);
+            if (loadImages_[FACE_NEGATIVE_Z])
+            {
+                loadImages_[FACE_NEGATIVE_Z]->FlipVertical();
+                loadImages_[FACE_NEGATIVE_Z]->FlipHorizontal();
+            }
+            break;
+            
+        case CML_BLENDER:
+            faceWidth = image->GetWidth() / 3;
+            faceHeight = image->GetHeight() / 2;
+            loadImages_[FACE_NEGATIVE_X] = GetTileImage(image, 0, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Z] = GetTileImage(image, 1, 0, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_X] = GetTileImage(image, 2, 0, faceWidth, faceHeight);
+            loadImages_[FACE_NEGATIVE_Y] = GetTileImage(image, 0, 1, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_Y] = GetTileImage(image, 1, 1, faceWidth, faceHeight);
+            loadImages_[FACE_POSITIVE_Z] = GetTileImage(image, 2, 1, faceWidth, faceHeight);
+            break;
+        }
     }
-
+    // Face per image
+    else
+    {
+        XMLElement faceElem = textureElem.GetChild("face");
+        while (faceElem)
+        {
+            String name = faceElem.GetAttribute("name");
+            
+            // If path is empty, add the XML file path
+            if (GetPath(name).Empty())
+                name = texPath + name;
+            
+            loadImages_.Push(cache->GetTempResource<Image>(name));
+            cache->StoreResourceDependency(this, name);
+            
+            faceElem = faceElem.GetNext("face");
+        }
+    }
+    
     // Precalculate mip levels if async loading
     if (GetAsyncLoadState() == ASYNC_LOADING)
     {

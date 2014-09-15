@@ -1,5 +1,5 @@
-﻿Urho3D - cross-platform rendering and game engine
--------------------------------------------------
+Urho3D - cross-platform 2D and 3D game engine
+---------------------------------------------
 
 http://urho3d.github.io/
 
@@ -442,10 +442,10 @@ cmake_xxxx batch files or shell scripts.
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check      |
 |                     | | LuaJIT's CMakeLists.txt for more options)            |
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)         |
-|URHO3D_PHYSICS       |1|Enable Physics support                                |
-|URHO3D_NAVIGATION    |1|Enable Navigation support                             |
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua        |
 |                     | | scripting support is enabled only)                   |
+|URHO3D_PHYSICS       |1|Enable Physics support                                |
+|URHO3D_NAVIGATION    |1|Enable Navigation support                             |
 |URHO3D_SAMPLES       |0|Build sample applications                             |
 |URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only;         |
 |                     | | on Android only build Lua standalone tools)          |
@@ -478,6 +478,10 @@ cmake_xxxx batch files or shell scripts.
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration to be generated     |
 |                     | | (Makefile generator only), possible values are       |
 |                     | | Release (*default), Debug, and RelWithDebInfo        |
+|CMAKE_OSX_           |-|Specify Mac OS X deployment target (OSX build only);  |
+| DEPLOYMENT_TARGET   | | default to current running OS X if not specified     |
+|IPHONEOS_            |-|Specify iPhone OS deployment target (iOS build only); |
+| DEPLOYMENT_TARGET   | | default to latest installed iOS SDK if not specified |
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible     |
 |                     | | values are armeabi-v7a (*default) and armeabi        |
 |---------------------|-|------------------------------------------------------|

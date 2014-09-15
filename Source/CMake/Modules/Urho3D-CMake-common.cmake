@@ -517,6 +517,12 @@ macro (setup_target)
     string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${STRIP_LIBS})
 
+    # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
+    # The iOS deployment target is set using the corresponding Xcode attribute as target property instead
+    if (IOS AND IPHONEOS_DEPLOYMENT_TARGET)
+        set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${IPHONEOS_DEPLOYMENT_TARGET})
+    endif ()
+
     # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red as if they are not yet built
     if (XCODE)
         file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)

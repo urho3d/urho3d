@@ -4318,7 +4318,8 @@ class Image
 // Methods:
 void Clear(const Color&);
 void ClearInt(uint);
-void FlipVertical();
+bool FlipHorizontal();
+bool FlipVertical();
 Color GetPixel(int, int) const;
 Color GetPixel(int, int, int) const;
 Color GetPixelBilinear(float, float) const;
@@ -4330,7 +4331,7 @@ bool Load(File);
 bool Load(VectorBuffer&);
 bool LoadColorLUT(File);
 bool LoadColorLUT(VectorBuffer&);
-void Resize(int, int);
+bool Resize(int, int);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SaveBMP(const String&) const;

@@ -151,6 +151,8 @@ A number of build options can be defined explicitly when invoking the above cmak
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua scripting support is enabled only)|
+|URHO3D_PHYSICS       |1|Enable Physics support|
+|URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_SAMPLES       |0|Build sample applications|
 |URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only; on Android only build Lua standalone tools)|
 |URHO3D_EXTRAS        |0|Build extras (Desktop and RPI only)|
@@ -169,6 +171,8 @@ A number of build options can be defined explicitly when invoking the above cmak
 |URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration to be generated (Makefile generator only), possible values are Release (\*default), Debug, and RelWithDebInfo|
+|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
+|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are armeabi-v7a (\*default) and armeabi|
 
 Note that build option values specified via command line are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. Once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly setting it via command line. That is, simply by NOT passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.

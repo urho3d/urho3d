@@ -64,30 +64,34 @@ task :android do
   android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
+# Usage: NOT intended to be used manually (if you insist then try: rake ci)
 desc 'Configure, build, and test Urho3D project'
-task :travis_ci do
-  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW build)
-  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && ENV['WINDOWS'])
+task :ci do
+  # Unshallow the clone's history when necessary
+  if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && ENV['RELEASE_TAG'].empty?
+    system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
+  end
+  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW and Android build)
+  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && (ENV['WINDOWS'] || ENV['ANDROID']))
     $configuration = 'Release'
     $testing = 0
   else
     $configuration = 'Debug'
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
-    $testing = (ENV['OSX'].to_i != 1 && ENV['URHO3D_64BIT'] && ENV['WINDOWS'].to_i != 1) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
+    $testing = (ENV['LINUX'] && ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
   end
   if ENV['XCODE']
     # xctool or xcodebuild
-    xcode_travis_ci
+    xcode_ci
   else
     # GCC or Clang
-    makefile_travis_ci
+    makefile_ci
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_site_update)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_site_update)
 desc 'Update site documentation to GitHub Pages'
-task :travis_ci_site_update do
+task :ci_site_update do
   # Pull or clone
   system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
   # Update credits from Readme.txt to about.md
@@ -95,14 +99,14 @@ task :travis_ci_site_update do
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
-  release = ENV['TRAVIS_TAG'].empty? ? 'HEAD' : ENV['TRAVIS_TAG'];
+  release = ENV['RELEASE_TAG'].empty? ? 'HEAD' : ENV['RELEASE_TAG'];
   unless release == 'HEAD'
     system "mkdir -p doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
     append_new_release release, 'doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
-  system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
   system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
   # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
@@ -120,16 +124,17 @@ task :travis_ci_site_update do
   system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake travis_ci_rebase)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
 desc 'Rebase Android-CI and OSX-CI mirror branches'
-task :travis_ci_rebase do
+task :ci_rebase do
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
+  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
   system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: rake travis_ci_package_upload)
+# Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
 desc 'Make binary package and upload it to a designated central hosting server'
-task :travis_ci_package_upload do
+task :ci_package_upload do
   if ENV['XCODE']
     $configuration = 'Release'
     $testing = 0
@@ -176,25 +181,24 @@ task :travis_ci_package_upload do
   end
   # Determine the upload location
   setup_digital_keys
-  if ENV['TRAVIS_TAG'].empty?
+  if ENV['RELEASE_TAG'].empty?
     upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/Snapshots"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
-      system 'SNAPSHOP_VER=`git describe $TRAVIS_COMMIT`; export SNAPSHOP_VER && wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOP_VER-Source-snapshot.zip' or abort 'Failed to get source packages'
-      # Only keep the snapshots from the last +/- 50 revisions
-      # The package revisions and their creation time may not always be in perfect chronological order due to Travis-CI build latency, so sort the final result one more time in order to get a unique revision removal list
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +51 |sort |uniq
+      system "export SNAPSHOT_VER=$(git describe $TRAVIS_COMMIT |ruby -pe 'gsub(/-(?!g)/, %q{.})'); wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.zip" or abort 'Failed to get source packages'
+      # Only keep the snapshots from the last 30 revisions
+      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31
 cd #{upload_dir}
-ls -1t
+ls -1r
 bye
 EOF
 ); do echo rm #{upload_dir}/${v}*; done |sftp -b - urho-travis-ci@frs.sourceforge.net" or abort 'Failed to housekeep snapshots'
     end
   else
-    upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/#{ENV['TRAVIS_TAG']}"
+    upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/#{ENV['RELEASE_TAG']}"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
-      system 'wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$TRAVIS_TAG.tar.gz -O Urho3D-$TRAVIS_TAG-Source.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$TRAVIS_TAG.zip -O Urho3D-$TRAVIS_TAG-Source.zip' or abort 'Failed to get source packages'
+      system 'wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.tar.gz -O Urho3D-$RELEASE_TAG-Source.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.zip -O Urho3D-$RELEASE_TAG-Source.zip' or abort 'Failed to get source packages'
     end
     # Make sure the release directory exists remotely, do this in all the build jobs as we don't know which one would start uploading first
     system "sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
@@ -202,8 +206,6 @@ mkdir #{upload_dir}
 bye
 EOF" or abort 'Failed to create release directory remotely'
   end
-  # Upload the package
-  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
   if ENV['SITE_UPDATE']
     # Upload the source package
     system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload source package'
@@ -211,6 +213,8 @@ EOF" or abort 'Failed to create release directory remotely'
     system 'for f in Readme.txt License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
     system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
   end
+  # Upload the package
+  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
@@ -260,7 +264,7 @@ add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_Physic
 EOF" or abort 'Failed to create new project using Urho3D as external library'
 end
 
-def makefile_travis_ci
+def makefile_ci
   if ENV['WINDOWS']
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
@@ -321,8 +325,11 @@ end
 def android_prepare_device api, name = 'test'
   system 'if ! ps |grep -cq adb; then adb start-server; fi'
   if `adb devices |tail -n +2 |head -1`.chomp.empty?
-    # Don't have any attached then force create a new virtual one and start it
-    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim'; else export OPTS='-gpu on'; fi && echo 'no' |android create avd --force -n #{name} -t android-#{api} && emulator -avd #{name} $OPTS &"
+    # Don't have any (virtual) device attached, try to attach the named device (create the named device as AVD if necessary)
+    if !system "android list avd |grep -cq 'Name: #{name}$'"
+      system "echo 'no' |android create avd -n #{name} -t android-#{api}" or abort "Failed to create '#{name}' Android virtual device"
+    end
+    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
   else
     # Otherwise, try to unlock it just in case it is locked
     system "adb shell 'input keyevent 82; input keyevent 4'"
@@ -367,12 +374,13 @@ EOF") { |stdout| echo = false; while output = stdout.gets do if echo && /#\s#/ !
   end
 end
 
-def xcode_travis_ci
+def xcode_ci
   if ENV['IOS']
     # IOS platform does not support LuaJIT
     jit = ''
     amalg = ''
     platform_prefix = 'ios-'
+    deployment_target = "-DIPHONEOS_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
     # Lua on IOS build requires tolua++ tool to be built natively first
     system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
     xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
@@ -380,12 +388,13 @@ def xcode_travis_ci
     jit = 'JIT'
     amalg = '-DURHO3D_AMALG=1'
     platform_prefix = ''
+    deployment_target = "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
   end
-  system "./cmake_macosx.sh -DIOS=$IOS -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 

@@ -1963,7 +1963,7 @@ namespace Urho3D
 
 \page ScriptAPI Scripting API
 
-\section ScriptAPI_TableOfContents Table of Contents
+\section ScriptAPI_TableOfContents Table of contents
 \ref ScriptAPI_ClassList "Class list"<br>
 \ref ScriptAPI_Classes "Classes"<br>
 \ref ScriptAPI_Enums "Enumerations"<br>
@@ -1971,7 +1971,7 @@ namespace Urho3D
 \ref ScriptAPI_GlobalProperties "Global properties"<br>
 \ref ScriptAPI_GlobalConstants "Global constants"<br>
 
-\section ScriptAPI_ClassList Class List
+\section ScriptAPI_ClassList Class list
 
 <a href="#Class_Animatable"><b>Animatable</b></a>
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
@@ -5875,7 +5875,8 @@ Methods:
 
 - void Clear(const Color&)
 - void ClearInt(uint)
-- void FlipVertical()
+- bool FlipHorizontal()
+- bool FlipVertical()
 - Color GetPixel(int, int) const
 - Color GetPixel(int, int, int) const
 - Color GetPixelBilinear(float, float) const
@@ -5887,7 +5888,7 @@ Methods:
 - bool Load(VectorBuffer&)
 - bool LoadColorLUT(File@)
 - bool LoadColorLUT(VectorBuffer&)
-- void Resize(int, int)
+- bool Resize(int, int)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SaveBMP(const String&) const

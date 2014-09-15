@@ -473,7 +473,7 @@ function writeClass(file, class)
 end
 
 function writeTableOfContents(file)
-  file:write("\n\\section LuaScriptAPI_TableOfContents Table of Contents\n\n")
+  file:write("\n\\section LuaScriptAPI_TableOfContents Table of contents\n\n")
   file:write("\\ref LuaScriptAPI_ClassList \"Class list\"<br>\n")
   file:write("\\ref LuaScriptAPI_Classes \"Classes\"<br>\n")
   file:write("\\ref LuaScriptAPI_Enums \"Enumerations\"<br>\n")
@@ -607,7 +607,7 @@ function classPackage:print()
   file:write("{\n")
   file:write("\n")
   file:write("/**\n")
-  file:write("\\page LuaScriptAPI Lua Scripting API\n")
+  file:write("\\page LuaScriptAPI Lua scripting API\n")
 
   local i = 1
   while self[i] do

@@ -71,7 +71,8 @@ endif ()
 set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
 set (DEST_SHARE_DIR share${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
-set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # Note to Linux package maintainer: ${PATH_SUFFIX} for library could be patched out if the suffix is not desirable
+# Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desirable, but if so then the RPATH setting below needs to be adjusted accordingly
+set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 # Install application launcher scripts
@@ -86,7 +87,7 @@ file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
 install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # Setup package variables
-set (URHO3D_DESCRIPTION "Urho3D is a lightweight, cross-platform rendering and game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org).")
+set (URHO3D_DESCRIPTION "Urho3D is a lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org).")
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
 set (URHO3D_URL "https://github.com/urho3d/Urho3D")
 set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
@@ -127,20 +128,24 @@ include (CPack)
 
 # Setup RPATH settings
 if (NOT WIN32)
-    if (APPLE AND (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12))
-        set (CMAKE_MACOSX_RPATH TRUE)
-        # Note for older version CMake users, you may need to use DYLD_LIBRARY_PATH environment variable to specify the path where Urho3D shared library is being installed
-        # when attempting to execute the samples or tools installed by Urho3D SDK with SHARED lib type
-    endif ()
+    # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
+    # But don't set them yet in the build tree
     set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    if (APPLE)
+        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
+            set (CMAKE_MACOSX_RPATH TRUE)
+        endif ()
+        set (ORIGIN @loader_path)
+    else ()
+        set (ORIGIN $ORIGIN)
+    endif ()
+    # When installing/packaging set the first RPATH entry to the library location relative to the executable
+    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../../../lib${LIB_SUFFIX}${PATH_SUFFIX})    # The library location is based on SDK install destination as defined above
+    # The second entry to the install destination of the library, if the destination location is not in the system default search path
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
     if (isSystemDir STREQUAL -1)
-        # If SDK installation location is not in the system default search paths then add the library installation location to target's RPATH
-        set (CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
-        # Note for Linux users, you should not need to use LD_LIBRARY_PATH environment variable pointing to Urho3D shared library path anymore when executing installed targets
-        # even when the shared library is installed on a non-default installation location
+        list (APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
     endif ()
 endif ()
 

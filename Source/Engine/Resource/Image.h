@@ -119,8 +119,10 @@ public:
     void SetPixelInt(int x, int y, int z, unsigned uintColor);
     /// Load as color LUT. Return true if successful.
     bool LoadColorLUT(Deserializer& source);
-    /// Flip image vertically.
-    void FlipVertical();
+    /// Flip image horizontally. Return true if successful.
+    bool FlipHorizontal();
+    /// Flip image vertically. Return true if successful.
+    bool FlipVertical();
     /// Resize image by bilinear resampling. Return true if successful.
     bool Resize(int width, int height);
     /// Clear the image with a color.
@@ -168,7 +170,7 @@ public:
     SharedPtr<Image> GetNextLevel() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
-    /// Return subimage from the image or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the subimage yourself.
+    /// Return subimage from the image by the defined rect or null if failed. 3D images are not supported. You must free the subimage yourself.
     Image* GetSubimage(const IntRect& rect) const;
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;

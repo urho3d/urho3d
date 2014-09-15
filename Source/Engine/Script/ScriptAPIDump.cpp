@@ -323,7 +323,7 @@ void Script::DumpAPI(DumpMode mode)
     
     if (mode == DOXYGEN)
     {
-        Log::WriteRaw("\\section ScriptAPI_TableOfContents Table of Contents\n"
+        Log::WriteRaw("\\section ScriptAPI_TableOfContents Table of contents\n"
             "\\ref ScriptAPI_ClassList \"Class list\"<br>\n"
             "\\ref ScriptAPI_Classes \"Classes\"<br>\n"
             "\\ref ScriptAPI_Enums \"Enumerations\"<br>\n"
@@ -331,7 +331,7 @@ void Script::DumpAPI(DumpMode mode)
             "\\ref ScriptAPI_GlobalProperties \"Global properties\"<br>\n"
             "\\ref ScriptAPI_GlobalConstants \"Global constants\"<br>\n\n");
 
-        Log::WriteRaw("\\section ScriptAPI_ClassList Class List\n\n");
+        Log::WriteRaw("\\section ScriptAPI_ClassList Class list\n\n");
         
         for (unsigned i = 0; i < sortedTypes.Size(); ++i)
         {
