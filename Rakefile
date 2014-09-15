@@ -189,7 +189,7 @@ task :ci_package_upload do
       # Only keep the snapshots from the last 30 revisions
       system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +31
 cd #{upload_dir}
-ls -1t
+ls -1r
 bye
 EOF
 ); do echo rm #{upload_dir}/${v}*; done |sftp -b - urho-travis-ci@frs.sourceforge.net" or abort 'Failed to housekeep snapshots'
