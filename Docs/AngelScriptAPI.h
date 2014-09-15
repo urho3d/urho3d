@@ -4318,6 +4318,7 @@ class Image
 // Methods:
 void Clear(const Color&);
 void ClearInt(uint);
+bool FlipHorizontal();
 bool FlipVertical();
 Color GetPixel(int, int) const;
 Color GetPixel(int, int, int) const;
