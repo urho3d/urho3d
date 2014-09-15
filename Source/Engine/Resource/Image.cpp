@@ -649,6 +649,73 @@ bool Image::LoadColorLUT(Deserializer& source)
     return true;
 }
 
+bool Image::FlipHorizontal()
+{
+    if (!data_)
+        return false;
+
+    if (depth_ > 1)
+    {
+        LOGERROR("FlipHorizontal not supported for 3D images");
+        return false;
+    }
+
+    if (!IsCompressed())
+    {
+        SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
+        unsigned rowSize = width_ * components_;
+
+        for (int y = 0; y < height_; ++y)
+        {
+            for (int x = 0; x < width_; ++x)
+            {
+                for (unsigned c = 0; c < components_; ++c)
+                    newData[y * rowSize + x * components_ + c] = data_[y * rowSize + (width_ - x - 1) * components_ + c];
+            }
+        }
+        
+        data_ = newData;
+    }
+    else
+    {
+        if (compressedFormat_ > CF_DXT5)
+        {
+            LOGERROR("FlipHorizontal not yet implemented for other compressed formats than DXT1,3,5");
+            return false;
+        }
+        
+        // Memory use = combined size of the compressed mip levels
+        SharedArrayPtr<unsigned char> newData(new unsigned char[GetMemoryUse()]);
+        unsigned dataOffset = 0;
+        
+        for (unsigned i = 0; i < numCompressedLevels_; ++i)
+        {
+            CompressedLevel level = GetCompressedLevel(i);
+            if (!level.data_)
+            {
+                LOGERROR("Got compressed level with no data, aborting horizontal flip");
+                return false;
+            }
+            
+            for (unsigned y = 0; y < level.rows_; ++y)
+            {
+                for (unsigned x = 0; x < level.rowSize_; x += level.blockSize_)
+                {
+                    unsigned char* src = level.data_ + y * level.rowSize_ + (level.rowSize_ - level.blockSize_ - x);
+                    unsigned char* dest = newData.Get() + y * level.rowSize_ + x;
+                    FlipBlockHorizontal(dest, src, compressedFormat_);
+                }
+            }
+            
+            dataOffset += level.dataSize_;
+        }
+        
+        data_ = newData;
+    }
+    
+    return true;
+}
+
 bool Image::FlipVertical()
 {
     if (!data_)

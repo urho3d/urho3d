@@ -169,7 +169,10 @@ bool TextureCube::BeginLoad(Deserializer& source)
             loadImages_[FACE_NEGATIVE_Y] = GetTileImage(image, 1, 2, faceWidth, faceHeight);
             loadImages_[FACE_NEGATIVE_Z] = GetTileImage(image, 1, 3, faceWidth, faceHeight);
             if (loadImages_[FACE_NEGATIVE_Z])
+            {
                 loadImages_[FACE_NEGATIVE_Z]->FlipVertical();
+                loadImages_[FACE_NEGATIVE_Z]->FlipHorizontal();
+            }
             break;
             
         case CML_BLENDER:

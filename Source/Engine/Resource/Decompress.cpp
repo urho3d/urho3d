@@ -996,4 +996,69 @@ void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat
     }
 }
 
+static unsigned char FlipDXT1Horizontal(unsigned char src)
+{
+    return ((src & 0x3) << 6) | ((src & 0xc) << 2) | ((src & 0x30) >> 2) | ((src & 0xc0) >> 6);
+}
+
+static unsigned FlipDXT5AlphaHorizontal(unsigned src)
+{
+    // Works on 2 lines at a time
+    return ((src & 0x7) << 9) | ((src & 0x38) << 3) | ((src & 0x1c0) >> 3) | ((src & 0xe00) >> 9) |
+        ((src & 0x7000) << 9) | ((src & 0x38000) << 3) | ((src & 0x1c0000) >> 3) | ((src & 0xe00000) >> 9);
+}
+
+void FlipBlockHorizontal(unsigned char* dest, unsigned char* src, CompressedFormat format)
+{
+    switch (format)
+    {
+    case CF_DXT1:
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            dest[i] = src[i];
+            dest[i + 4] = FlipDXT1Horizontal(src[i + 4]);
+        }
+        break;
+        
+    case CF_DXT3:
+        for (unsigned i = 0; i < 8; i += 2)
+        {
+            dest[i] = ((src[i+1] & 0xf0) >> 4) | ((src[i+1] & 0xf) << 4);
+            dest[i+1] = ((src[i] & 0xf0) >> 4) | ((src[i] & 0xf) << 4);
+        }
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            dest[i + 8] = src[i + 8];
+            dest[i + 12] = FlipDXT1Horizontal(src[i + 12]);
+        }
+        break;
+        
+    case CF_DXT5:
+        dest[0] = src[0];
+        dest[1] = src[1];
+        {
+            unsigned a1 = src[2] | ((unsigned)src[3] << 8) | ((unsigned)src[4] << 16);
+            unsigned a2 = src[5] | ((unsigned)src[6] << 8) | ((unsigned)src[7] << 16);
+            unsigned b1 = FlipDXT5AlphaHorizontal(a1);
+            unsigned b2 = FlipDXT5AlphaHorizontal(a2);
+            dest[2] = b1 & 0xff;
+            dest[3] = (b1 >> 8) & 0xff;
+            dest[4] = (b1 >> 16) & 0xff;
+            dest[5] = b2 & 0xff;
+            dest[6] = (b2 >> 8) & 0xff;
+            dest[7] = (b2 >> 16) & 0xff;
+        }
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            dest[i + 8] = src[i + 8];
+            dest[i + 12] = FlipDXT1Horizontal(src[i + 12]);
+        }
+        break;
+        
+    default:
+        /// ETC1 & PVRTC not yet implemented
+        break;
+    }
+}
+
 }

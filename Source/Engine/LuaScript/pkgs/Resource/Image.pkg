@@ -26,6 +26,7 @@ class Image : public Resource
     void SetPixelInt(int x, int y, int z, unsigned uintColor);
     bool LoadColorLUT(Deserializer& source);
     tolua_outside bool ImageLoadColorLUT @ LoadColorLUT(const String fileName);
+    bool FlipHorizontal();
     bool FlipVertical();
     bool Resize(int width, int height);
     void Clear(const Color& color);
