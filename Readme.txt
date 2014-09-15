@@ -478,6 +478,10 @@ cmake_xxxx batch files or shell scripts.
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration to be generated     |
 |                     | | (Makefile generator only), possible values are       |
 |                     | | Release (*default), Debug, and RelWithDebInfo        |
+|CMAKE_OSX_           |-|Specify Mac OS X deployment target (OSX build only);  |
+| DEPLOYMENT_TARGET   | | default to current running OS X if not specified     |
+|IPHONEOS_            |-|Specify iPhone OS deployment target (iOS build only); |
+| DEPLOYMENT_TARGET   | | default to latest installed iOS SDK if not specified |
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible     |
 |                     | | values are armeabi-v7a (*default) and armeabi        |
 |---------------------|-|------------------------------------------------------|
