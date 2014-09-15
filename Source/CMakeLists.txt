@@ -71,7 +71,8 @@ endif ()
 set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
 set (DEST_SHARE_DIR share${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
-set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # Note to Linux package maintainer: ${PATH_SUFFIX} for library could be patched out if the suffix is not desirable
+# Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desirable, but if so then the RPATH setting below needs to be adjusted accordingly
+set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 # Install application launcher scripts
@@ -140,7 +141,7 @@ if (NOT WIN32)
         set (ORIGIN $ORIGIN)
     endif ()
     # When installing/packaging set the first RPATH entry to the library location relative to the executable
-    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../../../lib${LIB_SUFFIX}/Urho3D)    # The library location is based on SDK install destination as defined above
+    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../../../lib${LIB_SUFFIX}${PATH_SUFFIX})    # The library location is based on SDK install destination as defined above
     # The second entry to the install destination of the library, if the destination location is not in the system default search path
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
     if (isSystemDir STREQUAL -1)
