@@ -490,27 +490,4 @@ public:
 /// Multiply a 3x4 matrix with a scalar.
 inline Matrix3x4 operator * (float lhs, const Matrix3x4& rhs) { return rhs * lhs; }
 
-/// Multiply a 3x4 matrix with a 4x4 matrix.
-inline Matrix4 operator * (const Matrix4& lhs, const Matrix3x4& rhs)
-{
-    return Matrix4(
-        lhs.m00_ * rhs.m00_ + lhs.m01_ * rhs.m10_ + lhs.m02_ * rhs.m20_,
-        lhs.m00_ * rhs.m01_ + lhs.m01_ * rhs.m11_ + lhs.m02_ * rhs.m21_,
-        lhs.m00_ * rhs.m02_ + lhs.m01_ * rhs.m12_ + lhs.m02_ * rhs.m22_,
-        lhs.m00_ * rhs.m03_ + lhs.m01_ * rhs.m13_ + lhs.m02_ * rhs.m23_ + lhs.m03_,
-        lhs.m10_ * rhs.m00_ + lhs.m11_ * rhs.m10_ + lhs.m12_ * rhs.m20_,
-        lhs.m10_ * rhs.m01_ + lhs.m11_ * rhs.m11_ + lhs.m12_ * rhs.m21_,
-        lhs.m10_ * rhs.m02_ + lhs.m11_ * rhs.m12_ + lhs.m12_ * rhs.m22_,
-        lhs.m10_ * rhs.m03_ + lhs.m11_ * rhs.m13_ + lhs.m12_ * rhs.m23_ + lhs.m13_,
-        lhs.m20_ * rhs.m00_ + lhs.m21_ * rhs.m10_ + lhs.m22_ * rhs.m20_,
-        lhs.m20_ * rhs.m01_ + lhs.m21_ * rhs.m11_ + lhs.m22_ * rhs.m21_,
-        lhs.m20_ * rhs.m02_ + lhs.m21_ * rhs.m12_ + lhs.m22_ * rhs.m22_,
-        lhs.m20_ * rhs.m03_ + lhs.m21_ * rhs.m13_ + lhs.m22_ * rhs.m23_ + lhs.m23_,
-        lhs.m30_ * rhs.m00_ + lhs.m31_ * rhs.m10_ + lhs.m32_ * rhs.m20_,
-        lhs.m30_ * rhs.m01_ + lhs.m31_ * rhs.m11_ + lhs.m32_ * rhs.m21_,
-        lhs.m30_ * rhs.m02_ + lhs.m31_ * rhs.m12_ + lhs.m32_ * rhs.m22_,
-        lhs.m30_ * rhs.m03_ + lhs.m31_ * rhs.m13_ + lhs.m32_ * rhs.m23_ + lhs.m33_
-    );
-}
-
 }

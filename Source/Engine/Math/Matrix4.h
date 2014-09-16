@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class Matrix3x4;
+
 /// 4x4 matrix for arbitrary linear transforms including projection.
 class URHO3D_API Matrix4
 {
@@ -316,6 +318,9 @@ public:
             m30_ * rhs.m03_ + m31_ * rhs.m13_ + m32_ * rhs.m23_ + m33_ * rhs.m33_
         );
     }
+    
+    /// Multiply with a 3x4 matrix.
+    Matrix4 operator * (const Matrix3x4& rhs) const;
     
     /// Set translation elements.
     void SetTranslation(const Vector3& translation)

@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Matrix3x4.h"
 #include "Matrix4.h"
 
 #include <cstdio>
@@ -37,6 +38,28 @@ const Matrix4 Matrix4::ZERO(
     0.0f, 0.0f, 0.0f, 0.0f);
 
 const Matrix4 Matrix4::IDENTITY;
+
+Matrix4 Matrix4::operator * (const Matrix3x4& rhs) const
+{
+    return Matrix4(
+        m00_ * rhs.m00_ + m01_ * rhs.m10_ + m02_ * rhs.m20_,
+        m00_ * rhs.m01_ + m01_ * rhs.m11_ + m02_ * rhs.m21_,
+        m00_ * rhs.m02_ + m01_ * rhs.m12_ + m02_ * rhs.m22_,
+        m00_ * rhs.m03_ + m01_ * rhs.m13_ + m02_ * rhs.m23_ + m03_,
+        m10_ * rhs.m00_ + m11_ * rhs.m10_ + m12_ * rhs.m20_,
+        m10_ * rhs.m01_ + m11_ * rhs.m11_ + m12_ * rhs.m21_,
+        m10_ * rhs.m02_ + m11_ * rhs.m12_ + m12_ * rhs.m22_,
+        m10_ * rhs.m03_ + m11_ * rhs.m13_ + m12_ * rhs.m23_ + m13_,
+        m20_ * rhs.m00_ + m21_ * rhs.m10_ + m22_ * rhs.m20_,
+        m20_ * rhs.m01_ + m21_ * rhs.m11_ + m22_ * rhs.m21_,
+        m20_ * rhs.m02_ + m21_ * rhs.m12_ + m22_ * rhs.m22_,
+        m20_ * rhs.m03_ + m21_ * rhs.m13_ + m22_ * rhs.m23_ + m23_,
+        m30_ * rhs.m00_ + m31_ * rhs.m10_ + m32_ * rhs.m20_,
+        m30_ * rhs.m01_ + m31_ * rhs.m11_ + m32_ * rhs.m21_,
+        m30_ * rhs.m02_ + m31_ * rhs.m12_ + m32_ * rhs.m22_,
+        m30_ * rhs.m03_ + m31_ * rhs.m13_ + m32_ * rhs.m23_ + m33_
+    );
+}
 
 void Matrix4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
