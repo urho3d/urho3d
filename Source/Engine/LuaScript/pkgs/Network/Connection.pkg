@@ -34,7 +34,7 @@ class Connection : public Object
     void ProcessPendingLatestData();
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
     
-    const VariantMap& GetIdentity() const;
+    VariantMap& GetIdentity();
     Scene* GetScene() const;
     const Controls& GetControls() const;
     const Vector3& GetPosition() const;
