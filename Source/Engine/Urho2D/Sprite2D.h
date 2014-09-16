@@ -91,7 +91,7 @@ private:
     IntRect rectangle_;
     /// Hot spot.
     Vector2 hotSpot_;
-    /// Offset.
+    /// Offset (for trimmed sprite).
     IntVector2 offset_;
     /// Sprite sheet.
     WeakPtr<SpriteSheet2D> spriteSheet_;
