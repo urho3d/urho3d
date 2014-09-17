@@ -704,7 +704,7 @@ String FileSystem::GetAppPreferencesDir(const String& org, const String& app) co
     char* prefPath = SDL_GetPrefPath(org.CString(), app.CString());
     if (prefPath)
     {
-        dir = String(prefPath);
+        dir = GetInternalPath(String(prefPath));
         SDL_free(prefPath);
     }
     else
