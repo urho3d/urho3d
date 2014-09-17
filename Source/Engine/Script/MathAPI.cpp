@@ -683,6 +683,8 @@ static void RegisterMatrix3x4(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Matrix3x4", "float m21", offsetof(Matrix3x4, m21_));
     engine->RegisterObjectProperty("Matrix3x4", "float m22", offsetof(Matrix3x4, m22_));
     engine->RegisterObjectProperty("Matrix3x4", "float m23", offsetof(Matrix3x4, m23_));
+    
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 opMul(const Matrix3x4&) const", asMETHODPR(Matrix4, operator *, (const Matrix3x4&) const, Matrix4), asCALL_THISCALL);
 }
 
 static void ConstructPlane(Plane* ptr)

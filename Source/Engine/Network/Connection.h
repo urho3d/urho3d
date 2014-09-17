@@ -151,7 +151,7 @@ public:
     /// Return the kNet message connection.
     kNet::MessageConnection* GetMessageConnection() const;
     /// Return client identity.
-    const VariantMap& GetIdentity() const { return identity_; }
+    VariantMap& GetIdentity() { return identity_; }
     /// Return the scene used by this connection.
     Scene* GetScene() const;
     /// Return the client controls of this connection.

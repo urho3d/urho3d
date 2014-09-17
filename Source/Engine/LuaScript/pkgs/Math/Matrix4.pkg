@@ -1,6 +1,5 @@
 $#include "Matrix4.h"
 
-
 class Matrix4
 {
     Matrix4();
@@ -11,18 +10,19 @@ class Matrix4
             float v20, float v21, float v22, float v23,
             float v30, float v31, float v32, float v33);
     ~Matrix4();
-    
+
     bool operator == (const Matrix4& rhs) const;
-    
+
     Vector3 operator * (const Vector3& rhs) const;
     Vector4 operator * (const Vector4& rhs) const;
     
     Matrix4 operator + (const Matrix4& rhs) const;
     Matrix4 operator - (const Matrix4& rhs) const;
-    
+
     Matrix4 operator * (float rhs) const;
     Matrix4 operator * (const Matrix4& rhs) const;
-    
+    Matrix4 operator * (const Matrix3x4& rhs) const;
+
     void SetTranslation(const Vector3& translation);
     void SetRotation(const Matrix3& rotation);
     void SetScale(const Vector3& scale);
@@ -62,3 +62,4 @@ class Matrix4
     static const Matrix4 ZERO;
     static const Matrix4 IDENTITY;
 };
+
