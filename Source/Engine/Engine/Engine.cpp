@@ -504,6 +504,11 @@ void Engine::SetAutoExit(bool enable)
     autoExit_ = enable;
 }
 
+void Engine::SetNextTimeStep(float seconds)
+{
+    timeStep_ = Max(seconds, 0.0f);
+}
+
 void Engine::Exit()
 {
 #if defined(IOS)

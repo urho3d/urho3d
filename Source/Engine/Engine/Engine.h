@@ -62,6 +62,8 @@ public:
     void SetPauseMinimized(bool enable);
     /// Set whether to exit automatically on exit request (window close button.)
     void SetAutoExit(bool enable);
+    /// Override timestep of the next frame. Should be called in between RunFrame() calls.
+    void SetNextTimeStep(float seconds);
     /// Close the graphics window and set the exit flag. No-op on iOS, as an iOS application can not legally exit.
     void Exit();
     /// Dump profiling information to the log.
@@ -71,6 +73,8 @@ public:
     /// Dump information of all memory allocations to the log. Supported in MSVC debug mode only.
     void DumpMemory();
     
+    /// Get timestep of the next frame. Updated by ApplyFrameLimit().
+    float GetNextTimeStep() const { return timeStep_; }
     /// Return the minimum frames per second.
     int GetMinFps() const { return minFps_; }
     /// Return the maximum frames per second.
