@@ -62,6 +62,10 @@ public:
         const T first_;
         /// Value.
         U second_;
+
+    private:
+        KeyValue(KeyValue &); // noncopyable
+        KeyValue &operator =(KeyValue &); // noncopyable
     };
     
     /// Hash map node.

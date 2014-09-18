@@ -56,6 +56,8 @@ public:
     ~MutexLock();
     
 private:
+    MutexLock(MutexLock &); // noncopyable
+    MutexLock &operator =(MutexLock &); // noncopyable
     /// Mutex reference.
     Mutex& mutex_;
 };

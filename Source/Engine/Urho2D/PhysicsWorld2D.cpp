@@ -390,6 +390,9 @@ public:
     }
 
 protected:
+    RayCastCallback(const RayCastCallback &); // noncopyable
+    RayCastCallback &operator =(const RayCastCallback &); // noncopyable
+
     // Physics raycast results.
     PODVector<PhysicsRaycastResult2D>& results_;
     // Start point.
@@ -444,6 +447,9 @@ public:
     }
 
 private:
+    SingleRayCastCallback(const SingleRayCastCallback &); // noncopyable
+    SingleRayCastCallback &operator =(const SingleRayCastCallback &); // noncopyable
+
     // Physics raycast result.
     PhysicsRaycastResult2D& result_;
     // Start point.
@@ -561,6 +567,8 @@ public:
     }
 
 private:
+    AabbQueryCallback(const AabbQueryCallback &); // noncopyable
+    AabbQueryCallback &operator =(const AabbQueryCallback &); // noncopyable
     // Results.
     PODVector<RigidBody2D*>& results_;
     // Collision mask.

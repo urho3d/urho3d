@@ -250,6 +250,9 @@ public:
     }
     
 private:
+    AsyncSystemRun(const AsyncSystemRun &); // noncopyable
+    AsyncSystemRun &operator =(const AsyncSystemRun &); // noncopyable
+
     /// File to run.
     String fileName_;
     /// Command line split in arguments.

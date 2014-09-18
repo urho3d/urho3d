@@ -63,6 +63,8 @@ public:
     }
     
 private:
+    ByteCodeSerializer(const ByteCodeSerializer &); // noncopyable
+    ByteCodeSerializer &operator =(const ByteCodeSerializer &); // noncopyable
     /// Destination stream.
     Serializer& dest_;
 };
@@ -89,6 +91,8 @@ public:
     }
     
 private:
+    ByteCodeDeserializer(const ByteCodeDeserializer &); // noncopyable
+    ByteCodeDeserializer &operator =(const ByteCodeDeserializer &); // noncopyable
     /// Source stream.
     MemoryBuffer& source_;
 };
@@ -157,7 +161,7 @@ bool ScriptFile::EndLoad()
     if (loadByteCode_)
     {
         MemoryBuffer buffer(loadByteCode_.Get(), loadByteCodeSize_);
-        ByteCodeDeserializer deserializer = ByteCodeDeserializer(buffer);
+        ByteCodeDeserializer deserializer(buffer);
 
         if (scriptModule_->LoadByteCode(&deserializer) >= 0)
         {
@@ -436,7 +440,7 @@ bool ScriptFile::SaveByteCode(Serializer& dest)
     if (compiled_)
     {
         dest.WriteFileID("ASBC");
-        ByteCodeSerializer serializer = ByteCodeSerializer(dest);
+        ByteCodeSerializer serializer(dest);
         return scriptModule_->SaveByteCode(&serializer, true) >= 0;
     }
     else
