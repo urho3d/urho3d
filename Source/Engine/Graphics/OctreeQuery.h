@@ -62,6 +62,12 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
+    
+private:
+    /// Prevent copy construction.
+    OctreeQuery(const OctreeQuery& rhs);
+    /// Prevent assignment.
+    OctreeQuery& operator = (const OctreeQuery& rhs);
 };
 
 /// Point octree query.
