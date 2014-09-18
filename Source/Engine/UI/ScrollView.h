@@ -68,6 +68,10 @@ public:
     void SetScrollStep(float step);
     /// Set arrow key page step.
     void SetPageStep(float step);
+    /// Return scroll deceleration.
+    void SetScrollDeceleration(float deceleration) { scrollDecerlation_ = deceleration; }
+    /// Return scroll snap epsilon
+    void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Return view offset from the top-left corner.
     const IntVector2& GetViewPosition() const { return viewPosition_; }
