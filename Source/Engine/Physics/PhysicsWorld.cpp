@@ -109,6 +109,10 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     PODVector<RigidBody*>& result_;
     /// Collision mask for the query.
     unsigned collisionMask_;
+
+private:
+    PhysicsQueryCallback(const PhysicsQueryCallback &); // noncopyable
+    PhysicsQueryCallback &operator =(const PhysicsQueryCallback &); // noncopyable
 };
 
 PhysicsWorld::PhysicsWorld(Context* context) :

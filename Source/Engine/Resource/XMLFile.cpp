@@ -60,6 +60,10 @@ public:
     Serializer& dest_;
     /// Success flag.
     bool success_;
+
+private:
+    XMLWriter(const XMLWriter &); // noncopyable
+    XMLWriter &operator =(const XMLWriter &); // noncopyable
 };
 
 XMLFile::XMLFile(Context* context) :
