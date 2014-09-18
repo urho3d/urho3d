@@ -45,6 +45,8 @@ ScrollView::ScrollView(Context* context) :
     viewSize_(IntVector2::ZERO),
     viewPositionAttr_(IntVector2::ZERO),
     touchScrollSpeed_(IntVector2::ZERO),
+    scrollDecerlation_(1.0),
+    scrollSnapEpsilon_(0.001),
     pageStep_(1.0f),
     scrollBarsAutoVisible_(true),
     ignoreEvents_(false),
@@ -97,7 +99,7 @@ void ScrollView::Update(float timeStep)
     // Update touch scrolling here if necessary
     if (touchScrollSpeed_ == IntVector2::ZERO)
         return;
-    
+
     // Check if we should not scroll:
     // - ScrollView is not visible, is not enabled, or doesn't have focus
     // - The element being dragged is not a child of the ScrollView, or is one of our scrollbars
@@ -106,13 +108,13 @@ void ScrollView::Update(float timeStep)
         touchScrollSpeed_ = IntVector2::ZERO;
         return;
     }
-    
+
     UIElement* dragElement = GetSubsystem<UI>()->GetDragElement();
     if (dragElement)
     {
         UIElement* dragParent = dragElement->GetParent();
         bool dragElementIsChild = false;
-        
+
         while (dragParent)
         {
             if (dragParent == this)
@@ -122,22 +124,42 @@ void ScrollView::Update(float timeStep)
             }
             dragParent = dragParent->GetParent();
         }
-        
+
         if (!dragElementIsChild || dragElement == horizontalScrollBar_->GetSlider() || dragElement == verticalScrollBar_->GetSlider())
         {
             touchScrollSpeed_ = IntVector2::ZERO;
             return;
         }
     }
-    
+
     // Update view position, reset speed accumulation for next frame
     IntVector2 newPosition = viewPosition_;
     newPosition.x_ += touchScrollSpeed_.x_;
     newPosition.y_ += touchScrollSpeed_.y_;
     SetViewPosition(newPosition);
-    
-    /// \todo Could have smooth deceleration
-    touchScrollSpeed_ = IntVector2::ZERO;
+
+    /// Smooth deceleration
+    if (touchScrollSpeed_.x_ > scrollSnapEpsilon_)
+    {
+        touchScrollSpeed_.x_ -= scrollDecerlation_;
+        touchScrollSpeed_.x_ = touchScrollSpeed_.x_ > 0 ? touchScrollSpeed_.x_ : 0;
+    }
+    else if (touchScrollSpeed_.x_ < -scrollSnapEpsilon_)
+    {
+        touchScrollSpeed_.x_ += scrollDecerlation_;
+        touchScrollSpeed_.x_ = touchScrollSpeed_.x_ < 0 ? touchScrollSpeed_.x_ : 0;
+    }
+
+    if (touchScrollSpeed_.y_ > scrollSnapEpsilon_)
+    {
+        touchScrollSpeed_.y_ -= scrollDecerlation_;
+        touchScrollSpeed_.y_ = touchScrollSpeed_.y_ > 0 ? touchScrollSpeed_.y_ : 0;
+    }
+    else if (touchScrollSpeed_.y_ < -scrollSnapEpsilon_)
+    {
+        touchScrollSpeed_.y_ += scrollDecerlation_;
+        touchScrollSpeed_.y_ = touchScrollSpeed_.y_ < 0 ? touchScrollSpeed_.y_ : 0;
+    }
 }
 
 void ScrollView::ApplyAttributes()
@@ -499,7 +521,7 @@ void ScrollView::HandleElementResized(StringHash eventType, VariantMap& eventDat
 void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace TouchMove;
-    
+
     // Take new scrolling speed if it's faster than the current accumulated value
     int dX = -eventData[P_DX].GetInt();
     int dY = -eventData[P_DY].GetInt();

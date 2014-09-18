@@ -68,6 +68,10 @@ public:
     void SetScrollStep(float step);
     /// Set arrow key page step.
     void SetPageStep(float step);
+    /// Return scroll deceleration.
+    void SetScrollDeceleration(float deceleration) { scrollDecerlation_ = deceleration; }
+    /// Return scroll snap epsilon
+    void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Return view offset from the top-left corner.
     const IntVector2& GetViewPosition() const { return viewPosition_; }
@@ -85,6 +89,10 @@ public:
     float GetScrollStep() const;
     /// Return arrow key page step.
     float GetPageStep() const { return pageStep_; }
+    /// Return scroll deceleration.
+    float GetScrollDeceleration() const { return scrollDecerlation_; }
+    /// Return scroll snap epsilon
+    float GetScrollSnapEpsilon() const { return scrollSnapEpsilon_; }
 
     /// Set view position attribute.
     void SetViewPositionAttr(const IntVector2& value);
@@ -127,6 +135,10 @@ protected:
     bool ignoreEvents_;
     /// Resize content widget width to match panel. Internal flag, used by the ListView class.
     bool resizeContentWidth_;
+    /// Scroll deceleration
+    float scrollDecerlation_;
+    /// Scroll snap epsilon
+    float scrollSnapEpsilon_;
 
 private:
     /// Handle scrollbar value changed.
