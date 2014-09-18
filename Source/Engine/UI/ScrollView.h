@@ -85,6 +85,10 @@ public:
     float GetScrollStep() const;
     /// Return arrow key page step.
     float GetPageStep() const { return pageStep_; }
+    /// Return scroll deceleration.
+    float GetScrollDeceleration() const { return scrollDecerlation_; }
+    /// Return scroll snap epsilon
+    float GetScrollSnapEpsilon() const { return scrollSnapEpsilon_; }
 
     /// Set view position attribute.
     void SetViewPositionAttr(const IntVector2& value);
@@ -127,6 +131,10 @@ protected:
     bool ignoreEvents_;
     /// Resize content widget width to match panel. Internal flag, used by the ListView class.
     bool resizeContentWidth_;
+    /// Scroll deceleration
+    float scrollDecerlation_;
+    /// Scroll snap epsilon
+    float scrollSnapEpsilon_;
 
 private:
     /// Handle scrollbar value changed.
