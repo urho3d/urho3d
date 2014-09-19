@@ -142,7 +142,9 @@ protected:
     /// Scroll snap epsilon
     float scrollSnapEpsilon_;
     /// Used to trigger scroll smoothing when false;
-    bool scrollFingerDown_;
+    bool scrollTouchDown_;
+    /// Used to prevent touch scroll - scroll bar conflict
+    bool barScrolling_;
 
 private:
     /// Handle scrollbar value changed.

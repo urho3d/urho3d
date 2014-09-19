@@ -48,11 +48,12 @@ ScrollView::ScrollView(Context* context) :
     touchScrollSpeedMax_(Vector2::ZERO),
     scrollDeceleration_(30.0),
     scrollSnapEpsilon_(M_EPSILON),
-    scrollFingerDown_(false),
+    scrollTouchDown_(false),
     pageStep_(1.0f),
     scrollBarsAutoVisible_(true),
     ignoreEvents_(false),
-    resizeContentWidth_(false)
+    resizeContentWidth_(false),
+    barScrolling_(false)
 {
     clipChildren_ = true;
     enabled_ = true;
@@ -78,6 +79,7 @@ ScrollView::ScrollView(Context* context) :
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(ScrollView, HandleTouchMove));
     SubscribeToEvent(E_TOUCHBEGIN, HANDLER(ScrollView, HandleTouchMove));
     SubscribeToEvent(E_TOUCHEND, HANDLER(ScrollView, HandleTouchMove));
+
 }
 
 ScrollView::~ScrollView()
@@ -103,7 +105,7 @@ void ScrollView::RegisterObject(Context* context)
 void ScrollView::Update(float timeStep)
 {
     // Update touch scrolling here if necessary
-    if (touchScrollSpeed_ == Vector2::ZERO && touchScrollSpeedMax_ == Vector2::ZERO)
+    if (touchScrollSpeed_ == Vector2::ZERO && touchScrollSpeedMax_ == Vector2::ZERO && !barScrolling_)
         return;
 
     // Check if we should not scroll:
@@ -511,9 +513,9 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace TouchMove;
 
-    if (eventType == E_TOUCHMOVE)
+    if (eventType == E_TOUCHMOVE && !barScrolling_)
     {
-        scrollFingerDown_ = true;
+        scrollTouchDown_ = true;
         // Take new scrolling speed if it's faster than the current accumulated value
         int dX = -eventData[P_DX].GetInt();
         int dY = -eventData[P_DY].GetInt();
@@ -529,14 +531,26 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     }
     else if (eventType == E_TOUCHBEGIN)
     {
-        // Stop the control if the figer goes back down
+        int X = eventData[P_X].GetInt();
+        int Y = eventData[P_Y].GetInt();
+        IntVector2 pos = IntVector2(X, Y);
+
+        // Prevent conflict between touch scroll and scrollbar scroll
+        if (horizontalScrollBar_->IsVisible() && horizontalScrollBar_->IsInsideCombined(pos, true))
+            barScrolling_ = true;
+
+        if (verticalScrollBar_->IsVisible() && verticalScrollBar_->IsInsideCombined(pos, true))
+            barScrolling_ = true;
+
+        // Stop the smooth scrolling
         touchScrollSpeed_ = Vector2::ZERO;
         touchScrollSpeedMax_ = Vector2::ZERO;
     }
-    else
+    else if (eventType == E_TOUCHEND)
     {
         // 'Flick' action
-        scrollFingerDown_ = false;
+        barScrolling_ = false;
+        scrollTouchDown_ = false;
         if (Abs(touchScrollSpeedMax_.x_) > scrollSnapEpsilon_ )
             touchScrollSpeed_.x_ = touchScrollSpeedMax_.x_;
         else
@@ -580,7 +594,7 @@ void ScrollView::ScrollSmooth(float timeStep)
         touchScrollSpeedMax_.y_ = 0;
 
     // Control vs flick
-    if (scrollFingerDown_)
+    if (scrollTouchDown_)
     {
         // Finger is held down: control = instant stop
         touchScrollSpeed_ = Vector2::ZERO;
