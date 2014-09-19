@@ -68,9 +68,9 @@ public:
     void SetScrollStep(float step);
     /// Set arrow key page step.
     void SetPageStep(float step);
-    /// Return scroll deceleration.
+    /// Set scroll deceleration.
     void SetScrollDeceleration(float deceleration) { scrollDeceleration_ = deceleration; }
-    /// Return scroll snap epsilon
+    /// Set scroll snap epsilon
     void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Return view offset from the top-left corner.
