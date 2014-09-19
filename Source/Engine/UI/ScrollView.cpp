@@ -103,7 +103,7 @@ void ScrollView::RegisterObject(Context* context)
 void ScrollView::Update(float timeStep)
 {
     // Update touch scrolling here if necessary
-    if (touchScrollSpeed_ == Vector2::ZERO)
+    if (touchScrollSpeed_ == Vector2::ZERO && touchScrollSpeedMax_ == Vector2::ZERO)
         return;
 
     // Check if we should not scroll:
@@ -112,6 +112,7 @@ void ScrollView::Update(float timeStep)
     if (!IsVisible() || !IsEnabled() || !HasFocus())
     {
         touchScrollSpeed_ = Vector2::ZERO;
+        touchScrollSpeedMax_ = Vector2::ZERO;
         return;
     }
 
@@ -134,6 +135,7 @@ void ScrollView::Update(float timeStep)
         if (!dragElementIsChild || dragElement == horizontalScrollBar_->GetSlider() || dragElement == verticalScrollBar_->GetSlider())
         {
             touchScrollSpeed_ = Vector2::ZERO;
+            touchScrollSpeedMax_ = Vector2::ZERO;
             return;
         }
     }
@@ -144,8 +146,8 @@ void ScrollView::Update(float timeStep)
     newPosition.y_ += touchScrollSpeed_.y_;
     SetViewPosition(newPosition);
 
-    /// Smooth deceleration
-    ScrollSmooth(float timeStep);
+    // Smooth deceleration
+    ScrollSmooth(timeStep);
 
 }
 
@@ -519,7 +521,11 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
             touchScrollSpeed_.x_ = dX;
         if (Abs(dY) > Abs(touchScrollSpeed_.y_))
             touchScrollSpeed_.y_ = dY;
-        touchScrollSpeedMax_ = touchScrollSpeed_;
+
+        if (Abs(dX) > Abs(touchScrollSpeedMax_.x_))
+            touchScrollSpeedMax_.x_ = dX;
+        if (Abs(dY) > Abs(touchScrollSpeedMax_.y_))
+            touchScrollSpeedMax_.y_ = dY;
     }
     else if (eventType == E_TOUCHBEGIN)
     {
@@ -531,13 +537,22 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     {
         // 'Flick' action
         scrollFingerDown_ = false;
-        touchScrollSpeed_ = touchScrollSpeedMax_;
+        if (Abs(touchScrollSpeedMax_.x_) > scrollSnapEpsilon_ )
+            touchScrollSpeed_.x_ = touchScrollSpeedMax_.x_;
+        else
+            touchScrollSpeed_.x_ = 0;
+
+        if (Abs(touchScrollSpeedMax_.y_) > scrollSnapEpsilon_ )
+            touchScrollSpeed_.y_ = touchScrollSpeedMax_.y_;
+        else
+            touchScrollSpeed_.y_ = 0;
         touchScrollSpeedMax_ = Vector2::ZERO;
     }
 }
 
 void ScrollView::ScrollSmooth(float timeStep)
 {
+    // Decay the momentum
     if (touchScrollSpeedMax_.x_ >= scrollSnapEpsilon_)
     {
         touchScrollSpeedMax_.x_ -= scrollDeceleration_ * timeStep;
@@ -564,12 +579,15 @@ void ScrollView::ScrollSmooth(float timeStep)
     else
         touchScrollSpeedMax_.y_ = 0;
 
+    // Control vs flick
     if (scrollFingerDown_)
     {
+        // Finger is held down: control = instant stop
         touchScrollSpeed_ = Vector2::ZERO;
     }
     else
     {
+        // Finger is released: flick = smooth deceleration
         if (touchScrollSpeed_.x_ >= scrollSnapEpsilon_)
         {
             touchScrollSpeed_.x_ -= scrollDeceleration_ * timeStep;
@@ -580,7 +598,7 @@ void ScrollView::ScrollSmooth(float timeStep)
 
             if (horizontalScrollBar_->GetValue() >= horizontalScrollBar_->GetRange() - M_EPSILON)
             {
-                // stop movement when we reach end of scroll
+                // Stop movement when we reach end of scroll
                 touchScrollSpeed_.x_ = 0;
             }
         }
@@ -594,7 +612,7 @@ void ScrollView::ScrollSmooth(float timeStep)
 
             if (horizontalScrollBar_->GetValue() <= M_EPSILON)
             {
-                // stop movement when we reach end of scroll
+                // Stop movement when we reach end of scroll
                 touchScrollSpeed_.x_ = 0;
             }
         }
@@ -611,7 +629,7 @@ void ScrollView::ScrollSmooth(float timeStep)
 
             if (verticalScrollBar_->GetValue() >= verticalScrollBar_->GetRange() - M_EPSILON)
             {
-                // stop movement when we reach end of scroll
+                // Stop movement when we reach end of scroll
                 touchScrollSpeed_.y_ = 0;
             }
         }
@@ -625,7 +643,7 @@ void ScrollView::ScrollSmooth(float timeStep)
 
             if (verticalScrollBar_->GetValue() <= M_EPSILON)
             {
-                // stop movement when we reach end of scroll
+                // Stop movement when we reach end of scroll
                 touchScrollSpeed_.y_ = 0;
             }
         }
