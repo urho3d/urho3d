@@ -2067,7 +2067,7 @@ A remote event consists of its event type (name hash), a flag that tells whether
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
-For safety, allowed remote event types should be registered so that a client can not for example trigger an internal render update event on the server. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". Similarly to file paths, as long as no remote event types are registered, all are allowed.
+For safety, allowed remote event types should be registered so that a client can not for example trigger an internal render update event on the server. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". Similarly to file paths, as long as no remote event types are registered, all are allowed. The registration affects only receiving events; sending whatever event is always allowed.
 
 Like with ordinary events, in script event types are strings instead of name hashes for convenience.
 
