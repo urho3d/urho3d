@@ -524,10 +524,8 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
         if (Abs(dY) > Abs(touchScrollSpeed_.y_))
             touchScrollSpeed_.y_ = dY;
 
-        if (Abs(dX) > Abs(touchScrollSpeedMax_.x_))
-            touchScrollSpeedMax_.x_ = dX;
-        if (Abs(dY) > Abs(touchScrollSpeedMax_.y_))
-            touchScrollSpeedMax_.y_ = dY;
+        touchScrollSpeedMax_.x_ = dX;
+        touchScrollSpeedMax_.y_ = dY;
     }
     else if (eventType == E_TOUCHBEGIN)
     {
