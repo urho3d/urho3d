@@ -42,6 +42,10 @@
 #include <angelscript.h>
 #include <cstring>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4505)
+#endif
+
 namespace Urho3D
 {
 

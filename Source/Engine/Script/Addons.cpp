@@ -2262,7 +2262,7 @@ static void DestructString(String* ptr)
     ptr->~String();
 }
 
-static char* StringCharAt(unsigned int i, String& str)
+static char* StringCharAt(unsigned i, String& str)
 {
     if (i >= str.Length())
     {

@@ -124,6 +124,10 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
     }
 }
 
+void Drawable::Update(const FrameInfo& frame)
+{
+}
+
 void Drawable::UpdateBatches(const FrameInfo& frame)
 {
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
@@ -143,6 +147,10 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
 }
 
+void Drawable::UpdateGeometry(const FrameInfo& frame)
+{
+}
+
 Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
 {
     // By default return the visible batch geometry
@@ -150,6 +158,11 @@ Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
         return batches_[batchIndex].geometry_;
     else
         return 0;
+}
+
+bool Drawable::DrawOcclusion(OcclusionBuffer* buffer)
+{
+    return true;
 }
 
 void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

@@ -320,7 +320,7 @@ void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
             names.Push(i->first_);
     }
 
-    for (unsigned int i = 0; i < names.Size(); ++i)
+    for (unsigned i = 0; i < names.Size(); ++i)
         SetObjectAttributeAnimation(names[i], 0, WM_LOOP, 1.0f);
 }
 

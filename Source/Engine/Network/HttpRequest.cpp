@@ -248,6 +248,11 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
     return totalRead;
 }
 
+unsigned HttpRequest::Seek(unsigned position)
+{
+    return position_;
+}
+
 String HttpRequest::GetError() const
 {
     MutexLock lock(mutex_);

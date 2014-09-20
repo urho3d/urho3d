@@ -101,7 +101,7 @@ public:
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
     /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
-    void SetFlushGPU(bool enable) {}
+    void SetFlushGPU(bool enable);
     /// Set allowed screen orientations as a space-separated list of "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Affects currently only iOS platform.
     void SetOrientations(const String& orientations);
     /// Toggle between full screen and windowed mode. Return true if successful.
@@ -370,7 +370,7 @@ public:
     /// Return whether a custom clipping plane is in use.
     bool GetUseClipPlane() const { return useClipPlane_; }
     /// Return stream frequency by vertex buffer index. Always returns 0 on OpenGL.
-    unsigned GetStreamFrequency(unsigned index) const { return 0; }
+    unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
     /// Return force Shader Model 2 flag. Always false on OpenGL.

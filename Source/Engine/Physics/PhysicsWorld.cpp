@@ -219,6 +219,14 @@ void PhysicsWorld::reportErrorWarning(const char* warningString)
     LOGWARNING("Physics: " + String(warningString));
 }
 
+void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)
+{
+}
+
+void PhysicsWorld::draw3dText(const btVector3& location, const char* textString)
+{ 
+}
+
 void PhysicsWorld::Update(float timeStep)
 {
     PROFILE(UpdatePhysics);

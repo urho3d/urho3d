@@ -86,7 +86,7 @@ ResourceCache::~ResourceCache()
     backgroundLoader_.Reset();
 }
 
-bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority)
+bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
     
@@ -125,7 +125,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority
     return true;
 }
 
-void ResourceCache::AddPackageFile(PackageFile* package, unsigned int priority)
+void ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
     

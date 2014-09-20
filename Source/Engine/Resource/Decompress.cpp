@@ -291,8 +291,8 @@ misrepresented as being the original software.
 
 #define _CLAMP_(X,Xmin,Xmax) ( (X)<(Xmax) ? ( (X)<(Xmin)?(Xmin):(X) ) : (Xmax) )
 
-unsigned int ETC_FLIP =  0x01000000;
-unsigned int ETC_DIFF = 0x02000000;
+unsigned ETC_FLIP =  0x01000000;
+unsigned ETC_DIFF = 0x02000000;
 const int mod[8][4]={{2, 8,-2,-8},
                     {5, 17, -5, -17},
                     {9, 29, -9, -29},
@@ -819,7 +819,7 @@ void DecompressImagePVRTC(unsigned char* dest, const void *blocks, int width, in
     
     int Mod, DoPT;
     
-    unsigned int uPosition;
+    unsigned uPosition;
     
     // Local neighbourhood of blocks
     AMTC_BLOCK_STRUCT *pBlocks[2][2];

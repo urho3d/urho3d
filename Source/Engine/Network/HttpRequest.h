@@ -55,7 +55,7 @@ public:
     /// Read response data from the HTTP connection and return number of bytes actually read. While the connection is open, will block while trying to read the specified size. To avoid blocking, only read up to as many bytes as GetAvailableSize() returns.
     virtual unsigned Read(void* dest, unsigned size);
     /// Set position from the beginning of the stream. Not supported.
-    virtual unsigned Seek(unsigned position) { return position_; }
+    virtual unsigned Seek(unsigned position);
     
     /// Return URL used in the request.
     const String& GetURL() const { return url_; }

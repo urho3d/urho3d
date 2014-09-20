@@ -57,9 +57,9 @@ public:
     /// Mark for attribute check on the next network update.
     virtual void MarkNetworkUpdate();
     /// Return the depended on nodes to order network updates.
-    virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
+    virtual void GetDependencyNodes(PODVector<Node*>& dest);
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) {};
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     /// Set enabled/disabled state.
     void SetEnabled(bool enable);
@@ -98,11 +98,11 @@ protected:
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved();
     /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node) {};
+    virtual void OnNodeSet(Node* node);
     /// Handle scene node transform dirtied.
-    virtual void OnMarkedDirty(Node* node) {};
+    virtual void OnMarkedDirty(Node* node);
     /// Handle scene node enabled status changing.
-    virtual void OnNodeSetEnabled(Node* node) {};
+    virtual void OnNodeSetEnabled(Node* node);
     /// Set ID. Called by Scene.
     void SetID(unsigned id);
     /// Set scene node. Called by Node when creating the component.

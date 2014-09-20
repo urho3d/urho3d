@@ -116,9 +116,9 @@ public:
     /// Log warning from the physics engine.
     virtual void reportErrorWarning(const char* warningString);
     /// Draw a physics debug contact point. Not implemented.
-    virtual void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) {}
+    virtual void drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
     /// Draw physics debug 3D text. Not implemented.
-    virtual void draw3dText(const btVector3& location,const char* textString) {}
+    virtual void draw3dText(const btVector3& location,const char* textString);
     /// Set debug draw flags.
     virtual void setDebugMode(int debugMode) { debugMode_ = debugMode; }
     /// Return debug draw flags.

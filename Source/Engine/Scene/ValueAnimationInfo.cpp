@@ -103,6 +103,10 @@ Object* ValueAnimationInfo::GetTarget() const
     return target_;
 }
 
+void ValueAnimationInfo::ApplyValue(const Variant& newValue)
+{
+}
+
 float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
 {
     float beginTime = animation_->GetBeginTime();

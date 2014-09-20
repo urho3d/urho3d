@@ -236,6 +236,12 @@ public:
     float maxDistance_;
     /// Raycast detail level.
     RayQueryLevel level_;
+    
+private:
+    /// Prevent copy construction.
+    RayOctreeQuery(const RayOctreeQuery& rhs);
+    /// Prevent assignment.
+    RayOctreeQuery& operator = (const RayOctreeQuery& rhs);
 };
 
 }
