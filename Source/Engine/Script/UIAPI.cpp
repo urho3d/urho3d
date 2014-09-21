@@ -235,6 +235,10 @@ static void RegisterScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "BorderImage@+ get_scrollPanel() const", asMETHOD(ScrollView, GetScrollPanel), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void set_scrollBarsAutoVisible(bool)", asMETHOD(ScrollView, SetScrollBarsAutoVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "bool get_scrollBarsAutoVisible() const", asMETHOD(ScrollView, GetScrollBarsAutoVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_scrollDeceleration(float)", asMETHOD(ScrollView, SetScrollDeceleration), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "float get_scrollDeceleration() const", asMETHOD(ScrollView, GetScrollDeceleration), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_scrollSnapEpsilon(float)", asMETHOD(ScrollView, SetScrollSnapEpsilon), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "float get_scrollSnapEpsilon() const", asMETHOD(ScrollView, GetScrollSnapEpsilon), asCALL_THISCALL);
 }
 
 void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
@@ -306,6 +310,10 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "float get_scrollStep() const", asMETHOD(ListView, GetScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_pageStep(float)", asMETHOD(ListView, SetPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float get_pageStep() const", asMETHOD(ListView, GetPageStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_scrollDeceleration(float)", asMETHOD(ListView, SetScrollDeceleration), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "float get_scrollDeceleration() const", asMETHOD(ListView, GetScrollDeceleration), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_scrollSnapEpsilon(float)", asMETHOD(ListView, SetScrollSnapEpsilon), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "float get_scrollSnapEpsilon() const", asMETHOD(ListView, GetScrollSnapEpsilon), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "uint get_numItems() const", asMETHOD(ListView, GetNumItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ get_items(uint) const", asMETHOD(ListView, GetItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_selection(uint)", asMETHOD(ListView, SetSelection), asCALL_THISCALL);

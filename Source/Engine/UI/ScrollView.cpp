@@ -46,7 +46,7 @@ ScrollView::ScrollView(Context* context) :
     viewPositionAttr_(IntVector2::ZERO),
     touchScrollSpeed_(Vector2::ZERO),
     touchScrollSpeedMax_(Vector2::ZERO),
-    scrollDeceleration_(30.0),
+    scrollDeceleration_(30.0f),
     scrollSnapEpsilon_(M_EPSILON),
     scrollTouchDown_(false),
     pageStep_(1.0f),
@@ -144,13 +144,12 @@ void ScrollView::Update(float timeStep)
 
     // Update view position
     IntVector2 newPosition = viewPosition_;
-    newPosition.x_ += touchScrollSpeed_.x_;
-    newPosition.y_ += touchScrollSpeed_.y_;
+    newPosition.x_ += (int)touchScrollSpeed_.x_;
+    newPosition.y_ += (int)touchScrollSpeed_.y_;
     SetViewPosition(newPosition);
 
     // Smooth deceleration
     ScrollSmooth(timeStep);
-
 }
 
 void ScrollView::ApplyAttributes()
@@ -517,8 +516,8 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     {
         scrollTouchDown_ = true;
         // Take new scrolling speed if it's faster than the current accumulated value
-        int dX = -eventData[P_DX].GetInt();
-        int dY = -eventData[P_DY].GetInt();
+        float dX = (float)-eventData[P_DX].GetInt();
+        float dY = (float)-eventData[P_DY].GetInt();
         if (Abs(dX) > Abs(touchScrollSpeed_.x_))
             touchScrollSpeed_.x_ = dX;
         if (Abs(dY) > Abs(touchScrollSpeed_.y_))

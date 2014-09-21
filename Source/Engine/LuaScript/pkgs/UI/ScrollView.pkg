@@ -12,7 +12,9 @@ class ScrollView : public UIElement
     void SetScrollBarsAutoVisible(bool enable);
     void SetScrollStep(float step);
     void SetPageStep(float step);
-    
+    void SetScrollDeceleration(float deceleration);
+    void SetScrollSnapEpsilon(float snap);
+
     const IntVector2& GetViewPosition() const;
     UIElement* GetContentElement() const;
     ScrollBar* GetHorizontalScrollBar() const;
@@ -21,7 +23,9 @@ class ScrollView : public UIElement
     bool GetScrollBarsAutoVisible() const;
     float GetScrollStep() const;
     float GetPageStep() const;
-    
+    float GetScrollDeceleration() const;
+    float GetScrollSnapEpsilon() const;
+
     tolua_property__get_set IntVector2& viewPosition;
     tolua_property__get_set UIElement* contentElement;
     tolua_readonly tolua_property__get_set ScrollBar* horizontalScrollBar;
@@ -30,6 +34,8 @@ class ScrollView : public UIElement
     tolua_property__get_set bool scrollBarsAutoVisible;
     tolua_property__get_set float scrollStep;
     tolua_property__get_set float pageStep;
+    tolua_property__get_set float scrollDeceleration;
+    tolua_property__get_set float scrollSnapEpsilon;
 };
 
 ${
