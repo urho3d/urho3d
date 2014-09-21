@@ -5117,8 +5117,10 @@ UIElement root;
 /* readonly */
 IntVector2 screenPosition;
 bool scrollBarsAutoVisible;
+float scrollDeceleration;
 /* readonly */
 BorderImage scrollPanel;
+float scrollSnapEpsilon;
 float scrollStep;
 bool selectOnClickEnd;
 bool selected;
@@ -7978,8 +7980,10 @@ UIElement root;
 /* readonly */
 IntVector2 screenPosition;
 bool scrollBarsAutoVisible;
+float scrollDeceleration;
 /* readonly */
 BorderImage scrollPanel;
+float scrollSnapEpsilon;
 float scrollStep;
 bool selected;
 IntVector2 size;

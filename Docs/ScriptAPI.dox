@@ -1227,6 +1227,8 @@ namespace Urho3D
 - %Scroll %Step : float
 - %Page %Step : float
 - %Auto %Show/Hide %Scrollbars : bool
+- %Scroll %Deceleration : float
+- %Scroll %Snap %Epsilon : float
 - %Highlight %Mode : int
 - %Multiselect : bool
 - %Hierarchy %Mode : bool
@@ -1515,6 +1517,8 @@ namespace Urho3D
 - %Scroll %Step : float
 - %Page %Step : float
 - %Auto %Show/Hide %Scrollbars : bool
+- %Scroll %Deceleration : float
+- %Scroll %Snap %Epsilon : float
 
 ### Skybox
 - %Is %Enabled : bool
@@ -6561,7 +6565,9 @@ Properties:
 - UIElement@ root // readonly
 - IntVector2 screenPosition // readonly
 - bool scrollBarsAutoVisible
+- float scrollDeceleration
 - BorderImage@ scrollPanel // readonly
+- float scrollSnapEpsilon
 - float scrollStep
 - bool selectOnClickEnd
 - bool selected
@@ -9081,7 +9087,9 @@ Properties:
 - UIElement@ root // readonly
 - IntVector2 screenPosition // readonly
 - bool scrollBarsAutoVisible
+- float scrollDeceleration
 - BorderImage@ scrollPanel // readonly
+- float scrollSnapEpsilon
 - float scrollStep
 - bool selected
 - IntVector2 size
