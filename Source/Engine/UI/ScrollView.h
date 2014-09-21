@@ -68,6 +68,10 @@ public:
     void SetScrollStep(float step);
     /// Set arrow key page step.
     void SetPageStep(float step);
+    /// Set scroll deceleration.
+    void SetScrollDeceleration(float deceleration) { scrollDeceleration_ = deceleration; }
+    /// Set scroll snap epsilon
+    void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Return view offset from the top-left corner.
     const IntVector2& GetViewPosition() const { return viewPosition_; }
@@ -85,6 +89,10 @@ public:
     float GetScrollStep() const;
     /// Return arrow key page step.
     float GetPageStep() const { return pageStep_; }
+    /// Return scroll deceleration.
+    float GetScrollDeceleration() const { return scrollDeceleration_; }
+    /// Return scroll snap epsilon
+    float GetScrollSnapEpsilon() const { return scrollSnapEpsilon_; }
 
     /// Set view position attribute.
     void SetViewPositionAttr(const IntVector2& value);
@@ -118,7 +126,9 @@ protected:
     /// View offset attribute.
     IntVector2 viewPositionAttr_;
     /// Accumulated touch scroll speed.
-    IntVector2 touchScrollSpeed_;
+    Vector2 touchScrollSpeed_;
+    /// Max touch scroll speed.
+    Vector2 touchScrollSpeedMax_;
     /// Arrow key page step.
     float pageStep_;
     /// Automatically show/hide scrollbars flag.
@@ -127,6 +137,14 @@ protected:
     bool ignoreEvents_;
     /// Resize content widget width to match panel. Internal flag, used by the ListView class.
     bool resizeContentWidth_;
+    /// Scroll deceleration
+    float scrollDeceleration_;
+    /// Scroll snap epsilon
+    float scrollSnapEpsilon_;
+    /// Used to trigger scroll smoothing when false;
+    bool scrollTouchDown_;
+    /// Used to prevent touch scroll - scroll bar conflict
+    bool barScrolling_;
 
 private:
     /// Handle scrollbar value changed.
@@ -137,6 +155,8 @@ private:
     void HandleElementResized(StringHash eventType, VariantMap& eventData);
     /// Handle touch move event for scrolling.
     void HandleTouchMove(StringHash eventType, VariantMap& eventData);
+    /// Handle the scroll smoothing.
+    void ScrollSmooth(float timeStep);
 };
 
 }
