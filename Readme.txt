@@ -122,7 +122,8 @@ Get Doxygen from http://www.doxygen.org & Graphviz from http://www.graphviz.org.
 See section "Documentation build" below on how to automate documentation
 generation as part of the build process.
 
-The documentation is also available online at http://urho3d.github.io/documentation/HEAD/index.html
+The documentation is also available online at
+http://urho3d.github.io/documentation/HEAD/index.html
 
 
 Building prerequisites
