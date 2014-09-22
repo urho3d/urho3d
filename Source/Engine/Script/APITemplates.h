@@ -43,6 +43,7 @@
 #include <cstring>
 
 #ifdef _MSC_VER
+#pragma warning(push)
 #pragma warning(disable:4505)
 #endif
 
@@ -1197,3 +1198,7 @@ template <class T> void RegisterButton(asIScriptEngine* engine, const char* clas
 }
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
