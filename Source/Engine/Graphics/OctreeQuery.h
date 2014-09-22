@@ -62,6 +62,12 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
+    
+private:
+    /// Prevent copy construction.
+    OctreeQuery(const OctreeQuery& rhs);
+    /// Prevent assignment.
+    OctreeQuery& operator = (const OctreeQuery& rhs);
 };
 
 /// Point octree query.
@@ -230,6 +236,12 @@ public:
     float maxDistance_;
     /// Raycast detail level.
     RayQueryLevel level_;
+    
+private:
+    /// Prevent copy construction.
+    RayOctreeQuery(const RayOctreeQuery& rhs);
+    /// Prevent assignment.
+    RayOctreeQuery& operator = (const RayOctreeQuery& rhs);
 };
 
 }

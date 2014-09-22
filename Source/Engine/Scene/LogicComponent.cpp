@@ -50,6 +50,22 @@ void LogicComponent::OnSetEnabled()
     UpdateEventSubscription();
 }
 
+void LogicComponent::Update(float timeStep)
+{
+}
+
+void LogicComponent::PostUpdate(float timeStep)
+{
+}
+
+void LogicComponent::FixedUpdate(float timeStep)
+{
+}
+
+void LogicComponent::FixedPostUpdate(float timeStep)
+{
+}
+
 void LogicComponent::SetUpdateEventMask(unsigned char mask)
 {
     if (updateEventMask_ != mask)

@@ -30,6 +30,7 @@
 #include "JSONFile.h"
 #include "Log.h"
 #include "PackageFile.h"
+#include "PListFile.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
@@ -85,7 +86,7 @@ ResourceCache::~ResourceCache()
     backgroundLoader_.Reset();
 }
 
-bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority)
+bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
     
@@ -124,7 +125,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority
     return true;
 }
 
-void ResourceCache::AddPackageFile(PackageFile* package, unsigned int priority)
+void ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
     
@@ -982,6 +983,7 @@ void RegisterResourceLibrary(Context* context)
 {
     Image::RegisterObject(context);
     JSONFile::RegisterObject(context);
+    PListFile::RegisterObject(context);
     XMLFile::RegisterObject(context);
 }
 

@@ -82,6 +82,14 @@ void Component::MarkNetworkUpdate()
     }
 }
 
+void Component::GetDependencyNodes(PODVector<Node*>& dest)
+{
+}
+
+void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+}
+
 void Component::SetEnabled(bool enable)
 {
     if (enable != enabled_)
@@ -203,6 +211,18 @@ void Component::OnAttributeAnimationRemoved()
 {
     if (attributeAnimationInfos_.Empty())
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
+}
+
+void Component::OnNodeSet(Node* node)
+{
+}
+
+void Component::OnMarkedDirty(Node* node)
+{
+}
+
+void Component::OnNodeSetEnabled(Node* node)
+{
 }
 
 void Component::SetID(unsigned id)

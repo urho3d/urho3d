@@ -592,6 +592,10 @@ void Graphics::SetSRGB(bool enable)
     }
 }
 
+void Graphics::SetFlushGPU(bool enable)
+{
+}
+
 void Graphics::SetOrientations(const String& orientations)
 {
     orientations_ = orientations.Trimmed();
@@ -2113,6 +2117,11 @@ Texture* Graphics::GetTexture(unsigned index) const
 RenderSurface* Graphics::GetRenderTarget(unsigned index) const
 {
     return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
+}
+
+unsigned Graphics::GetStreamFrequency(unsigned index) const
+{
+    return 0;
 }
 
 IntVector2 Graphics::GetRenderTargetDimensions() const

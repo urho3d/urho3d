@@ -105,12 +105,6 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
-    {
-        LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
-        return;
-    }
-    
     RemoteEvent queuedEvent;
     queuedEvent.senderID_ = 0;
     queuedEvent.eventType_ = eventType;
@@ -121,12 +115,6 @@ void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const Varia
 
 void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
-    {
-        LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
-        return;
-    }
-    
     if (!node)
     {
         LOGERROR("Null sender node for remote node event");

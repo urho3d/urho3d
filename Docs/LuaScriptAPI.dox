@@ -4677,6 +4677,8 @@ Methods:
 - void SetScrollBarsAutoVisible(bool enable)
 - void SetScrollStep(float step)
 - void SetPageStep(float step)
+- void SetScrollDeceleration(float deceleration)
+- void SetScrollSnapEpsilon(float snap)
 - const IntVector2& GetViewPosition() const
 - UIElement* GetContentElement() const
 - ScrollBar* GetHorizontalScrollBar() const
@@ -4685,6 +4687,8 @@ Methods:
 - bool GetScrollBarsAutoVisible() const
 - float GetScrollStep() const
 - float GetPageStep() const
+- float GetScrollDeceleration() const
+- float GetScrollSnapEpsilon() const
 
 Properties:
 
@@ -4696,6 +4700,8 @@ Properties:
 - bool scrollBarsAutoVisible
 - float scrollStep
 - float pageStep
+- float scrollDeceleration
+- float scrollSnapEpsilon
 
 <a name="Class_Serializable"></a>
 ### Serializable : Object

@@ -27,6 +27,7 @@
 namespace Urho3D
 {
 
+class PListFile;
 class Sprite2D;
 class Texture2D;
 class XMLFile;
@@ -60,10 +61,21 @@ public:
     const HashMap<String, SharedPtr<Sprite2D> >& GetSpriteMapping() const { return spriteMapping_; }
 
 private:
+    /// Begin load from PList file.
+    bool BeginLoadFromPListFile(Deserializer& source);
+    /// End load from PList file.
+    bool EndLoadFromPListFile();
+    /// Begin load from XML file.
+    bool BeginLoadFromXMLFile(Deserializer& source);
+    /// End load from XML file.
+    bool EndLoadFromXMLFile();
+
     /// Texture.
     SharedPtr<Texture2D> texture_;
     /// Sprite mapping.
     HashMap<String, SharedPtr<Sprite2D> > spriteMapping_;
+    /// PList file used while loading.
+    SharedPtr<PListFile> loadPListFile_;
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// Texture name used while loading.

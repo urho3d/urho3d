@@ -147,18 +147,29 @@ bool AnimationSet2D::LoadFolders(const XMLElement& rootElem)
     bool async = GetAsyncLoadState() == ASYNC_LOADING;
 
     String parentPath = GetParentPath(GetName());
-    String spriteSheetFilePath = parentPath + GetFileName(GetName()) + ".xml";
+    String spriteSheetFilePathPList = parentPath + GetFileName(GetName()) + ".plist";
+    String spriteSheetFilePathXML = parentPath + GetFileName(GetName()) + ".xml";
     SpriteSheet2D* spriteSheet = 0;
     bool hasSpriteSheet = false;
 
     // When async loading, request the sprite sheet for background loading but do not actually get it
     if (!async)
-        spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath, false);
+    {
+        spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePathPList, false);
+        if (!spriteSheet)
+            spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePathXML, false);
+    }
     else
     {
-        hasSpriteSheet = cache->Exists(spriteSheetFilePath);
+        hasSpriteSheet = cache->Exists(spriteSheetFilePathPList);
         if (hasSpriteSheet)
-            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath, false, this);
+            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePathPList, false, this);
+        else
+        {
+            hasSpriteSheet = cache->Exists(spriteSheetFilePathXML);
+            if (hasSpriteSheet)
+                cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePathXML, false, this);
+        }
     }
 
     for (XMLElement folderElem = rootElem.GetChild("folder"); folderElem; folderElem = folderElem.GetNext("folder"))

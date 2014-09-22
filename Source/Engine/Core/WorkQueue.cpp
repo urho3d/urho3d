@@ -323,7 +323,7 @@ void WorkQueue::PurgeCompleted(unsigned priority)
 
 void WorkQueue::PurgePool()
 {
-    unsigned int currentSize = poolItems_.Size();
+    unsigned currentSize = poolItems_.Size();
     int difference = lastSize_ - currentSize;
 
     // Difference tolerance, should be fairly significant to reduce the pool size.

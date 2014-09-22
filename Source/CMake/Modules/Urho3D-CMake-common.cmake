@@ -661,7 +661,7 @@ macro (setup_main_executable)
             COMMENT "Stripping lib${TARGET_NAME}.so in library output directory")
         # When performing packaging, include the final apk file
         if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
-            install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
+            install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D-debug.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
             set (APK_INCLUDED 1)
         endif ()
     else ()

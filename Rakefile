@@ -330,23 +330,23 @@ def android_prepare_device api, name = 'test'
       system "echo 'no' |android create avd -n #{name} -t android-#{api}" or abort "Failed to create '#{name}' Android virtual device"
     end
     system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
-  else
-    # Otherwise, try to unlock it just in case it is locked
-    system "adb shell 'input keyevent 82; input keyevent 4'"
   end
+  return 0;
 end
 
 def android_wait_for_device retries = -1, retry_interval = 10, package = 'com.android.launcher'
   # Wait until the indicator process is running or it is killed externally by Travis-CI or by user via Ctrl+C or when it exceeds the number of retries (if given)
   puts "\nWaiting for device...\n\n"
   # Capture adb's stdout and interpret it because adb does not return exit code from its last shell command
-  return /timeout/ =~ `adb wait-for-device shell 'retries=#{retries}; until [ $retries -eq 0 ] || ps |grep -c #{package} 1>/dev/null; do sleep #{retry_interval}; if [ $retries -gt 0 ]; then let retries=retries-1; fi; done; if [ $retries -eq 0 ]; then echo timeout; fi'` ? nil : 0;
+  return /timeout/ =~ `adb wait-for-device shell 'retries=#{retries}; until [ $retries -eq 0 ] || ps |grep -c #{package} 1>/dev/null; do sleep #{retry_interval}; if [ $retries -gt 0 ]; then let retries=retries-1; fi; done; if [ $retries -eq 0 ]; then echo timeout; else while ps |grep -c bootanimation 1>/dev/null; do sleep 1; done; fi'` ? nil : 0;
 end
 
 def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'input tap 10 200', timeout = 30
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
   begin
     IO.popen("adb shell <<EOF
+# Try to unlock the device just in case it is locked
+input keyevent 82; input keyevent 4
 # Clear the log
 logcat -c
 # Start the app

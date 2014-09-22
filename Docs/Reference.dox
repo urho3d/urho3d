@@ -1776,7 +1776,8 @@ You can chose from animated sprites, 2D particle emitters and static sprites.
 \section Urho2D_Animated Animated sprites
 
 Workflow for creating animated sprites in Urho2D relies on Spriter (c).
-Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see details below on how to generate this file). Keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
+Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to create a xml material file (see \ref Urho2D_Static_Sprites below and imp_all.xml as a sample) using the same name as your atlas image. Example 33_Urho2DSpriterAnimation is a good demonstration of this feature: 'imp_all.xml' material file is provided to match the atlas image ('imp_all.png') used by this example. You could remove the other image files in the 'imp' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
+
 A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
 - AnimationSet2D: a Spriter *.scml file including one or more animations.
@@ -2067,7 +2068,7 @@ A remote event consists of its event type (name hash), a flag that tells whether
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
-For safety, allowed remote event types should be registered so that a client can not for example trigger an internal render update event on the server. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". Similarly to file paths, as long as no remote event types are registered, all are allowed.
+For safety, allowed remote event types should be registered so that a client can not for example trigger an internal render update event on the server. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". Similarly to file paths, as long as no remote event types are registered, all are allowed. The registration affects only receiving events; sending whatever event is always allowed.
 
 Like with ordinary events, in script event types are strings instead of name hashes for convenience.
 

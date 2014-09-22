@@ -63,7 +63,7 @@ public:
 
 protected:
     /// Apply new animation value to the target object. Called by Update().
-    virtual void ApplyValue(const Variant& newValue) {}
+    virtual void ApplyValue(const Variant& newValue);
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return event frames.

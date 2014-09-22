@@ -81,7 +81,7 @@ void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned n
     buttonPress_.Resize(numButtons);
     axes_.Resize(numAxes);
     hats_.Resize(numHats);
-    
+
     Reset();
 }
 
@@ -231,7 +231,7 @@ void Input::SetMouseVisible(bool enable)
     // In touch emulation mode only enabled mouse is allowed
     if (touchEmulation_)
         enable = true;
-    
+
     // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
     #ifndef RASPI
     if (enable != mouseVisible_)
@@ -555,14 +555,14 @@ void Input::SetTouchEmulation(bool enable)
             // Touch emulation needs the mouse visible
             if (!mouseVisible_)
                 SetMouseVisible(true);
-            
+
             // Add a virtual touch device the first time we are enabling emulated touch
             if (!SDL_GetNumTouchDevices())
                 SDL_AddTouch(0, "Emulated Touch");
         }
         else
             ResetTouches();
-        
+
         touchEmulation_ = enable;
     }
 #endif
@@ -632,11 +632,11 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     state.name_ = SDL_JoystickName(joystick);
     if (SDL_IsGameController(index))
        state.controller_ = SDL_GameControllerOpen(index);
-    
+
     unsigned numButtons = SDL_JoystickNumButtons(joystick);
     unsigned numAxes = SDL_JoystickNumAxes(joystick);
     unsigned numHats = SDL_JoystickNumHats(joystick);
-    
+
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
     {
@@ -645,7 +645,7 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
         if (numAxes < SDL_CONTROLLER_AXIS_MAX)
             numAxes = SDL_CONTROLLER_AXIS_MAX;
     }
-    
+
     state.Initialize(numButtons, numAxes, numHats);
 
     return joystickID;
@@ -924,7 +924,7 @@ void Input::ResetTouches()
         eventData[P_Y] = state.position_.y_;
         SendEvent(E_TOUCHEND, eventData);
     }
-    
+
     touches_.Clear();
 }
 
@@ -1090,7 +1090,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
-            
+
             SDL_Event event;
             event.type = SDL_FINGERDOWN;
             event.tfinger.touchId = 0;
@@ -1111,7 +1111,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
-            
+
             SDL_Event event;
             event.type = SDL_FINGERUP;
             event.tfinger.touchId = 0;
@@ -1150,7 +1150,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
-            
+
             SDL_Event event;
             event.type = SDL_FINGERMOTION;
             event.tfinger.touchId = 0;
@@ -1215,6 +1215,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            // We don't want this event to create a new touches_ event if it doesn't exist (touchEmulation)
+            if (touchEmulation_ && !touches_.Contains(touchID))
+                break;
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
             state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
@@ -1589,12 +1592,12 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 // Disable touch emulation handling during this to prevent endless loop
                 bool oldTouchEmulation = touchEmulation_;
                 touchEmulation_ = false;
-                
+
                 SDL_Event evt;
                 evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
                 evt.button.button = mouseButtonBindingVar.GetInt();
                 HandleSDLEvent(&evt);
-                
+
                 touchEmulation_ = oldTouchEmulation;
             }
         }
