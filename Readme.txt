@@ -122,7 +122,7 @@ Get Doxygen from http://www.doxygen.org & Graphviz from http://www.graphviz.org.
 See section "Documentation build" below on how to automate documentation
 generation as part of the build process.
 
-The documentation is also available online at http://urho3d.github.io/documentation/
+The documentation is also available online at http://urho3d.github.io/documentation/HEAD/index.html
 
 
 Building prerequisites
@@ -519,8 +519,8 @@ adhere to the current limitations:
   If you choose not to adhere with this build directory naming convention then
   you will have to install the Urho3D library into your local filesystem in
   order to use the Urho3D library in your external project.
-  See http://urho3d.github.io/documentation/_building.html#Building_Library and
-  http://urho3d.github.io/documentation/_using_library.html#UsingLibraryFromSDK.
+  See http://urho3d.github.io/documentation/HEAD/_building.html#Building_Library and
+  http://urho3d.github.io/documentation/HEAD/_using_library.html#UsingLibraryFromSDK.
 - All the post-CMake workaround and/or bug fixes that are scripted in the batch
   files or shell scripts are not applied to the generated project file.
 
