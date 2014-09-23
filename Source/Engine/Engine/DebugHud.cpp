@@ -80,7 +80,7 @@ DebugHud::DebugHud(Context* context) :
     profilerText_->SetVisible(false);
     uiRoot->AddChild(profilerText_);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(DebugHud, HandleUpdate));
+    SubscribeToEvent(E_POSTUPDATE, HANDLER(DebugHud, HandlePostUpdate));
 }
 
 DebugHud::~DebugHud()
@@ -259,9 +259,9 @@ void DebugHud::ClearAppStats()
     appStats_.Clear();
 }
 
-void DebugHud::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace Update;
+    using namespace PostUpdate;
 
     Update();
 }
