@@ -1651,6 +1651,7 @@ Properties:
 
 Methods:
 
+- void Update()
 - void SetDefaultStyle(XMLFile* style)
 - void SetMode(unsigned mode)
 - void SetProfilerMaxDepth(unsigned depth)

@@ -3253,6 +3253,7 @@ void SetAppStats(const String&, const String&);
 void SetAppStats(const String&, const Variant&);
 void Toggle(uint);
 void ToggleAll();
+void Update();
 
 // Properties:
 /* readonly */
