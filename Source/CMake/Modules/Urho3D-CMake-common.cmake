@@ -476,8 +476,22 @@ macro (setup_target)
     endif ()
 endmacro ()
 
+# Macro for checking the SOURCE_FILES variable is properly initialized
+macro (check_source_files)
+    if (NOT SOURCE_FILES)
+        message (FATAL_ERROR "Could not configure and generate the project file because no source files have been defined yet. "
+            "You can define the source files explicitly by setting the SOURCE_FILES variable in your CMakeLists.txt; or "
+            "by calling the define_source_files() macro which would by default glob all the C++ source files found in the same scope of "
+            "CMakeLists.txt where the macro is being called and the macro would set the SOURCE_FILES variable automatically. "
+            "If your source files are not located in the same directory as the CMakeLists.txt or your source files are "
+            "more than just C++ language then you probably have to pass in extra arguments when calling the macro in order to make it works. "
+            "See the define_source_files() macro definition in the Source/CMake/Modules/Urho3D-CMake-common.cmake for more detail.")
+    endif ()
+endmacro ()
+
 # Macro for setting up a library target
 macro (setup_library)
+    check_source_files ()
     add_library (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
     setup_target ()
 
@@ -502,6 +516,7 @@ macro (setup_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NODEPS" "" "" ${ARGN})
 
+    check_source_files ()
     add_executable (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
     if (ARG_NODEPS)
         define_dependency_libs (Urho3D-nodeps)
