@@ -52,7 +52,7 @@ LineEdit::LineEdit(Context* context) :
     textCopyable_(true)
 {
     clipChildren_ = true;
-    enabled_ = true;
+    SetEnabled(true);
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
     text_ = CreateChild<Text>("LE_Text");
@@ -176,7 +176,7 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
             SetText(source->GetVar(VAR_DRAGDROPCONTENT).GetString());
             return true;
         }
-        
+
         StringHash sourceType = source->GetType();
         if (sourceType == LineEdit::GetTypeStatic())
         {

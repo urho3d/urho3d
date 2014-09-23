@@ -54,7 +54,7 @@ Slider::Slider(Context* context) :
     dragSlider_(false),
     repeatRate_(0.0f)
 {
-    enabled_ = true;
+    SetEnabled(true);
     knob_ = CreateChild<BorderImage>("S_Knob");
     knob_->SetInternal(true);
 
@@ -249,13 +249,13 @@ void Slider::Page(const IntVector2& position, bool pressed)
 {
     if (!editable_)
         return;
-    
+
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
     float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
 
     using namespace SliderPaged;
-    
+
     VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = this;
     eventData[P_OFFSET] = offset;

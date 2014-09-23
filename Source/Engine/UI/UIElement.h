@@ -251,6 +251,10 @@ public:
     void SetUseDerivedOpacity(bool enable);
     /// Set whether reacts to input. Default false, but is enabled by subclasses if applicable.
     void SetEnabled(bool enable);
+    /// Set enabled on self and child elements.
+    void SetDeepEnabled(bool enable);
+    /// Change enabled back to what it was prior to SetDeepEnabled.
+    void ResetDeepEnabled();
     /// Set whether value is editable through input. Not applicable to all elements. Default true.
     void SetEditable(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
@@ -379,6 +383,8 @@ public:
     bool HasFocus() const;
     /// Return whether reacts to input.
     bool IsEnabled() const { return enabled_; }
+    /// Returns whether affected by a deep enable.
+    bool IsDeepEnabled() const { return enabled_ != enabledPrev_; }
     /// Return whether value is editable through input.
     bool IsEditable() const { return editable_; }
     /// Return whether is selected. Actual meaning is element dependent.
@@ -511,6 +517,8 @@ protected:
     bool useDerivedOpacity_;
     /// Input enabled flag.
     bool enabled_;
+    /// Last SetEnabled flag before any SetDeepEnabled.
+    bool enabledPrev_;
     /// Value editable flag.
     bool editable_;
     /// Selected flag.

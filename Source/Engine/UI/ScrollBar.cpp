@@ -47,7 +47,7 @@ ScrollBar::ScrollBar(Context* context) :
     upRect_(IntRect::ZERO),
     downRect_(IntRect::ZERO)
 {
-    enabled_ = true;
+    SetEnabled(true);
 
     backButton_ = CreateChild<Button>("SB_Back");
     backButton_->SetInternal(true);
@@ -118,7 +118,7 @@ void ScrollBar::OnResize()
         backButton_->SetSize(height, height);
         slider_->SetSize(sliderWidth, height);
         forwardButton_->SetSize(height, height);
-        
+
         backButton_->SetPosition(0, 0);
         slider_->SetPosition(height, 0);
         forwardButton_->SetPosition(height + sliderWidth, 0);
@@ -131,7 +131,7 @@ void ScrollBar::OnResize()
         backButton_->SetSize(width, width);
         slider_->SetSize(width, sliderHeight);
         forwardButton_->SetSize(width, width);
-        
+
         backButton_->SetPosition(0, 0);
         slider_->SetPosition(0, width);
         forwardButton_->SetPosition(0, sliderHeight + width);
