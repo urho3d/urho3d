@@ -53,7 +53,7 @@ Window::Window(Context* context) :
 {
     bringToFront_ = true;
     clipChildren_ = true;
-    enabled_ = true;
+    SetEnabled(true);
 }
 
 Window::~Window()

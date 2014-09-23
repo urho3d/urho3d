@@ -38,7 +38,7 @@ CheckBox::CheckBox(Context* context) :
     checkedOffset_(IntVector2::ZERO),
     checked_(false)
 {
-    enabled_ = true;
+    SetEnabled(true);
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 }
 
