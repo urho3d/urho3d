@@ -183,7 +183,6 @@ void UIElement::RegisterObject(Context* context)
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Deep Enabled", IsDeepEnabled, SetDeepEnabled, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
@@ -842,9 +841,7 @@ void UIElement::SetDeepEnabled(bool enable)
     enabled_ = enable;
 
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-    {
         (*i)->SetDeepEnabled(enable);
-    }
 }
 
 void UIElement::ResetDeepEnabled()
@@ -852,9 +849,16 @@ void UIElement::ResetDeepEnabled()
     enabled_ = enabledPrev_;
 
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-    {
         (*i)->ResetDeepEnabled();
-    }
+}
+
+void UIElement::SetEnabledRecursive(bool enable)
+{
+    enabled_ = enable;
+    enabledPrev_ = enable;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->SetEnabledRecursive(enable);
 }
 
 void UIElement::SetEditable(bool enable)

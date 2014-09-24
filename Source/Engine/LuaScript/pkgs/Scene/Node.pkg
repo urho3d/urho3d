@@ -79,7 +79,9 @@ class Node : public Animatable
     void Scale2D(const Vector2& scale);
     
     void SetEnabled(bool enable);
-    void SetEnabled(bool enable, bool recursive);
+    void SetDeepEnabled(bool enable);
+    void ResetDeepEnabled();
+    void SetEnabledRecursive(bool enable);
     void SetOwner(Connection* owner);
     void MarkDirty();
     
@@ -121,6 +123,7 @@ class Node : public Animatable
     Node* GetParent() const;
     Scene* GetScene() const;
     bool IsEnabled() const;
+    bool IsEnabledSelf() const;
     Connection* GetOwner() const;
     
     const Vector3& GetPosition() const;
@@ -186,6 +189,7 @@ class Node : public Animatable
     tolua_property__get_set Node* parent;
     tolua_property__get_set Scene* scene;
     tolua_property__is_set bool enabled;
+    tolua_readonly tolua_property__is_set bool enabledSelf;
     tolua_property__get_set Connection* owner;
     tolua_property__get_set Vector3& position;
     tolua_property__get_set Vector2 position2D;

@@ -251,10 +251,12 @@ public:
     void SetUseDerivedOpacity(bool enable);
     /// Set whether reacts to input. Default false, but is enabled by subclasses if applicable.
     void SetEnabled(bool enable);
-    /// Set enabled on self and child elements.
+    /// Set enabled state on self and child elements. Elements' own enabled state is remembered (IsEnabledSelf) and can be restored.
     void SetDeepEnabled(bool enable);
-    /// Change enabled back to what it was prior to SetDeepEnabled.
+    /// Reset enabled state to the element's remembered state prior to calling SetDeepEnabled.
     void ResetDeepEnabled();
+    /// Set enabled state on self and child elements. Unlike SetDeepEnabled this does not remember the elements' own enabled state, but overwrites it.
+    void SetEnabledRecursive(bool enable);
     /// Set whether value is editable through input. Not applicable to all elements. Default true.
     void SetEditable(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
@@ -383,8 +385,8 @@ public:
     bool HasFocus() const;
     /// Return whether reacts to input.
     bool IsEnabled() const { return enabled_; }
-    /// Returns whether affected by a deep enable.
-    bool IsDeepEnabled() const { return enabled_ != enabledPrev_; }
+    /// Returns the element's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
+    bool IsEnabledSelf() const { return enabledPrev_; }
     /// Return whether value is editable through input.
     bool IsEditable() const { return editable_; }
     /// Return whether is selected. Actual meaning is element dependent.

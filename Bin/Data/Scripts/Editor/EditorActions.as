@@ -477,14 +477,14 @@ class ToggleNodeEnabledAction : EditAction
     {
         Node@ node = editorScene.GetNode(nodeID);
         if (node !is null)
-            node.SetEnabled(undoValue, true);
+            node.SetEnabledRecursive(undoValue);
     }
 
     void Redo()
     {
         Node@ node = editorScene.GetNode(nodeID);
         if (node !is null)
-            node.SetEnabled(!undoValue, true);
+            node.SetEnabledRecursive(!undoValue);
     }
 }
 

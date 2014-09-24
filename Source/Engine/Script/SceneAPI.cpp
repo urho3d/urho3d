@@ -116,9 +116,12 @@ static void RegisterNode(asIScriptEngine* engine)
     RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");
 
-    engine->RegisterObjectMethod("Node", "void SetEnabled(bool, bool)", asMETHODPR(Node, SetEnabled, (bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "void SetDeepEnabled(bool)", asMETHOD(Node, SetDeepEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "void ResetDeepEnabled()", asMETHOD(Node, ResetDeepEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "void SetEnabledRecursive(bool)", asMETHOD(Node, SetEnabledRecursive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void set_enabled(bool)", asMETHODPR(Node, SetEnabled, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool get_enabled() const", asMETHOD(Node, IsEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "bool get_enabledSelf() const", asMETHOD(Node, IsEnabledSelf), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool SaveXML(File@+)", asFUNCTION(NodeSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "bool SaveXML(VectorBuffer&)", asFUNCTION(NodeSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode mode = REPLICATED)", asMETHOD(Node, Clone), asCALL_THISCALL);

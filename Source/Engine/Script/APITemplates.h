@@ -1071,8 +1071,12 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_useDerivedOpacity() const", asMETHOD(T, GetUseDerivedOpacity), asCALL_THISCALL);
     if (!isSprite)
     {
+        engine->RegisterObjectMethod(className, "void SetDeepEnabled(bool)", asMETHOD(T, SetDeepEnabled), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void ResetDeepEnabled()", asMETHOD(T, ResetDeepEnabled), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void SetEnabledRecursive(bool)", asMETHOD(T, SetEnabledRecursive), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_enabledSelf() const", asMETHOD(T, IsEnabledSelf), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_editable(bool)", asMETHOD(T, SetEditable), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_editable() const", asMETHOD(T, IsEditable), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);

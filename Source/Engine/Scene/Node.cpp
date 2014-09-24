@@ -45,6 +45,7 @@ Node::Node(Context* context) :
     worldTransform_(Matrix3x4::IDENTITY),
     dirty_(false),
     enabled_(true),
+    enabledPrev_(true),
     parent_(0),
     scene_(0),
     id_(0),
@@ -513,73 +514,25 @@ void Node::Scale(const Vector3& scale)
 
 void Node::SetEnabled(bool enable)
 {
-    SetEnabled(enable, false);
+    SetEnabled(enable, false, true);
 }
 
-void Node::SetEnabled(bool enable, bool recursive)
+void Node::SetDeepEnabled(bool enable)
 {
-    // The enabled state of the whole scene can not be changed. SetUpdateEnabled() is used instead to start/stop updates.
-    if (GetType() == Scene::GetTypeStatic())
-    {
-        LOGERROR("Can not change enabled state of the Scene");
-        return;
-    }
+    SetEnabled(enable, true, false);
+}
 
-    if (enable != enabled_)
-    {
-        enabled_ = enable;
+void Node::ResetDeepEnabled()
+{
+    SetEnabled(enabledPrev_, false, false);
 
-        MarkNetworkUpdate();
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->ResetDeepEnabled();
+}
 
-        // Notify listener components of the state change
-        for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End();)
-        {
-            if (*i)
-            {
-                (*i)->OnNodeSetEnabled(this);
-                ++i;
-            }
-            // If listener has expired, erase from list
-            else
-                i = listeners_.Erase(i);
-        }
-
-        // Send change event
-        if (scene_)
-        {
-            using namespace NodeEnabledChanged;
-
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_SCENE] = scene_;
-            eventData[P_NODE] = this;
-
-            scene_->SendEvent(E_NODEENABLEDCHANGED, eventData);
-        }
-
-        for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
-        {
-            (*i)->OnSetEnabled();
-
-            // Send change event for the component
-            if (scene_)
-            {
-                using namespace ComponentEnabledChanged;
-
-                VariantMap& eventData = GetEventDataMap();
-                eventData[P_SCENE] = scene_;
-                eventData[P_NODE] = this;
-                eventData[P_COMPONENT] = (*i);
-
-                scene_->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
-            }
-        }
-    }
-
-    if (recursive)
-    {
-        for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
-            (*i)->SetEnabled(enable, recursive);
-    }
+void Node::SetEnabledRecursive(bool enable)
+{
+    SetEnabled(enable, true, true);
 }
 
 void Node::SetOwner(Connection* owner)
@@ -1582,6 +1535,74 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
 
             components[index]->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
         }
+    }
+}
+
+void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
+{
+    // The enabled state of the whole scene can not be changed. SetUpdateEnabled() is used instead to start/stop updates.
+    if (GetType() == Scene::GetTypeStatic())
+    {
+        LOGERROR("Can not change enabled state of the Scene");
+        return;
+    }
+
+    if (storeSelf)
+        enabledPrev_ = enable;
+    
+    if (enable != enabled_)
+    {
+        enabled_ = enable;
+        MarkNetworkUpdate();
+
+        // Notify listener components of the state change
+        for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End();)
+        {
+            if (*i)
+            {
+                (*i)->OnNodeSetEnabled(this);
+                ++i;
+            }
+            // If listener has expired, erase from list
+            else
+                i = listeners_.Erase(i);
+        }
+
+        // Send change event
+        if (scene_)
+        {
+            using namespace NodeEnabledChanged;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_SCENE] = scene_;
+            eventData[P_NODE] = this;
+
+            scene_->SendEvent(E_NODEENABLEDCHANGED, eventData);
+        }
+
+        for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+        {
+            (*i)->OnSetEnabled();
+
+            // Send change event for the component
+            if (scene_)
+            {
+                using namespace ComponentEnabledChanged;
+
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_SCENE] = scene_;
+                eventData[P_NODE] = this;
+                eventData[P_COMPONENT] = (*i);
+
+                scene_->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
+            }
+        }
+    }
+
+    if (recursive)
+    {
+        for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+            (*i)->SetEnabled(enable, recursive, storeSelf);
     }
 }
 

@@ -180,8 +180,12 @@ public:
     void Scale2D(const Vector2& scale) { Scale(Vector3(scale, 1.0f)); }
     /// Set enabled/disabled state without recursion. Components in a disabled node become effectively disabled regardless of their own enable/disable state.
     void SetEnabled(bool enable);
-    /// Set enabled/disabled state with optional recursion.
-    void SetEnabled(bool enable, bool recursive);
+    /// Set enabled state on self and child nodes. Nodes' own enabled state is remembered (IsEnabledSelf) and can be restored.
+    void SetDeepEnabled(bool enable);
+    /// Reset enabled state to the node's remembered state prior to calling SetDeepEnabled.
+    void ResetDeepEnabled();
+    /// Set enabled state on self and child nodes. Unlike SetDeepEnabled this does not remember the nodes' own enabled state, but overwrites it.
+    void SetEnabledRecursive(bool enable);
     /// Set owner connection for networking.
     void SetOwner(Connection* owner);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
@@ -243,6 +247,8 @@ public:
     Scene* GetScene() const { return scene_; }
     /// Return whether is enabled. Disables nodes effectively disable all their components.
     bool IsEnabled() const { return enabled_; }
+    /// Returns the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
+    bool IsEnabledSelf() const { return enabledPrev_; }
     /// Return owner connection in networking.
     Connection* GetOwner() const { return owner_; }
     /// Return position in parent space.
@@ -472,6 +478,8 @@ protected:
     VariantMap vars_;
 
 private:
+    /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
+    void SetEnabled(bool enable, bool recursive, bool storeSelf);
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
     Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id);
     /// Recalculate the world transform.
@@ -497,6 +505,8 @@ private:
     mutable bool dirty_;
     /// Enabled flag.
     bool enabled_;
+    /// Last SetEnabled flag before any SetDeepEnabled.
+    bool enabledPrev_;
     /// Parent scene node.
     Node* parent_;
     /// Scene (root node.)
