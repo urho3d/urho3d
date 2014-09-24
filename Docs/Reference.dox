@@ -1800,6 +1800,8 @@ A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered usin
 
 For a demonstration, check example 25_Urho2DParticle.
 
+ParticleEditor2D tool (https://github.com/aster2013/ParticleEditor2D) is provided to easily create pex files.
+
 \section Urho2D_Static_Sprites Static sprites
 Static sprites are built from single image files or from spritesheets/texture atlases.
 Single image files are loaded using Sprite2D class (Resource) and spritesheets/texture atlases are loaded using SpriteSheet2D class (Resource).
@@ -2257,6 +2259,10 @@ Options:
 \endverbatim
 
 Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
+
+\section Tools_BlenderExporter Blender exporter/add-on
+
+Blender users can export their assets using reattiva's Blender add-on available at https://github.com/reattiva/Urho3D-Blender
 
 \section Tools_PackageTool PackageTool
 
