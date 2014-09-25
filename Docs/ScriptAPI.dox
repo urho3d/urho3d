@@ -2791,6 +2791,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -2804,6 +2805,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -2847,6 +2850,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -2981,6 +2985,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -2994,6 +2999,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3040,6 +3047,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -3232,6 +3240,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -3246,6 +3255,8 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCheckedOffset(int, int)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -3291,6 +3302,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -4758,6 +4770,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -4771,6 +4784,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -4814,6 +4829,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -5377,6 +5393,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void RemoveItem(UIElement@)
 - void RemoveItem(uint)
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -5391,6 +5408,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -5440,6 +5459,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -6289,6 +6309,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -6302,6 +6323,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6350,6 +6373,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -6465,6 +6489,7 @@ Methods:
 - void RemoveItem(UIElement@, uint = 0)
 - void RemoveItem(uint)
 - void RemoveSelection(uint)
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -6478,6 +6503,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6525,6 +6552,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -6813,6 +6841,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -6827,6 +6856,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -6876,6 +6907,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -7252,6 +7284,7 @@ Methods:
 - void RemoveComponent(const String&)
 - void RemoveComponents(bool, bool)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
@@ -7271,7 +7304,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetEnabled(bool, bool)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetPosition2D(float, float)
 - void SetScale(float)
 - void SetScale2D(float, float)
@@ -7306,6 +7340,7 @@ Properties:
 - Component@[] components // readonly
 - Vector3 direction
 - bool enabled
+- bool enabledSelf // readonly
 - uint id // readonly
 - String name
 - uint numAllChildren // readonly
@@ -8844,6 +8879,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -8857,6 +8893,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -8900,6 +8938,7 @@ Properties:
 - float effectiveScrollStep // readonly
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -8997,6 +9036,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -9010,6 +9050,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -9052,6 +9094,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -9309,6 +9352,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -9322,6 +9366,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -9365,6 +9411,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -10477,6 +10524,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -10490,6 +10538,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -10535,6 +10585,7 @@ Properties:
 - Color effectColor
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -11138,6 +11189,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -11151,6 +11203,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -11191,6 +11245,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -11343,6 +11398,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -11356,6 +11412,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -11395,6 +11453,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedSize // readonly
 - bool fixedWidth // readonly
@@ -11721,6 +11780,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -11734,6 +11794,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -11777,6 +11839,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedHeightResizing
 - bool fixedSize // readonly
@@ -11919,6 +11982,7 @@ Methods:
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -11932,6 +11996,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
@@ -11971,6 +12037,7 @@ Properties:
 - bool editable
 - bool elementEventSender
 - bool enabled
+- bool enabledSelf // readonly
 - bool fixedHeight // readonly
 - bool fixedHeightResizing
 - bool fixedSize // readonly

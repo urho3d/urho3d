@@ -714,6 +714,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -727,6 +728,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -779,6 +782,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -926,6 +931,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -939,6 +945,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -994,6 +1002,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -1214,6 +1224,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -1228,6 +1239,8 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCheckedOffset(int, int);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -1282,6 +1295,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -3001,6 +3016,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -3014,6 +3030,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -3066,6 +3084,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -3713,6 +3733,7 @@ void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveItem(UIElement);
 void RemoveItem(uint);
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -3727,6 +3748,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -3787,6 +3810,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -4793,6 +4818,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -4806,6 +4832,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -4864,6 +4892,8 @@ uint echoCharacter;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -4993,6 +5023,7 @@ void RemoveInstanceDefault();
 void RemoveItem(UIElement, uint = 0);
 void RemoveItem(uint);
 void RemoveSelection(uint);
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -5006,6 +5037,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -5063,6 +5096,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -5376,6 +5411,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -5390,6 +5426,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -5450,6 +5488,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -5891,6 +5931,7 @@ void RemoveComponent(Component);
 void RemoveComponent(const String&);
 void RemoveComponents(bool, bool);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
 void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
@@ -5910,7 +5951,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetEnabled(bool, bool);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
@@ -5950,6 +5992,8 @@ Array<Node> children;
 Array<Component> components;
 Vector3 direction;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 uint id;
 String name;
@@ -7690,6 +7734,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -7703,6 +7748,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -7757,6 +7804,8 @@ bool editable;
 float effectiveScrollStep;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -7869,6 +7918,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -7882,6 +7932,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -7933,6 +7985,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -8225,6 +8279,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -8238,6 +8293,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -8290,6 +8347,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -9571,6 +9630,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -9584,6 +9644,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -9640,6 +9702,8 @@ bool editable;
 Color effectColor;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -10390,6 +10454,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -10403,6 +10468,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -10452,6 +10519,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -10625,6 +10694,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -10638,6 +10708,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -10686,6 +10758,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 /* readonly */
@@ -11030,6 +11104,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -11043,6 +11118,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -11097,6 +11174,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 bool fixedHeightResizing;
@@ -11258,6 +11337,7 @@ void RemoveAllChildren();
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -11271,6 +11351,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetDeepEnabled(bool);
+void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
@@ -11319,6 +11401,8 @@ uint dragDropMode;
 bool editable;
 bool elementEventSender;
 bool enabled;
+/* readonly */
+bool enabledSelf;
 /* readonly */
 bool fixedHeight;
 bool fixedHeightResizing;
