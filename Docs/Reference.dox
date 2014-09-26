@@ -1800,7 +1800,7 @@ A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered usin
 
 For a demonstration, check example 25_Urho2DParticle.
 
-ParticleEditor2D tool (https://github.com/aster2013/ParticleEditor2D) is provided to easily create pex files.
+ParticleEditor2D tool (https://github.com/aster2013/ParticleEditor2D) can be used to easily create pex files.
 
 \section Urho2D_Static_Sprites Static sprites
 Static sprites are built from single image files or from spritesheets/texture atlases.
@@ -2193,6 +2193,8 @@ Attribute animation and object animation can be save to scene file, Someday if o
 
 Loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at http://assimp.sourceforge.net/main_features_formats.html.
 
+An alternative export path for Blender is to use the Urho3D add-on (https://github.com/reattiva/Urho3D-Blender).
+
 Usage:
 
 \verbatim
@@ -2259,10 +2261,6 @@ Options:
 \endverbatim
 
 Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
-
-\section Tools_BlenderExporter Blender exporter/add-on
-
-Blender users can export their assets using reattiva's Blender add-on available at https://github.com/reattiva/Urho3D-Blender
 
 \section Tools_PackageTool PackageTool
 
