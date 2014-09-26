@@ -1651,6 +1651,7 @@ Properties:
 
 Methods:
 
+- void Update()
 - void SetDefaultStyle(XMLFile* style)
 - void SetMode(unsigned mode)
 - void SetProfilerMaxDepth(unsigned depth)
@@ -3351,7 +3352,9 @@ Methods:
 - void Scale(const Vector3& scale)
 - void Scale2D(const Vector2& scale)
 - void SetEnabled(bool enable)
-- void SetEnabled(bool enable, bool recursive)
+- void SetDeepEnabled(bool enable)
+- void ResetDeepEnabled()
+- void SetEnabledRecursive(bool enable)
 - void SetOwner(Connection* owner)
 - void MarkDirty()
 - Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
@@ -3383,6 +3386,7 @@ Methods:
 - Node* GetParent() const
 - Scene* GetScene() const
 - bool IsEnabled() const
+- bool IsEnabledSelf() const
 - Connection* GetOwner() const
 - const Vector3& GetPosition() const
 - Vector2 GetPosition2D() const
@@ -3438,6 +3442,7 @@ Properties:
 - Node* parent
 - Scene* scene
 - bool enabled
+- bool enabledSelf (readonly)
 - Connection* owner
 - Vector3& position
 - Vector2 position2D
@@ -5792,6 +5797,9 @@ Methods:
 - void SetSortChildren(bool enable)
 - void SetUseDerivedOpacity(bool enable)
 - void SetEnabled(bool enable)
+- void SetDeepEnabled(bool enable)
+- void ResetDeepEnabled()
+- void SetEnabledRecursive(bool enable)
 - void SetEditable(bool enable)
 - void SetFocus(bool enable)
 - void SetSelected(bool enable)
@@ -5855,6 +5863,7 @@ Methods:
 - bool GetUseDerivedOpacity() const
 - bool HasFocus() const
 - bool IsEnabled() const
+- bool IsEnabledSelf() const
 - bool IsEditable() const
 - bool IsSelected() const
 - bool IsVisible() const
@@ -5925,6 +5934,7 @@ Properties:
 - bool useDerivedOpacity
 - bool focus
 - bool enabled
+- bool enabledSelf (readonly)
 - bool editable
 - bool selected
 - bool visible

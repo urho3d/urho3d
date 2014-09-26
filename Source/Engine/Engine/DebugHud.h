@@ -50,7 +50,7 @@ public:
     /// Destruct.
     ~DebugHud();
 
-    /// Update. Called by HandleUpdate().
+    /// Update. Called by HandlePostUpdate().
     void Update();
     /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);
@@ -94,8 +94,8 @@ public:
     void ClearAppStats();
 
 private:
-    /// Handle logic update event.
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle logic post-update event. The HUD texts are updated here.
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Rendering stats text.
     SharedPtr<Text> statsText_;

@@ -43,7 +43,7 @@ Button::Button(Context* context) :
     repeatTimer_(0.0f),
     pressed_(false)
 {
-    enabled_ = true;
+    SetEnabled(true);
     focusMode_ = FM_FOCUSABLE;
 }
 

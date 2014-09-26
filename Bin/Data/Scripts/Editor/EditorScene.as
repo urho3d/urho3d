@@ -715,7 +715,7 @@ bool SceneToggleEnable()
         if (selectedNodes[i].typeName == "Node")
         {
             bool oldEnabled = selectedNodes[i].enabled;
-            selectedNodes[i].SetEnabled(!oldEnabled, true);
+            selectedNodes[i].SetEnabledRecursive(!oldEnabled);
 
             // Create undo action
             ToggleNodeEnabledAction action;

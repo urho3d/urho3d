@@ -56,7 +56,7 @@ ScrollView::ScrollView(Context* context) :
     barScrolling_(false)
 {
     clipChildren_ = true;
-    enabled_ = true;
+    SetEnabled(true);
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
     horizontalScrollBar_ = CreateChild<ScrollBar>("SV_HorizontalScrollBar");

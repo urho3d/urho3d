@@ -188,7 +188,7 @@ Instead of using one of the provided batch files or shell scripts, you can use c
     - On Android platform: android-Build\n
     - On Raspberry Pi platform: raspi-Build\n
 - The runtime and archive output directories are automatically set based on the target platform regardless of the build directory name (should you choose not to adhere with the above). For example on Android platform, they will be android-Bin and android-Lib, respectively.\n
-If you choose not to adhere with this build directory naming convention then you will have to install the Urho3D library into your local filesystem in order to use the Urho3D library in your external project. See \ref Building_Library and \ref UsingLibraryFromSDK.
+If you choose not to adhere with this build directory naming convention then you will have to install the Urho3D library into your local filesystem in order to use the Urho3D library in your external project. See \ref Building_Library and \ref FromSDK.
 - All the post-CMake workaround and/or bug fixes that are scripted in the batch files or shell scripts are not applied to the generated project file.
 
 Steps to configure:
@@ -344,7 +344,7 @@ PROJECT_ROOT/
  ┕ *.bat or *.sh
 \endcode
 
-The Source/ directory is where your project CMakeLists.txt and all your source codes should reside. The Bin/ directory is where all the executables output will be generated. In order to run the executable in this directory, you need to copy (or symlink) the CoreData/ and Data/ directories from Urho3D project Bin/ directory (or from Urho3D SDK installation) to here. You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The Build/ directory will be created automatically by the Urho3D CMake module that will be discussed shortly below. The *.bat or *.sh scripts work together with the module to create a so-called out-of-source build tree to keep the Source/ directory clean from intermediate build files.
+The Source/ directory is where your project CMakeLists.txt and all your source codes should reside. The Bin/ directory is where all the executables output will be generated. In order to run the executable in this directory, you need to copy (or symlink) the CoreData/ and Data/ directories from Urho3D project Bin/ directory (or from Urho3D SDK installation) to here. You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The Build/ directory will be created automatically by the Urho3D CMake module that will be discussed shortly below. The *.bat or *.sh scripts work together with the module to create a so-called out-of-source build tree to keep the Source/ directory clean from intermediate build files. Note that when you invoke one the *.bat or *.sh script, you can pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass the similar build options that you use when building the Urho3D library to avoid any conflict.
 
 \section UsingLibraryFromProjectRootTree From Urho3D project root tree
 
@@ -404,7 +404,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variables to setup a new CMake target that would work on ALL platforms supported by Urho3D. Make sure both your project name and target name are not called 'Urho3D', as this name is already reserved by Urho3D project.
 
-\section UsingLibraryFromSDK From Urho3D SDK installation
+\section FromSDK From Urho3D SDK installation
 
 This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "CMAKE_PREFIX_PATH" environment variable to specify the prefix path of the non-default installation location.
 
@@ -422,7 +422,7 @@ On non-Windows platform:
 set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
-\subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake
+\subsection FromSDKWithPkgConfig Using pkg-config instead of CMake
 
 If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
 
@@ -444,6 +444,17 @@ export PKG_CONFIG_SYSROOT_DIR=${RASPI_ROOT}
 export PKG_CONFIG_PATH=${RASPI_ROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
 \endcode
+
+\section Scaffolding Project scaffolding
+
+On Unix-like build/host system (Linux, Mac, Raspberry-Pi) with [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
+\verbatim
+Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
+\endverbatim
+
+As its name implies, this task just creates a basic project structure for your new project. You may also pass optional "project" and "target" parameters besides the "dir" parameter. Otherwise, you will get the default project name (Scaffolding) and target name (Main) in the main CMakeLists.txt. This task copies the Urho3DPlayer.cpp and Urho3DPlayer.h as placeholders for the source files. Normally, you should replace these two files with your own project source files before invoking one of the CMake *.bat or *.sh script.
+
+Unfortunately, all our rake tasks are currently not supported on Windows build/host system yet.
 
 \page Structure Overall structure
 

@@ -8,6 +8,7 @@ static const unsigned DEBUGHUD_SHOW_ALL;
 
 class DebugHud : public Object
 {
+    void Update();
     void SetDefaultStyle(XMLFile* style);
     void SetMode(unsigned mode);
     void SetProfilerMaxDepth(unsigned depth);

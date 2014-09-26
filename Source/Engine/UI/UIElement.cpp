@@ -119,7 +119,6 @@ UIElement::UIElement(Context* context) :
     clipChildren_(false),
     sortChildren_(true),
     useDerivedOpacity_(true),
-    enabled_(false),
     editable_(true),
     selected_(false),
     visible_(true),
@@ -151,6 +150,7 @@ UIElement::UIElement(Context* context) :
     traversalMode_(TM_BREADTH_FIRST),
     elementEventSender_(false)
 {
+    SetEnabled(false);
 }
 
 UIElement::~UIElement()
@@ -361,7 +361,7 @@ bool UIElement::SaveXML(XMLElement& dest) const
         UIElement* element = children_[i];
         if (element->IsTemporary())
             continue;
-        
+
         XMLElement childElem = dest.CreateChild("element");
         if (!element->SaveXML(childElem))
             return false;
@@ -833,6 +833,32 @@ void UIElement::SetUseDerivedOpacity(bool enable)
 void UIElement::SetEnabled(bool enable)
 {
     enabled_ = enable;
+    enabledPrev_ = enable;
+}
+
+void UIElement::SetDeepEnabled(bool enable)
+{
+    enabled_ = enable;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->SetDeepEnabled(enable);
+}
+
+void UIElement::ResetDeepEnabled()
+{
+    enabled_ = enabledPrev_;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->ResetDeepEnabled();
+}
+
+void UIElement::SetEnabledRecursive(bool enable)
+{
+    enabled_ = enable;
+    enabledPrev_ = enable;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->SetEnabledRecursive(enable);
 }
 
 void UIElement::SetEditable(bool enable)
@@ -897,7 +923,7 @@ bool UIElement::SetStyle(const String& styleName, XMLFile* file)
 {
     // If empty style was requested, replace with type name
     String actualStyleName = !styleName.Empty() ? styleName : GetTypeName();
-    
+
     appliedStyle_ = actualStyleName;
     if (styleName == "none")
         return true;
