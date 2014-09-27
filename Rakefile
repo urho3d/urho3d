@@ -259,8 +259,12 @@ define_source_files ()
 setup_main_executable ()
 
 # Setup test cases
-add_test (NAME ExternalLibAS COMMAND \\${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout \\${URHO3D_TEST_TIME_OUT})
-add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout \\${URHO3D_TEST_TIME_OUT})
+if (URHO3D_ANGELSCRIPT)
+    add_test (NAME ExternalLibAS COMMAND \\${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout \\${URHO3D_TEST_TIME_OUT})
+endif ()
+if (URHO3D_LUA)
+    add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout \\${URHO3D_TEST_TIME_OUT})
+endif ()
 EOF" or abort 'Failed to create new project using Urho3D as external library'
 end
 
