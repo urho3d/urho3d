@@ -47,13 +47,6 @@ namespace Urho3D
 
 ## %Graphics events
 
-### WindowMessage
-- %Window : int
-- %Msg : int
-- %WParam : int
-- %LParam : int
-- %Handled : bool
-
 ### ScreenMode
 - %Width : int
 - %Height : int
