@@ -37,28 +37,28 @@ if (DIRECT3D_FOUND)
 endif ()
 
 set (DIRECTX_INC_SEARCH_PATH
-    "$ENV{DIRECTX_ROOT}/Include"
-    "$ENV{DXSDK_DIR}/Include"
     "C:/Program Files (x86)/Microsoft DirectX SDK*/Include"
-    "C:/Program Files/Microsoft DirectX SDK*/Include")
-find_path (DIRECT3D_INCLUDE_DIRS d3dx9.h ${DIRECTX_INC_SEARCH_PATH})
+    "C:/Program Files/Microsoft DirectX SDK*/Include"
+    "$ENV{DIRECTX_ROOT}/Include"
+    "$ENV{DXSDK_DIR}/Include")
+find_path (DIRECT3D_INCLUDE_DIRS d3dcompiler.h ${DIRECTX_INC_SEARCH_PATH})
 
 if (CMAKE_CL_64)
     set (DIRECTX_LIB_SEARCH_PATH
-        "$ENV{DIRECTX_ROOT}/Lib/x64"
-        "$ENV{DXSDK_DIR}/Lib/x64"
         "C:/Program Files (x86)/Microsoft DirectX SDK*/Lib/x64"
-        "C:/Program Files/Microsoft DirectX SDK*/Lib/x64")
+        "C:/Program Files/Microsoft DirectX SDK*/Lib/x64"
+        "$ENV{DIRECTX_ROOT}/Lib/x64"
+        "$ENV{DXSDK_DIR}/Lib/x64")
 else ()
     set (DIRECTX_LIB_SEARCH_PATH
-        "$ENV{DIRECTX_ROOT}/Lib"
-        "$ENV{DIRECTX_ROOT}/Lib/x86"
-        "$ENV{DXSDK_DIR}/Lib"
-        "$ENV{DXSDK_DIR}/Lib/x86"
         "C:/Program Files (x86)/Microsoft DirectX SDK*/Lib"
         "C:/Program Files (x86)/Microsoft DirectX SDK*/Lib/x86"
         "C:/Program Files/Microsoft DirectX SDK*/Lib"
-        "C:/Program Files/Microsoft DirectX SDK*/Lib/x86")
+        "C:/Program Files/Microsoft DirectX SDK*/Lib/x86"
+        "$ENV{DIRECTX_ROOT}/Lib"
+        "$ENV{DIRECTX_ROOT}/Lib/x86"
+        "$ENV{DXSDK_DIR}/Lib"
+        "$ENV{DXSDK_DIR}/Lib/x86")
 endif ()
 find_library (DIRECT3D_LIBRARIES d3d9 ${DIRECTX_LIB_SEARCH_PATH})
 find_library (DIRECT3D_COMPILER_LIBRARIES d3dcompiler ${DIRECTX_LIB_SEARCH_PATH})
