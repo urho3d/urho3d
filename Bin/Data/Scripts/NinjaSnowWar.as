@@ -170,6 +170,7 @@ void InitScene()
 void InitNetworking()
 {
     network.updateFps = 25; // 1/4 of physics FPS
+    // Remote events sent between client & server must be explicitly registered or else they are not allowed to be received
     network.RegisterRemoteEvent("PlayerSpawned");
     network.RegisterRemoteEvent("UpdateScore");
     network.RegisterRemoteEvent("UpdateHiscores");

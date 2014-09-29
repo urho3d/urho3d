@@ -233,6 +233,8 @@ void SceneReplication::SubscribeToEvents()
     SubscribeToEvent(E_CLIENTDISCONNECTED, HANDLER(SceneReplication, HandleClientDisconnected));
     // This is a custom event, sent from the server to the client. It tells the node ID of the object the client should control
     SubscribeToEvent(E_CLIENTOBJECTID, HANDLER(SceneReplication, HandleClientObjectID));
+    // Events sent between client & server (remote events) must be explicitly registered or else they are not allowed to be received
+    GetSubsystem<Network>()->RegisterRemoteEvent(E_CLIENTOBJECTID);
 }
 
 Button* SceneReplication::CreateButton(const String& text, int width)

@@ -178,6 +178,8 @@ void SubscribeToEvents()
     SubscribeToEvent("ClientDisconnected", "HandleClientDisconnected");
     // This is a custom event, sent from the server to the client. It tells the node ID of the object the client should control
     SubscribeToEvent("ClientObjectID", "HandleClientObjectID");
+    // Events sent between client & server (remote events) must be explicitly registered or else they are not allowed to be received
+    network.RegisterRemoteEvent("ClientObjectID");
 }
 
 Button@ CreateButton(const String& text, int width)
