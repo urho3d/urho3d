@@ -373,11 +373,14 @@ be found in the mingw-Bin output directory.
 Desktop 64bit build
 -------------------
 
-Currently CMake build configuration has been set to compile Urho3D as 32bit by
-default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh
-by passing the option "-DURHO3D_64BIT=1" explicitly. For Visual Studio on
-Windows platform, this option also overrides CMake to use a 64bit solution
-generator.
+When using MSVC compiler, the Urho3D CMake build script will configure the
+Urho3D project to be built in 32-bit by default. When using other non-MSVC
+compilers (like GCC or clang), the CMake build script will set the default to
+32-bit or 64-bit based on the installed toolchain in the host system. You can
+use the build option "URHO3D_64BIT" to override the default, by setting the
+option to '0' (for 32-bit) and '1' (for 64-bit) explicitly. For MSVC on Windows
+platform, setting the option to '1' also instructs the build script to use a
+64-bit solution generator.
 
 
 Library build
@@ -438,7 +441,9 @@ cmake_xxxx batch files or shell scripts.
 |---------------------|-|------------------------------------------------------|
 |Build Option         |V|Description                                           |
 |---------------------|-|------------------------------------------------------|
-|URHO3D_64BIT         |0|Enable 64bit build                                    |
+|URHO3D_64BIT         |-|Enable 64bit build, on MSVC default to 0, on other    |
+|                     | | compilers the default is set based on the installed  |
+|                     | | toolchain on host system                             |
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support                  |
 |URHO3D_LUA           |0|Enable Lua scripting support                          |
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check      |
