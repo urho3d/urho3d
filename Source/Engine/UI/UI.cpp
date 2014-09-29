@@ -1361,7 +1361,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         {
             // If it is a modal window, by resetting its modal flag
             Window* window = dynamic_cast<Window*>(element);
-            if (window)
+            if (window && window->GetModalAutoDismiss())
                 window->SetModal(false);
         }
 

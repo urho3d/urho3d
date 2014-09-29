@@ -1177,6 +1177,8 @@ template <class T> void RegisterWindow(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "const Color& get_modalFrameColor() const", asMETHOD(T, GetModalFrameColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_modalFrameSize(const IntVector2&in)", asMETHOD(T, SetModalFrameSize), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_modalFrameSize() const", asMETHOD(T, GetModalFrameSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_modalAutoDismiss(bool)", asMETHOD(T, SetModalAutoDismiss), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_modalAutoDismiss() const", asMETHOD(T, GetModalAutoDismiss), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_fixedWidthResizing(bool)", asMETHOD(T, SetFixedWidthResizing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_fixedWidthResizing() const", asMETHOD(T, GetFixedWidthResizing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_fixedHeightResizing(bool)", asMETHOD(T, SetFixedHeightResizing), asCALL_THISCALL);

@@ -28,6 +28,7 @@ class Window : public BorderImage
     void SetModalShadeColor(const Color& color);
     void SetModalFrameColor(const Color& color);
     void SetModalFrameSize(const IntVector2& size);
+    void SetModalAutoDismiss(bool enable);
 
     bool IsMovable() const;
     bool IsResizable() const;
@@ -38,7 +39,8 @@ class Window : public BorderImage
     const Color& GetModalShadeColor() const;
     const Color& GetModalFrameColor() const;
     const IntVector2& GetModalFrameSize() const;
-    
+    bool GetModalAutoDismiss() const;
+
     tolua_property__is_set bool movable;
     tolua_property__is_set bool resizable;
     tolua_property__get_set bool fixedWidthResizing;
@@ -48,6 +50,7 @@ class Window : public BorderImage
     tolua_property__get_set Color& modalShadeColor;
     tolua_property__get_set Color& modalFrameColor;
     tolua_property__get_set IntVector2& modalFrameSize;
+    tolua_property__get_set bool modalAutoDismiss;
 };
 
 ${
