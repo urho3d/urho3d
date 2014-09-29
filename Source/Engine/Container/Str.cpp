@@ -133,6 +133,16 @@ String::String(float value) :
     *this = tempBuffer;
 }
 
+String::String(float value, String formatString) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, formatString.CString(), value);
+    *this = tempBuffer;
+}
+
 String::String(double value) :
     length_(0),
     capacity_(0),
@@ -140,6 +150,16 @@ String::String(double value) :
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%g", value);
+    *this = tempBuffer;
+}
+
+String::String(double value, String formatString) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, formatString.CString(), value);
     *this = tempBuffer;
 }
 

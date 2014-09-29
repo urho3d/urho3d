@@ -113,7 +113,9 @@ public:
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
     /// Return currently dragged element.
-    UIElement* GetDragElement() const;
+    //UIElement* GetDragElement(int dragButtons) const;
+    /// Return currently dragged elements.
+    const HashMap<UIElement*, int> GetDragElements();
     /// Return clipboard text.
     const String& GetClipboardText() const;
     /// Return UI element double click interval in seconds.
@@ -138,6 +140,27 @@ public:
     bool GetForceAutoHint() const { return forceAutoHint_; }
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
+    /// Return whether a drag is in progress.
+    bool IsDragging() const { return dragConfirmedCount_ > 0; };
+    /// Return number of buttons pressed in a button mask.
+    unsigned GetNumDragButtons(unsigned buttons);
+
+    /// Data structure used to represent the drag data associated to a UIElement.
+    struct DragData
+    {
+        /// Which button combo initiated the drag.
+        int dragButtons;
+        /// How many buttons initiated the drag.
+        int numDragButtons;
+        /// Sum of all touch locations
+        IntVector2 sumPos;
+        /// Flag for a drag start event pending.
+        bool dragBeginPending;
+        /// Timer used to trigger drag begin event.
+        Timer dragBeginTimer;
+        /// Drag start position.
+        IntVector2 dragBeginPos;
+    };
 
 private:
     /// Initialize when screen mode initially set.
@@ -167,9 +190,9 @@ private:
     /// Handle button or touch end.
     void ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle mouse or touch move.
-    void ProcessMove(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    void ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Send a UI element drag or hover begin event.
-    void SendDragOrHoverEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
+    void SendDragOrHoverEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos, UI::DragData* dragData);
     /// Send a UI click or double click event.
     void SendClickEvent(StringHash eventType, UIElement* element, const IntVector2& pos, int button, int buttons, int qualifiers);
     /// Handle screen mode event.
@@ -200,6 +223,12 @@ private:
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle a file being drag-dropped into the application window.
     void HandleDropFile(StringHash eventType, VariantMap& eventData);
+    /// Remove drag data and return next iterator.
+    HashMap<WeakPtr<UIElement>, DragData*>::Iterator dragElementErase(HashMap<WeakPtr<UIElement>, DragData*>::Iterator dragElement);
+    /// Handle clean up on a drag cancel.
+    void ProcessDragCancel();
+    /// Sum touch positions and return the begin position ready to send.
+    IntVector2 SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -209,8 +238,6 @@ private:
     SharedPtr<UIElement> rootModalElement_;
     /// Cursor.
     SharedPtr<Cursor> cursor_;
-    /// UI element being dragged.
-    WeakPtr<UIElement> dragElement_;
     /// Currently focused element.
     WeakPtr<UIElement> focusElement_;
     /// UI rendering batches.
@@ -259,26 +286,31 @@ private:
     bool useMutableGlyphs_;
     /// Flag for forcing FreeType autohinting.
     bool forceAutoHint_;
-    /// Flag for a drag start event pending.
-    bool dragBeginPending_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.
     Timer clickTimer_;
-    /// Timer used to trigger drag begin event.
-    Timer dragBeginTimer_;
-    /// Drag start position.
-    IntVector2 dragBeginPos_;
-    /// Timer used for drag begin.
     /// UI element last clicked for tracking click end.
     WeakPtr<UIElement> clickElement_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
     /// Currently hovered elements.
     HashMap<WeakPtr<UIElement>, bool> hoveredElements_;
+    /// Currently dragged elements.
+    HashMap<WeakPtr<UIElement>, DragData*> dragElements_;
+    /// Number of elements in dragElements_.
+    int dragElementsCount_;
+    /// Number of elements in dragElements_ with dragPending = false.
+    int dragConfirmedCount_;
+    /// UI elements that are being touched with touch input.
+    HashMap<WeakPtr<UIElement>, int> touchDragElements_;
+    /// Used to determine if input mouse grabbed was set by dragging.
+    bool dragMouseGrabbed_;
 };
 
 /// Register UI library objects.
 void URHO3D_API RegisterUILibrary(Context* context);
 
 }
+
+#define TOUCHID_MASK(id) (1 << id)

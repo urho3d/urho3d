@@ -27,6 +27,15 @@
 namespace Urho3D
 {
 
+/// Layout Edit Mode
+enum LineEditMode
+{
+    /// Alpha-numeric mode
+    LEM_ALL = 0,
+    /// Numeric only mode. Formats the value to specified formatting string and enables drag editing.
+    LEM_NUMERIC
+};
+
 class Font;
 class Text;
 
@@ -49,12 +58,18 @@ public:
     virtual void Update(float timeStep);
     /// React to mouse click begin.
     virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse click end.
+    virtual void OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement);
     /// React to mouse doubleclick.
     virtual void OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.
     virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse drag cancel.
+    virtual void OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
+    /// React to mouse drag ending.
+    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
     virtual bool OnDragDropTest(UIElement* source);
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
@@ -80,6 +95,18 @@ public:
     void SetTextSelectable(bool enable);
     /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
+    /// Set the mode.
+    void SetMode(LineEditMode mode);
+    /// Set the string format.
+    void SetNumericPrecision(unsigned precision);
+    /// Set the numeric value of the element.
+    void SetValue(float val);
+    /// Set the drag edit combo.
+    void SetDragEditCombo(int combo) { dragButton_ = combo; }
+    /// Set drag edit increment amount.
+    void SetDragEditIncrement(float incr) { dragIncrement_ = incr; }
+    /// Set how much movement in pixels it takes to drag increment.
+    void SetDragEditSmooth(float pixels) { dragEditSmooth_ = pixels; }
 
     /// Return text.
     const String& GetText() const { return line_; }
@@ -101,6 +128,18 @@ public:
     Text* GetTextElement() const { return text_; }
     /// Return cursor element.
     BorderImage* GetCursor() const { return cursor_; }
+    /// Return the mode.
+    LineEditMode GetMode() const { return mode_; }
+    /// Return the string format.
+    unsigned GetNumericPrecision() const { return numericPrecision_; }
+    /// Return the value.
+    float GetValue() const { return lineValue_; }
+    /// Return the drag edit combo.
+    int GetDragEditCombo() const { return dragButton_; }
+    /// Return drag edit increment amount;
+    float GetDragEditIncrement() const { return dragIncrement_; }
+    /// Return how many pixels it takes to drag increment.
+    float GetDragEditSmooth() const { return dragEditSmooth_; }
 
 protected:
     /// Filter implicit attributes in serialization process.
@@ -140,6 +179,20 @@ protected:
     bool textSelectable_;
     /// Copy-paste enable flag.
     bool textCopyable_;
+    /// How to process the element
+    LineEditMode mode_;
+    /// The numerical value
+    float lineValue_;
+    /// The string formatting value.
+    unsigned numericPrecision_;
+    /// The drag edit combo.
+    int dragButton_;
+    /// Drag increment amount.
+    float dragIncrement_;
+    /// Value of text when Line Edit receives focus.
+    String focusBeginLine_;
+    /// How much movement in pixels should cause a drag increment
+    float dragEditSmooth_;
 
 private:
     /// Handle being focused.
@@ -148,6 +201,19 @@ private:
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
     /// Handle the element layout having been updated.
     void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData);
+    /// Format the value to string.
+    void FormatString();
+
+    /// Where drag editing begins.
+    IntVector2 dragBeginPosition_;
+    /// Where last drag edit position was.
+    IntVector2 dragLastPosition_;
+    /// Value when beginning drag.
+    float dragBeginValue_;
+    /// Value while dragging.
+    float dragAccumValue_;
+    /// Used to prevent text finished being sent when drag cancelling.
+    bool sendTextFinishedEvent_;
 };
 
 }
