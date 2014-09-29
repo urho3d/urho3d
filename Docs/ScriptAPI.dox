@@ -11858,6 +11858,7 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - bool modal
+- bool modalAutoDismiss
 - Color modalFrameColor
 - IntVector2 modalFrameSize
 - Color modalShadeColor
@@ -12055,6 +12056,7 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - bool modal
+- bool modalAutoDismiss
 - Color modalFrameColor
 - IntVector2 modalFrameSize
 - Color modalShadeColor
