@@ -104,7 +104,7 @@ public:
     Vector<SharedPtr<Connection> > GetClientConnections() const;
     /// Return whether the server is running.
     bool IsServerRunning() const;
-    /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed.
+    /// Return whether a remote event is allowed to be received.
     bool CheckRemoteEvent(StringHash eventType) const;
     /// Return the package download cache directory.
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
