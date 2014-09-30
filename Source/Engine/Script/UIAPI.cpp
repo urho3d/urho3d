@@ -683,7 +683,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asFUNCTION(UISetFocusElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHOD(UI, GetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ get_dragElement() const", asMETHOD(UI, GetDragElement), asCALL_THISCALL);
+    //engine->RegisterObjectMethod("UI", "const HashMap<UIElement@+, int> GetDragElements()", asMETHOD(UI, GetDragElements), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool IsDragging() const", asMETHOD(UI, IsDragging), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHOD(UI, GetRootModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_clipBoardText(const String&in)", asMETHOD(UI, SetClipboardText), asCALL_THISCALL);

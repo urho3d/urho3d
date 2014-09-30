@@ -822,7 +822,8 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
         serializables[i].ApplyAttributes();
 
     // Do the editor post logic after attribute has been modified.
-    PostEditAttribute(serializables, index, oldValues);
+    if (!intermediateEdit)
+        PostEditAttribute(serializables, index, oldValues);
 
     inEditAttribute = false;
 

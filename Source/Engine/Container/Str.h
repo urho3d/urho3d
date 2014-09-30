@@ -127,8 +127,12 @@ public:
     explicit String(unsigned long long value);
     /// Construct from a float.
     explicit String(float value);
+    /// Construct from a float with a format string.
+    explicit String(float value, String formatString);
     /// Construct from a double.
     explicit String(double value);
+	/// Construct from a double with a format string.
+    explicit String(double value, String formatString);
     /// Construct from a bool.
     explicit String(bool value);
     /// Construct from a character.

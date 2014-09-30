@@ -209,6 +209,7 @@ EVENT(E_TEXTFINISHED, TextFinished)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
     PARAM(P_TEXT, Text);                    // String
+    PARAM(P_VALUE, Value);                 // Float
 }
 
 /// Menu selected.
@@ -322,6 +323,8 @@ EVENT(E_DRAGBEGIN, DragBegin)
     PARAM(P_Y, Y);                          // int
     PARAM(P_ELEMENTX, ElementX);            // int
     PARAM(P_ELEMENTY, ElementY);            // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag behavior of a UI Element when the input device has moved
@@ -332,6 +335,8 @@ EVENT(E_DRAGMOVE, DragMove)
     PARAM(P_Y, Y);                          // int
     PARAM(P_ELEMENTX, ElementX);            // int
     PARAM(P_ELEMENTY, ElementY);            // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag behavior of a UI Element has finished
@@ -342,6 +347,8 @@ EVENT(E_DRAGEND, DragEnd)
     PARAM(P_Y, Y);                          // int
     PARAM(P_ELEMENTX, ElementX);            // int
     PARAM(P_ELEMENTY, ElementY);            // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag of a UI Element was canceled by pressing ESC
@@ -352,6 +359,8 @@ EVENT(E_DRAGCANCEL, DragCancel)
     PARAM(P_Y, Y);                          // int
     PARAM(P_ELEMENTX, ElementX);            // int
     PARAM(P_ELEMENTY, ElementY);            // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable

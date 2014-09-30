@@ -30,8 +30,23 @@
 
 #include "DebugNew.h"
 
+#include "StringUtils.h"
+#include "Log.h"
+
 namespace Urho3D
 {
+
+static const char* lineEditModes[] =
+{
+    "All",
+    "Numeric",
+    0
+};
+
+template<> LineEditMode Variant::Get<LineEditMode>() const
+{
+    return (LineEditMode)GetInt();
+}
 
 StringHash VAR_DRAGDROPCONTENT("DragDropContent");
 
@@ -49,7 +64,18 @@ LineEdit::LineEdit(Context* context) :
     echoCharacter_(0),
     cursorMovable_(true),
     textSelectable_(true),
-    textCopyable_(true)
+    textCopyable_(true),
+    mode_(LEM_ALL),
+    dragBeginPosition_(IntVector2::ZERO),
+    dragLastPosition_(IntVector2::ZERO),
+    lineValue_(0.0f),
+    dragIncrement_(0.1f),
+    dragEditSmooth_(10.0f),
+    dragBeginValue_(0.0f),
+    dragAccumValue_(0.0f),
+    numericPrecision_(4),
+    dragButton_(MOUSEB_RIGHT),
+    sendTextFinishedEvent_(true)
 {
     clipChildren_ = true;
     SetEnabled(true);
@@ -84,6 +110,12 @@ void LineEdit::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
     ATTRIBUTE(LineEdit, VAR_INT, "Echo Character", echoCharacter_, 0, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(LineEdit, "Line Edit Mode", GetMode, SetMode, LineEditMode, lineEditModes, LEM_ALL, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Numeric Precision", GetNumericPrecision, SetNumericPrecision, unsigned, 4, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Drag Edit Combo", GetDragEditCombo, SetDragEditCombo, int, MOUSEB_RIGHT, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Drag Edit Increment", GetDragEditIncrement, SetDragEditIncrement, float, 0.1f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Drag Edit Smooth", GetDragEditSmooth, SetDragEditSmooth, float, 0.1f, AM_FILE);
 }
 
 void LineEdit::ApplyAttributes()
@@ -125,6 +157,18 @@ void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screen
             text_->ClearSelection();
         }
     }
+
+    if (button == dragButton_)
+    {
+        SetFocus(true);
+        BringToFront();
+    }
+}
+
+void LineEdit::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
+{// only triggers if you release on the element, eg other LineEdit can trigger it.
+    if (GetSubsystem<UI>()->GetUseScreenKeyboard())
+        GetSubsystem<Input>()->SetScreenKeyboardVisible(true);
 }
 
 void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
@@ -136,11 +180,39 @@ void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& scree
 void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     dragBeginCursor_ = GetCharIndex(position);
+
+    if (mode_ == LEM_NUMERIC)
+    {
+        dragBeginPosition_ = screenPosition;
+        dragLastPosition_ = screenPosition;
+        dragBeginValue_ = lineValue_;
+        dragAccumValue_ = 0.0f;
+
+        Input* input = GetSubsystem<Input>();
+
+        SetCursorPosition(0);
+        text_->ClearSelection();
+        UpdateCursor();
+    }
 }
 
 void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (cursorMovable_ && textSelectable_)
+    if (mode_ == LEM_NUMERIC && (buttons == dragButton_))
+    {
+        float dX =(float)( screenPosition.x_ - dragLastPosition_.x_) / dragEditSmooth_;
+        dragLastPosition_ = screenPosition;
+
+        if (qualifiers & QUAL_SHIFT)
+            dX *= 0.5f;
+        dragAccumValue_ += dX;
+
+        lineValue_ = dragBeginValue_ + dragAccumValue_ * dragIncrement_;
+
+        FormatString();
+        UpdateText();
+    }
+    else if (cursorMovable_ && textSelectable_)
     {
         unsigned start = dragBeginCursor_;
         unsigned current = GetCharIndex(position);
@@ -153,6 +225,30 @@ void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPo
             SetCursorPosition(current);
         }
     }
+}
+
+void LineEdit::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+{
+    if (mode_ == LEM_NUMERIC && (dragButtons & dragButton_))
+    {
+        lineValue_ = dragBeginValue_;
+        FormatString();
+        Input* input = GetSubsystem<Input>();
+        UpdateText();
+
+        SetCursorPosition(dragBeginCursor_);
+        UpdateCursor();
+
+        sendTextFinishedEvent_ = false;
+        SetFocus(false);
+        sendTextFinishedEvent_ = true;
+    }
+}
+
+void LineEdit::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+{
+    if (mode_ == LEM_NUMERIC && dragButtons == dragButton_)
+        SetFocus(false);
 }
 
 bool LineEdit::OnDragDropTest(UIElement* source)
@@ -395,19 +491,16 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case KEY_RETURN2:
     case KEY_KP_ENTER:
         {
-            // If using the on-screen keyboard, defocus this element to hide it now
-            if (GetSubsystem<UI>()->GetUseScreenKeyboard() && HasFocus())
-                SetFocus(false);
-
-            using namespace TextFinished;
-
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_ELEMENT] = this;
-            eventData[P_TEXT] = line_;
-            SendEvent(E_TEXTFINISHED, eventData);
+            SetFocus(false);
             return;
         }
         break;
+    }
+
+    if (mode_ == LEM_NUMERIC)
+    {
+        lineValue_ = ToFloat(line_.CString());
+        changed = true;
     }
 
     if (changed)
@@ -465,6 +558,12 @@ void LineEdit::OnTextInput(const String& text, int buttons, int qualifiers)
         changed = true;
     }
 
+    if (mode_ == LEM_NUMERIC)
+    {
+        lineValue_ = ToFloat(line_.CString());
+        changed = true;
+    }
+
     if (changed)
     {
         text_->ClearSelection();
@@ -479,8 +578,47 @@ void LineEdit::SetText(const String& text)
     {
         line_ = text;
         cursorPosition_ = line_.LengthUTF8();
+
+        if (mode_ == LEM_NUMERIC)
+        {
+            lineValue_ = ToFloat(line_.CString());
+        }
+
         UpdateText();
         UpdateCursor();
+    }
+}
+
+void LineEdit::SetValue(float val)
+{
+    if (Abs(lineValue_ - val) > M_EPSILON)
+    {
+        lineValue_ = val;
+        FormatString();
+        UpdateText();
+        cursorPosition_ = line_.LengthUTF8();
+        UpdateCursor();
+    }
+}
+
+void LineEdit::SetMode(LineEditMode mode)
+{
+    if (mode_ != mode)
+    {
+        mode_ = mode;
+        lineValue_ = ToFloat(line_);
+        FormatString();
+        UpdateText();
+    }
+}
+
+void LineEdit::SetNumericPrecision(unsigned precision)
+{
+    if (numericPrecision_ != precision)
+    {
+        numericPrecision_ = Clamp(precision, 0, 12);
+        FormatString();
+        UpdateText();
     }
 }
 
@@ -629,15 +767,13 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
 
 void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
 {
+    focusBeginLine_ = line_;
     if (eventData[Focused::P_BYKEY].GetBool())
     {
         cursorPosition_ = line_.LengthUTF8();
         text_->SetSelection(0);
     }
     UpdateCursor();
-
-    if (GetSubsystem<UI>()->GetUseScreenKeyboard())
-        GetSubsystem<Input>()->SetScreenKeyboardVisible(true);
 }
 
 void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
@@ -646,6 +782,32 @@ void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 
     if (GetSubsystem<UI>()->GetUseScreenKeyboard())
         GetSubsystem<Input>()->SetScreenKeyboardVisible(false);
+
+    if (sendTextFinishedEvent_ && line_ != focusBeginLine_)
+    {
+        if (mode_ == LEM_NUMERIC)
+        {
+            FormatString();
+            UpdateText();
+        }
+
+        using namespace TextFinished;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
+        eventData[P_TEXT] = line_;
+        eventData[P_VALUE] = (float)lineValue_;
+        SendEvent(E_TEXTFINISHED, eventData);
+    }
+}
+
+void LineEdit::FormatString()
+{
+    if (mode_ == LEM_NUMERIC)
+    {
+        String formatString = "%0." + String(numericPrecision_) + "g";
+        line_ = String(lineValue_, formatString);
+    }
 }
 
 void LineEdit::HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)

@@ -1369,7 +1369,7 @@ void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
 void ViewMouseMove()
 {
     // setting mouse position based on mouse position
-    if (ui.dragElement !is null) { }
+    if (!ui.IsDragging()) { }
     else if (ui.focusElement !is null || input.mouseButtonDown[MOUSEB_LEFT|MOUSEB_MIDDLE|MOUSEB_RIGHT])
         return;
 
