@@ -304,8 +304,6 @@ private:
     int dragConfirmedCount_;
     /// UI elements that are being touched with touch input.
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
-    /// Used to determine if input mouse grabbed was set by dragging.
-    bool dragMouseGrabbed_;
 };
 
 /// Register UI library objects.

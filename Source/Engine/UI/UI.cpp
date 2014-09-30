@@ -86,7 +86,6 @@ UI::UI(Context* context) :
     doubleClickInterval_(DEFAULT_DOUBLECLICK_INTERVAL),
     dragBeginInterval_(DEFAULT_DRAGBEGIN_INTERVAL),
     dragBeginDistance_(DEFAULT_DRAGBEGIN_DISTANCE),
-    dragMouseGrabbed_(false),
     dragElementsCount_(0),
     dragConfirmedCount_(0),
     defaultToolTipDelay_(DEFAULT_TOOLTIP_DELAY),
@@ -334,8 +333,6 @@ void UI::Update(float timeStep)
                 dragData->dragButtons = buttons;
                 dragData->numDragButtons = GetNumDragButtons(buttons);
                 sendPos = SumTouchPositions(dragData, sendPos);
-                GetSubsystem<Input>()->SetMouseGrabbed(true);
-                dragMouseGrabbed_ = true;
                 dragConfirmedCount_ ++;
                 if (!usingTouchInput_)
                     dragElement->OnDragBegin(dragElement->ScreenToElement(sendPos), sendPos, buttons, qualifiers_,cursor_);
@@ -1164,12 +1161,6 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
                 ++i;
         }
 
-        if (dragElementsCount_ == 0 && dragMouseGrabbed_)
-        {
-            GetSubsystem<Input>()->SetMouseGrabbed(false);
-            dragMouseGrabbed_ = false;
-        }
-
         clickElement_.Reset();
     }
 }
@@ -1220,8 +1211,6 @@ void UI::ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaP
                             dragData->dragButtons |= buttons;
                             dragData->numDragButtons = GetNumDragButtons(buttons);
                             sendPos = SumTouchPositions(dragData, sendPos);
-                            GetSubsystem<Input>()->SetMouseGrabbed(true);
-                            dragMouseGrabbed_ = true;
                             dragData->dragBeginPending = false;
                             dragConfirmedCount_ ++;
                             dragElement->OnDragBegin(dragElement->ScreenToElement(sendPos), sendPos, buttons, qualifiers, cursor);
@@ -1306,7 +1295,7 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
-    bool mouseGrabbed = !dragMouseGrabbed_ && input->IsMouseGrabbed();
+    bool mouseGrabbed = input->IsMouseGrabbed();
     if (dragElementsCount_ == 0 && mouseGrabbed)
         return;
 
@@ -1330,7 +1319,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
-    if (!dragMouseGrabbed_ && input->IsMouseGrabbed())
+    if (input->IsMouseGrabbed())
         return;
 
     using namespace MouseButtonUp;
@@ -1388,7 +1377,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
-    if (!dragMouseGrabbed_ && input->IsMouseGrabbed())
+    if (input->IsMouseGrabbed())
         return;
 
     using namespace MouseWheel;
@@ -1665,12 +1654,6 @@ void UI::ProcessDragCancel()
         }
 
         i = dragElementErase(i);
-    }
-
-    if (dragMouseGrabbed_)
-    {
-        GetSubsystem<Input>()->SetMouseGrabbed(false);
-        dragMouseGrabbed_ = false;
     }
 }
 
