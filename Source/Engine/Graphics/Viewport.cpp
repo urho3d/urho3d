@@ -38,7 +38,8 @@ namespace Urho3D
 
 Viewport::Viewport(Context* context) :
     Object(context),
-    rect_(IntRect::ZERO)
+    rect_(IntRect::ZERO),
+    drawDebug_(true)
 {
     SetRenderPath((RenderPath*)0);
 }
@@ -47,7 +48,8 @@ Viewport::Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* r
     Object(context),
     scene_(scene),
     camera_(camera),
-    rect_(IntRect::ZERO)
+    rect_(IntRect::ZERO),
+    drawDebug_(true)
 {
     SetRenderPath(renderPath);
 }
@@ -56,7 +58,8 @@ Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect
     Object(context),
     scene_(scene),
     camera_(camera),
-    rect_(rect)
+    rect_(rect),
+    drawDebug_(true)
 {
     SetRenderPath(renderPath);
 }
@@ -78,6 +81,11 @@ void Viewport::SetCamera(Camera* camera)
 void Viewport::SetRect(const IntRect& rect)
 {
     rect_ = rect;
+}
+
+void Viewport::SetDrawDebug(bool enable)
+{
+    drawDebug_ = enable;
 }
 
 void Viewport::SetRenderPath(RenderPath* renderPath)

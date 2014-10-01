@@ -737,6 +737,7 @@ The steps for rendering each viewport on each frame are roughly the following:
 - Check the influence of each visible light on the objects. If the light casts shadows, query the octree for shadowcaster objects.
 - Construct render operations (batches) for the visible objects, according to the scene passes in the render path command sequence.
 - Perform the render path command sequence during the rendering step at the end of the frame.
+- If the scene has a DebugRenderer component and the viewport has debug rendering enabled, render debug geometry last. Can be controlled with \ref Viewport::SetDrawDebug "SetDrawDebug()", default is enabled.
 
 In the default render paths, the rendering operations proceed in the following order:
 

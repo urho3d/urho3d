@@ -61,6 +61,8 @@ public:
     void SetRenderPath(RenderPath* path);
     /// Set rendering path from an XML file.
     void SetRenderPath(XMLFile* file);
+    /// Set whether to render debug geometry. Default true.
+    void SetDrawDebug(bool enable);
     
     /// Return scene.
     Scene* GetScene() const;
@@ -70,6 +72,8 @@ public:
     const IntRect& GetRect() const { return rect_; }
     /// Return rendering path.
     RenderPath* GetRenderPath() const;
+    /// Return whether to draw debug geometry.
+    bool GetDrawDebug() const { return drawDebug_; }
     /// Return ray corresponding to normalized screen coordinates.
     Ray GetScreenRay(int x, int y) const;
     // Convert a world space point to normalized screen coordinates.
@@ -86,6 +90,8 @@ private:
     IntRect rect_;
     /// Rendering path.
     SharedPtr<RenderPath> renderPath_;
+    /// Debug draw flag.
+    bool drawDebug_;
 };
 
 }

@@ -314,6 +314,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     if (!renderPath_)
         return false;
     
+    drawDebug_ = viewport->GetDrawDebug();
     hasScenePasses_ = false;
     
     // Make sure that all necessary batch queues exist
@@ -568,8 +569,8 @@ void View::Render()
     if (currentRenderTarget_ != renderTarget_)
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
-    // If this is a main view, draw the associated debug geometry now
-    if (!renderTarget_ && octree_ && camera_)
+    // Draw the associated debug geometry now if enabled
+    if (drawDebug_ && octree_ && camera_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective())
