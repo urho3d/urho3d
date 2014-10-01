@@ -11272,6 +11272,7 @@ StringHash baseType;
 Camera camera;
 /* readonly */
 String category;
+bool drawDebug;
 IntRect rect;
 /* readonly */
 int refs;

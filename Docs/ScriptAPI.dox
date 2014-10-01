@@ -11912,6 +11912,7 @@ Properties:
 - StringHash baseType // readonly
 - Camera@ camera
 - String category // readonly
+- bool drawDebug
 - IntRect rect
 - int refs // readonly
 - RenderPath@ renderPath
