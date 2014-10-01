@@ -232,7 +232,6 @@ void DynamicGeometry::CreateScene()
         geom->SetDrawRange(TRIANGLE_LIST, 0, numVertices);
         
         fromScratchModel->SetNumGeometries(1);
-        fromScratchModel->SetNumGeometryLodLevels(0, 1);
         fromScratchModel->SetGeometry(0, 0, geom);
         fromScratchModel->SetBoundingBox(BoundingBox(Vector3(-0.5f, -0.5f, -0.5f), Vector3(0.5f, 0.5f, 0.5f)));
         
