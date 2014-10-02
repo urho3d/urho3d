@@ -555,19 +555,24 @@ void View::Render()
     // Render
     ExecuteRenderPathCommands();
     
-    #ifdef URHO3D_OPENGL
-    if (camera_)
-        camera_->SetFlipVertical(false);
-    #endif
+    // After executing all commands, reset rendertarget & state for debug geometry rendering
+    // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
+    // values; after a blit to backbuffer the same depth buffer would not be available any longer
+    graphics_->SetRenderTarget(0, currentRenderTarget_);
+    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        graphics_->SetRenderTarget(i, (RenderSurface*)0);
+    graphics_->SetDepthStencil(GetDepthStencil(currentRenderTarget_));
+    IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
+    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+        rtSizeNow.y_);
+    graphics_->SetViewport(viewport);
     
+    graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetStreamFrequencies();
-    
-    // Run framebuffer blitting if necessary
-    if (currentRenderTarget_ != renderTarget_)
-        BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // Draw the associated debug geometry now if enabled
     if (drawDebug_ && octree_ && camera_)
@@ -579,6 +584,15 @@ void View::Render()
             debug->Render();
         }
     }
+    
+    #ifdef URHO3D_OPENGL
+    if (camera_)
+        camera_->SetFlipVertical(false);
+    #endif
+    
+    // Run framebuffer blitting if necessary
+    if (currentRenderTarget_ != renderTarget_)
+        BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // "Forget" the scene, camera, octree and zone after rendering
     scene_ = 0;
@@ -1539,15 +1553,6 @@ void View::ExecuteRenderPathCommands()
                 viewportModified = true;
         }
     }
-    
-    // After executing all commands, reset rendertarget for debug geometry rendering
-    graphics_->SetRenderTarget(0, renderTarget_);
-    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
-        graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
-    graphics_->SetViewport(viewRect_);
-    graphics_->SetFillMode(FILL_SOLID);
-    graphics_->SetClipPlane(false);
 }
 
 void View::SetRenderTargets(RenderPathCommand& command)
@@ -1582,11 +1587,11 @@ void View::SetRenderTargets(RenderPathCommand& command)
     // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
     // viewport-sized, so they should use their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewPort = (graphics_->GetRenderTarget(0) == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+    IntRect viewport = (graphics_->GetRenderTarget(0) == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     
     graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
-    graphics_->SetViewport(viewPort);
+    graphics_->SetViewport(viewport);
     graphics_->SetColorWrite(true);
 }
 
