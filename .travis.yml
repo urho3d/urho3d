@@ -50,7 +50,7 @@ matrix:
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
 before_install:
   - free -tm
-  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export SITE_UPDATE_ON_MASTER_COMMIT=$SITE_UPDATE; export RELEASE_TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); if [ $RELEASE_TAG ] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'; then export PACKAGE_UPLOAD=1; fi; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export SITE_UPDATE_ON_MASTER_COMMIT=$SITE_UPDATE; export RELEASE_TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); if [ "$CC" == "gcc" ] && ([ $RELEASE_TAG ] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
   - if [ "$SITE_UPDATE_ON_MASTER_COMMIT" -o "$PACKAGE_UPLOAD" ]; then travis_retry sudo add-apt-repository ppa:george-edison55/precise-backports -y; fi
   - travis_retry sudo apt-get update -q -y
 install:
