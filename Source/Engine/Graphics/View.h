@@ -139,6 +139,8 @@ public:
     const FrameInfo& GetFrameInfo() const { return frame_; }
     /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
+    /// Return whether should draw debug geometry.
+    bool GetDrawDebug() const { return drawDebug_; }
     /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
     /// Return occluder objects.
@@ -312,6 +314,8 @@ private:
     bool useLitBase_;
     /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
     bool hasScenePasses_;
+    /// Draw debug geometry flag. Copied from the viewport.
+    bool drawDebug_;
     /// Renderpath.
     RenderPath* renderPath_;
     /// Per-thread octree query results.

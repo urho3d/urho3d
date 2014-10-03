@@ -23,8 +23,11 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "EngineEvents.h"
 #include "FileSystem.h"
 #include "HttpRequest.h"
+#include "InputEvents.h"
+#include "IOEvents.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Network.h"
@@ -56,6 +59,49 @@ Network::Network(Context* context) :
     
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Network, HandleRenderUpdate));
+    
+    // Blacklist remote events which are not to be allowed to be registered in any case
+    blacklistedRemoteEvents_.Insert(E_CONSOLECOMMAND);
+    blacklistedRemoteEvents_.Insert(E_LOGMESSAGE);
+    blacklistedRemoteEvents_.Insert(E_BEGINFRAME);
+    blacklistedRemoteEvents_.Insert(E_UPDATE);
+    blacklistedRemoteEvents_.Insert(E_POSTUPDATE);
+    blacklistedRemoteEvents_.Insert(E_RENDERUPDATE);
+    blacklistedRemoteEvents_.Insert(E_ENDFRAME);
+    blacklistedRemoteEvents_.Insert(E_MOUSEBUTTONDOWN);
+    blacklistedRemoteEvents_.Insert(E_MOUSEBUTTONUP);
+    blacklistedRemoteEvents_.Insert(E_MOUSEMOVE);
+    blacklistedRemoteEvents_.Insert(E_MOUSEWHEEL);
+    blacklistedRemoteEvents_.Insert(E_KEYDOWN);
+    blacklistedRemoteEvents_.Insert(E_KEYUP);
+    blacklistedRemoteEvents_.Insert(E_TEXTINPUT);
+    blacklistedRemoteEvents_.Insert(E_JOYSTICKCONNECTED);
+    blacklistedRemoteEvents_.Insert(E_JOYSTICKDISCONNECTED);
+    blacklistedRemoteEvents_.Insert(E_JOYSTICKBUTTONDOWN);
+    blacklistedRemoteEvents_.Insert(E_JOYSTICKBUTTONUP);
+    blacklistedRemoteEvents_.Insert(E_JOYSTICKAXISMOVE);
+    blacklistedRemoteEvents_.Insert(E_JOYSTICKHATMOVE);
+    blacklistedRemoteEvents_.Insert(E_TOUCHBEGIN);
+    blacklistedRemoteEvents_.Insert(E_TOUCHEND);
+    blacklistedRemoteEvents_.Insert(E_TOUCHMOVE);
+    blacklistedRemoteEvents_.Insert(E_GESTURERECORDED);
+    blacklistedRemoteEvents_.Insert(E_GESTUREINPUT);
+    blacklistedRemoteEvents_.Insert(E_MULTIGESTURE);
+    blacklistedRemoteEvents_.Insert(E_DROPFILE);
+    blacklistedRemoteEvents_.Insert(E_INPUTFOCUS);
+    blacklistedRemoteEvents_.Insert(E_MOUSEVISIBLECHANGED);
+    blacklistedRemoteEvents_.Insert(E_EXITREQUESTED);
+    blacklistedRemoteEvents_.Insert(E_SERVERCONNECTED);
+    blacklistedRemoteEvents_.Insert(E_SERVERDISCONNECTED);
+    blacklistedRemoteEvents_.Insert(E_CONNECTFAILED);
+    blacklistedRemoteEvents_.Insert(E_CLIENTCONNECTED);
+    blacklistedRemoteEvents_.Insert(E_CLIENTDISCONNECTED);
+    blacklistedRemoteEvents_.Insert(E_CLIENTIDENTITY);
+    blacklistedRemoteEvents_.Insert(E_CLIENTSCENELOADED);
+    blacklistedRemoteEvents_.Insert(E_NETWORKMESSAGE);
+    blacklistedRemoteEvents_.Insert(E_NETWORKUPDATE);
+    blacklistedRemoteEvents_.Insert(E_NETWORKUPDATESENT);
+    blacklistedRemoteEvents_.Insert(E_NETWORKSCENELOADFAILED);
 }
 
 Network::~Network()
@@ -291,6 +337,12 @@ void Network::SetUpdateFps(int fps)
 
 void Network::RegisterRemoteEvent(StringHash eventType)
 {
+    if (blacklistedRemoteEvents_.Find(eventType) != blacklistedRemoteEvents_.End())
+    {
+        LOGERROR("Attempted to register blacklisted remote event type " + String(eventType));
+        return;
+    }
+    
     allowedRemoteEvents_.Insert(eventType);
 }
 
@@ -354,7 +406,7 @@ bool Network::IsServerRunning() const
 
 bool Network::CheckRemoteEvent(StringHash eventType) const
 {
-    return allowedRemoteEvents_.Empty() || allowedRemoteEvents_.Contains(eventType);
+    return allowedRemoteEvents_.Contains(eventType);
 }
 
 void Network::Update(float timeStep)

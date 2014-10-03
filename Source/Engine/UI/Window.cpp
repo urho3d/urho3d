@@ -46,6 +46,7 @@ Window::Window(Context* context) :
     resizeBorder_(DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER),
     dragMode_(DRAG_NONE),
     modal_(false),
+    modalAutoDismiss_(true),
     modalShadeColor_(Color::TRANSPARENT),
     modalFrameColor_(Color::TRANSPARENT),
     modalFrameSize_(IntVector2::ZERO)
@@ -78,6 +79,8 @@ void Window::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_INTVECTOR2, "Modal Frame Size", GetModalFrameSize, SetModalFrameSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    // Modal auto dismiss is purposefully not an attribute, as using it can make the editor lock up.
+    // Instead it should be set false in code when needed
 }
 
 void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
@@ -276,6 +279,11 @@ void Window::SetModalFrameColor(const Color& color)
 void Window::SetModalFrameSize(const IntVector2& size)
 {
     modalFrameSize_ = size;
+}
+
+void Window::SetModalAutoDismiss(bool enable)
+{
+    modalAutoDismiss_ = enable;
 }
 
 WindowDragMode Window::GetDragMode(const IntVector2& position) const

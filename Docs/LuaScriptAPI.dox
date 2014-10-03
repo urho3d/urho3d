@@ -6447,10 +6447,12 @@ Methods:
 - void SetRect(const IntRect& rect)
 - void SetRenderPath(RenderPath* path)
 - void SetRenderPath(XMLFile* file)
+- void SetDrawDebug(bool enable)
 - Scene* GetScene() const
 - Camera* GetCamera() const
 - const IntRect& GetRect() const
 - RenderPath* GetRenderPath() const
+- bool GetDrawDebug() const
 - Ray GetScreenRay(int x, int y) const
 - IntVector2 WorldToScreenPoint(const Vector3& worldPos) const
 - Vector3 ScreenToWorldPoint(int x, int y, float depth) const
@@ -6461,6 +6463,7 @@ Properties:
 - Camera* camera
 - IntRect& rect
 - RenderPath* renderPath
+- bool drawDebug
 
 <a name="Class_Window"></a>
 ### Window : BorderImage
@@ -6479,6 +6482,7 @@ Methods:
 - void SetModalShadeColor(const Color& color)
 - void SetModalFrameColor(const Color& color)
 - void SetModalFrameSize(const IntVector2& size)
+- void SetModalAutoDismiss(bool enable)
 - bool IsMovable() const
 - bool IsResizable() const
 - bool GetFixedWidthResizing() const
@@ -6488,6 +6492,7 @@ Methods:
 - const Color& GetModalShadeColor() const
 - const Color& GetModalFrameColor() const
 - const IntVector2& GetModalFrameSize() const
+- bool GetModalAutoDismiss() const
 
 Properties:
 
@@ -6500,6 +6505,7 @@ Properties:
 - Color& modalShadeColor
 - Color& modalFrameColor
 - IntVector2& modalFrameSize
+- bool modalAutoDismiss
 
 <a name="Class_XMLElement"></a>
 ### XMLElement

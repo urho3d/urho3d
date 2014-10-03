@@ -47,13 +47,6 @@ namespace Urho3D
 
 ## %Graphics events
 
-### WindowMessage
-- %Window : int
-- %Msg : int
-- %WParam : int
-- %LParam : int
-- %Handled : bool
-
 ### ScreenMode
 - %Width : int
 - %Height : int
@@ -11865,6 +11858,7 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - bool modal
+- bool modalAutoDismiss
 - Color modalFrameColor
 - IntVector2 modalFrameSize
 - Color modalShadeColor
@@ -11918,6 +11912,7 @@ Properties:
 - StringHash baseType // readonly
 - Camera@ camera
 - String category // readonly
+- bool drawDebug
 - IntRect rect
 - int refs // readonly
 - RenderPath@ renderPath
@@ -12062,6 +12057,7 @@ Properties:
 - IntVector2 minSize
 - int minWidth
 - bool modal
+- bool modalAutoDismiss
 - Color modalFrameColor
 - IntVector2 modalFrameSize
 - Color modalShadeColor

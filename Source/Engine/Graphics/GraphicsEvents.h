@@ -27,16 +27,6 @@
 namespace Urho3D
 {
 
-/// Operating system window message.
-EVENT(E_WINDOWMESSAGE, WindowMessage)
-{
-    PARAM(P_WINDOW, Window);                // int
-    PARAM(P_MSG, Msg);                      // int
-    PARAM(P_WPARAM, WParam);                // int
-    PARAM(P_LPARAM, LParam);                // int
-    PARAM(P_HANDLED, Handled);              // bool
-}
-
 /// New screen mode set.
 EVENT(E_SCREENMODE, ScreenMode)
 {

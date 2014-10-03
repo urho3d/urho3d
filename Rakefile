@@ -44,7 +44,7 @@ task :scaffolding do
   puts "\nNew project created in #{abs_path}\n\n"
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
   puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example:\n\n"
-  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
+  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
 end
 
 # Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [avd=test] [retries=60] [retry_interval=10]
@@ -78,8 +78,10 @@ task :ci do
   else
     $configuration = 'Debug'
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
-    $testing = (ENV['LINUX'] && ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
+    $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
   end
+  # Define the build option string only when the override environment variable is given
+  $urho3d_64bit = "-DURHO3D_64BIT=#{ENV['URHO3D_64BIT']}" if ENV['URHO3D_64BIT']
   if ENV['XCODE']
     # xctool or xcodebuild
     xcode_ci
@@ -127,9 +129,9 @@ end
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
 desc 'Rebase Android-CI and OSX-CI mirror branches'
 task :ci_rebase do
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
-  system 'sleep 10 && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
+  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
+  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
+  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
@@ -161,11 +163,9 @@ task :ci_package_upload do
   end
   # Make the package
   if ENV['IOS']
-    unless ENV['URHO3D_64BIT']  # Skip Mach-O universal binary build for the time being as otherwise overall build time exceeds 50 minutes time limit
-      # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-      system 'echo Rebuild Urho3D library as Mach-O universal binary'
-      xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
-    end
+    # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
+    system 'echo Rebuild Urho3D library as Mach-O universal binary'
+    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
     # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
     system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
   elsif ENV['XCODE']
@@ -259,8 +259,12 @@ define_source_files ()
 setup_main_executable ()
 
 # Setup test cases
-add_test (NAME ExternalLibAS COMMAND \\${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout \\${URHO3D_TEST_TIME_OUT})
-add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout \\${URHO3D_TEST_TIME_OUT})
+if (URHO3D_ANGELSCRIPT)
+    add_test (NAME ExternalLibAS COMMAND \\${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout \\${URHO3D_TEST_TIME_OUT})
+endif ()
+if (URHO3D_LUA)
+    add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout \\${URHO3D_TEST_TIME_OUT})
+endif ()
 EOF" or abort 'Failed to create new project using Urho3D as external library'
 end
 
@@ -270,14 +274,14 @@ def makefile_ci
     jit = ''
     amalg = ''
     # Lua on MinGW build requires tolua++ tool to be built natively first
-    system 'MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0' or abort 'Failed to configure native build for tolua++ target'
+    system "MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 #{$urho3d_64bit} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
     ENV['SKIP_NATIVE'] = '1'
   else
     jit = 'JIT'
     amalg = '-DURHO3D_AMALG=1'
   end
-  system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 #{$urho3d_64bit} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
     # The AVD on Travis-CI does not have enough memory for STATIC lib installation, so only prepare device for SHARED lib test run
     android_test = !ENV['PACKAGE_UPLOAD'] && (ENV['URHO3D_LIB_TYPE'] == 'SHARED' || !ENV['CI'])
@@ -312,7 +316,7 @@ def makefile_ci
   system "cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DURHO3D_MODERN_CPP=1 #{$urho3d_64bit} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if android_test
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
@@ -382,7 +386,7 @@ def xcode_ci
     platform_prefix = 'ios-'
     deployment_target = "-DIPHONEOS_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
     # Lua on IOS build requires tolua++ tool to be built natively first
-    system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
+    system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 #{$urho3d_64bit} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
     xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
   else
     jit = 'JIT'
@@ -390,11 +394,11 @@ def xcode_ci
     platform_prefix = ''
     deployment_target = "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
   end
-  system "./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 #{$urho3d_64bit} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_MODERN_CPP=1 -DURHO3D_64BIT=$URHO3D_64BIT -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_MODERN_CPP=1 #{$urho3d_64bit} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 

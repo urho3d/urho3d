@@ -12,20 +12,22 @@ class Viewport
     void SetRect(const IntRect& rect);
     void SetRenderPath(RenderPath* path);
     void SetRenderPath(XMLFile* file);
+    void SetDrawDebug(bool enable);
     
     Scene* GetScene() const;
     Camera* GetCamera() const;
     const IntRect& GetRect() const;
     RenderPath* GetRenderPath() const;
+    bool GetDrawDebug() const;
     Ray GetScreenRay(int x, int y) const;
     IntVector2 WorldToScreenPoint(const Vector3& worldPos) const;
     Vector3 ScreenToWorldPoint(int x, int y, float depth) const;
-    
-    
+
     tolua_property__get_set Scene* scene;
     tolua_property__get_set Camera* camera;
     tolua_property__get_set IntRect& rect;
     tolua_property__get_set RenderPath* renderPath;
+    tolua_property__get_set bool drawDebug;
 };
 
 ${

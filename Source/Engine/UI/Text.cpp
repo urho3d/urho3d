@@ -218,7 +218,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 void Text::OnResize()
 {
     if (wordWrap_)
-        UpdateText();
+        UpdateText(true);
     else
         charLocationsDirty_ = true;
 }
@@ -393,7 +393,7 @@ bool Text::FilterImplicitAttributes(XMLElement& dest) const
     return true;
 }
 
-void Text::UpdateText()
+void Text::UpdateText(bool onResize)
 {
     rowWidths_.Clear();
     printText_.Clear();
@@ -568,6 +568,15 @@ void Text::UpdateText()
     {
         // No font, nothing to render
         pageGlyphLocations_.Clear();
+    }
+    
+    // If wordwrap is on, parent may need layout update to correct for overshoot in size. However, do not do this when the 
+    // update is a response to resize, as that could cause infinite recursion
+    if (wordWrap_ && !onResize)
+    {
+        UIElement* parent = GetParent();
+        if (parent && parent->GetLayoutMode() != LM_FREE)
+            parent->UpdateLayout();
     }
 }
 

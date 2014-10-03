@@ -489,6 +489,13 @@ void Model::SetNumGeometries(unsigned num)
     geometries_.Resize(num);
     geometryBoneMappings_.Resize(num);
     geometryCenters_.Resize(num);
+    
+    // For easier creation of from-scratch geometry, ensure that all geometries start with at least 1 LOD level (0 makes no sense)
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        if (geometries_[i].Empty())
+            geometries_[i].Resize(1);
+    }
 }
 
 bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)

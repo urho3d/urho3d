@@ -83,11 +83,11 @@ public:
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
     void SetUpdateFps(int fps);
-    /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed.
+    /// Register a remote event as allowed to be received. There is also a fixed blacklist of events that can not be allowed in any case, such as ConsoleCommand.
     void RegisterRemoteEvent(StringHash eventType);
-    /// Unregister a remote event as allowed to be sent and received.
+    /// Unregister a remote event as allowed to received.
     void UnregisterRemoteEvent(StringHash eventType);
-    /// Unregister all remote events. This results in all being allowed.
+    /// Unregister all remote events.
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
     void SetPackageCacheDir(const String& path);
@@ -104,7 +104,7 @@ public:
     Vector<SharedPtr<Connection> > GetClientConnections() const;
     /// Return whether the server is running.
     bool IsServerRunning() const;
-    /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed.
+    /// Return whether a remote event is allowed to be received.
     bool CheckRemoteEvent(StringHash eventType) const;
     /// Return the package download cache directory.
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
@@ -132,6 +132,8 @@ private:
     HashMap<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
+    /// Remote event fixed blacklist.
+    HashSet<StringHash> blacklistedRemoteEvents_;
     /// Networked scenes.
     HashSet<Scene*> networkScenes_;
     /// Update FPS.

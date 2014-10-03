@@ -85,6 +85,8 @@ public:
     void SetModalFrameColor(const Color& color);
     /// Set modal frame size.
     void SetModalFrameSize(const IntVector2& size);
+    /// Set whether model window can be dismissed with the escape key. Default true.
+    void SetModalAutoDismiss(bool enable);
 
     /// Return whether is movable.
     bool IsMovable() const { return movable_; }
@@ -104,6 +106,8 @@ public:
     const Color& GetModalFrameColor() const { return modalFrameColor_; }
     /// Get modal frame size.
     const IntVector2& GetModalFrameSize() const { return modalFrameSize_; }
+    /// Return whether can be dismissed with escape key.
+    bool GetModalAutoDismiss() const { return modalAutoDismiss_; }
 
 protected:
     /// Identify drag mode (move/resize.)
@@ -135,6 +139,8 @@ protected:
     IntVector2 dragBeginSize_;
     /// Modal flag.
     bool modal_;
+    /// Modal auto dismiss (with escape key) flag. Default true.
+    bool modalAutoDismiss_;
     /// Modal shade color, used when modal flag is set.
     Color modalShadeColor_;
     /// Modal frame color, used when modal flag is set.

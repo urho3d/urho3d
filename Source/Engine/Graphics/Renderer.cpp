@@ -717,9 +717,8 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     
     for (unsigned i = 0; i < numViews_; ++i)
     {
-        // Make sure it's a main view, and process each node only once
         View* view = views_[i];
-        if (view->GetRenderTarget())
+        if (!view->GetDrawDebug())
             continue;
         Octree* octree = view->GetOctree();
         if (!octree)
@@ -728,6 +727,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         if (!debug || !debug->IsEnabledEffective())
             continue;
         
+        // Process geometries / lights only once
         const PODVector<Drawable*>& geometries = view->GetGeometries();
         const PODVector<Light*>& lights = view->GetLights();
         
