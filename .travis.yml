@@ -20,20 +20,22 @@
 # THE SOFTWARE.
 #
 
+language: cpp
+compiler: gcc
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - DISPLAY=:99.0
     - NUMJOBS=3
   matrix:
-    - LINUX=1                              URHO3D_LIB_TYPE=STATIC REBASE=1
-    - LINUX=1                              URHO3D_LIB_TYPE=SHARED
-    - WINDOWS=1 ARCH=x86_64                URHO3D_LIB_TYPE=STATIC
-    - WINDOWS=1 ARCH=x86_64                URHO3D_LIB_TYPE=SHARED
-    - LINUX=1               URHO3D_64BIT=0 URHO3D_LIB_TYPE=STATIC
-    - LINUX=1               URHO3D_64BIT=0 URHO3D_LIB_TYPE=SHARED
-    - WINDOWS=1 ARCH=i686   URHO3D_64BIT=0 URHO3D_LIB_TYPE=STATIC
-    - WINDOWS=1 ARCH=i686   URHO3D_64BIT=0 URHO3D_LIB_TYPE=SHARED
+    - LINUX=1   URHO3D_LIB_TYPE=STATIC REBASE=1
+    - LINUX=1   URHO3D_LIB_TYPE=SHARED
+    - WINDOWS=1 URHO3D_LIB_TYPE=STATIC
+    - WINDOWS=1 URHO3D_LIB_TYPE=SHARED
+    - LINUX=1   URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - LINUX=1   URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
 matrix:
   fast_finish: true
   include:
@@ -45,16 +47,14 @@ matrix:
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - compiler: clang
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-language: cpp
-compiler: gcc
 before_install:
   - free -tm
   - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export REBASE_ON_MASTER_COMMIT=$REBASE; fi
   - travis_retry sudo apt-get update -q -y
 install:
   - travis_retry sudo apt-get install -q -y --no-install-recommends libasound2-dev
-  - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get remove -q -y gvfs-daemons && travis_retry sudo apt-get install -q -y libxrandr-dev:i386 libglapi-mesa:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else bash -e /etc/init.d/xvfb start; fi; fi
-  - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64-i686 g++-mingw-w64-i686 binutils-mingw-w64-i686; else travis_retry sudo apt-get install -q -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64; fi && travis_retry sudo apt-get install -q -y g++-multilib && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
+  - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get remove -q -y gvfs-daemons && travis_retry sudo apt-get install -q -y libxrandr-dev:i386 libglapi-mesa:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else bash -e /etc/init.d/xvfb start; fi && if [ $PACKAGE_UPLOAD ]; then travis_retry sudo apt-get install -q -y rpm; fi; fi
+  - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64-i686 g++-mingw-w64-i686 binutils-mingw-w64-i686 && export ARCH=i686; else travis_retry sudo apt-get install -q -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64 && export ARCH=x86_64; fi && travis_retry sudo apt-get install -q -y g++-multilib && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - free -tm
 script: rake ci
 after_success: if [ $REBASE_ON_MASTER_COMMIT ]; then rake ci_rebase; fi
