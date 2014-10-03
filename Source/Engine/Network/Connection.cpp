@@ -100,7 +100,27 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
         return;
     }
     
-    connection_->SendMessage(msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
+    if (numBytes && !data)
+    {
+        LOGERROR("Null pointer supplied for network message data");
+        return;
+    }
+    
+    kNet::NetworkMessage *msg = connection_->StartNewMessage(msgID, numBytes);
+    if (!msg)
+    {
+        LOGERROR("Can not start new network message");
+        return;
+    }
+    
+    msg->reliable = reliable;
+    msg->inOrder = inOrder;
+    msg->priority = 0;
+    msg->contentID = contentID;
+    if (numBytes)
+        memcpy(msg->data, data, numBytes);
+    
+    connection_->EndAndQueueMessage(msg);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
