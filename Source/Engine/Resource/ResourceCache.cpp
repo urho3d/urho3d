@@ -413,34 +413,43 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     MutexLock lock(resourceMutex_);
     
     String name = SanitateResourceName(nameIn);
-    File* file = 0;
+    if (resourceRouter_)
+        resourceRouter_->Route(name, RESOURCE_GETFILE);
+    
+    if (name.Length())
+    {
+        File* file = 0;
 
-    if (searchPackagesFirst_)
-    {
-        file = SearchPackages(name);
-        if (!file)
-            file = SearchResourceDirs(name);
-    }
-    else
-    {
-        file = SearchResourceDirs(name);
-        if (!file)
+        if (searchPackagesFirst_)
+        {
             file = SearchPackages(name);
+            if (!file)
+                file = SearchResourceDirs(name);
+        }
+        else
+        {
+            file = SearchResourceDirs(name);
+            if (!file)
+                file = SearchPackages(name);
+        }
+        
+        if (file)
+            return SharedPtr<File>(file);
     }
     
-    if (file)
-        return SharedPtr<File>(file);
-
     if (sendEventOnFailure)
     {
-        LOGERROR("Could not find resource " + name);
+        if (resourceRouter_ && name.Empty() && !nameIn.Empty())
+            LOGERROR("Resource request " + nameIn + " was blocked");
+        else
+            LOGERROR("Could not find resource " + name);
 
         if (Thread::IsMainThread())
         {
             using namespace ResourceNotFound;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_RESOURCENAME] = name;
+            eventData[P_RESOURCENAME] = name.Length() ? name : nameIn;
             SendEvent(E_RESOURCENOTFOUND, eventData);
         }
     }
@@ -496,7 +505,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
         return 0;   // Error is already logged
 
     LOGDEBUG("Loading resource " + name);
-    resource->SetName(file->GetName());
+    resource->SetName(name);
 
     if (!resource->Load(*(file.Get())))
     {
@@ -612,6 +621,9 @@ bool ResourceCache::Exists(const String& nameIn) const
     MutexLock lock(resourceMutex_);
     
     String name = SanitateResourceName(nameIn);
+    if (resourceRouter_)
+        resourceRouter_->Route(name, RESOURCE_CHECKEXISTS);
+    
     if (name.Empty())
         return false;
     

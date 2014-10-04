@@ -56,6 +56,27 @@ struct ResourceGroup
     HashMap<StringHash, SharedPtr<Resource> > resources_;
 };
 
+/// Resource request types.
+enum ResourceRequest
+{
+    RESOURCE_CHECKEXISTS = 0,
+    RESOURCE_GETFILE = 1
+};
+
+/// Optional resource request processor. Can deny requests, re-route resource file names, or perform other processing per request.
+class URHO3D_API ResourceRouter : public Object
+{
+public:
+    /// Construct.
+    ResourceRouter(Context* context) :
+        Object(context)
+    {
+    }
+    
+    /// Process the resource request and optionally modify the resource name string. Empty name string means the resource is not found or not allowed.
+    virtual void Route(String& name, ResourceRequest requestType) = 0;
+};
+
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
 class URHO3D_API ResourceCache : public Object
 {
@@ -101,7 +122,9 @@ public:
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
     /// Set how many milliseconds maximum per frame to spend on finishing background loaded resources.
     void SetFinishBackgroundResourcesMs(int ms) { finishBackgroundResourcesMs_ = Max(ms, 1); }
-
+    /// Set the resource router object. By default there is none, so the routing process is skipped.
+    void SetResourceRouter(ResourceRouter* router) { resourceRouter_ = router; }
+    
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
@@ -146,6 +169,8 @@ public:
     bool GetSearchPackagesFirst() const { return searchPackagesFirst_; }
     /// Return how many milliseconds maximum to spend on finishing background loaded resources.
     int GetFinishBackgroundResourcesMs() const { return finishBackgroundResourcesMs_; }
+    /// Return the resource router.
+    ResourceRouter* GetResourceRouter() const { return resourceRouter_; }
 
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
@@ -188,6 +213,8 @@ private:
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Resource background loader.
     SharedPtr<BackgroundLoader> backgroundLoader_;
+    /// Resource router.
+    SharedPtr<ResourceRouter> resourceRouter_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.
