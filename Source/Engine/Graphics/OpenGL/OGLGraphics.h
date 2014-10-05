@@ -488,10 +488,12 @@ private:
     bool anisotropySupport_;
     /// DXT format support flag.
     bool dxtTextureSupport_;
+#ifdef GL_ES_VERSION_2_0
     /// ETC1 format support flag.
     bool etcTextureSupport_;
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_;
+#endif
     /// sRGB conversion on read support flag.
     bool sRGBSupport_;
     /// sRGB conversion on write support flag.

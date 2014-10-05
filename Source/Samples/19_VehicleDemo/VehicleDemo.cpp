@@ -157,8 +157,6 @@ void VehicleDemo::CreateScene()
 
 void VehicleDemo::CreateVehicle()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
     Node* vehicleNode = scene_->CreateChild("Vehicle");
     vehicleNode->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 
@@ -205,7 +203,6 @@ void VehicleDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
     Input* input = GetSubsystem<Input>();
 
     if (vehicle_)

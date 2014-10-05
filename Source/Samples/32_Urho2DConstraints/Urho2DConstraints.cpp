@@ -132,7 +132,7 @@ void Urho2DConstraints::CreateScene()
     for (unsigned j = 0; j<4; ++j)
     {
         Node* edgeNode = scene_->CreateChild("HorizontalEdge");
-        RigidBody2D* edgeBody = edgeNode->CreateComponent<RigidBody2D>();
+        /*RigidBody2D* edgeBody = */edgeNode->CreateComponent<RigidBody2D>();
         CollisionEdge2D* edgeShape = edgeNode->CreateComponent<CollisionEdge2D>();
         edgeShape->SetVertices(Vector2(-5.0f, j*2.0f -3.0f), Vector2(5.0f, j*2.0f -3.0f));
         edgeShape->SetFriction(0.5f); // Set friction

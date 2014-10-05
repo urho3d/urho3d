@@ -256,7 +256,6 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
     Input* input = GetSubsystem<Input>();
 
     if (character_)

@@ -117,7 +117,7 @@ void PhysicsStressTest::CreateScene()
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
         
         // Make the floor physical by adding RigidBody and CollisionShape components
-        RigidBody* body = floorNode->CreateComponent<RigidBody>();
+        /*RigidBody* body = */floorNode->CreateComponent<RigidBody>();
         CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
     }
@@ -136,7 +136,7 @@ void PhysicsStressTest::CreateScene()
             mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
             mushroomObject->SetCastShadows(true);
 
-            RigidBody* body = mushroomNode->CreateComponent<RigidBody>();
+            /*RigidBody* body = */mushroomNode->CreateComponent<RigidBody>();
             CollisionShape* shape = mushroomNode->CreateComponent<CollisionShape>();
             // By default the highest LOD level will be used, the LOD level can be passed as an optional parameter
             shape->SetTriangleMesh(mushroomObject->GetModel());

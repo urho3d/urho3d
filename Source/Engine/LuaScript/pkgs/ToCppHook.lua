@@ -91,10 +91,18 @@ function post_output_hook(package)
 
 #include "Precompiled.h"
 #include "tolua++.h"
-#include "ToluaUtils.h"]]
-    )
+#include "ToluaUtils.h"
+
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif]])
 
     WRITE(result)
+    WRITE([[
+#if __clang__
+#pragma clang diagnostic pop
+#endif]])
 end
 
 _push_functions['Component'] = "ToluaPushObject"

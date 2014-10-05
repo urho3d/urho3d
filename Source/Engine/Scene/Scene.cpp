@@ -60,11 +60,11 @@ Scene::Scene(Context* context) :
     localNodeID_(FIRST_LOCAL_ID),
     localComponentID_(FIRST_LOCAL_ID),
     checksum_(0),
+    asyncLoadingMs_(5),
     timeScale_(1.0f),
     elapsedTime_(0),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
-    asyncLoadingMs_(5),
     updateEnabled_(true),
     asyncLoading_(false),
     threadedUpdate_(false)
@@ -1072,7 +1072,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
     // Read node ID (not needed)
-    unsigned nodeID = file->ReadUInt();
+    /*unsigned nodeID = */file->ReadUInt();
 
     // Read Node or Scene attributes; these do not include any resources
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(isSceneFile ? Scene::GetTypeStatic() : Node::GetTypeStatic());
@@ -1092,7 +1092,8 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
     {
         VectorBuffer compBuffer(*file, file->ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
-        unsigned compID = compBuffer.ReadUInt();
+        // Read component ID (not needed)
+        /*unsigned compID = */compBuffer.ReadUInt();
         
         attributes = context_->GetAttributes(compType);
         if (attributes)

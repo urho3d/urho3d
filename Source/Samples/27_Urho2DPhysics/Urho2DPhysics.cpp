@@ -88,7 +88,7 @@ void Urho2DPhysics::CreateScene()
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     // Create 2D physics world component
-    PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
+    /*PhysicsWorld2D* physicsWorld = */scene_->CreateComponent<PhysicsWorld2D>();
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sprite2D* boxSprite = cache->GetResource<Sprite2D>("Urho2D/Box.png");
@@ -100,7 +100,7 @@ void Urho2DPhysics::CreateScene()
     groundNode->SetScale(Vector3(200.0f, 1.0f, 0.0f));
 
     // Create 2D rigid body for gound
-    RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
+    /*RigidBody2D* groundBody = */groundNode->CreateComponent<RigidBody2D>();
 
     StaticSprite2D* groundSprite = groundNode->CreateComponent<StaticSprite2D>();
     groundSprite->SetSprite(boxSprite);

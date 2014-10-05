@@ -54,7 +54,9 @@ static const char* openMode[] =
 };
 #endif
 
+#ifdef ANDROID
 static const unsigned READ_BUFFER_SIZE = 32768;
+#endif
 static const unsigned SKIP_BUFFER_SIZE = 1024;
 
 File::File(Context* context) :

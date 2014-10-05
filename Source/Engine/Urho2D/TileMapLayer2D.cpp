@@ -356,9 +356,6 @@ void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
     if (!imageLayer->GetSprite())
         return;
 
-    TmxFile2D* tmxFile = imageLayer->GetTmxFile();
-    float mapHeight = tmxFile->GetInfo().GetMapHeight();
-
     SharedPtr<Node> imageNode(GetNode()->CreateChild("Tile"));
     imageNode->SetTemporary(true);
     imageNode->SetPosition(imageLayer->GetPosition());

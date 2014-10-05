@@ -333,14 +333,12 @@ bool AnimationSet2D::LoadAnimation(const XMLElement& animationElem)
     for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
     {
         MainlineKey2D mainlineKey;
-        int id = keyElem.GetInt("id");
         mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
 
         for (XMLElement refElem = keyElem.GetChild(); refElem; refElem = refElem.GetNext())
         {
             Reference2D ref;
             
-            int refId = refElem.GetInt("id");
             if (refElem.GetName() == "bone_ref")
                 ref.type_ = OT_BONE;
             else

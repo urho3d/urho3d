@@ -208,7 +208,6 @@ bool Serializer::WriteResourceRef(const ResourceRef& value)
 bool Serializer::WriteResourceRefList(const ResourceRefList& value)
 {
     bool success = true;
-    unsigned size = value.names_.Size() * sizeof(StringHash);
     
     success &= WriteStringHash(value.type_);
     success &= WriteVLE(value.names_.Size());

@@ -134,12 +134,6 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
         Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount_, true));
         if (dest)
         {
-            Material* material = 0;
-            unsigned iStart = 0;
-            unsigned iCount = 0;
-            unsigned vStart = 0;
-            unsigned vCount = 0;
-
             for (unsigned d = 0; d < drawables_.Size(); ++d)
             {
                 if (!drawables_[d]->GetVisibility())
