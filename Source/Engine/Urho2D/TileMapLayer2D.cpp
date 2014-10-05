@@ -104,6 +104,9 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                         debug->AddLine(object->GetPoint(0), object->GetPoint(object->GetNumPoints() - 1), color, depthTest);
                 }
                 break;
+
+            default:
+                break;
             }
         }
     }

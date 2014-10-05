@@ -99,6 +99,9 @@ PListValue& PListValue::operator = (const PListValue& rhs)
 {
     switch (rhs.type_)
     {
+    case PLVT_NONE:
+        Reset();
+        break;
     case PLVT_INT:
         SetInt(rhs.int_);
         break;

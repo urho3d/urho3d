@@ -261,7 +261,7 @@ static void VariantSetString(Variant* variant, const String value)
 
 static void VariantSetBuffer(Variant* variant, const VectorBuffer& value)
 {
-    *variant == value.GetData();
+    *variant = value.GetData();
 }
 
 static void VariantSetResourceRef(Variant* variant, const ResourceRef& value)

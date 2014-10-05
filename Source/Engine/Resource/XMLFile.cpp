@@ -255,7 +255,7 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
 {
     // If pos is null, append or prepend add as a child, otherwise add before or after, the default is to append as a child
     pugi::xml_attribute pos = patch.attribute("pos");
-    if (!pos || strlen(pos.value()) <= 0 || pos.value() == "append")
+    if (!pos || strlen(pos.value()) <= 0 || strcmp(pos.value(), "append") == 0)
     {
         pugi::xml_node::iterator start = patch.begin();
         pugi::xml_node::iterator end = patch.end();
