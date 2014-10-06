@@ -11576,6 +11576,7 @@ void Patch(XMLFile);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+String ToString() const;
 
 // Properties:
 /* readonly */

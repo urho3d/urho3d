@@ -6604,6 +6604,7 @@ Methods:
 - bool FromString(const String source)
 - XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
+- String ToString() const
 - void Patch(XMLFile* patchFile)
 - void Patch(XMLElement patchElement)
 
