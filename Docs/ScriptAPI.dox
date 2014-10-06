@@ -11581,6 +11581,7 @@ Properties:
 
 - StringHash[]@ keys // readonly
 - uint length // readonly
+- Variant[]@ values // readonly
 
 <a name="Class_Vector2"></a>
 

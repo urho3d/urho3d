@@ -10914,6 +10914,8 @@ bool Erase(const String&);
 Array<StringHash> keys;
 /* readonly */
 uint length;
+/* readonly */
+Array<Variant> values;
 };
 
 class Vector2
