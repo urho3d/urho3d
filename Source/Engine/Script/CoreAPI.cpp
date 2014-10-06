@@ -353,6 +353,11 @@ static CScriptArray* VariantMapGetKeys(const VariantMap& map)
     return VectorToArray<StringHash>(map.Keys(), "Array<StringHash>");
 }
 
+static CScriptArray* VariantMapGetValues(const VariantMap& map)
+{
+    return VectorToArray<Variant>(map.Values(), "Array<Variant>");
+}
+
 static void RegisterVariant(asIScriptEngine* engine)
 {
     engine->RegisterEnum("VariantType");
@@ -520,6 +525,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Array<StringHash>@ get_keys() const", asFUNCTION(VariantMapGetKeys), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "Array<Variant>@ get_values() const", asFUNCTION(VariantMapGetValues), asCALL_CDECL_OBJLAST);
 }
 
 static void ConstructSpline(Spline* ptr)

@@ -462,6 +462,16 @@ public:
         return result;
     }
 
+    /// Return all the values.
+    Vector<U> Values() const
+    {
+        Vector<U> result;
+        result.Reserve(Size());
+        for (ConstIterator i = Begin(); i != End(); ++i)
+            result.Push(i->second_);
+        return result;
+    }
+    
     /// Return iterator to the beginning.
     Iterator Begin() { return Iterator(Head()); }
     /// Return iterator to the beginning.
