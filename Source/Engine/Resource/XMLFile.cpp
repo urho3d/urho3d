@@ -29,6 +29,7 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Serializer.h"
+#include "VectorBuffer.h"
 #include "XMLFile.h"
 
 #include <pugixml.hpp>
@@ -164,6 +165,14 @@ XMLElement XMLFile::GetRoot(const String& name)
         return XMLElement();
     else
         return XMLElement(this, root.internal_object());
+}
+
+String XMLFile::ToString() const
+{
+    VectorBuffer dest;
+    XMLWriter writer(dest);
+    document_->save(writer);
+    return String((const char*)dest.GetData(), dest.GetSize());
 }
 
 void XMLFile::Patch(XMLFile* patchFile)
@@ -347,9 +356,9 @@ bool XMLFile::CombineText(const pugi::xml_node& patch, pugi::xml_node original, 
         (patch.type() == pugi::node_cdata && original.type() == pugi::node_cdata))
     {
         if (prepend)
-            original.set_value(ToString("%s%s", patch.value(), original.value()).CString());
+            original.set_value(Urho3D::ToString("%s%s", patch.value(), original.value()).CString());
         else
-            original.set_value(ToString("%s%s", original.value(), patch.value()).CString());
+            original.set_value(Urho3D::ToString("%s%s", original.value(), patch.value()).CString());
 
         return true;
     }
