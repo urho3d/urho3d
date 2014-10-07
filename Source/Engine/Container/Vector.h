@@ -218,7 +218,7 @@ public:
         MoveRange(pos + length, pos, size_ - pos - length);
         
         T* destPtr = Buffer() + pos;
-        for (Iterator it = start; it != end; ++it)
+        for (ConstIterator it = start; it != end; ++it)
             *destPtr++ = *it;
         
         return Begin() + pos;
