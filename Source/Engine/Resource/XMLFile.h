@@ -62,6 +62,8 @@ public:
     XMLElement GetRoot(const String& name = String::EMPTY);
     /// Return the pugixml document.
     pugi::xml_document* GetDocument() const { return document_; }
+    /// Serialize the XML content to a string.
+    String ToString() const;
 
     /// Patch the XMLFile with another XMLFile. Based on RFC 5261.
     void Patch(XMLFile* patchFile);

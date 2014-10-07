@@ -1178,8 +1178,6 @@ void View::UpdateGeometries()
             
             if (command.type_ == CMD_SCENEPASS)
             {
-                BatchQueue* passQueue = &batchQueues_[command.pass_];
-                
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
                 item->priority_ = M_MAX_UNSIGNED;
                 item->workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;

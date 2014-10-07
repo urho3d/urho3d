@@ -29,6 +29,7 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Serializer.h"
+#include "VectorBuffer.h"
 #include "XMLFile.h"
 
 #include <pugixml.hpp>
@@ -166,6 +167,14 @@ XMLElement XMLFile::GetRoot(const String& name)
         return XMLElement(this, root.internal_object());
 }
 
+String XMLFile::ToString() const
+{
+    VectorBuffer dest;
+    XMLWriter writer(dest);
+    document_->save(writer);
+    return String((const char*)dest.GetData(), dest.GetSize());
+}
+
 void XMLFile::Patch(XMLFile* patchFile)
 {
     Patch(patchFile->GetRoot());
@@ -255,7 +264,7 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
 {
     // If pos is null, append or prepend add as a child, otherwise add before or after, the default is to append as a child
     pugi::xml_attribute pos = patch.attribute("pos");
-    if (!pos || strlen(pos.value()) <= 0 || pos.value() == "append")
+    if (!pos || strlen(pos.value()) <= 0 || strcmp(pos.value(), "append") == 0)
     {
         pugi::xml_node::iterator start = patch.begin();
         pugi::xml_node::iterator end = patch.end();
@@ -347,9 +356,9 @@ bool XMLFile::CombineText(const pugi::xml_node& patch, pugi::xml_node original, 
         (patch.type() == pugi::node_cdata && original.type() == pugi::node_cdata))
     {
         if (prepend)
-            original.set_value(ToString("%s%s", patch.value(), original.value()).CString());
+            original.set_value(Urho3D::ToString("%s%s", patch.value(), original.value()).CString());
         else
-            original.set_value(ToString("%s%s", original.value(), patch.value()).CString());
+            original.set_value(Urho3D::ToString("%s%s", original.value(), patch.value()).CString());
 
         return true;
     }

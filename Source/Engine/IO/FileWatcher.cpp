@@ -43,8 +43,9 @@ extern "C" {
 
 namespace Urho3D
 {
-
+#ifndef __APPLE__
 static const unsigned BUFFERSIZE = 4096;
+#endif
 
 FileWatcher::FileWatcher(Context* context) :
     Object(context),

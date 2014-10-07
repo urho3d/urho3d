@@ -22,9 +22,6 @@
 
 require 'pathname'
 require 'json'
-if ENV['XCODE']
-  require 'xcodeproj'
-end
 
 # Usage: rake sync (only intended to be used in a fork with remote 'upstream' set to urho3d/Urho3D)
 desc 'Fetch and merge upstream urho3d/Urho3D to a Urho3D fork'
@@ -156,7 +153,7 @@ task :ci_package_upload do
   unless ENV['SITE_UPDATE']
     system 'echo Generate documentation'
     if ENV['XCODE']
-      xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', false, '>/dev/null') or abort 'Failed to generate documentation'
+      xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', '>/dev/null') or abort 'Failed to generate documentation'
     else
       system "cd #{platform_prefix}Build && make -j$NUMJOBS doc >/dev/null" or abort 'Failed to generate documentation'
     end
@@ -165,11 +162,11 @@ task :ci_package_upload do
   if ENV['IOS']
     # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
     system 'echo Rebuild Urho3D library as Mach-O universal binary'
-    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal', false) or abort 'Failed to build Mach-O universal binary'
-    # There is a bug in CMake/CPack that causes the 'package' scheme failed to build for IOS platform, workaround by calling cpack directly
+    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
+    # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
     system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
   elsif ENV['XCODE']
-    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package', false) or abort 'Failed to make binary package'
+    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
   else
     if ENV['ANDROID']
       # Build Android package consisting of both armeabi-v7a and armeabi ABIs
@@ -402,21 +399,13 @@ def xcode_ci
   xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 
-def xcode_build(ios, project, scheme = 'ALL_BUILD', autosave = true, extras = '')
-  if autosave
-    # Save auto-created schemes from Xcode project file
-    system "ruby -i -pe 'gsub(/refType = 0; /, %q{})' #{project}/project.pbxproj" or abort 'Failed to remove legacy refType attributes from the generated Xcode project file'
-    system "ruby -i -e 'puts ARGF.read.gsub(/buildSettings = \\{\n\s*?\\};\n\s*?buildStyles = \(.*?\);/m, %q{})' #{project}/project.pbxproj" or abort 'Failed to remove unsupported PBXProject attributes from the generated Xcode project file'
-    xcproj = Xcodeproj::Project.open(project)
-    xcproj.recreate_user_schemes
-    xcproj.save     # There is a bug in this gem, it does not appear to exit with proper exit status (assume always success for now)
-  end
+def xcode_build(ios, project, target = 'ALL_BUILD', extras = '')
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
-  # Use xctool when building as its output is nicer
-  system "xctool -project #{project} -scheme #{scheme} -configuration #{$configuration} #{sdk} #{extras}" or return nil
-  if $testing == 1 && scheme == 'ALL_BUILD'     # Disable testing for other schemes such as 'doc', 'package', etc
-    # Use xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
-    system "xcodebuild -project #{project} -scheme RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return nil
+  # Use xcpretty to filter output from xcodebuild when building
+  system "xcodebuild -project #{project} -target #{target} -configuration #{$configuration} #{sdk} |xcpretty -c #{extras} && exit ${PIPESTATUS[0]}" or return nil
+  if $testing == 1 && target == 'ALL_BUILD'     # Disable testing for other targets such as 'doc', 'package', etc
+    # Use vanila xcodebuild when testing as its output is instantaneous (ensure Travis-CI does not kill the process during testing)
+    system "xcodebuild -project #{project} -target RUN_TESTS -configuration #{$configuration} #{sdk} #{extras}" or return nil
   end
   return 0
 end

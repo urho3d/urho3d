@@ -1471,7 +1471,6 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     PROFILE(LoadPassShaders);
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-    bool isSM3 = graphics_->GetSM3Support();
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();

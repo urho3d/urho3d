@@ -46,13 +46,13 @@ ScrollView::ScrollView(Context* context) :
     viewPositionAttr_(IntVector2::ZERO),
     touchScrollSpeed_(Vector2::ZERO),
     touchScrollSpeedMax_(Vector2::ZERO),
-    scrollDeceleration_(30.0f),
-    scrollSnapEpsilon_(M_EPSILON),
-    scrollTouchDown_(false),
     pageStep_(1.0f),
     scrollBarsAutoVisible_(true),
     ignoreEvents_(false),
     resizeContentWidth_(false),
+    scrollDeceleration_(30.0f),
+    scrollSnapEpsilon_(M_EPSILON),
+    scrollTouchDown_(false),
     barScrolling_(false)
 {
     clipChildren_ = true;

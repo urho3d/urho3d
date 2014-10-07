@@ -130,8 +130,6 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     face_ = face;
 
-    FT_GlyphSlot slot = face->glyph;
-
     FT_UInt glyphIndex;
     unsigned numGlyphs = 0;
     HashMap<unsigned, unsigned> indexToCharMapping;
@@ -147,8 +145,6 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
 
     // Load each of the glyphs to see the sizes & store other information
-    int maxWidth = 0;
-    int maxHeight = 0;
     int loadMode = ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
     ascender_ = face->size->metrics.ascender >> 6;
     int descender = face->size->metrics.descender >> 6;

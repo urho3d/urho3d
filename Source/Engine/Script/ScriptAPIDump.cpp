@@ -513,7 +513,7 @@ void Script::DumpAPI(DumpMode mode)
     
     for (unsigned i = 0; i < sortedEnums.Size(); ++i)
     {
-        int typeId;
+        int typeId = 0;
         if (mode == DOXYGEN)
             Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n\n");
         else if (mode == C_HEADER)

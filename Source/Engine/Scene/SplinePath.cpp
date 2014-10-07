@@ -34,14 +34,14 @@ extern const char* LOGIC_CATEGORY;
 
 SplinePath::SplinePath(Context* context) :
     Component(context),
+    spline_(BEZIER_CURVE),
     speed_(1.f),
     elapsedTime_(0.f),
-    length_(0.f),
     traveled_(0.f),
-    spline_(BEZIER_CURVE),
-    controlledIdAttr_(0),
+    length_(0.f),
+    dirty_(false),
     controlledNode_(NULL),
-    dirty_(false)
+    controlledIdAttr_(0)
 {
     UpdateNodeIds();
 }

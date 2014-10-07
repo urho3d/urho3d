@@ -8336,6 +8336,7 @@ Methods:
 - void ReleaseResources(const String&, bool = false)
 - void ReleaseResources(const String&, const String&, bool = false)
 - bool ReloadResource(Resource@)
+- void ReloadResourceWithDependencies(const String&)
 - void RemovePackageFile(PackageFile@, bool = true, bool = false)
 - void RemovePackageFile(const String&, bool = true, bool = false)
 - void RemoveResourceDir(const String&)
@@ -11580,6 +11581,7 @@ Properties:
 
 - StringHash[]@ keys // readonly
 - uint length // readonly
+- Variant[]@ values // readonly
 
 <a name="Class_Vector2"></a>
 
@@ -12184,6 +12186,7 @@ Methods:
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- String ToString() const
 
 Properties:
 

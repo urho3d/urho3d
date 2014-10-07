@@ -124,8 +124,8 @@ TimelineKey2D::TimelineKey2D() :
 }
 
 Timeline2D::Timeline2D() :
-    type_(OT_BONE),
-    parent_(-1)
+    parent_(-1),
+    type_(OT_BONE)
 {
 }
 

@@ -626,7 +626,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     
     engine->RegisterObjectType("TechniqueEntry", sizeof(TechniqueEntry), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(const TechniqueEntry&in)", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(const TechniqueEntry&in)", asFUNCTION(ConstructTechniqueEntryCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructTechniqueEntry), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TechniqueEntry", "TechniqueEntry& opAssign(const TechniqueEntry&in)", asMETHOD(TechniqueEntry, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("TechniqueEntry", "void set_technique(Technique@+)", asFUNCTION(TechniqueEntrySetTechnique), asCALL_CDECL_OBJLAST);

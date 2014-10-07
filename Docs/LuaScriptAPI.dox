@@ -4320,6 +4320,7 @@ Methods:
 
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
+- void ReloadResourceWithDependencies(const String fileName)
 - void SetMemoryBudget(StringHash type, unsigned budget)
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
@@ -6603,6 +6604,7 @@ Methods:
 - bool FromString(const String source)
 - XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
+- String ToString() const
 - void Patch(XMLFile* patchFile)
 - void Patch(XMLElement patchElement)
 

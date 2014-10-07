@@ -7120,6 +7120,7 @@ void ReleaseResources(StringHash, bool = false);
 void ReleaseResources(const String&, bool = false);
 void ReleaseResources(const String&, const String&, bool = false);
 bool ReloadResource(Resource);
+void ReloadResourceWithDependencies(const String&);
 void RemovePackageFile(PackageFile, bool = true, bool = false);
 void RemovePackageFile(const String&, bool = true, bool = false);
 void RemoveResourceDir(const String&);
@@ -10913,6 +10914,8 @@ bool Erase(const String&);
 Array<StringHash> keys;
 /* readonly */
 uint length;
+/* readonly */
+Array<Variant> values;
 };
 
 class Vector2
@@ -11573,6 +11576,7 @@ void Patch(XMLFile);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+String ToString() const;
 
 // Properties:
 /* readonly */

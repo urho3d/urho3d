@@ -83,7 +83,7 @@ Variant Spline::GetPoint(float f) const
 
 void Spline::SetKnot(const Variant& knot, unsigned index)
 {
-    if (index >= 0 && index < knots_.Size())
+    if (index < knots_.Size())
     {
         if (knots_.Size() > 0 && knots_[0].GetType() == knot.GetType())
             knots_[index] = knot;
@@ -106,9 +106,7 @@ void Spline::AddKnot(const Variant& knot)
 
 void Spline::AddKnot(const Variant& knot, unsigned index) 
 { 
-    if (index < 0)
-        index = 0;
-    else if (index > knots_.Size())
+    if (index > knots_.Size())
         index = knots_.Size();
 
     if (knots_.Size() > 0 && knots_[0].GetType() == knot.GetType())

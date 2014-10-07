@@ -15,6 +15,8 @@
 /** @file NetworkServer.cpp
 	@brief */
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
@@ -49,6 +51,8 @@ udpConnectionAttempts(64), workerThread(0)
 
 NetworkServer::~NetworkServer()
 {
+    // Urho3D: close listen sockets when shutting down
+    CloseListenSockets();
 	LOG(LogObjectAlloc, "Deleting NetworkServer %p.", this);
 }
 
@@ -78,8 +82,8 @@ void NetworkServer::CloseListenSockets()
 	{
 		if (listenSockets[i]->TransportLayer() == SocketOverUDP)
 			acceptNewConnections = false; ///\todo At this point, if in UDP mode, we should have destroyed all connections that use this socket!
-		else
-			owner->DeleteSocket(listenSockets[i]); 
+        // Urho3D: free also UDP listen sockets
+		owner->DeleteSocket(listenSockets[i]); 
 	}
 
 	// Now forget all sockets - not getting them back in any way.

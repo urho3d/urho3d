@@ -47,7 +47,6 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
 {
     zoom_ = false; // reset bool
 
-    Graphics* graphics = GetSubsystem<Graphics>();
     Input* input = GetSubsystem<Input>();
 
     // Zoom in/out

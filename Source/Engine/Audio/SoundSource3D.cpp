@@ -105,8 +105,8 @@ SoundSource3D::SoundSource3D(Context* context) :
     SoundSource(context),
     nearDistance_(DEFAULT_NEARDISTANCE),
     farDistance_(DEFAULT_FARDISTANCE),
-    outerAngle_(DEFAULT_ANGLE),
     innerAngle_(DEFAULT_ANGLE),
+    outerAngle_(DEFAULT_ANGLE),
     rolloffFactor_(DEFAULT_ROLLOFF)
 {
     // Start from zero volume until attenuation properly calculated

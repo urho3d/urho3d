@@ -138,8 +138,8 @@ void Character::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
     {
         Vector3 contactPosition = contacts.ReadVector3();
         Vector3 contactNormal = contacts.ReadVector3();
-        float contactDistance = contacts.ReadFloat();
-        float contactImpulse = contacts.ReadFloat();
+        /*float contactDistance = */contacts.ReadFloat();
+        /*float contactImpulse = */contacts.ReadFloat();
         
         // If contact is below node center and mostly vertical, assume it's a ground contact
         if (contactPosition.y_ < (node_->GetPosition().y_ + 1.0f))

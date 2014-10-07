@@ -104,6 +104,9 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                         debug->AddLine(object->GetPoint(0), object->GetPoint(object->GetNumPoints() - 1), color, depthTest);
                 }
                 break;
+
+            default:
+                break;
             }
         }
     }
@@ -352,9 +355,6 @@ void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
 
     if (!imageLayer->GetSprite())
         return;
-
-    TmxFile2D* tmxFile = imageLayer->GetTmxFile();
-    float mapHeight = tmxFile->GetInfo().GetMapHeight();
 
     SharedPtr<Node> imageNode(GetNode()->CreateChild("Tile"));
     imageNode->SetTemporary(true);

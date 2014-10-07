@@ -190,9 +190,10 @@ bool LuaFunction::PushVariant(const Variant& variant)
     case VAR_INTVECTOR2:
         PushUserType(variant.GetIntVector2(), "IntVector2"); 
         return true;
-    }
 
-    return false;
+    default:
+        return false;
+    }
 }
 
 bool LuaFunction::PushLuaTable(const String& tableName)

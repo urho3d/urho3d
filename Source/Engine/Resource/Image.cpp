@@ -1060,7 +1060,7 @@ Color Image::GetPixelTrilinear(float x, float y, float z) const
     Color colorNear = topColorNear.Lerp(bottomColorNear, yF);
     Color topColorFar = GetPixel(xI, yI, zI + 1).Lerp(GetPixel(xI + 1, yI, zI + 1), xF);
     Color bottomColorFar = GetPixel(xI, yI + 1, zI + 1).Lerp(GetPixel(xI + 1, yI + 1, zI + 1), xF);
-    Color colorFar = topColorNear.Lerp(bottomColorNear, yF);
+    Color colorFar = topColorFar.Lerp(bottomColorFar, yF);
     return colorNear.Lerp(colorFar, zF);
 }
 
