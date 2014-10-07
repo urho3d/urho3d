@@ -24,4 +24,11 @@
 define_source_files (PARENT_SCOPE)
 
 # Define dependency libs
-set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)
+set (INCLUDE_DIRS)
+if (URHO3D_NETWORK)
+    set (INCLUDE_DIRS ${INCLUDE_DIRS} ../ThirdParty/kNet/include)
+endif ()
+if (URHO3D_PHYSICS)
+    set (INCLUDE_DIRS ${INCLUDE_DIRS} ../ThirdParty/Bullet/src)
+endif ()
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ${INCLUDE_DIRS} PARENT_SCOPE)

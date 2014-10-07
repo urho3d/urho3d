@@ -35,7 +35,9 @@
 #ifdef URHO3D_NAVIGATION
 #include "NavigationMesh.h"
 #endif
+#ifdef URHO3D_NETWORK
 #include "Network.h"
+#endif
 #include "PackageFile.h"
 #ifdef URHO3D_PHYSICS
 #include "PhysicsWorld.h"
@@ -112,7 +114,9 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Log(context_));
     #endif
     context_->RegisterSubsystem(new ResourceCache(context_));
+    #ifdef URHO3D_NETWORK
     context_->RegisterSubsystem(new Network(context_));
+    #endif
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new Audio(context_));
     context_->RegisterSubsystem(new UI(context_));

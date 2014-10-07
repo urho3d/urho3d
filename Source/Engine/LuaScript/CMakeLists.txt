@@ -48,6 +48,11 @@ if (NOT URHO3D_NAVIGATION)
     list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/NavigationLuaAPI.pkg)
 endif ()
 
+# Remove NetworkLuaAPI.pkg
+if (NOT URHO3D_NETWORK)
+    list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/NetworkLuaAPI.pkg)
+endif ()
+
 # Remove PhysicsLuaAPI.pkg
 if (NOT URHO3D_PHYSICS)
     list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/PhysicsLuaAPI.pkg)
@@ -73,11 +78,15 @@ install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
-set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Resource ../Scene ../UI  ../Urho2D
-    ../../ThirdParty/Box2D ../../ThirdParty/kNet/include ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
+set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI  ../Urho2D
+    ../../ThirdParty/Box2D ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
 
 if (URHO3D_NAVIGATION)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Navigation)
+endif ()
+
+if (URHO3D_NETWORK)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Network ../../ThirdParty/kNet/include)
 endif ()
 
 if (URHO3D_PHYSICS)

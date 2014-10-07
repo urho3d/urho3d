@@ -452,6 +452,7 @@ cmake_xxxx batch files or shell scripts.
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)         |
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua        |
 |                     | | scripting support is enabled only)                   |
+|URHO3D_NETWORK       |1|Enable Network support                                |
 |URHO3D_PHYSICS       |1|Enable Physics support                                |
 |URHO3D_NAVIGATION    |1|Enable Navigation support                             |
 |URHO3D_SAMPLES       |0|Build sample applications                             |

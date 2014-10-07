@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#ifdef URHO3D_NETWORK
 #include "APITemplates.h"
 #include "Controls.h"
 #include "HttpRequest.h"
@@ -224,3 +225,5 @@ void RegisterNetworkAPI(asIScriptEngine* engine)
 }
 
 }
+
+#endif
