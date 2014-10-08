@@ -81,7 +81,9 @@ Script::Script(Context* context) :
     RegisterInputAPI(scriptEngine_);
     RegisterAudioAPI(scriptEngine_);
     RegisterUIAPI(scriptEngine_);
+#ifdef URHO3D_NETWORK
     RegisterNetworkAPI(scriptEngine_);
+#endif
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsAPI(scriptEngine_);
 #endif

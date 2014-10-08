@@ -150,7 +150,7 @@ if (NOT WIN32)
 endif ()
 
 # Add targets
-foreach (TARGET Box2D Civetweb FreeType JO kNet LZ4 PugiXml SDL StanHull STB)
+foreach (TARGET Box2D Civetweb FreeType JO LZ4 PugiXml SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -162,6 +162,10 @@ if (URHO3D_LUA)
     add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
+endif ()
+
+if (URHO3D_NETWORK)
+    add_subdirectory (ThirdParty/kNet)
 endif ()
 
 if (URHO3D_NAVIGATION)
