@@ -24,7 +24,6 @@
 define_source_files (PARENT_SCOPE)
 
 # Define dependency libs
-set (INCLUDE_DIRS)
 if (URHO3D_NETWORK)
     set (INCLUDE_DIRS ${INCLUDE_DIRS} ../ThirdParty/kNet/include)
 endif ()
