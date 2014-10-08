@@ -65,11 +65,13 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     if (height < 0)
         height = 0;
     
-    PODVector<IntRect>::Iterator best = freeAreas_.End();
-    int bestFreeArea = M_MAX_INT;
+    PODVector<IntRect>::Iterator best;
+    int bestFreeArea;
     
     for(;;)
     {
+        best = freeAreas_.End();
+        bestFreeArea = M_MAX_INT;
         for (PODVector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
         {
             int freeWidth = i->Width();
@@ -94,15 +96,29 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
             {
                 int oldWidth = size_.x_;
                 size_.x_ <<= 1;
-                IntRect newArea(oldWidth, 0, size_.x_, size_.y_);
-                freeAreas_.Push(newArea);
+                // If no allocations yet, simply expand the single free area
+                IntRect& first = freeAreas_.Front();
+                if (freeAreas_.Size() == 1 && first.left_ == 0 && first.top_ == 0 && first.right_ == oldWidth && first.bottom_ == size_.y_)
+                    first.right_ = size_.x_;
+                else
+                {
+                    IntRect newArea(oldWidth, 0, size_.x_, size_.y_);
+                    freeAreas_.Push(newArea);
+                }
             }
             else if (!doubleWidth_ && size_.y_ < maxSize_.y_)
             {
                 int oldHeight = size_.y_;
                 size_.y_ <<= 1;
-                IntRect newArea(0, oldHeight, size_.x_, size_.y_);
-                freeAreas_.Push(newArea);
+                // If no allocations yet, simply expand the single free area
+                IntRect& first = freeAreas_.Front();
+                if (freeAreas_.Size() == 1 && first.left_ == 0 && first.top_ == 0 && first.right_ == size_.x_ && first.bottom_ == oldHeight)
+                    first.bottom_ = size_.y_;
+                else
+                {
+                    IntRect newArea(0, oldHeight, size_.x_, size_.y_);
+                    freeAreas_.Push(newArea);
+                }
             }
             else
                 return false;
