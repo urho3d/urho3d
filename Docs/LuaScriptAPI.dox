@@ -6776,6 +6776,14 @@ Properties:
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
 
+### FaceCameraMode
+
+- int FC_NONE
+- int FC_ROTATE_XYZ
+- int FC_ROTATE_Y
+- int FC_LOOKAT_XYZ
+- int FC_LOOKAT_Y
+
 ### FileMode
 
 - int FILE_READ
