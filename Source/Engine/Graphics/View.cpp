@@ -499,7 +499,7 @@ void View::Update(const FrameInfo& frame)
         return;
     
     // Set automatic aspect ratio if required
-    if (camera_->GetAutoAspectRatio())
+    if (camera_ && camera_->GetAutoAspectRatio())
         camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
     
     GetDrawables();
@@ -705,6 +705,9 @@ void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& 
 
 void View::GetDrawables()
 {
+    if (!octree_ || !camera_)
+        return;
+    
     PROFILE(GetDrawables);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
@@ -871,6 +874,9 @@ void View::GetDrawables()
 
 void View::GetBatches()
 {
+    if (!octree_ || !camera_)
+        return;
+    
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
