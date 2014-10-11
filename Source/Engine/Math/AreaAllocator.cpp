@@ -92,7 +92,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         
         if (best == freeAreas_.End())
         {
-            if (doubleWidth_ && size_.x_ < maxSize_.x_)
+            if (doubleWidth_ && size_.x_ <= maxSize_.x_)
             {
                 int oldWidth = size_.x_;
                 size_.x_ <<= 1;
@@ -106,7 +106,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
                     freeAreas_.Push(newArea);
                 }
             }
-            else if (!doubleWidth_ && size_.y_ < maxSize_.y_)
+            else if (!doubleWidth_ && size_.y_ <= maxSize_.y_)
             {
                 int oldHeight = size_.y_;
                 size_.y_ <<= 1;
