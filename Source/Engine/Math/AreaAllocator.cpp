@@ -31,21 +31,22 @@ AreaAllocator::AreaAllocator()
     Reset(0, 0);
 }
 
-AreaAllocator::AreaAllocator(int width, int height)
+AreaAllocator::AreaAllocator(int width, int height, bool fastMode)
 {
-    Reset(width, height);
+    Reset(width, height, fastMode);
 }
 
-AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight)
+AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode)
 {
-    Reset(width, height, maxWidth, maxHeight);
+    Reset(width, height, maxWidth, maxHeight, fastMode);
 }
 
-void AreaAllocator::Reset(int width, int height, int maxWidth, int maxHeight)
+void AreaAllocator::Reset(int width, int height, int maxWidth, int maxHeight, bool fastMode)
 {
     doubleWidth_ = true;
     size_ = IntVector2(width, height);
     maxSize_ = IntVector2(maxWidth, maxHeight);
+    fastMode_ = fastMode;
     
     freeAreas_.Clear();
     IntRect initialArea(0, 0, width, height);
@@ -127,17 +128,102 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     x = best->left_;
     y = best->top_;
     
-    // Reserve the area by splitting up the remaining free area
-    /// \todo Reimplement a high-quality but slower mode; the algorithm here is not sufficient for offline packing (atlases)
-    best->left_ = reserved.right_;
-    if (best->Height() > 2 * height || height >= size_.y_ / 2)
+    if (fastMode_)
     {
-        IntRect splitArea(reserved.left_, reserved.bottom_, best->right_, best->bottom_);
-        best->bottom_ = reserved.bottom_;
-        freeAreas_.Push(splitArea);
+        // Reserve the area by splitting up the remaining free area
+        best->left_ = reserved.right_;
+        if (best->Height() > 2 * height || height >= size_.y_ / 2)
+        {
+            IntRect splitArea(reserved.left_, reserved.bottom_, best->right_, best->bottom_);
+            best->bottom_ = reserved.bottom_;
+            freeAreas_.Push(splitArea);
+        }
     }
-
+    else
+    {
+        // Remove the reserved area from all free areas
+        for (unsigned i = 0; i < freeAreas_.Size();)
+        {
+            if (SplitRect(freeAreas_[i], reserved))
+                freeAreas_.Erase(i);
+            else
+                ++i;
+        }
+        
+        Cleanup();
+    }
+    
     return true;
+}
+
+bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
+{
+    if (reserve.right_ > original.left_ && reserve.left_ < original.right_ && reserve.bottom_ > original.top_ &&
+        reserve.top_ < original.bottom_)
+    {
+        // Check for splitting from the right
+        if (reserve.right_ < original.right_) 
+        {
+            IntRect newRect = original;
+            newRect.left_ = reserve.right_;
+            freeAreas_.Push(newRect);
+        }
+        // Check for splitting from the left
+        if (reserve.left_ > original.left_)
+        {
+            IntRect newRect = original;
+            newRect.right_ = reserve.left_;
+            freeAreas_.Push(newRect);
+        }
+        // Check for splitting from the bottom
+        if (reserve.bottom_ < original.bottom_)
+        {
+            IntRect newRect = original;
+            newRect.top_ = reserve.bottom_;
+            freeAreas_.Push(newRect);
+        }
+        // Check for splitting from the top
+        if (reserve.top_ > original.top_)
+        {
+            IntRect newRect = original;
+            newRect.bottom_ = reserve.top_;
+            freeAreas_.Push(newRect);
+        }
+        
+        return true;
+    }
+    
+    return false;
+}
+
+void AreaAllocator::Cleanup()
+{
+    // Remove rects which are contained within another rect
+    for (unsigned i = 0; i < freeAreas_.Size(); )
+    {
+        bool erased = false;
+        for (unsigned j = i + 1; j < freeAreas_.Size(); )
+        {
+            if ((freeAreas_[i].left_ >= freeAreas_[j].left_) &&
+                (freeAreas_[i].top_ >= freeAreas_[j].top_) &&
+                (freeAreas_[i].right_ <= freeAreas_[j].right_) &&
+                (freeAreas_[i].bottom_ <= freeAreas_[j].bottom_))
+            {
+                freeAreas_.Erase(i);
+                erased = true;
+                break;
+            }
+            if ((freeAreas_[j].left_ >= freeAreas_[i].left_) &&
+                (freeAreas_[j].top_ >= freeAreas_[i].top_) &&
+                (freeAreas_[j].right_ <= freeAreas_[i].right_) &&
+                (freeAreas_[j].bottom_ <= freeAreas_[i].bottom_))
+                freeAreas_.Erase(j);
+            else
+                ++j;
+        }
+        if (!erased)
+            ++i;
+    }
 }
 
 }
