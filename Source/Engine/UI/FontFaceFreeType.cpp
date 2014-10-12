@@ -171,7 +171,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     image->SetSize(textureWidth, textureHeight, 1);
     unsigned char* imageData = image->GetData();
     memset(imageData, 0, image->GetWidth() * image->GetHeight());
-    allocator_ = AreaAllocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
+    allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
 
     for (unsigned i = 0; i < numGlyphs; ++i)
     {
@@ -333,7 +333,7 @@ bool FontFaceFreeType::SetupNextTexture(int textureWidth, int textureHeight)
         return false;
 
     textures_.Push(texture);
-    allocator_ = AreaAllocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
+    allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
 
     font_->SetMemoryUse(font_->GetMemoryUse() + textureWidth * textureHeight);
 

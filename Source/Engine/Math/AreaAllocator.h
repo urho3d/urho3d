@@ -39,7 +39,7 @@ public:
     AreaAllocator(int width, int height, int maxWidth, int maxHeight);
     
     /// Reset to given width and height and remove all previous allocations.
-    void Reset(int width, int height);
+    void Reset(int width, int height, int maxWidth = 0, int maxHeight = 0);
     /// Try to allocate an area. Return true if successful, with x & y coordinates filled.
     bool Allocate(int width, int height, int& x, int& y);
     /// Return the current width.

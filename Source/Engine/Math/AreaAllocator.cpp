@@ -26,34 +26,28 @@
 namespace Urho3D
 {
 
-AreaAllocator::AreaAllocator() :
-    size_(IntVector2::ZERO),
-    maxSize_(IntVector2::ZERO),
-    doubleWidth_(true)
+AreaAllocator::AreaAllocator()
 {
     Reset(0, 0);
 }
 
-AreaAllocator::AreaAllocator(int width, int height) :
-    size_(width, height),
-    maxSize_(IntVector2::ZERO),
-    doubleWidth_(true)
+AreaAllocator::AreaAllocator(int width, int height)
 {
     Reset(width, height);
 }
 
-AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight) :
-    size_(width, height),
-    maxSize_(maxWidth, maxHeight),
-    doubleWidth_(true)
+AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight)
 {
-    Reset(width, height);
+    Reset(width, height, maxWidth, maxHeight);
 }
 
-void AreaAllocator::Reset(int width, int height)
+void AreaAllocator::Reset(int width, int height, int maxWidth, int maxHeight)
 {
-    freeAreas_.Clear();
+    doubleWidth_ = true;
+    size_ = IntVector2(width, height);
+    maxSize_ = IntVector2(maxWidth, maxHeight);
     
+    freeAreas_.Clear();
     IntRect initialArea(0, 0, width, height);
     freeAreas_.Push(initialArea);
 }
@@ -134,8 +128,9 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     y = best->top_;
     
     // Reserve the area by splitting up the remaining free area
+    /// \todo Reimplement a high-quality but slower mode; the algorithm here is not sufficient for offline packing (atlases)
     best->left_ = reserved.right_;
-    if (best->Height() > 2 * height)
+    if (best->Height() > 2 * height || height >= size_.y_ / 2)
     {
         IntRect splitArea(reserved.left_, reserved.bottom_, best->right_, best->bottom_);
         best->bottom_ = reserved.bottom_;
