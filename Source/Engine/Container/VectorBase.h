@@ -145,6 +145,9 @@ template <class T> struct RandomAccessConstIterator
 };
 
 /// %Vector base class.
+/** Note that to prevent extra memory use due to vtable pointer, %VectorBase intentionally does not declare a virtual destructor
+    and therefore %VectorBase pointers should never be used.
+  */
 class URHO3D_API VectorBase
 {
 public:

@@ -88,6 +88,9 @@ struct HashIteratorBase
 };
 
 /// Hash set/map base class.
+/** Note that to prevent extra memory use due to vtable pointer, %HashBase intentionally does not declare a virtual destructor
+    and therefore %HashBase pointers should never be used.
+  */
 class URHO3D_API HashBase
 {
 public:
@@ -103,12 +106,6 @@ public:
     {
     }
 
-    /// Destruct.
-    ~HashBase()
-    {
-        delete[] ptrs_;
-    }
-    
     /// Swap with another hash set or map.
     void Swap(HashBase& rhs)
     {
