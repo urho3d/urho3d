@@ -182,7 +182,9 @@ public:
     const String& GetDownloadName() const;
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
-    
+    /// Start sync packages from server
+    void SyncPackages(bool allClients = true);
+
     /// Current controls.
     Controls controls_;
     /// Identity map.
@@ -213,6 +215,12 @@ private:
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received.
     void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
+    /// Process a SyncPackages message from client.
+    void ProcessSyncPackages(int msgID, MemoryBuffer& msg);
+    /// Process a SyncPackagesInfo message from server.
+    void ProcessSyncPackagesInfo(int msgID, MemoryBuffer& msg);
+	/// Send message with info about all required packages, clients start download missing packages
+	void SendSyncPackagesInfo(bool allClients = true);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.
