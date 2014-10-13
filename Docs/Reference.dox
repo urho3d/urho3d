@@ -1551,6 +1551,8 @@ To prevent tunneling of a fast moving rigid body through obstacles, continuous c
 
 All physics calculations are performed in world space. Nodes containing a RigidBody component should preferably be parented to the Scene (root node) to ensure independent motion. For ragdolls this is not absolute, as retaining proper bone hierarchy is more important, but be aware that the ragdoll bones may drift far from the animated model's root scene node.
 
+When several collision shapes are present in the same node, edits to them can cause redundant mass/inertia update computation in the RigidBody. To optimize performance in these cases, the edits can be enclosed between calls to \ref RigidBody::DisableMassUpdate "DisableMassUpdate()" and \ref RigidBody::EnableMassUpdate "EnableMassUpdate()".
+
 \section Physics_ConstraintParameters Constraint parameters
 
 %Constraint position (and rotation if relevant) need to be defined in relation to both connected bodies, see \ref Constraint::SetPosition "SetPosition()" and \ref Constraint::SetOtherPosition "SetOtherPosition()". If the constraint connects a body to the static world, then the "other body position" and "other body rotation" mean the static end's transform in world space. There is also a helper function \ref Constraint::SetWorldPosition "SetWorldPosition()" to assign the constraint to a world-space position; this sets both relative positions.
