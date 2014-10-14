@@ -112,7 +112,7 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "const Vector3& get_position() const", asMETHOD(Connection, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void set_rotation(const Quaternion&in)", asMETHOD(Connection, SetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const Quaternion& get_rotation() const", asMETHOD(Connection, GetRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "void syncPackages(bool)", asMETHOD(Connection, SyncPackages), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void sendPackageToClients(PackageFile@+)", asMETHOD(Connection, SendPackageToClients), asCALL_THISCALL);
     engine->RegisterObjectProperty("Connection", "Controls controls", offsetof(Connection, controls_));
     engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
     

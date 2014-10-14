@@ -428,12 +428,8 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer &msg)
             ProcessRemoteEvent(msgID, msg);
             break;
 
-        case MSG_SYNCPACKAGES:
-            ProcessSyncPackages(msgID, msg);
-            break;
-
-        case MSG_SYNCPACKAGESINFO:
-            ProcessSyncPackagesInfo(msgID, msg);
+        case MSG_PACKAGEINFO:
+            ProcessPackageInfo(msgID, msg);
             break;
             
         default:
@@ -1405,7 +1401,6 @@ void Connection::OnPackagesReady()
         return;
     
     // if sceneLoaded_ is true, then we are at sync state - skip loading, else we at start - loading scene from xml.
-    // FIXIT: may be use another flag - syncState_, and set it on start syncing and reset here.
     if (sceneLoaded_)
         return;
 
@@ -1436,82 +1431,31 @@ void Connection::OnPackagesReady()
     }
 }
 
-void Connection::SyncPackages(bool allClients)
-{
-    if (!scene_)
-        return;
-
-    if (IsClient())
-    {
-		// If we are server, then broadcast message to all clients
-		SendSyncPackagesInfo(true); 
-    }
-	else
-	{
-		// If we are client. then send message to server to send required packages info
-		msg_.Clear();
-		msg_.WriteBool(allClients);
-		SendMessage(MSG_SYNCPACKAGES, true, false, msg_);
-	}
-}
-
-void Connection::SendSyncPackagesInfo(bool allClients)
-{
-    const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
-    unsigned numPackages = packages.Size();
-
-	if (numPackages == 0)
-		return;
-
-	if (!CheckPackagesUpdate())
-		return;
-
-	cachedPackages_.Clear();
-    msg_.Clear();
-    msg_.WriteVLE(numPackages);
-
-    for (unsigned i = 0; i < numPackages; ++i)
-    {
-        PackageFile* package = packages[i];
-		String filename = GetFileNameAndExtension(package->GetName());
-		cachedPackages_.Push(filename);
-        msg_.WriteString(filename);
-        msg_.WriteUInt(package->GetTotalSize());
-        msg_.WriteUInt(package->GetChecksum());
-    }
-
-    if (allClients)
-	{
-		Network* network =  GetSubsystem<Network>();
-        network->BroadcastMessage(MSG_SYNCPACKAGESINFO, true, true, msg_);
-	}
-    else
-        SendMessage(MSG_SYNCPACKAGESINFO, true, true, msg_);
-}
-
-void Connection::ProcessSyncPackages(int msgID, MemoryBuffer& msg)
+void Connection::SendPackageToClients(PackageFile* package)
 {
     if (!scene_)
         return;
 
     if (!IsClient())
-    {
-        LOGWARNING("Received unexpected Sync message from server");
         return;
-    }
 
-	// Server receive MSG_SYNCPACKAGES message. Server send info about all required packages to client
-	SendSyncPackagesInfo(msg.ReadBool());   
+    msg_.Clear();
+
+    String filename = GetFileNameAndExtension(package->GetName());
+    msg_.WriteString(filename);
+    msg_.WriteUInt(package->GetTotalSize());
+    msg_.WriteUInt(package->GetChecksum());
+    GetSubsystem<Network>()->BroadcastMessage(MSG_PACKAGEINFO, true, true, msg_);
 }
 
-void Connection::ProcessSyncPackagesInfo(int msgID, MemoryBuffer& msg)
+void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
 {
     if (!scene_)
         return;
 
     if (IsClient())
     {
-        LOGWARNING("Received unexpected Sync packages info message from server");
+        LOGWARNING("Received unexpected packages info message from server");
         return;
     }
 
@@ -1529,74 +1473,49 @@ void Connection::ProcessSyncPackagesInfo(int msgID, MemoryBuffer& msg)
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
 
     // Now check which packages we have in the resource cache or in the download cache, and which we need to download
-    unsigned numPackages = msg.ReadVLE();
     Vector<String> downloadedPackages;
 
     if (!packageCacheDir.Empty())
         GetSubsystem<FileSystem>()->ScanDir(downloadedPackages, packageCacheDir, "*.*", SCAN_FILES, false);
+ 
+    String name = msg.ReadString();
+    unsigned fileSize = msg.ReadUInt();
+    unsigned checksum = msg.ReadUInt();
+    String checksumString = ToStringHex(checksum);
+    bool found = false;
 
-    for (unsigned i = 0; i < numPackages; ++i)
+    // Check first the resource cache
+    for (unsigned j = 0; j < packages.Size(); ++j)
     {
-        String name = msg.ReadString();
-        unsigned fileSize = msg.ReadUInt();
-        unsigned checksum = msg.ReadUInt();
-        String checksumString = ToStringHex(checksum);
-        bool found = false;
-
-        // Check first the resource cache
-        for (unsigned j = 0; j < packages.Size(); ++j)
+        PackageFile* package = packages[j];
+        if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
+            package->GetChecksum() == checksum)
         {
-            PackageFile* package = packages[j];
-            if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
-                package->GetChecksum() == checksum)
+            found = true;
+            break;
+        }
+    }
+
+    // Then the download cache
+    for (unsigned j = 0; j < downloadedPackages.Size(); ++j)
+    {
+        const String& fileName = downloadedPackages[j];
+        if (!fileName.Find(checksumString) && !fileName.Substring(9).Compare(name, false))
+        {
+            // Name matches. Check filesize and actual checksum to be sure
+            SharedPtr<PackageFile> newPackage(new PackageFile(context_, packageCacheDir + fileName));
+            if (newPackage->GetTotalSize() == fileSize && newPackage->GetChecksum() == checksum)
             {
+                // Add the package to the resource system now, as we will need it to load the scene
+                cache->AddPackageFile(newPackage, true);
                 found = true;
                 break;
             }
         }
+    }
 
-        // Then the download cache
-        for (unsigned j = 0; j < downloadedPackages.Size(); ++j)
-        {
-            const String& fileName = downloadedPackages[j];
-            if (!fileName.Find(checksumString) && !fileName.Substring(9).Compare(name, false))
-            {
-                // Name matches. Check filesize and actual checksum to be sure
-                SharedPtr<PackageFile> newPackage(new PackageFile(context_, packageCacheDir + fileName));
-                if (newPackage->GetTotalSize() == fileSize && newPackage->GetChecksum() == checksum)
-                {
-                    // Add the package to the resource system now, as we will need it to load the scene
-                    cache->AddPackageFile(newPackage, true);
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        // Package not found, need to request a download
-        if (!found)
-            RequestPackage(name, fileSize, checksum);
-
-    } // for
-}
-
-bool Connection::CheckPackagesUpdate()
-{
-	if (cachedPackages_.Empty())
-		return true;
-
-	const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
-	unsigned numPackages = packages.Size();
-
-	for (unsigned i = 0; i < numPackages; ++i)
-	{
-		PackageFile* package = packages[i];
-		String filename = GetFileNameAndExtension(package->GetName());
-
-		if (!cachedPackages_.Contains(filename))
-			return true;
-	}
-
-	return false;
+    // Package not found, need to request a download
+    if (!found)
+        RequestPackage(name, fileSize, checksum);
 }
 }

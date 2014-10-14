@@ -61,10 +61,8 @@ static const int MSG_REMOVECOMPONENT = 0x13;
 static const int MSG_REMOTEEVENT = 0x14;
 /// Client->server and server->client: remote node event.
 static const int MSG_REMOTENODEEVENT = 0x15;
-/// Client->server: start sync packages.
-static const int MSG_SYNCPACKAGES = 0x16;
-/// Server->client: info about sync packages.
-static const int MSG_SYNCPACKAGESINFO = 0x17;
+/// Server->client: info about package.
+static const int MSG_PACKAGEINFO = 0x16;
 
 /// Fixed content ID for client controls update.
 static const unsigned CONTROLS_CONTENT_ID = 1;
