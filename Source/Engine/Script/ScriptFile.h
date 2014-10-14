@@ -46,7 +46,8 @@ class Variant;
 class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 {
     OBJECT(ScriptFile);
-    
+    friend class asPEEK;
+
 public:
     /// Construct.
     ScriptFile(Context* context);
