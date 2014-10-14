@@ -108,10 +108,10 @@ private:
 	Vector<Connection*> connections_;
 
 	bool debugInterrupt_;
-	int nextDebugCommand_;
-	int debuggingStackLevel_;
-	int debuggingLine_;
-	int debuggingSection_;
+	unsigned int nextDebugCommand_;
+	unsigned int debuggingStackLevel_;
+	unsigned int debuggingLine_;
+	unsigned int debuggingSection_;
 	HashMap<int,SectionData> sections_;
 	HashMap<String,int> sectionIds_;
 	HashMap<int, asIScriptContext*> tracked_context_;

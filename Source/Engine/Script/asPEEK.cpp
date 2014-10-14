@@ -87,8 +87,6 @@ namespace Urho3D {
 	asPEEK::~asPEEK() 
 	{
 		::mg_stop(context_);
-		for (unsigned int i = 0; i < connections_.Size(); ++i)
-			delete connections_[i];
 	}
 
 	void asPEEK::SetDebuggerEnabled(bool enabled) 
@@ -163,8 +161,10 @@ namespace Urho3D {
 			for (HashMap<int,SectionData>::Iterator it = instance->sections_.Begin(); it != instance->sections_.End(); ++it)
 				it->second_.breakpoints.Clear();
 		}
-		if (instance->debuggingContext_ != 0x0)
+		if (instance->debuggingContext_ != 0x0 && instance->connectionList_.Size() == 0) {
+			instance->debugInterrupt_ = true;
 			instance->EndDebugging();
+		}
 		if (instance->connectionList_.Size() == 0) 
 		{
 			for (HashMap<int,asIScriptContext*>::ConstIterator it = instance->tracked_context_.Begin(); it != instance->tracked_context_.End(); ++it)
@@ -227,7 +227,7 @@ namespace Urho3D {
 	{
 		if (!sectionData || sectionData->breakpoints.Size() == 0)
 			return false;
-		return sectionData->breakpoints.Contains(line) > 0;
+		return sectionData->breakpoints.Contains(line);
 	}
 
 	void asPEEK::LineCallback(asIScriptContext* ctx) 
@@ -1172,6 +1172,8 @@ namespace Urho3D {
 				}
 			}
 		}
+		if (debugInterrupt_)
+			debugInterrupt_ = !debugInterrupt_;
 	}
 
 	void asPEEK::SendGlobalVariables(mg_connection* conn, asIScriptContext* ctx) 
@@ -1548,7 +1550,7 @@ namespace Urho3D {
 		ctx->SetLineCallback(asMETHOD(asPEEK, LineCallback), this, asCALL_THISCALL);
 		tracked_context_[contextCount_] = ctx;
 		contextCount_++;
-		for (int i = 0; i < this->connectionList_.Size(); ++i)
+		for (unsigned int i = 0; i < this->connectionList_.Size(); ++i)
 			SendContexts(connectionList_[i]);
 	}
 
@@ -1568,21 +1570,21 @@ namespace Urho3D {
 				break;
 			}
 		}
-		for (int i = 0; i < this->connectionList_.Size(); ++i)
+		for (unsigned int i = 0; i < this->connectionList_.Size(); ++i)
 			this->SendContexts(connectionList_[i]);
 	}
 
 	void asPEEK::AddModule(asIScriptModule* mod)
 	{
 		tracked_modules_.Insert(mod);
-		for (int i = 0; i < this->connectionList_.Size(); ++i)
+		for (unsigned int i = 0; i < this->connectionList_.Size(); ++i)
 			SendModuleNames(connectionList_[i]);
 	}
 
 	void asPEEK::RemoveModule(asIScriptModule* mod)
 	{
 		tracked_modules_.Erase(mod);
-		for (int i = 0; i < this->connectionList_.Size(); ++i)
+		for (unsigned int i = 0; i < this->connectionList_.Size(); ++i)
 			SendModuleNames(connectionList_[i]);
 	}
 
@@ -1595,7 +1597,7 @@ namespace Urho3D {
 		sectionIds_[name] = sectionCount_;
 		sections_[d.id] = d;
 		sectionCount_++;
-		for (int i = 0; i < this->connectionList_.Size(); ++i)
+		for (unsigned int i = 0; i < this->connectionList_.Size(); ++i)
 			SendSectionNames(connectionList_[i]);
 	}
 
@@ -1606,7 +1608,7 @@ namespace Urho3D {
 			sectionIds_.Erase(name);
 			sections_.Erase(id);
 		}
-		for (int i = 0; i < this->connectionList_.Size(); ++i)
+		for (unsigned int i = 0; i < this->connectionList_.Size(); ++i)
 			SendSectionNames(connectionList_[i]);
 	}
 

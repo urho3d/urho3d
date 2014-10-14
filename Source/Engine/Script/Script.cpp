@@ -44,7 +44,8 @@ Script::Script(Context* context) :
     scriptEngine_(0),
     immediateContext_(0),
     scriptNestingLevel_(0),
-    executeConsoleCommands_(false)
+    executeConsoleCommands_(false),
+	debugDaemon_(0)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
@@ -118,6 +119,14 @@ Script::~Script()
         scriptEngine_->Release();
         scriptEngine_ = 0;
     }
+
+#ifdef URHO3D_ANGELSCRIPT_DEBUGGING
+	if (debugDaemon_) 
+	{
+		delete debugDaemon_;
+		debugDaemon_ = 0;
+	}
+#endif
 }
 
 bool Script::Execute(const String& line)
