@@ -36,6 +36,9 @@ Docs/minimal-*
 Source/.*project
 Source/.settings
 
+# Qt Creator project settings
+Source/CMakeLists.txt.user
+
 # Android in-the-source project settings
 Source/Android/project.properties
 Source/Android/local.properties
