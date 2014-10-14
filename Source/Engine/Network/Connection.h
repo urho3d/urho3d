@@ -221,6 +221,8 @@ private:
     void ProcessSyncPackagesInfo(int msgID, MemoryBuffer& msg);
 	/// Send message with info about all required packages, clients start download missing packages
 	void SendSyncPackagesInfo(bool allClients = true);
+	/// Check changes in packages filename cache
+	bool CheckPackagesUpdate();
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.
@@ -274,6 +276,8 @@ private:
     bool sceneLoaded_;
     /// Show statistics flag.
     bool logStatistics_;
+	/// Cached filenames of packages
+	Vector<String> cachedPackages_;
 };
 
 }

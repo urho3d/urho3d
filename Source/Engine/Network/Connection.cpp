@@ -1459,13 +1459,23 @@ void Connection::SendSyncPackagesInfo(bool allClients)
 {
     const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
     unsigned numPackages = packages.Size();
+
+	if (numPackages == 0)
+		return;
+
+	if (!CheckPackagesUpdate())
+		return;
+
+	cachedPackages_.Clear();
     msg_.Clear();
     msg_.WriteVLE(numPackages);
 
     for (unsigned i = 0; i < numPackages; ++i)
     {
         PackageFile* package = packages[i];
-        msg_.WriteString(GetFileNameAndExtension(package->GetName()));
+		String filename = GetFileNameAndExtension(package->GetName());
+		cachedPackages_.Push(filename);
+        msg_.WriteString(filename);
         msg_.WriteUInt(package->GetTotalSize());
         msg_.WriteUInt(package->GetChecksum());
     }
@@ -1568,5 +1578,25 @@ void Connection::ProcessSyncPackagesInfo(int msgID, MemoryBuffer& msg)
             RequestPackage(name, fileSize, checksum);
 
     } // for
+}
+
+bool Connection::CheckPackagesUpdate()
+{
+	if (cachedPackages_.Empty())
+		return true;
+
+	const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
+	unsigned numPackages = packages.Size();
+
+	for (unsigned i = 0; i < numPackages; ++i)
+	{
+		PackageFile* package = packages[i];
+		String filename = GetFileNameAndExtension(package->GetName());
+
+		if (!cachedPackages_.Contains(filename))
+			return true;
+	}
+
+	return false;
 }
 }
