@@ -183,8 +183,8 @@ public:
     const String& GetDownloadName() const;
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
-    /// Trigger client connections to download a package file from the server. Can be used to download additional resource packages when clients are already joined in a scene.
-    void SendPackageToClients(PackageFile* package);
+    /// Trigger client connection to download a package file from the server. Can be used to download additional resource packages when client is already joined in a scene. The package must have been added as a requirement to the scene the client is joined in, or else the eventual download will fail.
+    void SendPackageToClient(PackageFile* package);
 
     /// Current controls.
     Controls controls_;

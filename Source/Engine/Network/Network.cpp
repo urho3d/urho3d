@@ -361,6 +361,27 @@ void Network::SetPackageCacheDir(const String& path)
     packageCacheDir_ = AddTrailingSlash(path);
 }
 
+void Network::SendPackageToClients(Scene* scene, PackageFile* package)
+{
+    if (!scene)
+    {
+        LOGERROR("Null scene specified for SendPackageToClients");
+        return;
+    }
+    if (!package)
+    {
+        LOGERROR("Null package specified for SendPackageToClients");
+        return;
+    }
+    
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+        i != clientConnections_.End(); ++i)
+    {
+        if (i->second_->GetScene() == scene)
+            i->second_->SendPackageToClient(package);
+    }
+}
+
 SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData)
 {
     PROFILE(MakeHttpRequest);

@@ -1432,21 +1432,29 @@ void Connection::OnPackagesReady()
     }
 }
 
-void Connection::SendPackageToClients(PackageFile* package)
+void Connection::SendPackageToClient(PackageFile* package)
 {
     if (!scene_)
         return;
 
     if (!IsClient())
+    {
+        LOGERROR("SendPackageToClient can be called on the server only");
         return;
-
+    }
+    if (!package)
+    {
+        LOGERROR("Null package specified for SendPackageToClient");
+        return;
+    }
+    
     msg_.Clear();
 
     String filename = GetFileNameAndExtension(package->GetName());
     msg_.WriteString(filename);
     msg_.WriteUInt(package->GetTotalSize());
     msg_.WriteUInt(package->GetChecksum());
-    GetSubsystem<Network>()->BroadcastMessage(MSG_PACKAGEINFO, true, true, msg_);
+    SendMessage(MSG_PACKAGEINFO, true, true, msg_);
 }
 
 void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)

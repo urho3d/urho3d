@@ -27,12 +27,7 @@ class Connection : public Object
     void SetConnectPending(bool connectPending);
     void SetLogStatistics(bool enable);
     void Disconnect(int waitMSec = 0);
-    void SendServerUpdate();
-    void SendClientUpdate();
-    void SendRemoteEvents();
-    void SendPackages();
-    void ProcessPendingLatestData();
-    bool ProcessMessage(int msgID, MemoryBuffer& msg);
+    void SendPackageToClient(PackageFile* package);
     
     VariantMap& GetIdentity();
     Scene* GetScene() const;
