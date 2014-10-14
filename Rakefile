@@ -160,9 +160,11 @@ task :ci_package_upload do
   end
   # Make the package
   if ENV['IOS']
-    # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-    system 'echo Rebuild Urho3D library as Mach-O universal binary'
-    xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
+    if ENV['CI'] && ENV['URHO3D_64BIT'].to_i == 0  # Skip Mach-O universal binary build for 64-bit build for the time being as otherwise overall build time may exceed 50 minutes time limit when Travis-CI is being overloaded
+      # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
+      system 'echo Rebuild Urho3D library as Mach-O universal binary'
+      xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
+    end
     # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
     system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
   elsif ENV['XCODE']
