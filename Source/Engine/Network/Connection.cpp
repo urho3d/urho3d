@@ -1400,7 +1400,8 @@ void Connection::OnPackagesReady()
     if (!scene_)
         return;
     
-    // if sceneLoaded_ is true, then we are at sync state - skip loading, else we at start - loading scene from xml.
+    // If sceneLoaded_ is true, we may have received additional package downloads while already joined in a scene.
+    // In that case the scene should not be loaded.
     if (sceneLoaded_)
         return;
 
