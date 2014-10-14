@@ -44,8 +44,7 @@ Script::Script(Context* context) :
     scriptEngine_(0),
     immediateContext_(0),
     scriptNestingLevel_(0),
-    executeConsoleCommands_(false),
-	debugDaemon_(0)
+    executeConsoleCommands_(false)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
