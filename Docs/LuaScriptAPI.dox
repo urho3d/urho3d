@@ -1143,12 +1143,7 @@ Methods:
 - void SetConnectPending(bool connectPending)
 - void SetLogStatistics(bool enable)
 - void Disconnect(int waitMSec = 0)
-- void SendServerUpdate()
-- void SendClientUpdate()
-- void SendRemoteEvents()
-- void SendPackages()
-- void ProcessPendingLatestData()
-- bool ProcessMessage(int msgID, MemoryBuffer& msg)
+- void SendPackageToClient(PackageFile* package)
 - VariantMap& GetIdentity()
 - Scene* GetScene() const
 - const Controls& GetControls() const
@@ -3258,6 +3253,7 @@ Methods:
 - void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
 - void SetPackageCacheDir(const String path)
+- void SendPackageToClients(Scene* scene, PackageFile* package)
 - HttpRequest* MakeHttpRequest(const String url, const String verb = String::EMPTY)
 - HttpRequest* MakeHttpRequest(const String url, const String verb, const Vector<String>& headers, const String postData = String::EMPTY)
 - int GetUpdateFps() const

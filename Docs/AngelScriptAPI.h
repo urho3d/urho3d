@@ -2005,6 +2005,7 @@ class Connection
 void Disconnect(int = 0);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SendMessage(int, bool, bool, const VectorBuffer&, uint = 0);
+void SendPackageToClient(PackageFile);
 void SendRemoteEvent(Node, const String&, bool, const VariantMap& = VariantMap ( ));
 void SendRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( ));
 String ToString() const;
@@ -5794,6 +5795,7 @@ void Disconnect(int = 0);
 HttpRequest MakeHttpRequest(const String&, const String& = String ( ), Array<String> = null, const String& = String ( ));
 void RegisterRemoteEvent(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SendPackageToClients(Scene, PackageFile);
 bool StartServer(uint16);
 void StopServer();
 void UnregisterAllRemoteEvents();
