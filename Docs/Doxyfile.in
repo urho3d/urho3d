@@ -1062,13 +1062,13 @@ GENERATE_QHP           = @CodeBlocks_HELP@
 # be used to specify the file name of the resulting .qch file. 
 # The path specified is relative to the HTML output folder.
 
-QCH_FILE               = com.github.urho3d.Urho3D.@URHO3D_VERSION@
+QCH_FILE               =
 
 # The QHP_NAMESPACE tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 
 # http://doc.trolltech.com/qthelpproject.html#namespace
 
-QHP_NAMESPACE          = com.github.urho3d.Urho3D
+QHP_NAMESPACE          = com.github.urho3d.Urho3D.@URHO3D_VERSION@
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 

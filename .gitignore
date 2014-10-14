@@ -29,6 +29,7 @@ Lib/
 
 # Generated documentation
 Docs/html/
+Docs/qch/
 Docs/Doxyfile
 Docs/minimal-*
 
