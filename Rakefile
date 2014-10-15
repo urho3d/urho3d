@@ -22,6 +22,9 @@
 
 require 'pathname'
 require 'json'
+if ENV['IOS']
+  require 'time'
+end
 
 # Usage: rake sync (only intended to be used in a fork with remote 'upstream' set to urho3d/Urho3D)
 desc 'Fetch and merge upstream urho3d/Urho3D to a Urho3D fork'
@@ -160,7 +163,8 @@ task :ci_package_upload do
   end
   # Make the package
   if ENV['IOS']
-    if ENV['CI'] && ENV['URHO3D_64BIT'].to_i == 0  # Skip Mach-O universal binary build for 64-bit build for the time being as otherwise overall build time may exceed 50 minutes time limit when Travis-CI is being overloaded
+    # Skip Mach-O universal binary build if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
+    if !ENV['CI_START_TIME'] || (Time.now - Time.parse(ENV['CI_START_TIME'])) / 60 < 20 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
       system 'echo Rebuild Urho3D library as Mach-O universal binary'
       xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
