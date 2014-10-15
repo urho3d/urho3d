@@ -369,9 +369,9 @@ public:
     unsigned Capacity() const { return capacity_; }
     /// Return whether the string is empty.
     bool Empty() const { return length_ == 0; }
-    /// Return comparision result with a string.
+    /// Return comparison result with a string.
     int Compare(const String& str, bool caseSensitive = true) const;
-    /// Return comparision result with a C string.
+    /// Return comparison result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
     /// Return whether contains a specific occurence of a string.
     bool Contains(const String& str, bool caseSensitive = true) const { return Find(str, 0, caseSensitive) != NPOS; }

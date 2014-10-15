@@ -835,7 +835,7 @@ Deferred rendering needs to render each opaque object only once to the G-buffer,
 
 After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to post-opaque, refract, transparent, and post-alpha passes, as in other rendering modes.
 
-\section RenderingModes_Comparision Advantages and disadvantages
+\section RenderingModes_Comparison Advantages and disadvantages
 
 Whether using forward or deferred rendering modes is more advantageous depends on the scene and lighting complexity.
 
