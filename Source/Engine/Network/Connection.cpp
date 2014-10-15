@@ -1304,8 +1304,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
     Vector<String> downloadedPackages;
-    if (!packageCacheDir.Empty())
-        GetSubsystem<FileSystem>()->ScanDir(downloadedPackages, packageCacheDir, "*.*", SCAN_FILES, false);
+    bool packagesScanned = false;
     
     for (unsigned i = 0; i < numPackages; ++i)
     {
@@ -1325,6 +1324,21 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
                 found = true;
                 break;
             }
+        }
+        
+        if (found)
+            continue;
+        
+        if (!packagesScanned)
+        {
+            if (packageCacheDir.Empty())
+            {
+                LOGERROR("Can not check/download required packages, as package cache directory is not set");
+                return false;
+            }
+            
+            GetSubsystem<FileSystem>()->ScanDir(downloadedPackages, packageCacheDir, "*.*", SCAN_FILES, false);
+            packagesScanned = true;
         }
         
         // Then the download cache
@@ -1348,15 +1362,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         
         // Package not found, need to request a download
         if (!found)
-        {
-            if (!packageCacheDir.Empty())
-                RequestPackage(name, fileSize, checksum);
-            else
-            {
-                LOGERROR("Can not download required packages, as package cache directory is not set");
-                return false;
-            }
-        }
+            RequestPackage(name, fileSize, checksum);
     }
     
     return true;
