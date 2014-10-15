@@ -218,6 +218,8 @@ private:
     void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
     /// Process a SyncPackagesInfo message from server.
     void ProcessPackageInfo(int msgID, MemoryBuffer& msg);
+    /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set)
+    bool RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.
