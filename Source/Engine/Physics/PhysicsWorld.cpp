@@ -575,6 +575,8 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
     rigidBodies_.Remove(body);
+    // Remove possible dangling pointer from the delayedWorldTransforms structure
+    delayedWorldTransforms_.Erase(body);
 }
 
 void PhysicsWorld::AddCollisionShape(CollisionShape* shape)

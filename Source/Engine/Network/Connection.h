@@ -44,6 +44,7 @@ class MemoryBuffer;
 class Node;
 class Scene;
 class Serializable;
+class PackageFile;
 
 /// Queued remote event.
 struct RemoteEvent
@@ -182,7 +183,9 @@ public:
     const String& GetDownloadName() const;
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
-    
+    /// Trigger client connection to download a package file from the server. Can be used to download additional resource packages when client is already joined in a scene. The package must have been added as a requirement to the scene the client is joined in, or else the eventual download will fail.
+    void SendPackageToClient(PackageFile* package);
+
     /// Current controls.
     Controls controls_;
     /// Identity map.
@@ -213,6 +216,8 @@ private:
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received.
     void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
+    /// Process a SyncPackagesInfo message from server.
+    void ProcessPackageInfo(int msgID, MemoryBuffer& msg);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.

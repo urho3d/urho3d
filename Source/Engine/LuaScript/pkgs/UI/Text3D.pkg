@@ -1,5 +1,15 @@
 $#include "Text3D.h"
 
+// Duplicated here from GraphicsDefs.pkg to so that enum is bound correctly to Text3D
+enum FaceCameraMode
+{
+    FC_NONE = 0,
+    FC_ROTATE_XYZ,
+    FC_ROTATE_Y,
+    FC_LOOKAT_XYZ,
+    FC_LOOKAT_Y
+};
+
 class Text3D : public Drawable
 {
     Text3D();

@@ -29,7 +29,8 @@ class Network
     
     void UnregisterAllRemoteEvents();
     void SetPackageCacheDir(const String path);
-    
+    void SendPackageToClients(Scene* scene, PackageFile* package);
+
     // SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
     tolua_outside HttpRequest* NetworkMakeHttpRequest @ MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
     

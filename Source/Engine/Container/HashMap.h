@@ -189,6 +189,7 @@ public:
         Clear();
         FreeNode(Tail());
         AllocatorUninitialize(allocator_);
+        delete[] ptrs_;
     }
     
     /// Assign a hash map.

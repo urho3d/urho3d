@@ -835,7 +835,7 @@ Deferred rendering needs to render each opaque object only once to the G-buffer,
 
 After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to post-opaque, refract, transparent, and post-alpha passes, as in other rendering modes.
 
-\section RenderingModes_Comparision Advantages and disadvantages
+\section RenderingModes_Comparison Advantages and disadvantages
 
 Whether using forward or deferred rendering modes is more advantageous depends on the scene and lighting complexity.
 
@@ -1550,6 +1550,8 @@ By default rigid bodies can move and rotate about all 3 coordinate axes when for
 To prevent tunneling of a fast moving rigid body through obstacles, continuous collision detection can be used. It approximates the object as a swept sphere, but has a performance cost, so it should be used only when necessary. Call \ref RigidBody::SetCcdRadius "SetCcdRadius()" and \ref RigidBody::SetCcdMotionThreshold "SetCcdMotionThreshold()" with non-zero values to enable. To prevent false collisions, the body's actual collision shape should completely contain the radius. The motion threshold is the required motion per simulation step for CCD to kick in: for example a box with size 1 should have motion threshold 1 as well.
 
 All physics calculations are performed in world space. Nodes containing a RigidBody component should preferably be parented to the Scene (root node) to ensure independent motion. For ragdolls this is not absolute, as retaining proper bone hierarchy is more important, but be aware that the ragdoll bones may drift far from the animated model's root scene node.
+
+When several collision shapes are present in the same node, edits to them can cause redundant mass/inertia update computation in the RigidBody. To optimize performance in these cases, the edits can be enclosed between calls to \ref RigidBody::DisableMassUpdate "DisableMassUpdate()" and \ref RigidBody::EnableMassUpdate "EnableMassUpdate()".
 
 \section Physics_ConstraintParameters Constraint parameters
 

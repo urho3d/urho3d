@@ -144,6 +144,10 @@ public:
     void Activate();
     /// Readd rigid body to the physics world to clean up internal state like stale contacts.
     void ReAddBodyToWorld();
+    /// Disable mass update. Call this to optimize performance when adding or editing multiple collision shapes in the same node.
+    void DisableMassUpdate();
+    /// Re-enable mass update and recalculate the mass/inertia by calling UpdateMass(). Call when collision shape changes are finished.
+    void EnableMassUpdate();
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -283,6 +287,8 @@ private:
     bool readdBody_;
     /// Body exists in world flag.
     bool inWorld_;
+    /// Mass update enable flag.
+    bool enableMassUpdate_;
 };
 
 }

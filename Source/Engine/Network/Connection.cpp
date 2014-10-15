@@ -427,6 +427,10 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer &msg)
         case MSG_REMOTENODEEVENT:
             ProcessRemoteEvent(msgID, msg);
             break;
+
+        case MSG_PACKAGEINFO:
+            ProcessPackageInfo(msgID, msg);
+            break;
             
         default:
             processed = false;
@@ -1396,6 +1400,11 @@ void Connection::OnPackagesReady()
     if (!scene_)
         return;
     
+    // If sceneLoaded_ is true, we may have received additional package downloads while already joined in a scene.
+    // In that case the scene should not be loaded.
+    if (sceneLoaded_)
+        return;
+
     if (sceneFileName_.Empty())
     {
         // If the scene filename is empty, just clear the scene of all existing replicated content, and send the loaded reply
@@ -1423,4 +1432,99 @@ void Connection::OnPackagesReady()
     }
 }
 
+void Connection::SendPackageToClient(PackageFile* package)
+{
+    if (!scene_)
+        return;
+
+    if (!IsClient())
+    {
+        LOGERROR("SendPackageToClient can be called on the server only");
+        return;
+    }
+    if (!package)
+    {
+        LOGERROR("Null package specified for SendPackageToClient");
+        return;
+    }
+    
+    msg_.Clear();
+
+    String filename = GetFileNameAndExtension(package->GetName());
+    msg_.WriteString(filename);
+    msg_.WriteUInt(package->GetTotalSize());
+    msg_.WriteUInt(package->GetChecksum());
+    SendMessage(MSG_PACKAGEINFO, true, true, msg_);
+}
+
+void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
+{
+    if (!scene_)
+        return;
+
+    if (IsClient())
+    {
+        LOGWARNING("Received unexpected packages info message from server");
+        return;
+    }
+
+    // Now client check all available packages and retrieve missing packages
+    Network* network =  GetSubsystem<Network>();
+    const String& packageCacheDir = network->GetPackageCacheDir();
+
+    if (packageCacheDir.Empty())
+    {
+        LOGERROR("Can not download required packages, as package cache directory is not set");
+        return;
+    }
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
+
+    // Now check which packages we have in the resource cache or in the download cache, and which we need to download
+    Vector<String> downloadedPackages;
+
+    if (!packageCacheDir.Empty())
+        GetSubsystem<FileSystem>()->ScanDir(downloadedPackages, packageCacheDir, "*.*", SCAN_FILES, false);
+ 
+    String name = msg.ReadString();
+    unsigned fileSize = msg.ReadUInt();
+    unsigned checksum = msg.ReadUInt();
+    String checksumString = ToStringHex(checksum);
+    bool found = false;
+
+    // Check first the resource cache
+    for (unsigned j = 0; j < packages.Size(); ++j)
+    {
+        PackageFile* package = packages[j];
+        if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
+            package->GetChecksum() == checksum)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    // Then the download cache
+    for (unsigned j = 0; j < downloadedPackages.Size(); ++j)
+    {
+        const String& fileName = downloadedPackages[j];
+        if (!fileName.Find(checksumString) && !fileName.Substring(9).Compare(name, false))
+        {
+            // Name matches. Check filesize and actual checksum to be sure
+            SharedPtr<PackageFile> newPackage(new PackageFile(context_, packageCacheDir + fileName));
+            if (newPackage->GetTotalSize() == fileSize && newPackage->GetChecksum() == checksum)
+            {
+                // Add the package to the resource system now, as we will need it to load the scene
+                cache->AddPackageFile(newPackage, true);
+                found = true;
+                break;
+            }
+        }
+    }
+
+    // Package not found, need to request a download
+    if (!found)
+        RequestPackage(name, fileSize, checksum);
+}
 }
