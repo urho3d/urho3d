@@ -877,7 +877,7 @@ ResourcePicker@ resourcePicker = null;
 void InitResourcePicker()
 {
     // Fill resource picker data
-    Array<String> fontFilters = {"*.ttf", "*.fnt", "*.xml"};
+    Array<String> fontFilters = {"*.ttf", "*.otf", "*.fnt", "*.xml"};
     Array<String> imageFilters = {"*.png", "*.jpg", "*.bmp", "*.tga"};
     Array<String> luaFileFilters = {"*.lua", "*.luc"};
     Array<String> scriptFilters = {"*.as", "*.asc"};
