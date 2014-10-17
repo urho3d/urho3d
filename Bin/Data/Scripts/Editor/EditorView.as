@@ -125,7 +125,7 @@ class ViewportContext
 
     void CreateViewportContextUI()
     {
-        Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+        Font@ font = cache.GetResource("Font", "Fonts/SourceSansPro-Light.otf");
 
         viewportContextUI = UIElement();
         viewportUI.AddChild(viewportContextUI);
@@ -140,17 +140,16 @@ class ViewportContext
         statusBar.SetLayout(LM_HORIZONTAL);
         statusBar.SetAlignment(HA_LEFT, VA_BOTTOM);
         statusBar.layoutSpacing = 4;
-        statusBar.opacity = uiMaxOpacity;
 
         Button@ settingsButton = CreateSmallToolBarButton("Settings");
         statusBar.AddChild(settingsButton);
+        settingsButton.position = IntVector2(0,-2);
 
         cameraPosText = Text();
         statusBar.AddChild(cameraPosText);
 
-        cameraPosText.SetFont(font, 11);
+        cameraPosText.SetFont(font, 10);
         cameraPosText.color = Color(1, 1, 0);
-        cameraPosText.textEffect = TE_SHADOW;
         cameraPosText.priority = -100;
 
         settingsWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorViewport.xml"));
@@ -189,22 +188,22 @@ class ViewportContext
     {
         viewportContextUI.SetPosition(viewport.rect.left, viewport.rect.top);
         viewportContextUI.SetFixedSize(viewport.rect.width, viewport.rect.height);
-        if (viewport.rect.left < 34)
+        if (viewport.rect.left < 32)
         {
-            statusBar.layoutBorder = IntRect(34 - viewport.rect.left, 4, 4, 8);
+            statusBar.layoutBorder = IntRect(32 - viewport.rect.left, 2, 1, 8);
             IntVector2 pos = settingsWindow.position;
             pos.x = 32 - viewport.rect.left;
             settingsWindow.position = pos;
         }
         else
         {
-            statusBar.layoutBorder = IntRect(8, 4, 4, 8);
+            statusBar.layoutBorder = IntRect(6, 2, 1, 8);
             IntVector2 pos = settingsWindow.position;
             pos.x = 5;
             settingsWindow.position = pos;
         }
 
-        statusBar.SetFixedSize(viewport.rect.width, 22);
+        statusBar.SetFixedSize(viewport.rect.width, 24);
     }
 
     void ToggleOrthographic()
@@ -230,7 +229,7 @@ class ViewportContext
 
         cameraPosText.text = String(
             "Pos: " + xText + " " + yText + " " + zText +
-            " Zoom: " + camera.zoom);
+            "     Zoom: " + camera.zoom);
 
         cameraPosText.size = cameraPosText.minSize;
     }
@@ -414,6 +413,7 @@ void CreateViewportUI()
     if (viewportUI is null)
     {
         viewportUI = UIElement();
+        viewportUI.vars["NoUIFade"] = true;
         ui.root.AddChild(viewportUI);
     }
 
@@ -1027,7 +1027,7 @@ void UpdateGrid(bool updateGridGeometry = true)
 
 void CreateStatsBar()
 {
-    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+    Font@ font = cache.GetResource("Font", "Fonts/SourceSansPro-Light.otf");
 
     editorModeText = Text();
     ui.root.AddChild(editorModeText);
@@ -1061,17 +1061,17 @@ void UpdateStats(float timeStep)
 {
     editorModeText.text = String(
         "Mode: " + editModeText[editMode] +
-        "  Axis: " + axisModeText[axisMode] +
-        "  Pick: " + pickModeText[pickMode] +
-        "  Fill: " + fillModeText[fillMode] +
-        "  Updates: " + (runUpdate ? "Running" : "Paused"));
+        "   Axis: " + axisModeText[axisMode] +
+        "   Pick: " + pickModeText[pickMode] +
+        "   Fill: " + fillModeText[fillMode] +
+        "   Updates: " + (runUpdate ? "Running" : "Paused"));
 
     renderStatsText.text = String(
         "Tris: " + renderer.numPrimitives +
-        "  Batches: " + renderer.numBatches +
-        "  Lights: " + renderer.numLights[true] +
-        "  Shadowmaps: " + renderer.numShadowMaps[true] +
-        "  Occluders: " + renderer.numOccluders[true]);
+        "   Batches: " + renderer.numBatches +
+        "   Lights: " + renderer.numLights[true] +
+        "   Shadowmaps: " + renderer.numShadowMaps[true] +
+        "   Occluders: " + renderer.numOccluders[true]);
 
     editorModeText.size = editorModeText.minSize;
     renderStatsText.size = renderStatsText.minSize;

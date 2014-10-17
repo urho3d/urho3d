@@ -14,7 +14,7 @@
 		<attribute name="Min Size" value="184 16" />
 		<attribute name="Max Size" value="2147483647 16" />
 		<attribute name="Layout Mode" value="Horizontal" />
-		<attribute name="Layout Spacing" value="8" />
+		<attribute name="Layout Spacing" value="4" />
 		<element type="Text">
 			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
