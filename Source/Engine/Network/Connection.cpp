@@ -1143,7 +1143,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
     }
     
     // Check if attributes have changed
-    if (nodeState.dirtyAttributes_.Count())
+    if (nodeState.dirtyAttributes_.Count() || nodeState.dirtyVars_.Size())
     {
         const Vector<AttributeInfo>* attributes = node->GetNetworkAttributes();
         unsigned numAttributes = attributes->Size();
