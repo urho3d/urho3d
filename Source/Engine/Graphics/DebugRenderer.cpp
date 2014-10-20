@@ -406,6 +406,7 @@ void DebugRenderer::Render()
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);
     graphics->SetDepthWrite(true);
+    graphics->SetDrawAntialiased(true);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     graphics->SetShaders(vs, ps);

@@ -1464,6 +1464,7 @@ void View::ExecuteRenderPathCommands()
                     
                     SetRenderTargets(command);
                     SetTextures(command);
+                    graphics_->SetDrawAntialiased(true);
                     graphics_->SetFillMode(camera_->GetFillMode());
                     graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                     batchQueues_[command.pass_].Draw(this, command.markToStencil_, false);
@@ -1498,6 +1499,7 @@ void View::ExecuteRenderPathCommands()
                         }
 
                         SetTextures(command);
+                        graphics_->SetDrawAntialiased(true);
                         graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                         
@@ -1703,6 +1705,7 @@ void View::RenderQuad(RenderPathCommand& command)
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
+    graphics_->SetDrawAntialiased(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
@@ -2796,6 +2799,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetTexture(TU_SHADOWMAP, 0);
     
     graphics_->SetColorWrite(false);
+    graphics_->SetDrawAntialiased(true);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
