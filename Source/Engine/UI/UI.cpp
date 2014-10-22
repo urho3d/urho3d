@@ -699,6 +699,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
+    graphics_->SetDrawAntialiased(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);

@@ -206,6 +206,8 @@ public:
     void SetDepthTest(CompareMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
+    /// Set antialiased drawing mode on/off. Default is on if the backbuffer is multisampled. Has no effect when backbuffer is not multisampled.
+    void SetDrawAntialiased(bool enable);
     /// Set polygon fill mode.
     void SetFillMode(FillMode mode);
     /// Set scissor test.
@@ -345,6 +347,8 @@ public:
     CompareMode GetDepthTest() const { return depthTestMode_; }
     /// Return whether depth write is enabled.
     bool GetDepthWrite() const { return depthWrite_; }
+    /// Return whether antialiased drawing mode is enabled.
+    bool GetDrawAntialiased() const { return drawAntialiased_; }
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
     /// Return whether stencil test is enabled.
@@ -568,14 +572,20 @@ private:
     StencilOp stencilFail_;
     /// Stencil operation on depth fail.
     StencilOp stencilZFail_;
-    /// Stencil test enable flag.
-    bool stencilTest_;
     /// Stencil test reference value.
     unsigned stencilRef_;
     /// Stencil compare bitmask.
     unsigned stencilCompareMask_;
     /// Stencil write bitmask.
     unsigned stencilWriteMask_;
+    /// Stencil test enable flag.
+    bool stencilTest_;
+    /// Custom clip plane enable flag.
+    bool useClipPlane_;
+    /// Draw antialiased mode flag.
+    bool drawAntialiased_;
+    /// Releasing GPU objects flag.
+    bool releasingGPUObjects_;
     /// Last used instance data offset.
     unsigned lastInstanceOffset_;
     /// Default texture filtering mode.
@@ -588,10 +598,6 @@ private:
     Matrix3 tempMatrices3_[NUM_TEMP_MATRICES];
     /// Temp matrices for transposing shader parameters.
     Matrix4 tempMatrices4_[NUM_TEMP_MATRICES];
-    /// Custom clip plane enable flag.
-    bool useClipPlane_;
-    /// Releasing GPU objects flag.
-    bool releasingGPUObjects_;
     /// Base directory for shaders.
     String shaderPath_;
     /// File extension for shaders.
