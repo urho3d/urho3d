@@ -182,14 +182,15 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         attrEdit.vars["Coordinate"] = i;
 
-	   Button@ tx = Button();
-	   tx.SetFixedHeight(ATTR_HEIGHT - 2);
-	   tx.SetFixedWidth(ATTR_HEIGHT);
-	   tx.SetAlignment(HA_RIGHT, VA_TOP);
-	   attrEdit.AddChild(tx);
+	   Button@ dragSld = Button();
+	   dragSld.style = "EditorDragSlider";
+	   dragSld.SetFixedHeight(ATTR_HEIGHT - 2);
+	   dragSld.SetFixedWidth(dragSld.height);
+	   dragSld.SetAlignment(HA_RIGHT, VA_TOP);
+	   attrEdit.AddChild(dragSld);
 
-	   SubscribeToEvent(tx, "DragBegin", "LineDragBegin");
-	   SubscribeToEvent(tx, "DragMove", "LineDragMove");
+	   SubscribeToEvent(dragSld, "DragBegin", "LineDragBegin");
+	   SubscribeToEvent(dragSld, "DragMove", "LineDragMove");
 
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
