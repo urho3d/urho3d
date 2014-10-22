@@ -181,16 +181,8 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     {
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         attrEdit.vars["Coordinate"] = i;
-
-	   Button@ dragSld = Button();
-	   dragSld.style = "EditorDragSlider";
-	   dragSld.SetFixedHeight(ATTR_HEIGHT - 2);
-	   dragSld.SetFixedWidth(dragSld.height);
-	   dragSld.SetAlignment(HA_RIGHT, VA_TOP);
-	   attrEdit.AddChild(dragSld);
-
-	   SubscribeToEvent(dragSld, "DragBegin", "LineDragBegin");
-	   SubscribeToEvent(dragSld, "DragMove", "LineDragMove");
+        
+        CreateDragSlider(attrEdit);
 
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
@@ -207,6 +199,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     {
         // No enums, create a numeric editor
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
+        CreateDragSlider(attrEdit);
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         // If the attribute is a node ID, make it a drag/drop target
@@ -802,6 +795,19 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool&
         list.viewPosition = oldViewPos;
 }
 
+void CreateDragSlider(LineEdit@ parent)
+{
+    Button@ dragSld = Button();
+    dragSld.style = "EditorDragSlider";
+    dragSld.SetFixedHeight(ATTR_HEIGHT - 2);
+    dragSld.SetFixedWidth(dragSld.height);
+    dragSld.SetAlignment(HA_RIGHT, VA_TOP);
+    parent.AddChild(dragSld);
+
+    SubscribeToEvent(dragSld, "DragBegin", "LineDragBegin");
+    SubscribeToEvent(dragSld, "DragMove", "LineDragMove");
+}
+
 void EditAttribute(StringHash eventType, VariantMap& eventData)
 {
     // Changing elements programmatically may cause events to be sent. Stop possible infinite loop in that case.
@@ -826,7 +832,8 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     inEditAttribute = true;
 
     Array<Variant> oldValues;
-    if (!dragEditAttribute){
+    if (!dragEditAttribute)
+    {
 	    // Store old values so that PostEditAttribute can create undo actions
 	    for (uint i = 0; i < serializables.length; ++i)
 		    oldValues.Push(serializables[i].attributes[index]);
@@ -837,7 +844,8 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 	    serializables[i].ApplyAttributes();
 
     //disable undo 
-    if (!dragEditAttribute){
+    if (!dragEditAttribute)
+    {
 	    // Do the editor post logic after attribute has been modified.
 	    PostEditAttribute(serializables, index, oldValues);
     }
@@ -850,34 +858,36 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 	    attributesDirty = true;
 }
 
-void LineDragBegin(StringHash eventType, VariantMap& eventData){
-	UIElement@ label = eventData["Element"].GetPtr();
-	int x = eventData["X"].GetInt();
-	label.vars["posX"] = x;
-
-	//store value old value before dragging 
-	dragEditAttribute = false;
-	LineEdit@ selectedNumEditor = label.parent;
-	//not convenient way to trigger EditAttribute event
-	selectedNumEditor.text = selectedNumEditor.text;
+void LineDragBegin(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ label = eventData["Element"].GetPtr();
+    int x = eventData["X"].GetInt();
+    label.vars["posX"] = x;
+    
+    //store value old value before dragging 
+    dragEditAttribute = false;
+    LineEdit@ selectedNumEditor = label.parent;
+    //not convenient way to trigger EditAttribute event
+    selectedNumEditor.text = selectedNumEditor.text;
 }
 
 
 
-void LineDragMove(StringHash eventTypem, VariantMap& eventData){
-	UIElement@ label = eventData["Element"].GetPtr();
-	LineEdit@ selectedNumEditor = label.parent;
-
-	int x = eventData["X"].GetInt();
-	int posx = label.vars["posX"].GetInt();
-	float val = x - posx;
-
-	float fieldVal = selectedNumEditor.text.ToFloat(); 
-	fieldVal += val/100;
-	label.vars["posX"] = x;
-	selectedNumEditor.text = fieldVal;
-	//disable storing undo 
-	dragEditAttribute = true;
+void LineDragMove(StringHash eventTypem, VariantMap& eventData)
+{
+    UIElement@ label = eventData["Element"].GetPtr();
+    LineEdit@ selectedNumEditor = label.parent;
+    
+    int x = eventData["X"].GetInt();
+    int posx = label.vars["posX"].GetInt();
+    float val = x - posx;
+    
+    float fieldVal = selectedNumEditor.text.ToFloat(); 
+    fieldVal += val/100;
+    label.vars["posX"] = x;
+    selectedNumEditor.text = fieldVal;
+    //disable storing undo 
+    dragEditAttribute = true;
 }
 
 
