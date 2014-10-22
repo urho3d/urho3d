@@ -29,6 +29,8 @@ Array<String> noTextChangedAttrs = {"Script File", "Class Name", "Script Object 
 
 WeakHandle testAnimState;
 
+bool dragEditAttribute = false;
+
 UIElement@ SetEditable(UIElement@ element, bool editable)
 {
     if (element is null)
@@ -179,6 +181,16 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     {
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         attrEdit.vars["Coordinate"] = i;
+
+	   Button@ tx = Button();
+	   tx.SetFixedHeight(ATTR_HEIGHT - 2);
+	   tx.SetFixedWidth(ATTR_HEIGHT);
+	   tx.SetAlignment(HA_RIGHT, VA_TOP);
+	   attrEdit.AddChild(tx);
+
+	   SubscribeToEvent(tx, "DragBegin", "LineDragBegin");
+	   SubscribeToEvent(tx, "DragMove", "LineDragMove");
+
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
     }
@@ -812,25 +824,61 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 
     inEditAttribute = true;
 
-    // Store old values so that PostEditAttribute can create undo actions
     Array<Variant> oldValues;
-    for (uint i = 0; i < serializables.length; ++i)
-        oldValues.Push(serializables[i].attributes[index]);
+    if (!dragEditAttribute){
+	    // Store old values so that PostEditAttribute can create undo actions
+	    for (uint i = 0; i < serializables.length; ++i)
+		    oldValues.Push(serializables[i].attributes[index]);
+    }
 
     StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)
-        serializables[i].ApplyAttributes();
+	    serializables[i].ApplyAttributes();
 
-    // Do the editor post logic after attribute has been modified.
-    PostEditAttribute(serializables, index, oldValues);
+    //disable undo 
+    if (!dragEditAttribute){
+	    // Do the editor post logic after attribute has been modified.
+	    PostEditAttribute(serializables, index, oldValues);
+    }
 
     inEditAttribute = false;
 
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)
     if (!intermediateEdit)
-        attributesDirty = true;
+	    attributesDirty = true;
 }
+
+void LineDragBegin(StringHash eventType, VariantMap& eventData){
+	UIElement@ label = eventData["Element"].GetPtr();
+	int x = eventData["X"].GetInt();
+	label.vars["posX"] = x;
+
+	//store value old value before dragging 
+	dragEditAttribute = false;
+	LineEdit@ selectedNumEditor = label.parent;
+	//not convenient way to trigger EditAttribute event
+	selectedNumEditor.text = selectedNumEditor.text;
+}
+
+
+
+void LineDragMove(StringHash eventTypem, VariantMap& eventData){
+	UIElement@ label = eventData["Element"].GetPtr();
+	LineEdit@ selectedNumEditor = label.parent;
+
+	int x = eventData["X"].GetInt();
+	int posx = label.vars["posX"].GetInt();
+	float val = x - posx;
+
+	float fieldVal = selectedNumEditor.text.ToFloat(); 
+	fieldVal += val/100;
+	label.vars["posX"] = x;
+	selectedNumEditor.text = fieldVal;
+	//disable storing undo 
+	dragEditAttribute = true;
+}
+
 
 // Resource picker functionality
 const uint ACTION_PICK = 1;
