@@ -279,7 +279,7 @@
         <attribute name="Max Size" value="2147483647 11" />
     </element>
     <element type="EditorDragSlider" style="BorderImage">
-	    <attribute name="Image Rect" value="40 67 58 80" />
+	    <attribute name="Image Rect" value="240 64 256 80" />
     </element>
     <element type="EditorSeparator" auto="false">
         <attribute name="Min Size" value="0 2" />

@@ -799,7 +799,7 @@ void CreateDragSlider(LineEdit@ parent)
 {
     Button@ dragSld = Button();
     dragSld.style = "EditorDragSlider";
-    dragSld.SetFixedHeight(ATTR_HEIGHT - 2);
+    dragSld.SetFixedHeight(ATTR_HEIGHT - 3);
     dragSld.SetFixedWidth(dragSld.height);
     dragSld.SetAlignment(HA_RIGHT, VA_TOP);
     parent.AddChild(dragSld);
