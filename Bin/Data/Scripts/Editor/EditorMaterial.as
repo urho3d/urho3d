@@ -294,6 +294,9 @@ void RefreshMaterialShaderParameters()
             attrEdit.vars["Coordinate"] = j;
             attrEdit.vars["Name"] = parameterNames[i];
             attrEdit.text = coordValues[j];
+
+            CreateDragSlider(attrEdit);
+
             SubscribeToEvent(attrEdit, "TextChanged", "EditShaderParameter");
             SubscribeToEvent(attrEdit, "TextFinished", "EditShaderParameter");
         }
@@ -814,10 +817,12 @@ void EndMaterialEdit()
 {
     if (editMaterial is null)
         return;
-
-    EditMaterialAction@ action = EditMaterialAction();
-    action.Define(editMaterial, oldMaterialState);
-    SaveEditAction(action);
-
+    if (!dragEditAttribute)
+    {
+        EditMaterialAction@ action = EditMaterialAction();
+        action.Define(editMaterial, oldMaterialState);
+        SaveEditAction(action);
+    }
+    
     materialPreview.QueueUpdate();
 }
