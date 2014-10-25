@@ -63,7 +63,6 @@ class asPEEK
 		String name;
 		HashSet<int> breakpoints;
 	};
-	class Handler;
 
 	enum Command {
 		CONTINUE,
@@ -73,9 +72,30 @@ class asPEEK
 	};
 		
 public:
+	/// return type for MEMBER_QUERY_METHOD implementations
+	enum QueryResult
+	{
+		/// we can't find your variable
+		FAILED = -1,
+		/// we've found your variable
+		FOUND = 0,
+		/// we found it, and we went ahead and set the value - see QueryNode in asPEEK.cpp for an explanation
+		FOUND_AND_SET = 1
+	};
+
+	/// function signature for converting a variable to string, the void* will never be null
+	typedef String (*TYPE_CONVERTER)(void*);
+	/// function signature for setting a variable value from a string, the void* will never be null
+	typedef void (*ASSIGNMENT_METHOD)(void*,String value);
+	/// signature used for query an instance for members of a specific type name, refer to examples in asPEEK.cpp
+	typedef QueryResult (*MEMBER_QUERY_METHOD)(void** varAddress, int* typeID, String* typeName, const String& query, const String& value);
+
 	/// construct the debugger daemon on the specified port
 	asPEEK(Context* engine, int port);
 	~asPEEK();
+
+	/// register a convesion method for a specified typename
+	void RegisterConversion(const String& typeName, TYPE_CONVERTER, ASSIGNMENT_METHOD, MEMBER_QUERY_METHOD);
 
 	/// function signature called when debugging first has a debugger attach
 	typedef void (*DEBUGGINGSTARTEDFUNCTION)();
@@ -87,9 +107,6 @@ public:
 	typedef void (*LOADSECTIONFUNCTION)(const String&, String&);
 	/// function called to save code received from a debugger to a file
 	typedef void (*SAVESECTIONFUNCTION)(const String&, String&);
-
-	/// turns on/off the debugger, by default the debugger is on
-	void SetDebuggerEnabled(bool enabled);
 
 	/// adds a script context to the list of tracked contexts
 	void AddContext(asIScriptContext* ctx);
@@ -120,10 +137,15 @@ public:
 	/// removes a breakpoint from a script section
 	bool RemoveBreakpoint(const String& section, int line);
 
+	/// the assigned function will be called whenever debugging begins (ie. a debugger attaches)
 	void SetDebuggingStartedFunction(DEBUGGINGSTARTEDFUNCTION func) {debuggingStartedFunction_ = func;}
+	/// the assigned function will be called whenever debugging ends (ie. all clients detach)
 	void SetDebuggingEndedFunction(DEBUGGINGENDEDFUNCTION func) {debuggingEndedFunction_ = func;}
+	/// assigned function is called to read script files to send over the network
 	void SetLoadSectionFunction(LOADSECTIONFUNCTION func) {loadSectionFunction_ = func;}
+	/// assigned function is called to save script code to file that has been received from the client
 	void SetSaveSectionFunction(SAVESECTIONFUNCTION func) {saveSectionFunction_ = func;}
+	/// assigned function is called whenever the client sends a "RESTART" command
 	void SetRestartFunction(RESTARTFUNCTION func) {restartFunction_ = func;}
 
 private:
@@ -145,6 +167,12 @@ private:
 	HashSet<asIScriptModule*> tracked_modules_;
 	Vector<String> debugCommands_;
 	Vector<mg_connection*> connectionList_;
+	
+	HashMap<int,TYPE_CONVERTER> conversionMethods_;
+	HashMap<String,TYPE_CONVERTER> tempConversionMap_;
+	HashMap<String,ASSIGNMENT_METHOD> tempAssignmentsMap_;
+	HashMap<int,ASSIGNMENT_METHOD> assignmentMethods_;
+	HashMap<String,MEMBER_QUERY_METHOD> queryMethods_;
 
 	int contextCount_;
 	int sectionCount_;
@@ -180,20 +208,32 @@ private:
 	/// uses the Script subsystem to execute some code on the immediate context, does not work while debugging is active
 	void ExecuteScript(mg_connection* conn, asIScriptModule* mod, const String& script);
 
+	/// sets the value of a variable from a string
+	void FromString(const Variable& var, String value, HashSet<void*>* previous = 0);
+	/// converts a variable to json string (or a hex address 0x______)
 	String ToString(const Variable& var, HashSet<void*> *previous = 0);
-
-	SectionData* GetSectionData(const String& section);
-	void ProcessMessage(Message& msg);
-	void ProcessVariableRequest(Vector<String>* msg);
-	void ProcessVariableAssignment(Vector<String>* msg);
-	Variable GetGlobalVariable(Vector<String>& msg);
-	Variable GetGlobalVariable(const String& msg, String& modName, const String& ns);
-	Variable GetMemberVariable(const Variable& parent, const String& name);
-	Variable GetMemberVariable(const String& name, asIScriptObject* object);
+	/// converts an angelscript (or C++) primitive to a string
 	String PrimitiveToString(const Variable& var);
-	void ScriptObjectToString(asIScriptObject* obj, String& ss, HashSet<void*> *previous = 0);
+	/// sets the value of a primitive type from the input string
+	void PrimitiveFromString(const Variable& var, const String& value);
+	/// converts a script object to a JSON string, appending the input 'target' with the value
+	void ScriptObjectToString(asIScriptObject* obj, String& target, HashSet<void*> *previous = 0);
+
+	/// get the SectionData for a section with specified name
+	SectionData* GetSectionData(const String& section);
+	/// does most of the work involved in determining what to do in response to client commands
+	void ProcessMessage(Message& msg);
+	/// retrieves a global scope variable from the terms
+	Variable GetGlobalVariable(Vector<String>& msg);
+	/// retrieves a specific global variable within a specific namespace
+	Variable GetGlobalVariable(const String& msg, String& modName, const String& ns);
+	/// extract as a Variable a value from a script object
+	Variable GetMemberVariable(const String& name, asIScriptObject* object);
+	/// grab a variable from the local stack (typically a function arg, function scope variable)
 	Variable GetVariableAtLocalStack(const String& varname);
+	/// retrieve a specific variable along the path (object.child.otherChild) in the specified module
 	Variable GetVariableByName(const Vector<String>& name, asIScriptModule* mod);
+	/// seek out a specific child of a script object
 	Variable GetChildOfObject(Vector<String>& name, asIScriptObject* obj);
 
 	/// sends stack,this,locals,line,etc to all connected debuggers
@@ -202,19 +242,19 @@ private:
 	void Debug(asIScriptContext* ctx, int line, SectionData* section);
 	/// clears out context specific vars when script debugging ceases (continue,detach,etc)
 	void EndDebugging();
+	/// check against angelscript for items we need to track
+	void UpdateAngelScriptBindings();
+	/// check against type conversion table to build an updated mapping of TID to function call
+	void UpdateTypeConversions();
 
 	static int websocket_connect_handler(const mg_connection *conn);
 	static void websocket_ready_handler(mg_connection *conn);
 	static void websocket_close_handler(mg_connection *conn);
 	static int websocket_data_handler(mg_connection *conn, int flags, char *data, size_t data_len);
 
-	static int getline(int offset, const String& input, String& ouput, char delimitter);
-
 	static void DefaultLoadSectionFunction(const String &filename, String &script);
 	static void DefaultSaveSectionFunction(const String& filename, String& code);
 
-	/// this line callback for AngelScript does nothing
-	void VoidLineCallback(asIScriptContext* ctx);
 	/// this line callback for AngelScript does the main work
 	void LineCallback(asIScriptContext* ctx);
 

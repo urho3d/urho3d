@@ -97,6 +97,11 @@ public:
     /// Return the script module create/delete mutex.
     Mutex& GetModuleMutex() { return moduleMutex_; }
 
+#ifdef URHO3D_ANGELSCRIPT_DEBUGGING
+	/// get the asPEEK debugger
+	asPEEK* GetDebugger() const {return debugDaemon_;}
+#endif
+
 private:
     /// Increase script nesting level.
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
