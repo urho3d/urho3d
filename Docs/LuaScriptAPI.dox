@@ -2163,6 +2163,20 @@ Methods:
 <a name="Class_Font"></a>
 ### Font : Resource
 
+Methods:
+
+- void SetAbsoluteGlyphOffset(const IntVector2& offset)
+- void SetScaledGlyphOffset(const Vector2& offset)
+- const IntVector2& GetAbsoluteGlyphOffset() const
+- const Vector2& GetScaledGlyphOffset() const
+- IntVector2 GetTotalGlyphOffset(int pointSize) const
+- bool IsSDFFont() const
+
+Properties:
+
+- IntVector2 absoluteGlyphOffset
+- Vector2 scaledGlyphOffset
+
 <a name="Class_Frustum"></a>
 ### Frustum
 

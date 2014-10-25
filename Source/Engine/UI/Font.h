@@ -59,16 +59,29 @@ public:
     virtual bool BeginLoad(Deserializer& source);
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false);
+    /// Set absolute (in pixels) position adjustment for glyphs.
+    void SetAbsoluteGlyphOffset(const IntVector2& offset);
+    /// Set point size scaled position adjustment for glyphs.
+    void SetScaledGlyphOffset(const Vector2& offset);
+
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(int pointSize);
     /// Is signed distance field font.
     bool IsSDFFont() const { return sdfFont_; }
+    /// Return absolute position adjustment for glyphs.
+    const IntVector2& GetAbsoluteGlyphOffset() const { return absoluteOffset_; }
+    /// Return point size scaled position adjustment for glyphs.
+    const Vector2& GetScaledGlyphOffset() const { return scaledOffset_; }
+    /// Return the total effective offset for a point size.
+    IntVector2 GetTotalGlyphOffset(int pointSize) const;
     
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
     
 private:
-    /// Return font face using FreeTyp. Called internally. Return null on error.
+    /// Load font glyph offset parameters from an optional XML file. Called internally when loading TrueType fonts.
+    void LoadParameters();
+    /// Return font face using FreeType. Called internally. Return null on error.
     FontFace* GetFaceFreeType(int pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
     FontFace* GetFaceBitmap(int pointSize);
@@ -79,9 +92,13 @@ private:
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.
     unsigned fontDataSize_;
+    /// Absolute position adjustment for glyphs.
+    IntVector2 absoluteOffset_;
+    /// Point size scaled position adjustment for glyphs.
+    Vector2 scaledOffset_;
     /// Font type.
     FONT_TYPE fontType_;
-    /// Signed distance field font.
+    /// Signed distance field font flag.
     bool sdfFont_;
 };
 

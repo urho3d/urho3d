@@ -597,10 +597,13 @@ void Text::UpdateCharLocations()
     for (unsigned i = 0; i < pageGlyphLocations_.Size(); ++i)
         pageGlyphLocations_[i].Clear();
 
+    IntVector2 offset = font_->GetTotalGlyphOffset(fontSize_);
+    
     unsigned rowIndex = 0;
     unsigned lastFilled = 0;
-    int x = GetRowStartPosition(rowIndex);
-    int y = 0;
+    int x = GetRowStartPosition(rowIndex) + offset.x_;
+    int y = offset.y_;
+    
     for (unsigned i = 0; i < printText_.Size(); ++i)
     {
         CharLocation loc;

@@ -5730,6 +5730,7 @@ Properties:
 
 Methods:
 
+- IntVector2 GetTotalGlyphOffset(int) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -5741,11 +5742,13 @@ Methods:
 
 Properties:
 
+- IntVector2 absoluteGlyphOffset
 - StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
+- Vector2 scaledGlyphOffset
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
