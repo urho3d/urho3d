@@ -9397,6 +9397,8 @@ class Technique
 {
 // Methods:
 Pass CreatePass(StringHash);
+Pass GetPass(StringHash);
+Pass GetSupportedPass(StringHash);
 bool HasPass(StringHash) const;
 bool Load(File);
 bool Load(VectorBuffer&);
@@ -9413,6 +9415,10 @@ String category;
 /* readonly */
 uint memoryUse;
 String name;
+/* readonly */
+uint numPasses;
+/* readonly */
+Array<StringHash> passTypes;
 /* readonly */
 Array<Pass> passes;
 /* readonly */

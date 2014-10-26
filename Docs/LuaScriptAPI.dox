@@ -3754,10 +3754,14 @@ Properties:
 Methods:
 
 - bool IsSM3() const
+- const String GetVertexShader() const
+- const String GetPixelShader() const
 
 Properties:
 
 - bool SM3 (readonly)
+- const String vertexShader (readonly)
+- const String pixelShader (readonly)
 
 <a name="Class_PhysicsRaycastResult"></a>
 ### PhysicsRaycastResult
@@ -5193,13 +5197,18 @@ Properties:
 
 Methods:
 
-- bool HasPass(const String type) const
-- Pass* GetPass(const String type) const
+- bool HasPass(const StringHash type) const
+- Pass* GetPass(const StringHash type) const
+- Pass* GetSupportedPass(const StringHash type) const
 - bool IsSM3() const
+- unsigned GetNumPasses() const
+- const Vector<StringHash>& GetPassTypes() const
+- const PODVector<Pass*>& GetPasses() const
 
 Properties:
 
 - bool SM3 (readonly)
+- unsigned numPasses (readonly)
 
 <a name="Class_Terrain"></a>
 ### Terrain : Component

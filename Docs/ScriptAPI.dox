@@ -10313,6 +10313,8 @@ Properties:
 Methods:
 
 - Pass@ CreatePass(StringHash)
+- Pass@ GetPass(StringHash)
+- Pass@ GetSupportedPass(StringHash)
 - bool HasPass(StringHash) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
@@ -10327,7 +10329,9 @@ Properties:
 - String category // readonly
 - uint memoryUse // readonly
 - String name
-- Pass@[] passes // readonly
+- uint numPasses // readonly
+- StringHash[]@ passTypes // readonly
+- Pass@[]@ passes // readonly
 - int refs // readonly
 - bool sm3
 - StringHash type // readonly
