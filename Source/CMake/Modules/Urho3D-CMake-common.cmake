@@ -35,6 +35,7 @@ if (NOT MSVC)
 endif ()
 option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
+option (URHO3D_ANGELSCRIPT_DEBUGGING "Enable AngelScript debugging daemon")
 option (URHO3D_LUA "Enable additional Lua scripting support")
 option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)")
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
@@ -174,6 +175,12 @@ endif ()
 # Add definition for AngelScript
 if (URHO3D_ANGELSCRIPT)
     add_definitions (-DURHO3D_ANGELSCRIPT)
+    
+    # Setup AngelScript
+    if (URHO3D_ANGELSCRIPT_DEBUGGING)
+        add_definitions (-DURHO3D_ANGELSCRIPT_DEBUGGING)
+        add_definitions (-DUSE_WEBSOCKET)
+    endif ()
 endif ()
 
 # Add definition for Lua and LuaJIT

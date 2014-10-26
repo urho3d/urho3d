@@ -55,6 +55,7 @@ class URHO3D_API Script : public Object
     OBJECT(Script);
 
     friend class ScriptFile;
+	friend class asPEEK;
 
 public:
     /// Construct.
@@ -96,6 +97,11 @@ public:
     /// Return the script module create/delete mutex.
     Mutex& GetModuleMutex() { return moduleMutex_; }
 
+#ifdef URHO3D_ANGELSCRIPT_DEBUGGING
+	/// get the asPEEK debugger
+	asPEEK* GetDebugger() const {return debugDaemon_;}
+#endif
+
 private:
     /// Increase script nesting level.
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
@@ -128,6 +134,11 @@ private:
     unsigned scriptNestingLevel_;
     /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
+
+#ifdef URHO3D_ANGELSCRIPT_DEBUGGING
+	/// asPEEK debugging server
+	asPEEK* debugDaemon_;
+#endif
 };
 
 /// Register Script library objects.

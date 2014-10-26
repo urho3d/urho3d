@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Addons.h"
+#include "asPEEK.h"
 #include "EngineEvents.h"
 #include "Log.h"
 #include "Profiler.h"
@@ -56,7 +57,7 @@ Script::Script(Context* context) :
     scriptEngine_->SetEngineProperty(asEP_USE_CHARACTER_LITERALS, true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, true);
-    scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
+    scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, false);
     scriptEngine_->SetMessageCallback(asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
 
     // Create the context for immediate execution
@@ -94,6 +95,9 @@ Script::Script(Context* context) :
     RegisterScriptAPI(scriptEngine_);
     RegisterEngineAPI(scriptEngine_);
 
+#ifdef URHO3D_ANGELSCRIPT_DEBUGGING
+	debugDaemon_ = new asPEEK(context,9002);
+#endif
     // Subscribe to console commands
     SetExecuteConsoleCommands(true);
 }
@@ -114,6 +118,14 @@ Script::~Script()
         scriptEngine_->Release();
         scriptEngine_ = 0;
     }
+
+#ifdef URHO3D_ANGELSCRIPT_DEBUGGING
+	if (debugDaemon_) 
+	{
+		delete debugDaemon_;
+		debugDaemon_ = 0;
+	}
+#endif
 }
 
 bool Script::Execute(const String& line)
