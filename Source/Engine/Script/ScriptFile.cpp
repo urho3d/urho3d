@@ -380,7 +380,7 @@ void ScriptFile::ClearDelayedExecute(const String& declaration)
         }
     }
 }
-asIScriptObject* ScriptFile::CreateObject(const String& className, bool interface)
+asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInterface)
 {
     PROFILE(CreateObject);
     
@@ -389,7 +389,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool interfac
     
     asIScriptContext* context = script_->GetScriptFileContext();
     asIObjectType* type = 0;
-    if (interface)
+    if (useInterface)
     {
         asIObjectType* interfaceType = scriptModule_->GetObjectTypeByDecl(className.CString());
 
