@@ -32,9 +32,16 @@ EVENT(E_SCREENMODE, ScreenMode)
 {
     PARAM(P_WIDTH, Width);                  // int
     PARAM(P_HEIGHT, Height);                // int
+    PARAM(P_POSITION_X, X);                 // int
+    PARAM(P_POSITION_Y, Y);                 // int
     PARAM(P_FULLSCREEN, Fullscreen);        // bool
     PARAM(P_RESIZABLE, Resizable);          // bool
     PARAM(P_BORDERLESS, Borderless);        // bool
+}
+
+/// Window is about to be destroyed.
+EVENT(E_WINDOWABOUTTOCLOSE, WindowAboutToClose)
+{
 }
 
 /// Graphics features checked.

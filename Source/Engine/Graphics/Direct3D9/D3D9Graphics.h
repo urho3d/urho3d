@@ -88,9 +88,9 @@ public:
     void SetWindowTitle(const String& windowTitle);
     /// Set window icon.
     void SetWindowIcon(Image* windowIcon);
-    /// Set window position.
+    /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(const IntVector2& position);
-    /// Set window position.
+    /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
@@ -238,9 +238,9 @@ public:
     /// Return window position.
     IntVector2 GetWindowPosition() const;
     /// Return window width.
-    int GetWidth() const { return width_; }
+    int GetWidth() const { return size_.x_; }
     /// Return window height.
-    int GetHeight() const { return height_; }
+    int GetHeight() const { return size_.y_; }
     /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const { return multiSample_; }
     /// Return whether window is fullscreen.
@@ -374,6 +374,8 @@ public:
     
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
+    /// Window was moved through user interaction. Called by Input subsystem.
+    void WindowMoved();
     /// Maximize the Window.
     void Maximize();
     /// Minimize the Window.
@@ -456,10 +458,10 @@ private:
     Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
-    /// Window width.
-    int width_;
-    /// Window height.
-    int height_;
+    /// Window size
+    IntVector2 size_;
+    /// Window position
+    IntVector2 position_;
     /// Multisampling mode.
     int multiSample_;
     /// Fullscreen flag.
