@@ -88,7 +88,7 @@ public:
     /// Clear pending delay-executed function calls. If empty declaration given, clears all.
     void ClearDelayedExecute(const String& declaration = String::EMPTY);
     /// Create a script object.
-    asIScriptObject* CreateObject(const String& className);
+    asIScriptObject* CreateObject(const String& className, bool interace = false);
     /// Save the script bytecode. Return true if successful.
     bool SaveByteCode(Serializer& dest);
     
