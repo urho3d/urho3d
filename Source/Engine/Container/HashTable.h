@@ -145,6 +145,24 @@ public:
         return 0;
     }
     
+    /// Return all the keys.
+    PODVector<unsigned> Keys() const
+    {
+        PODVector<unsigned> ret;
+
+        for (unsigned i = 0; i < U; ++i)
+        {
+            Node* ptr = ptrs_[i];
+            while (ptr)
+            {
+                ret.Push(ptr->hash_);
+                ptr = ptr->next_;
+            }
+        }
+
+        return ret;
+    }
+
     /// Return pointers to all values.
     PODVector<T*> Values() const
     {

@@ -157,7 +157,8 @@ void Pass::MarkShadersLoaded(unsigned frameNumber)
 
 Technique::Technique(Context* context) :
     Resource(context),
-    isSM3_(false)
+    isSM3_(false),
+    numPasses_(0)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     sm3Support_ = graphics ? graphics->GetSM3Support() : true;
@@ -175,6 +176,8 @@ void Technique::RegisterObject(Context* context)
 bool Technique::BeginLoad(Deserializer& source)
 {
     passes_.Clear();
+
+    numPasses_ = 0;
     SetMemoryUse(sizeof(Technique));
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -198,8 +201,6 @@ bool Technique::BeginLoad(Deserializer& source)
     if (rootElem.HasAttribute("alphamask"))
         globalAlphaMask = rootElem.GetBool("alphamask");
     
-    unsigned numPasses = 0;
-    
     XMLElement passElem = rootElem.GetChild("pass");
     while (passElem)
     {
@@ -208,7 +209,6 @@ bool Technique::BeginLoad(Deserializer& source)
             StringHash nameHash(passElem.GetAttribute("name"));
             
             Pass* newPass = CreatePass(nameHash);
-            ++numPasses;
             
             if (passElem.HasAttribute("sm3"))
                 newPass->SetIsSM3(passElem.GetBool("sm3"));
@@ -271,8 +271,6 @@ bool Technique::BeginLoad(Deserializer& source)
         passElem = passElem.GetNext("pass");
     }
     
-    // Calculate memory use now
-    SetMemoryUse(sizeof(Technique) + numPasses * sizeof(Pass));
     return true;
 }
 
@@ -291,7 +289,6 @@ void Technique::ReleaseShaders()
 
 Pass* Technique::CreatePass(StringHash type)
 {
-    /// \todo Memory use is not tracked when creating passes programmatically due to HashTable not returning the element count
     Pass* oldPass = GetPass(type);
     if (oldPass)
         return oldPass;
@@ -299,12 +296,40 @@ Pass* Technique::CreatePass(StringHash type)
     SharedPtr<Pass> newPass(new Pass(type));
     passes_.Insert(type.Value(), newPass);
     
+    // Calculate memory use now
+    SetMemoryUse(sizeof(Technique) + ++numPasses_ * sizeof(Pass));
+
     return newPass;
 }
 
 void Technique::RemovePass(StringHash type)
 {
-    passes_.Erase(type.Value());
+    if (passes_.Erase(type.Value()))
+        SetMemoryUse(sizeof(Technique) + --numPasses_ * sizeof(Pass));
+}
+
+Vector<StringHash> Technique::GetPassTypes() const
+{
+    // Convert PODVector<unsigned> to Vector<StringHash>
+    PODVector<unsigned> vectorIn = passes_.Keys();
+    Vector<StringHash> vectorOut;
+    vectorOut.Reserve(vectorIn.Size());
+    for (unsigned i = 0; i < vectorIn.Size(); ++i)
+        vectorOut.Push(StringHash(vectorIn[i]));
+
+    return vectorOut;
+}
+
+PODVector<Pass*> Technique::GetPasses() const
+{
+    // Convert PODVector<SharedPtr<Pass>*> to PODVector<Pass*>
+    PODVector<SharedPtr<Pass>*> vectorIn = passes_.Values();
+    PODVector<Pass*> vectorOut;
+    vectorOut.Reserve(vectorIn.Size());
+    for (unsigned i = 0; i < vectorIn.Size(); ++i)
+        vectorOut.Push(vectorIn[i]->Get());
+
+    return vectorOut;
 }
 
 }

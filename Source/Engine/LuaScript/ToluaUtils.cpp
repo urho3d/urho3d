@@ -133,6 +133,18 @@ template<> int ToluaPushVector<String>(lua_State* L, void* data, const char* typ
     return 1;
 }
 
+template<> int ToluaPushVector<StringHash>(lua_State* L, void* data, const char* type)
+{
+    Vector<StringHash>& vector = *((Vector<StringHash>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, &vector[i], "StringHash");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
 template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type, int def, tolua_Error* err)
 {
     if (lua_istable(L, lo))
@@ -373,6 +385,18 @@ template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* da
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char*)
 {
     return tolua_pushurho3dpodvectorusertype(L, *((const PODVector<RayQueryResult>*)data), "RayQueryResult");
+}
+
+template<> int ToluaPushPODVector<Pass*>(lua_State* L, void* data, const char*)
+{
+    const PODVector<Pass*>& vector = *((const PODVector<Pass*>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], "Pass");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
 }
 
 void ToluaPushObject(lua_State*L, void* data, const char* type)

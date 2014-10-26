@@ -10,13 +10,38 @@ enum PassLightingMode
 class Pass : public RefCounted
 {
     bool IsSM3() const;
+    const String GetVertexShader() const;
+    const String GetPixelShader() const;
+
     tolua_readonly tolua_property__is_set bool SM3;
+    tolua_readonly tolua_property__get_set const String vertexShader;
+    tolua_readonly tolua_property__get_set const String pixelShader;
 };
 
 class Technique : public Resource
 {
-    bool HasPass(const String type) const;
-    Pass* GetPass(const String  type) const;
+    bool HasPass(const StringHash type) const;
+    Pass* GetPass(const StringHash type) const;
+    Pass* GetSupportedPass(const StringHash type) const;
     bool IsSM3() const;
+    unsigned GetNumPasses() const;
+    tolua_outside const Vector<StringHash>& TechniqueGetPassTypes @ GetPassTypes() const;
+    tolua_outside const PODVector<Pass*>& TechniqueGetPasses @ GetPasses() const;
+
     tolua_readonly tolua_property__is_set bool SM3;
+    tolua_readonly tolua_property__get_set unsigned numPasses;
 };
+
+${
+static const Vector<StringHash>& TechniqueGetPassTypes(const Technique* technique)
+{
+    static Vector<StringHash> vector = technique->GetPassTypes();
+    return vector;
+}
+
+static const PODVector<Pass*>& TechniqueGetPasses(const Technique* technique)
+{
+    static PODVector<Pass*> vector = technique->GetPasses();
+    return vector;
+}
+$}
