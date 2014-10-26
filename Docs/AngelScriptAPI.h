@@ -4142,6 +4142,7 @@ float quantize;
 class Font
 {
 // Methods:
+IntVector2 GetTotalGlyphOffset(int) const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -4152,6 +4153,7 @@ bool SaveXML(const String&, int, bool = false);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
+IntVector2 absoluteGlyphOffset;
 /* readonly */
 StringHash baseType;
 /* readonly */
@@ -4161,6 +4163,7 @@ uint memoryUse;
 String name;
 /* readonly */
 int refs;
+Vector2 scaledGlyphOffset;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -9394,6 +9397,8 @@ class Technique
 {
 // Methods:
 Pass CreatePass(StringHash);
+Pass GetPass(StringHash);
+Pass GetSupportedPass(StringHash);
 bool HasPass(StringHash) const;
 bool Load(File);
 bool Load(VectorBuffer&);
@@ -9410,6 +9415,10 @@ String category;
 /* readonly */
 uint memoryUse;
 String name;
+/* readonly */
+uint numPasses;
+/* readonly */
+Array<StringHash> passTypes;
 /* readonly */
 Array<Pass> passes;
 /* readonly */

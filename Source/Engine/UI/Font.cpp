@@ -29,6 +29,9 @@
 #include "FontFaceFreeType.h"
 #include "Graphics.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
+#include "XMLElement.h"
+#include "XMLFile.h"
 
 #include "DebugNew.h"
 
@@ -41,6 +44,8 @@ static const int MAX_POINT_SIZE = 96;
 Font::Font(Context* context) :
     Resource(context),
     fontDataSize_(0),
+    absoluteOffset_(IntVector2::ZERO),
+    scaledOffset_(Vector2::ZERO),
     fontType_(FONT_NONE),
     sdfFont_(false)
 {
@@ -83,7 +88,10 @@ bool Font::BeginLoad(Deserializer& source)
 
     String ext = GetExtension(GetName());
     if (ext == ".ttf" || ext == ".otf" || ext == ".woff")
+    {
         fontType_ = FONT_FREETYPE;
+        LoadParameters();
+    }
     else if (ext == ".xml" || ext == ".fnt" || ext == ".sdf")
         fontType_ = FONT_BITMAP;
 
@@ -106,6 +114,16 @@ bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs)
         return false;
 
     return packedFontFace->Save(dest, pointSize);
+}
+
+void Font::SetAbsoluteGlyphOffset(const IntVector2& offset)
+{
+    absoluteOffset_ = offset;
+}
+
+void Font::SetScaledGlyphOffset(const Vector2& offset)
+{
+    scaledOffset_ = offset;
 }
 
 FontFace* Font::GetFace(int pointSize)
@@ -148,9 +166,46 @@ FontFace* Font::GetFace(int pointSize)
     }
 }
 
+IntVector2 Font::GetTotalGlyphOffset(int pointSize) const
+{
+    Vector2 multipliedOffset = (float)pointSize * scaledOffset_;
+    return absoluteOffset_ + IntVector2((int)multipliedOffset.x_, (int)multipliedOffset.y_);
+}
+
 void Font::ReleaseFaces()
 {
     faces_.Clear();
+}
+
+void Font::LoadParameters()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String xmlName = ReplaceExtension(GetName(), ".xml");
+    SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, false);
+    if (!xml)
+        return;
+    
+    XMLElement rootElem = xml->GetRoot();
+    
+    XMLElement absoluteElem = rootElem.GetChild("absoluteoffset");
+    if (!absoluteElem)
+        absoluteElem = rootElem.GetChild("absolute");
+    
+    if (absoluteElem)
+    {
+        absoluteOffset_.x_ = absoluteElem.GetInt("x");
+        absoluteOffset_.y_ = absoluteElem.GetInt("y");
+    }
+    
+    XMLElement scaledElem = rootElem.GetChild("scaledoffset");
+    if (!scaledElem)
+        scaledElem = rootElem.GetChild("scaled");
+    
+    if (scaledElem)
+    {
+        scaledOffset_.x_ = scaledElem.GetFloat("x");
+        scaledOffset_.y_ = scaledElem.GetFloat("y");
+    }
 }
 
 FontFace* Font::GetFaceFreeType(int pointSize)

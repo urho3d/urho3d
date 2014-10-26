@@ -510,6 +510,16 @@ static void ConstructTechniqueEntry(TechniqueEntry* ptr)
     new(ptr) TechniqueEntry();
 }
 
+static CScriptArray* TechniqueGetPassTypes(const Technique& technique)
+{
+    return VectorToArray<StringHash>(technique.GetPassTypes(), "Array<StringHash>");
+}
+
+static CScriptArray* TechniqueGetPasses(const Technique& technique)
+{
+    return VectorToHandleArray<Pass>(technique.GetPasses(), "Array<Pass@>");
+}
+
 static void ConstructTechniqueEntryCopy(const TechniqueEntry& entry, TechniqueEntry* ptr)
 {
     new(ptr) TechniqueEntry(entry);
@@ -620,9 +630,13 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(StringHash)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void RemovePass(StringHash)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool HasPass(StringHash) const", asMETHOD(Technique, HasPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ GetPass(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ GetSupportedPass(StringHash)", asMETHOD(Technique, GetSupportedPass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void set_sm3(bool)", asMETHOD(Technique, SetIsSM3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_sm3() const", asMETHOD(Technique, IsSM3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "uint get_numPasses() const", asMETHOD(Technique, GetNumPasses), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Array<StringHash>@ get_passTypes() const", asFUNCTION(TechniqueGetPassTypes), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Technique", "Array<Pass@>@ get_passes() const", asFUNCTION(TechniqueGetPasses), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("TechniqueEntry", sizeof(TechniqueEntry), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);

@@ -196,7 +196,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String exePath = fileSystem->GetProgramDir();
 
-    Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData;Data").GetString().Split(';');
+    Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "Data;CoreData").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
     Vector<String> autoloadFolders = GetParameter(parameters, "AutoloadPaths", "Extra").GetString().Split(';');
 
@@ -262,7 +262,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         }
     }
     
-    // Add auto load folders
+    // Add auto load folders. Prioritize these (if exist) before the default folders
     for (unsigned i = 0; i < autoloadFolders.Size(); ++i)
     {
         bool success = true;
@@ -279,7 +279,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                     continue;
 
                 String autoResourceDir = exePath + autoloadFolder + "/" + folder;
-                success = cache->AddResourceDir(autoResourceDir);
+                success = cache->AddResourceDir(autoResourceDir, 0);
                 if (!success)
                 {
                     badResource = folder;
@@ -300,7 +300,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                     String autoResourcePak = exePath + autoloadFolder + "/" + pak;
                     SharedPtr<PackageFile> package(new PackageFile(context_));
                     if (package->Open(autoResourcePak))
-                        cache->AddPackageFile(package);
+                        cache->AddPackageFile(package, 0);
                     else
                     {
                         badResource = autoResourcePak;
