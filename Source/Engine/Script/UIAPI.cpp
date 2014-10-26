@@ -66,6 +66,11 @@ static void RegisterFont(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool arg2 = false)", asMETHOD(Font, SaveXML), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool arg2 = false)", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool arg2 = false)", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Font", "IntVector2 GetTotalGlyphOffset(int) const", asMETHOD(Font, GetTotalGlyphOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "void set_absoluteGlyphOffset(const IntVector2&)", asMETHOD(Font, SetAbsoluteGlyphOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "const IntVector2& get_absoluteGlyphOffset() const", asMETHOD(Font, GetAbsoluteGlyphOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "void set_scaledGlyphOffset(const Vector2&)", asMETHOD(Font, SetScaledGlyphOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "const Vector2& get_scaledGlyphOffset() const", asMETHOD(Font, GetScaledGlyphOffset), asCALL_THISCALL);
 }
 
 static void RegisterUIElement(asIScriptEngine* engine)

@@ -36,6 +36,8 @@ class RigidBody : public Component
     void SetCollisionMask(unsigned mask);
     void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
     void SetCollisionEventMode(CollisionEventMode mode);
+    void DisableMassUpdate();
+    void EnableMassUpdate();
 
     void ApplyForce(const Vector3& force);
     void ApplyForce(const Vector3& force, const Vector3& position);

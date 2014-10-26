@@ -76,6 +76,7 @@ const StringHash BINARY_TYPE_SHADER("USHD");
 const StringHash BINARY_TYPE_ANIMATION("UANI");
 
 const StringHash EXTENSION_TYPE_TTF(".ttf");
+const StringHash EXTENSION_TYPE_OTF(".otf");
 const StringHash EXTENSION_TYPE_OGG(".ogg");
 const StringHash EXTENSION_TYPE_WAV(".wav");
 const StringHash EXTENSION_TYPE_DDS(".dds");
@@ -1049,6 +1050,8 @@ int GetResourceType(StringHash fileType)
 
     // extension fileTypes
     else if (fileType == EXTENSION_TYPE_TTF)
+        return RESOURCE_TYPE_FONT;
+    else if (fileType == EXTENSION_TYPE_OTF)
         return RESOURCE_TYPE_FONT;
     else if (fileType == EXTENSION_TYPE_OGG)
         return RESOURCE_TYPE_SOUND;

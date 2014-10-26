@@ -29,12 +29,16 @@ Lib/
 
 # Generated documentation
 Docs/html/
+Docs/qch/
 Docs/Doxyfile
 Docs/minimal-*
 
 # Eclipse project settings
 Source/.*project
 Source/.settings
+
+# Qt Creator project settings
+Source/CMakeLists.txt.user
 
 # Android in-the-source project settings
 Source/Android/project.properties

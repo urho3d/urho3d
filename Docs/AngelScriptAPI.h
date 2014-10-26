@@ -2005,6 +2005,7 @@ class Connection
 void Disconnect(int = 0);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SendMessage(int, bool, bool, const VectorBuffer&, uint = 0);
+void SendPackageToClient(PackageFile);
 void SendRemoteEvent(Node, const String&, bool, const VariantMap& = VariantMap ( ));
 void SendRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( ));
 String ToString() const;
@@ -4141,6 +4142,7 @@ float quantize;
 class Font
 {
 // Methods:
+IntVector2 GetTotalGlyphOffset(int) const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -4151,6 +4153,7 @@ bool SaveXML(const String&, int, bool = false);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
+IntVector2 absoluteGlyphOffset;
 /* readonly */
 StringHash baseType;
 /* readonly */
@@ -4160,6 +4163,7 @@ uint memoryUse;
 String name;
 /* readonly */
 int refs;
+Vector2 scaledGlyphOffset;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -5794,6 +5798,7 @@ void Disconnect(int = 0);
 HttpRequest MakeHttpRequest(const String&, const String& = String ( ), Array<String> = null, const String& = String ( ));
 void RegisterRemoteEvent(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SendPackageToClients(Scene, PackageFile);
 bool StartServer(uint16);
 void StopServer();
 void UnregisterAllRemoteEvents();
@@ -7194,7 +7199,9 @@ void ApplyImpulse(const Vector3&);
 void ApplyImpulse(const Vector3&, const Vector3&);
 void ApplyTorque(const Vector3&);
 void ApplyTorqueImpulse(const Vector3&);
+void DisableMassUpdate();
 void DrawDebugGeometry(DebugRenderer, bool);
+void EnableMassUpdate();
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;

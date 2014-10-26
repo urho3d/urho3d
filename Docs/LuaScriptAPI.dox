@@ -1143,12 +1143,7 @@ Methods:
 - void SetConnectPending(bool connectPending)
 - void SetLogStatistics(bool enable)
 - void Disconnect(int waitMSec = 0)
-- void SendServerUpdate()
-- void SendClientUpdate()
-- void SendRemoteEvents()
-- void SendPackages()
-- void ProcessPendingLatestData()
-- bool ProcessMessage(int msgID, MemoryBuffer& msg)
+- void SendPackageToClient(PackageFile* package)
 - VariantMap& GetIdentity()
 - Scene* GetScene() const
 - const Controls& GetControls() const
@@ -2167,6 +2162,20 @@ Methods:
 
 <a name="Class_Font"></a>
 ### Font : Resource
+
+Methods:
+
+- void SetAbsoluteGlyphOffset(const IntVector2& offset)
+- void SetScaledGlyphOffset(const Vector2& offset)
+- const IntVector2& GetAbsoluteGlyphOffset() const
+- const Vector2& GetScaledGlyphOffset() const
+- IntVector2 GetTotalGlyphOffset(int pointSize) const
+- bool IsSDFFont() const
+
+Properties:
+
+- IntVector2 absoluteGlyphOffset
+- Vector2 scaledGlyphOffset
 
 <a name="Class_Frustum"></a>
 ### Frustum
@@ -3258,6 +3267,7 @@ Methods:
 - void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
 - void SetPackageCacheDir(const String path)
+- void SendPackageToClients(Scene* scene, PackageFile* package)
 - HttpRequest* MakeHttpRequest(const String url, const String verb = String::EMPTY)
 - HttpRequest* MakeHttpRequest(const String url, const String verb, const Vector<String>& headers, const String postData = String::EMPTY)
 - int GetUpdateFps() const
@@ -4424,6 +4434,8 @@ Methods:
 - void SetCollisionMask(unsigned mask)
 - void SetCollisionLayerAndMask(unsigned layer, unsigned mask)
 - void SetCollisionEventMode(CollisionEventMode mode)
+- void DisableMassUpdate()
+- void EnableMassUpdate()
 - void ApplyForce(const Vector3& force)
 - void ApplyForce(const Vector3& force, const Vector3& position)
 - void ApplyTorque(const Vector3& torque)

@@ -1795,6 +1795,16 @@ void Graphics::SetDepthWrite(bool enable)
         depthWrite_ = enable;
     }
 }
+
+void Graphics::SetDrawAntialiased(bool enable)
+{
+    if (enable != drawAntialiased_)
+    {
+        impl_->device_->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, enable ? TRUE : FALSE);
+        drawAntialiased_ = enable;
+    }
+}
+
 void Graphics::SetFillMode(FillMode mode)
 {
     if (mode != fillMode_)
@@ -2767,6 +2777,7 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
+    drawAntialiased_ = true;
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;

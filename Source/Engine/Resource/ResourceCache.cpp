@@ -107,8 +107,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
             return true;
     }
     
-    // If the priority isn't last or greater than size insert at position otherwise push.
-    if (priority > PRIORITY_LAST && priority < resourceDirs_.Size())
+    if (priority < resourceDirs_.Size())
         resourceDirs_.Insert(priority, fixedPath);
     else
         resourceDirs_.Push(fixedPath);
@@ -133,8 +132,7 @@ void ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
     if (!package || !package->GetNumFiles())
         return;
     
-    // If the priority isn't last or greater than size insert at position otherwise push.
-    if (priority > PRIORITY_LAST && priority < packages_.Size())
+    if (priority < packages_.Size())
         packages_.Insert(priority, SharedPtr<PackageFile>(package));
     else
         packages_.Push(SharedPtr<PackageFile>(package));

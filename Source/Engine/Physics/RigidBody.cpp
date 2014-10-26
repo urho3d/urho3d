@@ -78,7 +78,8 @@ RigidBody::RigidBody(Context* context) :
     useGravity_(true),
     hasSmoothedTransform_(false),
     readdBody_(false),
-    inWorld_(false)
+    inWorld_(false),
+    enableMassUpdate_(true)
 {
     compoundShape_ = new btCompoundShape();
     shiftedCompoundShape_ = new btCompoundShape();
@@ -575,6 +576,20 @@ void RigidBody::ReAddBodyToWorld()
         AddBodyToWorld();
 }
 
+void RigidBody::DisableMassUpdate()
+{
+    enableMassUpdate_ = false;
+}
+
+void RigidBody::EnableMassUpdate()
+{
+    if (!enableMassUpdate_)
+    {
+        enableMassUpdate_ = true;
+        UpdateMass();
+    }
+}
+
 Vector3 RigidBody::GetPosition() const
 {
     if (body_)
@@ -713,7 +728,7 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
 
 void RigidBody::UpdateMass()
 {
-    if (!body_)
+    if (!body_ || !enableMassUpdate_)
         return;
 
     btTransform principal;
