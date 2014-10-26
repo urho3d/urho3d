@@ -220,8 +220,8 @@ Graphics::Graphics(Context* context_) :
     impl_(new GraphicsImpl()),
     windowIcon_(0),
     externalWindow_(0),
-    width_(0),
-    height_(0),
+    size_(0,0),
+    position_(M_MAX_INT,M_MAX_INT),
     multiSample_(1),
     fullscreen_(false),
     borderless_(false),
@@ -297,6 +297,8 @@ void Graphics::SetWindowPosition(const IntVector2& position)
 {
     if (impl_->window_)
         SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
+    else
+        position_ = position; // Sets as initial position for future window creation
 }
 
 void Graphics::SetWindowPosition(int x, int y)
@@ -320,12 +322,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    if (IsInitialized() && width == size_.x_ && height == size_.y_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    if (IsInitialized() && width == size_.x_ && height == size_.y_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
@@ -420,8 +422,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
         
-        int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
-        int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+        int x = fullscreen ? 0 : position_.x_ != M_MAX_INT ?
+            position_.x_ : SDL_WINDOWPOS_UNDEFINED;
+        int y = fullscreen ? 0 : position_.y_ != M_MAX_INT ?
+            position_.y_ : SDL_WINDOWPOS_UNDEFINED;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
@@ -539,9 +543,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
-    
-    SDL_GetWindowSize(impl_->window_, &width_, &height_);
-    
+
+    SDL_GetWindowSize(impl_->window_, &size_.x_, &size_.y_);
+    SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
+
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
     
@@ -553,7 +558,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     
     #ifdef URHO3D_LOGGING
     String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    msg.AppendWithFormat("Set screen mode %dx%d %s", size_.x_, size_.y_, (fullscreen_ ? "fullscreen" : "windowed"));
     if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
@@ -566,8 +571,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     using namespace ScreenMode;
     
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_WIDTH] = width_;
-    eventData[P_HEIGHT] = height_;
+    eventData[P_WIDTH] = size_.x_;
+    eventData[P_HEIGHT] = size_.y_;
+    eventData[P_POSITION_X] = position_.x_;
+    eventData[P_POSITION_Y] = position_.y_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
@@ -604,7 +611,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(size_.x_, size_.y_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -622,8 +629,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
     
     ResetRenderTargets();
     
-    destImage.SetSize(width_, height_, 3);
-    glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
+    destImage.SetSize(size_.x_, size_.y_, 3);
+    glReadPixels(0, 0, size_.x_, size_.y_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
     // On OpenGL we need to flip the image vertically after reading
     destImage.FlipVertical();
     
@@ -641,7 +648,7 @@ bool Graphics::BeginFrame()
         int width, height;
         
         SDL_GetWindowSize(impl_->window_, &width, &height);
-        if (width != width_ || height != height_)
+        if (width != size_.x_ || height != size_.y_)
             SetMode(width, height);
     }
 
@@ -745,17 +752,17 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
         vpCopy.right_ = vpCopy.left_ + 1;
     if (vpCopy.bottom_ <= vpCopy.top_)
         vpCopy.bottom_ = vpCopy.top_ + 1;
-    vpCopy.left_ = Clamp(vpCopy.left_, 0, width_);
-    vpCopy.top_ = Clamp(vpCopy.top_, 0, height_);
-    vpCopy.right_ = Clamp(vpCopy.right_, 0, width_);
-    vpCopy.bottom_ = Clamp(vpCopy.bottom_, 0, height_);
+    vpCopy.left_ = Clamp(vpCopy.left_, 0, size_.x_);
+    vpCopy.top_ = Clamp(vpCopy.top_, 0, size_.y_);
+    vpCopy.right_ = Clamp(vpCopy.right_, 0, size_.x_);
+    vpCopy.bottom_ = Clamp(vpCopy.bottom_, 0, size_.y_);
     
     // Make sure the FBO is not in use
     ResetRenderTargets();
     
     // Use Direct3D convention with the vertical coordinates ie. 0 is top
     SetTextureForUpdate(destination);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.Width(), vpCopy.Height());
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vpCopy.left_, size_.y_ - vpCopy.bottom_, vpCopy.Width(), vpCopy.Height());
     SetTexture(0, 0);
 
     return true;
@@ -1552,7 +1559,7 @@ void Graphics::ResetRenderTargets()
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         SetRenderTarget(i, (RenderSurface*)0);
     SetDepthStencil((RenderSurface*)0);
-    SetViewport(IntRect(0, 0, width_, height_));
+    SetViewport(IntRect(0, 0, size_.x_, size_.y_));
 }
 
 void Graphics::ResetRenderTarget(unsigned index)
@@ -1610,7 +1617,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         
         // Direct3D9 default depth-stencil can not be used when rendertarget is larger than the window.
         // Check size similarly
-        if (width <= width_ && height <= height_)
+        if (width <= size_.x_ && height <= size_.y_)
         {
             int searchKey = (width << 16) | height;
             HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
@@ -1981,12 +1988,9 @@ bool Graphics::IsDeviceLost() const
 
 IntVector2 Graphics::GetWindowPosition() const
 {
-    IntVector2 ret(IntVector2::ZERO);
-    
     if (impl_->window_)
-        SDL_GetWindowPosition(impl_->window_, &ret.x_, &ret.y_);
-    
-    return ret;
+        return position_;
+    return IntVector2::ZERO;
 }
 
 PODVector<IntVector2> Graphics::GetResolutions() const
@@ -2037,7 +2041,7 @@ IntVector2 Graphics::GetDesktopResolution() const
     return IntVector2(mode.w, mode.h);
 #else
     // SDL_GetDesktopDisplayMode() may not work correctly on mobile platforms. Rather return the window size
-    return IntVector2(width_, height_);
+    return IntVector2(size_.x_, size_.y_);
 #endif
 }
 
@@ -2154,8 +2158,8 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     }
     else
     {
-        width = width_;
-        height = height_;
+        width = size_.x_;
+        height = size_.y_;
     }
     
     return IntVector2(width, height);
@@ -2169,22 +2173,53 @@ void Graphics::WindowResized()
     int newWidth, newHeight;
     
     SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
-    if (newWidth == width_ && newHeight == height_)
+    if (newWidth == size_.x_ && newHeight == size_.y_)
         return;
 
-    width_ = newWidth;
-    height_ = newHeight;
+    size_.x_ = newWidth;
+    size_.y_ = newHeight;
     
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
     
-    LOGDEBUGF("Window was resized to %dx%d", width_, height_);
+    LOGDEBUGF("Window was resized to %dx%d", size_.x_, size_.y_);
     
     using namespace ScreenMode;
     
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_WIDTH] = width_;
-    eventData[P_HEIGHT] = height_;
+    eventData[P_WIDTH] = size_.x_;
+    eventData[P_HEIGHT] = size_.y_;
+    eventData[P_POSITION_X] = position_.x_;
+    eventData[P_POSITION_Y] = position_.y_;
+    eventData[P_FULLSCREEN] = fullscreen_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
+    SendEvent(E_SCREENMODE, eventData);
+}
+
+void Graphics::WindowMoved()
+{
+    if (!impl_->window_)
+        return;
+
+    int newX, newY;
+    
+    SDL_GetWindowPosition(impl_->window_, &newX, &newY);
+    if (newX == position_.x_ && newY == position_.y_)
+        return;
+
+    position_.x_ = newX;
+    position_.y_ = newY;
+
+    LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+    
+    using namespace ScreenMode;
+    
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WIDTH] = size_.x_;
+    eventData[P_HEIGHT] = size_.y_;
+    eventData[P_POSITION_X] = position_.x_;
+    eventData[P_POSITION_Y] = position_.y_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
@@ -2329,6 +2364,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         // Do not destroy external window except when shutting down
         if (!externalWindow_ || clearGPUObjects)
         {
+            SendEvent(E_WINDOWABOUTTOCLOSE);
+
             SDL_DestroyWindow(impl_->window_);
             impl_->window_ = 0;
         }
