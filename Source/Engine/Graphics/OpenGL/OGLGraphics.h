@@ -242,9 +242,9 @@ public:
     /// Return window position.
     IntVector2 GetWindowPosition() const;
     /// Return window width.
-    int GetWidth() const { return width_; }
+    int GetWidth() const { return size_.x_; }
     /// Return window height.
-    int GetHeight() const { return height_; }
+    int GetHeight() const { return size_.y_; }
     /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const { return multiSample_; }
     /// Return whether window is fullscreen.
@@ -382,6 +382,8 @@ public:
 
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
+    /// Window was moved through user interaction. Called by Input subsystem.
+    void WindowMoved();
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -464,10 +466,10 @@ private:
     Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
-    /// Window width.
-    int width_;
-    /// Window height.
-    int height_;
+    /// Window size
+    IntVector2 size_;
+    /// Window position
+    IntVector2 position_;
     /// Multisampling mode.
     int multiSample_;
     /// Fullscreen flag.

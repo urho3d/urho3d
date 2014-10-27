@@ -333,7 +333,10 @@ bool Engine::Initialize(const VariantMap& parameters)
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
         graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
         graphics->SetOrientations(GetParameter(parameters, "Orientations", "LandscapeLeft LandscapeRight").GetString());
-        
+
+        if (HasParameter(parameters, "WindowPositionX") && HasParameter(parameters, "WindowPositionY"))
+            graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(), GetParameter(parameters, "WindowPositionY").GetInt());
+
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
             GetParameter(parameters, "WindowHeight", 0).GetInt(),
