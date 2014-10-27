@@ -138,6 +138,8 @@ The full list of supported parameters, their datatypes and default values:
 - WindowTitle (string) %Window title. Default "Urho3D".
 - WindowWidth (int) %Window horizontal dimension. Default 0 (use desktop resolution, or 1024 in windowed mode.)
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
+- WindowPositionX (int) %Window horizontal position. Default center to screen.
+- WindowPositionY (int) %Window vertical position. Default center to screen.
 - WindowResizable (bool) Whether window is resizable. Default false.
 - FullScreen (bool) Whether to create a full-screen window. Default true.
 - Borderless (bool) Whether to create the window as borderless. Default false.
