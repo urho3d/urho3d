@@ -36,6 +36,7 @@ struct lua_State;
 namespace Urho3D
 {
 class Context;
+class Pass;
 class SoundSource;
 class UIElement;
 }
@@ -94,6 +95,8 @@ template<> void* ToluaToVector<String>(lua_State* L, int narg, void* def);
 template<typename T> int ToluaPushVector(lua_State*L, void* data, const char* type);
 /// Push Vector<String> to Lua as a table.
 template<> int ToluaPushVector<String>(lua_State* L, void* data, const char* type);
+/// Push Vector<StringHash> to Lua as a table.
+template<> int ToluaPushVector<StringHash>(lua_State* L, void* data, const char* type);
 
 /// Check is PODVector<T>.
 template<typename T> int ToluaIsPODVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
@@ -139,6 +142,8 @@ template<> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data
 template<> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.
 template<> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* type);
+/// Push PODVector<Pass*> to Lua as a table.
+template<> int ToluaPushPODVector<Pass*>(lua_State* L, void* data, const char* type);
 /// Push Object to Lua.
 void ToluaPushObject(lua_State*L, void* data, const char* type);
 

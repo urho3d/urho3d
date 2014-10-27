@@ -180,6 +180,13 @@ public:
         return pass && (!pass->IsSM3() || sm3Support_) ? pass : 0;
     }
     
+    /// Return number of passes.
+    unsigned GetNumPasses() const { return numPasses_; }
+    /// Return all the pass types in the hash table. The returned collection is not guaranteed to be in the same order as the hash table insertion order.
+    Vector<StringHash> GetPassTypes() const;
+    /// Return all the passes in the hash table. The returned collection is not guaranteed to be in the same order as the hash table insertion order.
+    PODVector<Pass*> GetPasses() const;
+
 private:
     /// Require %Shader %Model 3 flag.
     bool isSM3_;
@@ -187,6 +194,8 @@ private:
     bool sm3Support_;
     /// Passes.
     HashTable<SharedPtr<Pass>, 16> passes_;
+    /// Number of passes.
+    unsigned numPasses_;
 };
 
 }
