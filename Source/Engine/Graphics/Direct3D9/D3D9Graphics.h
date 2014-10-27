@@ -88,9 +88,9 @@ public:
     void SetWindowTitle(const String& windowTitle);
     /// Set window icon.
     void SetWindowIcon(Image* windowIcon);
-    /// Set window position.
+    /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(const IntVector2& position);
-    /// Set window position.
+    /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
@@ -374,6 +374,8 @@ public:
     
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
+    /// Window was moved through user interaction. Called by Input subsystem.
+    void WindowMoved();
     /// Maximize the Window.
     void Maximize();
     /// Minimize the Window.
@@ -460,6 +462,8 @@ private:
     int width_;
     /// Window height.
     int height_;
+    /// Window position.
+    IntVector2 position_;
     /// Multisampling mode.
     int multiSample_;
     /// Fullscreen flag.
