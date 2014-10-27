@@ -712,7 +712,7 @@ macro (define_dependency_libs TARGET)
                 list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
             else ()
                 # If SDK not found, assume the libraries are found from default directories
-                list (APPEND LINK_LIBS_ONLY ${DIRECT3D_LIBRARIES})
+                list (APPEND LINK_LIBS_ONLY d3d9 d3dcompiler)
             endif ()
         endif ()
 
