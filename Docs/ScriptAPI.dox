@@ -54,6 +54,10 @@ namespace Urho3D
 - %Resizable : bool
 - %Borderless : bool
 
+### WindowPos
+- %X : int
+- %Y : int
+
 ### GraphicsFeatures
 
 ### RenderSurfaceUpdate
