@@ -222,7 +222,7 @@ Graphics::Graphics(Context* context_) :
     externalWindow_(0),
     width_(0),
     height_(0),
-    position_(M_MAX_INT,M_MAX_INT),
+    position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
     multiSample_(1),
     fullscreen_(false),
     borderless_(false),
@@ -423,10 +423,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
         
-        int x = fullscreen ? 0 : position_.x_ != M_MAX_INT ?
-            position_.x_ : SDL_WINDOWPOS_UNDEFINED;
-        int y = fullscreen ? 0 : position_.y_ != M_MAX_INT ?
-            position_.y_ : SDL_WINDOWPOS_UNDEFINED;
+        int x = fullscreen ? 0 : position_.x_;
+        int y = fullscreen ? 0 : position_.y_;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)

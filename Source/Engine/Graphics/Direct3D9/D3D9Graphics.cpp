@@ -251,7 +251,7 @@ Graphics::Graphics(Context* context) :
     externalWindow_(0),
     width_(0),
     height_(0),
-    position_(M_MAX_INT,M_MAX_INT),
+    position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
     multiSample_(1),
     fullscreen_(false),
     borderless_(false),
@@ -2477,10 +2477,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
 
-        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(),
-             (position_.x_ != M_MAX_INT ? position_.x_ : SDL_WINDOWPOS_UNDEFINED), (position_.y_ != M_MAX_INT ? position_.y_ : SDL_WINDOWPOS_UNDEFINED),
-             width, height, flags
-        );
+        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
     }
     else
         impl_->window_ = SDL_CreateWindowFrom(externalWindow_, 0);
