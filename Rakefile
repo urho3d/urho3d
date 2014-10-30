@@ -82,7 +82,7 @@ task :ci do
   end
   # Define the build option string only when the override environment variable is given
   $build_options = "-DURHO3D_64BIT=#{ENV['URHO3D_64BIT']}" if ENV['URHO3D_64BIT']
-  $build_options = " -DURHO3D_OPENGL=#{ENV['URHO3D_OPENGL']}" if ENV['URHO3D_OPENGL']
+  $build_options = "#{$build_options} -DURHO3D_OPENGL=#{ENV['URHO3D_OPENGL']}" if ENV['URHO3D_OPENGL']
   if ENV['XCODE']
     # xctool or xcodebuild
     xcode_ci
