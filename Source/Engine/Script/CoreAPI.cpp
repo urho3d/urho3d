@@ -650,6 +650,11 @@ static unsigned TimeGetSystemTime(Time* time)
     return Time::GetSystemTime();
 }
 
+static unsigned TimeGetTimeSinceEpoch(Time* time)
+{
+    return Time::GetTimeSinceEpoch();
+}
+
 static String TimeGetTimeStamp(Time* time)
 {
     return Time::GetTimeStamp();
@@ -667,6 +672,7 @@ static void RegisterTimer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Time", "float get_timeStep() const", asMETHOD(Time, GetTimeStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_elapsedTime()", asMETHOD(Time, GetElapsedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "uint get_systemTime() const", asFUNCTION(TimeGetSystemTime), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Time", "uint get_timeSinceEpoch() const", asFUNCTION(TimeGetTimeSinceEpoch), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Time", "String get_timeStamp() const", asFUNCTION(TimeGetTimeStamp), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Time@+ get_time()", asFUNCTION(GetTime), asCALL_CDECL);
 }

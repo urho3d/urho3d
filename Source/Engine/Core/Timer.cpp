@@ -137,6 +137,11 @@ unsigned Time::GetSystemTime()
     return currentTime;
 }
 
+unsigned Time::GetTimeSinceEpoch()
+{
+    return (unsigned)time(NULL);
+}
+
 String Time::GetTimeStamp()
 {
     time_t sysTime;
