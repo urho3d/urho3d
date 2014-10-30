@@ -152,10 +152,8 @@ endif ()
 # enabled, but Windows graphics card drivers are usually better optimized for Direct3D. Direct3D can
 # be manually enabled for MinGW with -DURHO3D_OPENGL=0, but is likely to fail due to missing headers
 # and libraries, unless the MinGW-w64 distribution is used.
-if (NOT MSVC)
-    if (NOT WIN32 OR NOT DEFINED URHO3D_OPENGL)
-        set (URHO3D_OPENGL 1)
-    endif ()
+if (NOT WIN32 OR NOT DEFINED URHO3D_OPENGL)  # This option is only defined on Windows platform
+    set (URHO3D_OPENGL 1)
 endif ()
 if (URHO3D_OPENGL)
     add_definitions (-DURHO3D_OPENGL)
@@ -214,7 +212,7 @@ endif ()
 # Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
 # without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
 # incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
-if (MSVC)
+if (WIN32 AND NOT URHO3D_OPENGL)
     find_package (Direct3D)
     if (DIRECT3D_FOUND)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
