@@ -54,6 +54,10 @@ namespace Urho3D
 - %Resizable : bool
 - %Borderless : bool
 
+### WindowPos
+- %X : int
+- %Y : int
+
 ### GraphicsFeatures
 
 ### RenderSurfaceUpdate
@@ -5693,6 +5697,7 @@ Methods:
 - bool Rename(const String&, const String&)
 - String[]@ ScanDir(const String&, const String&, uint, bool) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetLastModifiedTime(const String&, uint)
 - int SystemCommand(const String&, bool = false)
 - uint SystemCommandAsync(const String&)
 - bool SystemOpen(const String&, const String&)
@@ -11113,6 +11118,7 @@ Properties:
 - uint frameNumber // readonly
 - int refs // readonly
 - uint systemTime // readonly
+- uint timeSinceEpoch // readonly
 - String timeStamp // readonly
 - float timeStep // readonly
 - StringHash type // readonly

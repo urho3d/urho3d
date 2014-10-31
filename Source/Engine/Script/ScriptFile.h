@@ -87,8 +87,8 @@ public:
     void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Clear pending delay-executed function calls. If empty declaration given, clears all.
     void ClearDelayedExecute(const String& declaration = String::EMPTY);
-    /// Create a script object.
-    asIScriptObject* CreateObject(const String& className);
+    /// Create a script object. Optionally search for the first class in the module that implements the specified interface.
+    asIScriptObject* CreateObject(const String& className, bool useInterface = false);
     /// Save the script bytecode. Return true if successful.
     bool SaveByteCode(Serializer& dest);
     

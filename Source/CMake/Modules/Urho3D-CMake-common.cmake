@@ -73,9 +73,14 @@ if (URHO3D_TESTING)
 else ()
     unset (URHO3D_TEST_TIME_OUT CACHE)
 endif ()
+# The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
 if (MSVC)
+    # On MSVC compiler, default to false (i.e. prefers Direct3D)
+    # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
     option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)")
 elseif (WIN32)
+    # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
+    # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
     option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" TRUE)
 endif ()
 cmake_dependent_option (URHO3D_MKLINK "Use mklink command to create symbolic links (Windows Vista and above only)" FALSE "WIN32" FALSE)
@@ -149,23 +154,15 @@ if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
 endif ()
 
-# If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
-# with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
-# enabled, but Windows graphics card drivers are usually better optimized for Direct3D. Direct3D can
-# be manually enabled for MinGW with -DURHO3D_OPENGL=0, but is likely to fail due to missing headers
-# and libraries, unless the MinGW-w64 distribution is used.
-if (NOT MSVC)
-    if (NOT WIN32 OR NOT DEFINED URHO3D_OPENGL)
-        set (URHO3D_OPENGL 1)
-    endif ()
-endif ()
-if (URHO3D_OPENGL)
-    add_definitions (-DURHO3D_OPENGL)
-endif ()
-
-# If not on Windows, enable Unix mode for kNet library.
+# If not on Windows platform, enable Unix mode for kNet library and OpenGL graphic back-end
 if (NOT WIN32)
     add_definitions (-DUNIX)
+    set (URHO3D_OPENGL 1)
+endif ()
+
+# Add definition for OpenGL
+if (URHO3D_OPENGL)
+    add_definitions (-DURHO3D_OPENGL)
 endif ()
 
 # Add definitions for GLEW
@@ -242,7 +239,7 @@ endif ()
 # Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
 # without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
 # incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
-if (MSVC)
+if (WIN32 AND NOT URHO3D_OPENGL)
     find_package (Direct3D)
     if (DIRECT3D_FOUND)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
@@ -788,7 +785,7 @@ macro (define_dependency_libs TARGET)
                 list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
             else ()
                 # If SDK not found, assume the libraries are found from default directories
-                list (APPEND LINK_LIBS_ONLY ${DIRECT3D_LIBRARIES})
+                list (APPEND LINK_LIBS_ONLY d3d9 d3dcompiler)
             endif ()
         endif ()
 

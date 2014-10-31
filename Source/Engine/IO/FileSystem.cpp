@@ -35,6 +35,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #ifndef _MSC_VER
@@ -44,11 +45,13 @@
 #include <shellapi.h>
 #include <direct.h>
 #include <shlobj.h>
+#include <sys/types.h>
+#include <sys/utime.h>
 #else
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/stat.h>
+#include <utime.h>
 #include <sys/wait.h>
 #define MAX_PATH 256
 #endif
@@ -534,15 +537,9 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
         return 0;
 
     #ifdef WIN32
-    WIN32_FILE_ATTRIBUTE_DATA fileAttrData;
-    memset(&fileAttrData, 0, sizeof fileAttrData);
-    if (GetFileAttributesExW(WString(fileName).CString(), GetFileExInfoStandard, &fileAttrData))
-    {
-        ULARGE_INTEGER ull;
-        ull.LowPart = fileAttrData.ftLastWriteTime.dwLowDateTime;
-        ull.HighPart = fileAttrData.ftLastWriteTime.dwHighDateTime;
-        return (unsigned)(ull.QuadPart / 10000000ULL - 11644473600ULL);
-    }
+    struct _stat st;
+    if (!_stat(fileName.CString(), &st))
+        return (unsigned)st.st_mtime;
     else
         return 0;
     #else
@@ -719,6 +716,30 @@ void FileSystem::RegisterPath(const String& pathName)
         return;
 
     allowedPaths_.Insert(AddTrailingSlash(pathName));
+}
+
+bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
+{
+    if (fileName.Empty() || !CheckAccess(fileName))
+        return false;
+
+    #ifdef WIN32
+    struct _stat oldTime;
+    struct _utimbuf newTimes;
+    if (_stat(fileName.CString(), &oldTime) != 0)
+        return false;
+    newTimes.actime = oldTime.st_atime;
+    newTimes.modtime = newTime;
+    return _utime(fileName.CString(), &newTimes) == 0;
+    #else
+    struct stat oldTime;
+    struct utimbuf newTimes;
+    if (stat(fileName.CString(), &oldTime) != 0)
+        return false;
+    newTimes.actime = oldTime.st_atime;
+    newTimes.modtime = newTime;
+    return utime(fileName.CString(), &newTimes) == 0;
+    #endif
 }
 
 void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,

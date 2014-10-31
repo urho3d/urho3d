@@ -7,8 +7,9 @@ class Time : public Object
     float GetTimeStep() const;
     unsigned GetTimerPeriod() const;
     float GetElapsedTime();
-    
+
     static unsigned GetSystemTime();
+    static unsigned GetTimeSinceEpoch();
     static String GetTimeStamp();
     static void Sleep(unsigned mSec);
     

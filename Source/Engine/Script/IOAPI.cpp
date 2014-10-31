@@ -333,6 +333,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     RegisterObject<FileSystem>(engine, "FileSystem");
     engine->RegisterObjectMethod("FileSystem", "bool FileExists(const String&in) const", asMETHOD(FileSystem, FileExists), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "bool DirExists(const String&in) const", asMETHOD(FileSystem, DirExists), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool SetLastModifiedTime(const String&in, uint)", asMETHOD(FileSystem, SetLastModifiedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "uint GetLastModifiedTime(const String&in) const", asMETHOD(FileSystem, GetLastModifiedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "Array<String>@ ScanDir(const String&in, const String&in, uint, bool) const", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);

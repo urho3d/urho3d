@@ -382,6 +382,8 @@ public:
 
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
+    /// Window was moved through user interaction. Called by Input subsystem.
+    void WindowMoved();
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -468,6 +470,8 @@ private:
     int width_;
     /// Window height.
     int height_;
+    /// Window position.
+    IntVector2 position_;
     /// Multisampling mode.
     int multiSample_;
     /// Fullscreen flag.

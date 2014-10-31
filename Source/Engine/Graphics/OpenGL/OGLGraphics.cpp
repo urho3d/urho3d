@@ -222,6 +222,7 @@ Graphics::Graphics(Context* context_) :
     externalWindow_(0),
     width_(0),
     height_(0),
+    position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
     multiSample_(1),
     fullscreen_(false),
     borderless_(false),
@@ -297,6 +298,8 @@ void Graphics::SetWindowPosition(const IntVector2& position)
 {
     if (impl_->window_)
         SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
+    else
+        position_ = position; // Sets as initial position for future window creation
 }
 
 void Graphics::SetWindowPosition(int x, int y)
@@ -420,8 +423,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
         
-        int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
-        int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+        int x = fullscreen ? 0 : position_.x_;
+        int y = fullscreen ? 0 : position_.y_;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
@@ -541,6 +544,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     multiSample_ = multiSample;
     
     SDL_GetWindowSize(impl_->window_, &width_, &height_);
+    SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
@@ -1981,12 +1985,9 @@ bool Graphics::IsDeviceLost() const
 
 IntVector2 Graphics::GetWindowPosition() const
 {
-    IntVector2 ret(IntVector2::ZERO);
-    
     if (impl_->window_)
-        SDL_GetWindowPosition(impl_->window_, &ret.x_, &ret.y_);
-    
-    return ret;
+        return position_;
+    return IntVector2::ZERO;
 }
 
 PODVector<IntVector2> Graphics::GetResolutions() const
@@ -2189,6 +2190,30 @@ void Graphics::WindowResized()
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
+}
+
+void Graphics::WindowMoved()
+{
+    if (!impl_->window_)
+        return;
+
+    int newX, newY;
+
+    SDL_GetWindowPosition(impl_->window_, &newX, &newY);
+    if (newX == position_.x_ && newY == position_.y_)
+        return;
+
+    position_.x_ = newX;
+    position_.y_ = newY;
+
+    LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+
+    using namespace WindowPos;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_X] = position_.x_;
+    eventData[P_Y] = position_.y_;
+    SendEvent(E_WINDOWPOS, eventData);
 }
 
 void Graphics::AddGPUObject(GPUObject* object)

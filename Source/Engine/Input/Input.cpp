@@ -1486,6 +1486,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
             case SDL_WINDOWEVENT_RESIZED:
                 graphics_->WindowResized();
                 break;
+            case SDL_WINDOWEVENT_MOVED:
+                graphics_->WindowMoved();
+                break;
             }
         }
         break;

@@ -380,7 +380,7 @@ void ScriptFile::ClearDelayedExecute(const String& declaration)
         }
     }
 }
-asIScriptObject* ScriptFile::CreateObject(const String& className)
+asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInterface)
 {
     PROFILE(CreateObject);
     
@@ -388,8 +388,29 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
         return 0;
     
     asIScriptContext* context = script_->GetScriptFileContext();
-    asIScriptEngine* engine = script_->GetScriptEngine();
-    asIObjectType *type = engine->GetObjectTypeById(scriptModule_->GetTypeIdByDecl(className.CString()));
+    asIObjectType* type = 0;
+    if (useInterface)
+    {
+        asIObjectType* interfaceType = scriptModule_->GetObjectTypeByDecl(className.CString());
+
+        if (!interfaceType)
+            return 0;
+
+        for (unsigned i = 0; i < scriptModule_->GetObjectTypeCount(); ++i)
+        {
+            asIObjectType* t = scriptModule_->GetObjectTypeByIndex(i);
+            if (t->Implements(interfaceType))
+            {
+                type = t;
+                break;
+            }
+        }
+    }
+    else
+    {
+       type = scriptModule_->GetObjectTypeByDecl(className.CString());
+    }
+
     if (!type)
         return 0;
     
@@ -400,26 +421,20 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
         found = i->second_;
     else
     {
-        unsigned numInterfaces = type->GetInterfaceCount();
-        for (unsigned j = 0; j < numInterfaces; ++j)
-        {
-            asIObjectType* interfaceType = type->GetInterface(j);
-            if (!strcmp(interfaceType->GetName(), "ScriptObject"))
-            {
-                found = true;
-                break;
-            }
-        }
+        asIObjectType* scriptObjectType = scriptModule_->GetObjectTypeByDecl("ScriptObject");
+
+        found = type->Implements(scriptObjectType);
         validClasses_[type] = found;
     }
+    
     if (!found)
     {
-        LOGERROR("Script class " + className + " does not implement the ScriptObject interface");
+        LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
         return 0;
     }
     
     // Get the factory function id from the object type
-    String factoryName = className + "@ " + className + "()";
+    String factoryName = String(type->GetName()) + "@ " + type->GetName() + "()";
     asIScriptFunction* factory = type->GetFactoryByDecl(factoryName.CString());
     if (!factory || context->Prepare(factory) < 0 || context->Execute() < 0)
         return 0;

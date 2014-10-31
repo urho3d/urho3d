@@ -37,6 +37,13 @@ EVENT(E_SCREENMODE, ScreenMode)
     PARAM(P_BORDERLESS, Borderless);        // bool
 }
 
+/// Window position changed.
+EVENT(E_WINDOWPOS, WindowPos)
+{
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+}
+
 /// Graphics features checked.
 EVENT(E_GRAPHICSFEATURES, GraphicsFeatures)
 {
