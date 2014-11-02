@@ -646,6 +646,9 @@ const Vector<UIElement*> UI::GetDragElements()
 UIElement* UI::GetDragElement(unsigned index)
 {
     GetDragElements();
+    if (index >= dragElementsConfirmed_.Size())
+        return (UIElement*)0;
+        
     return dragElementsConfirmed_[index];
 }
 
