@@ -438,9 +438,9 @@ public:
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
     /// Return the drag button combo if this element is being dragged.
-    const int GetDragButtonCombo() { return dragButtonCombo_; }
+    int GetDragButtonCombo() const { return dragButtonCombo_; }
     /// Return the number of buttons dragging this element.
-    const unsigned GetDragButtonCount() { return dragButtonCount_; }
+    unsigned GetDragButtonCount() const { return dragButtonCount_; }
 
     /// Convert screen coordinates to element coordinates.
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
