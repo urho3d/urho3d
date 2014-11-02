@@ -53,7 +53,11 @@ ScrollView::ScrollView(Context* context) :
     scrollDeceleration_(30.0f),
     scrollSnapEpsilon_(M_EPSILON),
     scrollTouchDown_(false),
-    barScrolling_(false)
+    barScrolling_(false),
+    scrollChildrenDisable_(false),
+    autoDisableChildren_(false),
+    autoDisableThreshold_(25.0f),
+    touchDistanceSum_(0.0f)
 {
     clipChildren_ = true;
     SetEnabled(true);
@@ -100,6 +104,8 @@ void ScrollView::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_BOOL, "Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Deceleration", GetScrollDeceleration, SetScrollDeceleration, float, 30.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollView, VAR_BOOL, "Auto Disable Children", GetAutoDisableChildren, SetAutoDisableChildren, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Auto Disable Threshold", GetAutoDisableThreshold, SetAutoDisableThreshold, float, 25.0f, AM_FILE);
 }
 
 void ScrollView::Update(float timeStep)
@@ -518,11 +524,21 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
         // Take new scrolling speed if it's faster than the current accumulated value
         float dX = (float)-eventData[P_DX].GetInt();
         float dY = (float)-eventData[P_DY].GetInt();
+
         if (Abs(dX) > Abs(touchScrollSpeed_.x_))
             touchScrollSpeed_.x_ = dX;
         if (Abs(dY) > Abs(touchScrollSpeed_.y_))
             touchScrollSpeed_.y_ = dY;
 
+        // Auto disable children
+        touchDistanceSum_ += dX * dX + dY * dY;
+        if (touchDistanceSum_ >= autoDisableThreshold_)
+            if (visible_ && autoDisableChildren_ && !scrollChildrenDisable_)
+            {
+                scrollChildrenDisable_ = true;
+                scrollPanel_->SetDeepEnabled(false);
+            }
+            
         touchScrollSpeedMax_.x_ = dX;
         touchScrollSpeedMax_.y_ = dY;
     }
@@ -546,6 +562,14 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     else if (eventType == E_TOUCHEND)
     {
         // 'Flick' action
+        // Release any auto disabled children
+        if (scrollChildrenDisable_)
+        {
+            touchDistanceSum_ = 0.0f;
+            scrollChildrenDisable_ = false;
+            scrollPanel_->ResetDeepEnabled();
+        }
+
         barScrolling_ = false;
         scrollTouchDown_ = false;
         if (Abs(touchScrollSpeedMax_.x_) > scrollSnapEpsilon_ )
