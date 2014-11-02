@@ -118,27 +118,37 @@ void ScrollView::Update(float timeStep)
         return;
     }
 
-    UIElement* dragElement = GetSubsystem<UI>()->GetDragElement();
-    if (dragElement)
+    if (GetSubsystem<UI>()->IsDragging())
     {
-        UIElement* dragParent = dragElement->GetParent();
-        bool dragElementIsChild = false;
+        Vector<UIElement*> dragElements = GetSubsystem<UI>()->GetDragElements();
 
-        while (dragParent)
+        for (unsigned i = 0; i< dragElements.Size(); i++)
         {
-            if (dragParent == this)
+            UIElement* dragElement = dragElements[i];
+            int dragButtons = dragElement->GetDragButtonCombo();
+
+            if (dragButtons != MOUSEB_LEFT)
+                continue;
+
+            UIElement* dragParent = dragElement->GetParent();
+            bool dragElementIsChild = false;
+
+            while (dragParent)
             {
-                dragElementIsChild = true;
-                break;
+                if (dragParent == this)
+                {
+                    dragElementIsChild = true;
+                    break;
+                }
+                dragParent = dragParent->GetParent();
             }
-            dragParent = dragParent->GetParent();
-        }
 
-        if (!dragElementIsChild || dragElement == horizontalScrollBar_->GetSlider() || dragElement == verticalScrollBar_->GetSlider())
-        {
-            touchScrollSpeed_ = Vector2::ZERO;
-            touchScrollSpeedMax_ = Vector2::ZERO;
-            return;
+            if (!dragElementIsChild || dragElement == horizontalScrollBar_->GetSlider() || dragElement == verticalScrollBar_->GetSlider())
+            {
+                touchScrollSpeed_ = Vector2::ZERO;
+                touchScrollSpeedMax_ = Vector2::ZERO;
+                return;
+            }
         }
     }
 

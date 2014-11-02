@@ -148,7 +148,9 @@ UIElement::UIElement(Context* context) :
     sortOrderDirty_(false),
     colorGradient_(false),
     traversalMode_(TM_BREADTH_FIRST),
-    elementEventSender_(false)
+    elementEventSender_(false),
+    dragButtonCombo_(0),
+    dragButtonCount_(0)
 {
     SetEnabled(false);
 }
@@ -499,14 +501,25 @@ void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& scre
 
 void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
+    dragButtonCombo_ = buttons;
+    UI* ui = GetSubsystem<UI>();
+    dragButtonCount_ = ui->GetNumDragButtons(dragButtonCombo_);
 }
 
-void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
+void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
 {
+    dragButtonCombo_ = 0;
+    dragButtonCount_ = 0;
+}
+
+void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+{
+    dragButtonCombo_ = 0;
+    dragButtonCount_ = 0;
 }
 
 bool UIElement::OnDragDropTest(UIElement* source)

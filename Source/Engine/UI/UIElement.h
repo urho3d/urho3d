@@ -156,9 +156,11 @@ public:
     /// React to mouse drag begin.
     virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
-    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag end.
-    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
+    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
+    /// React to a mouse drag cancel event (ie, when an extra button is pressed)
+    virtual void OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
     virtual bool OnDragDropTest(UIElement* source);
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
@@ -435,6 +437,10 @@ public:
     const Variant& GetVar(const StringHash& key) const;
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
+    /// Return the drag button combo if this element is being dragged.
+    const int GetDragButtonCombo() { return dragButtonCombo_; }
+    /// Return the number of buttons dragging this element.
+    const unsigned GetDragButtonCount() { return dragButtonCount_; }
 
     /// Convert screen coordinates to element coordinates.
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
@@ -559,6 +565,10 @@ protected:
     mutable bool positionDirty_;
     /// Applied style.
     String appliedStyle_;
+    /// Drag button combo.
+    int dragButtonCombo_;
+    /// Drag button count.
+    unsigned dragButtonCount_;
 
 private:
     /// Return child elements recursively.

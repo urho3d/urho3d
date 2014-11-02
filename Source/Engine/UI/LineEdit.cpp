@@ -135,10 +135,12 @@ void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& scree
 
 void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
+    UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
+    
     dragBeginCursor_ = GetCharIndex(position);
 }
 
-void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
 {
     if (cursorMovable_ && textSelectable_)
     {
