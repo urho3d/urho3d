@@ -25,6 +25,7 @@
 #include "HashSet.h"
 #include "Mutex.h"
 #include "Node.h"
+#include "Ptr.h"
 #include "SceneResolver.h"
 #include "XMLElement.h"
 
@@ -33,6 +34,7 @@ namespace Urho3D
 
 class File;
 class PackageFile;
+class Camera;
 
 static const unsigned FIRST_REPLICATED_ID = 0x1;
 static const unsigned LAST_REPLICATED_ID = 0xffffff;
@@ -130,6 +132,8 @@ public:
     void SetSnapThreshold(float threshold);
     /// Set maximum milliseconds per frame to spend on async scene loading.
     void SetAsyncLoadingMs(int ms);
+    /// Set default camera. This has no impact on functionality but provides a helper method for accessing it.
+    void SetDefaultCamera(Camera* camera);
     /// Add a required package file for networking. To be called on the server.
     void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files.
@@ -167,6 +171,8 @@ public:
     float GetSnapThreshold() const { return snapThreshold_; }
     /// Return maximum milliseconds per frame to spend on async loading.
     int GetAsyncLoadingMs() const { return asyncLoadingMs_; }
+    /// Return the default camera associated with this scene.
+    Camera* GetDefaultCamera() const;
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return a node user variable name, or empty if not registered.
@@ -281,6 +287,8 @@ private:
     bool asyncLoading_;
     /// Threaded update flag.
     bool threadedUpdate_;
+    /// Default Camera.
+    WeakPtr<Camera> defaultCamera_;
 };
 
 /// Register Scene library objects.

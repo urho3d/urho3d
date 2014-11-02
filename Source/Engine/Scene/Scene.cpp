@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Camera.h"
 #include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
@@ -1215,6 +1216,22 @@ void Scene::PreloadResourcesXML(const XMLElement& element)
         PreloadResourcesXML(childElem);
         childElem = childElem.GetNext("node");
     }
+}
+
+void Scene::SetDefaultCamera(Camera* camera)
+{
+    if (camera)
+    {
+        defaultCamera_ = camera;
+    }
+}
+
+Camera* Scene::GetDefaultCamera() const
+{
+    if (defaultCamera_)
+        return defaultCamera_.Get();
+
+    return NULL;
 }
 
 void RegisterSceneLibrary(Context* context)

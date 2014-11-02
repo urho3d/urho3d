@@ -120,6 +120,8 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "Frustum get_viewSpaceFrustum() const", asMETHOD(Camera, GetViewSpaceFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Matrix3x4 get_effectiveWorldTransform() const", asMETHOD(Camera, GetEffectiveWorldTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_defaultCamera(Camera@+)", asMETHOD(Scene, SetDefaultCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Camera@+ get_defaultCamera() const", asMETHOD(Scene, GetDefaultCamera), asCALL_THISCALL);
 }
 
 static Node* BoneGetNode(Bone* ptr)
