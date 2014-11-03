@@ -3806,6 +3806,7 @@ Methods:
 - void UpdateCollisions()
 - void SetFps(int fps)
 - void SetGravity(Vector3 gravity)
+- void SetMaxSubSteps(int num)
 - void SetNumIterations(int num)
 - void SetInterpolation(bool enable)
 - void SetInternalEdge(bool enable)
@@ -3821,6 +3822,7 @@ Methods:
 - void DrawDebugGeometry(bool depthTest)
 - void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const
+- int GetMaxSubSteps() const
 - int GetNumIterations() const
 - bool GetInterpolation() const
 - bool GetInternalEdge() const
@@ -3831,6 +3833,7 @@ Methods:
 Properties:
 
 - Vector3 gravity
+- int maxSubSteps
 - int numIterations
 - bool interpolation
 - bool internalEdge

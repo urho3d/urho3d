@@ -1360,6 +1360,7 @@ namespace Urho3D
 ### PhysicsWorld
 - %Gravity : Vector3
 - %Physics %FPS : int
+- %Max %Substeps : int
 - %Solver %Iterations : int
 - %Net %Max %Angular %Vel. : float
 - %Interpolation : bool
@@ -7899,6 +7900,7 @@ Properties:
 - uint id // readonly
 - bool internalEdge
 - bool interpolation
+- int maxSubSteps
 - Node@ node // readonly
 - uint numAttributes // readonly
 - int numIterations

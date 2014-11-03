@@ -6653,6 +6653,7 @@ Vector3 gravity;
 uint id;
 bool internalEdge;
 bool interpolation;
+int maxSubSteps;
 /* readonly */
 Node node;
 /* readonly */
