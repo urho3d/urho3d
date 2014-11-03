@@ -55,7 +55,7 @@
 #include "Window.h"
 #include "View3D.h"
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #include "DebugNew.h"
 

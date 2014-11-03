@@ -55,7 +55,7 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 namespace Urho3D
 {

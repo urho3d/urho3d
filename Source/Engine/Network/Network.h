@@ -27,8 +27,7 @@
 #include "Object.h"
 #include "VectorBuffer.h"
 
-#include <kNet/IMessageHandler.h>
-#include <kNet/INetworkServerListener.h>
+#include <kNet/kNet.h>
 
 namespace Urho3D
 {

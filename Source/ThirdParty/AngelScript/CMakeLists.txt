@@ -6,7 +6,7 @@ file (GLOB CPP_FILES
     source/*.cpp
 )
 file (GLOB H_FILES
-    include/*.h source/*.h
+    include/AngelScript/*.h source/*.h
 )
 
 if (IOS OR ANDROID OR RASPI)
@@ -30,11 +30,13 @@ endif ()
 set (SOURCE_FILES ${CPP_FILES} ${ASM_FILES} ${H_FILES})
 
 # Install dependency for Engine/Script/APITemplates.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/AngelScript ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
+install (DIRECTORY include/AngelScript/ DESTINATION ${DEST_INCLUDE_DIR}/AngelScript ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h) # Note: the trailing slash is significant
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} AngelScript PARENT_SCOPE)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} include)
+# Define some more includes for the library to build (Not required by Urho3D).
+set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} include/AngelScript)
 
 # Setup target
 setup_library ()
