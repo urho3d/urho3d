@@ -7968,6 +7968,8 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+bool autoDisableChildren;
+float autoDisableThreshold;
 /* readonly */
 StringHash baseType;
 bool bringToBack;

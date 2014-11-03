@@ -4704,6 +4704,8 @@ Methods:
 - void SetPageStep(float step)
 - void SetScrollDeceleration(float deceleration)
 - void SetScrollSnapEpsilon(float snap)
+- void SetAutoDisableChildren(bool disable)
+- void SetAutoDisableThreshold(float amount)
 - const IntVector2& GetViewPosition() const
 - UIElement* GetContentElement() const
 - ScrollBar* GetHorizontalScrollBar() const
@@ -4714,6 +4716,8 @@ Methods:
 - float GetPageStep() const
 - float GetScrollDeceleration() const
 - float GetScrollSnapEpsilon() const
+- bool GetAutoDisableChildren() const
+- float GetAutoDisableThreshold() const
 
 Properties:
 

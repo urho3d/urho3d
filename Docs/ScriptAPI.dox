@@ -1226,6 +1226,8 @@ namespace Urho3D
 - %Auto %Show/Hide %Scrollbars : bool
 - %Scroll %Deceleration : float
 - %Scroll %Snap %Epsilon : float
+- %Auto %Disable %Children : bool
+- %Auto %Disable %Threshold : float
 - %Highlight %Mode : int
 - %Multiselect : bool
 - %Hierarchy %Mode : bool
@@ -1517,6 +1519,8 @@ namespace Urho3D
 - %Auto %Show/Hide %Scrollbars : bool
 - %Scroll %Deceleration : float
 - %Scroll %Snap %Epsilon : float
+- %Auto %Disable %Children : bool
+- %Auto %Disable %Threshold : float
 
 ### Skybox
 - %Is %Enabled : bool
@@ -9083,6 +9087,8 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- bool autoDisableChildren
+- float autoDisableThreshold
 - StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
