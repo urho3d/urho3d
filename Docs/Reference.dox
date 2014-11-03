@@ -1529,7 +1529,7 @@ Urho3D implements rigid body physics simulation using the Bullet library.
 
 To use, a PhysicsWorld component must first be created to the Scene.
 
-The physics simulation has its own fixed update rate, which by default is 60Hz. When the rendering framerate is higher than the physics update rate, physics motion is interpolated so that it always appears smooth. The update rate can be changed with \ref PhysicsWorld::SetFps "SetFps()" function. The physics update rate also determines the frequency of fixed timestep scene logic updates.
+The physics simulation has its own fixed update rate, which by default is 60Hz. When the rendering framerate is higher than the physics update rate, physics motion is interpolated so that it always appears smooth. The update rate can be changed with \ref PhysicsWorld::SetFps "SetFps()" function. The physics update rate also determines the frequency of fixed timestep scene logic updates. Hard limit for physics steps per frame or adaptive timestep can be configured with \ref PhysicsWorld::SetMaxSubSteps "SetMaxSubSteps()" function. These can help to prevent a "spiral of death" due to the CPU being unable to handle the physics load. However, note that using either can lead to time slowing down (when steps are limited) or inconsistent physics behavior (when using adaptive step.)
 
 The other physics components are:
 
