@@ -1128,6 +1128,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void set_parent(UIElement@+)", asFUNCTION(UIElementSetParent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "UIElement@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_root() const", asMETHOD(T, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_dragButtonCount() const", asMETHOD(T, GetDragButtonCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_dragButtonCombo() const", asMETHOD(T, GetDragButtonCombo), asCALL_THISCALL);
     if (!isSprite)
     {
         engine->RegisterObjectMethod(className, "const IntVector2& get_screenPosition()", asMETHOD(T, GetScreenPosition), asCALL_THISCALL);

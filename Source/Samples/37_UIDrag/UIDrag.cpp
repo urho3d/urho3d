@@ -192,10 +192,8 @@ void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
     int ly = eventData[P_Y].GetInt();
 
     IntVector2 p = element->GetPosition();
-    element->SetVar("STARTX", p.x_);
-    element->SetVar("STARTY", p.y_);
-    element->SetVar("DX", p.x_ - lx);
-    element->SetVar("DY", p.y_ - ly);
+    element->SetVar("START", p);
+    element->SetVar("DELTA", IntVector2(p.x_ - lx, p.y_ - ly));
 
     int buttons = eventData[P_BUTTONS].GetInt();
     element->SetVar("BUTTONS", buttons);
@@ -212,8 +210,9 @@ void UIDrag::HandleDragMove(StringHash eventType, VariantMap& eventData)
     using namespace DragBegin;
     Button* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
     int buttons = eventData[P_BUTTONS].GetInt();
-    int X = eventData[P_X].GetInt() + element->GetVar("DX").GetInt();
-    int Y = eventData[P_Y].GetInt() + element->GetVar("DY").GetInt();
+    IntVector2 d = element->GetVar("DELTA").GetIntVector2();
+    int X = eventData[P_X].GetInt() + d.x_;
+    int Y = eventData[P_Y].GetInt() + d.y_;
     int BUTTONS = element->GetVar("BUTTONS").GetInt();
 
     Text* t = (Text*)element->GetChild(String("Event Touch"));
@@ -227,9 +226,8 @@ void UIDrag::HandleDragCancel(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
     Button* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
-    int X = element->GetVar("STARTX").GetInt();
-    int Y = element->GetVar("STARTY").GetInt();
-    element->SetPosition(IntVector2(X, Y));
+    IntVector2 P = element->GetVar("START").GetIntVector2();
+    element->SetPosition(P);
 }
 
 void UIDrag::HandleDragEnd(StringHash eventType, VariantMap& eventData)
