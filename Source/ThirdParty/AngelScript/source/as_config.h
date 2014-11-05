@@ -1164,7 +1164,8 @@
 // Usually where the variables are only used in debug mode.
 #define UNUSED_VAR(x) (void)(x)
 
-#include "../include/angelscript.h"
+// Urho3D: Changed this include to match our SDK-compatible inclusion scheme.
+#include "AngelScript/angelscript.h"
 #include "as_memory.h"
 
 #ifdef AS_USE_NAMESPACE

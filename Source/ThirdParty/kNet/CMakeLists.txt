@@ -17,11 +17,11 @@
 set (TARGET_NAME kNet)
 
 file (GLOB kNetSourceFiles ./src/*.cpp)
-file (GLOB kNetHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/*.inl)
+file (GLOB kNetHeaderFiles ./include/kNet/*.h ./include/kNet/kNet/*.h ./include/kNet/kNet/*.inl)
 
 if (WIN32)
    file (GLOB kNetWin32SourceFiles ./src/win32/*.cpp)
-   file (GLOB kNetWin32HeaderFiles ./include/kNet/win32/*.h)
+   file (GLOB kNetWin32HeaderFiles ./include/kNet/kNet/win32/*.h)
 
    if (USE_BOOST)
       list (REMOVE_ITEM kNetWin32SourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/win32/W32Thread.cpp)
@@ -36,7 +36,7 @@ if (WIN32)
 elseif (UNIX)
    list (REMOVE_ITEM kNetSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/Clock.cpp)
    file (GLOB kNetUnixSourceFiles ./src/unix/*.cpp)
-   file (GLOB kNetUnixHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/unix/*.h)
+   file (GLOB kNetUnixHeaderFiles ./include/kNet/*.h ./include/kNet/kNet/*.h ./include/kNet/kNet/unix/*.h)
 
    if (USE_BOOST)
       list (REMOVE_ITEM kNetUnixSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
@@ -59,11 +59,13 @@ endif ()
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 # Install dependency for Engine/Network/Connection.h and Engine/Network/Network.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
+install (DIRECTORY include/kNet/ DESTINATION ${DEST_INCLUDE_DIR}/kNet ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} kNet PARENT_SCOPE)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} include)
+# kNet needs pointers to the headers to build properly (Not required by Urho3D).
+set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} include/kNet include/kNet/kNet)
 
 # Setup target
 setup_library ()
