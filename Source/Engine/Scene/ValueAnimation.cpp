@@ -287,7 +287,7 @@ void ValueAnimation::GetEventFrames(float beginTime, float endTime, PODVector<co
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {
         const VAnimEventFrame& eventFrame = eventFrames_[i];
-        if (eventFrame.time_ >= endTime)
+        if (eventFrame.time_ > endTime)
             break;
 
         if (eventFrame.time_ >= beginTime)
