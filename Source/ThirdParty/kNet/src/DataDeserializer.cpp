@@ -19,10 +19,10 @@
 #include <cstring>
 #include <cmath>
 
-#include "kNet/DebugMemoryLeakCheck.h"
+#include "DebugMemoryLeakCheck.h"
 
-#include "kNet/DataDeserializer.h"
-#include "kNet/NetException.h"
+#include "DataDeserializer.h"
+#include "NetException.h"
 
 using namespace std;
 

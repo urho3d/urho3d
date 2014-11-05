@@ -265,23 +265,15 @@ void AnimationState::AddTime(float delta)
     // Process animation triggers
     if (animation_->GetNumTriggers())
     {
-        bool wrap = false;
-        
         if (delta > 0.0f)
         {
             if (oldTime > time)
-            {
                 oldTime -= length;
-                wrap = true;
-            }
         }
         if (delta < 0.0f)
         {
             if (time > oldTime)
-            {
                 time -= length;
-                wrap = true;
-            }
         }
         if (oldTime > time)
             Swap(oldTime, time);
@@ -289,11 +281,7 @@ void AnimationState::AddTime(float delta)
         const Vector<AnimationTriggerPoint>& triggers = animation_->GetTriggers();
         for (Vector<AnimationTriggerPoint>::ConstIterator i = triggers.Begin(); i != triggers.End(); ++i)
         {
-            float frameTime = i->time_;
-            if (looped_ && wrap)
-                frameTime = fmodf(frameTime, length);
-            
-            if (oldTime <= frameTime && time > frameTime)
+            if (oldTime <= i->time_ && time > i->time_)
             {
                 using namespace AnimationTrigger;
                 

@@ -19,10 +19,10 @@
 #include <sstream>
 #include <cmath>
 
-#include "kNet/DebugMemoryLeakCheck.h"
+#include "DebugMemoryLeakCheck.h"
 
-#include "kNet/DataSerializer.h"
-#include "kNet/BitOps.h"
+#include "DataSerializer.h"
+#include "BitOps.h"
 
 namespace kNet
 {

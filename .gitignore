@@ -3,6 +3,7 @@ Build/
 *-Build/
 
 # Output directories
+TmpBuilds/
 Bin/*
 !Bin/**/
 !Bin/*.bat

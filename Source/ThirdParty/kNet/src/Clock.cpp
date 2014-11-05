@@ -31,9 +31,9 @@
 #include <emscripten.h>
 #endif
 
-#include "kNetBuildConfig.h"
-#include "kNet/Clock.h"
-#include "kNet/NetworkLogging.h"
+#include "../kNetBuildConfig.h"
+#include "Clock.h"
+#include "NetworkLogging.h"
 
 namespace kNet
 {

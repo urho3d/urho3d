@@ -27,7 +27,7 @@
 #include "Polyhedron.h"
 #include "Ray.h"
 
-#include <angelscript.h>
+#include <AngelScript/angelscript.h>
 
 namespace Urho3D
 {

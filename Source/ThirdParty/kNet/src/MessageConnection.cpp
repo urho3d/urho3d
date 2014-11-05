@@ -22,23 +22,22 @@
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
-#include "kNet/Allocator.h"
-
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/MessageConnection.h"
-#include "kNet/PolledTimer.h"
-#include "kNet/Sort.h"
-#include "kNet/BitOps.h"
-#include "kNet/Network.h"
-#include "kNet/NetworkLogging.h"
-#include "kNet/DataSerializer.h"
-#include "kNet/DataDeserializer.h"
-#include "kNet/VLEPacker.h"
-#include "kNet/FragmentedTransferManager.h"
-#include "kNet/NetworkServer.h"
-#include "kNet/Clock.h"
-#include "kNet/NetworkWorkerThread.h"
+   
+#include "Allocator.h"
+#include "DebugMemoryLeakCheck.h"
+#include "MessageConnection.h"
+#include "PolledTimer.h"
+#include "Sort.h"
+#include "BitOps.h"
+#include "Network.h"
+#include "NetworkLogging.h"
+#include "DataSerializer.h"
+#include "DataDeserializer.h"
+#include "VLEPacker.h"
+#include "FragmentedTransferManager.h"
+#include "NetworkServer.h"
+#include "Clock.h"
+#include "NetworkWorkerThread.h"
 
 using namespace std;
 

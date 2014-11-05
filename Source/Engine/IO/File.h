@@ -28,7 +28,7 @@
 #include "Object.h"
 
 #ifdef ANDROID
-#include <SDL_rwops.h>
+#include <SDL/SDL_rwops.h>
 #endif
 
 namespace Urho3D

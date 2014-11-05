@@ -24,9 +24,9 @@
 #include <errno.h>
 #include <string.h>
 
-#include "kNet/Event.h"
-#include "kNet/Types.h"
-#include "kNet/NetworkLogging.h"
+#include "Event.h"
+#include "Types.h"
+#include "NetworkLogging.h"
 
 namespace kNet
 {

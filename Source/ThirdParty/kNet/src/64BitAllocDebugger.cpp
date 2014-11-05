@@ -19,7 +19,7 @@
 	Idea and code taken from http://randomascii.wordpress.com/2012/02/14/64-bit-made-easy/ */
 
 #ifdef _WIN64
-#include "kNet/64BitAllocDebugger.h"
+#include "64BitAllocDebugger.h"
 #include <stdio.h>
 #include <windows.h>
 #include <vector>

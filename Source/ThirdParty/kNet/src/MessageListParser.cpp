@@ -22,12 +22,11 @@
 #include <cassert>
 #include <cstring>
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/NetworkLogging.h"
-#include "kNet/MessageListParser.h"
-#include "kNet/NetException.h"
-#include "kNet/Socket.h"
+#include "DebugMemoryLeakCheck.h"
+#include "NetworkLogging.h"
+#include "MessageListParser.h"
+#include "NetException.h"
+#include "Socket.h"
 
 #define NUMELEMS(x) (sizeof(x)/sizeof(x[0]))
 

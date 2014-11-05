@@ -17,9 +17,8 @@
 
 #include <cassert>
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/SerializedDataIterator.h"
+#include "DebugMemoryLeakCheck.h"
+#include "SerializedDataIterator.h"
 
 namespace kNet
 {

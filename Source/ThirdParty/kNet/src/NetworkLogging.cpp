@@ -27,11 +27,10 @@
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/NetworkLogging.h"
-#include "kNet/Lockable.h"
-#include "kNet/Clock.h"
+#include "DebugMemoryLeakCheck.h"
+#include "NetworkLogging.h"
+#include "Lockable.h"
+#include "Clock.h"
 
 #if defined(UNIX) || defined(ANDROID)
 #define _snprintf snprintf

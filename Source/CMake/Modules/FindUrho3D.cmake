@@ -66,7 +66,7 @@ if (URHO3D_HOME)
         foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI Urho2D)
             list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_SOURCE_TREE}/${DIR})     # Note: variable change to list context after this
         endforeach ()
-        set (DIRS Box2D Bullet/src SDL/include)
+        set (DIRS Box2D Bullet/src Bullet/src/Bullet SDL/include)
         if (URHO3D_NETWORK)
             list (APPEND DIRS kNet/include)
         endif ()

@@ -17,10 +17,10 @@
 
 #include <cassert>
 
-#include "kNet/DebugMemoryLeakCheck.h"
+#include "DebugMemoryLeakCheck.h"
 
-#include "kNet/EventArray.h"
-#include "kNet/NetworkLogging.h"
+#include "EventArray.h"
+#include "NetworkLogging.h"
 
 namespace kNet
 {

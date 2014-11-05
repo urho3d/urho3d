@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "../SDL_internal.h"
-#include "../../include/SDL_touch.h"
+#include "../../include/SDL/SDL_touch.h"
 
 #ifndef _SDL_touch_c_h
 #define _SDL_touch_c_h

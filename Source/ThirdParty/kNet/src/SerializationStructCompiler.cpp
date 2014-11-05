@@ -20,10 +20,9 @@
 #include <cassert>
 #include <cstring>
 
-#include "kNet/NetException.h"
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/SerializationStructCompiler.h"
+#include "NetException.h"
+#include "DebugMemoryLeakCheck.h"
+#include "SerializationStructCompiler.h"
 
 using namespace std;
 
@@ -46,8 +45,8 @@ void SerializationStructCompiler::WriteFilePreamble(std::ofstream &out)
 	// Write the preamble of the file.
 	out << "#pragma once" << endl
 	    << endl
-	    << "#include \"kNet/DataDeserializer.h\"" << endl
-	    << "#include \"kNet/DataSerializer.h\"" << endl
+	    << "#include \"DataDeserializer.h\"" << endl
+	    << "#include \"DataSerializer.h\"" << endl
 	    << endl;
 }
 

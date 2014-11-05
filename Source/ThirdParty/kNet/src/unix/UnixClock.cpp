@@ -22,8 +22,8 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "kNet/Clock.h"
-#include "kNet/NetworkLogging.h"
+#include "Clock.h"
+#include "NetworkLogging.h"
 
 namespace kNet
 {

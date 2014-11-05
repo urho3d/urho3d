@@ -22,22 +22,21 @@
 #include <cstdio>
 #include <sstream>
 
-#include "kNet/Allocator.h"
+#include "Allocator.h"
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
-#include "kNet/MessageConnection.h"
-#include "kNet/UDPMessageConnection.h"
-
-#include "kNet/NetworkLogging.h"
-#include "kNet/DataSerializer.h"
-#include "kNet/DataDeserializer.h"
-#include "kNet/VLEPacker.h"
-#include "kNet/NetException.h"
-#include "kNet/Network.h"
-#include "kNet/Sort.h"
+#include "DebugMemoryLeakCheck.h"
+#include "MessageConnection.h"
+#include "UDPMessageConnection.h"
+#include "NetworkLogging.h"
+#include "DataSerializer.h"
+#include "DataDeserializer.h"
+#include "VLEPacker.h"
+#include "NetException.h"
+#include "Network.h"
+#include "Sort.h"
 
 using namespace std;
 

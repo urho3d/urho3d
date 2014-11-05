@@ -21,16 +21,15 @@
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/Network.h"
-#include "kNet/NetworkServer.h"
-#include "kNet/TCPMessageConnection.h"
-#include "kNet/UDPMessageConnection.h"
-#include "kNet/Datagram.h"
-#include "kNet/NetworkWorkerThread.h"
-#include "kNet/NetworkLogging.h"
-#include "kNet/Clock.h"
+#include "DebugMemoryLeakCheck.h"
+#include "Network.h"
+#include "NetworkServer.h"
+#include "TCPMessageConnection.h"
+#include "UDPMessageConnection.h"
+#include "Datagram.h"
+#include "NetworkWorkerThread.h"
+#include "NetworkLogging.h"
+#include "Clock.h"
 
 #include <iostream>
 #include <sstream>

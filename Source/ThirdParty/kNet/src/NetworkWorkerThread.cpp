@@ -23,16 +23,14 @@
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/UDPMessageConnection.h"
-
-#include "kNet/NetworkWorkerThread.h"
-#include "kNet/NetworkLogging.h"
-#include "kNet/Event.h"
-#include "kNet/EventArray.h"
-#include "kNet/Clock.h"
-#include "kNet/Thread.h"
+#include "DebugMemoryLeakCheck.h"
+#include "UDPMessageConnection.h"
+#include "NetworkWorkerThread.h"
+#include "NetworkLogging.h"
+#include "Event.h"
+#include "EventArray.h"
+#include "Clock.h"
+#include "Thread.h"
 
 using namespace std;
 

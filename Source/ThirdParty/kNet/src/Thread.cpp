@@ -21,11 +21,11 @@
 
 #include <sstream>
 
-#include "kNet/DebugMemoryLeakCheck.h"
-#include "kNet/Event.h" ///\todo Investigate the inclusion chain of these two files. Is this #include necessary?
-#include "kNet/NetworkLogging.h"
-#include "kNet/Thread.h"
-#include "kNet/PolledTimer.h"
+#include "DebugMemoryLeakCheck.h"
+#include "Event.h" ///\todo Investigate the inclusion chain of these two files. Is this #include necessary?
+#include "NetworkLogging.h"
+#include "Thread.h"
+#include "PolledTimer.h"
 
 namespace kNet
 {

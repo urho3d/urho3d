@@ -21,11 +21,11 @@
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
+#include "DebugMemoryLeakCheck.h"
 
-#include "kNet/MessageConnection.h"
-#include "kNet/FragmentedTransferManager.h"
-#include "kNet/NetworkLogging.h"
+#include "MessageConnection.h"
+#include "FragmentedTransferManager.h"
+#include "NetworkLogging.h"
 
 
 using namespace std;

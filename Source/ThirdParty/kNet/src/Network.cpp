@@ -31,14 +31,12 @@
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/Network.h"
-
-#include "kNet/TCPMessageConnection.h"
-#include "kNet/UDPMessageConnection.h"
-#include "kNet/NetworkWorkerThread.h"
-#include "kNet/NetworkLogging.h"
+#include "DebugMemoryLeakCheck.h"
+#include "Network.h"
+#include "TCPMessageConnection.h"
+#include "UDPMessageConnection.h"
+#include "NetworkWorkerThread.h"
+#include "NetworkLogging.h"
 
 namespace kNet
 {

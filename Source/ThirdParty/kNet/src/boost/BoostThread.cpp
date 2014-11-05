@@ -22,15 +22,13 @@
 #include <boost/thread/thread.hpp>
 #endif
 
-#include "kNet/DebugMemoryLeakCheck.h"
-
-#include "kNet/Event.h"
-#include "kNet/Thread.h"
-
-#include "kNet/NetworkLogging.h"
-#include "kNet/Clock.h"
-#include "kNet/NetException.h"
-#include "kNet/PolledTimer.h"
+#include "DebugMemoryLeakCheck.h"
+#include "Event.h"
+#include "Thread.h"
+#include "NetworkLogging.h"
+#include "Clock.h"
+#include "NetException.h"
+#include "PolledTimer.h"
 
 namespace kNet
 {

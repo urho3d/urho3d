@@ -33,7 +33,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include <jo_jpeg.h>
-#include <SDL_surface.h>
+#include <SDL/SDL_surface.h>
 
 #include "DebugNew.h"
 

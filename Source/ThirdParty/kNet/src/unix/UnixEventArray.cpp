@@ -24,9 +24,9 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "kNet/EventArray.h"
-#include "kNet/Thread.h"
-#include "kNet/NetworkLogging.h"
+#include "EventArray.h"
+#include "Thread.h"
+#include "NetworkLogging.h"
 
 using namespace std;
 

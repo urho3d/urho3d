@@ -21,7 +21,7 @@
 
 #import "SDLUIAccelerationDelegate.h"
 /* needed for SDL_IPHONE_MAX_GFORCE macro */
-#import "../../../include/SDL_config_iphoneos.h"
+#import "../../../include/SDL/SDL_config_iphoneos.h"
 
 static SDLUIAccelerationDelegate *sharedDelegate=nil;
 

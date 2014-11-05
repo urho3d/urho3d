@@ -20,16 +20,15 @@
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
-#include "kNet/Allocator.h"
-
-#include "kNet/DebugMemoryLeakCheck.h"
-#include "kNet/TCPMessageConnection.h"
-#include "kNet/NetworkLogging.h"
-#include "kNet/DataSerializer.h"
-#include "kNet/DataDeserializer.h"
-#include "kNet/VLEPacker.h"
-#include "kNet/NetException.h"
-#include "kNet/Network.h"
+#include "Allocator.h"
+#include "DebugMemoryLeakCheck.h"
+#include "TCPMessageConnection.h"
+#include "NetworkLogging.h"
+#include "DataSerializer.h"
+#include "DataDeserializer.h"
+#include "VLEPacker.h"
+#include "NetException.h"
+#include "Network.h"
 
 namespace kNet
 {

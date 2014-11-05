@@ -18,13 +18,12 @@
 #include <cassert>
 #include <exception>
 
-#include "kNet/Thread.h"
-#include "kNet/NetworkLogging.h"
-#include "kNet/Clock.h"
-#include "kNet/NetException.h"
-#include "kNet/Network.h"
-
-#include "kNet/DebugMemoryLeakCheck.h"
+#include "Thread.h"
+#include "NetworkLogging.h"
+#include "Clock.h"
+#include "NetException.h"
+#include "Network.h"
+#include "DebugMemoryLeakCheck.h"
 
 namespace kNet
 {

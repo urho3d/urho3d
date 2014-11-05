@@ -12,8 +12,8 @@
    See the License for the specific language governing permissions and
    limitations under the License. */
 
-#include "kNet/MessageConnection.h"
-#include "kNet/NetworkSimulator.h"
+#include "MessageConnection.h"
+#include "NetworkSimulator.h"
 
 namespace kNet
 {

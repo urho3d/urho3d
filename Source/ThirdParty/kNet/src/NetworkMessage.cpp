@@ -17,8 +17,8 @@
 
 #include <string.h>
 
-#include "kNet/DebugMemoryLeakCheck.h"
-#include "kNet/NetworkMessage.h"
+#include "DebugMemoryLeakCheck.h"
+#include "NetworkMessage.h"
 
 namespace kNet
 {
