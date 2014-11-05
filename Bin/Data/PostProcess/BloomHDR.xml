@@ -11,13 +11,13 @@
         <parameter name="BloomHDRThreshold" value="0.8" />
         <texture unit="diffuse" name="viewport" />
     </command>
-    <command type="quad" tag="BloomHDR" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="bright4">
+    <command type="quad" tag="BloomHDR" vs="CopyFramebuffer" ps="CopyFramebuffer" output="bright4">
         <texture unit="diffuse" name="bright2" />
     </command>
-    <command type="quad" tag="BloomHDR" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="bright8">
+    <command type="quad" tag="BloomHDR" vs="CopyFramebuffer" ps="CopyFramebuffer" output="bright8">
         <texture unit="diffuse" name="bright4" />
     </command>
-    <command type="quad" tag="BloomHDR" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="bright16">
+    <command type="quad" tag="BloomHDR" vs="CopyFramebuffer" ps="CopyFramebuffer" output="bright16">
         <texture unit="diffuse" name="bright8" />
     </command>
     <command type="quad" tag="BloomHDR" vs="BloomHDR" ps="BloomHDR" vsdefines="BLUR16" psdefines="BLUR16" output="blur16">

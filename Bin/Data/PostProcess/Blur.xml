@@ -25,7 +25,7 @@
         <parameter name="BlurSigma" value="2.0" />
         <texture unit="diffuse" name="blurh" />
     </command>
-    <command type="quad" tag="Blur" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="viewport">
+    <command type="quad" tag="Blur" vs="CopyFramebuffer" ps="CopyFramebuffer" output="viewport">
         <texture unit="diffuse" name="blurv" />
     </command>
 </renderpath>
