@@ -49,6 +49,11 @@ static void RegisterSerializable(asIScriptEngine* engine)
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
 
+static void ValueAnimationSetEventFrame(float time, const String& eventType, const VariantMap& eventData, ValueAnimation* ptr)
+{
+    ptr->SetEventFrame(time, eventType, eventData);
+}
+
 static void RegisterValueAnimation(asIScriptEngine* engine)
 {
     engine->RegisterEnum("InterpMethod");
@@ -63,7 +68,7 @@ static void RegisterValueAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ValueAnimation", "void set_valueType(VariantType)", asMETHOD(ValueAnimation, SetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "VariantType get_valueType() const", asMETHOD(ValueAnimation, GetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "void SetKeyFrame(float, const Variant&in)", asMETHOD(ValueAnimation, SetKeyFrame), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ValueAnimation", "void SetEventFrame(float, const String&in, const Variant&in)", asMETHOD(ValueAnimation, SetEventFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ValueAnimation", "void SetEventFrame(float, const String&in, const VariantMap&in eventData = VariantMap())", asFUNCTION(ValueAnimationSetEventFrame), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterObjectAnimation(asIScriptEngine* engine)
