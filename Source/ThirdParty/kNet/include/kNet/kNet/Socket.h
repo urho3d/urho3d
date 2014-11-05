@@ -18,7 +18,7 @@
 
 #ifdef WIN32
 
-#include "../BuildConfig.h"
+#include "../kNetBuildConfig.h"
 #include "win32/WS2Include.h"
 #define KNET_EWOULDBLOCK WSAEWOULDBLOCK
 #define KNET_SOCKET_ERROR SOCKET_ERROR
