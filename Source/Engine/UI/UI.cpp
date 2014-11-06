@@ -59,6 +59,8 @@
 
 #include "DebugNew.h"
 
+#define TOUCHID_MASK(id) (1 << id)
+
 namespace Urho3D
 {
 
@@ -302,12 +304,14 @@ void UI::Update(float timeStep)
         i->second_ = false;
 
     Input* input = GetSubsystem<Input>();
+    bool mouseGrabbed = input->IsMouseGrabbed();
+
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
     // Drag begin based on time
-    if (dragElementsCount_ > 0)
+    if (dragElementsCount_ > 0 && !mouseGrabbed)
     {
         for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End(); )
         {
@@ -344,7 +348,7 @@ void UI::Update(float timeStep)
     }
 
     // Mouse hover
-    if (!input->IsMouseGrabbed() && !input->GetTouchEmulation())
+    if (!mouseGrabbed && !input->GetTouchEmulation())
     {
         if (!usingTouchInput_ && cursorVisible)
             ProcessHover(cursorPos, mouseButtons_, qualifiers_, cursor_);
@@ -648,7 +652,7 @@ UIElement* UI::GetDragElement(unsigned index)
     GetDragElements();
     if (index >= dragElementsConfirmed_.Size())
         return (UIElement*)0;
-        
+
     return dragElementsConfirmed_[index];
 }
 
@@ -668,16 +672,6 @@ const String& UI::GetClipboardText() const
 bool UI::HasModalElement() const
 {
     return rootModalElement_->GetNumChildren() > 0;
-}
-
-unsigned UI::GetNumDragButtons(unsigned buttons)
-{
-    // Counting set bits in mask
-    // Brian Kernighan's method
-    unsigned count = 0;
-    for (count = 0; buttons; count++)
-        buttons &= buttons - 1;
-    return count;
 }
 
 void UI::Initialize()
@@ -1125,7 +1119,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
                 dragData->dragBeginSumPos = cursorPos;
                 dragData->dragBeginTimer.Reset();
                 dragData->dragButtons = button;
-                dragData->numDragButtons = GetNumDragButtons(dragData->dragButtons);
+                dragData->numDragButtons = CountSetBits(dragData->dragButtons);
                 dragElementsCount_++;
 
                 dragElementsContain = dragElements_.Contains(element);
@@ -1136,7 +1130,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
                 dragData->sumPos += cursorPos;
                 dragData->dragBeginSumPos += cursorPos;
                 dragData->dragButtons |= button;
-                dragData->numDragButtons = GetNumDragButtons(dragData->dragButtons);
+                dragData->numDragButtons = CountSetBits(dragData->dragButtons);
             }
         }
         else
@@ -1218,8 +1212,9 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
 void UI::ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
 {
     if (cursorVisible && dragElementsCount_ > 0 && buttons)
-    if (dragElementsCount_ > 0 && buttons)
     {
+        Input* input = GetSubsystem<Input>();
+        bool mouseGrabbed = input->IsMouseGrabbed();
         for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
         {
             WeakPtr<UIElement> dragElement = i->first_;
@@ -1254,7 +1249,8 @@ void UI::ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaP
             if (dragElement->IsEnabled() && dragElement->IsVisible())
             {
                 // Signal drag begin if distance threshold was exceeded
-                if (dragData->dragBeginPending)
+
+                if (dragData->dragBeginPending && !mouseGrabbed)
                 {
                     IntVector2 beginSendPos;
                     beginSendPos.x_ = dragData->dragBeginSumPos.x_ / dragData->numDragButtons;
@@ -1351,11 +1347,6 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
-    bool mouseGrabbed = input->IsMouseGrabbed();
-    if (dragElementsCount_ == 0 && mouseGrabbed)
-        return;
-
     using namespace MouseButtonDown;
 
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
@@ -1369,16 +1360,14 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     // Handle drag cancelling
     ProcessDragCancel();
 
-    if (!mouseGrabbed)
+    Input* input = GetSubsystem<Input>();
+
+    if (!input->IsMouseGrabbed())
         ProcessClickBegin(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
-    if (input->IsMouseGrabbed())
-        return;
-
     using namespace MouseButtonUp;
 
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
@@ -1483,6 +1472,10 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
+    Input* input = GetSubsystem<Input>();
+    if (input->IsMouseGrabbed())
+        return;
+
     using namespace TouchBegin;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
@@ -1490,6 +1483,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 
     int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
     WeakPtr<UIElement> element(GetElementAt(pos));
+
     if (element)
     {
         ProcessClickBegin(pos, touchId, touchDragElements_[element], 0, 0, true);

@@ -23,7 +23,6 @@
 #include "Precompiled.h"
 #include "APITemplates.h"
 #include "Input.h"
-#include "Cursor.h"
 
 namespace Urho3D
 {

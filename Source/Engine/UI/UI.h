@@ -144,8 +144,6 @@ public:
     bool HasModalElement() const;
     /// Return whether a drag is in progress.
     bool IsDragging() const { return dragConfirmedCount_ > 0; };
-    /// Return number of buttons pressed in a button mask.
-    unsigned GetNumDragButtons(unsigned buttons);
 
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData
@@ -292,8 +290,6 @@ private:
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.
     Timer clickTimer_;
-    /// UI element last clicked for tracking click end.
-    /*WeakPtr<UIElement> clickElement_;*/
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
     /// Currently hovered elements.
@@ -314,5 +310,3 @@ private:
 void URHO3D_API RegisterUILibrary(Context* context);
 
 }
-
-#define TOUCHID_MASK(id) (1 << id)

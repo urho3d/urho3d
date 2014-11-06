@@ -36,7 +36,6 @@ class UI : public Object
 
     UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;
-    unsigned GetNumDragElements() const;
     UIElement* GetDragElement(unsigned index);
     const String GetClipboardText() const;
     float GetDoubleClickInterval() const;
