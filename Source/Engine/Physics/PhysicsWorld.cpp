@@ -119,6 +119,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     solver_(0),
     world_(0),
     fps_(DEFAULT_FPS),
+    maxSubSteps_(0),
     timeAcc_(0.0f),
     maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
     interpolation_(true),
@@ -180,6 +181,7 @@ void PhysicsWorld::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Substeps", maxSubSteps_, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_INT, "Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Net Max Angular Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Interpolation", interpolation_, true, AM_FILE);
@@ -232,20 +234,27 @@ void PhysicsWorld::Update(float timeStep)
     PROFILE(UpdatePhysics);
 
     float internalTimeStep = 1.0f / fps_;
+    int maxSubSteps = (int)(timeStep * fps_) + 1;
+    if (maxSubSteps_ < 0)
+    {
+        internalTimeStep = timeStep;
+        maxSubSteps = 1;
+    }
+    else if (maxSubSteps_ > 0)
+        maxSubSteps = Min(maxSubSteps, maxSubSteps_);
+    
     delayedWorldTransforms_.Clear();
 
     if (interpolation_)
-    {
-        int maxSubSteps = (int)(timeStep * fps_) + 1;
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
-    }
     else
     {
         timeAcc_ += timeStep;
-        while (timeAcc_ >= internalTimeStep)
+        while (timeAcc_ >= internalTimeStep && maxSubSteps > 0)
         {
             world_->stepSimulation(internalTimeStep, 0, internalTimeStep);
             timeAcc_ -= internalTimeStep;
+            --maxSubSteps;
         }
     }
 
@@ -283,6 +292,12 @@ void PhysicsWorld::SetGravity(Vector3 gravity)
 {
     world_->setGravity(ToBtVector3(gravity));
     
+    MarkNetworkUpdate();
+}
+
+void PhysicsWorld::SetMaxSubSteps(int num)
+{
+    maxSubSteps_ = num;
     MarkNetworkUpdate();
 }
 

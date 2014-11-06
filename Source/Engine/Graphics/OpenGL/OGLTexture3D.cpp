@@ -105,6 +105,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
             loadImage_->PrecalculateLevels();
         cache->StoreResourceDependency(this, name);
+        return true;
     }
     else if (colorlutElem)
     {
@@ -128,8 +129,10 @@ bool Texture3D::BeginLoad(Deserializer& source)
         if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
             loadImage_->PrecalculateLevels();
         cache->StoreResourceDependency(this, name);
+        return true;
     }
 
+    LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
     return false;
 }
 

@@ -54,6 +54,7 @@ Urho3D development, contributions and bugfixes by:
 - ninjastone
 - rasteron
 - reattiva
+- rifai
 - skaiware
 - szamq
 - thebluefish

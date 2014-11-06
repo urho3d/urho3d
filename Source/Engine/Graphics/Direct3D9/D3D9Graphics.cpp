@@ -273,7 +273,7 @@ Graphics::Graphics(Context* context) :
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
-    defaultTextureFilterMode_(FILTER_BILINEAR),
+    defaultTextureFilterMode_(FILTER_TRILINEAR),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight")

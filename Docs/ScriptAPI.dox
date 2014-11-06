@@ -1226,6 +1226,8 @@ namespace Urho3D
 - %Auto %Show/Hide %Scrollbars : bool
 - %Scroll %Deceleration : float
 - %Scroll %Snap %Epsilon : float
+- %Auto %Disable %Children : bool
+- %Auto %Disable %Threshold : float
 - %Highlight %Mode : int
 - %Multiselect : bool
 - %Hierarchy %Mode : bool
@@ -1360,6 +1362,7 @@ namespace Urho3D
 ### PhysicsWorld
 - %Gravity : Vector3
 - %Physics %FPS : int
+- %Max %Substeps : int
 - %Solver %Iterations : int
 - %Net %Max %Angular %Vel. : float
 - %Interpolation : bool
@@ -1516,6 +1519,8 @@ namespace Urho3D
 - %Auto %Show/Hide %Scrollbars : bool
 - %Scroll %Deceleration : float
 - %Scroll %Snap %Epsilon : float
+- %Auto %Disable %Children : bool
+- %Auto %Disable %Threshold : float
 
 ### Skybox
 - %Is %Enabled : bool
@@ -7899,6 +7904,7 @@ Properties:
 - uint id // readonly
 - bool internalEdge
 - bool interpolation
+- int maxSubSteps
 - Node@ node // readonly
 - uint numAttributes // readonly
 - int numIterations
@@ -9081,6 +9087,8 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- bool autoDisableChildren
+- float autoDisableThreshold
 - StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
@@ -11524,7 +11532,7 @@ Methods:
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetEventFrame(float, const String&, const Variant&)
+- void SetEventFrame(float, const String&, const VariantMap& = VariantMap ( ))
 - void SetKeyFrame(float, const Variant&)
 
 Properties:

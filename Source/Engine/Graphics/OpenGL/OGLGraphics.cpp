@@ -246,7 +246,7 @@ Graphics::Graphics(Context* context_) :
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     releasingGPUObjects_(false),
-    defaultTextureFilterMode_(FILTER_BILINEAR),
+    defaultTextureFilterMode_(FILTER_TRILINEAR),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight")

@@ -213,7 +213,7 @@ void Texture::UpdateParameters()
     // Anisotropy
     if (graphics_->GetAnisotropySupport())
     {
-        glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, filterMode_ == FILTER_ANISOTROPIC ?
+        glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, filterMode == FILTER_ANISOTROPIC ?
             (float)graphics_->GetTextureAnisotropy() : 1.0f);
     }
     

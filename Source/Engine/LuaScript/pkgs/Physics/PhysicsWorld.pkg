@@ -17,6 +17,7 @@ class PhysicsWorld : public Component
     void UpdateCollisions();
     void SetFps(int fps);
     void SetGravity(Vector3 gravity);
+    void SetMaxSubSteps(int num);
     void SetNumIterations(int num);
     void SetInterpolation(bool enable);
     void SetInternalEdge(bool enable);
@@ -43,6 +44,7 @@ class PhysicsWorld : public Component
     void RemoveCachedGeometry(Model* model);
 
     Vector3 GetGravity() const;
+    int GetMaxSubSteps() const;
     int GetNumIterations() const;
     bool GetInterpolation() const;
     bool GetInternalEdge() const;
@@ -51,6 +53,7 @@ class PhysicsWorld : public Component
     float GetMaxNetworkAngularVelocity() const;
 
     tolua_property__get_set Vector3 gravity;
+    tolua_property__get_set int maxSubSteps;
     tolua_property__get_set int numIterations;
     tolua_property__get_set bool interpolation;
     tolua_property__get_set bool internalEdge;

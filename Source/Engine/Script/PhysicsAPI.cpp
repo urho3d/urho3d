@@ -305,6 +305,8 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void RemoveCachedGeometry(Model@+)", asMETHOD(PhysicsWorld, RemoveCachedGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_maxSubSteps(int)", asMETHOD(PhysicsWorld, SetMaxSubSteps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "int get_maxSubSteps() const", asMETHOD(PhysicsWorld, GetMaxSubSteps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_numIterations(int)", asMETHOD(PhysicsWorld, SetNumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int get_numIterations() const", asMETHOD(PhysicsWorld, GetNumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);

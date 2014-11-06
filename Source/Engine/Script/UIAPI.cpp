@@ -244,6 +244,10 @@ static void RegisterScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "float get_scrollDeceleration() const", asMETHOD(ScrollView, GetScrollDeceleration), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void set_scrollSnapEpsilon(float)", asMETHOD(ScrollView, SetScrollSnapEpsilon), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float get_scrollSnapEpsilon() const", asMETHOD(ScrollView, GetScrollSnapEpsilon), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_autoDisableChildren(bool)", asMETHOD(ScrollView, SetAutoDisableChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool get_autoDisableChildren() const", asMETHOD(ScrollView, GetAutoDisableChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_autoDisableThreshold(float)", asMETHOD(ScrollView, SetAutoDisableThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "float get_autoDisableThreshold() const", asMETHOD(ScrollView, GetAutoDisableThreshold), asCALL_THISCALL);
 }
 
 void ListViewSetSelections(CScriptArray* selections, ListView* ptr)

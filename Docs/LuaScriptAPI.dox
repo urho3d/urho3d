@@ -3806,6 +3806,7 @@ Methods:
 - void UpdateCollisions()
 - void SetFps(int fps)
 - void SetGravity(Vector3 gravity)
+- void SetMaxSubSteps(int num)
 - void SetNumIterations(int num)
 - void SetInterpolation(bool enable)
 - void SetInternalEdge(bool enable)
@@ -3821,6 +3822,7 @@ Methods:
 - void DrawDebugGeometry(bool depthTest)
 - void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const
+- int GetMaxSubSteps() const
 - int GetNumIterations() const
 - bool GetInterpolation() const
 - bool GetInternalEdge() const
@@ -3831,6 +3833,7 @@ Methods:
 Properties:
 
 - Vector3 gravity
+- int maxSubSteps
 - int numIterations
 - bool interpolation
 - bool internalEdge
@@ -4701,6 +4704,8 @@ Methods:
 - void SetPageStep(float step)
 - void SetScrollDeceleration(float deceleration)
 - void SetScrollSnapEpsilon(float snap)
+- void SetAutoDisableChildren(bool disable)
+- void SetAutoDisableThreshold(float amount)
 - const IntVector2& GetViewPosition() const
 - UIElement* GetContentElement() const
 - ScrollBar* GetHorizontalScrollBar() const
@@ -4711,6 +4716,8 @@ Methods:
 - float GetPageStep() const
 - float GetScrollDeceleration() const
 - float GetScrollSnapEpsilon() const
+- bool GetAutoDisableChildren() const
+- float GetAutoDisableThreshold() const
 
 Properties:
 

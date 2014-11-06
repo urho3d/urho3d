@@ -6653,6 +6653,7 @@ Vector3 gravity;
 uint id;
 bool internalEdge;
 bool interpolation;
+int maxSubSteps;
 /* readonly */
 Node node;
 /* readonly */
@@ -7967,6 +7968,8 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+bool autoDisableChildren;
+float autoDisableThreshold;
 /* readonly */
 StringHash baseType;
 bool bringToBack;
@@ -10849,7 +10852,7 @@ bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetEventFrame(float, const String&, const Variant&);
+void SetEventFrame(float, const String&, const VariantMap& = VariantMap ( ));
 void SetKeyFrame(float, const Variant&);
 
 // Properties:
