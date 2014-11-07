@@ -6562,6 +6562,7 @@ bool alphaMask;
 BlendMode blendMode;
 CompareMode depthTestMode;
 bool depthWrite;
+bool desktop;
 PassLightingMode lightingMode;
 String pixelShader;
 String pixelShaderDefines;
@@ -9416,6 +9417,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 StringHash baseType;
 /* readonly */
 String category;
+bool desktop;
 /* readonly */
 uint memoryUse;
 String name;
@@ -9428,6 +9430,8 @@ Array<Pass> passes;
 /* readonly */
 int refs;
 bool sm3;
+/* readonly */
+bool supported;
 /* readonly */
 StringHash type;
 /* readonly */

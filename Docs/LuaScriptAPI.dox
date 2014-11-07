@@ -2286,7 +2286,7 @@ Properties:
 - unsigned dummyColorFormat (readonly)
 - unsigned shadowMapFormat (readonly)
 - unsigned hiresShadowMapFormat (readonly)
-- bool sM3Support (readonly)
+- bool SM3Support (readonly)
 - bool instancingSupport (readonly)
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
@@ -3754,12 +3754,14 @@ Properties:
 Methods:
 
 - bool IsSM3() const
+- bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
 
 Properties:
 
 - bool SM3 (readonly)
+- bool desktop (readonly)
 - const String vertexShader (readonly)
 - const String pixelShader (readonly)
 
@@ -5207,14 +5209,18 @@ Methods:
 - bool HasPass(const StringHash type) const
 - Pass* GetPass(const StringHash type) const
 - Pass* GetSupportedPass(const StringHash type) const
+- bool IsSupported() const
 - bool IsSM3() const
+- bool IsDesktop() const
 - unsigned GetNumPasses() const
 - const Vector<StringHash>& GetPassTypes() const
 - const PODVector<Pass*>& GetPasses() const
 
 Properties:
 
+- bool supported (readonly)
 - bool SM3 (readonly)
+- bool desktop (readonly)
 - unsigned numPasses (readonly)
 
 <a name="Class_Terrain"></a>
