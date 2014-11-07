@@ -248,6 +248,7 @@ endif ()
 set (CMAKE_MODULE_PATH
     \\$ENV{URHO3D_HOME}/Source/CMake/Modules
     \\$ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules
+    \\${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
 # Include Urho3D CMake common module

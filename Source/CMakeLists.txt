@@ -51,8 +51,8 @@ if (HAVE_STDINT_H)
 endif ()
 
 # Setup SDK install destinations
-if (WIN32)
-    # CMake already automatically prepends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
+if (CMAKE_HOST_WIN32)
+    # CMake already automatically appends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (PATH_SUFFIX /Urho3D)
