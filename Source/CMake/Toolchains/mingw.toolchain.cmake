@@ -51,3 +51,8 @@ set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+# setup install destination prefix path only when cross-compiling
+if (CMAKE_CROSSCOMPILING)
+    set (CMAKE_INSTALL_PREFIX "${MINGW_SYSROOT}/usr/local" CACHE PATH "Install path prefix, prepended onto install directories.")
+endif ()
