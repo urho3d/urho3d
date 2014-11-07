@@ -268,7 +268,6 @@ Renderer::Renderer(Context* context) :
     occluderSizeThreshold_(0.025f),
     mobileShadowBiasMul_(2.0f),
     mobileShadowBiasAdd_(0.0001f),
-    numViews_(0),
     numOcclusionBuffers_(0),
     numShadowCameras_(0),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
@@ -278,7 +277,8 @@ Renderer::Renderer(Context* context) :
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
     shadersDirty_(true),
-    initialized_(false)
+    initialized_(false),
+    resetViews_(false)
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
@@ -356,7 +356,8 @@ void Renderer::SetMaterialQuality(int quality)
     {
         materialQuality_ = quality;
         shadersDirty_ = true;
-        ResetViews();
+        // Reallocate views to not store eg. pass information that might be unnecessary on the new material quality level
+        resetViews_ = true;
     }
 }
 
@@ -492,10 +493,13 @@ RenderPath* Renderer::GetDefaultRenderPath() const
 unsigned Renderer::GetNumGeometries(bool allViews) const
 {
     unsigned numGeometries = 0;
-    unsigned lastView = allViews ? numViews_ : 1;
+    unsigned lastView = allViews ? views_.Size() : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        numGeometries += views_[i]->GetGeometries().Size();
+    {
+        if (views_[i])
+            numGeometries += views_[i]->GetGeometries().Size();
+    }
     
     return numGeometries;
 }
@@ -503,10 +507,13 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
 unsigned Renderer::GetNumLights(bool allViews) const
 {
     unsigned numLights = 0;
-    unsigned lastView = allViews ? numViews_ : 1;
+    unsigned lastView = allViews ? views_.Size() : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        numLights += views_[i]->GetLights().Size();
+    {
+        if (views_[i])
+            numLights += views_[i]->GetLights().Size();
+    }
     
     return numLights;
 }
@@ -514,10 +521,13 @@ unsigned Renderer::GetNumLights(bool allViews) const
 unsigned Renderer::GetNumShadowMaps(bool allViews) const
 {
     unsigned numShadowMaps = 0;
-    unsigned lastView = allViews ? numViews_ : 1;
+    unsigned lastView = allViews ? views_.Size() : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
     {
+        if (!views_[i])
+            continue;
+        
         const Vector<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
         
         for (Vector<LightBatchQueue>::ConstIterator i = lightQueues.Begin(); i != lightQueues.End(); ++i)
@@ -533,10 +543,13 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
 unsigned Renderer::GetNumOccluders(bool allViews) const
 {
     unsigned numOccluders = 0;
-    unsigned lastView = allViews ? numViews_ : 1;
+    unsigned lastView = allViews ? views_.Size() : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        numOccluders += views_[i]->GetOccluders().Size();
+    {
+        if (views_[i])
+            numOccluders += views_[i]->GetOccluders().Size();
+    }
     
     return numOccluders;
 }
@@ -545,7 +558,7 @@ void Renderer::Update(float timeStep)
 {
     PROFILE(UpdateViews);
     
-    numViews_ = 0;
+    views_.Clear();
     
     // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
     // and if the device is lost, the updates queue up, causing memory use to rise constantly
@@ -573,26 +586,26 @@ void Renderer::Update(float timeStep)
     SendEvent(E_RENDERSURFACEUPDATE);
     
     // Process gathered views. This may queue further views (render surfaces that are only updated when visible)
-    for (unsigned i = 0; i < queuedViews_.Size(); ++i)
+    for (unsigned i = 0; i < queuedViewports_.Size(); ++i)
     {
-        WeakPtr<RenderSurface>& renderTarget = queuedViews_[i].first_;
-        WeakPtr<Viewport>& viewport = queuedViews_[i].second_;
+        WeakPtr<RenderSurface>& renderTarget = queuedViewports_[i].first_;
+        WeakPtr<Viewport>& viewport = queuedViewports_[i].second_;
         
         // Null pointer means backbuffer view. Differentiate between that and an expired rendersurface
         if ((renderTarget.NotNull() && renderTarget.Expired()) || viewport.Expired())
             continue;
         
-        // Allocate new view if necessary
-        if (numViews_ == views_.Size())
-            views_.Push(SharedPtr<View>(new View(context_)));
+        // (Re)allocate the view structure if necessary
+        if (!viewport->GetView() || resetViews_)
+            viewport->AllocateView();
         
+        View* view = viewport->GetView();
+        assert(view);
         // Check if view can be defined successfully (has either valid scene, camera and octree, or no scene passes)
-        assert(numViews_ < views_.Size());
-        View* view = views_[numViews_];
         if (!view->Define(renderTarget, viewport))
             continue;
         
-        ++numViews_;
+        views_.Push(WeakPtr<View>(view));
         
         const IntRect& viewRect = viewport->GetRect();
         Scene* scene = viewport->GetScene();
@@ -636,14 +649,15 @@ void Renderer::Update(float timeStep)
     }
     
     // Reset update flag from queued render surfaces. At this point no new views can be added on this frame
-    for (unsigned i = 0; i < queuedViews_.Size(); ++i)
+    for (unsigned i = 0; i < queuedViewports_.Size(); ++i)
     {
-        WeakPtr<RenderSurface>& renderTarget = queuedViews_[i].first_;
+        WeakPtr<RenderSurface>& renderTarget = queuedViewports_[i].first_;
         if (renderTarget)
             renderTarget->WasUpdated();
     }
     
-    queuedViews_.Clear();
+    queuedViewports_.Clear();
+    resetViews_ = false;
 }
 
 void Renderer::Render()
@@ -662,7 +676,7 @@ void Renderer::Render()
     graphics_->ClearParameterSources();
     
     // If no views, just clear the screen
-    if (!numViews_)
+    if (views_.Empty())
     {
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetColorWrite(true);
@@ -678,8 +692,11 @@ void Renderer::Render()
     else
     {
         // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
-        for (unsigned i = numViews_ - 1; i < numViews_; --i)
+        for (unsigned i = views_.Size() - 1; i < views_.Size(); --i)
         {
+            if (!views_[i])
+                continue;
+            
             using namespace BeginViewRender;
             
             RenderSurface* renderTarget = views_[i]->GetRenderTarget();
@@ -715,10 +732,10 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     HashSet<Drawable*> processedGeometries;
     HashSet<Light*> processedLights;
     
-    for (unsigned i = 0; i < numViews_; ++i)
+    for (unsigned i = 0; i < views_.Size(); ++i)
     {
         View* view = views_[i];
-        if (!view->GetDrawDebug())
+        if (!view || !view->GetDrawDebug())
             continue;
         Octree* octree = view->GetOctree();
         if (!octree)
@@ -765,7 +782,7 @@ void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
 {
     if (viewport)
     {
-        queuedViews_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
+        queuedViewports_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
             WeakPtr<Viewport>(viewport)));
     }
 }
@@ -1421,7 +1438,6 @@ void Renderer::Initialize()
     CreateInstancingBuffer();
     
     viewports_.Resize(1);
-    ResetViews();
     ResetShadowMaps();
     ResetBuffers();
     
@@ -1431,12 +1447,6 @@ void Renderer::Initialize()
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
 
     LOGINFO("Initialized renderer");
-}
-
-void Renderer::ResetViews()
-{
-    views_.Clear();
-    numViews_ = 0;
 }
 
 void Renderer::LoadShaders()
@@ -1721,10 +1731,7 @@ void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     if (!initialized_)
         Initialize();
     else
-    {
-        // When screen mode changes, purge old views
-        ResetViews();
-    }
+        resetViews_ = true;
 }
 
 void Renderer::HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData)

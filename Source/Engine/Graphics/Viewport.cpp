@@ -28,6 +28,7 @@
 #include "RenderPath.h"
 #include "ResourceCache.h"
 #include "Scene.h"
+#include "View.h"
 #include "Viewport.h"
 #include "XMLFile.h"
 
@@ -117,6 +118,11 @@ Camera* Viewport::GetCamera() const
     return camera_;
 }
 
+View* Viewport::GetView() const
+{
+    return view_;
+}
+
 RenderPath* Viewport::GetRenderPath() const
 {
     return renderPath_;
@@ -190,6 +196,11 @@ Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
     }
 
     return camera_->ScreenToWorldPoint(Vector3(screenX, screenY, depth));
+}
+
+void Viewport::AllocateView()
+{
+    view_ = new View(context_);
 }
 
 }
