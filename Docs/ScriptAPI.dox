@@ -7818,6 +7818,7 @@ Properties:
 - BlendMode blendMode
 - CompareMode depthTestMode
 - bool depthWrite
+- bool desktop
 - PassLightingMode lightingMode
 - String pixelShader
 - String pixelShaderDefines
@@ -10340,6 +10341,7 @@ Properties:
 
 - StringHash baseType // readonly
 - String category // readonly
+- bool desktop
 - uint memoryUse // readonly
 - String name
 - uint numPasses // readonly
@@ -10347,6 +10349,7 @@ Properties:
 - Pass@[]@ passes // readonly
 - int refs // readonly
 - bool sm3
+- bool supported // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
