@@ -1481,7 +1481,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
@@ -1498,7 +1498,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     using namespace TouchEnd;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));
@@ -1527,7 +1527,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
 
     ProcessMove(pos, deltaPos, touchId, 0, 0, true);
 }
@@ -1734,6 +1734,19 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
         sendPos.y_ = dragData->sumPos.y_ / dragData->numDragButtons;
     }
     return sendPos;
+}
+
+unsigned UI::GetTouchIndexFromID(int touchID)
+{
+    Input* input = GetSubsystem<Input>();
+    unsigned numTouches = input->GetNumTouches();
+    for (unsigned i = 0; i < numTouches; ++i)
+    {
+        TouchState* touch = input->GetTouch(i);
+        if (touch->touchID_ == touchID)
+            return i;
+    }
+    return 0; // Should not happen
 }
 
 void RegisterUILibrary(Context* context)

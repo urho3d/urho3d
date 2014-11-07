@@ -229,6 +229,8 @@ private:
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.
     IntVector2 SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos);
+    /// Get the index of a touch based on the touch ID.
+    unsigned GetTouchIndexFromID(int touchID);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
