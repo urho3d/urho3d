@@ -5750,7 +5750,7 @@ Methods:
 - UIElement* GetElementAt(int x, int y, bool enabledOnly = true)
 - UIElement* GetFocusElement() const
 - UIElement* GetFrontElement() const
-- UIElement* GetDragElement() const
+- UIElement* GetDragElement(unsigned index)
 - const String GetClipboardText() const
 - float GetDoubleClickInterval() const
 - float GetDragBeginInterval() const
@@ -5763,6 +5763,7 @@ Methods:
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
 - bool HasModalElement() const
+- bool IsDragging() const
 
 Properties:
 
@@ -5772,7 +5773,6 @@ Properties:
 - IntVector2 cursorPosition (readonly)
 - UIElement* focusElement (readonly)
 - UIElement* frontElement (readonly)
-- UIElement* dragElement (readonly)
 - String clipboardText
 - float doubleClickInterval
 - float dragBeginInterval
@@ -5914,6 +5914,8 @@ Methods:
 - int GetLayoutSpacing() const
 - const IntRect& GetLayoutBorder() const
 - unsigned GetNumChildren(bool recursive = false) const
+- int GetDragButtonCombo() const
+- unsigned GetDragButtonCount() const
 - UIElement* GetChild(const String name, bool recursive = false) const
 - UIElement* GetChild(unsigned index) const
 - UIElement* GetParent() const
@@ -7177,6 +7179,7 @@ Properties:
 - int ClampInt(int value, int min, int max)
 - VectorBuffer CompressVectorBuffer(VectorBuffer& src)
 - float Cos(float angle)
+- unsigned CountSetBits(unsigned value)
 - VectorBuffer DecompressVectorBuffer(VectorBuffer& src)
 - bool Equals(float lhs, float rhs)
 - void ErrorDialog(const String title, const String message)
@@ -7226,11 +7229,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float range)
 - float Random(float min, float max)
+- float Random(float range)
 - float Random()
-- int RandomInt(int min, int max)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7241,8 +7244,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
 - void SubscribeToEvent(const String eventName, const String functionName)
+- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -7264,8 +7267,8 @@ Properties:
 - Vector3 ToVector3(const String source)
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
-- void UnsubscribeFromEvent(void* sender, const String eventName, const String functionName = String::EMPTY)
 - void UnsubscribeFromEvent(const String eventName, const String functionName = String::EMPTY)
+- void UnsubscribeFromEvent(void* sender, const String eventName, const String functionName = String::EMPTY)
 - void UnsubscribeFromEvents(void* sender)
 
 

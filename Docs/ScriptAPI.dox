@@ -521,6 +521,7 @@ namespace Urho3D
 ### TextFinished
 - %Element : UIElement pointer
 - %Text : String
+- %Value : Float
 
 ### MenuSelected
 - %Element : UIElement pointer
@@ -592,13 +593,19 @@ namespace Urho3D
 - %Y : int
 - %ElementX : int
 - %ElementY : int
+- %Buttons : int
+- %NumButtons : int
 
 ### DragMove
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
+- %DX : int
+- %DY : int
 - %ElementX : int
 - %ElementY : int
+- %Buttons : int
+- %NumButtons : int
 
 ### DragEnd
 - %Element : UIElement pointer
@@ -606,6 +613,8 @@ namespace Urho3D
 - %Y : int
 - %ElementX : int
 - %ElementY : int
+- %Buttons : int
+- %NumButtons : int
 
 ### DragCancel
 - %Element : UIElement pointer
@@ -613,6 +622,8 @@ namespace Urho3D
 - %Y : int
 - %ElementX : int
 - %ElementY : int
+- %Buttons : int
+- %NumButtons : int
 
 ### UIDropFile
 - %FileName : String
@@ -2848,6 +2859,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -3045,6 +3058,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -3300,6 +3315,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -4828,6 +4845,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -5458,6 +5477,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -6375,6 +6396,8 @@ Properties:
 - uint cursorPosition
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - uint echoCharacter
 - bool editable
@@ -6555,6 +6578,8 @@ Properties:
 - UIElement@ contentElement // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -6910,6 +6935,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -8946,6 +8973,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - float effectiveScrollStep // readonly
@@ -9105,6 +9134,8 @@ Properties:
 - UIElement@ contentElement
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -9422,6 +9453,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -9942,6 +9975,8 @@ Properties:
 - Color[] colors
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - bool elementEventSender
 - int height
 - HorizontalAlignment horizontalAlignment
@@ -10601,6 +10636,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - Color effectColor
@@ -11263,6 +11300,8 @@ Properties:
 - XMLFile@ defaultStyle
 - float delay
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -11340,6 +11379,7 @@ Methods:
 - UIElement@ GetElementAt(const IntVector2&, bool = true)
 - UIElement@ GetElementAt(int, int, bool = true)
 - bool HasModalElement() const
+- bool IsDragging() const
 - UIElement@ LoadLayout(File@)
 - UIElement@ LoadLayout(File@, XMLFile@)
 - UIElement@ LoadLayout(VectorBuffer&)
@@ -11350,6 +11390,7 @@ Methods:
 - bool SaveLayout(VectorBuffer&, UIElement@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetFocusElement(UIElement@, bool = false)
+- const UIElement@[]@ GetDragElements()
 
 Properties:
 
@@ -11362,7 +11403,6 @@ Properties:
 - float doubleClickInterval
 - int dragBeginDistance
 - float dragBeginInterval
-- UIElement@ dragElement // readonly
 - UIElement@ focusElement
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
@@ -11471,6 +11511,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -11858,6 +11900,8 @@ Properties:
 - XMLFile@ defaultStyle
 - Texture2D@ depthTexture // readonly
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -12058,6 +12102,8 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -12787,6 +12833,7 @@ Properties:
 - void ClearDelayedExecute(const String& = String ( ))
 - VectorBuffer CompressVectorBuffer(VectorBuffer&)
 - float Cos(float)
+- uint CountSetBits(uint)
 - VectorBuffer DecompressVectorBuffer(VectorBuffer&)
 - void DelayedExecute(float, bool, const String&)
 - void DelayedExecute(float, bool, const String&, const Variant[]@)

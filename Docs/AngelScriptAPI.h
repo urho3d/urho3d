@@ -778,6 +778,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -998,6 +1002,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -1291,6 +1299,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -3081,6 +3093,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -3807,6 +3823,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -4892,6 +4912,10 @@ uint cursorPosition;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 uint echoCharacter;
 bool editable;
@@ -5097,6 +5121,10 @@ UIElement contentElement;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -5489,6 +5517,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -7809,6 +7841,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 /* readonly */
@@ -7994,6 +8030,10 @@ UIElement contentElement;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -8356,6 +8396,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -8958,6 +9002,10 @@ Array<Color> colors;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 bool elementEventSender;
 int height;
 HorizontalAlignment horizontalAlignment;
@@ -9719,6 +9767,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 Color effectColor;
@@ -10539,6 +10591,10 @@ XMLFile defaultStyle;
 float delay;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -10630,6 +10686,7 @@ void DebugDraw(UIElement);
 UIElement GetElementAt(const IntVector2&, bool = true);
 UIElement GetElementAt(int, int, bool = true);
 bool HasModalElement() const;
+bool IsDragging() const;
 UIElement LoadLayout(File);
 UIElement LoadLayout(File, XMLFile);
 UIElement LoadLayout(VectorBuffer&);
@@ -10640,6 +10697,7 @@ bool SaveLayout(File, UIElement);
 bool SaveLayout(VectorBuffer&, UIElement);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetFocusElement(UIElement, bool = false);
+const Array<UIElement> GetDragElements();
 
 // Properties:
 /* readonly */
@@ -10654,8 +10712,6 @@ float defaultToolTipDelay;
 float doubleClickInterval;
 int dragBeginDistance;
 float dragBeginInterval;
-/* readonly */
-UIElement dragElement;
 UIElement focusElement;
 bool forceAutoHint;
 /* readonly */
@@ -10778,6 +10834,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -11196,6 +11256,10 @@ XMLFile defaultStyle;
 Texture2D depthTexture;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -11425,6 +11489,10 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+/* readonly */
+uint dragButtonCombo;
+/* readonly */
+int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
@@ -12195,6 +12263,7 @@ int Clamp(int, int, int);
 void ClearDelayedExecute(const String& = String ( ));
 VectorBuffer CompressVectorBuffer(VectorBuffer&);
 float Cos(float);
+uint CountSetBits(uint);
 VectorBuffer DecompressVectorBuffer(VectorBuffer&);
 void DelayedExecute(float, bool, const String&);
 void DelayedExecute(float, bool, const String&, const Array<Variant>);
