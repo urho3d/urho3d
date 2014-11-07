@@ -29,7 +29,7 @@ SOURCE=`pwd`/Source
 . ./.bash_helpers.sh
 
 # Detect CMake toolchains directory if it is not provided explicitly
-[ "$TOOLCHAINS" == "" -a -d $SOURCE/CMake/Toolchains ] && TOOLCHAINS=$SOURCE/CMake/Toolchains
+[ "$TOOLCHAINS" == "" ] && TOOLCHAINS=$SOURCE/CMake/Toolchains
 [ ! -d $TOOLCHAINS -a -d $URHO3D_HOME/Source/CMake/Toolchains ] && TOOLCHAINS=$URHO3D_HOME/Source/CMake/Toolchains
 [ ! -d $TOOLCHAINS -a -d $CMAKE_PREFIX_PATH/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS=$CMAKE_PREFIX_PATH/share/Urho3D/CMake/Toolchains
 
