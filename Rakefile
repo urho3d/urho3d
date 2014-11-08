@@ -36,15 +36,19 @@ end
 desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
   abort 'Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]' unless ENV['dir']
-  abs_path = ENV['dir'][0, 1] == '/' ? ENV['dir'] : "#{Dir.pwd}/#{ENV['dir']}"
+  abs_path = (ENV['OS'] ? ENV['dir'][1, 1] == ':' : ENV['dir'][0, 1] == '/') ? ENV['dir'] : "#{Dir.pwd}/#{ENV['dir']}"
   project = ENV['project'] || 'Scaffolding'
   target = ENV['target'] || 'Main'
   scaffolding(abs_path, project, target)
   abs_path = Pathname.new(abs_path).realpath
   puts "\nNew project created in #{abs_path}\n\n"
-  puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
+  puts "To build the new project, you may need to first set and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
   puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example:\n\n"
-  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DURHO3D_LUAJIT=1\n$ cd Build\n$ make\n\n"
+  if ENV['OS']
+    puts "set URHO3D_HOME=#{Dir.pwd}\ncd #{abs_path}\ncmake_vs2013.bat -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n\n"
+  else
+    puts "export URHO3D_HOME=#{Dir.pwd}\ncd #{abs_path}\n./cmake_gcc.sh -DURHO3D_LUAJIT=1\ncd Build\nmake\n\n"
+  end
 end
 
 # Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [avd=test] [retries=60] [retry_interval=10]
@@ -226,7 +230,7 @@ EOF" or abort 'Failed to create release directory remotely'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
-  system "bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\" && cat <<EOF >#{dir}/Source/CMakeLists.txt
+  build_script = <<EOF
 # Set project name
 project (#{project})
 
@@ -246,9 +250,9 @@ endif ()
 
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH
-    \\$ENV{URHO3D_HOME}/Source/CMake/Modules
-    \\$ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules
-    \\${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
+    $ENV{URHO3D_HOME}/Source/CMake/Modules
+    $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules
+    ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
 # Include Urho3D CMake common module
@@ -256,7 +260,7 @@ include (Urho3D-CMake-common)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
-include_directories (\\${URHO3D_INCLUDE_DIRS})
+include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Define target name
 set (TARGET_NAME #{target})
@@ -269,12 +273,18 @@ setup_main_executable ()
 
 # Setup test cases
 if (URHO3D_ANGELSCRIPT)
-    add_test (NAME ExternalLibAS COMMAND \\${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout \\${URHO3D_TEST_TIME_OUT})
+    add_test (NAME ExternalLibAS COMMAND ${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout ${URHO3D_TEST_TIME_OUT})
 endif ()
 if (URHO3D_LUA)
-    add_test (NAME ExternalLibLua COMMAND \\${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout \\${URHO3D_TEST_TIME_OUT})
+    add_test (NAME ExternalLibLua COMMAND ${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
 endif ()
-EOF" or abort 'Failed to create new project using Urho3D as external library'
+EOF
+  # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
+  if ENV['OS']
+    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+  else
+    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+  end
 end
 
 def makefile_ci
