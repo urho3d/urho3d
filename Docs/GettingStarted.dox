@@ -444,6 +444,12 @@ export CC=${RASPI_TOOL}/arm-linux-gnueabihf-c++
 export PKG_CONFIG_SYSROOT_DIR=${RASPI_ROOT}
 export PKG_CONFIG_PATH=${RASPI_ROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
+
+# To cross-compile and link for Windows platform using MinGW cross compiler (in DEBUG configuration)
+export CC=${MINGW_PREFIX}-c++
+export PKG_CONFIG_SYSROOT_DIR=${MINGW_ROOT}
+export PKG_CONFIG_PATH=${MINGW_ROOT}/usr/local/lib/pkgconfig
+$CC -o Urho3DPlayer.exe Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D |sed 's/-lUrho3D/-lUrho3D_d.dll/g'`
 \endcode
 
 \section Scaffolding Project scaffolding
