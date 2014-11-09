@@ -1,8 +1,8 @@
--- Urho2D tile map example.
+-- Urho3D UI Drag Example:
 -- This sample demonstrates:
---     - Creating a 2D scene with tile map
---     - Displaying the scene using the Renderer subsystem
---     - Handling keyboard to move and zoom 2D camera
+--     - Creating GUI elements from AngelScript
+--     - Loading GUI Style from xml
+--     - Subscribing to GUI drag events and handling them.
 
 require "LuaScripts/Utilities/Sample"
 VAR_BUTTONS = StringHash("BUTTONS")
@@ -130,7 +130,7 @@ function HandleDragBegin(eventType, eventData)
     local lx = eventData:GetInt("X")
     local ly = eventData:GetInt("Y")
 
-    local p = element:GetPosition()
+    local p = element.position
     element:SetVar(VAR_START, Variant(p))
     element:SetVar(VAR_DELTA, Variant(Vector2(p.x - lx, p.y - ly)))
 
@@ -171,7 +171,7 @@ function HandleUpdate(eventType, eventData)
         local t = tolua.cast(ui.root:GetChild("Touch " .. i), 'Text')
         local ts = input:GetTouch(i)
 
-        local pos = ts:GetPosition()
+        local pos = ts.position
         pos.y = pos.y - 30
 
         t:SetPosition(pos)

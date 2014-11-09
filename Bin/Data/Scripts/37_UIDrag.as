@@ -1,8 +1,8 @@
-// Urho2D tile map example.
+// Urho3D UI Drag Example:
 // This sample demonstrates:
-//     - Creating a 2D scene with tile map
-//     - Displaying the scene using the Renderer subsystem
-//     - Handling keyboard to move and zoom 2D camera
+//     - Creating GUI elements from AngelScript
+//     - Loading GUI Style from xml
+//     - Subscribing to GUI drag events and handling them.
 
 #include "Scripts/Utilities/Sample.as"
 StringHash VAR_BUTTONS("BUTTONS");
