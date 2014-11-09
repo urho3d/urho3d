@@ -1,6 +1,13 @@
 $#include "File.h"
 $#include "Input.h"
 
+enum MouseMode
+{
+    MM_ABSOLUTE = 0,
+    MM_RELATIVE,
+    MM_WRAP
+};
+
 struct TouchState
 {
     UIElement* GetTouchedElement();
@@ -40,6 +47,7 @@ class Input : public Object
     void SetToggleFullscreen(bool enable);
     void SetMouseVisible(bool enable);
     void SetMouseGrabbed(bool grab);
+    void SetMouseMode(MouseMode mode);
     int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     bool RemoveScreenJoystick(int id);
     void SetScreenJoystickVisible(int id, bool enable);
@@ -87,6 +95,7 @@ class Input : public Object
     bool GetTouchEmulation() const;
     bool IsMouseVisible() const;
     bool IsMouseGrabbed() const;
+    MouseMode GetMouseMode() const;
     bool HasFocus();
     bool IsMinimized() const;
 

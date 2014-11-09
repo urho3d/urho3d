@@ -806,6 +806,8 @@ void CreateDragSlider(LineEdit@ parent)
 
     SubscribeToEvent(dragSld, "DragBegin", "LineDragBegin");
     SubscribeToEvent(dragSld, "DragMove", "LineDragMove");
+    SubscribeToEvent(dragSld, "DragEnd", "LineDragEnd");
+    SubscribeToEvent(dragSld, "DragCancel", "LineDragCancel");
 }
 
 void EditAttribute(StringHash eventType, VariantMap& eventData)
@@ -869,20 +871,21 @@ void LineDragBegin(StringHash eventType, VariantMap& eventData)
     LineEdit@ selectedNumEditor = label.parent;
     //not convenient way to trigger EditAttribute event
     selectedNumEditor.text = selectedNumEditor.text;
+    selectedNumEditor.vars["DragBeginValue"] = selectedNumEditor.text;
+
+    SetMouseMode(true);
 }
-
-
 
 void LineDragMove(StringHash eventTypem, VariantMap& eventData)
 {
     UIElement@ label = eventData["Element"].GetPtr();
     LineEdit@ selectedNumEditor = label.parent;
-    
+
     int x = eventData["X"].GetInt();
     int posx = label.vars["posX"].GetInt();
-    float val = x - posx;
-    
-    float fieldVal = selectedNumEditor.text.ToFloat(); 
+    float val = input.mouseMoveX;
+
+    float fieldVal = selectedNumEditor.text.ToFloat();
     fieldVal += val/100;
     label.vars["posX"] = x;
     selectedNumEditor.text = fieldVal;
@@ -890,6 +893,22 @@ void LineDragMove(StringHash eventTypem, VariantMap& eventData)
     dragEditAttribute = true;
 }
 
+void LineDragEnd(StringHash eventType, VariantMap& eventData)
+{
+    dragEditAttribute = false;
+    SetMouseMode(false);
+}
+
+void LineDragCancel(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ label = eventData["Element"].GetPtr();
+
+    //prevent undo triggering
+    dragEditAttribute = true;
+    LineEdit@ selectedNumEditor = label.parent;
+    selectedNumEditor.text = selectedNumEditor.vars["DragBeginValue"].GetString();
+    SetMouseMode(false);
+}
 
 // Resource picker functionality
 const uint ACTION_PICK = 1;

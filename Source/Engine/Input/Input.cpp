@@ -107,6 +107,9 @@ Input::Input(Context* context) :
     toggleFullscreen_(true),
     mouseVisible_(false),
     mouseGrabbed_(false),
+    mouseMode_(MM_ABSOLUTE),
+    lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
+    supressNextVisibleChangeEvent_(false),
     touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
@@ -155,6 +158,47 @@ void Input::Update()
     SDL_Event evt;
     while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
         HandleSDLEvent(&evt);
+
+    if (mouseVisible_ && mouseMode_ == MM_WRAP)
+    {
+        IntVector2 mpos;
+        SDL_GetMouseState(&mpos.x_, &mpos.y_);
+
+        int buffer = 5;
+        int width = graphics_->GetWidth() - buffer * 2;
+        int height = graphics_->GetHeight() - buffer * 2;
+
+        bool warp = false;
+        if (mpos.x_ < buffer)
+        {
+            warp = true;
+            mpos.x_ += width;
+        }
+
+        if (mpos.x_ > width)
+        {
+            warp = true;
+            mpos.x_ -= width;
+        }
+
+        if (mpos.y_ < buffer)
+        {
+            warp = true;
+            mpos.y_ += height;
+        }
+
+        if (mpos.y_ > height)
+        {
+            warp = true;
+            mpos.y_ -= height;
+        }
+
+        if (warp)
+        {
+            SetMousePosition(mpos);
+            SDL_FlushEvent(SDL_MOUSEMOTION);
+        }
+    }
 
     // Check for activation and inactivation from SDL window flags. Must nullcheck the window pointer because it may have
     // been closed due to input events
@@ -251,19 +295,28 @@ void Input::SetMouseVisible(bool enable)
             {
                 SDL_ShowCursor(SDL_FALSE);
                 // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                lastVisibleMousePosition_ = GetMousePosition();
                 IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
                 SetMousePosition(center);
                 lastMousePosition_ = center;
             }
             else
+            {
                 SDL_ShowCursor(SDL_TRUE);
+                if (lastVisibleMousePosition_.x_ != MOUSE_POSITION_OFFSCREEN.x_ && lastVisibleMousePosition_.y_ != MOUSE_POSITION_OFFSCREEN.y_)
+                    SetMousePosition(lastVisibleMousePosition_);
+            }
         }
 
-        using namespace MouseVisibleChanged;
+        if (supressNextVisibleChangeEvent_)
+        {
+            supressNextVisibleChangeEvent_ = false;
+            using namespace MouseVisibleChanged;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_VISIBLE] = mouseVisible_;
-        SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_VISIBLE] = mouseVisible_;
+            SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+        }
     }
     #endif
 }
@@ -271,6 +324,58 @@ void Input::SetMouseVisible(bool enable)
 void Input::SetMouseGrabbed(bool grab)
 {
     mouseGrabbed_ = grab;
+}
+
+void Input::SetMouseMode(MouseMode mode)
+{
+    if (mode != mouseMode_)
+    {
+        if (mouseMode_ == MM_RELATIVE)
+        {
+            // Todo: Use SDL_SetRelativeMouseMode()
+            supressNextVisibleChangeEvent_ = true;
+            SetMouseVisible(true);
+
+            // Send updated mouse position:
+            {
+                using namespace MouseMove;
+
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_X] = lastVisibleMousePosition_.x_;
+                eventData[P_Y] = lastVisibleMousePosition_.y_;
+                eventData[P_DX] = mouseMove_.x_;
+                eventData[P_DY] = mouseMove_.y_;
+                eventData[P_BUTTONS] = mouseButtonDown_;
+                eventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_MOUSEMOVE, eventData);
+            }
+        }
+        else if (mouseMode_ == MM_WRAP)
+        {
+            SDL_Window* window = graphics_->GetImpl()->GetWindow();
+            SDL_SetWindowGrab(window, SDL_FALSE);
+        }
+
+        if (mode == MM_ABSOLUTE)
+            SetMouseGrabbed(false);
+        else
+        {
+            SetMouseGrabbed(true);
+
+            if (mode == MM_RELATIVE)
+            {
+                supressNextVisibleChangeEvent_ = true;
+                SetMouseVisible(false);
+            }
+            else if (mode == MM_WRAP)
+            {
+                // Todo: When SDL 2.0.4 is integrated, use SDL_CaptureMouse() and global mouse functions.
+                SDL_Window* window = graphics_->GetImpl()->GetWindow();
+                SDL_SetWindowGrab(window, SDL_TRUE);
+            }
+        }
+        mouseMode_ = mode;
+    }
 }
 
 void Input::SetToggleFullscreen(bool enable)
@@ -884,6 +989,8 @@ void Input::LoseFocus()
     // Show the mouse cursor when inactive
     SDL_ShowCursor(SDL_TRUE);
 
+    SetMouseMode(MM_ABSOLUTE);
+
     SendInputFocusEvent();
 }
 
@@ -1126,7 +1233,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEMOTION:
-        if (mouseVisible_ && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE) && !touchEmulation_)
         {
             mouseMove_.x_ += evt.motion.xrel;
             mouseMove_.y_ += evt.motion.yrel;

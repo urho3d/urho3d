@@ -27,8 +27,18 @@
 #include "Mutex.h"
 #include "Object.h"
 
+#include "Cursor.h"
+
 namespace Urho3D
 {
+
+/// %Input Mouse Modes.
+enum MouseMode
+{
+    MM_ABSOLUTE = 0,
+    MM_RELATIVE,
+    MM_WRAP
+};
 
 class Deserializer;
 class Graphics;
@@ -36,12 +46,14 @@ class Serializer;
 class UIElement;
 class XMLFile;
 
+const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
+
 /// %Input state for a finger touch.
 struct TouchState
 {
     /// Return last touched UI element, used by scripting integration.
     UIElement* GetTouchedElement();
-    
+
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.
@@ -126,6 +138,8 @@ public:
     void SetMouseVisible(bool enable);
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab);
+    /// Set the mouse mode.
+    void SetMouseMode(MouseMode mode);
     /// Add screen joystick.
     /** Return the joystick instance ID when successful or negative on error.
      *  If layout file is not given, use the default screen joystick layout.
@@ -223,6 +237,8 @@ public:
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether the mouse is currently being grabbed by an operation.
     bool IsMouseGrabbed() const { return mouseGrabbed_; }
+    /// Return the mouse mode.
+    MouseMode GetMouseMode() const { return mouseMode_; }
     /// Return whether application window has input focus.
     bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
@@ -284,6 +300,8 @@ private:
     unsigned mouseButtonPress_;
     /// Last mouse position for calculating movement.
     IntVector2 lastMousePosition_;
+    /// Last mouse position before being set to not visible.
+    IntVector2 lastVisibleMousePosition_;
     /// Mouse movement since last frame.
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
@@ -296,6 +314,8 @@ private:
     bool mouseVisible_;
     /// Flag to indicate the mouse is being grabbed by an operation. Subsystems like UI that uses mouse should temporarily ignore the mouse hover or click events.
     bool mouseGrabbed_;
+    /// Determines the mode of mouse behaviour.
+    MouseMode mouseMode_;
     /// Touch emulation mode flag.
     bool touchEmulation_;
     /// Input focus flag.
@@ -306,6 +326,8 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
+    /// Next visible event suppress flag.
+    bool supressNextVisibleChangeEvent_;
     /// Initialized flag.
     bool initialized_;
 };
