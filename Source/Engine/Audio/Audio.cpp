@@ -54,7 +54,7 @@ Audio::Audio(Context* context) :
     playing_(false)
 {
     for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
-        masterGain_[i] = 1.0f;
+        masterGain_[soundTypeHashes[i]] = 1.0f;
     
     // Register Audio library object factories
     RegisterAudioLibrary(context_);
@@ -153,7 +153,12 @@ void Audio::SetMasterGain(SoundType type, float gain)
 {
     if (type >= MAX_SOUND_TYPES)
         return;
-    
+
+    SetMasterGain(soundTypeHashes[type], gain);
+}
+
+void Audio::SetMasterGain(const StringHash& type, float gain)
+{
     masterGain_[type] = Clamp(gain, 0.0f, 1.0f);
 }
 
@@ -171,12 +176,23 @@ void Audio::StopSound(Sound* soundClip)
     }
 }
 
+
 float Audio::GetMasterGain(SoundType type) const
 {
     if (type >= MAX_SOUND_TYPES)
         return 0.0f;
-    
-    return masterGain_[type];
+
+    return GetMasterGain(soundTypeHashes[type]);
+}
+
+
+float Audio::GetMasterGain(const StringHash& type) const
+{
+    VariantMap::ConstIterator findIt = masterGain_.Find(type);
+    if (findIt == masterGain_.End())
+        return 0.0f;
+
+    return findIt->second_.GetFloat();
 }
 
 SoundListener* Audio::GetListener() const
@@ -198,6 +214,25 @@ void Audio::RemoveSoundSource(SoundSource* channel)
         MutexLock lock(audioMutex_);
         soundSources_.Erase(i);
     }
+}
+
+float Audio::GetSoundSourceMasterGain(SoundType type) const
+{
+    if (type >= MAX_SOUND_TYPES)
+        return 0.0f;
+    
+    return GetSoundSourceMasterGain(soundTypeHashes[type]);
+}
+
+float Audio::GetSoundSourceMasterGain(const StringHash& type) const
+{
+    VariantMap::ConstIterator masterIt = masterGain_.Find(soundTypeHashes[SOUND_MASTER]);
+    VariantMap::ConstIterator typeIt = masterGain_.Find(type);
+
+    if (typeIt == masterGain_.End())
+        return 0.0f;
+
+    return masterIt->second_.GetFloat() * typeIt->second_.GetFloat();
 }
 
 void SDLAudioCallback(void *userdata, Uint8* stream, int len)

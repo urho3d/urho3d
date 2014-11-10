@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "StringHash.h"
+
 namespace Urho3D
 {
 
@@ -35,5 +37,15 @@ enum SoundType
     SOUND_MASTER,
     MAX_SOUND_TYPES
 };
+
+static const StringHash soundTypeHashes[MAX_SOUND_TYPES] =
+{
+    "Effect",
+    "Ambient",
+    "Voice",
+    "Music",
+    "Master"
+};
+
 
 }

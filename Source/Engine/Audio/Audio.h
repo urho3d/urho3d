@@ -54,8 +54,10 @@ public:
     bool Play();
     /// Suspend sound output.
     void Stop();
-    /// Set master gain on a specific sound type such as sound effects, music or voice.
+    /// Set master gain on a specific sound type such as sound effecs, music or voice using the enum for backwards compatibility.
     void SetMasterGain(SoundType type, float gain);
+    /// Set master gain on a specific sound type such as sound effects, music or voice.
+    void SetMasterGain(const StringHash& type, float gain);
     /// Set active sound listener for 3D sounds.
     void SetListener(SoundListener* listener);
     /// Stop any sound source playing a certain sound clip.
@@ -73,12 +75,17 @@ public:
     bool IsPlaying() const { return playing_; }
     /// Return whether an audio stream has been reserved.
     bool IsInitialized() const { return deviceID_ != 0; }
-    /// Return master gain for a specific sound source type.
+    /// Return master gain for a specific sound source type by enum.
     float GetMasterGain(SoundType type) const;
+    /// Return master gain for a specific sound source type.
+    float GetMasterGain(const StringHash& type) const;
     /// Return active sound listener.
     SoundListener* GetListener() const;
     /// Return all sound sources.
     const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
+
+    /// Return whether the specified master gain has been defined.
+    bool IsMasterGain(const StringHash& type) const { return masterGain_.Contains(type); }
 
     /// Add a sound source to keep track of. Called by SoundSource.
     void AddSoundSource(SoundSource* soundSource);
@@ -87,7 +94,9 @@ public:
     /// Return audio thread mutex.
     Mutex& GetMutex() { return audioMutex_; }
     /// Return sound type specific gain multiplied by master gain.
-    float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
+    float GetSoundSourceMasterGain(SoundType type) const;
+    /// Return sound type specific gain multiplied by master gain.
+    float GetSoundSourceMasterGain(const StringHash& type) const;
 
     /// Mix sound sources into the buffer.
     void MixOutput(void *dest, unsigned samples);
@@ -97,7 +106,6 @@ private:
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Stop sound output and release the sound buffer.
     void Release();
-
     /// Clipping buffer for mixing.
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex.
@@ -117,7 +125,7 @@ private:
     /// Playing flag.
     bool playing_;
     /// Master gain by sound source type.
-    float masterGain_[MAX_SOUND_TYPES];
+    VariantMap masterGain_;
     /// Sound sources.
     PODVector<SoundSource*> soundSources_;
     /// Sound listener.

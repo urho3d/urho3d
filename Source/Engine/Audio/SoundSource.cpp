@@ -91,7 +91,13 @@ namespace Urho3D
 
 #define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
 
-static const char* typeNames[] =
+static const float AUTOREMOVE_DELAY = 0.25f;
+
+static const int STREAM_SAFETY_SAMPLES = 4;
+
+extern const char* AUDIO_CATEGORY;
+
+static const char* typeNames[MAX_SOUND_TYPES] =
 {
     "Effect",
     "Ambient",
@@ -100,15 +106,14 @@ static const char* typeNames[] =
     0
 };
 
-static const float AUTOREMOVE_DELAY = 0.25f;
-
-static const int STREAM_SAFETY_SAMPLES = 4;
-
-extern const char* AUDIO_CATEGORY;
+template<> SoundType Variant::Get<SoundType>() const
+{
+    return static_cast<SoundType>(GetInt());
+}
 
 SoundSource::SoundSource(Context* context) :
     Component(context),
-    soundType_(SOUND_EFFECT),
+    soundType_(soundTypeHashes[SOUND_EFFECT]),
     frequency_(0.0f),
     gain_(1.0f),
     attenuation_(1.0f),
@@ -138,7 +143,8 @@ void SoundSource::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
-    ENUM_ATTRIBUTE("Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE("Sound Type", GetSoundTypeAttr, SetSoundTypeAttr, SoundType, typeNames, SOUND_MASTER, AM_EDIT | AM_READ);
+    ATTRIBUTE("Type", StringHash, soundType_, soundTypeHashes[SOUND_EFFECT], AM_DEFAULT);
     ATTRIBUTE("Frequency", float, frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE("Gain", float, gain_, 1.0f, AM_DEFAULT);
     ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
@@ -239,6 +245,18 @@ void SoundSource::SetSoundType(SoundType type)
 {
     if (type == SOUND_MASTER || type >= MAX_SOUND_TYPES)
         return;
+
+    soundType_ = soundTypeHashes[type];
+    MarkNetworkUpdate();
+}
+
+void SoundSource::SetSoundType(const StringHash& type)
+{
+    if (type == soundTypeHashes[SOUND_MASTER])
+        return;
+
+    if (!audio_->IsMasterGain(type))
+        audio_->SetMasterGain(type, 1.0f);
 
     soundType_ = type;
     MarkNetworkUpdate();
@@ -458,6 +476,26 @@ int SoundSource::GetPositionAttr() const
         return 0;
 }
 
+SoundType SoundSource::GetSoundTypeAttr() const
+{
+    for (int i; i < MAX_SOUND_TYPES; i++)
+    {
+        if (soundType_ == soundTypeHashes[i])
+            return static_cast<SoundType>(i);
+    }
+
+    // Valid as this defaults to 0 in type names.
+    return SOUND_MASTER;
+}
+
+void SoundSource::SetSoundTypeAttr(SoundType type)
+{
+    // Ensure that we don't set twice via normal attribute and backwards compatibility attribute.
+    if (soundType_ == StringHash::ZERO)
+        SetSoundType(type);
+}
+
+
 void SoundSource::PlayLockless(Sound* sound)
 {
     // Reset the time position in any case
@@ -619,7 +657,6 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
             position_ = pos;
         }
     }
-
     fractPosition_ = fractPos;
 }
 
