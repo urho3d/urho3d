@@ -51,7 +51,7 @@ task :scaffolding do
   end
 end
 
-# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [avd=test] [retries=60] [retry_interval=10]
+# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [abi=armeabi-v7a] [avd=test] [retries=60] [retry_interval=10]
 desc 'Test run already installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
   intent = ENV['intent'] || '.SampleLauncher'
@@ -60,10 +60,11 @@ task :android do
   payload = ENV['payload'] || (intent == '.SampleLauncher' ? 'input tap 10 200' : '')
   timeout = ENV['timeout'] || 30
   api = ENV['api'] || 19
+  abi = ENV['abi'] || 'armeabi-v7a'
   avd = ENV['avd'] || 'test'
   retries = ENV['retries'] || 60 # Roughly equals to 10 minutes wait with 10 seconds interval
   retry_interval = ENV['retry_interval'] || 10 # seconds
-  android_prepare_device api, avd or abort 'Failed to prepare Android (virtual) device for test run'
+  android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
   android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
@@ -87,6 +88,7 @@ task :ci do
   # Define the build option string only when the override environment variable is given
   $build_options = "-DURHO3D_64BIT=#{ENV['URHO3D_64BIT']}" if ENV['URHO3D_64BIT']
   $build_options = "#{$build_options} -DURHO3D_OPENGL=#{ENV['URHO3D_OPENGL']}" if ENV['URHO3D_OPENGL']
+  $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   if ENV['XCODE']
     # xctool or xcodebuild
     xcode_ci
@@ -184,9 +186,6 @@ task :ci_package_upload do
     xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
   else
     if ENV['ANDROID']
-      # Build Android package consisting of both armeabi-v7a and armeabi ABIs
-      system 'echo Reconfigure and rebuild Urho3D project using armeabi ABI'
-      system "SKIP_NATIVE=1 ./cmake_gcc.sh -DANDROID_ABI=armeabi && cd #{platform_prefix}Build && make -j$NUMJOBS" or abort 'Failed to reconfigure and rebuild for armeabi'
       system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     end
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
@@ -307,10 +306,8 @@ def makefile_ci
   end
   system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
-    # The AVD on Travis-CI does not have enough memory for STATIC lib installation, so only prepare device for SHARED lib test run
-    android_test = !ENV['PACKAGE_UPLOAD'] && (ENV['URHO3D_LIB_TYPE'] == 'SHARED' || !ENV['CI'])
-    if android_test
-      android_prepare_device ENV['API'] or abort 'Failed to prepare Android (virtual) device for test run'
+    if ENV['AVD']
+      android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
     end
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
@@ -342,7 +339,7 @@ def makefile_ci
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   # Make, deploy, and test run Android APK in an Android (virtual) device
-  if android_test
+  if ENV['AVD']
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     android_wait_for_device # We either success or die trying, killed by Travis-CI due 10 minutes no-output timeout which is perfect for this case
     system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
@@ -350,12 +347,12 @@ def makefile_ci
   end
 end
 
-def android_prepare_device api, name = 'test'
+def android_prepare_device api, abi = 'armeabi-v7a', name = 'test'
   system 'if ! ps |grep -cq adb; then adb start-server; fi'
   if `adb devices |tail -n +2 |head -1`.chomp.empty?
     # Don't have any (virtual) device attached, try to attach the named device (create the named device as AVD if necessary)
     if !system "android list avd |grep -cq 'Name: #{name}$'"
-      system "echo 'no' |android create avd -n #{name} -t android-#{api}" or abort "Failed to create '#{name}' Android virtual device"
+      system "echo 'no' |android create avd -n #{name} -t android-#{api} --abi #{abi}" or abort "Failed to create '#{name}' Android virtual device"
     end
     system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
   end

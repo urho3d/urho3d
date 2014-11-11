@@ -286,7 +286,8 @@ activity subclasses the SDLActivity from org.libsdl.app package, whose name
 Note that the native code is built by default for armeabi-v7a ABI. To make your
 program compatible also with old Android devices, build also an armeabi version
 by executing the CMake batch file again with the parameter -DANDROID_ABI=armeabi
-added, then execute make again in the build directory.
+added, then execute make again in the build directory. See "Build options" for
+all the possible values
 
 You can also build and deploy using Eclipse IDE with ADT plugin. To do that,
 after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh.
@@ -496,7 +497,9 @@ cmake_xxxx batch files or shell scripts.
 |IPHONEOS_            |-|Specify iPhone OS deployment target (iOS build only); |
 | DEPLOYMENT_TARGET   | | default to latest installed iOS SDK if not specified |
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible     |
-|                     | | values are armeabi-v7a (*default) and armeabi        |
+|                     | | values are armeabi, armeabi-v7a (*default),          |
+|                     | | armeabi-v7a with NEON, armeabi-v7a with VFPV3,       |
+|                     | | armeabi-v6 with VFP, arm64-v8a, x86, and x86_64      |
 |---------------------|-|------------------------------------------------------|
 
 Note that build option values specified via command line are cached by CMake.

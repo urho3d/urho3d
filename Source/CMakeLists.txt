@@ -122,7 +122,9 @@ if (URHO3D_64BIT)
 endif ()
 set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
 if (WIN32 AND NOT URHO3D_OPENGL)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)    # Stands for Direct 3D
+elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
 endif ()
 if ("$ENV{RELEASE_TAG}" STREQUAL "")
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
@@ -130,7 +132,7 @@ endif ()
 include (CPack)
 
 # Setup RPATH settings
-if (NOT WIN32)
+if (NOT WIN32 AND NOT ANDROID)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree

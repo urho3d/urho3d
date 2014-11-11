@@ -94,6 +94,10 @@ if (ANDROID)
     set (ANDROID_ABI armeabi-v7a CACHE STRING "Specify ABI for native code (Android build only), possible values are armeabi-v7a (default) and armeabi")
 else ()
     unset (ANDROID_ABI CACHE)
+    if (ANDROID_ABI)
+        # Just reference it to suppress "unused variable" CMake warning on non-Android project
+        # Due to the design of cmake_gcc.sh currently, the script can be used to configure/generate Android project and other non-Android projects in one go
+    endif ()
 endif ()
 
 # Set the build type if not explicitly set, for single-configuration generator only
