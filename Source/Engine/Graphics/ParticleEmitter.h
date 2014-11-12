@@ -74,6 +74,8 @@ public:
     void SetNumParticles(unsigned num);
     /// Set whether should be emitting. If the state was changed, also resets the emission period timer.
     void SetEmitting(bool enable);
+    /// Set whether particles should be serialized. Default true, set false to reduce scene file size.
+    void SetSerializeParticles(bool enable);
     /// Reset the emission period timer.
     void ResetEmissionTimer();
     /// Remove all current particles.
@@ -89,6 +91,8 @@ public:
     unsigned GetNumParticles() const { return particles_.Size(); }
     /// Return whether is currently emitting.
     bool IsEmitting() const { return emitting_; }
+    /// Return whether particles are to be serialized.
+    bool GetSerializeParticles() const { return serializeParticles_; }
 
     /// Set particles effect attribute.
     void SetEffectAttr(ResourceRef value);
@@ -96,9 +100,11 @@ public:
     ResourceRef GetEffectAttr() const;
     /// Set particles attribute.
     void SetParticlesAttr(VariantVector value);
-    /// Return particles attribute.
+    /// Return particles attribute. Returns particle amount only if particles are not to be serialized.
     VariantVector GetParticlesAttr() const;
-
+    /// Return billboards attribute. Returns billboard amount only if particles are not to be serialized.
+    VariantVector GetParticleBillboardsAttr() const;
+    
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -130,6 +136,8 @@ private:
     bool emitting_;
     /// Need update flag.
     bool needUpdate_;
+    /// Serialize particles flag.
+    bool serializeParticles_;
 };
 
 }

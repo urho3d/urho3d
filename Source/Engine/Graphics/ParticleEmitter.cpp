@@ -44,7 +44,8 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     periodTimer_(0.0f),
     emissionTimer_(0.0f),
     lastTimeStep_(0.0f),
-    lastUpdateFrameNumber_(M_MAX_UNSIGNED)
+    lastUpdateFrameNumber_(M_MAX_UNSIGNED),
+    serializeParticles_(true)
 {
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
@@ -70,7 +71,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     COPY_BASE_ATTRIBUTES(ParticleEmitter, Drawable);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Serialize Particles", serializeParticles_, true, AM_FILE);
 }
 
 void ParticleEmitter::OnSetEnabled()
@@ -283,9 +285,16 @@ void ParticleEmitter::SetEmitting(bool enable)
     {
         emitting_ = enable;
         periodTimer_ = 0.0f;
-        MarkNetworkUpdate();
+        // Note: network update does not need to be marked as this is a file only attribute
     }
 }
+
+void ParticleEmitter::SetSerializeParticles(bool enable)
+{
+    serializeParticles_ = enable;
+    // Note: network update does not need to be marked as this is a file only attribute
+}
+
 void ParticleEmitter::ResetEmissionTimer()
 {
     emissionTimer_ = 0.0f;
@@ -351,6 +360,12 @@ void ParticleEmitter::SetParticlesAttr(VariantVector value)
 VariantVector ParticleEmitter::GetParticlesAttr() const
 {
     VariantVector ret;
+    if (!serializeParticles_)
+    {
+        ret.Push(particles_.Size());
+        return ret;
+    }
+    
     ret.Reserve(particles_.Size() * 8 + 1);
     ret.Push(particles_.Size());
     for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
@@ -364,6 +379,31 @@ VariantVector ParticleEmitter::GetParticlesAttr() const
         ret.Push(i->colorIndex_);
         ret.Push(i->texIndex_);
     }
+    return ret;
+}
+
+VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
+{
+    VariantVector ret;
+    if (!serializeParticles_)
+    {
+        ret.Push(billboards_.Size());
+        return ret;
+    }
+    
+    ret.Reserve(billboards_.Size() * 6 + 1);
+    ret.Push(billboards_.Size());
+    
+    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    {
+        ret.Push(i->position_);
+        ret.Push(i->size_);
+        ret.Push(Vector4(i->uv_.min_.x_, i->uv_.min_.y_, i->uv_.max_.x_, i->uv_.max_.y_));
+        ret.Push(i->color_);
+        ret.Push(i->rotation_);
+        ret.Push(i->enabled_);
+    }
+    
     return ret;
 }
 
@@ -418,7 +458,7 @@ bool ParticleEmitter::EmitNewParticle()
         break;
     }
 
-    startDir = effect_->GetRandomDirection();        
+    startDir = effect_->GetRandomDirection();
     startDir.Normalize();
 
     if (!relative_)

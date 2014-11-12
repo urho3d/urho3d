@@ -1179,6 +1179,8 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_emitting() const", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_emitting() const", asMETHOD(ParticleEmitter, IsEmitting), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_serializeParticles() const", asMETHOD(ParticleEmitter, SetSerializeParticles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool get_serializeParticles() const", asMETHOD(ParticleEmitter, GetSerializeParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void ResetEmissionTimer()", asMETHOD(ParticleEmitter, ResetEmissionTimer), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void RemoveAllParticles()", asMETHOD(ParticleEmitter, RemoveAllParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void Reset()", asMETHOD(ParticleEmitter, Reset), asCALL_THISCALL);
