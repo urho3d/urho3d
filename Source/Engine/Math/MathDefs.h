@@ -141,6 +141,16 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ret;
 }
 
+/// Count the number of set bits in a mask.
+inline unsigned CountSetBits(unsigned value)
+{
+    // Brian Kernighan's method
+    unsigned count = 0;
+    for (count = 0; value; count++)
+        value &= value - 1;
+    return count;
+}
+
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
 inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }
 /// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)

@@ -425,7 +425,9 @@ set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules CACHE 
 
 \subsection FromSDKWithPkgConfig Using pkg-config instead of CMake
 
-If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
+If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of 'Urho3D.pc' configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. The 'Urho3D.pc' file contains important information on how to configure your compiler and linker correctly. You can use that information as a reference to configure your own project even when you do not use 'pkg-config' tool.
+
+Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
 
 \code
 # To get installed Urho3D version
@@ -444,18 +446,24 @@ export CC=${RASPI_TOOL}/arm-linux-gnueabihf-c++
 export PKG_CONFIG_SYSROOT_DIR=${RASPI_ROOT}
 export PKG_CONFIG_PATH=${RASPI_ROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
+
+# To cross-compile and link for Windows platform using MinGW cross-compiler (in Debug configuration)
+export CC=${MINGW_PREFIX}-c++
+export PKG_CONFIG_SYSROOT_DIR=${MINGW_ROOT}
+export PKG_CONFIG_PATH=${MINGW_ROOT}/usr/local/lib/pkgconfig
+$CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --variable CFLAGS_DEBUG Urho3D` `pkg-config --cflags --libs Urho3D`
 \endcode
 
 \section Scaffolding Project scaffolding
 
-On Unix-like build/host system (Linux, Mac, Raspberry-Pi) with [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
+With [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
 \verbatim
 Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
 \endverbatim
 
 As its name implies, this task just creates a basic project structure for your new project. You may also pass optional "project" and "target" parameters besides the "dir" parameter. Otherwise, you will get the default project name (Scaffolding) and target name (Main) in the main CMakeLists.txt. This task copies the Urho3DPlayer.cpp and Urho3DPlayer.h as placeholders for the source files. Normally, you should replace these two files with your own project source files before invoking one of the CMake *.bat or *.sh script.
 
-Unfortunately, all our rake tasks are currently not supported on Windows build/host system yet.
+On Windows host system, this task requires privilege to create symlinks by using mklink command. The task would fail when the Windows user account does not have that privilege.
 
 \page Structure Overall structure
 

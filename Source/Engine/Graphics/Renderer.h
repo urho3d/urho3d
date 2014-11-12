@@ -255,7 +255,7 @@ public:
     /// Return shadow depth bias addition for mobile platforms.
     float GetMobileShadowBiasAdd() const { return mobileShadowBiasAdd_; }
     /// Return number of views rendered.
-    unsigned GetNumViews() const { return numViews_; }
+    unsigned GetNumViews() const { return views_.Size(); }
     /// Return number of primitives rendered.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches rendered.
@@ -332,8 +332,6 @@ public:
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
-    /// Clear views from previous frame.
-    void ResetViews();
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material pass.
@@ -409,12 +407,12 @@ private:
     HashMap<long long, unsigned> savedScreenBufferAllocations_;
     /// Cache for light scissor queries.
     HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
-    /// Viewports.
+    /// Backbuffer viewports.
     Vector<SharedPtr<Viewport> > viewports_;
-    /// Queued views.
-    Vector<Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > > queuedViews_;
-    /// Views.
-    Vector<SharedPtr<View> > views_;
+    /// Render surface viewports queued for update.
+    Vector<Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > > queuedViewports_;
+    /// Views that have been processed this frame.
+    Vector<WeakPtr<View> > views_;
     /// Octrees that have been updated during the frame.
     HashSet<Octree*> updatedOctrees_;
     /// Techniques for which missing shader error has been displayed.
@@ -455,8 +453,6 @@ private:
     float mobileShadowBiasMul_;
     /// Mobile platform shadow depth bias addition.
     float mobileShadowBiasAdd_;
-    /// Number of views.
-    unsigned numViews_;
     /// Number of occlusion buffers in use.
     unsigned numOcclusionBuffers_;
     /// Number of temporary shadow cameras in use.
@@ -483,6 +479,8 @@ private:
     bool shadersDirty_;
     /// Initialized flag.
     bool initialized_;
+    /// Flag for views needing reset.
+    bool resetViews_;
 };
 
 }

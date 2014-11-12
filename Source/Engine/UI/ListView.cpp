@@ -988,9 +988,9 @@ void ListView::EnsureItemVisibility(UIElement* item)
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
     // Disregard the click end if a drag is going on
-    if (selectOnClickEnd_ && GetSubsystem<UI>()->GetDragElement())
+    if (selectOnClickEnd_ && GetSubsystem<UI>()->IsDragging())
         return;
-    
+
     int button = eventData[UIMouseClick::P_BUTTON].GetInt();
     int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();

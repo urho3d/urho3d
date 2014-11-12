@@ -20,19 +20,14 @@
 # THE SOFTWARE.
 #
 
-prefix=@DEST_INSTALL_PREFIX@
-exec_prefix=${prefix}
-libdir=${exec_prefix}/@DEST_LIBRARY_DIR@
-includedir=${prefix}/@DEST_INCLUDE_DIR@
+# Define target name
+set (TARGET_NAME 37_UIDrag)
 
-# Additional Cflags for various build configurations, which can be accessed as normal pkg-config variable using '--variable' option
-CFLAGS_DEBUG=@CMAKE_CXX_FLAGS_DEBUG@
-CFLAGS_RELEASE=@CMAKE_CXX_FLAGS_RELEASE@
-CFLAGS_RELWITHDEBINFO=@CMAKE_CXX_FLAGS_RELWITHDEBINFO@
+# Define source files
+define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
 
-Name: Urho3D
-Description: @URHO3D_DESCRIPTION@
-Version: @URHO3D_VERSION@
-URL: @URHO3D_URL@
-Libs: @CMAKE_EXE_LINKER_FLAGS@ @URHO3D_ABS_PATH_LIBS@ @LIB_DIR@ @URHO3D_LIBS@
-Cflags: @URHO3D_COMPILE_DEFINITIONS@ @CMAKE_CXX_FLAGS@ @GLOBAL_INCLUDE_DIRS@ @ENGINE_INCLUDE_DIRS@
+# Setup target with resource copying
+setup_main_executable ()
+
+# Setup test cases
+add_test (NAME ${TARGET_NAME} COMMAND ${TARGET_NAME} -timeout ${URHO3D_TEST_TIME_OUT})

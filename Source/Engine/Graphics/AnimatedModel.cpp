@@ -134,11 +134,11 @@ void AnimatedModel::ApplyAttributes()
 
 void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    // If no bones or no bone-level testing, use the Drawable test
+    // If no bones or no bone-level testing, use the StaticModel test
     RayQueryLevel level = query.level_;
-    if (level < RAY_AABB || !skeleton_.GetRootBone() || !skeleton_.GetRootBone()->node_)
+    if (level < RAY_AABB || !skeleton_.GetNumBones())
     {
-        Drawable::ProcessRayQuery(query, results);
+        StaticModel::ProcessRayQuery(query, results);
         return;
     }
 

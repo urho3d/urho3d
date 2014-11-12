@@ -110,7 +110,7 @@ else ()
     # Note that the prefix path should not contain the "/include" or "/lib"
     # For example on Windows platform: CMAKE_PREFIX_PATH=C:/Users/john/Urho3D if the SDK is installed using CMAKE_INSTALL_PREFIX=C:/Users/john/Urho3D
     # For example on Linux platform: CMAKE_PREFIX_PATH=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
-    if (WIN32)
+    if (CMAKE_HOST_WIN32)
         set (URHO3D_INC_SEARCH_PATH include)
         set (URHO3D_LIB_SEARCH_PATH lib)
     else ()
@@ -123,7 +123,7 @@ else ()
     find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     if (WIN32)
-        find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES_DBG} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES_DBG} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     endif ()
 
     if (URHO3D_INCLUDE_DIRS)

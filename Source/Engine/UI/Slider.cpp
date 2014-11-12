@@ -116,12 +116,17 @@ void Slider::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
 
 void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    dragBeginCursor_ = position;
-    dragBeginPosition_ = knob_->GetPosition();
-    dragSlider_ = knob_->IsInside(screenPosition, true);
+    UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
+
+    if (buttons == MOUSEB_LEFT)
+    {
+        dragBeginCursor_ = position;
+        dragBeginPosition_ = knob_->GetPosition();
+        dragSlider_ = knob_->IsInside(screenPosition, true);
+    }
 }
 
-void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
 {
     if (!editable_ || !dragSlider_ || GetSize() == knob_->GetSize())
         return;
@@ -145,10 +150,15 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     SetValue(newValue);
 }
 
-void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
+void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
 {
-    dragSlider_ = false;
-    selected_ = false;
+    UIElement::OnDragEnd(position, screenPosition, dragButtons, buttons, cursor);
+
+    if (dragButtons == MOUSEB_LEFT)
+    {
+        dragSlider_ = false;
+        selected_ = false;
+    }
 }
 
 void Slider::OnResize()

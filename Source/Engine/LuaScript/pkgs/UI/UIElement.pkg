@@ -191,6 +191,8 @@ class UIElement : public Animatable
     int GetLayoutSpacing() const;
     const IntRect& GetLayoutBorder() const;
     unsigned GetNumChildren(bool recursive = false) const;
+    int GetDragButtonCombo() const;
+    unsigned GetDragButtonCount() const;
 
     UIElement* GetChild(const String name, bool recursive = false) const;
     UIElement* GetChild(unsigned index) const;

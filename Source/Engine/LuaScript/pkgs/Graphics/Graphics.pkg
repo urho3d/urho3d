@@ -77,7 +77,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set unsigned dummyColorFormat;
     tolua_readonly tolua_property__get_set unsigned shadowMapFormat;
     tolua_readonly tolua_property__get_set unsigned hiresShadowMapFormat;
-    tolua_readonly tolua_property__get_set bool sM3Support;
+    tolua_readonly tolua_property__get_set bool SM3Support;
     tolua_readonly tolua_property__get_set bool instancingSupport;
     tolua_readonly tolua_property__get_set bool lightPrepassSupport;
     tolua_readonly tolua_property__get_set bool deferredSupport;

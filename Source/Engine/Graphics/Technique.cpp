@@ -25,6 +25,7 @@
 #include "Graphics.h"
 #include "Log.h"
 #include "Technique.h"
+#include "ProcessUtils.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ShaderVariation.h"
@@ -69,6 +70,9 @@ static const char* lightingModeNames[] =
     0
 };
 
+static bool desktopSupportChecked = false;
+static bool desktopSupportResult = false;
+
 Pass::Pass(StringHash type) :
     type_(type),
     blendMode_(BLEND_REPLACE),
@@ -77,7 +81,8 @@ Pass::Pass(StringHash type) :
     shadersLoadedFrameNumber_(0),
     depthWrite_(true),
     alphaMask_(false),
-    isSM3_(false)
+    isSM3_(false),
+    isDesktop_(false)
 {
     // Guess default lighting mode from pass name
     if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
@@ -120,6 +125,11 @@ void Pass::SetIsSM3(bool enable)
     isSM3_ = enable;
 }
 
+void Pass::SetIsDesktop(bool enable)
+{
+    isDesktop_ = enable;
+}
+
 void Pass::SetVertexShader(const String& name)
 {
     vertexShaderName_ = name;
@@ -158,10 +168,20 @@ void Pass::MarkShadersLoaded(unsigned frameNumber)
 Technique::Technique(Context* context) :
     Resource(context),
     isSM3_(false),
+    isDesktop_(false),
     numPasses_(0)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     sm3Support_ = graphics ? graphics->GetSM3Support() : true;
+    
+    if (!desktopSupportChecked)
+    {
+        String platformString = GetPlatform();
+        desktopSupportResult = (platformString == "Windows" || platformString == "Mac OS X" || platformString == "Linux");
+        desktopSupportChecked = true;
+    }
+    
+    desktopSupport_ = desktopSupportResult;
 }
 
 Technique::~Technique()
@@ -187,6 +207,8 @@ bool Technique::BeginLoad(Deserializer& source)
     XMLElement rootElem = xml->GetRoot();
     if (rootElem.HasAttribute("sm3"))
         isSM3_ = rootElem.GetBool("sm3");
+    if (rootElem.HasAttribute("desktop"))
+        isDesktop_ = rootElem.GetBool("desktop");
     
     String globalVS = rootElem.GetAttribute("vs");
     String globalPS = rootElem.GetAttribute("ps");
@@ -212,6 +234,8 @@ bool Technique::BeginLoad(Deserializer& source)
             
             if (passElem.HasAttribute("sm3"))
                 newPass->SetIsSM3(passElem.GetBool("sm3"));
+            if (passElem.HasAttribute("desktop"))
+                newPass->SetIsDesktop(passElem.GetBool("desktop"));
             
             // Append global defines only when pass does not redefine the shader
             if (passElem.HasAttribute("vs"))
@@ -277,6 +301,11 @@ bool Technique::BeginLoad(Deserializer& source)
 void Technique::SetIsSM3(bool enable)
 {
     isSM3_ = enable;
+}
+
+void Technique::SetIsDesktop(bool enable)
+{
+    isDesktop_ = enable;
 }
 
 void Technique::ReleaseShaders()

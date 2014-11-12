@@ -35,6 +35,7 @@ class Camera;
 class RenderPath;
 class Scene;
 class XMLFile;
+class View;
 
 /// %Viewport definition either for a render surface or the backbuffer.
 class URHO3D_API Viewport : public Object
@@ -68,6 +69,8 @@ public:
     Scene* GetScene() const;
     /// Return camera.
     Camera* GetCamera() const;
+    /// Return the internal rendering structure. May be null if the viewport has not been rendered yet.
+    View* GetView() const;
     /// Return rectangle.
     const IntRect& GetRect() const { return rect_; }
     /// Return rendering path.
@@ -81,6 +84,9 @@ public:
     // Convert screen coordinates and depth to a world space point.
     Vector3 ScreenToWorldPoint(int x, int y, float depth) const;
     
+    /// Allocate the view structure. Called by Renderer.
+    void AllocateView();
+    
 private:
     /// Scene pointer.
     WeakPtr<Scene> scene_;
@@ -90,6 +96,8 @@ private:
     IntRect rect_;
     /// Rendering path.
     SharedPtr<RenderPath> renderPath_;
+    /// Internal rendering structure.
+    SharedPtr<View> view_;
     /// Debug draw flag.
     bool drawDebug_;
 };

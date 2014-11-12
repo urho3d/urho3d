@@ -24,6 +24,7 @@
 
 #include "Batch.h"
 #include "HashSet.h"
+#include "Light.h"
 #include "List.h"
 #include "Object.h"
 #include "Polyhedron.h"
@@ -104,7 +105,7 @@ struct PerThreadSceneResult
 
 static const unsigned MAX_VIEWPORT_TEXTURES = 2;
 
-/// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
+/// Internal structure for 3D rendering work. Created for each backbuffer and texture viewport, but not for shadow cameras.
 class URHO3D_API View : public Object
 {
     friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
