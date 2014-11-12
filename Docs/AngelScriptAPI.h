@@ -6486,6 +6486,7 @@ bool occluder;
 int refs;
 bool relative;
 bool scaled;
+bool serializeParticles;
 float shadowDistance;
 uint shadowMask;
 bool sorted;

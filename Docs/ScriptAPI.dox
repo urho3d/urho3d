@@ -1356,6 +1356,7 @@ namespace Urho3D
 - %Light %Mask : int
 - %Shadow %Mask : int
 - %Zone %Mask : int
+- %Serialize %Particles : bool
 
 ### ParticleEmitter2D
 - %Particle %Effect : ResourceRef
@@ -7753,6 +7754,7 @@ Properties:
 - int refs // readonly
 - bool relative
 - bool scaled
+- bool serializeParticles
 - float shadowDistance
 - uint shadowMask
 - bool sorted

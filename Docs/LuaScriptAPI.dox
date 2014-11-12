@@ -3722,6 +3722,7 @@ Methods:
 - void SetEffect(ParticleEffect* effect)
 - void SetNumParticles(unsigned num)
 - void SetEmitting(bool enable)
+- void SetSerializeParticles(bool enable)
 - void ResetEmissionTimer()
 - void RemoveAllParticles()
 - void Reset()
@@ -3729,12 +3730,14 @@ Methods:
 - ParticleEffect* GetEffect() const
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
+- bool GetSerializeParticles() const
 
 Properties:
 
 - ParticleEffect* effect
 - unsigned numParticles
 - bool emitting
+- bool serializeParticles
 
 <a name="Class_ParticleEmitter2D"></a>
 ### ParticleEmitter2D : Drawable2D
