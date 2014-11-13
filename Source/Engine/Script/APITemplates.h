@@ -39,7 +39,7 @@
 #include "StaticModel.h"
 #include "Texture.h"
 
-#include <angelscript.h>
+#include <AngelScript/angelscript.h>
 #include <cstring>
 
 #ifdef _MSC_VER
