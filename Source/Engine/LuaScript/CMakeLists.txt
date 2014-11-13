@@ -90,7 +90,7 @@ if (URHO3D_NETWORK)
 endif ()
 
 if (URHO3D_PHYSICS)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Physics ../../ThirdParty/Bullet/src)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Physics ../../ThirdParty/Bullet/src ../../ThirdParty/Bullet/src/Bullet)
 endif ()
 
 # Setup target
