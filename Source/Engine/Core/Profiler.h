@@ -67,7 +67,7 @@ public:
             *i = 0;
         }
         
-        delete name_;
+        delete [] name_;
     }
     
     /// Begin timing.
