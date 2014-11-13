@@ -25,7 +25,7 @@
 #include "Color.h"
 
 #include <d3d9.h>
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 namespace Urho3D
 {

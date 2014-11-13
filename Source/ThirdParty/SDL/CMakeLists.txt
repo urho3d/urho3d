@@ -106,19 +106,19 @@ else ()
     set (SYS_C_FILES ${SYS_C_FILES} ${VIDEO_DRIVER_C_FILES})
 endif ()
 
-file (GLOB H_FILES include/*.h)
+file (GLOB H_FILES include/SDL/*.h)
 
 # Define source files
 set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
 set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 # Install dependency for SDL_android_main.c, D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
+install (DIRECTORY include/SDL/ DESTINATION ${DEST_INCLUDE_DIR}/SDL ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} SDL PARENT_SCOPE)
 install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_INCLUDE_DIR})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS_ONLY include include/SDL)
 
 # Setup target
 setup_library ()
