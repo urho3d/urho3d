@@ -51,6 +51,7 @@ Urho3D development, contributions and bugfixes by:
 - celeron55
 - hdunderscore
 - mightyCelu
+- nemerle
 - ninjastone
 - rasteron
 - reattiva
