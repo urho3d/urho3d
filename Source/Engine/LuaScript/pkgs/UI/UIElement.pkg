@@ -209,7 +209,6 @@ class UIElement : public Animatable
 
     IntRect GetCombinedScreenRect();
     void SortChildren();
-    int GetLayoutMinSize() const;
     int GetIndent() const;
     int GetIndentSpacing() const;
     int GetIndentWidth() const;
@@ -269,7 +268,6 @@ class UIElement : public Animatable
     tolua_readonly tolua_property__get_set UIElement* root;
     tolua_readonly tolua_property__get_set Color& derivedColor;
     tolua_readonly tolua_property__get_set IntRect combinedScreenRect;
-    tolua_readonly tolua_property__get_set int layoutMinSize;
     tolua_property__get_set int indent;
     tolua_property__get_set int indentSpacing;
     tolua_readonly tolua_property__get_set int indentWidth;
