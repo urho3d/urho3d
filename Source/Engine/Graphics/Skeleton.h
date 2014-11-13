@@ -92,6 +92,8 @@ public:
     bool Save(Serializer& dest) const;
     /// Define from another skeleton.
     void Define(const Skeleton& src);
+    /// Set root bone's index.
+    void SetRootBoneIndex(unsigned index);
     /// Clear bones.
     void ClearBones();
     /// Reset all animating bones to initial positions.

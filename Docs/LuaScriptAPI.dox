@@ -5932,7 +5932,6 @@ Methods:
 - bool IsInsideCombined(IntVector2 position, bool isScreen)
 - IntRect GetCombinedScreenRect()
 - void SortChildren()
-- int GetLayoutMinSize() const
 - int GetIndent() const
 - int GetIndentSpacing() const
 - int GetIndentWidth() const
@@ -5994,7 +5993,6 @@ Properties:
 - UIElement* root (readonly)
 - Color& derivedColor (readonly)
 - IntRect combinedScreenRect (readonly)
-- int layoutMinSize (readonly)
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)

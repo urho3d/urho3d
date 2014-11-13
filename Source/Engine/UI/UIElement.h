@@ -454,15 +454,16 @@ public:
     IntRect GetCombinedScreenRect();
     /// Sort child elements if sorting enabled and order dirty. Called by UI.
     void SortChildren();
-    /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated.
+    /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated. Used internally by UI for optimizations.
     int GetLayoutMinSize() const { return layoutMinSize_; }
+    /// Return maximum layout element size in the layout direction. Only valid after layout has been calculated. Used internally by UI for optimizations.
+    int GetLayoutMaxSize() const { return layoutMaxSize_; }
     /// Return horizontal indentation.
     int GetIndent() const { return indent_; }
     /// Return indent spacing (number of pixels per indentation level).
     int GetIndentSpacing() const { return indentSpacing_; }
     /// Return indent width in pixels.
     int GetIndentWidth() const { return indent_ * indentSpacing_; }
-
     /// Set child offset.
     void SetChildOffset(const IntVector2& offset);
     /// Set hovering state.
@@ -553,6 +554,8 @@ protected:
     unsigned layoutNestingLevel_;
     /// Layout element minimum size in layout direction.
     int layoutMinSize_;
+    /// Layout element maximum size in layout direction.
+    int layoutMaxSize_;
     /// Horizontal indentation.
     int indent_;
     /// Indent spacing (number of pixels per indentation level).

@@ -132,6 +132,7 @@ UIElement::UIElement(Context* context) :
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
     layoutMinSize_(0),
+    layoutMaxSize_(0),
     indent_(0),
     indentSpacing_(16),
     position_(IntVector2::ZERO),
@@ -1922,6 +1923,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
 
     // Calculate final positions and store the minimum child element size
     layoutMinSize_ = M_MAX_INT;
+    layoutMaxSize_ = 0;
     int position = begin;
     for (int i = 0; i < numChildren; ++i)
     {
@@ -1929,6 +1931,8 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         position += sizes[i] + spacing;
         if (sizes[i] < layoutMinSize_)
             layoutMinSize_ = sizes[i];
+        if (sizes[i] > layoutMaxSize_)
+            layoutMaxSize_ = sizes[i];
     }
 }
 
