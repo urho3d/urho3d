@@ -25,7 +25,7 @@
 
 #ifndef KNET_NO_FIXEDWIDTH_TYPES
 
-#include "kNetBuildConfig.h"
+#include "../kNetBuildConfig.h"
 
 #ifdef __MINGW32__
 #include <stdint.h>

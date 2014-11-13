@@ -54,51 +54,51 @@ void Clock::Sleep(int milliseconds)
 		LOG(LogError, "nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
 }
 
-int Clock::Year()
-{
-	///\todo.
-	return 0;
-}
+// int Clock::Year()
+// {
+// 	///\todo.
+// 	return 0;
+// }
 
-int Clock::Month()
-{
-	///\todo.
-	return 0;
-}
+// int Clock::Month()
+// {
+// 	///\todo.
+// 	return 0;
+// }
 
-int Clock::Day()
-{
-	///\todo.
-	return 0;
-}
+// int Clock::Day()
+// {
+// 	///\todo.
+// 	return 0;
+// }
 
-int Clock::Hour()
-{
-	///\todo.
-	return 0;
-}
+// int Clock::Hour()
+// {
+// 	///\todo.
+// 	return 0;
+// }
 
-int Clock::Min()
-{
-	///\todo.
-	return 0;
-}
+// int Clock::Min()
+// {
+// 	///\todo.
+// 	return 0;
+// }
 
-int Clock::Sec()
-{
-	///\todo.
-	return 0;
-}
+// int Clock::Sec()
+// {
+// 	///\todo.
+// 	return 0;
+// }
 
-unsigned long Clock::SystemTime()
-{
-	return TickU32();
-}
+// unsigned long Clock::SystemTime()
+// {
+// 	return TickU32();
+// }
 
-unsigned long Clock::Time()
-{
-	return (unsigned long)(Tick() - appStartTime);
-}
+// unsigned long Clock::Time()
+// {
+// 	return (unsigned long)(Tick() - appStartTime);
+// }
 
 tick_t Clock::Tick()
 {
@@ -120,10 +120,10 @@ tick_t Clock::Tick()
 #endif
 }
 
-unsigned long Clock::TickU32()
-{
-	return (unsigned long)Tick();
-}
+// unsigned long Clock::TickU32()
+// {
+// 	return (unsigned long)Tick();
+// }
 
 tick_t Clock::TicksPerSec()
 {

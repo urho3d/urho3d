@@ -37,7 +37,7 @@
 #include "Protocol.h"
 #include "Scene.h"
 
-#include <kNet.h>
+#include <kNet/kNet.h>
 
 #include "DebugNew.h"
 

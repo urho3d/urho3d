@@ -131,5 +131,5 @@ bool operator==(const SharedPtr<T> &a, const SharedPtr<T> &b)
 
 } // ~kNet
 
-#include "kNet/SharedPtr.inl"
+#include "SharedPtr.inl"
 

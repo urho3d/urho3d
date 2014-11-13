@@ -16,7 +16,7 @@
 /** @file INetworkServerListener.h
 	@brief The \ref kNet::INetworkServerListener INetworkServerListener interface. Implementable by the client application. */
 
-#include "kNet/Types.h"
+#include "Types.h"
 
 namespace kNet
 {

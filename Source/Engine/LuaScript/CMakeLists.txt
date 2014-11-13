@@ -86,7 +86,7 @@ if (URHO3D_NAVIGATION)
 endif ()
 
 if (URHO3D_NETWORK)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Network ../../ThirdParty/kNet/include)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Network ../../ThirdParty/kNet/include ../../ThirdParty/kNet/include/kNet)
 endif ()
 
 if (URHO3D_PHYSICS)
