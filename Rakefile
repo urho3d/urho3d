@@ -357,7 +357,7 @@ def android_prepare_device api, abi = 'armeabi-v7a', name = 'test'
     if !system "android list avd |grep -cq 'Name: #{name}$'"
       system "echo 'no' |android create avd -n #{name} -t android-#{api} --abi #{abi}" or abort "Failed to create '#{name}' Android virtual device"
     end
-    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
+    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; ANDROID_TMP=~ emulator -avd #{name} $OPTS &"
   end
   return 0
 end
