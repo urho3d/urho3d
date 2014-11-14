@@ -51,7 +51,7 @@ task :scaffolding do
   end
 end
 
-# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [abi=armeabi-v7a] [avd=test] [retries=60] [retry_interval=10]
+# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [abi=armeabi-v7a] [avd=test] [retries=10] [retry_interval=10]
 desc 'Test run already installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
   intent = ENV['intent'] || '.SampleLauncher'
@@ -62,7 +62,7 @@ task :android do
   api = ENV['api'] || 19
   abi = ENV['abi'] || 'armeabi-v7a'
   avd = ENV['avd'] || 'test'
-  retries = ENV['retries'] || 60 # Roughly equals to 10 minutes wait with 10 seconds interval
+  retries = ENV['retries'] || 10 # minutes
   retry_interval = ENV['retry_interval'] || 10 # seconds
   android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
@@ -341,9 +341,12 @@ def makefile_ci
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD']
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
-    android_wait_for_device # We either success or die trying, killed by Travis-CI due 10 minutes no-output timeout which is perfect for this case
-    system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
-    android_test_run or abort 'Failed to test run Urho3D Samples APK'
+    if android_wait_for_device 20 # minutes
+      system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
+      android_test_run or abort 'Failed to test run Urho3D Samples APK'
+    else
+      puts 'Skipped test running Urho3D Samples APK as emulator failed to start in time'
+    end
   end
 end
 
@@ -356,14 +359,27 @@ def android_prepare_device api, abi = 'armeabi-v7a', name = 'test'
     end
     system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
   end
-  return 0;
+  return 0
 end
 
 def android_wait_for_device retries = -1, retry_interval = 10, package = 'com.android.launcher'
-  # Wait until the indicator process is running or it is killed externally by Travis-CI or by user via Ctrl+C or when it exceeds the number of retries (if given)
-  puts "\nWaiting for device...\n\n"
+  # Wait until the indicator process is running or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
+  print "\nWaiting for device..."; $stdout.flush
   # Capture adb's stdout and interpret it because adb does not return exit code from its last shell command
-  return /timeout/ =~ `adb wait-for-device shell 'retries=#{retries}; until [ $retries -eq 0 ] || ps |grep -c #{package} 1>/dev/null; do sleep #{retry_interval}; if [ $retries -gt 0 ]; then let retries=retries-1; fi; done; if [ $retries -eq 0 ]; then echo timeout; else while ps |grep -c bootanimation 1>/dev/null; do sleep 1; done; fi'` ? nil : 0;
+  thread = Thread.new { `adb wait-for-device shell 'until ps |grep -c #{package} >/dev/null; do sleep #{retry_interval}; done; while ps |grep -c bootanimation >/dev/null; do sleep 1; done'` }
+  sleep 1
+  retries = retries * 60 / retry_interval unless retries == -1
+  until retries == 0
+    if thread.status == false
+      thread.join
+      break
+    end
+    sleep retry_interval
+    print '.'; $stdout.flush  # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
+    retries -= 1 if retries > 0
+  end
+  puts "\n\n"; $stdout.flush
+  return retries == 0 ? nil : 0
 end
 
 def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'input tap 10 200', timeout = 30
