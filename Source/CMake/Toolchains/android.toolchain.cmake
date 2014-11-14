@@ -645,9 +645,8 @@ if( BUILD_WITH_ANDROID_NDK )
  endif()
  if( NOT __availableToolchains )
   file( GLOB __availableToolchainsLst RELATIVE "${ANDROID_NDK_TOOLCHAINS_PATH}" "${ANDROID_NDK_TOOLCHAINS_PATH}/*" )
-  if( __availableToolchains )
-   list(SORT __availableToolchainsLst) # we need clang to go after gcc
-  endif()
+  # Urho3D: bug fix
+  list(SORT __availableToolchainsLst) # we need clang to go after gcc
   __LIST_FILTER( __availableToolchainsLst "^[.]" )
   __LIST_FILTER( __availableToolchainsLst "llvm" )
   __LIST_FILTER( __availableToolchainsLst "renderscript" )
@@ -1302,6 +1301,9 @@ elseif( ARMEABI_V6 )
  set( ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -march=armv6 -mfloat-abi=softfp -mfpu=vfp" ) # vfp == vfpv2
 elseif( ARMEABI )
  set( ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -march=armv5te -mtune=xscale -msoft-float" )
+# Urho3D: merged from gongminmin's PR
+elseif( ARM64_V8A )
+ set( ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -march=armv8-a" )
 endif()
 
 if( ANDROID_STL MATCHES "gnustl" AND (EXISTS "${__libstl}" OR EXISTS "${__libsupcxx}") )
@@ -1616,6 +1618,13 @@ macro( ANDROID_GET_ABI_RAWNAME TOOLCHAIN_FLAG VAR )
   set( ${VAR} "x86" )
  elseif( "${TOOLCHAIN_FLAG}" STREQUAL "MIPS" )
   set( ${VAR} "mips" )
+# Urho3D: merged from gongminmin's PR
+ elseif( "${TOOLCHAIN_FLAG}" STREQUAL "ARM64_V8A" )
+  set( ${VAR} "arm64-v8a" )
+ elseif( "${TOOLCHAIN_FLAG}" STREQUAL "X86_64" )
+  set( ${VAR} "x86_64" )
+ elseif( "${TOOLCHAIN_FLAG}" STREQUAL "MIPS64" )
+  set( ${VAR} "mips64" )
  else()
   set( ${VAR} "unknown" )
  endif()
