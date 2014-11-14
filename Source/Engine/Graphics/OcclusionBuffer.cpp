@@ -734,7 +734,8 @@ struct Edge
     /// Construct from gradients and top & bottom vertices.
     Edge(const Gradients& gradients, const Vector3& top, const Vector3& bottom, int topY)
     {
-        float slope = (bottom.x_ - top.x_) / (bottom.y_ - top.y_);
+        float height = (bottom.y_ - top.y_);
+        float slope = (height != 0.0f) ? (bottom.x_ - top.x_) / height : 0.0f;
         float yPreStep = (float)(topY + 1) - top.y_;
         float xPreStep = slope * yPreStep;
         
