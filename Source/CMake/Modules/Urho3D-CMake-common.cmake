@@ -768,10 +768,10 @@ macro (define_source_files)
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
     if (NOT ARG_GLOB_CPP_PATTERNS)
-        set (ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
+        set (ARG_GLOB_CPP_PATTERNS *.c *.c++ *.cxx *.cpp *.cc *.C)     # Default glob pattern
     endif ()
     if (NOT ARG_GLOB_H_PATTERNS)
-        set (ARG_GLOB_H_PATTERNS *.h)
+        set (ARG_GLOB_H_PATTERNS *.h *.hh *.H *.h++ *.hxx *.hpp *.hcc) # Default glob pattern
     endif ()
     file (GLOB CPP_FILES ${ARG_GLOB_CPP_PATTERNS})
     file (GLOB H_FILES ${ARG_GLOB_H_PATTERNS})
