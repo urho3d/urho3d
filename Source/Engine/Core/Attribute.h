@@ -46,6 +46,8 @@ static const unsigned AM_NODEID = 0x10;
 static const unsigned AM_COMPONENTID = 0x20;
 /// Attribute is a node ID vector where first element is the amount of nodes.
 static const unsigned AM_NODEIDVECTOR = 0x40;
+/// Attribute is only read not written, mainly used for backwards compatibility with serialization.
+static const unsigned AM_READ = 0x80;
 
 class Serializable;
 

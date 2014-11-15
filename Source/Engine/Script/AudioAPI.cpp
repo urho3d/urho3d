@@ -117,7 +117,7 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "bool get_playing() const", asMETHOD(Audio, IsPlaying), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_initialized() const", asMETHOD(Audio, IsInitialized), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(GetAudio), asCALL_CDECL);
-    engine->RegisterGlobalFunction("StringHash GetHashFromSoundType(SoundType type) const", asFUNCTION(GetHashFromType), asCALL_CDECL);
+    engine->RegisterGlobalFunction("StringHash GetHashFromSoundType(SoundType type)", asFUNCTION(GetHashFromType), asCALL_CDECL);
 }
 
 void RegisterAudioAPI(asIScriptEngine* engine)

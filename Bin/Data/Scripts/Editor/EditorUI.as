@@ -77,6 +77,7 @@ void CreateUI()
     CreateMaterialEditor();
     CreateParticleEffectEditor();
     CreateSpawnEditor();
+    CreateSoundTypeEditor();
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
@@ -417,6 +418,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Material editor", @ShowMaterialEditor));
         popup.AddChild(CreateMenuItem("Particle editor", @ShowParticleEffectEditor));
         popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
+        popup.AddChild(CreateMenuItem("Sound Type editor", @ShowSoundTypeEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
         CreateChildDivider(popup);

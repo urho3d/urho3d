@@ -229,8 +229,8 @@ float Audio::GetSoundSourceMasterGain(const StringHash& type) const
     VariantMap::ConstIterator masterIt = masterGain_.Find(soundTypeHashes[SOUND_MASTER]);
     VariantMap::ConstIterator typeIt = masterGain_.Find(type);
 
-    if (typeIt == masterGain_.End())
-        return 0.0f;
+    if (typeIt == masterGain_.End() || typeIt == masterIt)
+        return masterIt->second_.GetFloat();
 
     return masterIt->second_.GetFloat() * typeIt->second_.GetFloat();
 }
