@@ -37,6 +37,9 @@ Docs/minimal-*
 Source/.*project
 Source/.settings
 
+# KDevelop project settings
+*.kdev?
+
 # Qt Creator project settings
 Source/CMakeLists.txt.user
 
@@ -57,6 +60,9 @@ CMakeScripts/
 Makefile
 cmake_install.cmake
 install_manifest.txt
+
+# GCC PCH files that are some-how ending up in the Source tree instead of the Build directory
+*.gch
 
 # Misc.
 configure*
