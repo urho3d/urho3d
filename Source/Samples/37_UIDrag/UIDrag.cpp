@@ -145,7 +145,6 @@ void UIDrag::CreateGUI()
         Text* t = new Text(context_);
         root->AddChild(t);
         t->SetStyle("Text");
-        t->SetText("Touch "+ String(i));
         t->SetName("Touch "+ String(i));
         t->SetVisible(false);
     }
@@ -248,6 +247,7 @@ void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         Text* t = (Text*)root->GetChild("Touch " + String(i));
         TouchState* ts = input->GetTouch(i);
+        t->SetText("Touch " + String(ts->touchID_));
 
         IntVector2 pos = ts->position_;
         pos.y_ -= 30;

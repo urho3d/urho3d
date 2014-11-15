@@ -359,7 +359,7 @@ void UI::Update(float timeStep)
     for (unsigned i = 0; i < numTouches; ++i)
     {
         TouchState* touch = input->GetTouch(i);
-        ProcessHover(touch->position_, TOUCHID_MASK(i), 0, 0);
+        ProcessHover(touch->position_, TOUCHID_MASK(touch->touchID_), 0, 0);
     }
 
     // End hovers that expired without refreshing
@@ -1500,8 +1500,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
 
     // Get the touch index
-    int eventTouchId = eventData[P_TOUCHID].GetInt();
-    int touchId = TOUCHID_MASK(eventTouchId);
+    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));

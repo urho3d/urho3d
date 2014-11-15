@@ -103,7 +103,6 @@ void CreateGUI()
         Text@ t = Text();
         root.AddChild(t);
         t.style = "Text";
-        t.text = "Touch "+ String(i);
         t.name = "Touch "+ String(i);
         t.visible = false;
     }
@@ -193,7 +192,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         Text@ t = root.GetChild("Touch " + String(i));
         TouchState@ ts = input.touches[i];
-
+        t.text = "Touch "+ String(ts.touchID);
+        
         IntVector2 pos = ts.position;
         pos.y -= 30;
 

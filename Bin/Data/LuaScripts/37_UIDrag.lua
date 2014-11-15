@@ -102,7 +102,6 @@ function CreateGUI()
         local t = Text:new()
         ui.root:AddChild(t)
         t:SetStyle("Text")
-        t:SetText("Touch " .. i)
         t:SetName("Touch " .. i)
         t:SetVisible(false)
     end
@@ -170,13 +169,14 @@ function HandleUpdate(eventType, eventData)
     while i < n do
         local t = tolua.cast(ui.root:GetChild("Touch " .. i), 'Text')
         local ts = input:GetTouch(i)
+        t:SetText("Touch " .. ts.touchID)
 
-        local pos = ts.position
+        local pos = IntVector2(ts.position)
         pos.y = pos.y - 30
 
         t:SetPosition(pos)
         t:SetVisible(true)
-        
+
         i = i + 1
     end
 

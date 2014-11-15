@@ -931,6 +931,11 @@ void Input::ResetTouches()
     }
 
     touches_.Clear();
+    touchIDMap_.Clear();
+    availableTouchIDs_.Clear();
+    for (int i = 0; i < TOUCHID_MAX; i++)
+        availableTouchIDs_.Push(i);
+
 }
 
 unsigned Input::GetTouchIndexFromID(int touchID)
@@ -961,7 +966,7 @@ void Input::PushTouchIndex(int touchID)
     HashMap<int, int>::ConstIterator ci = touchIDMap_.Find(touchID);
     if (ci == touchIDMap_.End())
         return;
-
+    
     int index = touchIDMap_[touchID];
     touchIDMap_.Erase(touchID);
 
@@ -1269,7 +1274,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             SendEvent(E_TOUCHEND, eventData);
 
             // Add touch index back to list of available touch Ids
-            PushTouchIndex(touchID);
+            PushTouchIndex(evt.tfinger.fingerId & 0x7ffffff);
 
             touches_.Erase(touchID);
         }
