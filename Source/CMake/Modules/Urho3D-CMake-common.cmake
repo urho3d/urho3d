@@ -755,7 +755,7 @@ macro (set_list TO_LIST FROM_LIST)
 endmacro ()
 
 # Macro for defining source files with optional arguments as follows:
-#  GROUP <value> - Group source files into a sub-group folder in VS and Xcode (only works in curent scope context)
+#  GROUP <value> - Group source files into a sub-group folder in VS and Xcode (only works in current scope context)
 #  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp
 #  GLOB_H_PATTERNS <list> - Use the provided globbing patterns for H_FILES instead of the default *.h
 #  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
@@ -768,10 +768,10 @@ macro (define_source_files)
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
     if (NOT ARG_GLOB_CPP_PATTERNS)
-        set (ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
+        set (ARG_GLOB_CPP_PATTERNS *.c *.c++ *.cxx *.cpp *.cc *.C)     # Default glob pattern
     endif ()
     if (NOT ARG_GLOB_H_PATTERNS)
-        set (ARG_GLOB_H_PATTERNS *.h)
+        set (ARG_GLOB_H_PATTERNS *.h *.hh *.H *.h++ *.hxx *.hpp *.hcc) # Default glob pattern
     endif ()
     file (GLOB CPP_FILES ${ARG_GLOB_CPP_PATTERNS})
     file (GLOB H_FILES ${ARG_GLOB_H_PATTERNS})
