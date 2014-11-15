@@ -342,7 +342,7 @@ def makefile_ci
   if ENV['AVD']
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     if android_wait_for_device ENV['CI'] ? 1 : 10 # minutes
-      system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
+      system "cd #{platform_prefix}Build && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
       android_test_run or abort 'Failed to test run Urho3D Samples APK'
     else
       puts 'Skipped test running Urho3D Samples APK as emulator failed to start in time'
@@ -350,10 +350,23 @@ def makefile_ci
   end
 end
 
+def android_find_device api = $specific_api, abi = $specific_abi
+  $specific_api = api
+  $specific_abi = abi
+  $specific_device = nil
+  for i in `adb devices |tail -n +2`.split "\n"
+    device = i.split.first
+    if api.to_s == `adb -s #{device} wait-for-device shell getprop ro.build.version.sdk`.chomp && abi.to_s == `adb -s #{device} shell getprop ro.product.cpu.abi`.chomp
+      return $specific_device = device
+    end
+  end
+  nil
+end
+
 def android_prepare_device api, abi = 'armeabi-v7a', name = 'test'
   system 'if ! ps |grep -cq adb; then adb start-server; fi'
-  if `adb devices |tail -n +2 |head -1`.chomp.empty?
-    # Don't have any (virtual) device attached, try to attach the named device (create the named device as AVD if necessary)
+  if !android_find_device api, abi
+    # Don't have any matching (virtual) device attached, try to attach the named device (create the named device as AVD if necessary)
     if !system "android list avd |grep -cq 'Name: #{name}$'"
       system "echo 'no' |android create avd -n #{name} -t android-#{api} --abi #{abi}" or abort "Failed to create '#{name}' Android virtual device"
     end
@@ -365,27 +378,36 @@ end
 def android_wait_for_device retries = -1, retry_interval = 10, package = 'com.android.launcher'
   # Wait until the indicator process is running or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
   print "\nWaiting for device..."; $stdout.flush
-  # Capture adb's stdout and interpret it because adb does not return exit code from its last shell command
-  thread = Thread.new { `adb wait-for-device shell 'until ps |grep -c #{package} >/dev/null; do sleep #{retry_interval}; done; while ps |grep -c bootanimation >/dev/null; do sleep 1; done'` }
-  sleep 1
-  retries = retries * 60 / retry_interval unless retries == -1
-  until retries == 0
-    if thread.status == false
-      thread.join
-      break
+  # Find the specific device in case it is not found earlier
+  $specific_device = android_find_device unless $specific_device
+  if $specific_device
+    # Capture adb's stdout and interpret it because adb does not return exit code from its last shell command
+    thread = Thread.new { `adb -s #{$specific_device} shell 'until ps |grep -c #{package} >/dev/null; do sleep #{retry_interval}; done; while ps |grep -c bootanimation >/dev/null; do sleep 1; done'` }
+    sleep 1
+    retries = retries * 60 / retry_interval unless retries == -1
+    until retries == 0
+      if thread.status == false
+        thread.join
+        break
+      end
+      sleep retry_interval
+      print '.'; $stdout.flush  # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
+      retries -= 1 if retries > 0
     end
-    sleep retry_interval
-    print '.'; $stdout.flush  # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
-    retries -= 1 if retries > 0
+  else
+    # No matching device found
+    retries = 0
   end
   puts "\n\n"; $stdout.flush
   return retries == 0 ? nil : 0
 end
 
 def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'input tap 10 200', timeout = 30
+  # The device should have been found at this point
+  return nil unless $specific_device
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
   begin
-    IO.popen("adb shell <<EOF
+    IO.popen("adb -s #{$specific_device} shell <<EOF
 # Try to unlock the device just in case it is locked
 input keyevent 82; input keyevent 4
 # Clear the log
@@ -409,7 +431,7 @@ exit
 ##
 EOF") { |stdout| echo = false; while output = stdout.gets do if echo && /#\s#/ !~ output then puts output else echo = true if /^##/ =~ output end; return nil if /^error/i =~ output end }
     # Result of the test run is determined based on the presence of the success indicator string in the log
-    system "adb logcat -d |grep -cq '#{success_indicator}'"
+    system "adb -s #{$specific_device} logcat -d |grep -cq '#{success_indicator}'"
   rescue
     nil
   end
