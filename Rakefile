@@ -341,7 +341,7 @@ def makefile_ci
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD']
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
-    if android_wait_for_device 20 # minutes
+    if android_wait_for_device ENV['CI'] ? 1 : 10 # minutes
       system "cd #{platform_prefix}Build && ant installd" or abort 'Failed to deploy Urho3D Samples APK'
       android_test_run or abort 'Failed to test run Urho3D Samples APK'
     else
