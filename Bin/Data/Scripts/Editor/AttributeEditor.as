@@ -872,6 +872,7 @@ void LineDragBegin(StringHash eventType, VariantMap& eventData)
     //not convenient way to trigger EditAttribute event
     selectedNumEditor.text = selectedNumEditor.text;
     selectedNumEditor.vars["DragBeginValue"] = selectedNumEditor.text;
+    selectedNumEditor.cursorPosition = 0;
 
     SetMouseMode(true);
 }
@@ -889,6 +890,7 @@ void LineDragMove(StringHash eventTypem, VariantMap& eventData)
     fieldVal += val/100;
     label.vars["posX"] = x;
     selectedNumEditor.text = fieldVal;
+    selectedNumEditor.cursorPosition = 0;
     //disable storing undo 
     dragEditAttribute = true;
 }
@@ -907,6 +909,7 @@ void LineDragCancel(StringHash eventType, VariantMap& eventData)
     dragEditAttribute = true;
     LineEdit@ selectedNumEditor = label.parent;
     selectedNumEditor.text = selectedNumEditor.vars["DragBeginValue"].GetString();
+    selectedNumEditor.cursorPosition = 0;
     SetMouseMode(false);
 }
 

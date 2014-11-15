@@ -139,6 +139,20 @@ public:
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab);
     /// Set the mouse mode.
+    /** Set the mouse mode behaviour.
+     *  MM_ABSOLUTE is the default behaviour, allowing the toggling of operating system cursor visibility and allowing the cursor to escape the window when visible.
+     *  When the operating system cursor is invisible in absolute mouse mode, the mouse is confined to the window.
+     *  If the operating system and UI cursors are both invisible, interaction with the Urho UI will be limited (eg: drag move / drag end events will not trigger).
+     *  SetMouseMode(MM_ABSOLUTE) will call SetMouseGrabbed(false).
+     *
+     *  MM_RELATIVE sets the operating system cursor to invisible and confines the cursor to the window.
+     *  The operating system cursor cannot be set to be visible in this mode via SetMouseVisible(), however changes are tracked and will be restored when another mouse mode is set.
+     *  When the virtual cursor is also invisible, UI interaction will still function as normal (eg: drag events will trigger).
+     *  SetMouseMode(MM_RELATIVE) will call SetMouseGrabbed(true).
+     *
+     *  MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
+     *  SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
+    */
     void SetMouseMode(MouseMode mode);
     /// Add screen joystick.
     /** Return the joystick instance ID when successful or negative on error.
@@ -312,6 +326,8 @@ private:
     bool toggleFullscreen_;
     /// Operating system mouse cursor visible flag.
     bool mouseVisible_;
+    /// The last operating system mouse cursor visible flag set by end use call to SetMouseVisible.
+    bool lastMouseVisible_;
     /// Flag to indicate the mouse is being grabbed by an operation. Subsystems like UI that uses mouse should temporarily ignore the mouse hover or click events.
     bool mouseGrabbed_;
     /// Determines the mode of mouse behaviour.
