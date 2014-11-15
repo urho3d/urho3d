@@ -6012,6 +6012,7 @@ Properties:
 - bool[] mouseButtonDown // readonly
 - bool[] mouseButtonPress // readonly
 - bool mouseGrabbed
+- MouseMode mouseMode
 - IntVector2 mouseMove // readonly
 - int mouseMoveWheel // readonly
 - int mouseMoveX // readonly
@@ -12600,6 +12601,13 @@ Properties:
 - LM_DEFAULT
 - LM_FORCE_LOOPED
 - LM_FORCE_CLAMPED
+
+
+### MouseMode
+
+- MM_ABSOLUTE
+- MM_RELATIVE
+- MM_WRAP
 
 
 ### Orientation

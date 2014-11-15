@@ -2376,6 +2376,7 @@ Methods:
 - void SetToggleFullscreen(bool enable)
 - void SetMouseVisible(bool enable)
 - void SetMouseGrabbed(bool grab)
+- void SetMouseMode(MouseMode mode)
 - int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - bool RemoveScreenJoystick(int id)
 - void SetScreenJoystickVisible(int id, bool enable)
@@ -2422,6 +2423,7 @@ Methods:
 - bool GetTouchEmulation() const
 - bool IsMouseVisible() const
 - bool IsMouseGrabbed() const
+- MouseMode GetMouseMode() const
 - bool HasFocus()
 - bool IsMinimized() const
 
@@ -6929,6 +6931,12 @@ Properties:
 - int LM_DEFAULT
 - int LM_FORCE_LOOPED
 - int LM_FORCE_CLAMPED
+
+### MouseMode
+
+- int MM_ABSOLUTE
+- int MM_RELATIVE
+- int MM_WRAP
 
 ### Orientation
 

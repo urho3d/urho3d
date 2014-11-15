@@ -4471,6 +4471,7 @@ Array<bool> mouseButtonDown;
 /* readonly */
 Array<bool> mouseButtonPress;
 bool mouseGrabbed;
+MouseMode mouseMode;
 /* readonly */
 IntVector2 mouseMove;
 /* readonly */
@@ -12028,6 +12029,13 @@ enum LoopMode2D
 LM_DEFAULT,
 LM_FORCE_LOOPED,
 LM_FORCE_CLAMPED,
+};
+
+enum MouseMode
+{
+MM_ABSOLUTE,
+MM_RELATIVE,
+MM_WRAP,
 };
 
 enum Orientation
