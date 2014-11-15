@@ -952,6 +952,8 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
         pos = cursor_->GetPosition();
         visible = true;
     }
+    else if (GetSubsystem<Input>()->GetMouseMode() == MM_RELATIVE)
+        visible = true;
     else
     {
         Input* input = GetSubsystem<Input>();

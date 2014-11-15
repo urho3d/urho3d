@@ -28,8 +28,18 @@
 #include "Object.h"
 #include "List.h"
 
+#include "Cursor.h"
+
 namespace Urho3D
 {
+
+/// %Input Mouse Modes.
+enum MouseMode
+{
+    MM_ABSOLUTE = 0,
+    MM_RELATIVE,
+    MM_WRAP
+};
 
 class Deserializer;
 class Graphics;
@@ -37,12 +47,14 @@ class Serializer;
 class UIElement;
 class XMLFile;
 
+const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
+
 /// %Input state for a finger touch.
 struct TouchState
 {
     /// Return last touched UI element, used by scripting integration.
     UIElement* GetTouchedElement();
-    
+
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.
@@ -127,6 +139,22 @@ public:
     void SetMouseVisible(bool enable);
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab);
+    /// Set the mouse mode.
+    /** Set the mouse mode behaviour.
+     *  MM_ABSOLUTE is the default behaviour, allowing the toggling of operating system cursor visibility and allowing the cursor to escape the window when visible.
+     *  When the operating system cursor is invisible in absolute mouse mode, the mouse is confined to the window.
+     *  If the operating system and UI cursors are both invisible, interaction with the Urho UI will be limited (eg: drag move / drag end events will not trigger).
+     *  SetMouseMode(MM_ABSOLUTE) will call SetMouseGrabbed(false).
+     *
+     *  MM_RELATIVE sets the operating system cursor to invisible and confines the cursor to the window.
+     *  The operating system cursor cannot be set to be visible in this mode via SetMouseVisible(), however changes are tracked and will be restored when another mouse mode is set.
+     *  When the virtual cursor is also invisible, UI interaction will still function as normal (eg: drag events will trigger).
+     *  SetMouseMode(MM_RELATIVE) will call SetMouseGrabbed(true).
+     *
+     *  MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
+     *  SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
+    */
+    void SetMouseMode(MouseMode mode);
     /// Add screen joystick.
     /** Return the joystick instance ID when successful or negative on error.
      *  If layout file is not given, use the default screen joystick layout.
@@ -224,6 +252,8 @@ public:
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether the mouse is currently being grabbed by an operation.
     bool IsMouseGrabbed() const { return mouseGrabbed_; }
+    /// Return the mouse mode.
+    MouseMode GetMouseMode() const { return mouseMode_; }
     /// Return whether application window has input focus.
     bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
@@ -295,6 +325,8 @@ private:
     unsigned mouseButtonPress_;
     /// Last mouse position for calculating movement.
     IntVector2 lastMousePosition_;
+    /// Last mouse position before being set to not visible.
+    IntVector2 lastVisibleMousePosition_;
     /// Mouse movement since last frame.
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
@@ -305,8 +337,12 @@ private:
     bool toggleFullscreen_;
     /// Operating system mouse cursor visible flag.
     bool mouseVisible_;
+    /// The last operating system mouse cursor visible flag set by end use call to SetMouseVisible.
+    bool lastMouseVisible_;
     /// Flag to indicate the mouse is being grabbed by an operation. Subsystems like UI that uses mouse should temporarily ignore the mouse hover or click events.
     bool mouseGrabbed_;
+    /// Determines the mode of mouse behaviour.
+    MouseMode mouseMode_;
     /// Touch emulation mode flag.
     bool touchEmulation_;
     /// Input focus flag.
@@ -317,6 +353,8 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
+    /// Next visible event suppress flag.
+    bool supressNextVisibleChangeEvent_;
     /// Initialized flag.
     bool initialized_;
 };

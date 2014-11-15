@@ -40,6 +40,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ mouseWheelCameraPositionToggle = settingsDialog.GetChild("MouseWheelCameraPositionToggle", true);
     mouseWheelCameraPositionToggle.checked = mouseWheelCameraPosition;
 
+    DropDownList@ MouseOrbitEdit = settingsDialog.GetChild("MouseOrbitEdit", true);
+    MouseOrbitEdit.selection = mouseOrbitMode;
+
     LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
 
@@ -106,6 +109,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
         SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
         SubscribeToEvent(mouseWheelCameraPositionToggle, "Toggled", "EditMouseWheelCameraPosition");
+        SubscribeToEvent(MouseOrbitEdit, "ItemSelected", "EditMouseOrbitMode");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
         SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
         SubscribeToEvent(moveStepEdit, "TextChanged", "EditMoveStep");
@@ -194,6 +198,12 @@ void EditMouseWheelCameraPosition(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetPtr();
     mouseWheelCameraPosition = edit.checked;
+}
+
+void EditMouseOrbitMode(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetPtr();
+    mouseOrbitMode = edit.selection;
 }
 
 void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)

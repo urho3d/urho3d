@@ -86,6 +86,33 @@
                         <attribute name="Text" value="Mouse wheel camera position" />
                     </element>
                 </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Mouse orbit and drag behavior" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="MouseOrbitEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Relative" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Window Wrap" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
                 <element type="BorderImage" style="EditorDivider" />
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="20" />

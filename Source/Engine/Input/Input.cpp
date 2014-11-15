@@ -108,7 +108,11 @@ Input::Input(Context* context) :
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
+    lastMouseVisible_(true),
     mouseGrabbed_(false),
+    mouseMode_(MM_ABSOLUTE),
+    lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
+    supressNextVisibleChangeEvent_(false),
     touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
@@ -160,6 +164,47 @@ void Input::Update()
     SDL_Event evt;
     while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
         HandleSDLEvent(&evt);
+
+    if (mouseVisible_ && mouseMode_ == MM_WRAP)
+    {
+        IntVector2 mpos;
+        SDL_GetMouseState(&mpos.x_, &mpos.y_);
+
+        int buffer = 5;
+        int width = graphics_->GetWidth() - buffer * 2;
+        int height = graphics_->GetHeight() - buffer * 2;
+
+        bool warp = false;
+        if (mpos.x_ < buffer)
+        {
+            warp = true;
+            mpos.x_ += width;
+        }
+
+        if (mpos.x_ > buffer + width)
+        {
+            warp = true;
+            mpos.x_ -= width;
+        }
+
+        if (mpos.y_ < buffer)
+        {
+            warp = true;
+            mpos.y_ += height;
+        }
+
+        if (mpos.y_ > buffer + height)
+        {
+            warp = true;
+            mpos.y_ -= height;
+        }
+
+        if (warp)
+        {
+            SetMousePosition(mpos);
+            SDL_FlushEvent(SDL_MOUSEMOTION);
+        }
+    }
 
     // Check for activation and inactivation from SDL window flags. Must nullcheck the window pointer because it may have
     // been closed due to input events
@@ -237,6 +282,10 @@ void Input::SetMouseVisible(bool enable)
     if (touchEmulation_)
         enable = true;
 
+    // In mouse mode relative, the mouse should be invisible
+    if (mouseMode_ == MM_RELATIVE)
+        enable = false;
+
     // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
     #ifndef RASPI
     if (enable != mouseVisible_)
@@ -249,6 +298,7 @@ void Input::SetMouseVisible(bool enable)
             if (graphics_->GetExternalWindow())
             {
                 mouseVisible_ = true;
+                lastMouseVisible_ = true;
                 return;
             }
 
@@ -256,19 +306,30 @@ void Input::SetMouseVisible(bool enable)
             {
                 SDL_ShowCursor(SDL_FALSE);
                 // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                lastVisibleMousePosition_ = GetMousePosition();
                 IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
                 SetMousePosition(center);
                 lastMousePosition_ = center;
             }
             else
+            {
                 SDL_ShowCursor(SDL_TRUE);
+                if (lastVisibleMousePosition_.x_ != MOUSE_POSITION_OFFSCREEN.x_ && lastVisibleMousePosition_.y_ != MOUSE_POSITION_OFFSCREEN.y_)
+                    SetMousePosition(lastVisibleMousePosition_);
+            }
         }
 
-        using namespace MouseVisibleChanged;
+        if (supressNextVisibleChangeEvent_)
+        {
+            supressNextVisibleChangeEvent_ = false;
+            using namespace MouseVisibleChanged;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_VISIBLE] = mouseVisible_;
-        SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_VISIBLE] = mouseVisible_;
+            SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+        }
+        else
+            lastMouseVisible_ = mouseVisible_;
     }
     #endif
 }
@@ -276,6 +337,59 @@ void Input::SetMouseVisible(bool enable)
 void Input::SetMouseGrabbed(bool grab)
 {
     mouseGrabbed_ = grab;
+}
+
+void Input::SetMouseMode(MouseMode mode)
+{
+    if (mode != mouseMode_)
+    {
+        MouseMode previousMode = mouseMode_;
+        mouseMode_ = mode;
+        // Handle changing away from previous mode
+        if (previousMode == MM_RELATIVE)
+        {
+            /// \todo Use SDL_SetRelativeMouseMode() for MM_RELATIVE mode
+            supressNextVisibleChangeEvent_ = true;
+            SetMouseVisible(lastMouseVisible_);
+
+            // Send updated mouse position:
+            using namespace MouseMove;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_X] = lastVisibleMousePosition_.x_;
+            eventData[P_Y] = lastVisibleMousePosition_.y_;
+            eventData[P_DX] = mouseMove_.x_;
+            eventData[P_DY] = mouseMove_.y_;
+            eventData[P_BUTTONS] = mouseButtonDown_;
+            eventData[P_QUALIFIERS] = GetQualifiers();
+            SendEvent(E_MOUSEMOVE, eventData);
+        }
+        else if (previousMode == MM_WRAP)
+        {
+            SDL_Window* window = graphics_->GetImpl()->GetWindow();
+            SDL_SetWindowGrab(window, SDL_FALSE);
+        }
+
+        // Handle changing to new mode
+        if (mode == MM_ABSOLUTE)
+            SetMouseGrabbed(false);
+        else
+        {
+            SetMouseGrabbed(true);
+
+            if (mode == MM_RELATIVE)
+            {
+                supressNextVisibleChangeEvent_ = true;
+                SetMouseVisible(false);
+            }
+            else if (mode == MM_WRAP)
+            {
+                /// \todo When SDL 2.0.4 is integrated, use SDL_CaptureMouse() and global mouse functions for MM_WRAP mode.
+                SDL_Window* window = graphics_->GetImpl()->GetWindow();
+                SDL_SetWindowGrab(window, SDL_TRUE);
+            }
+        }
+    }
 }
 
 void Input::SetToggleFullscreen(bool enable)
@@ -867,6 +981,11 @@ void Input::GainFocus()
     inputFocus_ = true;
     focusedThisFrame_ = false;
 
+    // Restore mouse mode
+    MouseMode mm = mouseMode_;
+    mouseMode_ = MM_ABSOLUTE;
+    SetMouseMode(mm);
+
     // Re-establish mouse cursor hiding as necessary
     if (!mouseVisible_)
     {
@@ -886,8 +1005,16 @@ void Input::LoseFocus()
     inputFocus_ = false;
     focusedThisFrame_ = false;
 
+    MouseMode mm = mouseMode_;
+
     // Show the mouse cursor when inactive
     SDL_ShowCursor(SDL_TRUE);
+
+    // Change mouse mode -- removing any cursor grabs, etc.
+    SetMouseMode(MM_ABSOLUTE);
+
+    // Restore flags to reflect correct mouse state.
+    mouseMode_ = mm;
 
     SendInputFocusEvent();
 }
@@ -1192,7 +1319,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEMOTION:
-        if (mouseVisible_ && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE) && !touchEmulation_)
         {
             mouseMove_.x_ += evt.motion.xrel;
             mouseMove_.y_ += evt.motion.yrel;
