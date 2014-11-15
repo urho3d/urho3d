@@ -34,8 +34,7 @@ namespace Urho3D
 /// This sample demonstrates:
 ///     - Creating GUI elements from C++
 ///     - Loading GUI Style from xml
-///     - Subscribing to GUI events and handling them.
-///     - Using the drag edit of a LineEdit.
+///     - Subscribing to GUI drag events and handling them.
 class UIDrag : public Sample
 {
     OBJECT(UIDrag);
