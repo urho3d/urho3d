@@ -26,6 +26,7 @@
 #include "InputEvents.h"
 #include "Mutex.h"
 #include "Object.h"
+#include "List.h"
 
 namespace Urho3D
 {
@@ -243,6 +244,12 @@ private:
     void ResetState();
     /// Clear touch states and send touch end events.
     void ResetTouches();
+    /// Get the index of a touch based on the touch ID.
+    unsigned GetTouchIndexFromID(int touchID);
+    /// Used internally to return and remove the next available touch index.
+    unsigned PopTouchIndex();
+    /// Push a touch index back into the list of available when finished with it.
+    void PushTouchIndex(int touchID);
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
@@ -274,6 +281,10 @@ private:
     HashSet<int> scancodePress_;
     /// Active finger touches.
     HashMap<int, TouchState> touches_;
+    /// List that maps between event touch IDs and normalised touch IDs
+    List<int> availableTouchIDs_;
+    /// Mapping of touch indicies
+    HashMap<int, int> touchIDMap_;
     /// String for text input.
     String textInput_;
     /// Opened joysticks.

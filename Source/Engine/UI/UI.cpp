@@ -69,8 +69,6 @@ const StringHash VAR_ORIGINAL_PARENT("OriginalParent");
 const StringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
 const StringHash VAR_PARENT_CHANGED("ParentChanged");
 
-const unsigned TOUCHID_MAX = 32;
-
 const float DEFAULT_DOUBLECLICK_INTERVAL = 0.5f;
 const float DEFAULT_DRAGBEGIN_INTERVAL = 0.5f;
 const float DEFAULT_TOOLTIP_DELAY = 0.5f;
@@ -112,9 +110,6 @@ UI::UI(Context* context) :
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
-
-    for (int i = 0; i < TOUCHID_MAX; i++)
-        availableTouchIDs_.Push(i);
 
     // Register UI library object factories
     RegisterUILibrary(context_);
@@ -1486,7 +1481,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
+    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
@@ -1506,10 +1501,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 
     // Get the touch index
     int eventTouchId = eventData[P_TOUCHID].GetInt();
-    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventTouchId));
-
-    // Add touch index back to list of available touch Ids
-    PushTouchIndex(eventTouchId);
+    int touchId = TOUCHID_MASK(eventTouchId);
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));
@@ -1538,7 +1530,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
+    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
 
     ProcessMove(pos, deltaPos, touchId, 0, 0, true);
 }
@@ -1745,62 +1737,6 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
         sendPos.y_ = dragData->sumPos.y_ / dragData->numDragButtons;
     }
     return sendPos;
-}
-
-unsigned UI::GetTouchIndexFromID(int touchID)
-{
-    HashMap<int, int>::ConstIterator i = touchIDMap_.Find(touchID);
-    if (i != touchIDMap_.End())
-    {
-        return i->second_;
-    }
-
-    int index = PopTouchIndex();
-    touchIDMap_[touchID] = index;
-    return index;
-}
-
-unsigned UI::PopTouchIndex()
-{
-    if (availableTouchIDs_.Empty())
-        return 0;
-
-    unsigned index = availableTouchIDs_.Front();
-    availableTouchIDs_.PopFront();
-    return index;
-}
-
-void UI::PushTouchIndex(int touchID)
-{
-    HashMap<int, int>::ConstIterator ci = touchIDMap_.Find(touchID);
-    if (ci == touchIDMap_.End())
-        return;
-
-    int index = touchIDMap_[touchID];
-    touchIDMap_.Erase(touchID);
-
-    // Sorted insertion
-    bool inserted = false;
-    for (List<int>::Iterator i = availableTouchIDs_.Begin(); i != availableTouchIDs_.End(); ++i)
-    {
-        if (*i == index)
-        {
-            // This condition can occur when TOUCHID_MAX is reached.
-            inserted = true;
-            break;
-        }
-
-        if (*i > index)
-        {
-            availableTouchIDs_.Insert(i, index);
-            inserted = true;
-            break;
-        }
-    }
-
-    // If empty, or the lowest value then insert at end.
-    if (!inserted)
-        availableTouchIDs_.Push(index);
 }
 
 void RegisterUILibrary(Context* context)

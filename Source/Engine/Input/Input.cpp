@@ -61,6 +61,8 @@ const StringHash VAR_BUTTON_MOUSE_BUTTON_BINDING("VAR_BUTTON_MOUSE_BUTTON_BINDIN
 const StringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const StringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 
+const unsigned TOUCHID_MAX = 32;
+
 /// Convert SDL keycode if necessary.
 int ConvertSDLKeyCode(int keySym, int scanCode)
 {
@@ -114,6 +116,9 @@ Input::Input(Context* context) :
     suppressNextMouseMove_(false),
     initialized_(false)
 {
+    for (int i = 0; i < TOUCHID_MAX; i++)
+        availableTouchIDs_.Push(i);
+
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
 
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -928,6 +933,62 @@ void Input::ResetTouches()
     touches_.Clear();
 }
 
+unsigned Input::GetTouchIndexFromID(int touchID)
+{
+    HashMap<int, int>::ConstIterator i = touchIDMap_.Find(touchID);
+    if (i != touchIDMap_.End())
+    {
+        return i->second_;
+    }
+
+    int index = PopTouchIndex();
+    touchIDMap_[touchID] = index;
+    return index;
+}
+
+unsigned Input::PopTouchIndex()
+{
+    if (availableTouchIDs_.Empty())
+        return 0;
+
+    unsigned index = availableTouchIDs_.Front();
+    availableTouchIDs_.PopFront();
+    return index;
+}
+
+void Input::PushTouchIndex(int touchID)
+{
+    HashMap<int, int>::ConstIterator ci = touchIDMap_.Find(touchID);
+    if (ci == touchIDMap_.End())
+        return;
+
+    int index = touchIDMap_[touchID];
+    touchIDMap_.Erase(touchID);
+
+    // Sorted insertion
+    bool inserted = false;
+    for (List<int>::Iterator i = availableTouchIDs_.Begin(); i != availableTouchIDs_.End(); ++i)
+    {
+        if (*i == index)
+        {
+            // This condition can occur when TOUCHID_MAX is reached.
+            inserted = true;
+            break;
+        }
+
+        if (*i > index)
+        {
+            availableTouchIDs_.Insert(i, index);
+            inserted = true;
+            break;
+        }
+    }
+
+    // If empty, or the lowest value then insert at end.
+    if (!inserted)
+        availableTouchIDs_.Push(index);
+}
+
 void Input::SendInputFocusEvent()
 {
     using namespace InputFocus;
@@ -1172,7 +1233,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERDOWN:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
             state.lastPosition_ = state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
@@ -1194,7 +1255,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERUP:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             TouchState& state = touches_[touchID];
 
             using namespace TouchEnd;
@@ -1207,6 +1268,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_Y] = state.position_.y_;
             SendEvent(E_TOUCHEND, eventData);
 
+            // Add touch index back to list of available touch Ids
+            PushTouchIndex(touchID);
+
             touches_.Erase(touchID);
         }
         break;
@@ -1214,7 +1278,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERMOTION:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             // We don't want this event to create a new touches_ event if it doesn't exist (touchEmulation)
             if (touchEmulation_ && !touches_.Contains(touchID))
                 break;

@@ -25,7 +25,6 @@
 #include "Object.h"
 #include "Cursor.h"
 #include "UIBatch.h"
-#include "List.h"
 
 namespace Urho3D
 {
@@ -230,12 +229,6 @@ private:
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.
     IntVector2 SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos);
-    /// Get the index of a touch based on the touch ID.
-    unsigned GetTouchIndexFromID(int touchID);
-    /// Used internally to return and remove the next available touch index.
-    unsigned PopTouchIndex();
-    /// Push a touch index back into the list of available when finished with it.
-    void PushTouchIndex(int touchID);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -311,10 +304,6 @@ private:
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
-    /// List that maps between event touch IDs and normalised touch IDs
-    List<int> availableTouchIDs_;
-    /// Mapping of touch indicies
-    HashMap<int, int> touchIDMap_;
 };
 
 /// Register UI library objects.
