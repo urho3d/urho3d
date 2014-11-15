@@ -311,7 +311,7 @@ def makefile_ci
     end
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-    system "cd Build/ThirdParty/LuaJIT/generated/buildvm-android && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
+    system "cd Build/ThirdParty/LuaJIT/generated/buildvm-android-#{ENV['ABI']} && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
     # Reconfigure Android build one more time now that we have the tools built
     ENV['SKIP_NATIVE'] = '1'
     system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
