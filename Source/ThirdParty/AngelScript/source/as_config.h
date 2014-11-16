@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Yao Wei Tjong for Urho3D
 
 
 //
@@ -984,6 +985,18 @@
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
+// Urho3D - Add support for Android Intel x86_64
+		#elif defined(__LP64__)
+			// Android Intel x86_64 (same config as Linux x86_64). Tested with Intel x86_64 Atom System Image.
+			#define AS_X64_GCC
+			#undef AS_NO_THISCALL_FUNCTOR_METHOD
+			#define HAS_128_BIT_PRIMITIVES
+			#define SPLIT_OBJS_BY_MEMBER_TYPES
+			#define AS_LARGE_OBJS_PASSED_BY_REF
+			#define AS_LARGE_OBJ_MIN_SIZE 5
+			// STDCALL is not available on 64bit Linux
+			#undef STDCALL
+			#define STDCALL
 		#endif
 
 	// Haiku OS
