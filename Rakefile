@@ -185,7 +185,7 @@ task :ci_package_upload do
   elsif ENV['XCODE']
     xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
   else
-    if ENV['ANDROID']
+    if ENV['ANDROID'] && !ENV['NO_SDK_SYSIMG']
       system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     end
     system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
@@ -300,6 +300,10 @@ def makefile_ci
     system "MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
     ENV['SKIP_NATIVE'] = '1'
+  elsif ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a'
+    # The upstream LuaJIT library does not support this Android ABI at the moment, fallback to use Lua library instead
+    jit = ''
+    amalg = ''
   else
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
@@ -311,7 +315,9 @@ def makefile_ci
     end
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
     system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-    system "cd Build/ThirdParty/LuaJIT/generated/buildvm-android-#{ENV['ABI']} && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
+    if !jit.empty?
+      system "cd Build/ThirdParty/Lua#{jit}/generated/buildvm-android-#{ENV['ABI']} && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
+    end
     # Reconfigure Android build one more time now that we have the tools built
     ENV['SKIP_NATIVE'] = '1'
     system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
