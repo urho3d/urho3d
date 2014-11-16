@@ -56,7 +56,7 @@ if (CMAKE_HOST_WIN32)
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (PATH_SUFFIX /Urho3D)
-    if (URHO3D_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores URHO3D_64BIT build option
+    if (URHO3D_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
             # Probably target system is a RedHat-based distro
             set (LIB_SUFFIX 64)

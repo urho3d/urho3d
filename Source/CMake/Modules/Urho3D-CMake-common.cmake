@@ -29,6 +29,9 @@ if (NOT MSVC)
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
     execute_process (COMMAND echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
     string (REGEX MATCH "#define +__x86_64__ +1" matched "${PREDEFINED_MACROS}")
+    if (NOT matched)
+        string (REGEX MATCH "#define +__aarch64__ +1" matched "${PREDEFINED_MACROS}")
+    endif ()
     if (matched)
         set (URHO3D_DEFAULT_64BIT TRUE)
     endif ()
@@ -284,10 +287,6 @@ else ()
         # Most of the flags are already setup in android.toolchain.cmake module
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector")
-        if (URHO3D_64BIT)
-            # TODO: Revisit this again when ARM also support 64bit
-            # For now just reference it to suppress "unused variable" warning
-        endif ()
     else ()
         if (RASPI)
             add_definitions (-DRASPI)
