@@ -5859,6 +5859,7 @@ Methods:
 - void SetLayoutMode(LayoutMode mode)
 - void SetLayoutSpacing(int spacing)
 - void SetLayoutBorder(const IntRect& border)
+- void SetLayoutFlexScale(const Vector2& scale)
 - void SetIndent(int indent)
 - void SetIndentSpacing(int indentSpacing)
 - void UpdateLayout()
@@ -5921,6 +5922,7 @@ Methods:
 - LayoutMode GetLayoutMode() const
 - int GetLayoutSpacing() const
 - const IntRect& GetLayoutBorder() const
+- const Vector2& GetLayoutFlexScale() const
 - unsigned GetNumChildren(bool recursive = false) const
 - int GetDragButtonCombo() const
 - unsigned GetDragButtonCount() const
@@ -5993,6 +5995,7 @@ Properties:
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect& layoutBorder
+- Vector2& layoutFlexScale
 - unsigned numChildren (readonly)
 - UIElement* parent
 - UIElement* root (readonly)
