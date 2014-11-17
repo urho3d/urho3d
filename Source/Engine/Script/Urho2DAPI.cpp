@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#ifdef URHO3D_URHO2D
 #include "AnimatedSprite2D.h"
 #include "Animation2D.h"
 #include "AnimationSet2D.h"
@@ -767,3 +768,4 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
 }
 
 }
+#endif

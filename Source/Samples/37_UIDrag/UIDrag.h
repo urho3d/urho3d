@@ -57,14 +57,10 @@ protected:
     }
 
 private:
-    /// Construct the scene content.
-    void CreateScene();
-    /// Construct the GUI
+    /// Construct the GUI.
     void CreateGUI();
     /// Construct an instruction text to the UI.
     void CreateInstructions();
-    /// Set up a viewport for displaying the scene.
-    void SetupViewport();
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
 

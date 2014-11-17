@@ -13,39 +13,12 @@ function Start()
     -- Execute base class startup
     SampleStart()
 
-    -- Create the scene content
-    CreateScene()
-
     -- Create the UI content
     CreateGUI()
     CreateInstructions()
 
-    -- Setup the viewport for displaying the scene
-    SetupViewport()
-
     -- Hook up to the frame update events
     SubscribeToEvents()
-end
-
-function CreateScene()
-    scene_ = Scene()
-
-    -- Create the Octree component to the scene. This is required before adding any drawable components, or else nothing will
-    -- show up. The default octree volume will be from (-1000, -1000, -1000) to (1000, 1000, 1000) in world coordinates it
-    -- is also legal to place objects outside the volume but their visibility can then not be checked in a hierarchically
-    -- optimizing manner
-    scene_:CreateComponent("Octree")
-
-    -- Create a scene node for the camera, which we will move around
-    -- The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
-    cameraNode = scene_:CreateChild("Camera")
-    -- Set an initial position for the camera scene node above the plane
-    cameraNode.position = Vector3(0.0, 0.0, -10.0)
-    local camera = cameraNode:CreateComponent("Camera")
-    camera.orthographic = true
-    camera.orthoSize = graphics.height * PIXEL_SIZE
-
-    input:SetMouseVisible(true)
 end
 
 function CreateInstructions()
@@ -107,20 +80,9 @@ function CreateGUI()
     end
 end
 
-function SetupViewport()
-    -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen. We need to define the scene and the camera
-    -- at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
-    -- use, but now we just use full screen and default render path configured in the engine command line options
-    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
-    renderer:SetViewport(0, viewport)
-end
-
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
-
-    -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
-    UnsubscribeFromEvent("SceneUpdate")
 end
 
 function HandleDragBegin(eventType, eventData)

@@ -56,37 +56,12 @@ void UIDrag::Start()
     // Execute base class startup
     Sample::Start();
 
-    // Create the scene content
-    CreateScene();
-
     // Create the UI content
     CreateGUI();
     CreateInstructions();
 
-    // Setup the viewport for displaying the scene
-    SetupViewport();
-
     // Hook up to the frame update events
     SubscribeToEvents();
-}
-
-void UIDrag::CreateScene()
-{
-    scene_ = new Scene(context_);
-    scene_->CreateComponent<Octree>();
-
-    // Create camera node
-    cameraNode_ = scene_->CreateChild("Camera");
-    // Set camera's position
-    cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
-    camera->SetOrthographic(true);
-
-    Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-
-    GetSubsystem<Input>()->SetMouseVisible(true);
 }
 
 void UIDrag::CreateGUI()
@@ -166,20 +141,9 @@ void UIDrag::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void UIDrag::SetupViewport()
-{
-    Renderer* renderer = GetSubsystem<Renderer>();
-
-    // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
-    renderer->SetViewport(0, viewport);
-}
-
 void UIDrag::SubscribeToEvents()
 {
     SubscribeToEvent(E_UPDATE, HANDLER(UIDrag, HandleUpdate));
-    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
-    UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
 void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)

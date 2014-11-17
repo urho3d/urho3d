@@ -62,7 +62,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI Urho2D)
+set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI)
 if (URHO3D_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
@@ -77,6 +77,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     list (APPEND SOURCES Physics)
+endif ()
+
+if (URHO3D_URHO2D)
+    list (APPEND SOURCES Urho2D)
 endif ()
 
 foreach (SOURCE ${SOURCES})

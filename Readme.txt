@@ -458,6 +458,7 @@ cmake_xxxx batch files or shell scripts.
 |URHO3D_NETWORK       |1|Enable Networking support                             |
 |URHO3D_PHYSICS       |1|Enable Physics support                                |
 |URHO3D_NAVIGATION    |1|Enable Navigation support                             |
+|URHO3D_URHO2D        |1|Enable 2D rendering & physics support                 |
 |URHO3D_SAMPLES       |0|Build sample applications                             |
 |URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only;         |
 |                     | | on Android only build Lua standalone tools)          |

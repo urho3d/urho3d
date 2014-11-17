@@ -153,7 +153,7 @@ if (NOT WIN32)
 endif ()
 
 # Add targets
-foreach (TARGET Box2D Civetweb FreeType JO LZ4 PugiXml SDL StanHull STB)
+foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -168,6 +168,7 @@ if (URHO3D_LUA)
 endif ()
 
 if (URHO3D_NETWORK)
+    add_subdirectory (ThirdParty/Civetweb)
     add_subdirectory (ThirdParty/kNet)
 endif ()
 
@@ -178,6 +179,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
+endif ()
+
+if (URHO3D_URHO2D)
+    add_subdirectory (ThirdParty/Box2D)
 endif ()
 
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
