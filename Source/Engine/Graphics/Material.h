@@ -33,6 +33,7 @@ namespace Urho3D
 
 class Material;
 class Pass;
+class Scene;
 class Technique;
 class Texture;
 class Texture2D;
@@ -137,6 +138,8 @@ public:
     void SetShadowCullMode(CullMode mode);
     /// Set depth bias.
     void SetDepthBias(const BiasParameters& parameters);
+    /// Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
+    void SetScene(Scene* scene);
     /// Remove shader parameter.
     void RemoveShaderParameter(const String& name);
     /// Reset all shader pointers.
@@ -147,8 +150,6 @@ public:
     void SortTechniques();
     /// Mark material for auxiliary view rendering.
     void MarkForAuxView(unsigned frameNumber);
-    /// Update shader parameter animations.
-    void UpdateShaderParameterAnimations();
 
     /// Return number of techniques.
     unsigned GetNumTechniques() const { return techniques_.Size(); }
@@ -186,6 +187,8 @@ public:
     bool GetOcclusion() const { return occlusion_; }
     /// Return whether should render specular.
     bool GetSpecular() const { return specular_; }
+    /// Return the scene associated with the material for shader parameter animation updates.
+    Scene* GetScene() const;
 
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);
@@ -201,6 +204,10 @@ private:
     void RefreshMemoryUse();
     /// Return shader parameter animation info.
     ShaderParameterAnimationInfo* GetShaderParameterAnimationInfo(const String& name) const;
+    /// Update whether should be subscribed to scene or global update events for shader parameter animation.
+    void UpdateEventSubscription();
+    /// Update shader parameter animations.
+    void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
@@ -222,10 +229,12 @@ private:
     bool occlusion_;
     /// Specular lighting flag.
     bool specular_;
-    /// Last animation update frame number.
-    unsigned animationFrameNumber_;
+    /// Flag for whether is subscribed to animation updates.
+    bool subscribed_;
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
+    /// Associated scene for shader parameter animation updates.
+    WeakPtr<Scene> scene_;
 };
 
 }
