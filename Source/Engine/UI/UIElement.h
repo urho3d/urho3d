@@ -287,6 +287,8 @@ public:
     void SetLayoutSpacing(int spacing);
     /// Set layout border.
     void SetLayoutBorder(const IntRect& border);
+    /// Set layout flex scale.
+    void SetLayoutFlexScale(const Vector2& scale);
     /// Set horizontal indentation.
     void SetIndent(int indent);
     /// Set indent spacing (number of pixels per indentation level).
@@ -415,6 +417,8 @@ public:
     int GetLayoutSpacing() const { return layoutSpacing_; }
     /// Return layout border.
     const IntRect& GetLayoutBorder() const { return layoutBorder_; }
+    /// Return layout flex scale.
+    const Vector2& GetLayoutFlexScale() const { return layoutFlexScale_; }
     /// Return number of child elements.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child element by index.
@@ -548,6 +552,8 @@ protected:
     int layoutSpacing_;
     /// Layout borders.
     IntRect layoutBorder_;
+    /// Layout flex scale.
+    Vector2 layoutFlexScale_;
     /// Resize nesting level to prevent multiple events and endless loop.
     unsigned resizeNestingLevel_;
     /// Layout update nesting level to prevent endless loop.
@@ -579,7 +585,7 @@ private:
     /// Calculate layout width for resizing the parent element.
     int CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing);
     /// Calculate child widths/positions in the layout.
-    void CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
+    void CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetWidth, int begin, int end, int spacing);
     /// Get child element constant position in a layout.
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.
