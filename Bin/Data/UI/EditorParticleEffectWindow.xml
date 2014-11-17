@@ -396,6 +396,15 @@
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
+                        <element type="Button">
+                            <attribute name="Name" value="ColorFrameSort" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Border" value="1 1 1 1" />
+                            <element type="Text">
+                                <attribute name="Text" value="Sort" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
                     </element>
                     <element>
                         <!-- Texture Frames -->
@@ -433,6 +442,15 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Remove" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                        <element type="Button">
+                            <attribute name="Name" value="TextureFrameSort" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Border" value="1 1 1 1" />
+                            <element type="Text">
+                                <attribute name="Text" value="Sort" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
