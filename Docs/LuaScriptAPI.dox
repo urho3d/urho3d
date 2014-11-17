@@ -2878,6 +2878,7 @@ Methods:
 - void SetCullMode(CullMode mode)
 - void SetShadowCullMode(CullMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
+- void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
 - Material* Clone(const String cloneName = String::EMPTY) const
@@ -2897,6 +2898,7 @@ Methods:
 - unsigned GetAuxViewFrameNumber() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
+- Scene* GetScene() const
 
 Properties:
 
@@ -2905,6 +2907,7 @@ Properties:
 - unsigned auxViewFrameNumber (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
+- Scene* scene
 
 <a name="Class_Matrix3"></a>
 ### Matrix3

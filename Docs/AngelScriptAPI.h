@@ -5293,6 +5293,7 @@ uint numTechniques;
 bool occlusion;
 /* readonly */
 int refs;
+Scene scene;
 /* readonly */
 Array<String> shaderParameterNames;
 Array<Variant> shaderParameters;
