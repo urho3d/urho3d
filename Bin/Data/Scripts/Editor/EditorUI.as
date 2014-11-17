@@ -75,6 +75,7 @@ void CreateUI()
     CreateEditorSettingsDialog();
     CreateEditorPreferencesDialog();
     CreateMaterialEditor();
+    CreateParticleEffectEditor();
     CreateSpawnEditor();
     CreateStatsBar();
     CreateConsole();
@@ -413,6 +414,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Resource browser", @ShowResourceBrowserWindow, 'B', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Material editor", @ShowMaterialEditor));
+        popup.AddChild(CreateMenuItem("Particle editor", @ShowParticleEffectEditor));
         popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));

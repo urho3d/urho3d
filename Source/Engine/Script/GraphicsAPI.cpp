@@ -1123,7 +1123,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "void set_minParticleSize(const Vector2&in)", asMETHOD(ParticleEffect, SetMinParticleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_maxParticleSize(const Vector2&in)", asMETHOD(ParticleEffect, SetMaxParticleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "const Vector2& get_minParticleSize() const", asMETHOD(ParticleEffect, GetMinParticleSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_maxParticleSize() const", asMETHOD(ParticleEffect, GetMaxParticleSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& get_maxParticleSize() const", asMETHOD(ParticleEffect, GetMaxParticleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_minTimeToLive(float)", asMETHOD(ParticleEffect, SetMinTimeToLive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_maxTimeToLive(float)", asMETHOD(ParticleEffect, SetMaxTimeToLive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "float get_minTimeToLive() const", asMETHOD(ParticleEffect, GetMinTimeToLive), asCALL_THISCALL);

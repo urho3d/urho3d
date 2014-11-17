@@ -7,6 +7,7 @@
 #include "Scripts/Editor/EditorUIElement.as"
 #include "Scripts/Editor/EditorGizmo.as"
 #include "Scripts/Editor/EditorMaterial.as"
+#include "Scripts/Editor/EditorParticleEffect.as"
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorPreferences.as"
 #include "Scripts/Editor/EditorToolBar.as"

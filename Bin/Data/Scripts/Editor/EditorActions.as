@@ -758,13 +758,13 @@ class EditMaterialAction : EditAction
     XMLFile@ oldState;
     XMLFile@ newState;
     WeakHandle material;
-    
+
     void Define(Material@ material_, XMLFile@ oldState_)
     {
         material = material_;
         oldState = oldState_;
         newState = XMLFile();
-        
+
         XMLElement materialElem = newState.CreateRoot("material");
         material_.Save(materialElem);
     }
@@ -787,6 +787,49 @@ class EditMaterialAction : EditAction
             mat.Load(newState.root);
             RefreshMaterialEditor();
         }
+    }
+}
+
+class EditParticleEffectAction : EditAction
+{
+    WeakHandle particleEffect;
+    File@ oldEffect;
+    File@ newEffect;
+
+    void Define(ParticleEffect@ particleEffect_, XMLFile@ oldEffect_)
+    {
+        /*particleEffect = particleEffect_;
+        oldEffect = oldEffect_;
+        newEffect = File();
+
+        XMLElement effectElem = newEffect.CreateRoot("particleemitter");
+        particleEffect.Save(newEffect);*/
+    }
+
+    void Undo()
+    {
+        /*ParticleEmitter@ particleEmitter_ = particleEmitter.Get();
+        if (particleEmitter_ is null)
+            return;
+
+        ParticleEffect@ effect = cache.GetResource("ParticleEffect", oldEffect);
+        if (effect is null)
+            return;
+        particleEmitter_.effect = effect;*/
+        RefreshParticleEffectEditor();
+    }
+
+    void Redo()
+    {
+        /*ParticleEmitter@ particleEmitter_ = particleEmitter.Get();
+        if (particleEmitter_ is null)
+            return;
+
+        ParticleEffect@ effect = cache.GetResource("ParticleEffect", newEffect);
+        if (effect is null)
+            return;
+        particleEmitter_.effect = effect;*/
+        RefreshParticleEffectEditor();
     }
 }
 
