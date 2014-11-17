@@ -806,6 +806,10 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         }
     }
     
+    // If culling is reversed, also reverse the middleIsRight assumption
+    if (cullMode_ == CULL_CW)
+        middleIsRight = !middleIsRight;
+    
     int topY = (int)vertices[top].y_;
     int middleY = (int)vertices[middle].y_;
     int bottomY = (int)vertices[bottom].y_;
@@ -819,7 +823,6 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
     Edge topToBottom(gradients, vertices[top], vertices[bottom], topY);
     Edge middleToBottom(gradients, vertices[middle], vertices[bottom], middleY);
     
-    // The triangle is clockwise, so if bottom > middle then middle is right
     if (middleIsRight)
     {
         // Top half
