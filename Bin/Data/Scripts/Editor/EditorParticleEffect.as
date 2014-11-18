@@ -37,6 +37,7 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("SaveAsButton", true), "Released", "SaveParticleEffectAs");
     SubscribeToEvent(particleEffectWindow.GetChild("CloseButton", true), "Released", "HideParticleEffectEditor");
     SubscribeToEvent(particleEffectWindow.GetChild("NewColorFrame", true), "Released", "EditParticleEffectColorFrameNew");
+    SubscribeToEvent(particleEffectWindow.GetChild("ColorFrameSort", true), "Released", "EditParticleEffectColorFrameSort");
     SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceX", true), "TextChanged", "EditParticleEffectConstantForce");
     SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceY", true), "TextChanged", "EditParticleEffectConstantForce");
     SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceZ", true), "TextChanged", "EditParticleEffectConstantForce");
@@ -83,10 +84,15 @@ void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData
         return;
 
     uint num = editParticleEffect.numColorFrames;
-    log.Info(String(num));
-    //ColorFrame@ cf = ColorFrame(Color(0,0,0), 0.0);
-    //editParticleEffect.SetColorFrame(0, cf);
+    editParticleEffect.numColorFrames = num + 1;
+    RefreshParticleEffectColorFrames();
 }
+
+void EditParticleEffectColorFrameSort(StringHash eventType, VariantMap& eventData)
+{
+    RefreshParticleEffectColorFrames();
+}
+
 
 void InitParticleEffectBasicAttributes()
 {
@@ -122,7 +128,7 @@ void InitParticleEffectBasicAttributes()
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("RotationMax", true)));
 
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("RotationSpeedMin", true)));
-    CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("RotationSpeedMin", true)));
+    CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("RotationSpeedMax", true)));
 
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("SizeAdd", true)));
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("SizeMultiply", true)));
@@ -587,6 +593,8 @@ void RefreshParticleEffectColorFrames()
     if (editParticleEffect is null)
         return;
 
+    editParticleEffect.SortColorFrames();
+
     ListView@ lv = particleEffectWindow.GetChild("ColorFrameListView", true);
     lv.RemoveAllItems();
 
@@ -594,91 +602,97 @@ void RefreshParticleEffectColorFrames()
     {
         ColorFrame@ colorFrame = editParticleEffect.GetColorFrame(i);
 
-        Window@ container = Window();
-        container.style = "Window";
-        container.minSize = IntVector2(0, 16);
-        container.maxSize = IntVector2(2147483647, 16);
+        Button@ container = Button();
+        lv.AddItem(container);
+        container.style = "Button";
+        container.imageRect = IntRect(18, 2, 30, 14);
+        container.minSize = IntVector2(0, 20);
+        container.maxSize = IntVector2(2147483647, 20);
         container.layoutMode = LM_HORIZONTAL;
         container.layoutBorder = IntRect(1,1,1,1);
         container.layoutSpacing = 4;
-        lv.AddItem(container);
         
         UIElement@ labelContainer = UIElement();
+        container.AddChild(labelContainer);
         labelContainer.style = "HorizontalPanel";
         labelContainer.minSize = IntVector2(0, 16);
         labelContainer.maxSize = IntVector2(2147483647, 16);
-        container.AddChild(labelContainer);
 
         {
             LineEdit@ le = LineEdit();
+            labelContainer.AddChild(le);
             le.name = "ColorTime";
             le.vars["ColorFrame"] = i;
             le.style = "LineEdit";
             le.minSize = IntVector2(0, 16);
             le.maxSize = IntVector2(40, 16);
             le.text = colorFrame.time;
-            labelContainer.AddChild(le);
+            le.cursorPosition = 0;
             CreateDragSlider(le);
 
             SubscribeToEvent(le, "TextChanged", "EditParticleEffectColorFrame");
         }
 
         UIElement@ textContainer = UIElement();
+        labelContainer.AddChild(textContainer);
         textContainer.minSize = IntVector2(0, 16);
         textContainer.maxSize = IntVector2(2147483647, 16);
-        labelContainer.AddChild(textContainer);
 
         Text@ t = Text();
+        textContainer.AddChild(t);
         t.style = "Text";
         t.text = "Color";
-        textContainer.AddChild(t);
 
         UIElement@ editContainer = UIElement();
+        container.AddChild(editContainer);
         editContainer.style = "HorizontalPanel";
         editContainer.minSize = IntVector2(0, 16);
         editContainer.maxSize = IntVector2(2147483647, 16);
-        container.AddChild(editContainer);
 
         {
             LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
             le.name = "ColorR";
             le.vars["ColorFrame"] = i;
             le.style = "LineEdit";
             le.text = colorFrame.color.r;
-            editContainer.AddChild(le);
+            le.cursorPosition = 0;
             CreateDragSlider(le);
 
             SubscribeToEvent(le, "TextChanged", "EditParticleEffectColorFrame");
         }
         {
             LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
             le.name = "ColorG";
             le.vars["ColorFrame"] = i;
             le.style = "LineEdit";
             le.text = colorFrame.color.g;
-            editContainer.AddChild(le);
+            le.cursorPosition = 0;
             CreateDragSlider(le);
 
             SubscribeToEvent(le, "TextChanged", "EditParticleEffectColorFrame");
         }
         {
             LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
             le.name = "ColorB";
             le.vars["ColorFrame"] = i;
             le.style = "LineEdit";
             le.text = colorFrame.color.b;
-            editContainer.AddChild(le);
+            le.cursorPosition = 0;
             CreateDragSlider(le);
 
             SubscribeToEvent(le, "TextChanged", "EditParticleEffectColorFrame");
         }
         {
             LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
             le.name = "ColorA";
             le.vars["ColorFrame"] = i;
             le.style = "LineEdit";
             le.text = colorFrame.color.a;
-            editContainer.AddChild(le);
+            le.cursorPosition = 0;
             CreateDragSlider(le);
 
             SubscribeToEvent(le, "TextChanged", "EditParticleEffectColorFrame");
@@ -780,7 +794,7 @@ void RefreshParticleEffectBasicAttributes()
     cast<LineEdit>(particleEffectWindow.GetChild("RotationMax", true)).text = editParticleEffect.maxRotation;
 
     cast<LineEdit>(particleEffectWindow.GetChild("RotationSpeedMin", true)).text = editParticleEffect.minRotationSpeed;
-    cast<LineEdit>(particleEffectWindow.GetChild("RotationSpeedMin", true)).text = editParticleEffect.maxRotationSpeed;
+    cast<LineEdit>(particleEffectWindow.GetChild("RotationSpeedMax", true)).text = editParticleEffect.maxRotationSpeed;
 
     cast<LineEdit>(particleEffectWindow.GetChild("SizeAdd", true)).text = editParticleEffect.sizeAdd;
     cast<LineEdit>(particleEffectWindow.GetChild("SizeMultiply", true)).text = editParticleEffect.sizeMul;

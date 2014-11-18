@@ -1145,10 +1145,13 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "void set_sizeMul(float)", asMETHOD(ParticleEffect, SetSizeMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "float get_sizeMul() const", asMETHOD(ParticleEffect, GetSizeMul), asCALL_THISCALL);
 
-    engine->RegisterObjectMethod("ParticleEffect", "void SetColorFrame(uint, ColorFrame@+) const", asMETHOD(ParticleEffect, SetColorFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void AddColorFrame(Color&, float)", asMETHOD(ParticleEffect, AddColorFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void RemoveColorFrame(uint)", asMETHOD(ParticleEffect, RemoveColorFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void SetColorFrame(uint, ColorFrame@+)", asMETHOD(ParticleEffect, SetColorFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_numColorFrames(uint)", asMETHOD(ParticleEffect, SetNumColorFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "uint get_numColorFrames() const", asMETHOD(ParticleEffect, GetNumColorFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "ColorFrame@+ GetColorFrame(uint) const", asMETHOD(ParticleEffect, GetColorFrame), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void SetTextureFrame(uint, TextureFrame@+) const", asMETHOD(ParticleEffect, SetTextureFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void SetTextureFrame(uint, TextureFrame@+)", asMETHOD(ParticleEffect, SetTextureFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "uint get_numTextureFrames() const", asMETHOD(ParticleEffect, GetNumTextureFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "TextureFrame@+ GetTextureFrame(uint) const", asMETHOD(ParticleEffect, GetTextureFrame), asCALL_THISCALL);
 }

@@ -176,10 +176,16 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
+    /// Add a color frame sorted in the correct position based on time.
+    void AddColorFrame(const Color& color, const float time);
+    /// Remove color frame at index
+    void RemoveColorFrame(unsigned index);
     /// Set color animation of particles.
     void SetColorFrames(const Vector<ColorFrame>& colorFrames);
-    /// Set number of color animation frames.
+    /// Set color animation frame at index. If index is greater than number of color frames, new color frames are added.
     void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
+    /// Set number of color frames.
+    void SetNumColorFrames(unsigned number);
     /// Set particle texture animation.
     void SetTextureFrames(const Vector<TextureFrame>& animation);
     /// Set number of texture animation frames.
