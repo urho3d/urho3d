@@ -985,7 +985,7 @@
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
-// Urho3D - Add support for Android Intel x86_64
+// Urho3D - Add support for Android Intel x86_64 and Android ARM 64bit
 		#elif defined(__LP64__) && !defined(__aarch64__)
 			// Android Intel x86_64 (same config as Linux x86_64). Tested with Intel x86_64 Atom System Image.
 			#define AS_X64_GCC
@@ -995,6 +995,12 @@
 			#define AS_LARGE_OBJS_PASSED_BY_REF
 			#define AS_LARGE_OBJ_MIN_SIZE 5
 			// STDCALL is not available on 64bit Linux
+			#undef STDCALL
+			#define STDCALL
+        #elif defined(__aarch64__)
+			// Doesn't support native calling for Android ARM 64bit yet
+			#define AS_MAX_PORTABILITY
+			// STDCALL is not available on ARM
 			#undef STDCALL
 			#define STDCALL
 		#endif
