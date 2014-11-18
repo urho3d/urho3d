@@ -986,7 +986,7 @@
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 // Urho3D - Add support for Android Intel x86_64
-		#elif defined(__LP64__)
+		#elif defined(__LP64__) && !defined(__aarch64__)
 			// Android Intel x86_64 (same config as Linux x86_64). Tested with Intel x86_64 Atom System Image.
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
