@@ -50,5 +50,5 @@ if "%use_mklink%" == "1" (
 ) 
 echo on
 @set "OPT="
-cmake -E chdir %build% cmake %OPT% -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
+cmake -E chdir %build% cmake %OPT% -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
 @popd

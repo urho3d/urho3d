@@ -547,9 +547,7 @@ Steps to configure:
    are no more new options in red. For the first configuration, choose the
    generator you like to use. Click the Group check box to group the build
    options.
-    - In the Ungrouped Entries: only check one of these options (ANDROID, IOS,
-      RASPI) when you target the platform, leave them unchecked for
-      dekstop/native build.
+    - In the Ungrouped Entries: check IOS option when targeting it on Xcode.
     - In the URHO3D group: check any of the options you desire. Some of the
       options when checked may cause new options to be made available in the
       subsequent configuration loop.

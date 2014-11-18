@@ -20,11 +20,23 @@
 # THE SOFTWARE.
 #
 
+# Set the build type if not explicitly set, for single-configuration generator only
+if (CMAKE_GENERATOR STREQUAL Xcode)
+    set (XCODE TRUE)
+endif ()
+if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE Release)
+endif ()
+if (CMAKE_HOST_WIN32)
+    execute_process (COMMAND uname -o RESULT_VARIABLE UNAME_EXIT_CODE OUTPUT_VARIABLE UNAME_OPERATING_SYSTEM ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (UNAME_EXIT_CODE EQUAL 0 AND UNAME_OPERATING_SYSTEM STREQUAL Msys)
+        set (MSYS 1)
+    endif ()
+endif ()
+
 # Define all supported build options
 include (CMakeDependentOption)
-option (ANDROID "Setup build for Android platform")
-option (RASPI "Setup build for Raspberry Pi platform")
-option (IOS "Setup build for iOS platform")
+cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC)
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
     execute_process (COMMAND echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
@@ -34,6 +46,15 @@ if (NOT MSVC)
     endif ()
     if (matched)
         set (URHO3D_DEFAULT_64BIT TRUE)
+    endif ()
+    # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
+    # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
+    if (NOT ANDROID)
+        string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
+        if (matched)
+            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too
+            set (RASPI TRUE)
+        endif ()
     endif ()
 endif ()
 option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
@@ -100,20 +121,6 @@ else ()
     if (ANDROID_ABI)
         # Just reference it to suppress "unused variable" CMake warning on non-Android project
         # Due to the design of cmake_gcc.sh currently, the script can be used to configure/generate Android project and other non-Android projects in one go
-    endif ()
-endif ()
-
-# Set the build type if not explicitly set, for single-configuration generator only
-if (CMAKE_GENERATOR STREQUAL Xcode)
-    set (XCODE TRUE)
-endif ()
-if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release)
-endif ()
-if (CMAKE_HOST_WIN32)
-    execute_process (COMMAND uname -o RESULT_VARIABLE UNAME_EXIT_CODE OUTPUT_VARIABLE UNAME_OPERATING_SYSTEM ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (UNAME_EXIT_CODE EQUAL 0 AND UNAME_OPERATING_SYSTEM STREQUAL Msys)
-        set (MSYS 1)
     endif ()
 endif ()
 
