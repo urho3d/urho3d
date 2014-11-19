@@ -220,7 +220,7 @@ V1.32
 - Improve terrain rendering on mobile devices
 - Refactoring of camera facing modes in %BillboardSet & %Text3D
 - Additive alpha techniques for particle rendering
-- Possibility to use %CustomGeometry component for physics triangle mesh  collision
+- Possibility to use %CustomGeometry component for physics triangle mesh collision
 - Access to 2D node coordinates for convenience when using 2D graphics features
 - Save embedded textures in AssetImporter
 - Use best matching fullscreen resolution if no exact match
@@ -250,7 +250,7 @@ V1.32
 - Allow to create AngelScript script objects by specifying the interface it implements
 - %Window position startup parameters
 - Functions to get time since epoch & modify file's last modified time
-- Optionally auto-disable child elements of a scroll view when touch  scrolling
+- Optionally auto-disable child elements of a scroll view when touch scrolling
 - Allocate views permanently per viewport to allow querying for drawables, lights etc. reliably
 - Allow to specify material techniques/passes that should not be used on mobile devices
 - Reduced default shadow mapping issues on mobile devices
@@ -258,7 +258,7 @@ V1.32
 - Build system: possibility to build Urho3D without networking or 2D graphics functionality
 - Build system: improved generated scripting documentation
 - Build system: improved support for IDE's in CMake scripts
-- Build system: support up to Android NDK r10c
+- Build system: support up to Android NDK r10c and 64-bit ABIs
 - Build system: numerous other improvements
 - Editor: resource browser
 - Editor: spawn window for random-generating objects
@@ -296,14 +296,14 @@ V1.32
 - Fix skeleton-only model not importing in AssetImporter
 - Fix terrain raycast returning incorrect position/normal
 - Fix animation keyframe timing in AssetImporter if start time is not 0
-- Fix storing %Image resources to memory unnecessarily during cube/3D  texture loading
+- Fix storing %Image resources to memory unnecessarily during cube/3D texture loading
 - Fix to node transform dirtying mechanism and the TransformChanged() script function
 - Fix returned documents directory not being writable on iOS
 - Fix click to emptiness not closing a menu
 - Fix %FileWatcher notifying when file was still being saved. By default delay notification 1 second
 - Fix .txml import in the editor
 - Fix erroneous raycast to triangles behind the ray
-- Fix crash when multiple AnimatedModels exist in a node and the master  model is destroyed
+- Fix crash when multiple AnimatedModels exist in a node and the master model is destroyed
 - Fix missing %Matrix4 * %Matrix3x4 operator in script
 - Fix various compile warnings that leak to applications using Urho3D
 - Fix %DebugHud update possibly being late one frame

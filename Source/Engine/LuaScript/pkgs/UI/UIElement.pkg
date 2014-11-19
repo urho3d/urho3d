@@ -125,7 +125,7 @@ class UIElement : public Animatable
     void SetLayoutMode(LayoutMode mode);
     void SetLayoutSpacing(int spacing);
     void SetLayoutBorder(const IntRect& border);
-	void SetLayoutFlexScale(const Vector2& scale);
+    void SetLayoutFlexScale(const Vector2& scale);
     void SetIndent(int indent);
     void SetIndentSpacing(int indentSpacing);
     void UpdateLayout();
@@ -191,7 +191,7 @@ class UIElement : public Animatable
     LayoutMode GetLayoutMode() const;
     int GetLayoutSpacing() const;
     const IntRect& GetLayoutBorder() const;
-	const Vector2& GetLayoutFlexScale() const;
+    const Vector2& GetLayoutFlexScale() const;
     unsigned GetNumChildren(bool recursive = false) const;
     int GetDragButtonCombo() const;
     unsigned GetDragButtonCount() const;
@@ -265,7 +265,7 @@ class UIElement : public Animatable
     tolua_property__get_set LayoutMode layoutMode;
     tolua_property__get_set int layoutSpacing;
     tolua_property__get_set IntRect& layoutBorder;
-	tolua_property__get_set Vector2& layoutFlexScale;
+    tolua_property__get_set Vector2& layoutFlexScale;
     tolua_readonly tolua_property__get_set unsigned numChildren;
     tolua_property__get_set UIElement* parent;
     tolua_readonly tolua_property__get_set UIElement* root;

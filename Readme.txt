@@ -287,7 +287,7 @@ Note that the native code is built by default for armeabi-v7a ABI. To make your
 program compatible also with old Android devices, build also an armeabi version
 by executing the CMake batch file again with the parameter -DANDROID_ABI=armeabi
 added, then execute make again in the build directory. See "Build options" for
-all the possible values
+all the possible values.
 
 You can also build and deploy using Eclipse IDE with ADT plugin. To do that,
 after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh.
@@ -669,7 +669,7 @@ V1.32   - Finalized Urho2D functionality, including 2D physics using Box2D,
           graphics functionality
         - Build system: improved generated scripting documentation
         - Build system: improved support for IDE's in CMake scripts
-        - Build system: support up to Android NDK r10c
+        - Build system: support up to Android NDK r10c and 64-bit ABIs
         - Build system: numerous other improvements
         - Editor: resource browser
         - Editor: spawn window for random-generating objects
