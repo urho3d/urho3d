@@ -246,6 +246,7 @@ bool SaveUILayout(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     if (!file.open)
     {
@@ -260,6 +261,8 @@ bool SaveUILayout(const String&in fileName)
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
     bool success = element.SaveXML(rootElem);
+    RemoveBackup(success, fileName);
+
     if (success)
     {
         FilterInternalVars(rootElem);
@@ -349,6 +352,7 @@ bool SaveChildUIElement(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     if (!file.open)
     {
@@ -359,6 +363,8 @@ bool SaveChildUIElement(const String&in fileName)
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
     bool success = editUIElement.SaveXML(rootElem);
+    RemoveBackup(success, fileName);
+    
     if (success)
     {
         FilterInternalVars(rootElem);

@@ -322,3 +322,14 @@ void SaveConfig()
 
     config.Save(File(configFileName, FILE_WRITE));
 }
+
+void MakeBackup(const String&in fileName)
+{
+    fileSystem.Rename(fileName, fileName + ".old");
+}
+
+void RemoveBackup(bool success, const String&in fileName)
+{
+    if (success)
+        fileSystem.Delete(fileName + ".old");
+}
