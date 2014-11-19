@@ -1921,7 +1921,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         for (int i = 0; i < numResizable; ++i)
         {
             unsigned index = resizable[i];
-            int targetSize = sizes[index] + errorPerChild * flexScales[i];
+            int targetSize = sizes[index] + errorPerChild;
             if (remainder)
             {
                 acc += add;
