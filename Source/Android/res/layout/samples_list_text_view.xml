@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:paddingBottom="14dp"
-    android:paddingLeft="24dp"
     android:paddingTop="14dp"
+    android:paddingLeft="14dp"
+    android:paddingRight="14dp"
     android:textSize="22sp" />

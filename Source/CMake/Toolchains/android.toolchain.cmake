@@ -1540,12 +1540,13 @@ if(NOT _CMAKE_IN_TRY_COMPILE)
  set( ANDROID_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" FORCE )
 endif()
 
-# copy shaed stl library to build directory
+# Urho3D: Copy shared STL library to final Android library output path pointed by ANDROID_LIBRARY_OUTPUT_PATH variable as CMake's LIBRARY_OUTPUT_PATH still points to its default
+# copy shared stl library to build directory
 if( NOT _CMAKE_IN_TRY_COMPILE AND __libstl MATCHES "[.]so$" )
  get_filename_component( __libstlname "${__libstl}" NAME )
- execute_process( COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${__libstl}" "${LIBRARY_OUTPUT_PATH}/${__libstlname}" RESULT_VARIABLE __fileCopyProcess )
- if( NOT __fileCopyProcess EQUAL 0 OR NOT EXISTS "${LIBRARY_OUTPUT_PATH}/${__libstlname}")
-  message( SEND_ERROR "Failed copying of ${__libstl} to the ${LIBRARY_OUTPUT_PATH}/${__libstlname}" )
+ execute_process( COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${__libstl}" "${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}" RESULT_VARIABLE __fileCopyProcess )
+ if( NOT __fileCopyProcess EQUAL 0 OR NOT EXISTS "${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}")
+   message( SEND_ERROR "Failed copying of ${__libstl} to the ${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}" )
  endif()
  unset( __fileCopyProcess )
  unset( __libstlname )

@@ -42,7 +42,7 @@ if "%use_mklink%" == "1" (
     set "build=android-Build"
     set "source=..\Source"
     for %%d in (CoreData Data) do if not exist "Source\Android\assets\%%d". mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
-    for %%d in (src res assets) do if not exist "android-Build\%%d". mklink /D "android-Build\%%d" "..\Source\Android\%%d"
+    for %%d in (src res assets jni) do if exist "Source\Android\%%d" if not exist "android-Build\%%d". mklink /D "android-Build\%%d" "..\Source\Android\%%d"
     for %%f in (AndroidManifest.xml build.xml) do if not exist "android-Build\%%f". mklink "android-Build\%%f" "..\Source\Android\%%f"
 ) else (
     if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt

@@ -33,16 +33,16 @@ import android.widget.ListView;
 
 public class SampleLauncher extends ListActivity {
 
-    public static final String LIBRARY_NAMES = "LIBRARY_NAMES";
-    public static final String PICKED_LIBRARY = "PICKED_LIBRARY";
+    public static final String LIBRARY_NAMES = "libraryNames";
+    public static final String PICKED_LIBRARY = "pickedLibrary";
     private static final int OBTAINING_LIBNAMES = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Start Urho3D activity with the intention for obtaining the library name(s)
-        startActivityForResult(new Intent(this, Urho3D.class), OBTAINING_LIBNAMES);
+        // Start Urho3D activity with the intention for obtaining the library name(s), except when a library is already being picked externally
+        startActivityForResult(new Intent(this, Urho3D.class).putExtra(PICKED_LIBRARY, getIntent().getStringExtra(PICKED_LIBRARY)), OBTAINING_LIBNAMES);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);

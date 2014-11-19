@@ -51,22 +51,22 @@ task :scaffolding do
   end
 end
 
-# Usage: rake android [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='input tap 10 200'] [timeout=30] [api=19] [abi=armeabi-v7a] [avd=test] [retries=10] [retry_interval=10]
+# Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
 desc 'Test run already installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
+  parameter = ENV['parameter'] || '--es pickedLibrary Urho3DPlayer'
   intent = ENV['intent'] || '.SampleLauncher'
   package = ENV['package'] || 'com.github.urho3d'
-  success_indicator = ENV['success_indicator'] || (intent == '.SampleLauncher' ? 'Initialized engine' : '')
-  payload = ENV['payload'] || (intent == '.SampleLauncher' ? 'input tap 10 200' : '')
-  timeout = ENV['timeout'] || 30
+  success_indicator = ENV['success_indicator'] || 'Initialized engine'
+  payload = ENV['payload'] || 'sleep 30'
   api = ENV['api'] || 19
   abi = ENV['abi'] || 'armeabi-v7a'
-  avd = ENV['avd'] || 'test'
+  avd = ENV['avd'] || "test_#{api}_#{abi}"
   retries = ENV['retries'] || 10 # minutes
   retry_interval = ENV['retry_interval'] || 10 # seconds
   android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
-  android_test_run intent, package, success_indicator, payload, timeout or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
+  android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci)
@@ -356,13 +356,15 @@ def makefile_ci
   end
 end
 
-def android_find_device api = $specific_api, abi = $specific_abi
-  $specific_api = api
-  $specific_abi = abi
-  $specific_device = nil
-  for i in `adb devices |tail -n +2`.split "\n"
+def android_find_device api = nil, abi = nil
+  # Return the previously found matching device or if not found yet then try to find the matching device now
+  return $specific_device if $specific_device
+  wait = api ? '' : 'wait-for-device'
+  $specific_api = api.to_s if api
+  $specific_abi = abi.to_s if abi
+  for i in `adb #{wait} devices |tail -n +2`.split "\n"
     device = i.split.first
-    if api.to_s == `adb -s #{device} wait-for-device shell getprop ro.build.version.sdk`.chomp && abi.to_s == `adb -s #{device} shell getprop ro.product.cpu.abi`.chomp
+    if `adb -s #{device} wait-for-device shell getprop ro.build.version.sdk`.chomp == $specific_api && `adb -s #{device} shell getprop ro.product.cpu.abi`.chomp == $specific_abi
       return $specific_device = device
     end
   end
@@ -376,39 +378,33 @@ def android_prepare_device api, abi = 'armeabi-v7a', name = 'test'
     if !system "android list avd |grep -cq 'Name: #{name}$'"
       system "echo 'no' |android create avd -n #{name} -t android-#{api} --abi #{abi}" or abort "Failed to create '#{name}' Android virtual device"
     end
-    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; ANDROID_TMP=~ emulator -avd #{name} $OPTS &"
+    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
   end
   return 0
 end
 
-def android_wait_for_device retries = -1, retry_interval = 10, package = 'com.android.launcher'
+def android_wait_for_device retries = -1, retry_interval = 10, package = 'android.process.acore'  # Waiting for HOME by default
   # Wait until the indicator process is running or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
-  print "\nWaiting for device..."; $stdout.flush
-  # Find the specific device in case it is not found earlier
-  $specific_device = android_find_device unless $specific_device
-  if $specific_device
-    # Capture adb's stdout and interpret it because adb does not return exit code from its last shell command
-    thread = Thread.new { `adb -s #{$specific_device} shell 'until ps |grep -c #{package} >/dev/null; do sleep #{retry_interval}; done; while ps |grep -c bootanimation >/dev/null; do sleep 1; done'` }
-    sleep 1
-    retries = retries * 60 / retry_interval unless retries == -1
-    until retries == 0
-      if thread.status == false
-        thread.join
-        break
-      end
-      sleep retry_interval
-      print '.'; $stdout.flush  # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
-      retries -= 1 if retries > 0
+  str = "\nWaiting for device..."
+  thread = Thread.new { android_find_device }; sleep 0.5
+  process_ready = false
+  retries = retries * 60 / retry_interval unless retries == -1
+  until retries == 0
+    if thread.status == false
+      thread.join
+      break if process_ready
+      process_ready = thread = Thread.new { `adb -s #{$specific_device} shell 'until ps |grep -c #{package} >/dev/null; do sleep #{retry_interval}; done; while ps |grep -c bootanimation >/dev/null; do sleep 1; done'` }; sleep 0.5
+      next
     end
-  else
-    # No matching device found
-    retries = 0
+    print str; str = '.'; $stdout.flush   # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
+    sleep retry_interval
+    retries -= 1 if retries > 0
   end
-  puts "\n\n"; $stdout.flush
+  puts "\n\n" if str == '.'; $stdout.flush
   return retries == 0 ? nil : 0
 end
 
-def android_test_run intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'input tap 10 200', timeout = 30
+def android_test_run parameter = '--es pickedLibrary Urho3DPlayer', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'sleep 30'
   # The device should have been found at this point
   return nil unless $specific_device
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
@@ -419,15 +415,11 @@ input keyevent 82; input keyevent 4
 # Clear the log
 logcat -c
 # Start the app
-am start -a android.intent.action.MAIN -n #{package}/#{intent}
+am start -a android.intent.action.MAIN -n #{package}/#{intent} #{parameter}
 # Wait until the process is running
 until ps |grep -c #{package} 1>/dev/null; do sleep 1; done
-# Make sure the app is on the foreground
-sleep 3 && am start -n #{package}/#{intent} && sleep 3
-# Execute the payload, the default payload is a single tap to launch Urho3DPlayer which in turn runs NinjaSnowWar.as
+# Execute the payload
 #{payload}
-# Let it runs for a while
-sleep #{timeout}
 # Exit and stop the app
 input keyevent 4 && am force-stop #{package}
 # Dump the log

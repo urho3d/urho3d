@@ -489,6 +489,7 @@ cmake_xxxx batch files or shell scripts.
 |                     | | Android cross-compiling build only), SSH digital key |
 |                     | | must be setup first for this to work, typical value  |
 |                     | | has a pattern of usr@tgt:remote-loc                  |
+|URHO3D_NDK_GDB       |0|Enable ndk-gdb for debugging (Android build only)     |
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration to be generated     |
 |                     | | (Makefile generator only), possible values are       |
 |                     | | Release (*default), Debug, and RelWithDebInfo        |
