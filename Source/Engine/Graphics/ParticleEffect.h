@@ -176,8 +176,11 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
+
     /// Add a color frame sorted in the correct position based on time.
-    void AddColorFrame(const Color& color, const float time);
+    void AddColorTime(const Color& color, const float time);
+    /// Add a color frame sorted in the correct position based on time.
+    void AddColorFrame(const ColorFrame& colorFrame);
     /// Remove color frame at index
     void RemoveColorFrame(unsigned index);
     /// Set color animation of particles.
@@ -186,10 +189,23 @@ public:
     void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
     /// Set number of color frames.
     void SetNumColorFrames(unsigned number);
+    /// Sort the list of color frames based on time.
+    void SortColorFrames();
+
+    /// Add a texture frame sorted in the correct position based on time.
+    void AddTextureTime(const Rect& uv, const float time);
+    /// Add a texture frame sorted in the correct position based on time.
+    void AddTextureFrame(const TextureFrame& textureFrame);
+    /// Remove texture frame at index
+    void RemoveTextureFrame(unsigned index);
     /// Set particle texture animation.
     void SetTextureFrames(const Vector<TextureFrame>& animation);
     /// Set number of texture animation frames.
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
+    /// Set number of texture frames.
+    void SetNumTextureFrames(unsigned number);
+    /// Sort the list of texture frames based on time.
+    void SortTextureFrames();
 
     /// Return material.
     Material* GetMaterial() const { return material_; }

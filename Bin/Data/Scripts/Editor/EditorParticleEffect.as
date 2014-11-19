@@ -38,6 +38,8 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("CloseButton", true), "Released", "HideParticleEffectEditor");
     SubscribeToEvent(particleEffectWindow.GetChild("NewColorFrame", true), "Released", "EditParticleEffectColorFrameNew");
     SubscribeToEvent(particleEffectWindow.GetChild("ColorFrameSort", true), "Released", "EditParticleEffectColorFrameSort");
+    SubscribeToEvent(particleEffectWindow.GetChild("NewTextureFrame", true), "Released", "EditParticleEffectTextureFrameNew");
+    SubscribeToEvent(particleEffectWindow.GetChild("TextureFrameSort", true), "Released", "EditParticleEffectTextureFrameSort");
     SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceX", true), "TextChanged", "EditParticleEffectConstantForce");
     SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceY", true), "TextChanged", "EditParticleEffectConstantForce");
     SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceZ", true), "TextChanged", "EditParticleEffectConstantForce");
@@ -88,11 +90,25 @@ void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData
     RefreshParticleEffectColorFrames();
 }
 
+void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventData)
+{
+    if (editParticleEffect is null)
+        return;
+
+    uint num = editParticleEffect.numTextureFrames;
+    editParticleEffect.numTextureFrames = num + 1;
+    RefreshParticleEffectTextureFrames();
+}
+
 void EditParticleEffectColorFrameSort(StringHash eventType, VariantMap& eventData)
 {
     RefreshParticleEffectColorFrames();
 }
 
+void EditParticleEffectTextureFrameSort(StringHash eventType, VariantMap& eventData)
+{
+    RefreshParticleEffectTextureFrames();
+}
 
 void InitParticleEffectBasicAttributes()
 {
@@ -586,6 +602,7 @@ void RefreshParticleEffectEditor()
     RefreshParticleEffectBasicAttributes();
     RefreshParticleEffectMaterial();
     RefreshParticleEffectColorFrames();
+    RefreshParticleEffectTextureFrames();
 }
 
 void RefreshParticleEffectColorFrames()
@@ -611,7 +628,7 @@ void RefreshParticleEffectColorFrames()
         container.layoutMode = LM_HORIZONTAL;
         container.layoutBorder = IntRect(1,1,1,1);
         container.layoutSpacing = 4;
-        
+
         UIElement@ labelContainer = UIElement();
         container.AddChild(labelContainer);
         labelContainer.style = "HorizontalPanel";
@@ -701,6 +718,118 @@ void RefreshParticleEffectColorFrames()
     }
 }
 
+void RefreshParticleEffectTextureFrames()
+{
+    if (editParticleEffect is null)
+        return;
+
+    editParticleEffect.SortTextureFrames();
+
+    ListView@ lv = particleEffectWindow.GetChild("TextureFrameListView", true);
+    lv.RemoveAllItems();
+
+    for (uint i = 0; i < editParticleEffect.numTextureFrames; i++)
+    {
+        TextureFrame@ textureFrame = editParticleEffect.GetTextureFrame(i);
+
+        Button@ container = Button();
+        lv.AddItem(container);
+        container.style = "Button";
+        container.imageRect = IntRect(18, 2, 30, 14);
+        container.minSize = IntVector2(0, 20);
+        container.maxSize = IntVector2(2147483647, 20);
+        container.layoutMode = LM_HORIZONTAL;
+        container.layoutBorder = IntRect(1,1,1,1);
+        container.layoutSpacing = 4;
+
+        UIElement@ labelContainer = UIElement();
+        container.AddChild(labelContainer);
+        labelContainer.style = "HorizontalPanel";
+        labelContainer.minSize = IntVector2(0, 16);
+        labelContainer.maxSize = IntVector2(2147483647, 16);
+
+        {
+            LineEdit@ le = LineEdit();
+            labelContainer.AddChild(le);
+            le.name = "TextureTime";
+            le.vars["TextureFrame"] = i;
+            le.style = "LineEdit";
+            le.minSize = IntVector2(0, 16);
+            le.maxSize = IntVector2(40, 16);
+            le.text = textureFrame.time;
+            le.cursorPosition = 0;
+            CreateDragSlider(le);
+
+            SubscribeToEvent(le, "TextChanged", "EditParticleEffectTextureFrame");
+        }
+
+        UIElement@ textContainer = UIElement();
+        labelContainer.AddChild(textContainer);
+        textContainer.minSize = IntVector2(0, 16);
+        textContainer.maxSize = IntVector2(2147483647, 16);
+
+        Text@ t = Text();
+        textContainer.AddChild(t);
+        t.style = "Text";
+        t.text = "Texture";
+
+        UIElement@ editContainer = UIElement();
+        container.AddChild(editContainer);
+        editContainer.style = "HorizontalPanel";
+        editContainer.minSize = IntVector2(0, 16);
+        editContainer.maxSize = IntVector2(2147483647, 16);
+
+        {
+            LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
+            le.name = "TextureMinX";
+            le.vars["TextureFrame"] = i;
+            le.style = "LineEdit";
+            le.text = textureFrame.uv.min.x;
+            le.cursorPosition = 0;
+            CreateDragSlider(le);
+
+            SubscribeToEvent(le, "TextChanged", "EditParticleEffectTextureFrame");
+        }
+        {
+            LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
+            le.name = "TextureMinY";
+            le.vars["TextureFrame"] = i;
+            le.style = "LineEdit";
+            le.text = textureFrame.uv.min.y;
+            le.cursorPosition = 0;
+            CreateDragSlider(le);
+
+            SubscribeToEvent(le, "TextChanged", "EditParticleEffectTextureFrame");
+        }
+        {
+            LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
+            le.name = "TextureMaxX";
+            le.vars["TextureFrame"] = i;
+            le.style = "LineEdit";
+            le.text = textureFrame.uv.max.x;
+            le.cursorPosition = 0;
+            CreateDragSlider(le);
+
+            SubscribeToEvent(le, "TextChanged", "EditParticleEffectTextureFrame");
+        }
+        {
+            LineEdit@ le = LineEdit();
+            editContainer.AddChild(le);
+            le.name = "TextureMaxY";
+            le.vars["TextureFrame"] = i;
+            le.style = "LineEdit";
+            le.text = textureFrame.uv.max.y;
+            le.cursorPosition = 0;
+            CreateDragSlider(le);
+
+            SubscribeToEvent(le, "TextChanged", "EditParticleEffectTextureFrame");
+        }
+    }
+}
+
 void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
@@ -712,10 +841,6 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
     LineEdit@ element = eventData["Element"].GetPtr();
     uint i = element.vars["ColorFrame"].GetInt();
     ColorFrame@ cf = editParticleEffect.GetColorFrame(i);
-
-    log.Info(String(i));
-    log.Info(element.text);
-    log.Info(element.name);
 
     if (element.name == "ColorTime")
         cf.time = element.text.ToFloat();
@@ -733,6 +858,37 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
         cf.color = Color(cf.color.r, cf.color.g, cf.color.b, element.text.ToFloat());
 
     editParticleEffect.SetColorFrame(i, cf);
+    particleEffectEmitter.Reset();
+}
+
+void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
+{
+    if (editParticleEffect is null)
+        return;
+
+    if (particleEffectEmitter is null)
+        return;
+
+    LineEdit@ element = eventData["Element"].GetPtr();
+    uint i = element.vars["TextureFrame"].GetInt();
+    TextureFrame@ tf = editParticleEffect.GetTextureFrame(i);
+
+    if (element.name == "TextureTime")
+        tf.time = element.text.ToFloat();
+
+    if (element.name == "TextureMinX")
+        tf.uv = Rect(element.text.ToFloat(), tf.uv.min.y, tf.uv.max.x, tf.uv.max.y);
+
+    if (element.name == "TextureMinY")
+        tf.uv = Rect(tf.uv.min.x, element.text.ToFloat(), tf.uv.max.x, tf.uv.max.y);
+
+    if (element.name == "TextureMaxX")
+        tf.uv = Rect(tf.uv.min.x, tf.uv.min.y, element.text.ToFloat(), tf.uv.max.y);
+
+    if (element.name == "TextureMaxY")
+        tf.uv = Rect(tf.uv.min.x, tf.uv.min.y, tf.uv.max.x, element.text.ToFloat());
+
+    editParticleEffect.SetTextureFrame(i, tf);
     particleEffectEmitter.Reset();
 }
 

@@ -370,7 +370,7 @@
                     <element type="ListView" style="PanelView">
                         <attribute name="Name" value="ColorFrameListView" />
                         <attribute name="Highlight Mode" value="Always" />
-                        <attribute name="Min Size" value="0 60" />
+                        <attribute name="Min Size" value="0 100" />
                     </element>
                     <element>
                         <attribute name="Name" value="ColorFrameButtonContainer" />
@@ -419,7 +419,7 @@
                     </element>
                     <element type="ListView" style="PanelView">
                         <attribute name="Name" value="TextureFrameListView" />
-                        <attribute name="Min Size" value="0 60" />
+                        <attribute name="Min Size" value="0 100" />
                     </element>
                     <element>
                         <attribute name="Name" value="TextureFrameButtonContainer" />
