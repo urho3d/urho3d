@@ -84,9 +84,9 @@ public:
 
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
-    /// Return Lua function.
+    /// Return Lua function by function stack index.
     WeakPtr<LuaFunction> GetFunction(int functionIndex);
-    /// Return Lua function.
+    /// Return Lua function by function name.
     WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
@@ -118,8 +118,8 @@ private:
     lua_State* luaState_;
     /// Coroutine update function.
     WeakPtr<LuaFunction> coroutineUpdate_;
-    /// Pointer to function map.
-    HashMap<const void*, SharedPtr<LuaFunction> > pointerToFunctionMap_;
+    /// Function pointer to function map.
+    HashMap<const void*, SharedPtr<LuaFunction> > functionPointerToFunctionMap_;
     /// Function name to function map.
     HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
     /// Typedef Lua function vector.

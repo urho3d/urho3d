@@ -508,19 +508,19 @@ WeakPtr<LuaFunction> LuaScript::GetFunction(int functionIndex)
     if (!lua_isfunction(luaState_, functionIndex))
         return WeakPtr<LuaFunction>();
 
-    const void* pointer = lua_topointer(luaState_, functionIndex);
-    if (!pointer)
+    const void* functionPointer = lua_topointer(luaState_, functionIndex);
+    if (!functionPointer)
         return WeakPtr<LuaFunction>();
 
-    HashMap<const void*, SharedPtr<LuaFunction> >::Iterator i = pointerToFunctionMap_.Find(pointer);
-    if (i != pointerToFunctionMap_.End())
+    HashMap<const void*, SharedPtr<LuaFunction> >::Iterator i = functionPointerToFunctionMap_.Find(functionPointer);
+    if (i != functionPointerToFunctionMap_.End())
         return WeakPtr<LuaFunction>(i->second_);
 
     lua_pushvalue(luaState_, functionIndex);
     int functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
     SharedPtr<LuaFunction> function(new LuaFunction(luaState_, functionRef, false));
-    pointerToFunctionMap_[pointer] = function;
+    functionPointerToFunctionMap_[functionPointer] = function;
 
     return WeakPtr<LuaFunction>(function);
 }
