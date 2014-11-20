@@ -356,6 +356,30 @@ String GetPlatform()
     #endif
 }
 
+#ifdef ANDROID
+unsigned GetAndroidCPUCount()
+{
+    FILE* fp;
+    int res, i = -1, j = -1;
+
+    fp = fopen("/sys/devices/system/cpu/present", "r");
+    // If failed, return at least 1
+    if (fp == 0)
+        return 1;
+
+    res = fscanf(fp, "%d-%d", &i, &j);
+    fclose(fp);
+
+    if (res == 1 && i == 0)
+        return 1;
+    else if (res == 2 && i == 0)
+        return j + 1;
+
+    // If failed, return at least 1
+    return 1;
+}
+#endif
+
 unsigned GetNumPhysicalCPUs()
 {
     #if defined(IOS)
@@ -367,6 +391,8 @@ unsigned GetNumPhysicalCPUs()
     #else
     return data.physical_cpu;
     #endif
+    #elif defined(ANDROID)
+    return GetAndroidCPUCount();
     #elif !defined(ANDROID) && !defined(RASPI)
     struct cpu_id_t data;
     GetCPUData(&data);
@@ -387,6 +413,8 @@ unsigned GetNumLogicalCPUs()
     #else
     return data.logical_cpu;
     #endif
+    #elif defined(ANDROID)
+    return GetAndroidCPUCount();
     #elif !defined(ANDROID) && !defined(RASPI)
     struct cpu_id_t data;
     GetCPUData(&data);

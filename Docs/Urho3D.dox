@@ -212,6 +212,7 @@ V1.32
 - Support for copying %ListView text to system clipboard
 - Async system command execution
 - Generic attribute access for Lua script objects
+- Use Lua functions directly as event subscribers
 - Touch gesture recording and load/save
 - AssetImporter option to allow multiple import of identical meshes
 - Automatically create a physics world component to scene when necessary
@@ -323,6 +324,7 @@ V1.32
 - Fix %UI elements not receiving input when the window containing them is partially outside the screen to the left
 - Fix occlusion rendering not working with counterclockwise triangles
 - Fix material shader parameter animations going out of sync with other animations when the object using the material is not in view
+- Fix CPU count functions on Android
 
 V1.31
 

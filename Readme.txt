@@ -611,6 +611,7 @@ V1.32   - Finalized Urho2D functionality, including 2D physics using Box2D,
         - Support for copying ListView text to system clipboard
         - Async system command execution
         - Generic attribute access for Lua script objects
+        - Use Lua functions directly as event subscribers
         - Touch gesture recording and load/save
         - AssetImporter option to allow multiple import of identical meshes
         - Automatically create a physics world component to scene when necessary
@@ -748,6 +749,7 @@ V1.32   - Finalized Urho2D functionality, including 2D physics using Box2D,
         - Fix occlusion rendering not working with counterclockwise triangles
         - Fix material shader parameter animations going out of sync with other
           animations when the object using the material is not in view
+        - Fix CPU count functions on Android          
 
 V1.31   - Extensive build system improvements, especially for using Urho3D as
           a library in an external project.
