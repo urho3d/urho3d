@@ -14,7 +14,6 @@ ParticleEmitter@ particleEffectEmitter;
 
 void CreateParticleEffectEditor()
 {
-    log.Info("CreateParticleEffectEditor()");
     if (particleEffectWindow !is null)
         return;
 
@@ -85,7 +84,6 @@ void CreateParticleEffectEditor()
 
 void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectColorFrameNew()");
     if (editParticleEffect is null)
         return;
 
@@ -96,7 +94,6 @@ void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData
 
 void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectTextureFrameNew()");
     if (editParticleEffect is null)
         return;
 
@@ -107,7 +104,6 @@ void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventDa
 
 void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectColorFrameRemove()");
     if (editParticleEffect is null)
         return;
         
@@ -122,7 +118,6 @@ void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventD
 
 void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectTextureFrameRemove()");
     if (editParticleEffect is null)
         return;
 
@@ -136,19 +131,16 @@ void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& even
 
 void EditParticleEffectColorFrameSort(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectColorFrameSort()");
     RefreshParticleEffectColorFrames();
 }
 
 void EditParticleEffectTextureFrameSort(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectTextureFrameSort()");
     RefreshParticleEffectTextureFrames();
 }
 
 void InitParticleEffectBasicAttributes()
 {
-    log.Info("InitParticleEffectBasicAttributes()");
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("ConstantForceX", true)));
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("ConstantForceY", true)));
     CreateDragSlider(cast<LineEdit>(particleEffectWindow.GetChild("ConstantForceZ", true)));
@@ -200,7 +192,6 @@ void InitParticleEffectBasicAttributes()
 
 void EditParticleEffectConstantForce(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectConstantForce()");
     if (editParticleEffect is null)
         return;
 
@@ -220,7 +211,6 @@ void EditParticleEffectConstantForce(StringHash eventType, VariantMap& eventData
 
 void EditParticleEffectDirection(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectDirection()");
     if (editParticleEffect is null)
         return;
 
@@ -250,7 +240,6 @@ void EditParticleEffectDirection(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectDampingForce(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectDampingForce()");
     if (editParticleEffect is null)
         return;
 
@@ -261,7 +250,6 @@ void EditParticleEffectDampingForce(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectActiveTime(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectActiveTime()");
     if (editParticleEffect is null)
         return;
 
@@ -276,7 +264,6 @@ void EditParticleEffectActiveTime(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectInactiveTime(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectInactiveTime()");
     if (editParticleEffect is null)
         return;
 
@@ -291,7 +278,6 @@ void EditParticleEffectInactiveTime(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectParticleSize(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectParticleSize()");
     if (editParticleEffect is null)
         return;
 
@@ -315,7 +301,6 @@ void EditParticleEffectParticleSize(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectTimeToLive(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectTimeToLive()");
     if (editParticleEffect is null)
         return;
 
@@ -333,7 +318,6 @@ void EditParticleEffectTimeToLive(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectVelocity(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectVelocity()");
     if (editParticleEffect is null)
         return;
 
@@ -351,7 +335,6 @@ void EditParticleEffectVelocity(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectRotation(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectRotation()");
     if (editParticleEffect is null)
         return;
 
@@ -369,7 +352,6 @@ void EditParticleEffectRotation(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectRotationSpeed(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectRotationSpeed()");
     if (editParticleEffect is null)
         return;
 
@@ -387,7 +369,6 @@ void EditParticleEffectRotationSpeed(StringHash eventType, VariantMap& eventData
 
 void EditParticleEffectSizeAdd(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectSizeAdd()");
     if (editParticleEffect is null)
         return;
 
@@ -398,7 +379,6 @@ void EditParticleEffectSizeAdd(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectSizeMultiply(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectSizeMultiply()");
     if (editParticleEffect is null)
         return;
 
@@ -409,7 +389,6 @@ void EditParticleEffectSizeMultiply(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectAnimationLodBias(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectAnimationLodBias()");
     if (editParticleEffect is null)
         return;
 
@@ -420,7 +399,6 @@ void EditParticleEffectAnimationLodBias(StringHash eventType, VariantMap& eventD
 
 void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectNumParticles()");
     if (editParticleEffect is null)
         return;
 
@@ -435,7 +413,6 @@ void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectEmitterSize(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectEmitterSize()");
     if (editParticleEffect is null)
         return;
 
@@ -455,7 +432,6 @@ void EditParticleEffectEmitterSize(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectEmissionRate(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectEmissionRate()");
     if (editParticleEffect is null)
         return;
 
@@ -470,7 +446,6 @@ void EditParticleEffectEmissionRate(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectEmitterShape()");
     if (editParticleEffect is null)
         return;
 
@@ -490,7 +465,6 @@ void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectMaterial()");
     if (editParticleEffect is null)
         return;
 
@@ -509,7 +483,6 @@ void EditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
 
 void PickEditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("PickEditParticleEffectMaterial()");
     @resourcePicker = GetResourcePicker(StringHash("Material"));
     if (resourcePicker is null)
         return;
@@ -523,7 +496,6 @@ void PickEditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
 
 void PickEditParticleEffectMaterialDone(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("PickEditParticleEffectMaterialDone()");
     StoreResourcePickerPath();
     CloseFileSelector();
 
@@ -548,7 +520,6 @@ void PickEditParticleEffectMaterialDone(StringHash eventType, VariantMap& eventD
 
 void EditParticleEffectScaled(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectScaled()");
     if (editParticleEffect is null)
         return;
 
@@ -563,7 +534,6 @@ void EditParticleEffectScaled(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectSorted(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectSorted()");
     if (editParticleEffect is null)
         return;
 
@@ -578,7 +548,6 @@ void EditParticleEffectSorted(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectRelative()");
     if (editParticleEffect is null)
         return;
 
@@ -593,7 +562,6 @@ void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
 
 bool ShowParticleEffectEditor()
 {
-    log.Info("ShowParticleEffectEditor()");
     RefreshParticleEffectEditor();
     particleEffectWindow.visible = true;
     particleEffectWindow.BringToFront();
@@ -602,14 +570,12 @@ bool ShowParticleEffectEditor()
 
 void HideParticleEffectEditor()
 {
-    log.Info("HideParticleEffectEditor()");
     if (particleEffectWindow !is null)
         particleEffectWindow.visible = false;
 }
 
 void InitParticleEffectPreview()
 {
-    log.Info("InitParticleEffectPreview()");
     particlePreviewScene = Scene("particlePreviewScene");
     particlePreviewScene.CreateComponent("Octree");
 
@@ -643,7 +609,7 @@ void InitParticleEffectPreview()
     gizmo.occludee = false;
 
     particleEffectEmitter = particleEffectPreviewNode.CreateComponent("ParticleEmitter");
-    editParticleEffect = CreateNewParticleEffect();//cache.GetResource("ParticleEffect", "Particle/SnowExplosion.xml");
+    editParticleEffect = CreateNewParticleEffect();
     particleEffectEmitter.effect = editParticleEffect;
 
     particleEffectPreview = particleEffectWindow.GetChild("ParticleEffectPreview", true);
@@ -666,13 +632,13 @@ ParticleEffect@ CreateNewParticleEffect()
 
 void EditParticleEffect(ParticleEffect@ effect)
 {
-    log.Info("EditParticleEffect()");
     if (effect is null)
         return;
 
     if (editParticleEffect !is null)
         UnsubscribeFromEvent(editParticleEffect, "ReloadFinished");
 
+    cache.ReloadResource(effect);
     editParticleEffect = effect;
     particleEffectEmitter.effect = editParticleEffect;
 
@@ -684,7 +650,6 @@ void EditParticleEffect(ParticleEffect@ effect)
 
 void RefreshParticleEffectEditor()
 {
-    log.Info("RefreshParticleEffectEditor()");
     RefreshParticleEffectPreview();
     RefreshParticleEffectName();
     RefreshParticleEffectBasicAttributes();
@@ -695,7 +660,6 @@ void RefreshParticleEffectEditor()
 
 void RefreshParticleEffectColorFrames()
 {
-    log.Info("RefreshParticleEffectColorFrames()");
     if (editParticleEffect is null)
         return;
 
@@ -815,7 +779,6 @@ void RefreshParticleEffectColorFrames()
 
 void RefreshParticleEffectTextureFrames()
 {
-    log.Info("RefreshParticleEffectTextureFrames()");
     if (editParticleEffect is null)
         return;
 
@@ -936,7 +899,6 @@ void RefreshParticleEffectTextureFrames()
 
 void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectColorFrame()");
     if (editParticleEffect is null)
         return;
 
@@ -968,7 +930,6 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectTextureFrame()");
     if (editParticleEffect is null)
         return;
 
@@ -1000,7 +961,6 @@ void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
 
 void RefreshParticleEffectPreview()
 {
-    log.Info("RefreshParticleEffectPreview()");
     if (particleEffectEmitter is null || editParticleEffect is null)
         return;
     particleEffectEmitter.effect = editParticleEffect;
@@ -1010,7 +970,6 @@ void RefreshParticleEffectPreview()
 
 void RefreshParticleEffectName()
 {
-    log.Info("RefreshParticleEffectName()");
     UIElement@ container = particleEffectWindow.GetChild("NameContainer", true);
     if (container is null)
         return;
@@ -1028,7 +987,6 @@ void RefreshParticleEffectName()
 
 void RefreshParticleEffectBasicAttributes()
 {
-    log.Info("RefreshParticleEffectBasicAttributes()");
     if (editParticleEffect is null)
         return;
 
@@ -1096,7 +1054,6 @@ void RefreshParticleEffectBasicAttributes()
 
 void RefreshParticleEffectMaterial()
 {
-    log.Info("RefreshParticleEffectMaterial()");
     UIElement@ container = particleEffectWindow.GetChild("ParticleMaterialContainer", true);
     if (container is null)
         return;
@@ -1125,7 +1082,6 @@ void RefreshParticleEffectMaterial()
 
 void RotateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("RotateParticleEffectPreview()");
     int elemX = eventData["ElementX"].GetInt();
     int elemY = eventData["ElementY"].GetInt();
     
@@ -1141,7 +1097,6 @@ void RotateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectName(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("EditParticleEffectName()");
     LineEdit@ nameEdit = eventData["Element"].GetPtr();
     String newParticleEffectName = nameEdit.text.Trimmed();
     if (!newParticleEffectName.empty && !(editParticleEffect !is null && newParticleEffectName == editParticleEffect.name))
@@ -1154,7 +1109,6 @@ void EditParticleEffectName(StringHash eventType, VariantMap& eventData)
 
 void PickEditParticleEffect()
 {
-    log.Info("PickEditParticleEffect()");
     @resourcePicker = GetResourcePicker(StringHash("ParticleEffect"));
     if (resourcePicker is null)
         return;
@@ -1168,7 +1122,6 @@ void PickEditParticleEffect()
 
 void PickEditParticleEffectDone(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("PickEditParticleEffectDone()");
     StoreResourcePickerPath();
     CloseFileSelector();
 
@@ -1189,13 +1142,11 @@ void PickEditParticleEffectDone(StringHash eventType, VariantMap& eventData)
 
 void NewParticleEffect()
 {
-    log.Info("NewParticleEffect()");
     EditParticleEffect(CreateNewParticleEffect());
 }
 
 void RevertParticleEffect()
 {
-    log.Info("RevertParticleEffect()");
     if (editParticleEffect is null)
         return;
 
@@ -1208,7 +1159,6 @@ void RevertParticleEffect()
 
 void SaveParticleEffect()
 {
-    log.Info("SaveParticleEffect()");
     if (editParticleEffect is null || editParticleEffect.name.empty)
         return;
 
@@ -1222,7 +1172,6 @@ void SaveParticleEffect()
 
 void SaveParticleEffectAs()
 {
-    log.Info("SaveParticleEffectAs()");
     if (editParticleEffect is null)
         return;
 
@@ -1239,7 +1188,6 @@ void SaveParticleEffectAs()
 
 void SaveParticleEffectAsDone(StringHash eventType, VariantMap& eventData)
 {
-    log.Info("SaveParticleEffectAsDone()");
     StoreResourcePickerPath();
     CloseFileSelector();
     @resourcePicker = null;
@@ -1274,7 +1222,6 @@ void SaveParticleEffectAsDone(StringHash eventType, VariantMap& eventData)
 
 void BeginParticleEffectEdit()
 {
-    log.Info("BeginParticleEffectEdit()");
     if (editParticleEffect is null)
         return;
 
@@ -1285,7 +1232,6 @@ void BeginParticleEffectEdit()
 
 void EndParticleEffectEdit()
 {
-    log.Info("EndParticleEffectEdit()");
     if (editParticleEffect is null)
         return;
     if (!dragEditAttribute)
