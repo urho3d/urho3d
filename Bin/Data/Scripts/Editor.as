@@ -116,7 +116,17 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         if (!particleEffectEmitter.emitting)
         {
-            particleEffectEmitter.Reset();
+            if (particleResetTimer == 0.0f)
+                particleResetTimer = editParticleEffect.maxTimeToLive + 0.2f;
+            else
+            {
+                particleResetTimer = Max(particleResetTimer - timeStep, 0.0f);
+                if (particleResetTimer <= 0.0001f)
+                {
+                    particleEffectEmitter.Reset();
+                    particleResetTimer = 0.0f;
+                }
+            }
         }
     }
 }

@@ -792,44 +792,42 @@ class EditMaterialAction : EditAction
 
 class EditParticleEffectAction : EditAction
 {
+    XMLFile@ oldState;
+    XMLFile@ newState;
     WeakHandle particleEffect;
-    File@ oldEffect;
-    File@ newEffect;
+    ParticleEmitter@ particleEmitter;
 
-    void Define(ParticleEffect@ particleEffect_, XMLFile@ oldEffect_)
+    void Define(ParticleEmitter@ particleEmitter_, ParticleEffect@ particleEffect_, XMLFile@ oldState_)
     {
-        /*particleEffect = particleEffect_;
-        oldEffect = oldEffect_;
-        newEffect = File();
+        particleEmitter = particleEmitter_;
+        particleEffect = particleEffect_;
+        oldState = oldState_;
+        newState = XMLFile();
 
-        XMLElement effectElem = newEffect.CreateRoot("particleemitter");
-        particleEffect.Save(newEffect);*/
+        XMLElement particleElem = newState.CreateRoot("particleeffect");
+        particleEffect_.Save(particleElem);
     }
 
     void Undo()
     {
-        /*ParticleEmitter@ particleEmitter_ = particleEmitter.Get();
-        if (particleEmitter_ is null)
-            return;
-
-        ParticleEffect@ effect = cache.GetResource("ParticleEffect", oldEffect);
-        if (effect is null)
-            return;
-        particleEmitter_.effect = effect;*/
-        RefreshParticleEffectEditor();
+        ParticleEffect@ effect = particleEffect.Get();
+        if (effect !is null)
+        {
+            effect.Load(oldState.root);
+            particleEmitter.ApplyEffect();
+            RefreshParticleEffectEditor();
+        }
     }
 
     void Redo()
     {
-        /*ParticleEmitter@ particleEmitter_ = particleEmitter.Get();
-        if (particleEmitter_ is null)
-            return;
-
-        ParticleEffect@ effect = cache.GetResource("ParticleEffect", newEffect);
-        if (effect is null)
-            return;
-        particleEmitter_.effect = effect;*/
-        RefreshParticleEffectEditor();
+        ParticleEffect@ effect = particleEffect.Get();
+        if (effect !is null)
+        {
+            effect.Load(newState.root);
+            particleEmitter.ApplyEffect();
+            RefreshParticleEffectEditor();
+        }
     }
 }
 

@@ -1085,7 +1085,8 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TextureFrame", "float time", offsetof(TextureFrame, time_));
     
     RegisterResource<ParticleEffect>(engine, "ParticleEffect");
-
+    engine->RegisterObjectMethod("ParticleEffect", "bool Load(const XMLElement&in)", asMETHODPR(ParticleEffect, Load, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool Save(XMLElement&in) const", asMETHODPR(ParticleEffect, Save, (XMLElement&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_material(Material@+)", asMETHOD(ParticleEffect, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "Material@+ get_material() const", asMETHOD(ParticleEffect, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_numParticles(uint) const", asMETHOD(ParticleEffect, SetNumParticles), asCALL_THISCALL);

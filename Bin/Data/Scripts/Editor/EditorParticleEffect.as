@@ -11,6 +11,7 @@ Node@ particlePreviewCameraNode;
 Node@ particlePreviewLightNode;
 Light@ particlePreviewLight;
 ParticleEmitter@ particleEffectEmitter;
+float particleResetTimer;
 
 void CreateParticleEffectEditor()
 {
@@ -75,6 +76,41 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("EmitterSizeZ", true), "TextChanged", "EditParticleEffectEmitterSize");
     SubscribeToEvent(particleEffectWindow.GetChild("EmissionRateMin", true), "TextChanged", "EditParticleEffectEmissionRate");
     SubscribeToEvent(particleEffectWindow.GetChild("EmissionRateMax", true), "TextChanged", "EditParticleEffectEmissionRate");
+
+    SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceX", true), "TextFinished", "EditParticleEffectConstantForce");
+    SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceY", true), "TextFinished", "EditParticleEffectConstantForce");
+    SubscribeToEvent(particleEffectWindow.GetChild("ConstantForceZ", true), "TextFinished", "EditParticleEffectConstantForce");
+    SubscribeToEvent(particleEffectWindow.GetChild("DirectionMinX", true), "TextFinished", "EditParticleEffectDirection");
+    SubscribeToEvent(particleEffectWindow.GetChild("DirectionMinY", true), "TextFinished", "EditParticleEffectDirection");
+    SubscribeToEvent(particleEffectWindow.GetChild("DirectionMinZ", true), "TextFinished", "EditParticleEffectDirection");
+    SubscribeToEvent(particleEffectWindow.GetChild("DirectionMaxX", true), "TextFinished", "EditParticleEffectDirection");
+    SubscribeToEvent(particleEffectWindow.GetChild("DirectionMaxY", true), "TextFinished", "EditParticleEffectDirection");
+    SubscribeToEvent(particleEffectWindow.GetChild("DirectionMaxZ", true), "TextFinished", "EditParticleEffectDirection");
+    SubscribeToEvent(particleEffectWindow.GetChild("DampingForce", true), "TextFinished", "EditParticleEffectDampingForce");
+    SubscribeToEvent(particleEffectWindow.GetChild("ActiveTime", true), "TextFinished", "EditParticleEffectActiveTime");
+    SubscribeToEvent(particleEffectWindow.GetChild("InactiveTime", true), "TextFinished", "EditParticleEffectInactiveTime");
+    SubscribeToEvent(particleEffectWindow.GetChild("ParticleSizeMinX", true), "TextFinished", "EditParticleEffectParticleSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("ParticleSizeMinY", true), "TextFinished", "EditParticleEffectParticleSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("ParticleSizeMaxX", true), "TextFinished", "EditParticleEffectParticleSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("ParticleSizeMaxY", true), "TextFinished", "EditParticleEffectParticleSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("TimeToLiveMin", true), "TextFinished", "EditParticleEffectTimeToLive");
+    SubscribeToEvent(particleEffectWindow.GetChild("TimeToLiveMax", true), "TextFinished", "EditParticleEffectTimeToLive");
+    SubscribeToEvent(particleEffectWindow.GetChild("VelocityMin", true), "TextFinished", "EditParticleEffectVelocity");
+    SubscribeToEvent(particleEffectWindow.GetChild("VelocityMax", true), "TextFinished", "EditParticleEffectVelocity");
+    SubscribeToEvent(particleEffectWindow.GetChild("RotationMin", true), "TextFinished", "EditParticleEffectRotation");
+    SubscribeToEvent(particleEffectWindow.GetChild("RotationMax", true), "TextFinished", "EditParticleEffectRotation");
+    SubscribeToEvent(particleEffectWindow.GetChild("RotationSpeedMin", true), "TextFinished", "EditParticleEffectRotationSpeed");
+    SubscribeToEvent(particleEffectWindow.GetChild("RotationSpeedMax", true), "TextFinished", "EditParticleEffectRotationSpeed");
+    SubscribeToEvent(particleEffectWindow.GetChild("SizeAdd", true), "TextFinished", "EditParticleEffectSizeAdd");
+    SubscribeToEvent(particleEffectWindow.GetChild("SizeMultiply", true), "TextFinished", "EditParticleEffectSizeMultiply");
+    SubscribeToEvent(particleEffectWindow.GetChild("AnimationLodBias", true), "TextFinished", "EditParticleEffectAnimationLodBias");
+    SubscribeToEvent(particleEffectWindow.GetChild("NumParticles", true), "TextFinished", "EditParticleEffectNumParticles");
+    SubscribeToEvent(particleEffectWindow.GetChild("EmitterSizeX", true), "TextFinished", "EditParticleEffectEmitterSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("EmitterSizeY", true), "TextFinished", "EditParticleEffectEmitterSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("EmitterSizeZ", true), "TextFinished", "EditParticleEffectEmitterSize");
+    SubscribeToEvent(particleEffectWindow.GetChild("EmissionRateMin", true), "TextFinished", "EditParticleEffectEmissionRate");
+    SubscribeToEvent(particleEffectWindow.GetChild("EmissionRateMax", true), "TextFinished", "EditParticleEffectEmissionRate");
+
     SubscribeToEvent(particleEffectWindow.GetChild("EmitterShape", true), "ItemSelected", "EditParticleEffectEmitterShape");
     SubscribeToEvent(particleEffectWindow.GetChild("Scaled", true), "Toggled", "EditParticleEffectScaled");
     SubscribeToEvent(particleEffectWindow.GetChild("Sorted", true), "Toggled", "EditParticleEffectSorted");
@@ -87,9 +123,13 @@ void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     uint num = editParticleEffect.numColorFrames;
     editParticleEffect.numColorFrames = num + 1;
     RefreshParticleEffectColorFrames();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventData)
@@ -97,22 +137,31 @@ void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventDa
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     uint num = editParticleEffect.numTextureFrames;
     editParticleEffect.numTextureFrames = num + 1;
     RefreshParticleEffectTextureFrames();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
-        
+
     ListView@ lv = particleEffectWindow.GetChild("ColorFrameListView", true);
     if (lv !is null && lv.selection != M_MAX_UNSIGNED )
     {
+        BeginParticleEffectEdit();
+        
         editParticleEffect.RemoveColorFrame(lv.selection);
         RefreshParticleEffectColorFrames();
+
+        EndParticleEffectEdit();
     }
+
 }
 
 
@@ -124,8 +173,12 @@ void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& even
     ListView@ lv = particleEffectWindow.GetChild("TextureFrameListView", true);
     if (lv !is null && lv.selection != M_MAX_UNSIGNED )
     {
+        BeginParticleEffectEdit();
+        
         editParticleEffect.RemoveTextureFrame(lv.selection);
         RefreshParticleEffectTextureFrames();
+
+        EndParticleEffectEdit();
     }
 }
 
@@ -195,6 +248,8 @@ void EditParticleEffectConstantForce(StringHash eventType, VariantMap& eventData
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     Vector3 v = editParticleEffect.constantForce;
@@ -207,12 +262,16 @@ void EditParticleEffectConstantForce(StringHash eventType, VariantMap& eventData
 
     if (element.name == "ConstantForceZ")
         editParticleEffect.constantForce = Vector3(v.x, v.y, element.text.ToFloat());
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectDirection(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -236,6 +295,8 @@ void EditParticleEffectDirection(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "DirectionMaxZ")
         editParticleEffect.maxDirection = Vector3(vMax.x, vMax.y, element.text.ToFloat());
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectDampingForce(StringHash eventType, VariantMap& eventData)
@@ -243,9 +304,13 @@ void EditParticleEffectDampingForce(StringHash eventType, VariantMap& eventData)
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.dampingForce = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectActiveTime(StringHash eventType, VariantMap& eventData)
@@ -256,10 +321,14 @@ void EditParticleEffectActiveTime(StringHash eventType, VariantMap& eventData)
     if (particleEffectEmitter is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.activeTime = element.text.ToFloat();
     particleEffectEmitter.Reset();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectInactiveTime(StringHash eventType, VariantMap& eventData)
@@ -269,17 +338,23 @@ void EditParticleEffectInactiveTime(StringHash eventType, VariantMap& eventData)
 
     if (particleEffectEmitter is null)
         return;
-        
+
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.inactiveTime = element.text.ToFloat();
     particleEffectEmitter.Reset();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectParticleSize(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -297,12 +372,16 @@ void EditParticleEffectParticleSize(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "ParticleSizeMaxY")
         editParticleEffect.maxParticleSize = Vector2(vMax.x, element.text.ToFloat());
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectTimeToLive(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -314,12 +393,16 @@ void EditParticleEffectTimeToLive(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "TimeToLiveMax")
         editParticleEffect.maxTimeToLive = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectVelocity(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -331,12 +414,16 @@ void EditParticleEffectVelocity(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "VelocityMax")
         editParticleEffect.maxVelocity = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectRotation(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -348,12 +435,16 @@ void EditParticleEffectRotation(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "RotationMax")
         editParticleEffect.maxRotation = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectRotationSpeed(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -365,6 +456,8 @@ void EditParticleEffectRotationSpeed(StringHash eventType, VariantMap& eventData
 
     if (element.name == "RotationSpeedMax")
         editParticleEffect.maxRotationSpeed = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectSizeAdd(StringHash eventType, VariantMap& eventData)
@@ -372,9 +465,13 @@ void EditParticleEffectSizeAdd(StringHash eventType, VariantMap& eventData)
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.sizeAdd = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectSizeMultiply(StringHash eventType, VariantMap& eventData)
@@ -382,9 +479,13 @@ void EditParticleEffectSizeMultiply(StringHash eventType, VariantMap& eventData)
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.sizeMul = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectAnimationLodBias(StringHash eventType, VariantMap& eventData)
@@ -392,9 +493,13 @@ void EditParticleEffectAnimationLodBias(StringHash eventType, VariantMap& eventD
     if (editParticleEffect is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.animationLodBias = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
@@ -405,16 +510,22 @@ void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
     if (particleEffectEmitter is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.numParticles = element.text.ToInt();
     particleEffectEmitter.ApplyEffect();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectEmitterSize(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -428,12 +539,16 @@ void EditParticleEffectEmitterSize(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "EmitterSizeZ")
         editParticleEffect.emitterSize = Vector3(v.x, v.y, element.text.ToFloat());
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectEmissionRate(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
@@ -442,12 +557,16 @@ void EditParticleEffectEmissionRate(StringHash eventType, VariantMap& eventData)
 
     if (element.name == "EmissionRateMax")
         editParticleEffect.maxEmissionRate = element.text.ToFloat();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
 {
     if (editParticleEffect is null)
         return;
+
+    BeginParticleEffectEdit();
 
     DropDownList@ element = eventData["Element"].GetPtr();
 
@@ -461,6 +580,8 @@ void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
             editParticleEffect.emitterType = EMITTER_SPHERE;
             break;
     }
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
@@ -476,8 +597,12 @@ void EditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
 
     if (res !is null)
     {
+        BeginParticleEffectEdit();
+
         editParticleEffect.material = res;
         particleEffectEmitter.ApplyEffect();
+        
+        EndParticleEffectEdit();
     }
 }
 
@@ -526,10 +651,14 @@ void EditParticleEffectScaled(StringHash eventType, VariantMap& eventData)
     if (particleEffectEmitter is null)
         return;
 
+    BeginParticleEffectEdit();
+
     CheckBox@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.scaled = element.checked;
     particleEffectEmitter.ApplyEffect();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectSorted(StringHash eventType, VariantMap& eventData)
@@ -540,10 +669,14 @@ void EditParticleEffectSorted(StringHash eventType, VariantMap& eventData)
     if (particleEffectEmitter is null)
         return;
 
+    BeginParticleEffectEdit();
+
     CheckBox@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.sorted = element.checked;
     particleEffectEmitter.ApplyEffect();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
@@ -553,11 +686,15 @@ void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
 
     if (particleEffectEmitter is null)
         return;
-        
+
+    BeginParticleEffectEdit();
+
     CheckBox@ element = eventData["Element"].GetPtr();
 
     editParticleEffect.relative = element.checked;
     particleEffectEmitter.ApplyEffect();
+
+    EndParticleEffectEdit();
 }
 
 bool ShowParticleEffectEditor()
@@ -638,7 +775,9 @@ void EditParticleEffect(ParticleEffect@ effect)
     if (editParticleEffect !is null)
         UnsubscribeFromEvent(editParticleEffect, "ReloadFinished");
 
-    cache.ReloadResource(effect);
+    if (!effect.name.empty)
+        cache.ReloadResource(effect);
+        
     editParticleEffect = effect;
     particleEffectEmitter.effect = editParticleEffect;
 
@@ -905,6 +1044,8 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
     if (particleEffectEmitter is null)
         return;
 
+    BeginParticleEffectEdit();
+
     LineEdit@ element = eventData["Element"].GetPtr();
     uint i = element.vars["ColorFrame"].GetInt();
     ColorFrame@ cf = editParticleEffect.GetColorFrame(i);
@@ -926,6 +1067,8 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
 
     editParticleEffect.SetColorFrame(i, cf);
     particleEffectEmitter.Reset();
+
+    EndParticleEffectEdit();
 }
 
 void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
@@ -935,6 +1078,8 @@ void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
 
     if (particleEffectEmitter is null)
         return;
+
+    BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
     uint i = element.vars["TextureFrame"].GetInt();
@@ -957,6 +1102,8 @@ void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
 
     editParticleEffect.SetTextureFrame(i, tf);
     particleEffectEmitter.Reset();
+
+    EndParticleEffectEdit();
 }
 
 void RefreshParticleEffectPreview()
@@ -1142,7 +1289,11 @@ void PickEditParticleEffectDone(StringHash eventType, VariantMap& eventData)
 
 void NewParticleEffect()
 {
+    BeginParticleEffectEdit();
+
     EditParticleEffect(CreateNewParticleEffect());
+    
+    EndParticleEffectEdit();
 }
 
 void RevertParticleEffect()
@@ -1150,8 +1301,16 @@ void RevertParticleEffect()
     if (editParticleEffect is null)
         return;
 
+    if (editParticleEffect.name.empty)
+    {
+        NewParticleEffect();
+        return;
+    }
+
     BeginParticleEffectEdit();
+    
     cache.ReloadResource(editParticleEffect);
+
     EndParticleEffectEdit();
     
     RefreshParticleEffectEditor();
@@ -1226,18 +1385,19 @@ void BeginParticleEffectEdit()
         return;
 
     oldParticleEffectState = XMLFile();
-    XMLElement particleEffectElem = oldParticleEffectState.CreateRoot("particleemitter");
-    //editParticleEffect.Save(particleEffectElem);
+    XMLElement particleElem = oldParticleEffectState.CreateRoot("particleeffect");
+    editParticleEffect.Save(particleElem);
 }
 
 void EndParticleEffectEdit()
 {
     if (editParticleEffect is null)
         return;
+        
     if (!dragEditAttribute)
     {
         EditParticleEffectAction@ action = EditParticleEffectAction();
-        action.Define(editParticleEffect, oldParticleEffectState);
+        action.Define(particleEffectEmitter, editParticleEffect, oldParticleEffectState);
         SaveEditAction(action);
     }
     

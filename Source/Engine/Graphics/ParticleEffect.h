@@ -117,6 +117,10 @@ public:
     virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
+    /// Save resource to XMLElement. Return true if successful.
+    virtual bool Save(XMLElement& dest) const;
+    /// Load resource from XMLElement synchronously. Return true if successful.
+    virtual bool Load(const XMLElement& source);
 
     /// Set material.
     void SetMaterial(Material* material);
