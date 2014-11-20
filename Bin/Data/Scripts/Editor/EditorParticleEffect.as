@@ -646,8 +646,6 @@ void InitParticleEffectPreview()
     editParticleEffect = CreateNewParticleEffect();//cache.GetResource("ParticleEffect", "Particle/SnowExplosion.xml");
     particleEffectEmitter.effect = editParticleEffect;
 
-    SubscribeToEvent(particleEffectPreviewNode, "Update", "HandleParticleEffectUpdate");
-
     particleEffectPreview = particleEffectWindow.GetChild("ParticleEffectPreview", true);
     particleEffectPreview.SetFixedHeight(100);
     particleEffectPreview.SetView(particlePreviewScene, camera);
@@ -664,16 +662,6 @@ ParticleEffect@ CreateNewParticleEffect()
     effect.material = res;
     effect.AddColorTime(Color(1,1,1,1), 0.0f);
     return effect;
-}
-
-void HandleParticleEffectUpdate(StringHash eventType, VariantMap& eventData)
-{
-    log.Info("ASDSA");
-    if (!particleEffectEmitter.emitting)
-    {
-        log.Info("Reset emitter");
-        particleEffectEmitter.Reset();
-    }
 }
 
 void EditParticleEffect(ParticleEffect@ effect)
@@ -842,6 +830,8 @@ void RefreshParticleEffectTextureFrames()
     for (uint i = 0; i < editParticleEffect.numTextureFrames; i++)
     {
         TextureFrame@ textureFrame = editParticleEffect.GetTextureFrame(i);
+        if (textureFrame is null)
+            continue;
 
         Button@ container = Button();
         lv.AddItem(container);

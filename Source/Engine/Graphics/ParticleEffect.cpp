@@ -687,7 +687,7 @@ const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 
 const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
 {
-    return index < colorFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
+    return index < textureFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
 }
 
 Vector3 ParticleEffect::GetRandomDirection() const

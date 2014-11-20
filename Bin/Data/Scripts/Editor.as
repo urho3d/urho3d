@@ -110,6 +110,15 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateTestAnimation(timeStep);
     UpdateGizmo();
     UpdateDirtyUI();
+
+    // Handle Particle Editor looping.
+    if (particleEffectWindow !is null and particleEffectWindow.visible)
+    {
+        if (!particleEffectEmitter.emitting)
+        {
+            particleEffectEmitter.Reset();
+        }
+    }
 }
 
 void HandleReloadFinished(StringHash eventType, VariantMap& eventData)
