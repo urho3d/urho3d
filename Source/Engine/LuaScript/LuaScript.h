@@ -55,7 +55,7 @@ public:
     /// Script send event.
     void ScriptSendEvent(const String& eventName, VariantMap& eventData);
     /// Script subscribe to an event that can by send by any sender.
-    void ScriptSubscribeToEvent(const String& eventName, int funcitonRef);
+    void ScriptSubscribeToEvent(const String& eventName, int functionIndex);
     /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
     /// Script unsubscribe from an event.
@@ -85,7 +85,7 @@ public:
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function.
-    WeakPtr<LuaFunction> GetFunction(int index);
+    WeakPtr<LuaFunction> GetFunction(int functionIndex);
     /// Return Lua function.
     WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
     /// Return whether is executing engine console commands as script code.
