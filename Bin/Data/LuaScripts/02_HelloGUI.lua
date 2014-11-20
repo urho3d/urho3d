@@ -103,10 +103,13 @@ function InitWindow()
     buttonClose:SetStyle("CloseButton")
 
     -- Subscribe to buttonClose release (following a 'press') events
-    SubscribeToEvent(buttonClose, "Released", "HandleClosePressed")
+    SubscribeToEvent(buttonClose, "Released", 
+        function (eventType, eventData)
+            engine:Exit()
+        end)
 
     -- Subscribe also to all UI mouse clicks just to see where we have clicked
-    SubscribeToEvent("UIMouseClick", "HandleControlClicked")
+    SubscribeToEvent("UIMouseClick", HandleControlClicked)
 end
 
 function CreateDraggableFish()
@@ -128,30 +131,25 @@ function CreateDraggableFish()
 
     -- Subscribe draggableFish to Drag Events (in order to make it draggable)
     -- See "Event list" in documentation's Main Page for reference on available Events and their eventData
-    SubscribeToEvent(draggableFish, "DragBegin", "HandleDragBegin")
-    SubscribeToEvent(draggableFish, "DragMove", "HandleDragMove")
-    SubscribeToEvent(draggableFish, "DragEnd", "HandleDragEnd")
-end
+    SubscribeToEvent(draggableFish, "DragBegin", 
+        function (eventType, eventData)
+            -- Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+            dragBeginPosition = IntVector2(eventData:GetInt("ElementX"), eventData:GetInt("ElementY"))
+        end)
 
-function HandleDragBegin(eventType, eventData)
-    -- Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
-    dragBeginPosition = IntVector2(eventData:GetInt("ElementX"), eventData:GetInt("ElementY"))
-end
-
-function HandleDragMove(eventType, eventData)
-    local dragCurrentPosition = IntVector2(eventData:GetInt("X"), eventData:GetInt("Y"))
-    -- Get the dragged fish element
-    -- Note difference to C++: in C++ we would call GetPtr() and cast the pointer to UIElement, here we must specify
-    -- what kind of object we are getting. Null will be returned on type mismatch
-    local draggedElement = eventData:GetPtr("UIElement", "Element")
-    draggedElement:SetPosition(dragCurrentPosition - dragBeginPosition)
-end
-
-function HandleDragEnd(eventType, eventData) -- For reference (not used here)
-end
-
-function HandleClosePressed(eventType, eventData)
-    engine:Exit()
+    SubscribeToEvent(draggableFish, "DragMove", 
+        function (eventType, eventData)
+            local dragCurrentPosition = IntVector2(eventData:GetInt("X"), eventData:GetInt("Y"))
+            -- Get the dragged fish element
+            -- Note difference to C++: in C++ we would call GetPtr() and cast the pointer to UIElement, here we must specify
+            -- what kind of object we are getting. Null will be returned on type mismatch
+            local draggedElement = eventData:GetPtr("UIElement", "Element")
+            draggedElement:SetPosition(dragCurrentPosition - dragBeginPosition)
+        end)
+    
+    SubscribeToEvent(draggableFish, "DragEnd", 
+        function (eventType, eventData)
+        end)
 end
 
 function HandleControlClicked(eventType, eventData)
