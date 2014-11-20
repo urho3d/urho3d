@@ -45,7 +45,7 @@ struct JoystickState
 class Input : public Object
 {
     void SetToggleFullscreen(bool enable);
-    void SetMouseVisible(bool enable, bool supressEvent = false);
+    void SetMouseVisible(bool enable, bool suppressEvent = false);
     void SetMouseGrabbed(bool grab);
     void SetMouseMode(MouseMode mode);
     int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);

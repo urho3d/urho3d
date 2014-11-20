@@ -275,7 +275,7 @@ void Input::Update()
     }
 }
 
-void Input::SetMouseVisible(bool enable, bool supressEvent)
+void Input::SetMouseVisible(bool enable, bool suppressEvent)
 {
     // In touch emulation mode only enabled mouse is allowed
     if (touchEmulation_)
@@ -297,7 +297,7 @@ void Input::SetMouseVisible(bool enable, bool supressEvent)
             if (graphics_->GetExternalWindow())
             {
                 mouseVisible_ = true;
-                if (!supressEvent)
+                if (!suppressEvent)
                     lastMouseVisible_ = true;
                 return;
             }
@@ -319,7 +319,7 @@ void Input::SetMouseVisible(bool enable, bool supressEvent)
             }
         }
 
-        if (!supressEvent)
+        if (!suppressEvent)
         {
             using namespace MouseVisibleChanged;
 
@@ -330,7 +330,7 @@ void Input::SetMouseVisible(bool enable, bool supressEvent)
     }
 
     // Make sure last mouse visible is valid:
-    if (!supressEvent)
+    if (!suppressEvent)
         lastMouseVisible_ = mouseVisible_;
     #endif
 }

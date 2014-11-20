@@ -511,7 +511,7 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "int GetScancodeFromKey(int) const", asMETHOD(Input, GetScancodeFromKey), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int GetScancodeFromName(const String&in) const", asMETHOD(Input, GetScancodeFromName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "String GetScancodeName(int) const", asMETHOD(Input, GetScancodeName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void SetMouseVisible(bool enable, bool supressEvent = false)", asMETHOD(Input, SetMouseVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetMouseVisible(bool enable, bool suppressEvent = false)", asMETHOD(Input, SetMouseVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_mouseVisible(bool)", asFUNCTION(InputSetMouseVisible), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Input", "void ResetMouseVisible()", asMETHOD(Input, ResetMouseVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_mouseVisible() const", asMETHOD(Input, IsMouseVisible), asCALL_THISCALL);
