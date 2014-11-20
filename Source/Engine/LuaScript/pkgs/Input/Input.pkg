@@ -45,7 +45,7 @@ struct JoystickState
 class Input : public Object
 {
     void SetToggleFullscreen(bool enable);
-    void SetMouseVisible(bool enable);
+    void SetMouseVisible(bool enable, bool supressEvent = false);
     void SetMouseGrabbed(bool grab);
     void SetMouseMode(MouseMode mode);
     int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
@@ -109,6 +109,7 @@ class Input : public Object
     tolua_readonly tolua_property__get_set unsigned numJoysticks;
     tolua_readonly tolua_property__get_set bool toggleFullscreen;
     tolua_readonly tolua_property__get_set bool screenKeyboardSupport;
+    tolua_property__get_set MouseMode mouseMode;
     tolua_property__is_set bool screenKeyboardVisible;
     tolua_property__get_set bool touchEmulation;
     tolua_property__is_set bool mouseVisible;

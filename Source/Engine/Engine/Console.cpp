@@ -142,8 +142,7 @@ void Console::SetVisible(bool enable)
         background_->SetHeight(background_->GetMinHeight());
 
         // Show OS mouse
-        savedMouseVisibility_ = input->IsMouseVisible();
-        input->SetMouseVisible(true);
+        input->SetMouseVisible(true, true);
     }
     else
     {
@@ -152,7 +151,7 @@ void Console::SetVisible(bool enable)
         lineEdit_->SetFocus(false);
 
         // Restore OS mouse visibility
-        input->SetMouseVisible(savedMouseVisibility_);
+        input->ResetMouseVisible();
     }
 }
 
