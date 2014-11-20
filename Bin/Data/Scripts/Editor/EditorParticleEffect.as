@@ -603,8 +603,8 @@ bool ShowParticleEffectEditor()
 void HideParticleEffectEditor()
 {
     log.Info("HideParticleEffectEditor()");
-    //if (particleEffectWindow !is null)
-        //particleEffectWindow.visible = false;
+    if (particleEffectWindow !is null)
+        particleEffectWindow.visible = false;
 }
 
 void InitParticleEffectPreview()
@@ -643,7 +643,7 @@ void InitParticleEffectPreview()
     gizmo.occludee = false;
 
     particleEffectEmitter = particleEffectPreviewNode.CreateComponent("ParticleEmitter");
-    editParticleEffect = ParticleEffect();//cache.GetResource("ParticleEffect", "Particle/SnowExplosion.xml");
+    editParticleEffect = CreateNewParticleEffect();//cache.GetResource("ParticleEffect", "Particle/SnowExplosion.xml");
     particleEffectEmitter.effect = editParticleEffect;
 
     SubscribeToEvent(particleEffectPreviewNode, "Update", "HandleParticleEffectUpdate");
@@ -653,6 +653,17 @@ void InitParticleEffectPreview()
     particleEffectPreview.SetView(particlePreviewScene, camera);
 
     SubscribeToEvent(particleEffectPreview, "DragMove", "RotateParticleEffectPreview");
+}
+
+ParticleEffect@ CreateNewParticleEffect()
+{
+    ParticleEffect@ effect = ParticleEffect();
+    Material@ res = cache.GetResource("Material", "Materials/Particle.xml");
+    if (res is null)
+        log.Error("Could not load default material for new particle effect.");
+    effect.material = res;
+    effect.AddColorTime(Color(1,1,1,1), 0.0f);
+    return effect;
 }
 
 void HandleParticleEffectUpdate(StringHash eventType, VariantMap& eventData)
@@ -1111,9 +1122,7 @@ void RefreshParticleEffectMaterial()
         {
             nameEdit.text = "Materials/Particle.xml";
             Material@ res = cache.GetResource("Material", "Materials/Particle.xml");
-            if (res is null)
-                log.Error("Could not load default material for particle effect editor.");
-            else
+            if (res !is null)
                 editParticleEffect.material = res;
         }
     }
@@ -1191,7 +1200,7 @@ void PickEditParticleEffectDone(StringHash eventType, VariantMap& eventData)
 void NewParticleEffect()
 {
     log.Info("NewParticleEffect()");
-    EditParticleEffect(ParticleEffect());
+    EditParticleEffect(CreateNewParticleEffect());
 }
 
 void RevertParticleEffect()

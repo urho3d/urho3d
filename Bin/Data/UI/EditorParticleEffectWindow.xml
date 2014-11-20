@@ -389,7 +389,6 @@
                     <attribute name="Name" value="ColorFrameListView" />
                     <attribute name="Highlight Mode" value="Always" />
                     <attribute name="Min Size" value="0 100" />
-                    <attribute name="Layout Border" value="0 4 0 4" />
                 </element>
                 <element>
                     <attribute name="Name" value="ColorFrameButtonContainer" />
