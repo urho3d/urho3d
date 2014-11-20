@@ -234,9 +234,6 @@ void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName)
 
 void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName, int functionIndex)
 {
-    if (functionIndex == LUA_REFNIL)
-        return;
-
     WeakPtr<LuaFunction> function = GetFunction(functionIndex);
     if (!function)
         return;
