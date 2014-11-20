@@ -1431,6 +1431,7 @@ class BrowserFile
 
 void CreateResourcePreview(String path, Node@ previewNode)
 {
+    resourceBrowserPreview.autoUpdate = false;
     int resourceType = GetResourceType(path); 
     if (resourceType > 0)
     {
@@ -1489,6 +1490,19 @@ void CreateResourcePreview(String path, Node@ previewNode)
 
             previewNode.RemoveAllChildren();
             previewNode.RemoveAllComponents();
+        }
+        else if (resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
+        {
+            ParticleEffect@ particleEffect = ParticleEffect();
+            if (particleEffect.Load(file))
+            {
+                ParticleEmitter@ particleEmitter = previewNode.CreateComponent("ParticleEmitter");
+                particleEmitter.effect = particleEffect;
+                particleEffect.activeTime = 0.0;
+                particleEmitter.Reset();
+                resourceBrowserPreview.autoUpdate = true;
+                return;
+            }
         }
     }
 
