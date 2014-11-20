@@ -533,7 +533,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             bool sameValue = true;
             Array<Variant> varValues;
 
-            // Reevaluate aach variant in the vector
+            // Reevaluate each variant in the vector
             for (uint i = 0; i < values.length; ++i)
             {
                 Array<Variant>@ vector = values[i].GetVariantVector();
