@@ -187,6 +187,22 @@ void LuaScript::ScriptSendEvent(const String& eventName, VariantMap& eventData)
     SendEvent(StringHash(eventName), eventData);
 }
 
+void LuaScript::ScriptSubscribeToEvent(const String& eventName, int functionIndex)
+{
+    StringHash eventType(eventName);
+
+    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
+    if (function)
+    {
+        LuaFunctionVector& functions = eventHandleFunctions_[eventType];
+
+        SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
+
+        if (!functions.Contains(function))
+            functions.Push(function);
+    }
+}
+
 void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& functionName)
 {
     StringHash eventType(eventName);
@@ -203,21 +219,61 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
     }
 }
 
-void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName, const String& functionName)
+void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName)
 {
     StringHash eventType(eventName);
-    
+
     HashMap<StringHash, LuaFunctionVector>::Iterator i = eventHandleFunctions_.Find(eventType);
     if (i != eventHandleFunctions_.End())
     {
         LuaFunctionVector& functions = i->second_;
-        if (!functionName.Empty())
-        {   
-            WeakPtr<LuaFunction> function = GetFunction(functionName);
-            functions.Remove(function);
-        }
+        UnsubscribeFromEvent(eventType);
+        eventHandleFunctions_.Erase(i);
+    }
+}
 
-        if (functionName.Empty() || functions.Empty())
+void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName, int functionIndex)
+{
+    if (functionIndex == LUA_REFNIL)
+        return;
+
+    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
+    if (!function)
+        return;
+
+    StringHash eventType(eventName);
+
+    HashMap<StringHash, LuaFunctionVector>::Iterator i = eventHandleFunctions_.Find(eventType);
+    if (i != eventHandleFunctions_.End())
+    {
+        LuaFunctionVector& functions = i->second_;
+        functions.Remove(function);
+
+        if (functions.Empty())
+        {
+            UnsubscribeFromEvent(eventType);
+            eventHandleFunctions_.Erase(i);
+        }
+    }
+}
+
+void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName, const String& functionName)
+{
+    if (functionName.Empty())
+        return;
+
+    WeakPtr<LuaFunction> function = GetFunction(functionName);
+    if (!function)
+        return;
+
+    StringHash eventType(eventName);    
+    HashMap<StringHash, LuaFunctionVector>::Iterator i = eventHandleFunctions_.Find(eventType);
+    if (i != eventHandleFunctions_.End())
+    {
+        LuaFunctionVector& functions = i->second_;
+        functions.Remove(function);
+
+        if (functions.Empty())
         {
             UnsubscribeFromEvent(eventType);
             eventHandleFunctions_.Erase(i);
@@ -233,6 +289,28 @@ void LuaScript::ScriptUnsubscribeFromAllEvents()
     UnsubscribeFromAllEventsExcept(internalEvents_, false);
 
     eventHandleFunctions_.Clear();
+}
+
+void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, int functionIndex)
+{
+    StringHash eventType(eventName);
+    Object* object = (Object*)sender;
+
+    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
+    if (function)
+    {
+        LuaFunctionVector& functions = objectHandleFunctions_[object][eventType];
+
+        // Fix issue #256
+        HashSet<Object*>* receivers = context_->GetEventReceivers(object, eventType);
+        if ((!receivers || !receivers->Contains(this)) && !functions.Empty())
+            functions.Clear();
+
+        SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
+
+        if (!functions.Contains(function))
+            functions.Push(function);
+    }
 }
 
 void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName)
@@ -257,7 +335,7 @@ void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, co
     }
 }
 
-void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName)
+void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName)
 {
     StringHash eventType(eventName);
     Object* object = (Object*)sender;
@@ -266,13 +344,50 @@ void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName
     if (i != objectHandleFunctions_[object].End())
     {
         LuaFunctionVector& functions = i->second_;
-        if (!functionName.Empty())
-        {
-            WeakPtr<LuaFunction> function = GetFunction(functionName);
-            functions.Remove(function);
-        }
+        UnsubscribeFromEvent(object, eventType);
+        objectHandleFunctions_[object].Erase(i);
+    }
+}
 
-        if (functionName.Empty() || functions.Empty())
+void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName, int functionIndex)
+{
+    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
+    if (!function)
+        return;
+
+    StringHash eventType(eventName);
+    Object* object = (Object*)sender;
+
+    HashMap<StringHash, LuaFunctionVector>::Iterator i = objectHandleFunctions_[object].Find(eventType);
+    if (i != objectHandleFunctions_[object].End())
+    {
+        LuaFunctionVector& functions = i->second_;
+        functions.Remove(function);
+
+        if (functions.Empty())
+        {
+            UnsubscribeFromEvent(object, eventType);
+            objectHandleFunctions_[object].Erase(i);
+        }
+    }
+}
+
+void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName)
+{
+    WeakPtr<LuaFunction> function = GetFunction(functionName);
+    if (!function)
+        return;
+
+    StringHash eventType(eventName);
+    Object* object = (Object*)sender;
+
+    HashMap<StringHash, LuaFunctionVector>::Iterator i = objectHandleFunctions_[object].Find(eventType);
+    if (i != objectHandleFunctions_[object].End())
+    {
+        LuaFunctionVector& functions = i->second_;
+        functions.Remove(function);
+        
+        if (functions.Empty())
         {
             UnsubscribeFromEvent(object, eventType);
             objectHandleFunctions_[object].Erase(i);
@@ -389,6 +504,28 @@ int LuaScript::Print(lua_State *L)
     LOGRAW(string + "\n");
 
     return 0;
+}
+
+WeakPtr<LuaFunction> LuaScript::GetFunction(int functionIndex)
+{
+    if (!lua_isfunction(luaState_, functionIndex))
+        return WeakPtr<LuaFunction>();
+
+    const void* pointer = lua_topointer(luaState_, functionIndex);
+    if (!pointer)
+        return WeakPtr<LuaFunction>();
+
+    HashMap<const void*, SharedPtr<LuaFunction> >::Iterator i = pointerToFunctionMap_.Find(pointer);
+    if (i != pointerToFunctionMap_.End())
+        return WeakPtr<LuaFunction>(i->second_);
+
+    lua_pushvalue(luaState_, functionIndex);
+    int functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+
+    SharedPtr<LuaFunction> function(new LuaFunction(luaState_, functionRef, false));
+    pointerToFunctionMap_[pointer] = function;
+
+    return WeakPtr<LuaFunction>(function);
 }
 
 WeakPtr<LuaFunction> LuaScript::GetFunction(const String& functionName, bool silentIfNotFound)
