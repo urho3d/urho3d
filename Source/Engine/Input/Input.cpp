@@ -108,11 +108,10 @@ Input::Input(Context* context) :
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
-    lastMouseVisible_(true),
+    lastMouseVisible_(false),
     mouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
     lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
-    supressNextVisibleChangeEvent_(false),
     touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
@@ -276,7 +275,7 @@ void Input::Update()
     }
 }
 
-void Input::SetMouseVisible(bool enable)
+void Input::SetMouseVisible(bool enable, bool supressEvent)
 {
     // In touch emulation mode only enabled mouse is allowed
     if (touchEmulation_)
@@ -298,7 +297,8 @@ void Input::SetMouseVisible(bool enable)
             if (graphics_->GetExternalWindow())
             {
                 mouseVisible_ = true;
-                lastMouseVisible_ = true;
+                if (!supressEvent)
+                    lastMouseVisible_ = true;
                 return;
             }
 
@@ -319,18 +319,19 @@ void Input::SetMouseVisible(bool enable)
             }
         }
 
-        if (supressNextVisibleChangeEvent_)
+        if (!supressEvent)
         {
-            supressNextVisibleChangeEvent_ = false;
             using namespace MouseVisibleChanged;
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_VISIBLE] = mouseVisible_;
             SendEvent(E_MOUSEVISIBLECHANGED, eventData);
         }
-        else
-            lastMouseVisible_ = mouseVisible_;
     }
+
+    // Make sure last mouse visible is valid:
+    if (!supressEvent)
+        lastMouseVisible_ = mouseVisible_;
     #endif
 }
 
@@ -349,8 +350,7 @@ void Input::SetMouseMode(MouseMode mode)
         if (previousMode == MM_RELATIVE)
         {
             /// \todo Use SDL_SetRelativeMouseMode() for MM_RELATIVE mode
-            supressNextVisibleChangeEvent_ = true;
-            SetMouseVisible(lastMouseVisible_);
+            ResetMouseVisible();
 
             // Send updated mouse position:
             using namespace MouseMove;
@@ -379,8 +379,7 @@ void Input::SetMouseMode(MouseMode mode)
 
             if (mode == MM_RELATIVE)
             {
-                supressNextVisibleChangeEvent_ = true;
-                SetMouseVisible(false);
+                SetMouseVisible(false, true);
             }
             else if (mode == MM_WRAP)
             {
@@ -1093,7 +1092,7 @@ void Input::PushTouchIndex(int touchID)
     HashMap<int, int>::ConstIterator ci = touchIDMap_.Find(touchID);
     if (ci == touchIDMap_.End())
         return;
-    
+
     int index = touchIDMap_[touchID];
     touchIDMap_.Erase(touchID);
 

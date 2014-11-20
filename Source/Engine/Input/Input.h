@@ -135,8 +135,10 @@ public:
     void Update();
     /// Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
-    /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
-    void SetMouseVisible(bool enable);
+    /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visiblility event can be supressed-- this also recalls any unsupressed SetMouseVisible which can be returned by ResetMouseVisible().
+    void SetMouseVisible(bool enable, bool supressEvent = false);
+    /// Reset last mouse visibilty that was not supressed in SetMouseVisible.
+    void ResetMouseVisible() { SetMouseVisible(lastMouseVisible_, true); }
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab);
     /// Set the mouse mode.
@@ -353,8 +355,6 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
-    /// Next visible event suppress flag.
-    bool supressNextVisibleChangeEvent_;
     /// Initialized flag.
     bool initialized_;
 };
