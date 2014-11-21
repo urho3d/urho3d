@@ -116,6 +116,7 @@ TOLUA_API void tolua_error (lua_State* L, const char* msg, tolua_Error* err)
 }
 
 /* the equivalent of lua_is* for usertable */
+// Modified by Aster Jian for Urho3D.
 static  int lua_isusertable (lua_State* L, int lo, const char* type)
 {
 	int r = 0;
