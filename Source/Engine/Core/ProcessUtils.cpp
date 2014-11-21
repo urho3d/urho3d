@@ -85,14 +85,14 @@ static String currentLine;
 static Vector<String> arguments;
 
 #if defined(IOS)
-void GetCPUData(host_basic_info_data_t* data)
+static void GetCPUData(host_basic_info_data_t* data)
 {
     mach_msg_type_number_t infoCount;
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
 #elif !defined(ANDROID) && !defined(RASPI)
-void GetCPUData(struct cpu_id_t* data)
+static void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
     {
@@ -357,7 +357,7 @@ String GetPlatform()
 }
 
 #ifdef ANDROID
-unsigned GetAndroidCPUCount()
+static unsigned GetAndroidCPUCount()
 {
     FILE* fp;
     int res, i = -1, j = -1;
