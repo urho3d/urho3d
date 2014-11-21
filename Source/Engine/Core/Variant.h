@@ -825,4 +825,29 @@ private:
     VariantValue value_;
 };
 
+/// Return variant type from type.
+template<typename T> VariantType GetVariantType();
+
+/// Return variant type from concrete types.
+template<> inline VariantType GetVariantType<int>() { return VAR_INT; }
+template<> inline VariantType GetVariantType<unsigned>() { return VAR_INT; }
+template<> inline VariantType GetVariantType<bool>() { return VAR_BOOL; }
+template<> inline VariantType GetVariantType<float>() { return VAR_FLOAT; }
+template<> inline VariantType GetVariantType<Vector2>() { return VAR_VECTOR2; }
+template<> inline VariantType GetVariantType<Vector3>() { return VAR_VECTOR3; }
+template<> inline VariantType GetVariantType<Vector4>() { return VAR_VECTOR4; }
+template<> inline VariantType GetVariantType<Quaternion>() { return VAR_QUATERNION; }
+template<> inline VariantType GetVariantType<Color>() { return VAR_COLOR; }
+template<> inline VariantType GetVariantType<String>() { return VAR_STRING; }
+template<> inline VariantType GetVariantType<PODVector<unsigned char>>() { return VAR_BUFFER; }
+template<> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOURCEREF; }
+template<> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RESOURCEREFLIST; }
+template<> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
+template<> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
+template<> inline VariantType GetVariantType<IntRect>() { return VAR_INTRECT; }
+template<> inline VariantType GetVariantType<IntVector2>() { return VAR_INTVECTOR2; }
+template<> inline VariantType GetVariantType<Matrix3>() { return VAR_MATRIX3; }
+template<> inline VariantType GetVariantType<Matrix3x4>() { return VAR_MATRIX3X4; }
+template<> inline VariantType GetVariantType<Matrix4>() { return VAR_MATRIX4; }
+
 }
