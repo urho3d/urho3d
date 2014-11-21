@@ -1011,6 +1011,9 @@ void View::GetBatches()
                             destBatch.camera_ = shadowCamera;
                             destBatch.zone_ = zone;
                             destBatch.lightQueue_ = &lightQueue;
+
+                            if (drawable->HasShaderParameters())
+                                destBatch.shaderParameters_ = &(drawable->GetShaderParameters());
                             
                             AddBatchToQueue(shadowQueue.shadowBatches_, destBatch, tech);
                         }
@@ -1123,6 +1126,9 @@ void View::GetBatches()
                 destBatch.isBase_ = true;
                 destBatch.pass_ = 0;
                 destBatch.lightMask_ = GetLightMask(drawable);
+
+                if (drawable->HasShaderParameters())
+                    destBatch.shaderParameters_ = &(drawable->GetShaderParameters());
                 
                 // Check each of the scene passes
                 for (unsigned k = 0; k < scenePasses_.Size(); ++k)
@@ -1172,7 +1178,7 @@ void View::GetBatches()
                         destBatch.lightQueue_ = 0;
                     
                     bool allowInstancing = info.allowInstancing_;
-                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (zone->GetLightMask() & 0xff))
+                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (zone->GetLightMask() & 0xff) || destBatch.shaderParameters_)
                         allowInstancing = false;
                     
                     AddBatchToQueue(*info.batchQueue_, destBatch, tech, allowInstancing);
@@ -1329,6 +1335,9 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         destBatch.camera_ = camera_;
         destBatch.lightQueue_ = &lightQueue;
         destBatch.zone_ = zone;
+
+        if (drawable->HasShaderParameters())
+            destBatch.shaderParameters_ = &(drawable->GetShaderParameters());
         
         if (!isLitAlpha)
         {
@@ -2694,7 +2703,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         }
 
         int oldSize = i->second_.instances_.Size();
-        i->second_.AddTransforms(batch);
+        i->second_.AddBatchInstances(batch);
         // Convert to using instancing shaders when the instancing limit is reached
         if (oldSize < minInstances_ && (int)i->second_.instances_.Size() >= minInstances_)
         {

@@ -245,6 +245,27 @@ void Drawable::SetOccludee(bool enable)
     }
 }
 
+void Drawable::SetShaderParameter(const String& name, const Variant& value)
+{
+    MaterialShaderParameter newParam;
+    newParam.name_ = name;
+    newParam.value_ = value;
+    StringHash nameHash(name);
+    shaderParameters_[nameHash] = newParam;
+}
+
+const Variant& Drawable::GetShaderParameter(const String& name) const
+{
+    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(name);
+    return i != shaderParameters_.End() ? i->second_.value_ : Variant::EMPTY;
+}
+
+void Drawable::RemoveShaderParameter(const String& name)
+{
+    StringHash nameHash(name);
+    shaderParameters_.Erase(nameHash);
+}
+
 void Drawable::MarkForUpdate()
 {
     if (!updateQueued_ && octant_)

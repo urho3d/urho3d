@@ -50,6 +50,7 @@ class OcclusionBuffer;
 class Octant;
 class RayOctreeQuery;
 class Zone;
+struct MaterialShaderParameter;
 struct RayQueryResult;
 struct WorkItem;
 
@@ -158,6 +159,10 @@ public:
     void SetOccluder(bool enable);
     /// Set occludee flag.
     void SetOccludee(bool enable);
+    /// Set shader parameter.
+    void SetShaderParameter(const String& name, const Variant& value);
+    /// Remove shader parameter.
+    void RemoveShaderParameter(const String& name);
     /// Mark for update and octree reinsertion. Update is automatically queued when the drawable's scene node moves or changes scale.
     void MarkForUpdate();
     
@@ -195,6 +200,14 @@ public:
     bool IsInView(Camera* camera) const;
     /// Return draw call source data.
     const Vector<SourceBatch>& GetBatches() const { return batches_; }
+    /// Return whether has any shader parameters.
+    bool HasShaderParameters() const { return !shaderParameters_.Empty(); }
+    /// Return all shader parameters.
+    const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
+    /// Return all shader parameters.
+    HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() { return shaderParameters_; }
+    /// Return shader parameter.
+    const Variant& GetShaderParameter(const String& name) const;
     
     /// Set new zone. Zone assignment may optionally be temporary, meaning it needs to be re-evaluated on the next frame.
     void SetZone(Zone* zone, bool temporary = false);
@@ -340,6 +353,8 @@ protected:
     bool zoneDirty_;
     /// Set of cameras from which is seen on the current frame.
     HashSet<Camera*> viewCameras_;
+    /// Shader parameters.
+    HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

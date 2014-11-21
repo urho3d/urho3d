@@ -30,6 +30,7 @@
 #include "File.h"
 #include "HashSet.h"
 #include "Log.h"
+#include "Material.h"
 #include "Node.h"
 #include "Resource.h"
 #include "Script.h"
@@ -745,6 +746,18 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "uint get_useTimer()" ,asMETHODPR(T, GetUseTimer, (), unsigned), asCALL_THISCALL);
 }
 
+static CScriptArray* DrawableGetShaderParameterNames(Drawable* drawable)
+{
+    Vector<String> result;
+
+    const HashMap<StringHash, MaterialShaderParameter>& parameters = drawable->GetShaderParameters();
+    for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        result.Push(i->second_.name_);
+
+    Sort(result.Begin(), result.End());
+    return VectorToArray<String>(result, "Array<String>");
+}
+
 /// Template function for registering a class derived from Drawable.
 template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* className)
 {
@@ -776,6 +789,10 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "uint get_maxLights() const", asMETHOD(T, GetMaxLights), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const BoundingBox& get_boundingBox() const", asMETHOD(T, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const BoundingBox& get_worldBoundingBox()", asMETHOD(T, GetWorldBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveShaderParameter(const String&in)", asMETHOD(T, RemoveShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(T, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Variant& get_shaderParameters(const String&in) const", asMETHOD(T, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<String>@ get_shaderParameterNames() const", asFUNCTION(DrawableGetShaderParameterNames), asCALL_CDECL_OBJLAST);
 }
 
 /// Template function for registering a class derived from SoundSource.

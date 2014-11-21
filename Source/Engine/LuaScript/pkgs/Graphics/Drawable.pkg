@@ -25,10 +25,13 @@ class Drawable : public Component
     void SetCastShadows(bool enable);
     void SetOccluder(bool enable);
     void SetOccludee(bool enable);
+    void SetShaderParameter(const String name, const Variant& value);
+    void RemoveShaderParameter(const String name);
     void MarkForUpdate();
     
     const BoundingBox& GetBoundingBox() const;
     const BoundingBox& GetWorldBoundingBox();
+    const Variant& GetShaderParameter(const String name) const;
     unsigned char GetDrawableFlags() const;
     float GetDrawDistance() const;
     float GetShadowDistance() const;

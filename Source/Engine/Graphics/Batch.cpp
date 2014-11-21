@@ -555,6 +555,14 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
+
+        // Set batch's shader parameters
+        if (shaderParameters_)
+        {
+            graphics->ClearParameterSource(SP_MATERIAL);
+            for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_->Begin(); i != shaderParameters_->End(); ++i)
+                graphics->SetShaderParameter(i->first_, i->second_.value_);
+        }
         
         const SharedPtr<Texture>* textures = material_->GetTextures();
         for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
@@ -632,13 +640,43 @@ void BatchGroup::Draw(View* view) const
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
             graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
             
-            for (unsigned i = 0; i < instances_.Size(); ++i)
+            if (!hasInstanceShaderParameters_)
             {
-                if (graphics->NeedParameterUpdate(SP_OBJECTTRANSFORM, instances_[i].worldTransform_))
-                    graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
-                
-                graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
-                    geometry_->GetVertexStart(), geometry_->GetVertexCount());
+                for (unsigned i = 0; i < instances_.Size(); ++i)
+                {
+                    if (graphics->NeedParameterUpdate(SP_OBJECTTRANSFORM, instances_[i].worldTransform_))
+                        graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
+
+                    graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
+                        geometry_->GetVertexStart(), geometry_->GetVertexCount());
+                }
+            }
+            else
+            {
+                for (unsigned i = 0; i < instances_.Size(); ++i)
+                {
+                    // Set instance's shader parameters
+                    HashMap<StringHash, MaterialShaderParameter>* instanceShaderParameters = instances_[i].shaderParameters_;
+                    if (instanceShaderParameters)
+                    {
+                        graphics->ClearParameterSource(SP_MATERIAL);
+                        for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = instanceShaderParameters->Begin(); i != instanceShaderParameters->End(); ++i)
+                            graphics->SetShaderParameter(i->first_, i->second_.value_);
+                    }
+                    // Reset material's shader parameters
+                    else if (graphics->NeedParameterUpdate(SP_MATERIAL, material_))
+                    {
+                        const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
+                        for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+                            graphics->SetShaderParameter(i->first_, i->second_.value_);
+                    }
+
+                    if (graphics->NeedParameterUpdate(SP_OBJECTTRANSFORM, instances_[i].worldTransform_))
+                        graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
+
+                    graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
+                        geometry_->GetVertexStart(), geometry_->GetVertexCount());
+                }
             }
         }
         else
