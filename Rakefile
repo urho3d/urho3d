@@ -281,9 +281,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
   if ENV['OS']
-    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   else
-    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh Rakefile; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   end
 end
 
@@ -545,5 +545,8 @@ RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 EOF" or abort 'Failed to create user private key to id_rsa'
   system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
 end
+
+# Load custom rake scripts
+Dir['.rake/*.rake'].each { |r| load r }
 
 # vi: set ts=2 sw=2 expandtab:
