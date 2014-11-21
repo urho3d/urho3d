@@ -179,7 +179,7 @@ void PhysicsWorld::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
-    MIXED_ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(PhysicsWorld, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Substeps", maxSubSteps_, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_INT, "Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);

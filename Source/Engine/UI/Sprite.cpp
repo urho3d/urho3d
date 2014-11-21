@@ -61,7 +61,7 @@ void Sprite::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ONE, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
-    MIXED_ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE(Sprite, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);

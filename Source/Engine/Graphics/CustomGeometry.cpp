@@ -66,7 +66,7 @@ void CustomGeometry::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Dynamic Vertex Buffer", dynamic_, false, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BUFFER, "Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE(CustomGeometry, "Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);

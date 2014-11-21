@@ -79,7 +79,7 @@ void Text::RegisterObject(Context* context)
 
     COPY_BASE_ATTRIBUTES(Text, UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Text, "Use Derived Opacity", false);
-    MIXED_ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE(Text, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     ATTRIBUTE(Text, VAR_STRING, "Text", text_, String::EMPTY, AM_FILE);
     ENUM_ATTRIBUTE(Text, "Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
