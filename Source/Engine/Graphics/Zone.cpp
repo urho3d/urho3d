@@ -84,7 +84,7 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Zone, VAR_RESOURCEREF, "Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(Zone, VAR_RESOURCEREF, "Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Zone, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
@@ -225,7 +225,7 @@ bool Zone::IsInside(const Vector3& point) const
     return boundingBox_.IsInside(localPoint) != OUTSIDE;
 }
 
-void Zone::SetZoneTextureAttr(ResourceRef value)
+void Zone::SetZoneTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     zoneTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
@@ -247,10 +247,10 @@ void Zone::OnMarkedDirty(Node* node)
     }
 
     Drawable::OnMarkedDirty(node);
-    
+
     // Clear zone reference from all drawables inside the bounding box, and mark gradient dirty in neighbor zones
     ClearDrawablesZone();
-    
+
     inverseWorldDirty_ = true;
 }
 

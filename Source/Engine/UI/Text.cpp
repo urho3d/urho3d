@@ -79,7 +79,7 @@ void Text::RegisterObject(Context* context)
 
     COPY_BASE_ATTRIBUTES(Text, UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Text, "Use Derived Opacity", false);
-    ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     ATTRIBUTE(Text, VAR_STRING, "Text", text_, String::EMPTY, AM_FILE);
     ENUM_ATTRIBUTE(Text, "Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
@@ -116,7 +116,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         hovering_ = false;
         return;
     }
-    
+
     // If face has changed or char locations are not valid anymore, update before rendering
     if (charLocationsDirty_ || !fontFace_ || face != fontFace_)
         UpdateCharLocations();
@@ -126,13 +126,13 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         for (unsigned i = 0; i < printText_.Size(); ++i)
             face->GetGlyph(printText_[i]);
     }
-    
+
     // Hovering and/or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
         bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
-        batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) : (selected_ && selectionColor_.a_ > 0.0f ? 
+        batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) : (selected_ && selectionColor_.a_ > 0.0f ?
             selectionColor_: hoverColor_));
         batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
         UIBatch::AddOrMerge(batch, batches);
@@ -189,12 +189,12 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         case TE_NONE:
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
-            
+
         case TE_SHADOW:
             ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
-            
+
         case TE_STROKE:
             ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
@@ -364,7 +364,7 @@ IntVector2 Text::GetCharSize(unsigned index)
     return charLocations_[index].size_;
 }
 
-void Text::SetFontAttr(ResourceRef value)
+void Text::SetFontAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     font_ = cache->GetResource<Font>(value.name_);
@@ -397,7 +397,7 @@ void Text::UpdateText(bool onResize)
 {
     rowWidths_.Clear();
     printText_.Clear();
-    
+
     if (font_)
     {
         FontFace* face = font_->GetFace(fontSize_);
@@ -405,7 +405,7 @@ void Text::UpdateText(bool onResize)
             return;
 
         rowHeight_ = face->GetRowHeight();
-        
+
         int width = 0;
         int height = 0;
         int rowWidth = 0;
@@ -425,7 +425,7 @@ void Text::UpdateText(bool onResize)
             unsigned nextBreak = 0;
             unsigned lineStart = 0;
             printToText_.Clear();
-            
+
             for (unsigned i = 0; i < unicodeText_.Size(); ++i)
             {
                 unsigned j;
@@ -561,7 +561,7 @@ void Text::UpdateText(bool onResize)
             SetWidth(width);
         }
         SetFixedHeight(height);
-        
+
         charLocationsDirty_ = true;
     }
     else
@@ -569,8 +569,8 @@ void Text::UpdateText(bool onResize)
         // No font, nothing to render
         pageGlyphLocations_.Clear();
     }
-    
-    // If wordwrap is on, parent may need layout update to correct for overshoot in size. However, do not do this when the 
+
+    // If wordwrap is on, parent may need layout update to correct for overshoot in size. However, do not do this when the
     // update is a response to resize, as that could cause infinite recursion
     if (wordWrap_ && !onResize)
     {
@@ -587,9 +587,9 @@ void Text::UpdateCharLocations()
     if (!face)
         return;
     fontFace_ = face;
-    
+
     int rowHeight = (int)(rowSpacing_ * rowHeight_);
-    
+
     // Store position & size of each character, and locations per texture page
     unsigned numChars = unicodeText_.Size();
     charLocations_.Resize(numChars + 1);
@@ -598,17 +598,17 @@ void Text::UpdateCharLocations()
         pageGlyphLocations_[i].Clear();
 
     IntVector2 offset = font_->GetTotalGlyphOffset(fontSize_);
-    
+
     unsigned rowIndex = 0;
     unsigned lastFilled = 0;
     int x = GetRowStartPosition(rowIndex) + offset.x_;
     int y = offset.y_;
-    
+
     for (unsigned i = 0; i < printText_.Size(); ++i)
     {
         CharLocation loc;
         loc.position_ = IntVector2(x, y);
-        
+
         unsigned c = printText_[i];
         if (c != '\n')
         {
@@ -630,7 +630,7 @@ void Text::UpdateCharLocations()
             x = GetRowStartPosition(++rowIndex);
             y += rowHeight;
         }
-        
+
         // Fill gaps in case characters were skipped from printing
         for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
             charLocations_[j] = loc;
@@ -639,7 +639,7 @@ void Text::UpdateCharLocations()
     // Store the ending position
     charLocations_[numChars].position_ = IntVector2(x, y);
     charLocations_[numChars].size_ = IntVector2::ZERO;
-    
+
     charLocationsDirty_ = false;
 }
 
@@ -689,7 +689,7 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
     float depthBias)
 {
     unsigned startDataSize = pageBatch.vertexData_->Size();
-    
+
     if (!color)
         pageBatch.SetDefaultColor();
     else

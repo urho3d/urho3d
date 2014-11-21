@@ -59,7 +59,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEmitter>(GEOMETRY_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()), AM_DEFAULT);
     ENUM_ATTRIBUTE(ParticleEmitter, "Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_ROTATE_XYZ, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
@@ -70,8 +70,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     COPY_BASE_ATTRIBUTES(ParticleEmitter, Drawable);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Serialize Particles", serializeParticles_, true, AM_FILE);
 }
 
@@ -188,7 +188,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                 else
                     particle.velocity_ += lastTimeStep_ * constantForce;
             }
-            
+
             float dampingForce = effect_->GetDampingForce();
             if (dampingForce != 0.0f)
             {
@@ -262,7 +262,7 @@ void ParticleEmitter::SetEffect(ParticleEffect* effect)
 
     if (effect_)
         SubscribeToEvent(effect_, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleEffectReloadFinished));
-    
+
     ApplyEffect();
     MarkNetworkUpdate();
 }
@@ -319,7 +319,7 @@ void ParticleEmitter::ApplyEffect()
 {
     if (!effect_)
         return;
-    
+
     SetMaterial(effect_->GetMaterial());
     SetNumParticles(effect_->GetNumParticles());
     SetRelative(effect_->IsRelative());
@@ -328,7 +328,7 @@ void ParticleEmitter::ApplyEffect()
     SetAnimationLodBias(effect_->GetAnimationLodBias());
 }
 
-void ParticleEmitter::SetEffectAttr(ResourceRef value)
+void ParticleEmitter::SetEffectAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetEffect(cache->GetResource<ParticleEffect>(value.name_));
@@ -339,11 +339,11 @@ ResourceRef ParticleEmitter::GetEffectAttr() const
     return GetResourceRef(effect_, ParticleEffect::GetTypeStatic());
 }
 
-void ParticleEmitter::SetParticlesAttr(VariantVector value)
+void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
 {
     unsigned index = 0;
     SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
-    
+
     for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
     {
         i->velocity_ = value[index++].GetVector3();
@@ -365,7 +365,7 @@ VariantVector ParticleEmitter::GetParticlesAttr() const
         ret.Push(particles_.Size());
         return ret;
     }
-    
+
     ret.Reserve(particles_.Size() * 8 + 1);
     ret.Push(particles_.Size());
     for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
@@ -390,10 +390,10 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
         ret.Push(billboards_.Size());
         return ret;
     }
-    
+
     ret.Reserve(billboards_.Size() * 6 + 1);
     ret.Push(billboards_.Size());
-    
+
     for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         ret.Push(i->position_);
@@ -403,7 +403,7 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
         ret.Push(i->rotation_);
         ret.Push(i->enabled_);
     }
-    
+
     return ret;
 }
 
@@ -431,7 +431,7 @@ bool ParticleEmitter::EmitNewParticle()
     Vector3 startPos;
     Vector3 startDir;
 
-    
+
     switch (effect_->GetEmitterType())
     {
     case EMITTER_SPHERE:

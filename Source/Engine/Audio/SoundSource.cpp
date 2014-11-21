@@ -137,7 +137,7 @@ void SoundSource::RegisterObject(Context* context)
     context->RegisterFactory<SoundSource>(AUDIO_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(SoundSource, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(SoundSource, VAR_RESOURCEREF, "Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(SoundSource, VAR_RESOURCEREF, "Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
     ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Frequency", frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Gain", gain_, 1.0f, AM_DEFAULT);
@@ -152,7 +152,7 @@ void SoundSource::Play(Sound* sound)
 {
     if (!audio_)
         return;
-    
+
     // If no frequency set yet, set from the sound's default
     if (frequency_ == 0.0f && sound)
         SetFrequency(sound->GetFrequency());
@@ -200,7 +200,7 @@ void SoundSource::Play(SoundStream* stream)
         SetFrequency(stream->GetFrequency());
 
     SharedPtr<SoundStream> streamPtr(stream);
-    
+
     // If sound source is currently playing, have to lock the audio mutex. When stream playback is explicitly
     // requested, clear the existing sound if any
     if (position_)
@@ -214,7 +214,7 @@ void SoundSource::Play(SoundStream* stream)
         sound_.Reset();
         PlayLockless(streamPtr);
     }
-    
+
     // Stream playback is not supported for network replication, no need to mark network dirty
 }
 
@@ -231,7 +231,7 @@ void SoundSource::Stop()
     }
     else
         StopLockless();
-    
+
     MarkNetworkUpdate();
 }
 
@@ -323,9 +323,9 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
 {
     if (!position_ || (!sound_ && !soundStream_) || !IsEnabledEffective())
         return;
-    
+
     int streamFilledSize, outBytes;
-    
+
     if (soundStream_ && streamBuffer_)
     {
         int streamBufferSize = streamBuffer_->GetDataSize();
@@ -336,10 +336,10 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         neededSize *= soundStream_->GetSampleSize();
         neededSize -= unusedStreamSize_;
         neededSize = Clamp(neededSize, 0, streamBufferSize - unusedStreamSize_);
-        
+
         // Always start play position at the beginning of the stream buffer
         position_ = streamBuffer_->GetStart();
-        
+
         // Request new data from the stream
         signed char* dest = streamBuffer_->GetStart() + unusedStreamSize_;
         outBytes = neededSize ? soundStream_->GetData(dest, neededSize) : 0;
@@ -347,7 +347,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         // Zero-fill rest if stream did not produce enough data
         if (outBytes < neededSize)
             memset(dest, 0, neededSize - outBytes);
-        
+
         // Calculate amount of total bytes of data in stream buffer now, to know how much went unused after mixing
         streamFilledSize = neededSize + unusedStreamSize_;
     }
@@ -397,11 +397,11 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     if (soundStream_)
     {
         timePosition_ += ((float)samples / (float)mixRate) * frequency_ / soundStream_->GetFrequency();
-        
+
         unusedStreamSize_ = Max(streamFilledSize - (int)(size_t)(position_ - streamBuffer_->GetStart()), 0);
         if (unusedStreamSize_)
             memcpy(streamBuffer_->GetStart(), (const void*)position_, unusedStreamSize_);
-        
+
         // If stream did not produce any data, stop if applicable
         if (!outBytes && soundStream_->GetStopAtEnd())
         {
@@ -413,7 +413,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
-void SoundSource::SetSoundAttr(ResourceRef value)
+void SoundSource::SetSoundAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sound* newSound = cache->GetResource<Sound>(value.name_);
@@ -488,7 +488,7 @@ void SoundSource::PlayLockless(Sound* sound)
             return;
         }
     }
-    
+
     // If sound pointer is null or if sound has no data, stop playback
     StopLockless();
     sound_.Reset();
@@ -504,19 +504,19 @@ void SoundSource::PlayLockless(SharedPtr<SoundStream> stream)
         // Setup the stream buffer
         unsigned sampleSize = stream->GetSampleSize();
         unsigned streamBufferSize = sampleSize * stream->GetIntFrequency() * STREAM_BUFFER_LENGTH / 1000;
-        
+
         streamBuffer_ = new Sound(context_);
         streamBuffer_->SetSize(streamBufferSize);
         streamBuffer_->SetFormat(stream->GetIntFrequency(), stream->IsSixteenBit(), stream->IsStereo());
         streamBuffer_->SetLooped(true);
-        
+
         soundStream_ = stream;
         unusedStreamSize_ = 0;
         position_ = streamBuffer_->GetStart();
         fractPosition_ = 0;
         return;
     }
-    
+
     // If stream pointer is null, stop playback
     StopLockless();
 }
@@ -525,7 +525,7 @@ void SoundSource::StopLockless()
 {
     position_ = 0;
     timePosition_ = 0.0f;
-    
+
     // Free the sound stream and decode buffer if a stream was playing
     soundStream_.Reset();
     streamBuffer_.Reset();

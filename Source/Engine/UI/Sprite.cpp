@@ -54,14 +54,14 @@ Sprite::~Sprite()
 void Sprite::RegisterObject(Context* context)
 {
     context->RegisterFactory<Sprite>(UI_CATEGORY);
-    
+
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ONE, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
@@ -97,15 +97,15 @@ void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
         color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
-    
+
     const IntVector2& size = GetSize();
     UIBatch batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
-    
+
     batch.AddQuad(GetTransform(), 0, 0, size.x_, size.y_, imageRect_.left_, imageRect_.top_, imageRect_.right_ -
         imageRect_.left_, imageRect_.bottom_ - imageRect_.top_);
-    
+
     UIBatch::AddOrMerge(batch, batches);
-    
+
     // Reset hovering for next frame
     hovering_ = false;
 }
@@ -203,9 +203,9 @@ const Matrix3x4& Sprite::GetTransform() const
     if (positionDirty_)
     {
         Vector2 pos = floatPosition_;
-        
+
         Matrix3x4 parentTransform;
-        
+
         if (parent_)
         {
             Sprite* parentSprite = dynamic_cast<Sprite*>(parent_);
@@ -217,16 +217,16 @@ const Matrix3x4& Sprite::GetTransform() const
                 parentTransform = Matrix3x4::IDENTITY;
                 parentTransform.SetTranslation(Vector3((float)parentScreenPos.x_, (float)parentScreenPos.y_, 0.0f));
             }
-            
+
             switch (GetHorizontalAlignment())
             {
             case HA_LEFT:
                 break;
-                
+
             case HA_CENTER:
                 pos.x_ += (float)(parent_->GetSize().x_ / 2);
                 break;
-                
+
             case HA_RIGHT:
                 pos.x_ += (float)parent_->GetSize().x_;
                 break;
@@ -235,11 +235,11 @@ const Matrix3x4& Sprite::GetTransform() const
             {
             case VA_TOP:
                 break;
-                
+
             case VA_CENTER:
                 pos.y_ += (float)(parent_->GetSize().y_ / 2);
                 break;
-                
+
             case VA_BOTTOM:
                 pos.y_ += (float)(parent_->GetSize().y_);
                 break;
@@ -247,24 +247,24 @@ const Matrix3x4& Sprite::GetTransform() const
         }
         else
             parentTransform = Matrix3x4::IDENTITY;
-        
+
         Matrix3x4 hotspotAdjust(Matrix3x4::IDENTITY);
         hotspotAdjust.SetTranslation(Vector3((float)-hotSpot_.x_, (float)-hotSpot_.y_, 0.0f));
-        
+
         Matrix3x4 mainTransform(Vector3(pos, 0.0f), Quaternion(rotation_, Vector3::FORWARD), Vector3(scale_, 1.0f));
-        
+
         transform_ = parentTransform * mainTransform * hotspotAdjust;
         positionDirty_ = false;
-        
+
         // Calculate an approximate screen position for GetElementAt(), or pixel-perfect child elements
         Vector3 topLeftCorner = transform_ * Vector3::ZERO;
         screenPosition_ = IntVector2((int)topLeftCorner.x_, (int)topLeftCorner.y_);
     }
-    
+
     return transform_;
 }
 
-void Sprite::SetTextureAttr(ResourceRef value)
+void Sprite::SetTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetTexture(cache->GetResource<Texture2D>(value.name_));

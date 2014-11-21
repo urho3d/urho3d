@@ -16,7 +16,7 @@ class PhysicsWorld : public Component
     void Update(float timeStep);
     void UpdateCollisions();
     void SetFps(int fps);
-    void SetGravity(Vector3 gravity);
+    void SetGravity(const Vector3& gravity);
     void SetMaxSubSteps(int num);
     void SetNumIterations(int num);
     void SetInterpolation(bool enable);

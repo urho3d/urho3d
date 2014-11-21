@@ -48,7 +48,7 @@ class VertexBuffer;
 class URHO3D_API CustomGeometry : public Drawable
 {
     OBJECT(CustomGeometry);
-    
+
 public:
     /// Construct.
     CustomGeometry(Context* context);
@@ -56,7 +56,7 @@ public:
     virtual ~CustomGeometry();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Return the geometry for a specific LOD level.
@@ -65,7 +65,7 @@ public:
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
-    
+
     /// Clear all geometries.
     void Clear();
     /// Set number of geometries.
@@ -107,18 +107,18 @@ public:
     CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
 
     /// Set geometry data attribute.
-    void SetGeometryDataAttr(PODVector<unsigned char> value);
+    void SetGeometryDataAttr(const PODVector<unsigned char>& value);
     /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return geometry data attribute.
     PODVector<unsigned char> GetGeometryDataAttr() const;
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
 private:
     /// Primitive type per geometry.
     PODVector<PrimitiveType> primitiveTypes_;

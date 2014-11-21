@@ -103,17 +103,17 @@ void RigidBody::RegisterObject(Context* context)
     context->RegisterFactory<RigidBody>(PHYSICS_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Anisotropic Friction", GetAnisotropicFriction, SetAnisotropicFriction, Vector3, Vector3::ONE, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Anisotropic Friction", GetAnisotropicFriction, SetAnisotropicFriction, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Rolling Friction", GetRollingFriction, SetRollingFriction, float, DEFAULT_ROLLING_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Factor", GetLinearFactor, SetLinearFactor, Vector3, Vector3::ONE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Factor", GetAngularFactor, SetAngularFactor, Vector3, Vector3::ONE, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Factor", GetLinearFactor, SetLinearFactor, Vector3, Vector3::ONE, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Factor", GetAngularFactor, SetAngularFactor, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.8f, AM_DEFAULT);
@@ -228,7 +228,7 @@ void RigidBody::SetMass(float mass)
     }
 }
 
-void RigidBody::SetPosition(Vector3 position)
+void RigidBody::SetPosition(const Vector3& position)
 {
     if (body_)
     {
@@ -245,7 +245,7 @@ void RigidBody::SetPosition(Vector3 position)
     }
 }
 
-void RigidBody::SetRotation(Quaternion rotation)
+void RigidBody::SetRotation(const Quaternion& rotation)
 {
     if (body_)
     {
@@ -286,7 +286,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     }
 }
 
-void RigidBody::SetLinearVelocity(Vector3 velocity)
+void RigidBody::SetLinearVelocity(const Vector3& velocity)
 {
     if (body_)
     {
@@ -297,7 +297,7 @@ void RigidBody::SetLinearVelocity(Vector3 velocity)
     }
 }
 
-void RigidBody::SetLinearFactor(Vector3 factor)
+void RigidBody::SetLinearFactor(const Vector3& factor)
 {
     if (body_)
     {
@@ -324,7 +324,7 @@ void RigidBody::SetLinearDamping(float damping)
     }
 }
 
-void RigidBody::SetAngularVelocity(Vector3 velocity)
+void RigidBody::SetAngularVelocity(const Vector3& velocity)
 {
     if (body_)
     {
@@ -335,7 +335,7 @@ void RigidBody::SetAngularVelocity(Vector3 velocity)
     }
 }
 
-void RigidBody::SetAngularFactor(Vector3 factor)
+void RigidBody::SetAngularFactor(const Vector3& factor)
 {
     if (body_)
     {
@@ -371,7 +371,7 @@ void RigidBody::SetFriction(float friction)
     }
 }
 
-void RigidBody::SetAnisotropicFriction(Vector3 friction)
+void RigidBody::SetAnisotropicFriction(const Vector3& friction)
 {
     if (body_)
     {
@@ -705,7 +705,7 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
     // where node is already null
     if (!node_ || !physicsWorld_)
         return;
-    
+
     physicsWorld_->SetApplyingTransforms(true);
 
     // Apply transform to the SmoothedTransform component instead of node transform if available

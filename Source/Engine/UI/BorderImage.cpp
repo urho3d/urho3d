@@ -59,7 +59,7 @@ void BorderImage::RegisterObject(Context* context)
     context->RegisterFactory<BorderImage>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
-    ACCESSOR_ATTRIBUTE(BorderImage, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE(BorderImage, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Image Border", GetImageBorder, SetImageBorder, IntRect, IntRect::ZERO, AM_FILE);
@@ -198,7 +198,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     hovering_ = false;
 }
 
-void BorderImage::SetTextureAttr(ResourceRef value)
+void BorderImage::SetTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetTexture(cache->GetResource<Texture2D>(value.name_));

@@ -132,7 +132,7 @@ public:
     {
         const Vector<PODVector<CustomGeometryVertex> >& srcVertices = custom->GetVertices();
         unsigned totalVertexCount = 0;
-        
+
         for (unsigned i = 0; i < srcVertices.Size(); ++i)
             totalVertexCount += srcVertices[i].Size();
 
@@ -143,11 +143,11 @@ public:
             SharedArrayPtr<unsigned char> indexData(new unsigned char[totalVertexCount * sizeof(unsigned)]);
             dataArrays_.Push(vertexData);
             dataArrays_.Push(indexData);
-            
+
             Vector3* destVertex = reinterpret_cast<Vector3*>(&vertexData[0]);
             unsigned* destIndex = reinterpret_cast<unsigned*>(&indexData[0]);
             unsigned k = 0;
-            
+
             for (unsigned i = 0; i < srcVertices.Size(); ++i)
             {
                 for (unsigned j = 0; j < srcVertices[i].Size(); ++j)
@@ -156,7 +156,7 @@ public:
                     *destIndex++ = k++;
                 }
             }
-            
+
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = totalVertexCount / 3;
             meshIndex.m_triangleIndexBase = indexData;
@@ -169,7 +169,7 @@ public:
             m_indexedMeshes.push_back(meshIndex);
         }
     }
-    
+
 private:
     /// Shared vertex/index data used in the collision
     Vector<SharedArrayPtr<unsigned char> > dataArrays_;
@@ -262,7 +262,7 @@ ConvexData::ConvexData(CustomGeometry* custom)
         for (unsigned j = 0; j < srcVertices[i].Size(); ++j)
             vertices.Push(srcVertices[i][j].position_);
     }
-    
+
     BuildHull(vertices);
 }
 
@@ -388,7 +388,7 @@ void CollisionShape::RegisterObject(Context* context)
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Collision Margin", margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "CustomGeometry NodeID", customGeometryID_, 0, AM_DEFAULT | AM_NODEID);
@@ -830,7 +830,7 @@ void CollisionShape::NotifyRigidBody(bool updateMass)
     }
 }
 
-void CollisionShape::SetModelAttr(ResourceRef value)
+void CollisionShape::SetModelAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     model_ = cache->GetResource<Model>(value.name_);

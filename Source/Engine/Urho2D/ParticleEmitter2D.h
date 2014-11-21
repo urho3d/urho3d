@@ -34,7 +34,7 @@ class ParticleEffect2D;
 {
     /// Time to live.
     float timeToLive_;
-    
+
     /// Position.
     Vector2 position_;
     /// Size.
@@ -99,7 +99,7 @@ public:
     unsigned GetMaxParticles() const { return particles_.Size(); }
 
     /// Set particle model attr.
-    void SetParticleEffectAttr(ResourceRef value);
+    void SetParticleEffectAttr(const ResourceRef& value);
     /// Return particle model attr.
     ResourceRef GetParticleEffectAttr() const;
 

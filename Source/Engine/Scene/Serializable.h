@@ -203,6 +203,44 @@ public:
     SetFunctionPtr setFunction_;
 };
 
+/// Template implementation of the attribute accessor invoke helper class using const references for setter only.
+template <class T, class U> class MixedAttributeAccessorImpl : public AttributeAccessor
+{
+public:
+    typedef U (T::*GetFunctionPtr)() const;
+    typedef void (T::*SetFunctionPtr)(const U&);
+
+    /// Construct with function pointers.
+    MixedAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
+        getFunction_(getFunction),
+        setFunction_(setFunction)
+    {
+        assert(getFunction_);
+        assert(setFunction_);
+    }
+
+    /// Invoke getter function.
+    virtual void Get(const Serializable* ptr, Variant& dest) const
+    {
+        assert(ptr);
+        const T* classPtr = static_cast<const T*>(ptr);
+        dest = (classPtr->*getFunction_)();
+    }
+
+    /// Invoke setter function.
+    virtual void Set(Serializable* ptr, const Variant& value)
+    {
+        assert(ptr);
+        T* classPtr = static_cast<T*>(ptr);
+        (classPtr->*setFunction_)(value.Get<U>());
+    }
+
+    /// Class-specific pointer to getter function.
+    GetFunctionPtr getFunction_;
+    /// Class-specific pointer to setter function.
+    SetFunctionPtr setFunction_;
+};
+
 #define COPY_BASE_ATTRIBUTES(className, sourceClassName) context->CopyBaseAttributes<sourceClassName, className>()
 #define REMOVE_ATTRIBUTE(className, name) context->RemoveAttribute<className>(name)
 #define ATTRIBUTE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
@@ -210,6 +248,7 @@ public:
 #define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, new Urho3D::AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
 #define ENUM_ACCESSOR_ATTRIBUTE(className, name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(name, new Urho3D::AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), enumNames, defaultValue, mode))
 #define REF_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, new Urho3D::RefAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
+#define MIXED_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, new Urho3D::MixedAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
 #define UPDATE_ATTRIBUTE_DEFAULT_VALUE(className, name, defaultValue) context->UpdateAttributeDefaultValue<className>(name, defaultValue)
 
 }

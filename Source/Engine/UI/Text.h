@@ -162,7 +162,7 @@ public:
     /// Return effect Z bias.
     float GetEffectDepthBias() const { return effectDepthBias_; }
     /// Set font attribute.
-    void SetFontAttr(ResourceRef value);
+    void SetFontAttr(const ResourceRef& value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
 

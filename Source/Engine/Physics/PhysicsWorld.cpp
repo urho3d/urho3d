@@ -179,7 +179,7 @@ void PhysicsWorld::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Substeps", maxSubSteps_, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_INT, "Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
@@ -226,7 +226,7 @@ void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& 
 }
 
 void PhysicsWorld::draw3dText(const btVector3& location, const char* textString)
-{ 
+{
 }
 
 void PhysicsWorld::Update(float timeStep)
@@ -242,7 +242,7 @@ void PhysicsWorld::Update(float timeStep)
     }
     else if (maxSubSteps_ > 0)
         maxSubSteps = Min(maxSubSteps, maxSubSteps_);
-    
+
     delayedWorldTransforms_.Clear();
 
     if (interpolation_)
@@ -284,14 +284,14 @@ void PhysicsWorld::UpdateCollisions()
 void PhysicsWorld::SetFps(int fps)
 {
     fps_ = Clamp(fps, 1, 1000);
-    
+
     MarkNetworkUpdate();
 }
 
-void PhysicsWorld::SetGravity(Vector3 gravity)
+void PhysicsWorld::SetGravity(const Vector3& gravity)
 {
     world_->setGravity(ToBtVector3(gravity));
-    
+
     MarkNetworkUpdate();
 }
 
@@ -305,7 +305,7 @@ void PhysicsWorld::SetNumIterations(int num)
 {
     num = Clamp(num, 1, MAX_SOLVER_ITERATIONS);
     world_->getSolverInfo().m_numIterations = num;
-    
+
     MarkNetworkUpdate();
 }
 
@@ -317,21 +317,21 @@ void PhysicsWorld::SetInterpolation(bool enable)
 void PhysicsWorld::SetInternalEdge(bool enable)
 {
     internalEdge_ = enable;
-    
+
     MarkNetworkUpdate();
 }
 
 void PhysicsWorld::SetSplitImpulse(bool enable)
 {
     world_->getSolverInfo().m_splitImpulse = enable;
-    
+
     MarkNetworkUpdate();
 }
 
 void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
 {
     maxNetworkAngularVelocity_ = Clamp(velocity, 1.0f, 32767.0f);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -427,7 +427,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
         result.distance_ = M_INFINITY;
         return;
     }
-    
+
     // If shape is attached in a rigidbody, set its collision group temporarily to 0 to make sure it is not returned in the sweep result
     RigidBody* bodyComp = shape->GetComponent<RigidBody>();
     btRigidBody* body = bodyComp ? bodyComp->GetBody() : (btRigidBody*)0;
@@ -457,7 +457,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.distance_ = M_INFINITY;
         return;
     }
-    
+
     if (!shape->isConvex())
     {
         LOGERROR("Can not use non-convex collision shape for convex cast");
@@ -467,7 +467,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.distance_ = M_INFINITY;
         return;
     }
-    
+
     PROFILE(PhysicsConvexCast);
 
     btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(startPos), ToBtVector3(endPos));
@@ -715,7 +715,7 @@ void PhysicsWorld::SendCollisionEvents()
     currentCollisions_.Clear();
     physicsCollisionData_.Clear();
     nodeCollisionData_.Clear();
-    
+
     int numManifolds = collisionDispatcher_->getNumManifolds();
 
     if (numManifolds)

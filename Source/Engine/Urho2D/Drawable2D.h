@@ -88,13 +88,13 @@ public:
     bool GetVisibility() const { return visibility_; }
 
     /// Set sprite attribute.
-    void SetSpriteAttr(ResourceRef value);
+    void SetSpriteAttr(const ResourceRef& value);
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
     /// Set blend mode attribute.
     void SetBlendModeAttr(BlendMode mode);
     /// Set material attribute.
-    void SetMaterialAttr(ResourceRef value);
+    void SetMaterialAttr(const ResourceRef& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
 

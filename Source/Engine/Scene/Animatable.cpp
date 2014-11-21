@@ -69,7 +69,7 @@ Animatable::~Animatable()
 
 void Animatable::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(Animatable, VAR_RESOURCEREF, "Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef, ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(Animatable, VAR_RESOURCEREF, "Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef, ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
 
 bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
@@ -273,7 +273,7 @@ float Animatable::GetAttributeAnimationSpeed(const String& name) const
     return info ? info->GetSpeed() : 1.0f;
 }
 
-void Animatable::SetObjectAnimationAttr(ResourceRef value)
+void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
 {
     if (!value.name_.Empty())
     {

@@ -67,9 +67,9 @@ void Drawable2D::RegisterObject(Context* context)
 {
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_INT, "Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable2D, VAR_INT, "Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Drawable2D, "Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE(Drawable2D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D, Drawable);
 }
 
@@ -173,7 +173,7 @@ const Vector<Vertex2D>& Drawable2D::GetVertices()
     return vertices_;
 }
 
-void Drawable2D::SetSpriteAttr(ResourceRef value)
+void Drawable2D::SetSpriteAttr(const ResourceRef& value)
 {
     // Delay applying material update
     materialUpdatePending_ = true;
@@ -225,7 +225,7 @@ void Drawable2D::SetBlendModeAttr(BlendMode mode)
     SetBlendMode(mode);
 }
 
-void Drawable2D::SetMaterialAttr(ResourceRef value)
+void Drawable2D::SetMaterialAttr(const ResourceRef& value)
 {
     // Delay applying material update
     materialUpdatePending_ = true;
