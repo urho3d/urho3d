@@ -127,84 +127,8 @@ private:
     bool temporary_;
 };
 
-/// Template implementation of the attribute accessor invoke helper class.
-template <class T, class U> class AttributeAccessorImpl : public AttributeAccessor
-{
-public:
-    typedef U (T::*GetFunctionPtr)() const;
-    typedef void (T::*SetFunctionPtr)(U);
-
-    /// Construct with function pointers.
-    AttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
-        getFunction_(getFunction),
-        setFunction_(setFunction)
-    {
-        assert(getFunction_);
-        assert(setFunction_);
-    }
-
-    /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& dest) const
-    {
-        assert(ptr);
-        const T* classPtr = static_cast<const T*>(ptr);
-        dest = (classPtr->*getFunction_)();
-    }
-
-    /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value)
-    {
-        assert(ptr);
-        T* classPtr = static_cast<T*>(ptr);
-        (classPtr->*setFunction_)(value.Get<U>());
-    }
-
-    /// Class-specific pointer to getter function.
-    GetFunctionPtr getFunction_;
-    /// Class-specific pointer to setter function.
-    SetFunctionPtr setFunction_;
-};
-
-/// Template implementation of the attribute accessor invoke helper class using const references.
-template <class T, class U> class RefAttributeAccessorImpl : public AttributeAccessor
-{
-public:
-    typedef const U& (T::*GetFunctionPtr)() const;
-    typedef void (T::*SetFunctionPtr)(const U&);
-
-    /// Construct with function pointers.
-    RefAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
-        getFunction_(getFunction),
-        setFunction_(setFunction)
-    {
-        assert(getFunction_);
-        assert(setFunction_);
-    }
-
-    /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& dest) const
-    {
-        assert(ptr);
-        const T* classPtr = static_cast<const T*>(ptr);
-        dest = (classPtr->*getFunction_)();
-    }
-
-    /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value)
-    {
-        assert(ptr);
-        T* classPtr = static_cast<T*>(ptr);
-        (classPtr->*setFunction_)(value.Get<U>());
-    }
-
-    /// Class-specific pointer to getter function.
-    GetFunctionPtr getFunction_;
-    /// Class-specific pointer to setter function.
-    SetFunctionPtr setFunction_;
-};
-
-/// Template implementation of the attribute accessor invoke helper class.
-template <class T, class U> class EnumAttributeAccessorImpl : public AttributeAccessor
+/// Template implementation of the enum attribute accessor invoke helper class.
+template <typename T, typename U> class EnumAttributeAccessorImpl : public AttributeAccessor
 {
 public:
     typedef U (T::*GetFunctionPtr)() const;
@@ -241,15 +165,59 @@ public:
     SetFunctionPtr setFunction_;
 };
 
-/// Template implementation of the attribute accessor invoke helper class using const references for setter only.
-template <class T, class U> class MixedAttributeAccessorImpl : public AttributeAccessor
+/// Attribute trait (default use const reference for object type).
+template<typename T> struct AttributeTrait
+{
+    /// Get function return type.
+    typedef const T& ReturnType;
+    /// Set function parameter type.
+    typedef const T& ParameterType;    
+};
+
+/// Int attribute trait.
+template<> struct AttributeTrait<int>
+{
+    typedef int ReturnType;
+    typedef int ParameterType;    
+};
+
+/// unsigned attribute trait.
+template<> struct AttributeTrait<unsigned>
+{
+    typedef unsigned ReturnType;
+    typedef unsigned ParameterType;    
+};
+
+/// Bool attribute trait.
+template<> struct AttributeTrait<bool>
+{
+    typedef bool ReturnType; 
+    typedef bool ParameterType; 
+};
+
+/// Float attribute trait.
+template<> struct AttributeTrait<float>
+{
+    typedef float ReturnType;
+    typedef float ParameterType;    
+};
+
+/// Mixed attribute trait (use const reference for set function only).
+template<typename T> struct MixedAttributeTrait
+{
+    typedef T ReturnType;
+    typedef const T& ParameterType; 
+};
+
+/// Template implementation of the attribute accessor invoke helper class.
+template <typename T, typename U, typename Trait> class AttributeAccessorImpl : public AttributeAccessor
 {
 public:
-    typedef U (T::*GetFunctionPtr)() const;
-    typedef void (T::*SetFunctionPtr)(const U&);
+    typedef typename Trait ::ReturnType (T::*GetFunctionPtr)() const;
+    typedef void (T::*SetFunctionPtr)(typename Trait ::ParameterType);
 
     /// Construct with function pointers.
-    MixedAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
+    AttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
         getFunction_(getFunction),
         setFunction_(setFunction)
     {
@@ -281,12 +249,11 @@ public:
 
 #define COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
 #define REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
-#define ATTRIBUTE(type, name, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(type, name, offsetof(ClassName, variable), defaultValue, mode))
 #define ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, offsetof(ClassName, variable), enumNames, defaultValue, mode))
-#define ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define ATTRIBUTE(typeName, name, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, offsetof(ClassName, variable), defaultValue, mode))
 #define ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, new Urho3D::EnumAttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), enumNames, defaultValue, mode))
-#define REF_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::RefAttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
-#define MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::MixedAttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, AttributeTrait<typeName> >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, MixedAttributeTrait<typeName> >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
 #define UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
 
 }

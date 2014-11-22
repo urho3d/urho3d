@@ -139,12 +139,12 @@ void SoundSource::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
     ENUM_ATTRIBUTE("Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Frequency", frequency_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Gain", gain_, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Attenuation", attenuation_, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Panning", panning_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(float, "Frequency", frequency_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(float, "Gain", gain_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(float, "Attenuation", attenuation_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(float, "Panning", panning_, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
-    ATTRIBUTE(VAR_BOOL, "Autoremove on Stop", autoRemove_, false, AM_FILE);
+    ATTRIBUTE(bool, "Autoremove on Stop", autoRemove_, false, AM_FILE);
     ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
 }
 

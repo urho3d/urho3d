@@ -70,25 +70,25 @@ void Text3D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(VAR_INT, "Font Size", text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
-    ATTRIBUTE(VAR_STRING, "Text", text_.text_, String::EMPTY, AM_DEFAULT);
+    ATTRIBUTE(int, "Font Size", text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    ATTRIBUTE(String, "Text", text_.text_, String::EMPTY, AM_DEFAULT);
     ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
+    ATTRIBUTE(float, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(bool, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE(VAR_COLOR, "Top Left Color", text_.color_[0], Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE(VAR_COLOR, "Top Right Color", text_.color_[1], Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE(VAR_COLOR, "Bottom Left Color", text_.color_[2], Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE(VAR_COLOR, "Bottom Right Color", text_.color_[3], Color::WHITE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Color, "Top Left Color", text_.color_[0], Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Color, "Top Right Color", text_.color_[1], Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Color, "Bottom Left Color", text_.color_[2], Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Color, "Bottom Right Color", text_.color_[3], Color::WHITE, AM_DEFAULT);
     ENUM_ATTRIBUTE("Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Effect Depth Bias", text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
+    ATTRIBUTE(float, "Effect Depth Bias", text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
 }
 

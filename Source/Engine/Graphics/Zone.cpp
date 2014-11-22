@@ -72,21 +72,21 @@ void Zone::RegisterObject(Context* context)
     context->RegisterFactory<Zone>(SCENE_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE(VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
-    ATTRIBUTE(VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
-    ATTRIBUTE(VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
-    ATTRIBUTE(VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Fog Height", fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
-    ATTRIBUTE(VAR_FLOAT, "Fog Height Scale", fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
-    ATTRIBUTE(VAR_BOOL, "Height Fog Mode", heightFog_, false, AM_DEFAULT);
-    ATTRIBUTE(VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
-    ATTRIBUTE(VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
-    ATTRIBUTE(VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
+    ATTRIBUTE(Vector3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
+    ATTRIBUTE(Vector3, "Bounding Box Max", boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
+    ATTRIBUTE(Color, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    ATTRIBUTE(Color, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
+    ATTRIBUTE(float, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
+    ATTRIBUTE(float, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
+    ATTRIBUTE(float, "Fog Height", fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
+    ATTRIBUTE(float, "Fog Height Scale", fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
+    ATTRIBUTE(bool, "Height Fog Mode", heightFog_, false, AM_DEFAULT);
+    ATTRIBUTE(bool, "Override Mode", override_, false, AM_DEFAULT);
+    ATTRIBUTE(bool, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
+    ATTRIBUTE(int, "Priority", priority_, 0, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE(VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    ATTRIBUTE(int, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATTRIBUTE(int, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 

@@ -46,7 +46,7 @@ void Navigable::RegisterObject(Context* context)
     context->RegisterFactory<Navigable>(NAVIGATION_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE(VAR_BOOL, "Recursive", recursive_, true, AM_DEFAULT);
+    ATTRIBUTE(bool, "Recursive", recursive_, true, AM_DEFAULT);
 }
 
 void Navigable::SetRecursive(bool enable)

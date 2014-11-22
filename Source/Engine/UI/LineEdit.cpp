@@ -83,7 +83,7 @@ void LineEdit::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
-    ATTRIBUTE(VAR_INT, "Echo Character", echoCharacter_, 0, AM_FILE);
+    ATTRIBUTE(int, "Echo Character", echoCharacter_, 0, AM_FILE);
 }
 
 void LineEdit::ApplyAttributes()

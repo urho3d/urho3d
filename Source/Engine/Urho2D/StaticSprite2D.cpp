@@ -54,7 +54,7 @@ void StaticSprite2D::RegisterObject(Context* context)
     context->RegisterFactory<StaticSprite2D>(URHO2D_CATEGORY);
     ACCESSOR_ATTRIBUTE("Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D);
 }
 

@@ -55,7 +55,7 @@ void StaticModelGroup::RegisterObject(Context* context)
     context->RegisterFactory<StaticModelGroup>(GEOMETRY_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(StaticModel);
-    REF_ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT | AM_NODEIDVECTOR);
+    ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT | AM_NODEIDVECTOR);
 }
 
 void StaticModelGroup::ApplyAttributes()

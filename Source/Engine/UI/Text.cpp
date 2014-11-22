@@ -80,15 +80,15 @@ void Text::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
-    ATTRIBUTE(VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
-    ATTRIBUTE(VAR_STRING, "Text", text_, String::EMPTY, AM_FILE);
+    ATTRIBUTE(int, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
+    ATTRIBUTE(String, "Text", text_, String::EMPTY, AM_FILE);
     ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
-    ATTRIBUTE(VAR_FLOAT, "Row Spacing", rowSpacing_, 1.0f, AM_FILE);
-    ATTRIBUTE(VAR_BOOL, "Word Wrap", wordWrap_, false, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
+    ATTRIBUTE(float, "Row Spacing", rowSpacing_, 1.0f, AM_FILE);
+    ATTRIBUTE(bool, "Word Wrap", wordWrap_, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_FILE);
 
     // Change the default value for UseDerivedOpacity
     context->GetAttribute<Text>("Use Derived Opacity")->defaultValue_ = false;
