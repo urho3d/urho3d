@@ -102,6 +102,7 @@ void Text3D::ApplyAttributes()
 
 void Text3D::UpdateBatches(const FrameInfo& frame)
 {
+    bool hasShaderParameters = HasShaderParameters();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
     
     if (faceCameraMode_ != FC_NONE)
@@ -116,6 +117,7 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
     {
         batches_[i].distance_ = distance_;
         batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
+        batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
     }
 }
 

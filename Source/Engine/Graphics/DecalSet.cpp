@@ -220,6 +220,8 @@ void DecalSet::UpdateBatches(const FrameInfo& frame)
     batches_[0].distance_ = distance_;
     if (!skinned_)
         batches_[0].worldTransform_ = &worldTransform;
+
+    batches_[0].shaderParameters_ = HasShaderParameters() ? &shaderParameters_ : 0;
 }
 
 void DecalSet::UpdateGeometry(const FrameInfo& frame)

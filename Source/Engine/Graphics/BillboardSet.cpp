@@ -186,6 +186,7 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
     
     batches_[0].distance_ = distance_;
     batches_[0].numWorldTransforms_ = 2;
+    batches_[0].shaderParameters_ = HasShaderParameters() ? &shaderParameters_ : 0;
     // Billboard positioning
     transforms_[0] = relative_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     // Billboard rotation

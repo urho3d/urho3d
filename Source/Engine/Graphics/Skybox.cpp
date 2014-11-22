@@ -58,6 +58,7 @@ void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResu
 
 void Skybox::UpdateBatches(const FrameInfo& frame)
 {
+    bool hasShaderParameters = HasShaderParameters();
     distance_ = 0.0f;
 
     if (frame.frameNumber_ != lastFrame_)
@@ -75,6 +76,7 @@ void Skybox::UpdateBatches(const FrameInfo& frame)
     {
         batches_[i].worldTransform_ = &it->second_;
         batches_[i].distance_ = 0.0f;
+        batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
     }
 }
 

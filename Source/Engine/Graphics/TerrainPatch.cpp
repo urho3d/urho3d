@@ -120,6 +120,7 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
     
     batches_[0].distance_ = distance_;
     batches_[0].worldTransform_ = &worldTransform;
+    batches_[0].shaderParameters_ = HasShaderParameters() ? &shaderParameters_ : 0;
     
     unsigned newLodLevel = 0;
     for (unsigned i = 0; i < lodErrors_.Size(); ++i)
