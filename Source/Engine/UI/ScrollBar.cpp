@@ -78,17 +78,17 @@ void ScrollBar::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollBar>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(ScrollBar, UIElement);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollBar, "Is Enabled", true);
-    ENUM_ACCESSOR_ATTRIBUTE(ScrollBar, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
-    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Left Image Rect", leftRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
+    COPY_BASE_ATTRIBUTES(UIElement);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
+    ATTRIBUTE(VAR_INTRECT, "Left Image Rect", leftRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(VAR_INTRECT, "Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(VAR_INTRECT, "Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(VAR_INTRECT, "Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
 }
 
 void ScrollBar::ApplyAttributes()

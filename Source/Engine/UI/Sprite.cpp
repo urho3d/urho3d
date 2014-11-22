@@ -55,27 +55,27 @@ void Sprite::RegisterObject(Context* context)
 {
     context->RegisterFactory<Sprite>(UI_CATEGORY);
 
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ONE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
-    MIXED_ACCESSOR_ATTRIBUTE(Sprite, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_INT, "Priority", GetPriority, SetPriority, int, 0, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_COLOR, "Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
-    ATTRIBUTE(Sprite, VAR_COLOR, "Top Left Color", color_[0], Color::WHITE, AM_FILE);
-    ATTRIBUTE(Sprite, VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
-    ATTRIBUTE(Sprite, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
-    ATTRIBUTE(Sprite, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
-    ATTRIBUTE(Sprite, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector2, Vector2::ONE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
+    MIXED_ACCESSOR_ATTRIBUTE("Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
+    ATTRIBUTE(VAR_COLOR, "Top Left Color", color_[0], Color::WHITE, AM_FILE);
+    ATTRIBUTE(VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
+    ATTRIBUTE(VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
+    ATTRIBUTE(VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
+    ATTRIBUTE(VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
 }
 
 bool Sprite::IsWithinScissor(const IntRect& currentScissor)

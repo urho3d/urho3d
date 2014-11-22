@@ -54,8 +54,8 @@ void ParticleEmitter2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter2D>(URHO2D_CATEGORY);
 
-    MIXED_ACCESSOR_ATTRIBUTE(ParticleEmitter2D, "Particle Effect", GetParticleEffectAttr, SetParticleEffectAttr, ResourceRef, ResourceRef(ParticleEffect2D::GetTypeStatic()), AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ParticleEmitter2D, Drawable2D);
+    MIXED_ACCESSOR_ATTRIBUTE("Particle Effect", GetParticleEffectAttr, SetParticleEffectAttr, ResourceRef, ResourceRef(ParticleEffect2D::GetTypeStatic()), AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Drawable2D);
 }
 
 void ParticleEmitter2D::OnSetEnabled()

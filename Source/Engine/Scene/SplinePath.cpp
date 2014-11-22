@@ -50,12 +50,12 @@ void SplinePath::RegisterObject(Context* context)
 {
     context->RegisterFactory<SplinePath>(LOGIC_CATEGORY);
 
-    ENUM_ACCESSOR_ATTRIBUTE(SplinePath, "Interpolation Mode", GetInterpolationMode, SetInterpolationMode, InterpolationMode, interpolationModeNames, BEZIER_CURVE, AM_FILE);
-    ATTRIBUTE(SplinePath, VAR_FLOAT, "Speed", speed_, 1.f, AM_FILE);
-    ATTRIBUTE(SplinePath, VAR_FLOAT, "Traveled", traveled_, 0.f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(SplinePath, VAR_FLOAT, "Elapsed Time", elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(SplinePath, VAR_INT, "Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
-    REF_ACCESSOR_ATTRIBUTE(SplinePath, VAR_VARIANTVECTOR, "Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NODEIDVECTOR);
+    ENUM_ACCESSOR_ATTRIBUTE("Interpolation Mode", GetInterpolationMode, SetInterpolationMode, InterpolationMode, interpolationModeNames, BEZIER_CURVE, AM_FILE);
+    ATTRIBUTE(VAR_FLOAT, "Speed", speed_, 1.f, AM_FILE);
+    ATTRIBUTE(VAR_FLOAT, "Traveled", traveled_, 0.f, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(VAR_FLOAT, "Elapsed Time", elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
+    REF_ACCESSOR_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NODEIDVECTOR);
 }
 
 void SplinePath::ApplyAttributes()

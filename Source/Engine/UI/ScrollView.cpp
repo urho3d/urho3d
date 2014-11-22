@@ -94,18 +94,18 @@ void ScrollView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollView>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Is Enabled", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
-    REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_BOOL, "Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Deceleration", GetScrollDeceleration, SetScrollDeceleration, float, 30.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_BOOL, "Auto Disable Children", GetAutoDisableChildren, SetAutoDisableChildren, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Auto Disable Threshold", GetAutoDisableThreshold, SetAutoDisableThreshold, float, 25.0f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(UIElement);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    REF_ACCESSOR_ATTRIBUTE("View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Scroll Deceleration", GetScrollDeceleration, SetScrollDeceleration, float, 30.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Auto Disable Children", GetAutoDisableChildren, SetAutoDisableChildren, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Auto Disable Threshold", GetAutoDisableThreshold, SetAutoDisableThreshold, float, 25.0f, AM_FILE);
 }
 
 void ScrollView::Update(float timeStep)

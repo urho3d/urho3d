@@ -50,11 +50,11 @@ void CheckBox::RegisterObject(Context* context)
 {
     context->RegisterFactory<CheckBox>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(CheckBox, "Is Enabled", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(CheckBox, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
-    ACCESSOR_ATTRIBUTE(CheckBox, VAR_BOOL,"Is Checked", IsChecked, SetChecked, bool, false, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(CheckBox, VAR_INTVECTOR2,"Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    COPY_BASE_ATTRIBUTES(BorderImage);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    ACCESSOR_ATTRIBUTE("Is Checked", IsChecked, SetChecked, bool, false, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE("Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)

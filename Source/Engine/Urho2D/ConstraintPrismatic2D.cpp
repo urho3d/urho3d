@@ -46,16 +46,16 @@ void ConstraintPrismatic2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintPrismatic2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_VECTOR2, "Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_VECTOR2, "Axis", GetAxis, SetAxis, Vector2, Vector2::RIGHT, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_BOOL, "Enable Limit", GetEnableLimit, SetEnableLimit, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_FLOAT, "Lower translation", GetLowerTranslation, SetLowerTranslation, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_FLOAT, "Upper translation", GetUpperTranslation, SetUpperTranslation, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_BOOL, "Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_FLOAT, "Max Motor Force", GetMaxMotorForce, SetMaxMotorForce, float, 2.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintPrismatic2D, VAR_FLOAT, "Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.7f, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE("Axis", GetAxis, SetAxis, Vector2, Vector2::RIGHT, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Enable Limit", GetEnableLimit, SetEnableLimit, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Lower translation", GetLowerTranslation, SetLowerTranslation, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Upper translation", GetUpperTranslation, SetUpperTranslation, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Motor Force", GetMaxMotorForce, SetMaxMotorForce, float, 2.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.7f, AM_DEFAULT);
 
-    COPY_BASE_ATTRIBUTES(ConstraintPrismatic2D, Constraint2D);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 void ConstraintPrismatic2D::SetAnchor(const Vector2& anchor)
 {

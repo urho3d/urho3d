@@ -241,14 +241,14 @@ public:
     SetFunctionPtr setFunction_;
 };
 
-#define COPY_BASE_ATTRIBUTES(className, sourceClassName) context->CopyBaseAttributes<sourceClassName, className>()
-#define REMOVE_ATTRIBUTE(className, name) context->RemoveAttribute<className>(name)
-#define ATTRIBUTE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
-#define ENUM_ATTRIBUTE(className, name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(name, offsetof(className, variable), enumNames, defaultValue, mode))
-#define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
-#define ENUM_ACCESSOR_ATTRIBUTE(className, name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(name, new Urho3D::AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), enumNames, defaultValue, mode))
-#define REF_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::RefAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
-#define MIXED_ACCESSOR_ATTRIBUTE(className, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::MixedAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
-#define UPDATE_ATTRIBUTE_DEFAULT_VALUE(className, name, defaultValue) context->UpdateAttributeDefaultValue<className>(name, defaultValue)
+#define COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
+#define REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
+#define ATTRIBUTE(type, name, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(type, name, offsetof(ClassName, variable), defaultValue, mode))
+#define ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, offsetof(ClassName, variable), enumNames, defaultValue, mode))
+#define ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, new Urho3D::AttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), enumNames, defaultValue, mode))
+#define REF_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::RefAttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName>(), name, new Urho3D::MixedAttributeAccessorImpl<ClassName, typeName>(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
 
 }

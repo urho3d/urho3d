@@ -45,7 +45,7 @@ CollisionPolygon2D::~CollisionPolygon2D()
 void CollisionPolygon2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionPolygon2D>(URHO2D_CATEGORY);
-    COPY_BASE_ATTRIBUTES(CollisionPolygon2D, CollisionShape2D);
+    COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionPolygon2D::SetVertexCount(unsigned count)
