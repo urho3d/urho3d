@@ -839,7 +839,7 @@ template<> inline VariantType GetVariantType<Vector4>() { return VAR_VECTOR4; }
 template<> inline VariantType GetVariantType<Quaternion>() { return VAR_QUATERNION; }
 template<> inline VariantType GetVariantType<Color>() { return VAR_COLOR; }
 template<> inline VariantType GetVariantType<String>() { return VAR_STRING; }
-template<> inline VariantType GetVariantType<PODVector<unsigned char>>() { return VAR_BUFFER; }
+template<> inline VariantType GetVariantType<PODVector<unsigned char> >() { return VAR_BUFFER; }
 template<> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOURCEREF; }
 template<> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RESOURCEREFLIST; }
 template<> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
