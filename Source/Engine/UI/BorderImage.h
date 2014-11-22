@@ -35,7 +35,7 @@ class Texture2D;
 class URHO3D_API BorderImage : public UIElement
 {
     OBJECT(BorderImage);
-    
+
 public:
     /// Construct.
     BorderImage(Context* context);
@@ -43,10 +43,10 @@ public:
     virtual ~BorderImage();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
-    
+
     /// Set texture.
     void SetTexture(Texture* texture);
     /// Set part of texture to use as the image.
@@ -65,7 +65,7 @@ public:
     void SetBlendMode(BlendMode mode);
     /// Set tiled mode.
     void SetTiled(bool enable);
-    
+
     /// Return texture.
     Texture* GetTexture() const { return texture_; }
     /// Return image rectangle.
@@ -80,16 +80,16 @@ public:
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return whether is tiled.
     bool IsTiled() const { return tiled_; }
-    
+
     /// Set texture attribute.
-    void SetTextureAttr(ResourceRef value);
+    void SetTextureAttr(const ResourceRef& value);
     /// Return texture attribute.
     ResourceRef GetTextureAttr() const;
-    
+
 protected:
     /// Return UI rendering batches with offset to image rectangle.
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
-    
+
     /// Texture.
     SharedPtr<Texture> texture_;
     /// Image rectangle.

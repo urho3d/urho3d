@@ -13,6 +13,12 @@ function Start()
     -- Execute base class startup
     SampleStart()
 
+    -- Set mouse visible
+    local platform = GetPlatform()
+    if platform ~= "Android" and platform ~= "iOS" then
+        input.mouseVisible = true
+    end
+
     -- Create the UI content
     CreateGUI()
     CreateInstructions()

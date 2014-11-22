@@ -84,24 +84,24 @@ void Camera::RegisterObject(Context* context)
 {
     context->RegisterFactory<Camera>(SCENE_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_CAMERA_FOV, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatioInternal, float, 1.0f, AM_DEFAULT);
-    ENUM_ATTRIBUTE(Camera, "Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", GetOrthoSize, SetOrthoSize, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VO_NONE, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR4, "Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR4, "Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Reflection", GetUseReflection, SetUseReflection, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Clipping", GetUseClipping, SetUseClipping, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("FOV", GetFov, SetFov, float, DEFAULT_CAMERA_FOV, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Aspect Ratio", GetAspectRatio, SetAspectRatioInternal, float, 1.0f, AM_DEFAULT);
+    ENUM_ATTRIBUTE("Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
+    ATTRIBUTE("Auto Aspect Ratio", bool, autoAspectRatio_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Orthographic Size", GetOrthoSize, SetOrthoSize, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE("View Override Flags", int, viewOverrideFlags_, VO_NONE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Use Reflection", GetUseReflection, SetUseReflection, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Use Clipping", GetUseClipping, SetUseClipping, bool, false, AM_DEFAULT);
 }
 
 void Camera::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -263,7 +263,7 @@ float Camera::GetNearClip() const
 Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
-    
+
     Matrix3x4 worldTransform = GetEffectiveWorldTransform();
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
@@ -365,7 +365,7 @@ const Frustum& Camera::GetFrustum() const
     if (frustumDirty_)
     {
         Matrix3x4 worldTransform = GetEffectiveWorldTransform();
-        
+
         if (!orthographic_)
             frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
         else
@@ -531,39 +531,39 @@ Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaterni
 {
     if (!node_)
         return rotation;
-    
+
     switch (mode)
     {
     default:
         return rotation;
-        
+
     case FC_ROTATE_XYZ:
         return node_->GetWorldRotation();
-        
+
     case FC_ROTATE_Y:
         {
             Vector3 euler = rotation.EulerAngles();
             euler.y_ = node_->GetWorldRotation().EulerAngles().y_;
             return Quaternion(euler.x_, euler.y_, euler.z_);
         }
-        
+
     case FC_LOOKAT_XYZ:
         {
             Quaternion lookAt;
             lookAt.FromLookRotation(position - node_->GetWorldPosition());
             return lookAt;
         }
-        
+
     case FC_LOOKAT_Y:
         {
             // Make the Y-only lookat happen on an XZ plane to make sure there are no unwanted transitions
             // or singularities
             Vector3 lookAtVec(position - node_->GetWorldPosition());
             lookAtVec.y_ = 0.0f;
-            
+
             Quaternion lookAt;
             lookAt.FromLookRotation(lookAtVec);
-            
+
             Vector3 euler = rotation.EulerAngles();
             euler.y_ = lookAt.EulerAngles().y_;
             return Quaternion(euler.x_, euler.y_, euler.z_);
@@ -590,7 +590,7 @@ const Matrix3x4& Camera::GetView() const
         view_ = GetEffectiveWorldTransform().Inverse();
         viewDirty_ = false;
     }
-    
+
     return view_;
 }
 
@@ -602,12 +602,12 @@ void Camera::SetAspectRatioInternal(float aspectRatio)
     MarkNetworkUpdate();
 }
 
-void Camera::SetReflectionPlaneAttr(Vector4 value)
+void Camera::SetReflectionPlaneAttr(const Vector4& value)
 {
     SetReflectionPlane(Plane(value));
 }
 
-void Camera::SetClipPlaneAttr(Vector4 value)
+void Camera::SetClipPlaneAttr(const Vector4& value)
 {
     SetClipPlane(Plane(value));
 }

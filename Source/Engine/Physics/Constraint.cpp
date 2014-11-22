@@ -82,18 +82,18 @@ void Constraint::RegisterObject(Context* context)
 {
     context->RegisterFactory<Constraint>(PHYSICS_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(Constraint, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherPosition_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_QUATERNION, "Other Body Rotation", otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
-    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "CFM Parameter", GetCFM, SetCFM, float, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_BOOL, "Disable Collision", disableCollision_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ENUM_ATTRIBUTE("Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
+    ATTRIBUTE("Position", Vector3, position_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE("Rotation", Quaternion, rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE("Other Body Position", Vector3, otherPosition_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE("Other Body Rotation", Quaternion, otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE("Other Body NodeID", int, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    ACCESSOR_ATTRIBUTE("High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("CFM Parameter", GetCFM, SetCFM, float, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Disable Collision", bool, disableCollision_, false, AM_DEFAULT);
 }
 
 void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

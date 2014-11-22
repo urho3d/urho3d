@@ -14,6 +14,11 @@ void Start()
     // Execute base class startup
     SampleStart();
 
+    // Set mouse visible
+    String platform = GetPlatform();
+    if (platform != "Android" and platform != "iOS")
+        input.mouseVisible = true;
+    
     // Create the UI content
     CreateGUI();
     CreateInstructions();

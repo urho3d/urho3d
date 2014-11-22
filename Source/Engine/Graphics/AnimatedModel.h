@@ -129,11 +129,11 @@ public:
     bool IsMaster() const { return isMaster_; }
 
     /// Set model attribute.
-    void SetModelAttr(ResourceRef value);
+    void SetModelAttr(const ResourceRef& value);
     /// Set bones' animation enabled attribute.
-    void SetBonesEnabledAttr(VariantVector value);
+    void SetBonesEnabledAttr(const VariantVector& value);
     /// Set animation states attribute.
-    void SetAnimationStatesAttr(VariantVector value);
+    void SetAnimationStatesAttr(const VariantVector& value);
     /// Set morphs attribute.
     void SetMorphsAttr(const PODVector<unsigned char>& value);
     /// Return model attribute.

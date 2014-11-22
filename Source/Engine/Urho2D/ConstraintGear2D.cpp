@@ -44,8 +44,8 @@ void ConstraintGear2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintGear2D>();
 
-    ACCESSOR_ATTRIBUTE(ConstraintGear2D, VAR_FLOAT, "Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ConstraintGear2D, Constraint2D);
+    ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint)

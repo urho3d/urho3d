@@ -71,23 +71,23 @@ void Zone::RegisterObject(Context* context)
 {
     context->RegisterFactory<Zone>(SCENE_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(Zone, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Height", fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Height Scale", fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_BOOL, "Height Fog Mode", heightFog_, false, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Zone, VAR_RESOURCEREF, "Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Zone, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Bounding Box Min", Vector3, boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
+    ATTRIBUTE("Bounding Box Max", Vector3, boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
+    ATTRIBUTE("Ambient Color", Color, ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    ATTRIBUTE("Fog Color", Color, fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
+    ATTRIBUTE("Fog Start", float, fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
+    ATTRIBUTE("Fog End", float, fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
+    ATTRIBUTE("Fog Height", float, fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
+    ATTRIBUTE("Fog Height Scale", float, fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
+    ATTRIBUTE("Height Fog Mode", bool, heightFog_, false, AM_DEFAULT);
+    ATTRIBUTE("Override Mode", bool, override_, false, AM_DEFAULT);
+    ATTRIBUTE("Ambient Gradient", bool, ambientGradient_, false, AM_DEFAULT);
+    ATTRIBUTE("Priority", int, priority_, 0, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -225,7 +225,7 @@ bool Zone::IsInside(const Vector3& point) const
     return boundingBox_.IsInside(localPoint) != OUTSIDE;
 }
 
-void Zone::SetZoneTextureAttr(ResourceRef value)
+void Zone::SetZoneTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     zoneTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
@@ -247,10 +247,10 @@ void Zone::OnMarkedDirty(Node* node)
     }
 
     Drawable::OnMarkedDirty(node);
-    
+
     // Clear zone reference from all drawables inside the bounding box, and mark gradient dirty in neighbor zones
     ClearDrawablesZone();
-    
+
     inverseWorldDirty_ = true;
 }
 

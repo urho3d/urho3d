@@ -46,12 +46,12 @@ void ConstraintMotor2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintMotor2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_VECTOR2, "Linear Offset", GetLinearOffset, SetLinearOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Angular Offset", GetAngularOffset, SetAngularOffset, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Max Force", GetMaxForce, SetMaxForce, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Max Torque", GetMaxTorque, SetMaxTorque, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintMotor2D, VAR_FLOAT, "Correction Factor", GetCorrectionFactor, SetCorrectionFactor, float, 0.3f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ConstraintMotor2D, Constraint2D);
+    ACCESSOR_ATTRIBUTE("Linear Offset", GetLinearOffset, SetLinearOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Angular Offset", GetAngularOffset, SetAngularOffset, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Force", GetMaxForce, SetMaxForce, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Torque", GetMaxTorque, SetMaxTorque, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Correction Factor", GetCorrectionFactor, SetCorrectionFactor, float, 0.3f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintMotor2D::SetLinearOffset(const Vector2& linearOffset)

@@ -195,7 +195,7 @@ public:
     /// Component removed. Remove from ID map.
     void ComponentRemoved(Component* component);
     /// Set node user variable reverse mappings.
-    void SetVarNamesAttr(String value);
+    void SetVarNamesAttr(const String& value);
     /// Return node user variable reverse mappings.
     String GetVarNamesAttr() const;
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.

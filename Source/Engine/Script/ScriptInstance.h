@@ -57,7 +57,7 @@ enum ScriptInstanceMethod
 class URHO3D_API ScriptInstance : public Component, public ScriptEventListener
 {
     OBJECT(ScriptInstance);
-    
+
 public:
     /// Construct.
     ScriptInstance(Context* context);
@@ -65,7 +65,7 @@ public:
     virtual ~ScriptInstance();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access.
@@ -106,24 +106,24 @@ public:
     void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Clear pending delay-executed method calls. If empty declaration given, clears all.
     void ClearDelayedExecute(const String& declaration = String::EMPTY);
-    
+
     /// Return script file.
     ScriptFile* GetScriptFile() const { return scriptFile_; }
     /// Return script object.
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
     /// Return class name.
     const String& GetClassName() const { return className_; }
-    
+
     /// Set script file attribute.
-    void SetScriptFileAttr(ResourceRef value);
+    void SetScriptFileAttr(const ResourceRef& value);
     /// Set delayed method calls attribute.
-    void SetDelayedCallsAttr(PODVector<unsigned char> value);
+    void SetDelayedCallsAttr(const PODVector<unsigned char>& value);
     /// Set fixed update time accumulator attribute.
     void SetFixedUpdateAccAttr(float value);
     /// Set script file serialization attribute by calling a script function.
-    void SetScriptDataAttr(PODVector<unsigned char> data);
+    void SetScriptDataAttr(const PODVector<unsigned char>& data);
     /// Set script network serialization attribute by calling a script function.
-    void SetScriptNetworkDataAttr(PODVector<unsigned char> data);
+    void SetScriptNetworkDataAttr(const PODVector<unsigned char>& data);
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
@@ -134,11 +134,11 @@ public:
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
-    
+
 protected:
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    
+
 private:
     /// (Re)create the script object and check for supported methods if successfully created.
     void CreateObject();
@@ -170,7 +170,7 @@ private:
     void HandleScriptFileReload(StringHash eventType, VariantMap& eventData);
     /// Handle script file reload finished.
     void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
-    
+
     /// Script subsystem.
     SharedPtr<Script> script_;
     /// Script file.

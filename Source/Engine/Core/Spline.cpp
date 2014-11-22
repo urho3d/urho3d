@@ -33,11 +33,6 @@ const char* interpolationModeNames[] =
     0
 };
 
-template<> InterpolationMode Variant::Get<InterpolationMode>() const
-{
-    return (InterpolationMode) GetInt();
-}
-
 Spline::Spline() :
     interpolationMode_(BEZIER_CURVE)
 {

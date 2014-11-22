@@ -36,7 +36,7 @@ class Text;
 class URHO3D_API Text3D : public Drawable
 {
     OBJECT(Text3D);
-    
+
 public:
     /// Construct.
     Text3D(Context* context);
@@ -44,7 +44,7 @@ public:
     ~Text3D();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -53,7 +53,7 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
-    
+
     /// Set font and font size and use signed distance field font. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size and use signed distance field font. Return true if successful.
@@ -90,7 +90,7 @@ public:
     void SetOpacity(float opacity);
     /// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
     void SetFaceCameraMode(FaceCameraMode mode);
-    
+
     /// Return font.
     Font* GetFont() const;
     /// Return material.
@@ -135,24 +135,24 @@ public:
     float GetOpacity() const;
     /// Return how the text rotates in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
-    
+
     /// Set font attribute.
-    void SetFontAttr(ResourceRef value);
+    void SetFontAttr(const ResourceRef& value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
     /// Set material attribute.
-    void SetMaterialAttr(ResourceRef value);
+    void SetMaterialAttr(const ResourceRef& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Get color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return text_.color_[0]; }
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
 private:
     /// Mark text & geometry dirty.
     void MarkTextDirty();
@@ -162,7 +162,7 @@ private:
     void UpdateTextBatches();
     /// Create materials for text rendering. May only be called from the main thread. Text %UI batches must be up-to-date.
     void UpdateTextMaterials(bool forceUpdate = false);
-    
+
     /// Internally used text element.
     Text text_;
     /// Geometries.

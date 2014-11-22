@@ -73,7 +73,7 @@ struct TriangleMeshData : public CollisionGeometryData
     TriangleMeshData(CustomGeometry* custom);
     /// Destruct. Free geometry data.
     ~TriangleMeshData();
-    
+
     /// Bullet triangle mesh interface.
     TriangleMeshInterface* meshInterface_;
     /// Bullet triangle mesh collision shape.
@@ -91,10 +91,10 @@ struct ConvexData : public CollisionGeometryData
     ConvexData(CustomGeometry* custom);
     /// Destruct. Free geometry data.
     ~ConvexData();
-    
+
     /// Build the convex hull from vertices.
     void BuildHull(const PODVector<Vector3>& vertices);
-    
+
     /// Vertex data.
     SharedArrayPtr<Vector3> vertexData_;
     /// Number of vertices.
@@ -112,7 +112,7 @@ struct HeightfieldData : public CollisionGeometryData
     HeightfieldData(Terrain* terrain);
     /// Destruct. Free geometry data.
     ~HeightfieldData();
-    
+
     /// Height data.
     SharedArrayPtr<float> heightData_;
     /// Vertex spacing.
@@ -129,7 +129,7 @@ struct HeightfieldData : public CollisionGeometryData
 class URHO3D_API CollisionShape : public Component
 {
     OBJECT(CollisionShape);
-    
+
 public:
     /// Construct.
     CollisionShape(Context* context);
@@ -137,7 +137,7 @@ public:
     virtual ~CollisionShape();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
@@ -146,7 +146,7 @@ public:
     virtual void OnSetEnabled();
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a sphere.
@@ -185,7 +185,7 @@ public:
     void SetModel(Model* model);
     /// Set model LOD level.
     void SetLodLevel(unsigned lodLevel);
-    
+
     /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_; }
     /// Return the shared geometry data.
@@ -208,22 +208,22 @@ public:
     unsigned GetLodLevel() const { return lodLevel_; }
     /// Return world-space bounding box.
     BoundingBox GetWorldBoundingBox() const;
-    
+
     /// Update the new collision shape to the RigidBody.
     void NotifyRigidBody(bool updateMass = true);
     /// Set model attribute.
-    void SetModelAttr(ResourceRef value);
+    void SetModelAttr(const ResourceRef& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Release the collision shape.
     void ReleaseShape();
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    
+
 private:
     /// Find the parent rigid body component and return its compound collision shape.
     btCompoundShape* GetParentCompoundShape();

@@ -56,6 +56,11 @@ void UIDrag::Start()
     // Execute base class startup
     Sample::Start();
 
+    // Set mouse visible
+    String platform = GetPlatform();
+    if (platform != "Android" && platform != "iOS")
+        GetSubsystem<Input>()->SetMouseVisible(true);
+
     // Create the UI content
     CreateGUI();
     CreateInstructions();
