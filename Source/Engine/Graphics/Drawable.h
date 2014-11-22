@@ -89,6 +89,8 @@ struct SourceBatch
     Geometry* geometry_;
     /// Material.
     SharedPtr<Material> material_;
+    /// Shader parameters.
+    HashMap<StringHash, MaterialShaderParameter>* shaderParameters_;
     /// World transform(s). For a skinned model, these are the bone transforms.
     const Matrix3x4* worldTransform_;
     /// Number of world transforms.

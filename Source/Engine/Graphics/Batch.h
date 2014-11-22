@@ -64,7 +64,7 @@ struct Batch
         worldTransform_(rhs.worldTransform_),
         numWorldTransforms_(rhs.numWorldTransforms_),
         lightQueue_(0),
-        shaderParameters_(0),
+        shaderParameters_(rhs.shaderParameters_),
         geometryType_(rhs.geometryType_),
         overrideView_(rhs.overrideView_),
         isBase_(false)
@@ -207,6 +207,7 @@ struct BatchGroupKey
         lightQueue_(batch.lightQueue_),
         pass_(batch.pass_),
         material_(batch.material_),
+        shaderParameters_(batch.shaderParameters_),
         geometry_(batch.geometry_)
     {
     }
@@ -219,13 +220,15 @@ struct BatchGroupKey
     Pass* pass_;
     /// Material.
     Material* material_;
+    /// Shader parameters.
+    HashMap<StringHash, MaterialShaderParameter>* shaderParameters_;
     /// Geometry.
     Geometry* geometry_;
     
     /// Test for equality with another batch group key.
-    bool operator == (const BatchGroupKey& rhs) const { return zone_ == rhs.zone_ && lightQueue_ == rhs.lightQueue_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
+    bool operator == (const BatchGroupKey& rhs) const { return zone_ == rhs.zone_ && lightQueue_ == rhs.lightQueue_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_ && shaderParameters_ == rhs.shaderParameters_; }
     /// Test for inequality with another batch group key.
-    bool operator != (const BatchGroupKey& rhs) const { return zone_ != rhs.zone_ || lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
+    bool operator != (const BatchGroupKey& rhs) const { return zone_ != rhs.zone_ || lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_ || shaderParameters_ != rhs.shaderParameters_; }
     
     /// Return hash value.
     unsigned ToHash() const;

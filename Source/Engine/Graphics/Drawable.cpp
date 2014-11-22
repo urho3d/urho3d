@@ -132,12 +132,14 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
 {
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    bool hasShaderParameters = HasShaderParameters();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].distance_ = distance_;
         batches_[i].worldTransform_ = &worldTransform;
+        batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
     }
 
     float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);

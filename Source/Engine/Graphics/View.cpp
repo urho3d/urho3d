@@ -1178,7 +1178,7 @@ void View::GetBatches()
                         destBatch.lightQueue_ = 0;
                     
                     bool allowInstancing = info.allowInstancing_;
-                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (zone->GetLightMask() & 0xff) || destBatch.shaderParameters_)
+                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (zone->GetLightMask() & 0xff))
                         allowInstancing = false;
                     
                     AddBatchToQueue(*info.batchQueue_, destBatch, tech, allowInstancing);
@@ -2683,9 +2683,9 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         batch.material_ = renderer_->GetDefaultMaterial();
     
     // Convert to instanced if possible
-    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.overrideView_)
+    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.overrideView_ && !batch.shaderParameters_)
         batch.geometryType_ = GEOM_INSTANCED;
-    
+
     if (batch.geometryType_ == GEOM_INSTANCED)
     {
         BatchGroupKey key(batch);

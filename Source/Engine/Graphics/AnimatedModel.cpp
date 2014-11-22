@@ -226,6 +226,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
+    bool hasShaderParameters = HasShaderParameters();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
     // Note: per-geometry distances do not take skinning into account. Especially in case of a ragdoll they may be
@@ -233,10 +234,16 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     if (batches_.Size() > 1)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
             batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
+            batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
+        }
     }
     else if (batches_.Size() == 1)
+    {
         batches_[0].distance_ = distance_;
+        batches_[0].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
+    }
 
     // Use a transformed version of the model's bounding box instead of world bounding box for LOD scale
     // determination so that animation does not change the scale

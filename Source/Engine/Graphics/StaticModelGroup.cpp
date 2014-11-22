@@ -164,6 +164,7 @@ void StaticModelGroup::UpdateBatches(const FrameInfo& frame)
     // Getting the world bounding box ensures the transforms are updated
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    bool hasShaderParameters = HasShaderParameters();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
     
     if (batches_.Size() > 1)
@@ -173,6 +174,8 @@ void StaticModelGroup::UpdateBatches(const FrameInfo& frame)
             batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
             batches_[i].worldTransform_ = numWorldTransforms_ ? &worldTransforms_[0] : &Matrix3x4::IDENTITY;
             batches_[i].numWorldTransforms_ = numWorldTransforms_;
+            batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
+            batches_[i].geometryType_ = GEOM_INSTANCED;
         }
     }
     else if (batches_.Size() == 1)
@@ -180,6 +183,8 @@ void StaticModelGroup::UpdateBatches(const FrameInfo& frame)
         batches_[0].distance_ = distance_;
         batches_[0].worldTransform_ = numWorldTransforms_ ? &worldTransforms_[0] : &Matrix3x4::IDENTITY;
         batches_[0].numWorldTransforms_ = numWorldTransforms_;
+        batches_[0].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
+        batches_[0].geometryType_ = GEOM_INSTANCED;
     }
     
     float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);

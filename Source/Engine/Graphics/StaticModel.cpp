@@ -127,6 +127,7 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
 {
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    bool hasShaderParameters = HasShaderParameters();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
     
     if (batches_.Size() > 1)
@@ -135,12 +136,14 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
         {
             batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
             batches_[i].worldTransform_ = &worldTransform;
+            batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
         }
     }
     else if (batches_.Size() == 1)
     {
         batches_[0].distance_ = distance_;
         batches_[0].worldTransform_ = &worldTransform;
+        batches_[0].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
     }
     
     float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
