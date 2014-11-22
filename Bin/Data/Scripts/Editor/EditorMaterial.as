@@ -411,8 +411,10 @@ void SaveMaterial()
     if (fullName.empty)
         return;
 
+    MakeBackup(fullName);
     File saveFile(fullName, FILE_WRITE);
-    editMaterial.Save(saveFile);
+    bool success = editMaterial.Save(saveFile);
+    RemoveBackup(success, fullName);
 }
 
 void SaveMaterialAs()
@@ -453,10 +455,12 @@ void SaveMaterialAsDone(StringHash eventType, VariantMap& eventData)
     if (GetExtension(fullName).empty && filter != "*.*")
         fullName = fullName + filter.Substring(1);
 
+    MakeBackup(fullName);
     File saveFile(fullName, FILE_WRITE);
     if (editMaterial.Save(saveFile))
     {
         saveFile.Close();
+        RemoveBackup(true, fullName);
 
         // Load the new resource to update the name in the editor
         Material@ newMat = cache.GetResource("Material", GetResourceNameFromFullName(fullName));

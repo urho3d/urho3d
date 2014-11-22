@@ -253,7 +253,9 @@ void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable* drawable = *start++;
-        drawable->UpdateGeometry(frame);
+        // We may leave null pointer holes in the queue if a drawable is found out to require a main thread update
+        if (drawable)
+            drawable->UpdateGeometry(frame);
     }
 }
 
@@ -487,7 +489,6 @@ void View::Update(const FrameInfo& frame)
     // Clear buffers, geometry, light, occluder & batch list
     renderTargets_.Clear();
     geometries_.Clear();
-    shadowGeometries_.Clear();
     lights_.Clear();
     zones_.Clear();
     occluders_.Clear();
@@ -877,6 +878,9 @@ void View::GetBatches()
     if (!octree_ || !camera_)
         return;
     
+    nonThreadedGeometries_.Clear();
+    threadedGeometries_.Clear();
+    
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
@@ -975,10 +979,15 @@ void View::GetBatches()
                         k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
                     {
                         Drawable* drawable = *k;
+                        // If drawable is not in actual view frustum, mark it in view here and check its geometry update type
                         if (!drawable->IsInView(frame_, true))
                         {
                             drawable->MarkInView(frame_.frameNumber_, 0);
-                            shadowGeometries_.Push(drawable);
+                            UpdateGeometryType type = drawable->GetUpdateGeometryType();
+                            if (type == UPDATE_MAIN_THREAD)
+                                nonThreadedGeometries_.Push(drawable);
+                            else if (type == UPDATE_WORKER_THREAD)
+                                threadedGeometries_.Push(drawable);
                         }
                         
                         Zone* zone = GetZone(drawable);
@@ -1075,13 +1084,19 @@ void View::GetBatches()
         }
     }
     
-    // Build base pass batches
+    // Build base pass batches and find out the geometry update queue (threaded or nonthreaded) drawables should end up to
     {
         PROFILE(GetBaseBatches);
         
         for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
         {
             Drawable* drawable = *i;
+            UpdateGeometryType type = drawable->GetUpdateGeometryType();
+            if (type == UPDATE_MAIN_THREAD)
+                nonThreadedGeometries_.Push(drawable);
+            else if (type == UPDATE_WORKER_THREAD)
+                threadedGeometries_.Push(drawable);
+            
             Zone* zone = GetZone(drawable);
             const Vector<SourceBatch>& batches = drawable->GetBatches();
             
@@ -1175,7 +1190,6 @@ void View::UpdateGeometries()
     
     // Sort batches
     {
-     
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
@@ -1213,28 +1227,20 @@ void View::UpdateGeometries()
     
     // Update geometries. Split into threaded and non-threaded updates.
     {
-        nonThreadedGeometries_.Clear();
-        threadedGeometries_.Clear();
-        
-        for (PODVector<Drawable*>::Iterator i = geometries_.Begin(); i != geometries_.End(); ++i)
-        {
-            UpdateGeometryType type = (*i)->GetUpdateGeometryType();
-            if (type == UPDATE_MAIN_THREAD)
-                nonThreadedGeometries_.Push(*i);
-            else if (type == UPDATE_WORKER_THREAD)
-                threadedGeometries_.Push(*i);
-        }
-        for (PODVector<Drawable*>::Iterator i = shadowGeometries_.Begin(); i != shadowGeometries_.End(); ++i)
-        {
-            UpdateGeometryType type = (*i)->GetUpdateGeometryType();
-            if (type == UPDATE_MAIN_THREAD)
-                nonThreadedGeometries_.Push(*i);
-            else if (type == UPDATE_WORKER_THREAD)
-                threadedGeometries_.Push(*i);
-        }
-        
         if (threadedGeometries_.Size())
         {
+            // In special cases (context loss, multi-view) a drawable may theoretically first have reported a threaded update, but will actually
+            // require a main thread update. Check these cases first and move as applicable. The threaded work routine will tolerate the null
+            // pointer holes that we leave to the threaded update queue.
+            for (PODVector<Drawable*>::Iterator i = threadedGeometries_.Begin(); i != threadedGeometries_.End(); ++i)
+            {
+                if ((*i)->GetUpdateGeometryType() == UPDATE_MAIN_THREAD)
+                {
+                    nonThreadedGeometries_.Push(*i);
+                    *i = 0;
+                }
+            }
+            
             int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
             int drawablesPerItem = threadedGeometries_.Size() / numWorkItems;
             

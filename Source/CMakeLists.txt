@@ -56,7 +56,7 @@ if (CMAKE_HOST_WIN32)
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (PATH_SUFFIX /Urho3D)
-    if (URHO3D_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores URHO3D_64BIT build option
+    if (URHO3D_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
             # Probably target system is a RedHat-based distro
             set (LIB_SUFFIX 64)
@@ -122,7 +122,9 @@ if (URHO3D_64BIT)
 endif ()
 set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
 if (WIN32 AND NOT URHO3D_OPENGL)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)    # Stands for Direct 3D
+elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
 endif ()
 if ("$ENV{RELEASE_TAG}" STREQUAL "")
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
@@ -130,7 +132,7 @@ endif ()
 include (CPack)
 
 # Setup RPATH settings
-if (NOT WIN32)
+if (NOT WIN32 AND NOT ANDROID)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree
@@ -153,7 +155,7 @@ if (NOT WIN32)
 endif ()
 
 # Add targets
-foreach (TARGET Box2D Civetweb FreeType JO LZ4 PugiXml SDL StanHull STB)
+foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -168,6 +170,7 @@ if (URHO3D_LUA)
 endif ()
 
 if (URHO3D_NETWORK)
+    add_subdirectory (ThirdParty/Civetweb)
     add_subdirectory (ThirdParty/kNet)
 endif ()
 
@@ -178,6 +181,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
+endif ()
+
+if (URHO3D_URHO2D)
+    add_subdirectory (ThirdParty/Box2D)
 endif ()
 
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)

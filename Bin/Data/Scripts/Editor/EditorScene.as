@@ -234,9 +234,11 @@ bool SaveScene(const String&in fileName)
     // Unpause when saving so that the scene will work properly when loaded outside the editor
     editorScene.updateEnabled = true;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
     bool success = (extension != ".xml" ? editorScene.Save(file) : editorScene.SaveXML(file));
+    RemoveBackup(success, fileName);
 
     editorScene.updateEnabled = false;
 
@@ -418,6 +420,7 @@ bool SaveNode(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     if (!file.open)
     {
@@ -427,6 +430,8 @@ bool SaveNode(const String&in fileName)
 
     String extension = GetExtension(fileName);
     bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
+    RemoveBackup(success, fileName);
+
     if (success)
         instantiateFileName = fileName;
     else

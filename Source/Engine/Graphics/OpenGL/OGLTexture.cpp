@@ -72,6 +72,7 @@ Texture::Texture(Context* context) :
     Resource(context),
     GPUObject(GetSubsystem<Graphics>()),
     usage_(TEXTURE_STATIC),
+    format_(0),
     levels_(0),
     requestedLevels_(0),
     width_(0),

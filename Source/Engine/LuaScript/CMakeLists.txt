@@ -58,6 +58,11 @@ if (NOT URHO3D_PHYSICS)
     list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/PhysicsLuaAPI.pkg)
 endif ()
 
+# Remove Urho2DLuaAPI.pkg
+if (NOT URHO3D_URHO2D)
+    list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/Urho2DLuaAPI.pkg)
+endif ()
+
 foreach (API_PKG_FILE ${API_PKG_FILES})
     get_filename_component (NAME ${API_PKG_FILE} NAME)
     string (REGEX REPLACE LuaAPI\\.pkg$ "" API ${NAME})
@@ -80,8 +85,8 @@ set (AMALG_SINGLE_TARGET 1)
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
-set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI  ../Urho2D
-    ../../ThirdParty/Box2D ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
+set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI
+    ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
 
 if (URHO3D_NAVIGATION)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Navigation)
@@ -93,6 +98,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Physics ../../ThirdParty/Bullet/src)
+endif ()
+
+if (URHO3D_URHO2D)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Urho2D ../../ThirdParty/Box2D)
 endif ()
 
 # Setup target

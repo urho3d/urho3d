@@ -1449,9 +1449,26 @@ Key events include both the symbolic keycode ("Key") that depends on the keyboar
 
 The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down. To check whether keys are down or pressed by scancode, use \ref Input::GetScancodeDown "GetScancodeDown()" and \ref Input::GetScancodePress "GetScancodePress()". Functions also exist for converting keycodes to scancodes or vice versa, or getting key names. See for example \ref Input::GetKeyName "GetKeyName()" and \ref Input::GetKeyFromScancode "GetKeyFromScancode()".
 
-Mouse motion since the last frame can be accessed with \ref Input::GetMouseMove() "GetMouseMove()". When the operating system mouse cursor is hidden, it will be kept centered to the application window to allow "endless" movement in any direction, for example for camera control. The cursor position within the window can be queried with \ref Input::GetMousePosition "GetMousePosition()", but that should only be used with a visible cursor (when no automatic centering is being done.)
+Mouse motion since the last frame can be accessed with \ref Input::GetMouseMove() "GetMouseMove()".  The cursor position within the window can be queried with \ref Input::GetMousePosition "GetMousePosition()".
 
 In AngelScript, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.scancodeDown[], input.scancodePress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove, input.mousePosition.
+
+\section InputMouseModes Mouse modes
+
+The operating system mouse cursor can be used in three modes which can be switched with \ref Input::SetMouseMode() "SetMouseMode()".
+
+- MM_ABSOLUTE is the default behaviour, allowing the toggling of operating system cursor visibility and allowing the cursor to escape the window when visible.
+  When the operating system cursor is invisible in absolute mouse mode, the mouse is confined to the window.
+  If the operating system and %UI cursors are both invisible, interaction with the \ref UI "user interface" will be limited (eg: drag move / drag end events will not trigger).
+  SetMouseMode(MM_ABSOLUTE) will call SetMouseGrabbed(false).
+
+- MM_RELATIVE sets the operating system cursor to invisible and confines the cursor to the window.
+  The operating system cursor cannot be set to be visible in this mode via SetMouseVisible(), however changes are tracked and will be restored when another mouse mode is set.
+  When the virtual cursor is also invisible, %UI interaction will still function as normal (eg: drag events will trigger).
+  SetMouseMode(MM_RELATIVE) will call SetMouseGrabbed(true).
+
+- MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
+  SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
 
 \section InputJoystick Joystick input
 

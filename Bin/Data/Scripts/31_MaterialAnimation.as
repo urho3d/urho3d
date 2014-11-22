@@ -62,6 +62,8 @@ void CreateScene()
     specColorAnimation.SetKeyFrame(1.0f, Variant(Color(1.0f, 0.0f, 0.0f, 2.0f)));
     specColorAnimation.SetKeyFrame(2.0f, Variant(Color(1.0f, 1.0f, 0.0f, 2.0f)));
     specColorAnimation.SetKeyFrame(3.0f, Variant(Color(0.1f, 0.1f, 0.1f, 16.0f)));
+    // Optionally associate material with scene to make sure shader parameter animation respects scene time scale
+    mushroomMat.scene = scene_;
     mushroomMat.SetShaderParameterAnimation("MatSpecColor", specColorAnimation);
 
     const uint NUM_OBJECTS = 200;

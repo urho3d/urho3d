@@ -372,6 +372,17 @@ void LuaScriptInstance::SetScriptNetworkDataAttr(PODVector<unsigned char> data)
     }
 }
 
+void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, int functionIndex)
+{
+    WeakPtr<LuaFunction> function = luaScript_->GetFunction(functionIndex);
+    if (function)
+    {
+        StringHash eventType(eventName);
+        SubscribeToEvent(eventType, HANDLER(LuaScriptInstance, HandleEvent));
+        eventTypeToFunctionMap_[eventType] = function;
+    }
+}
+
 void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, const String& functionName)
 {
     String realFunctionName = functionName.Replaced(":", ".");
@@ -404,6 +415,18 @@ void LuaScriptInstance::ScriptUnsubscribeFromAllEvents()
 
     UnsubscribeFromAllEvents();
     eventTypeToFunctionMap_.Clear();
+}
+
+void LuaScriptInstance::ScriptSubscribeToEvent(void* sender, const String& eventName, int functionIndex)
+{
+    WeakPtr<LuaFunction> function = luaScript_->GetFunction(functionIndex);
+    if (function)
+    {
+        Object* object = (Object*)sender;
+        StringHash eventType(eventName);
+        SubscribeToEvent(object, eventType, HANDLER(LuaScriptInstance, HandleObjectEvent));
+        objectToEventTypeToFunctionMap_[object][eventType] = function;
+    }
 }
 
 void LuaScriptInstance::ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName)

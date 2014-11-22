@@ -119,6 +119,8 @@ void CreateAttributeInspectorWindow()
     attributeInspectorWindow.opacity = uiMaxOpacity;
     attributeInspectorWindow.BringToFront();
 
+    UpdateAttributeInspector();
+
     SubscribeToEvent(attributeInspectorWindow.GetChild("CloseButton", true), "Released", "HideAttributeInspectorWindow");
     SubscribeToEvent(attributeInspectorWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
 }
@@ -703,7 +705,10 @@ String GetVariableName(StringHash hash)
     // Then from the UIElement variable names
     if (name.empty && uiElementVarNames.Contains(hash))
         name = uiElementVarNames[hash].ToString();
-    return name;    // Since this is a reverse mapping, it does not really matter from which side the name is retrieved back
+    // Finally just convert to hexadecimal
+    if (name.empty)
+        name = hash.ToString();
+    return name;
 }
 
 bool inSetStyleListSelection = false;

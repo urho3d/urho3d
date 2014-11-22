@@ -20,19 +20,43 @@
 # THE SOFTWARE.
 #
 
+# Set the build type if not explicitly set, for single-configuration generator only
+if (CMAKE_GENERATOR STREQUAL Xcode)
+    set (XCODE TRUE)
+endif ()
+if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE Release)
+endif ()
+if (CMAKE_HOST_WIN32)
+    execute_process (COMMAND uname -o RESULT_VARIABLE UNAME_EXIT_CODE OUTPUT_VARIABLE UNAME_OPERATING_SYSTEM ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (UNAME_EXIT_CODE EQUAL 0 AND UNAME_OPERATING_SYSTEM STREQUAL Msys)
+        set (MSYS 1)
+    endif ()
+endif ()
+
 # Define all supported build options
 include (CMakeDependentOption)
-option (ANDROID "Setup build for Android platform")
-option (RASPI "Setup build for Raspberry Pi platform")
-option (IOS "Setup build for iOS platform")
 option (URHO3D_MODERN_CPP "Enable modern cpp dialect/standard")
 option (URHO3D_AMALG "Enable amalgamated build")
+cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC)
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
     execute_process (COMMAND echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
     string (REGEX MATCH "#define +__x86_64__ +1" matched "${PREDEFINED_MACROS}")
+    if (NOT matched)
+        string (REGEX MATCH "#define +__aarch64__ +1" matched "${PREDEFINED_MACROS}")
+    endif ()
     if (matched)
         set (URHO3D_DEFAULT_64BIT TRUE)
+    endif ()
+    # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
+    # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
+    if (NOT ANDROID)
+        string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
+        if (matched)
+            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too
+            set (RASPI TRUE CACHE STRING "Setup build for Raspberry Pi platform")
+        endif ()
     endif ()
 endif ()
 option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
@@ -42,6 +66,7 @@ option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 option (URHO3D_NETWORK "Enable networking support" TRUE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
+option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (MINGW AND NOT DEFINED URHO3D_SSE)
     # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
     execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
@@ -92,22 +117,15 @@ else ()
     unset (URHO3D_SCP_TO_TARGET CACHE)
 endif ()
 if (ANDROID)
-    set (ANDROID_ABI armeabi-v7a CACHE STRING "Specify ABI for native code (Android build only), possible values are armeabi-v7a (default) and armeabi")
+    set (ANDROID TRUE CACHE STRING "Setup build for Android platform")  # Cache the CMake variable
+    set (ANDROID_ABI armeabi-v7a CACHE STRING "Specify ABI for native code (Android build only), possible values are armeabi, armeabi-v7a (default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, armeabi-v6 with VFP, arm64-v8a, x86, and x86_64")
+    cmake_dependent_option (URHO3D_NDK_GDB "Enable ndk-gdb for debugging (Android build only)" FALSE "CMAKE_BUILD_TYPE STREQUAL Debug" FALSE)
 else ()
     unset (ANDROID_ABI CACHE)
-endif ()
-
-# Set the build type if not explicitly set, for single-configuration generator only
-if (CMAKE_GENERATOR STREQUAL Xcode)
-    set (XCODE TRUE)
-endif ()
-if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release)
-endif ()
-if (CMAKE_HOST_WIN32)
-    execute_process (COMMAND uname -o RESULT_VARIABLE UNAME_EXIT_CODE OUTPUT_VARIABLE UNAME_OPERATING_SYSTEM ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (UNAME_EXIT_CODE EQUAL 0 AND UNAME_OPERATING_SYSTEM STREQUAL Msys)
-        set (MSYS 1)
+    unset (URHO3D_NDK_GDB CACHE)
+    if (ANDROID_ABI)
+        # Just reference it to suppress "unused variable" CMake warning on non-Android project
+        # Due to the design of cmake_gcc.sh currently, the script can be used to configure/generate Android project and other non-Android projects in one go
     endif ()
 endif ()
 
@@ -227,6 +245,11 @@ if (URHO3D_PHYSICS)
     add_definitions (-DURHO3D_PHYSICS)
 endif ()
 
+# Add definition for Urho2D
+if (URHO3D_URHO2D)
+    add_definitions (-DURHO3D_URHO2D)
+endif ()
+
 # Default library type is STATIC
 if (URHO3D_LIB_TYPE)
     string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
@@ -332,10 +355,6 @@ else ()
         # Most of the flags are already setup in android.toolchain.cmake module
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector")
-        if (URHO3D_64BIT)
-            # TODO: Revisit this again when ARM also support 64bit
-            # For now just reference it to suppress "unused variable" warning
-        endif ()
     else ()
         if (RASPI)
             add_definitions (-DRASPI)
@@ -416,6 +435,24 @@ elseif (CMAKE_CROSSCOMPILING)
     endif ()
 endif ()
 set_output_directories (${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Bin RUNTIME PDB)
+
+# Enable Android ndk-gdb
+if (URHO3D_NDK_GDB)
+    set (NDK_GDB_SOLIB_PATH ${PROJECT_BINARY_DIR}/obj/local/${ANDROID_NDK_ABI_NAME}/)
+    file (MAKE_DIRECTORY ${NDK_GDB_SOLIB_PATH})
+    set (NDK_GDB_JNI ${PROJECT_BINARY_DIR}/jni)
+    set (NDK_GDB_MK "# This is a generated file. DO NOT EDIT!\n\nAPP_ABI := ${ANDROID_NDK_ABI_NAME}\n")
+    foreach (MK Android.mk Application.mk)
+        if (NOT EXISTS ${NDK_GDB_JNI}/${MK})
+            file (WRITE ${NDK_GDB_JNI}/${MK} ${NDK_GDB_MK})
+        endif ()
+    endforeach ()
+    get_directory_property (INCLUDE_DIRECTORIES DIRECTORY ${PROJECT_SOURCE_DIR} INCLUDE_DIRECTORIES)
+    string (REPLACE ";" " " INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}")   # Note: need to always "stringify" a variable in list context for replace to work correctly
+    set (NDK_GDB_SETUP "# This is a generated file. DO NOT EDIT!\n\nset solib-search-path ${NDK_GDB_SOLIB_PATH}\ndirectory ${INCLUDE_DIRECTORIES}\n")
+    file (WRITE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdb.setup ${NDK_GDB_SETUP})
+    file (COPY ${ANDROID_NDK}/prebuilt/android-${ANDROID_ARCH_NAME}/gdbserver/gdbserver DESTINATION ${ANDROID_LIBRARY_OUTPUT_PATH})
+endif ()
 
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
@@ -584,6 +621,9 @@ macro (setup_library)
         if (URHO3D_LIB_TYPE STREQUAL SHARED)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
         endif ()
+    elseif (URHO3D_SCP_TO_TARGET)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
+            COMMENT "Scp-ing ${TARGET_NAME} library to target system")
     endif ()
 endmacro ()
 
@@ -605,8 +645,9 @@ macro (setup_executable)
     
     if (IOS)
         set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
-    elseif (CMAKE_CROSSCOMPILING AND NOT ANDROID AND URHO3D_SCP_TO_TARGET)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0)
+    elseif (URHO3D_SCP_TO_TARGET)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
+            COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
     if (DEST_RUNTIME_DIR)
         # Need to check if the variable is defined first because this macro could be called by CMake project outside of Urho3D that does not wish to install anything
@@ -679,6 +720,12 @@ macro (setup_main_executable)
                     COMMENT "Copying ${NAME} to library output directory")
             endif ()
         endforeach ()
+        if (URHO3D_NDK_GDB)
+            # Copy the library while it still has debug symbols for ndk-gdb
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
+                COMMENT "Copying lib${TARGET_NAME}.so with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
+        endif ()
         # Strip target main shared library
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>

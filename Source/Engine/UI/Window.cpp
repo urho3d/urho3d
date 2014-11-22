@@ -179,7 +179,7 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         break;
 
     case DRAG_RESIZE_TOPRIGHT:
-        SetPosition(dragBeginPosition_.x_, dragBeginPosition_.y_ + delta.y_);
+        SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
         dragSize = IntVector2(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_ - delta.y_);
         fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);

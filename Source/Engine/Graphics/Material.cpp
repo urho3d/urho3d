@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "FileSystem.h"
 #include "Graphics.h"
 #include "Log.h"
@@ -29,6 +30,8 @@
 #include "Matrix3x4.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "Scene.h"
+#include "SceneEvents.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -151,7 +154,7 @@ Material::Material(Context* context) :
     auxViewFrameNumber_(0),
     occlusion_(true),
     specular_(false),
-    animationFrameNumber_(0)
+    subscribed_(false)
 {
     ResetToDefaults();
 }
@@ -342,7 +345,6 @@ bool Material::Load(const XMLElement& source)
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
 
-    // Calculate memory use
     RefreshMemoryUse();
     CheckOcclusion();
     return true;
@@ -482,6 +484,7 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
         
         StringHash nameHash(name);
         shaderParameterAnimationInfos_[nameHash] = new ShaderParameterAnimationInfo(this, name, animation, wrapMode, speed);
+        UpdateEventSubscription();
     }
     else
     {
@@ -489,6 +492,7 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
         {
             StringHash nameHash(name);
             shaderParameterAnimationInfos_.Erase(nameHash);
+            UpdateEventSubscription();
         }
     }
 }
@@ -562,6 +566,15 @@ void Material::SetDepthBias(const BiasParameters& parameters)
     depthBias_.Validate();
 }
 
+void Material::SetScene(Scene* scene)
+{
+    UnsubscribeFromEvent(E_UPDATE);
+    UnsubscribeFromEvent(E_ATTRIBUTEANIMATIONUPDATE);
+    subscribed_ = false;
+    scene_ = scene;
+    UpdateEventSubscription();
+}
+
 void Material::RemoveShaderParameter(const String& name)
 {
     StringHash nameHash(name);
@@ -611,30 +624,6 @@ void Material::MarkForAuxView(unsigned frameNumber)
     auxViewFrameNumber_ = frameNumber;
 }
 
-void Material::UpdateShaderParameterAnimations()
-{
-    if (shaderParameterAnimationInfos_.Empty())
-        return;
-
-    Time* time = GetSubsystem<Time>();
-    if (time->GetFrameNumber() == animationFrameNumber_)
-        return;
-
-    animationFrameNumber_ = time->GetFrameNumber();
-    float timeStep = time->GetTimeStep();
-
-    Vector<String> finishedNames;
-    for (HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Begin(); i != shaderParameterAnimationInfos_.End(); ++i)
-    {
-        if (i->second_->Update(timeStep))
-            finishedNames.Push(i->second_->GetName());
-    }
-
-    // Remove finished animation
-    for (unsigned i = 0; i < finishedNames.Size(); ++i)
-        SetShaderParameterAnimation(finishedNames[i], 0);
-}
-
 const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 {
     return index < techniques_.Size() ? techniques_[index] : noEntry;
@@ -678,6 +667,11 @@ float Material::GetShaderParameterAnimationSpeed(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
     return info == 0 ? 0 : info->GetSpeed();
+}
+
+Scene* Material::GetScene() const
+{
+    return scene_;
 }
 
 String Material::GetTextureUnitName(TextureUnit unit)
@@ -756,6 +750,41 @@ ShaderParameterAnimationInfo* Material::GetShaderParameterAnimationInfo(const St
     if (i == shaderParameterAnimationInfos_.End())
         return 0;
     return i->second_;
+}
+
+void Material::UpdateEventSubscription()
+{
+    if (shaderParameterAnimationInfos_.Size() && !subscribed_)
+    {
+        if (scene_)
+            SubscribeToEvent(scene_, E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Material, HandleAttributeAnimationUpdate));
+        else
+            SubscribeToEvent(E_UPDATE, HANDLER(Material, HandleAttributeAnimationUpdate));
+        subscribed_ = true;
+    }
+    else if (subscribed_)
+    {
+        UnsubscribeFromEvent(E_UPDATE);
+        UnsubscribeFromEvent(E_ATTRIBUTEANIMATIONUPDATE);
+        subscribed_ = false;
+    }
+}
+
+void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // Timestep parameter is same no matter what event is being listened to
+    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
+
+    Vector<String> finishedNames;
+    for (HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Begin(); i != shaderParameterAnimationInfos_.End(); ++i)
+    {
+        if (i->second_->Update(timeStep))
+            finishedNames.Push(i->second_->GetName());
+    }
+
+    // Remove finished animations
+    for (unsigned i = 0; i < finishedNames.Size(); ++i)
+        SetShaderParameterAnimation(finishedNames[i], 0);
 }
 
 }

@@ -46,8 +46,8 @@ GENERATOR="Unix Makefiles"
 
 # Create project with the respective CMake generators
 OPT=
-[ $ANDROID_NDK ] && msg "Android build" && cmake -E make_directory android-Build && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
-[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E make_directory raspi-Build && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
+[ $ANDROID_NDK ] && msg "Android build" && cmake -E make_directory android-Build && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
+[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E make_directory raspi-Build && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
 [ $MINGW_PREFIX ] && msg "MinGW build" && cmake -E make_directory mingw-Build && cmake -E chdir mingw-Build cmake $OPT -G $GENERATOR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake $@ $SOURCE && post_cmake mingw-Build
 [ ! $SKIP_NATIVE ] && msg "Native build" && cmake -E make_directory Build && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
 unset IFS
@@ -57,8 +57,8 @@ if [ $ANDROID_NDK ]; then
     for dir in CoreData Data; do
         cmake -E create_symlink ../../../Bin/$dir Source/Android/assets/$dir
     done
-    for f in AndroidManifest.xml build.xml src res assets; do
-        cmake -E create_symlink ../Source/Android/$f android-Build/$f
+    for f in AndroidManifest.xml build.xml src res assets jni; do
+        if [ -e Source/Android/$f ]; then cmake -E create_symlink ../Source/Android/$f android-Build/$f; fi
     done
 fi
 

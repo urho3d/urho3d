@@ -684,6 +684,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_depthBias(const BiasParameters&in)", asMETHOD(Material, SetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_scene(Scene@+)", asMETHOD(Material, SetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Scene@+ get_scene() const", asMETHOD(Material, GetScene), asCALL_THISCALL);
     
     engine->RegisterGlobalFunction("String GetTextureUnitName(TextureUnit)", asFUNCTION(Material::GetTextureUnitName), asCALL_CDECL);
 }
@@ -1179,6 +1181,8 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_emitting() const", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_emitting() const", asMETHOD(ParticleEmitter, IsEmitting), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_serializeParticles() const", asMETHOD(ParticleEmitter, SetSerializeParticles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool get_serializeParticles() const", asMETHOD(ParticleEmitter, GetSerializeParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void ResetEmissionTimer()", asMETHOD(ParticleEmitter, ResetEmissionTimer), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void RemoveAllParticles()", asMETHOD(ParticleEmitter, RemoveAllParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void Reset()", asMETHOD(ParticleEmitter, Reset), asCALL_THISCALL);

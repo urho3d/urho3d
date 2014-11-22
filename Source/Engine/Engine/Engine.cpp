@@ -49,7 +49,9 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "UI.h"
+#ifdef URHO3D_URHO2D
 #include "Urho2D.h"
+#endif
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
@@ -161,8 +163,10 @@ bool Engine::Initialize(const VariantMap& parameters)
         RegisterGraphicsLibrary(context_);
     }
 
+#ifdef URHO3D_URHO2D
     // 2D graphics library is dependent on 3D graphics library
     RegisterUrho2DLibrary(context_);
+#endif
 
     // Start logging
     Log* log = GetSubsystem<Log>();

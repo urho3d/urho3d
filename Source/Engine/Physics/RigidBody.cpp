@@ -701,6 +701,11 @@ void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
 
 void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
 {
+    // In case of holding an extra reference to the RigidBody, this could be called in a situation
+    // where node is already null
+    if (!node_ || !physicsWorld_)
+        return;
+    
     physicsWorld_->SetApplyingTransforms(true);
 
     // Apply transform to the SmoothedTransform component instead of node transform if available

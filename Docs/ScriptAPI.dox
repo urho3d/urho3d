@@ -723,6 +723,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -763,6 +764,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -827,6 +829,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1030,6 +1033,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1101,6 +1105,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1182,6 +1187,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1228,6 +1234,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1280,6 +1287,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1356,6 +1364,7 @@ namespace Urho3D
 - %Light %Mask : int
 - %Shadow %Mask : int
 - %Zone %Mask : int
+- %Serialize %Particles : bool
 
 ### ParticleEmitter2D
 - %Particle %Effect : ResourceRef
@@ -1479,6 +1488,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1521,6 +1531,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1579,6 +1590,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1751,6 +1763,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1821,6 +1834,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1855,6 +1869,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1888,6 +1903,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -1938,6 +1954,7 @@ namespace Urho3D
 - %Layout %Mode : int
 - %Layout %Spacing : int
 - %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
@@ -2882,6 +2899,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -3081,6 +3099,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -3338,6 +3357,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -4868,6 +4888,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -5501,6 +5522,7 @@ Properties:
 - bool internal
 - UIElement@[] items // readonly
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - ListView@ listView // readonly
@@ -5992,11 +6014,13 @@ Methods:
 - void RemoveAllGestures()
 - bool RemoveGesture(uint)
 - bool RemoveScreenJoystick(int)
+- void ResetMouseVisible()
 - bool SaveGesture(File@, uint)
 - bool SaveGesture(VectorBuffer&, uint)
 - bool SaveGestures(File@)
 - bool SaveGestures(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetMouseVisible(bool, bool = false)
 
 Properties:
 
@@ -6011,6 +6035,7 @@ Properties:
 - bool[] mouseButtonDown // readonly
 - bool[] mouseButtonPress // readonly
 - bool mouseGrabbed
+- MouseMode mouseMode
 - IntVector2 mouseMove // readonly
 - int mouseMoveWheel // readonly
 - int mouseMoveX // readonly
@@ -6420,6 +6445,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -6602,6 +6628,7 @@ Properties:
 - bool internal
 - UIElement@[] items // readonly
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -6717,6 +6744,7 @@ Properties:
 - uint numTechniques
 - bool occlusion // readonly
 - int refs // readonly
+- Scene@ scene
 - String[]@ shaderParameterNames // readonly
 - Variant[] shaderParameters
 - CullMode shadowCullMode
@@ -6958,6 +6986,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -7753,6 +7782,7 @@ Properties:
 - int refs // readonly
 - bool relative
 - bool scaled
+- bool serializeParticles
 - float shadowDistance
 - uint shadowMask
 - bool sorted
@@ -8995,6 +9025,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -9155,6 +9186,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -9477,6 +9509,7 @@ Properties:
 - bool internal
 - BorderImage@ knob // readonly
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -10660,6 +10693,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -11320,6 +11354,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -11531,6 +11566,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -11923,6 +11959,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -12124,6 +12161,7 @@ Properties:
 - int indentWidth // readonly
 - bool internal
 - IntRect layoutBorder
+- Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
 - int maxHeight
@@ -12598,6 +12636,13 @@ Properties:
 - LM_DEFAULT
 - LM_FORCE_LOOPED
 - LM_FORCE_CLAMPED
+
+
+### MouseMode
+
+- MM_ABSOLUTE
+- MM_RELATIVE
+- MM_WRAP
 
 
 ### Orientation

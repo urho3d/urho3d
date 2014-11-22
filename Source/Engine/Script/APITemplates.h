@@ -1112,6 +1112,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "int get_layoutSpacing() const", asMETHOD(T, GetLayoutSpacing), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_layoutBorder(const IntRect&)", asMETHOD(T, SetLayoutBorder), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "const IntRect& get_layoutBorder() const", asMETHOD(T, GetLayoutBorder), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void set_layoutFlexScale(const Vector2&)", asMETHOD(T, SetLayoutFlexScale), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "const Vector2& get_layoutFlexScale() const", asMETHOD(T, GetLayoutFlexScale), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_indent(int)", asMETHOD(T, SetIndent), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "int get_indent() const", asMETHOD(T, GetIndent), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_indentSpacing(int)", asMETHOD(T, SetIndentSpacing), asCALL_THISCALL);

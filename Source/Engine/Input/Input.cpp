@@ -61,6 +61,8 @@ const StringHash VAR_BUTTON_MOUSE_BUTTON_BINDING("VAR_BUTTON_MOUSE_BUTTON_BINDIN
 const StringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const StringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 
+const unsigned TOUCHID_MAX = 32;
+
 /// Convert SDL keycode if necessary.
 int ConvertSDLKeyCode(int keySym, int scanCode)
 {
@@ -106,7 +108,10 @@ Input::Input(Context* context) :
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
+    lastMouseVisible_(false),
     mouseGrabbed_(false),
+    mouseMode_(MM_ABSOLUTE),
+    lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
     touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
@@ -114,6 +119,9 @@ Input::Input(Context* context) :
     suppressNextMouseMove_(false),
     initialized_(false)
 {
+    for (int i = 0; i < TOUCHID_MAX; i++)
+        availableTouchIDs_.Push(i);
+
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
 
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -155,6 +163,47 @@ void Input::Update()
     SDL_Event evt;
     while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
         HandleSDLEvent(&evt);
+
+    if (mouseVisible_ && mouseMode_ == MM_WRAP)
+    {
+        IntVector2 mpos;
+        SDL_GetMouseState(&mpos.x_, &mpos.y_);
+
+        int buffer = 5;
+        int width = graphics_->GetWidth() - buffer * 2;
+        int height = graphics_->GetHeight() - buffer * 2;
+
+        bool warp = false;
+        if (mpos.x_ < buffer)
+        {
+            warp = true;
+            mpos.x_ += width;
+        }
+
+        if (mpos.x_ > buffer + width)
+        {
+            warp = true;
+            mpos.x_ -= width;
+        }
+
+        if (mpos.y_ < buffer)
+        {
+            warp = true;
+            mpos.y_ += height;
+        }
+
+        if (mpos.y_ > buffer + height)
+        {
+            warp = true;
+            mpos.y_ -= height;
+        }
+
+        if (warp)
+        {
+            SetMousePosition(mpos);
+            SDL_FlushEvent(SDL_MOUSEMOTION);
+        }
+    }
 
     // Check for activation and inactivation from SDL window flags. Must nullcheck the window pointer because it may have
     // been closed due to input events
@@ -226,11 +275,15 @@ void Input::Update()
     }
 }
 
-void Input::SetMouseVisible(bool enable)
+void Input::SetMouseVisible(bool enable, bool suppressEvent)
 {
     // In touch emulation mode only enabled mouse is allowed
     if (touchEmulation_)
         enable = true;
+
+    // In mouse mode relative, the mouse should be invisible
+    if (mouseMode_ == MM_RELATIVE)
+        enable = false;
 
     // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
     #ifndef RASPI
@@ -244,6 +297,8 @@ void Input::SetMouseVisible(bool enable)
             if (graphics_->GetExternalWindow())
             {
                 mouseVisible_ = true;
+                if (!suppressEvent)
+                    lastMouseVisible_ = true;
                 return;
             }
 
@@ -251,26 +306,89 @@ void Input::SetMouseVisible(bool enable)
             {
                 SDL_ShowCursor(SDL_FALSE);
                 // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                lastVisibleMousePosition_ = GetMousePosition();
                 IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
                 SetMousePosition(center);
                 lastMousePosition_ = center;
             }
             else
+            {
                 SDL_ShowCursor(SDL_TRUE);
+                if (lastVisibleMousePosition_.x_ != MOUSE_POSITION_OFFSCREEN.x_ && lastVisibleMousePosition_.y_ != MOUSE_POSITION_OFFSCREEN.y_)
+                    SetMousePosition(lastVisibleMousePosition_);
+            }
         }
 
-        using namespace MouseVisibleChanged;
+        if (!suppressEvent)
+        {
+            using namespace MouseVisibleChanged;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_VISIBLE] = mouseVisible_;
-        SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_VISIBLE] = mouseVisible_;
+            SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+        }
     }
+
+    // Make sure last mouse visible is valid:
+    if (!suppressEvent)
+        lastMouseVisible_ = mouseVisible_;
     #endif
 }
 
 void Input::SetMouseGrabbed(bool grab)
 {
     mouseGrabbed_ = grab;
+}
+
+void Input::SetMouseMode(MouseMode mode)
+{
+    if (mode != mouseMode_)
+    {
+        MouseMode previousMode = mouseMode_;
+        mouseMode_ = mode;
+        // Handle changing away from previous mode
+        if (previousMode == MM_RELATIVE)
+        {
+            /// \todo Use SDL_SetRelativeMouseMode() for MM_RELATIVE mode
+            ResetMouseVisible();
+
+            // Send updated mouse position:
+            using namespace MouseMove;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_X] = lastVisibleMousePosition_.x_;
+            eventData[P_Y] = lastVisibleMousePosition_.y_;
+            eventData[P_DX] = mouseMove_.x_;
+            eventData[P_DY] = mouseMove_.y_;
+            eventData[P_BUTTONS] = mouseButtonDown_;
+            eventData[P_QUALIFIERS] = GetQualifiers();
+            SendEvent(E_MOUSEMOVE, eventData);
+        }
+        else if (previousMode == MM_WRAP)
+        {
+            SDL_Window* window = graphics_->GetImpl()->GetWindow();
+            SDL_SetWindowGrab(window, SDL_FALSE);
+        }
+
+        // Handle changing to new mode
+        if (mode == MM_ABSOLUTE)
+            SetMouseGrabbed(false);
+        else
+        {
+            SetMouseGrabbed(true);
+
+            if (mode == MM_RELATIVE)
+            {
+                SetMouseVisible(false, true);
+            }
+            else if (mode == MM_WRAP)
+            {
+                /// \todo When SDL 2.0.4 is integrated, use SDL_CaptureMouse() and global mouse functions for MM_WRAP mode.
+                SDL_Window* window = graphics_->GetImpl()->GetWindow();
+                SDL_SetWindowGrab(window, SDL_TRUE);
+            }
+        }
+    }
 }
 
 void Input::SetToggleFullscreen(bool enable)
@@ -862,6 +980,11 @@ void Input::GainFocus()
     inputFocus_ = true;
     focusedThisFrame_ = false;
 
+    // Restore mouse mode
+    MouseMode mm = mouseMode_;
+    mouseMode_ = MM_ABSOLUTE;
+    SetMouseMode(mm);
+
     // Re-establish mouse cursor hiding as necessary
     if (!mouseVisible_)
     {
@@ -881,8 +1004,16 @@ void Input::LoseFocus()
     inputFocus_ = false;
     focusedThisFrame_ = false;
 
+    MouseMode mm = mouseMode_;
+
     // Show the mouse cursor when inactive
     SDL_ShowCursor(SDL_TRUE);
+
+    // Change mouse mode -- removing any cursor grabs, etc.
+    SetMouseMode(MM_ABSOLUTE);
+
+    // Restore flags to reflect correct mouse state.
+    mouseMode_ = mm;
 
     SendInputFocusEvent();
 }
@@ -926,6 +1057,67 @@ void Input::ResetTouches()
     }
 
     touches_.Clear();
+    touchIDMap_.Clear();
+    availableTouchIDs_.Clear();
+    for (int i = 0; i < TOUCHID_MAX; i++)
+        availableTouchIDs_.Push(i);
+
+}
+
+unsigned Input::GetTouchIndexFromID(int touchID)
+{
+    HashMap<int, int>::ConstIterator i = touchIDMap_.Find(touchID);
+    if (i != touchIDMap_.End())
+    {
+        return i->second_;
+    }
+
+    int index = PopTouchIndex();
+    touchIDMap_[touchID] = index;
+    return index;
+}
+
+unsigned Input::PopTouchIndex()
+{
+    if (availableTouchIDs_.Empty())
+        return 0;
+
+    unsigned index = availableTouchIDs_.Front();
+    availableTouchIDs_.PopFront();
+    return index;
+}
+
+void Input::PushTouchIndex(int touchID)
+{
+    HashMap<int, int>::ConstIterator ci = touchIDMap_.Find(touchID);
+    if (ci == touchIDMap_.End())
+        return;
+
+    int index = touchIDMap_[touchID];
+    touchIDMap_.Erase(touchID);
+
+    // Sorted insertion
+    bool inserted = false;
+    for (List<int>::Iterator i = availableTouchIDs_.Begin(); i != availableTouchIDs_.End(); ++i)
+    {
+        if (*i == index)
+        {
+            // This condition can occur when TOUCHID_MAX is reached.
+            inserted = true;
+            break;
+        }
+
+        if (*i > index)
+        {
+            availableTouchIDs_.Insert(i, index);
+            inserted = true;
+            break;
+        }
+    }
+
+    // If empty, or the lowest value then insert at end.
+    if (!inserted)
+        availableTouchIDs_.Push(index);
 }
 
 void Input::SendInputFocusEvent()
@@ -1126,7 +1318,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEMOTION:
-        if (mouseVisible_ && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE) && !touchEmulation_)
         {
             mouseMove_.x_ += evt.motion.xrel;
             mouseMove_.y_ += evt.motion.yrel;
@@ -1172,7 +1364,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERDOWN:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
             state.lastPosition_ = state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
@@ -1194,7 +1386,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERUP:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             TouchState& state = touches_[touchID];
 
             using namespace TouchEnd;
@@ -1207,6 +1399,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_Y] = state.position_.y_;
             SendEvent(E_TOUCHEND, eventData);
 
+            // Add touch index back to list of available touch Ids
+            PushTouchIndex(evt.tfinger.fingerId & 0x7ffffff);
+
             touches_.Erase(touchID);
         }
         break;
@@ -1214,7 +1409,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERMOTION:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = evt.tfinger.fingerId & 0x7ffffff;
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             // We don't want this event to create a new touches_ event if it doesn't exist (touchEmulation)
             if (touchEmulation_ && !touches_.Contains(touchID))
                 break;

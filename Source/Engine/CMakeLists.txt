@@ -62,7 +62,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI Urho2D)
+set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI)
 if (URHO3D_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
@@ -77,6 +77,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     list (APPEND SOURCES Physics)
+endif ()
+
+if (URHO3D_URHO2D)
+    list (APPEND SOURCES Urho2D)
 endif ()
 
 foreach (SOURCE ${SOURCES})
@@ -273,13 +277,18 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Define post build steps
-# Strip the output shared library for embedded devices
-if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
-        COMMENT "Stripping shared library")
+if (URHO3D_NDK_GDB)
+    # Copy the library while it still has debug symbols for ndk-gdb
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
+        COMMENT "Copying Urho3D library with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
 endif ()
-if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND URHO3D_SCP_TO_TARGET)
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND (ANDROID OR RASPI OR IOS))
+    # Strip the output shared library for embedded devices
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
+        COMMENT "Stripping Urho3D shared library")
+endif ()
+if (URHO3D_SCP_TO_TARGET)
     # Ensure SCP is the last command
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
-        COMMENT "Scp-ing library to target system")
+        COMMENT "Scp-ing Urho3D library to target system")
 endif ()

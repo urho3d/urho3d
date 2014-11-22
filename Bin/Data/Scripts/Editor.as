@@ -50,7 +50,6 @@ void Start()
     input.mouseVisible = true;
     // Use system clipboard to allow transport of text in & out from the editor
     ui.useSystemClipboard = true;
-
 }
 
 void FirstFrame()
@@ -141,6 +140,8 @@ void LoadConfig()
         if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
         if (cameraElem.HasAttribute("mousewheelcameraposition")) mouseWheelCameraPosition = cameraElem.GetBool("mousewheelcameraposition");
         if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
+        UpdateViewParameters();
+        if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetInt("mouseorbitmode");
         UpdateViewParameters();
     }
 
@@ -258,6 +259,7 @@ void SaveConfig()
     cameraElem.SetBool("limitrotation", limitRotation);
     cameraElem.SetBool("mousewheelcameraposition", mouseWheelCameraPosition);
     cameraElem.SetUInt("viewportmode", viewportMode);
+    cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
@@ -319,4 +321,15 @@ void SaveConfig()
     consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
     config.Save(File(configFileName, FILE_WRITE));
+}
+
+void MakeBackup(const String&in fileName)
+{
+    fileSystem.Rename(fileName, fileName + ".old");
+}
+
+void RemoveBackup(bool success, const String&in fileName)
+{
+    if (success)
+        fileSystem.Delete(fileName + ".old");
 }

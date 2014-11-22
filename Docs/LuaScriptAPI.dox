@@ -2374,8 +2374,9 @@ Properties:
 Methods:
 
 - void SetToggleFullscreen(bool enable)
-- void SetMouseVisible(bool enable)
+- void SetMouseVisible(bool enable, bool suppressEvent = false)
 - void SetMouseGrabbed(bool grab)
+- void SetMouseMode(MouseMode mode)
 - int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - bool RemoveScreenJoystick(int id)
 - void SetScreenJoystickVisible(int id, bool enable)
@@ -2422,6 +2423,7 @@ Methods:
 - bool GetTouchEmulation() const
 - bool IsMouseVisible() const
 - bool IsMouseGrabbed() const
+- MouseMode GetMouseMode() const
 - bool HasFocus()
 - bool IsMinimized() const
 
@@ -2437,6 +2439,7 @@ Properties:
 - unsigned numJoysticks (readonly)
 - bool toggleFullscreen (readonly)
 - bool screenKeyboardSupport (readonly)
+- MouseMode mouseMode
 - bool screenKeyboardVisible
 - bool touchEmulation
 - bool mouseVisible
@@ -2842,10 +2845,10 @@ Methods:
 - bool CreateObject(LuaFile* scriptFile, const String scriptObjectType)
 - void SetScriptFile(LuaFile* scriptFile)
 - void SetScriptObjectType(const String scriptObjectType)
-- void SubscribeToEvent(const String eventName, const String functionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromAllEvents()
-- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void UnsubscribeFromEvent(void* sender, const String eventName)
 - void UnsubscribeFromEvents(void* sender)
 - LuaFile* GetScriptFile() const
@@ -2876,6 +2879,7 @@ Methods:
 - void SetCullMode(CullMode mode)
 - void SetShadowCullMode(CullMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
+- void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
 - Material* Clone(const String cloneName = String::EMPTY) const
@@ -2895,6 +2899,7 @@ Methods:
 - unsigned GetAuxViewFrameNumber() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
+- Scene* GetScene() const
 
 Properties:
 
@@ -2903,6 +2908,7 @@ Properties:
 - unsigned auxViewFrameNumber (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
+- Scene* scene
 
 <a name="Class_Matrix3"></a>
 ### Matrix3
@@ -3722,6 +3728,7 @@ Methods:
 - void SetEffect(ParticleEffect* effect)
 - void SetNumParticles(unsigned num)
 - void SetEmitting(bool enable)
+- void SetSerializeParticles(bool enable)
 - void ResetEmissionTimer()
 - void RemoveAllParticles()
 - void Reset()
@@ -3729,12 +3736,14 @@ Methods:
 - ParticleEffect* GetEffect() const
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
+- bool GetSerializeParticles() const
 
 Properties:
 
 - ParticleEffect* effect
 - unsigned numParticles
 - bool emitting
+- bool serializeParticles
 
 <a name="Class_ParticleEmitter2D"></a>
 ### ParticleEmitter2D : Drawable2D
@@ -5851,6 +5860,7 @@ Methods:
 - void SetLayoutMode(LayoutMode mode)
 - void SetLayoutSpacing(int spacing)
 - void SetLayoutBorder(const IntRect& border)
+- void SetLayoutFlexScale(const Vector2& scale)
 - void SetIndent(int indent)
 - void SetIndentSpacing(int indentSpacing)
 - void UpdateLayout()
@@ -5913,6 +5923,7 @@ Methods:
 - LayoutMode GetLayoutMode() const
 - int GetLayoutSpacing() const
 - const IntRect& GetLayoutBorder() const
+- const Vector2& GetLayoutFlexScale() const
 - unsigned GetNumChildren(bool recursive = false) const
 - int GetDragButtonCombo() const
 - unsigned GetDragButtonCount() const
@@ -5929,7 +5940,6 @@ Methods:
 - bool IsInsideCombined(IntVector2 position, bool isScreen)
 - IntRect GetCombinedScreenRect()
 - void SortChildren()
-- int GetLayoutMinSize() const
 - int GetIndent() const
 - int GetIndentSpacing() const
 - int GetIndentWidth() const
@@ -5986,12 +5996,12 @@ Properties:
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect& layoutBorder
+- Vector2& layoutFlexScale
 - unsigned numChildren (readonly)
 - UIElement* parent
 - UIElement* root (readonly)
 - Color& derivedColor (readonly)
 - IntRect combinedScreenRect (readonly)
-- int layoutMinSize (readonly)
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
@@ -6929,6 +6939,12 @@ Properties:
 - int LM_FORCE_LOOPED
 - int LM_FORCE_CLAMPED
 
+### MouseMode
+
+- int MM_ABSOLUTE
+- int MM_RELATIVE
+- int MM_WRAP
+
 ### Orientation
 
 - int O_HORIZONTAL
@@ -7229,11 +7245,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
+- float Random()
 - float Random(float min, float max)
 - float Random(float range)
-- float Random()
-- int RandomInt(int range)
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7244,8 +7260,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(const String eventName, const String functionName)
-- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -7267,8 +7283,9 @@ Properties:
 - Vector3 ToVector3(const String source)
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
-- void UnsubscribeFromEvent(const String eventName, const String functionName = String::EMPTY)
-- void UnsubscribeFromEvent(void* sender, const String eventName, const String functionName = String::EMPTY)
+- void UnsubscribeFromEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName)
 - void UnsubscribeFromEvents(void* sender)
 
 

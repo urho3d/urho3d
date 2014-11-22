@@ -88,11 +88,15 @@ public:
     /// Set script network serialization attribute by calling a script function.
     void SetScriptNetworkDataAttr(PODVector<unsigned char> data);
     /// Script subscribe to an event that can by send by any sender.
+    void ScriptSubscribeToEvent(const String& eventName, int functionIndex);
+    /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
     /// Script unsubscribe from an event.
     void ScriptUnsubscribeFromEvent(const String& eventName);
     /// Script unsubscribe from all events.
     void ScriptUnsubscribeFromAllEvents();
+    /// Script subscribe to a specific sender's event.
+    void ScriptSubscribeToEvent(void* sender, const String& eventName, int functionIndex);
     /// Script subscribe to a specific sender's event.
     void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
     /// Script unsubscribe from a specific sender's event.

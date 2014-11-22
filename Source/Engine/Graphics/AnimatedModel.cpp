@@ -873,8 +873,11 @@ void AnimatedModel::OnMarkedDirty(Node* node)
     Drawable::OnMarkedDirty(node);
 
     // If the scene node or any of the bone nodes move, mark skinning and the bone bounding box dirty
-    skinningDirty_ = true;
-    boneBoundingBoxDirty_ = true;
+    if (skeleton_.GetNumBones())
+    {
+        skinningDirty_ = true;
+        boneBoundingBoxDirty_ = true;
+    }
 }
 
 void AnimatedModel::OnWorldBoundingBoxUpdate()
