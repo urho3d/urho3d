@@ -90,13 +90,13 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("FOV", GetFov, SetFov, float, DEFAULT_CAMERA_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Aspect Ratio", GetAspectRatio, SetAspectRatioInternal, float, 1.0f, AM_DEFAULT);
     ENUM_ATTRIBUTE("Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
-    ATTRIBUTE(bool, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
+    ATTRIBUTE("Auto Aspect Ratio", bool, autoAspectRatio_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Orthographic Size", GetOrthoSize, SetOrthoSize, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(int, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(int, "View Override Flags", viewOverrideFlags_, VO_NONE, AM_DEFAULT);
+    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE("View Override Flags", int, viewOverrideFlags_, VO_NONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);

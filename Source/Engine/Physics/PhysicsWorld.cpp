@@ -180,12 +180,12 @@ void PhysicsWorld::RegisterObject(Context* context)
     context->RegisterFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
     MIXED_ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
-    ATTRIBUTE(int, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
-    ATTRIBUTE(int, "Max Substeps", maxSubSteps_, 0, AM_DEFAULT);
+    ATTRIBUTE("Physics FPS", int, fps_, DEFAULT_FPS, AM_DEFAULT);
+    ATTRIBUTE("Max Substeps", int, maxSubSteps_, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
-    ATTRIBUTE(float, "Net Max Angular Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
-    ATTRIBUTE(bool, "Interpolation", interpolation_, true, AM_FILE);
-    ATTRIBUTE(bool, "Internal Edge Utility", internalEdge_, true, AM_DEFAULT);
+    ATTRIBUTE("Net Max Angular Vel.", float, maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
+    ATTRIBUTE("Interpolation", bool, interpolation_, true, AM_FILE);
+    ATTRIBUTE("Internal Edge Utility", bool, internalEdge_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Split Impulse", GetSplitImpulse, SetSplitImpulse, bool, false, AM_DEFAULT);
 }
 

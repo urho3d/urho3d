@@ -359,9 +359,9 @@ void Octree::RegisterObject(Context* context)
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
 
-    ATTRIBUTE(Vector3, "Bounding Box Min", worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
-    ATTRIBUTE(Vector3, "Bounding Box Max", worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
-    ATTRIBUTE(int, "Number of Levels", numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
+    ATTRIBUTE("Bounding Box Min", Vector3, worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
+    ATTRIBUTE("Bounding Box Max", Vector3, worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
+    ATTRIBUTE("Number of Levels", int, numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
 void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

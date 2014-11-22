@@ -53,10 +53,10 @@ void NetworkPriority::RegisterObject(Context* context)
 {
     context->RegisterFactory<NetworkPriority>(NETWORK_CATEGORY);
     
-    ATTRIBUTE(float, "Base Priority", basePriority_, DEFAULT_BASE_PRIORITY, AM_DEFAULT);
-    ATTRIBUTE(float, "Distance Factor", distanceFactor_, DEFAULT_DISTANCE_FACTOR, AM_DEFAULT);
-    ATTRIBUTE(float, "Minimum Priority", minPriority_, DEFAULT_MIN_PRIORITY, AM_DEFAULT);
-    ATTRIBUTE(bool, "Always Update Owner", alwaysUpdateOwner_, true, AM_DEFAULT);
+    ATTRIBUTE("Base Priority", float, basePriority_, DEFAULT_BASE_PRIORITY, AM_DEFAULT);
+    ATTRIBUTE("Distance Factor", float, distanceFactor_, DEFAULT_DISTANCE_FACTOR, AM_DEFAULT);
+    ATTRIBUTE("Minimum Priority", float, minPriority_, DEFAULT_MIN_PRIORITY, AM_DEFAULT);
+    ATTRIBUTE("Always Update Owner", bool, alwaysUpdateOwner_, true, AM_DEFAULT);
 }
 
 void NetworkPriority::SetBasePriority(float priority)

@@ -100,11 +100,11 @@ void Scene::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
-    ATTRIBUTE(int, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(int, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(int, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(int, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(VariantMap, "Variables", vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
+    ATTRIBUTE("Next Replicated Node ID", int, replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Replicated Component ID", int, replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Local Node ID", int, localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Local Component ID", int, localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
     MIXED_ACCESSOR_ATTRIBUTE("Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
 

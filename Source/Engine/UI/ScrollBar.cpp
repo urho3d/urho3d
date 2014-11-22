@@ -85,10 +85,10 @@ void ScrollBar::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
     ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
-    ATTRIBUTE(IntRect, "Left Image Rect", leftRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(IntRect, "Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(IntRect, "Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(IntRect, "Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE("Left Image Rect", IntRect, leftRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE("Right Image Rect", IntRect, rightRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE("Up Image Rect", IntRect, upRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE("Down Image Rect", IntRect, downRect_, IntRect::ZERO, AM_FILE);
 }
 
 void ScrollBar::ApplyAttributes()

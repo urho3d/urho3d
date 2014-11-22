@@ -91,10 +91,10 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    ATTRIBUTE(int, "Max Lights", maxLights_, 0, AM_DEFAULT);
-    ATTRIBUTE(int, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(int, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE(int, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
+    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 

@@ -121,27 +121,27 @@ void Light::RegisterObject(Context* context)
     MIXED_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE(bool, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ATTRIBUTE(bool, "Per Vertex", perVertex_, false, AM_DEFAULT);
+    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    ATTRIBUTE("Per Vertex", bool, perVertex_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Fade Distance", GetFadeDistance, SetFadeDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(bool, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
-    ATTRIBUTE(bool, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
-    ATTRIBUTE(bool, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
-    ATTRIBUTE(Vector4, "CSM Splits", shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
-    ATTRIBUTE(float, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
-    ATTRIBUTE(float, "CSM Bias Auto Adjust", shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
-    ATTRIBUTE(float, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
-    ATTRIBUTE(float, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
-    ATTRIBUTE(float, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
-    ATTRIBUTE(float, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
-    ATTRIBUTE(float, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
-    ATTRIBUTE(int, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(int, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATTRIBUTE("Focus To Scene", bool, shadowFocus_.focus_, true, AM_DEFAULT);
+    ATTRIBUTE("Non-uniform View", bool, shadowFocus_.nonUniform_, true, AM_DEFAULT);
+    ATTRIBUTE("Auto-Reduce Size", bool, shadowFocus_.autoSize_, true, AM_DEFAULT);
+    ATTRIBUTE("CSM Splits", Vector4, shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ATTRIBUTE("CSM Fade Start", float, shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
+    ATTRIBUTE("CSM Bias Auto Adjust", float, shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
+    ATTRIBUTE("View Size Quantize", float, shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
+    ATTRIBUTE("View Size Minimum", float, shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
+    ATTRIBUTE("Depth Constant Bias", float, shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
+    ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
+    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
 
 void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
