@@ -81,11 +81,6 @@ void FocusParameters::Validate()
     minView_ = Max(minView_, SHADOW_MIN_VIEW);
 }
 
-template<> LightType Variant::Get<LightType>() const
-{
-    return (LightType)GetInt();
-}
-
 Light::Light(Context* context) :
     Drawable(context, DRAWABLE_LIGHT),
     lightType_(DEFAULT_LIGHTTYPE),

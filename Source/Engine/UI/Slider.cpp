@@ -39,11 +39,6 @@ const char* orientations[] =
     0
 };
 
-template<> Orientation Variant::Get<Orientation>() const
-{
-    return (Orientation)GetInt();
-}
-
 extern const char* UI_CATEGORY;
 
 Slider::Slider(Context* context) :

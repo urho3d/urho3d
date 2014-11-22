@@ -34,11 +34,6 @@ namespace Urho3D
 extern const char* blendModeNames[];
 extern const char* UI_CATEGORY;
 
-template<> BlendMode Variant::Get<BlendMode>() const
-{
-    return (BlendMode)GetInt();
-}
-
 BorderImage::BorderImage(Context* context) :
     UIElement(context),
     imageRect_(IntRect::ZERO),

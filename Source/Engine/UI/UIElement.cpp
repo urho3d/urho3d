@@ -87,26 +87,6 @@ static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
     return lhs->GetPriority() < rhs->GetPriority();
 }
 
-template<> HorizontalAlignment Variant::Get<HorizontalAlignment>() const
-{
-    return (HorizontalAlignment)GetInt();
-}
-
-template<> VerticalAlignment Variant::Get<VerticalAlignment>() const
-{
-    return (VerticalAlignment)GetInt();
-}
-
-template<> FocusMode Variant::Get<FocusMode>() const
-{
-    return (FocusMode)GetInt();
-}
-
-template<> LayoutMode Variant::Get<LayoutMode>() const
-{
-    return (LayoutMode)GetInt();
-}
-
 XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
 
 UIElement::UIElement(Context* context) :

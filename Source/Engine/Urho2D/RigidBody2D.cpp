@@ -46,11 +46,6 @@ static const char* bodyTypeNames[] =
     0
 };
 
-template<> BodyType2D Variant::Get<BodyType2D>() const
-{
-    return (BodyType2D)GetInt();
-}
-
 RigidBody2D::RigidBody2D(Context* context) :
     Component(context),
     massData_(),    // b2MassData structure does not have a constructor so need to zero-initialize all its members

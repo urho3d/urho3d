@@ -44,11 +44,6 @@ static const char* highlightModes[] =
     0
 };
 
-template<> HighlightMode Variant::Get<HighlightMode>() const
-{
-    return (HighlightMode)GetInt();
-}
-
 static const StringHash expandedHash("Expanded");
 
 extern const char* UI_CATEGORY;

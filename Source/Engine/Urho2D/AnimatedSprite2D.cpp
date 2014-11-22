@@ -48,11 +48,6 @@ const char* loopModeNames[] =
     0
 };
 
-template<> LoopMode2D Variant::Get<LoopMode2D>() const
-{
-    return (LoopMode2D)GetInt();
-}
-
 AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     layer_(0),
