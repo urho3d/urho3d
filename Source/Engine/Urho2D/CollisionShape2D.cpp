@@ -61,8 +61,6 @@ void CollisionShape2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Density", GetDensity, SetDensity, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Friction", GetFriction, SetFriction, float, 0.2f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Restitution", GetRestitution, SetRestitution, float, 0.0f, AM_DEFAULT);
-
-    COPY_BASE_ATTRIBUTES(Component);
 }
 
 void CollisionShape2D::OnSetEnabled()

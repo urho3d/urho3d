@@ -96,7 +96,6 @@ void PhysicsWorld2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, DEFAULT_VELOCITY_ITERATIONS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Position Iterations", GetPositionIterations, SetPositionIterations, int, DEFAULT_POSITION_ITERATIONS, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Component);
 }
 
 void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

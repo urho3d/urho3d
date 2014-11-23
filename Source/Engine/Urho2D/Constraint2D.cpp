@@ -59,7 +59,6 @@ Constraint2D::~Constraint2D()
 void Constraint2D::RegisterObject(Context* context)
 {
     ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Component);
 }
 
 void Constraint2D::OnSetEnabled()
