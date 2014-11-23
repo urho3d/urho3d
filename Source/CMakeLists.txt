@@ -155,6 +155,10 @@ if (NOT WIN32 AND NOT ANDROID)
 endif ()
 
 # Add targets
+if (URHO3D_URHO2D)
+    add_subdirectory (ThirdParty/Box2D)
+endif ()
+
 foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
@@ -181,10 +185,6 @@ endif ()
 
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
-endif ()
-
-if (URHO3D_URHO2D)
-    add_subdirectory (ThirdParty/Box2D)
 endif ()
 
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
