@@ -24,7 +24,6 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable2D.h"
-#include "DrawableProxy2D.h"
 #include "Geometry.h"
 #include "GraphicsEvents.h"
 #include "IndexBuffer.h"
@@ -32,17 +31,22 @@
 #include "Material.h"
 #include "Node.h"
 #include "Profiler.h"
+#include "Renderer2D.h"
 #include "Scene.h"
-#include "VertexBuffer.h"
 #include "Sort.h"
+#include "VertexBuffer.h"
 #include "WorkQueue.h"
+#include "Texture2D.h"
+#include "Technique.h"
 
 #include "DebugNew.h"
 
 namespace Urho3D
 {
 
-DrawableProxy2D::DrawableProxy2D(Context* context) :
+extern const char* blendModeNames[];
+
+Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_PROXYGEOMETRY),
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
@@ -51,19 +55,19 @@ DrawableProxy2D::DrawableProxy2D(Context* context) :
     indexCount_(0),
     vertexCount_(0)
 {
-    SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(DrawableProxy2D, HandleBeginViewUpdate));
+    SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
 
-DrawableProxy2D::~DrawableProxy2D()
+Renderer2D::~Renderer2D()
 {
 }
 
-void DrawableProxy2D::RegisterObject(Context* context)
+void Renderer2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<DrawableProxy2D>();
+    context->RegisterFactory<Renderer2D>();
 }
 
-void DrawableProxy2D::UpdateBatches(const FrameInfo& frame)
+void Renderer2D::UpdateBatches(const FrameInfo& frame)
 {
     unsigned count = batches_.Size();
 
@@ -75,7 +79,7 @@ void DrawableProxy2D::UpdateBatches(const FrameInfo& frame)
     }
 }
 
-void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
+void Renderer2D::UpdateGeometry(const FrameInfo& frame)
 {
     // Fill index buffer
     if (indexBuffer_->GetIndexCount() < indexCount_)
@@ -152,12 +156,12 @@ void DrawableProxy2D::UpdateGeometry(const FrameInfo& frame)
     }
 }
 
-UpdateGeometryType DrawableProxy2D::GetUpdateGeometryType()
+UpdateGeometryType Renderer2D::GetUpdateGeometryType()
 {
     return UPDATE_MAIN_THREAD;
 }
 
-void DrawableProxy2D::AddDrawable(Drawable2D* drawable)
+void Renderer2D::AddDrawable(Drawable2D* drawable)
 {
     if (!drawable)
         return;
@@ -169,7 +173,7 @@ void DrawableProxy2D::AddDrawable(Drawable2D* drawable)
     orderDirty_ = true;
 }
 
-void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
+void Renderer2D::RemoveDrawable(Drawable2D* drawable)
 {
     if (!drawable)
         return;
@@ -178,7 +182,7 @@ void DrawableProxy2D::RemoveDrawable(Drawable2D* drawable)
     orderDirty_ = true;
 }
 
-bool DrawableProxy2D::CheckVisibility(Drawable2D* drawable) const
+bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
 {
     const BoundingBox& box = drawable->GetWorldBoundingBox();
     if (frustum_)
@@ -187,30 +191,67 @@ bool DrawableProxy2D::CheckVisibility(Drawable2D* drawable) const
     return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
 }
 
-void DrawableProxy2D::OnWorldBoundingBoxUpdate()
+Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 {
-    // Set a large dummy bounding box to ensure the proxy is rendered
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
+    if (t == cachedMaterials_.End())
+    {
+        SharedPtr<Material> material(CreateMaterial(texture, blendMode));
+        cachedMaterials_[texture][blendMode] = material;
+        return material;
+    }
+
+    HashMap<int, SharedPtr<Material> >& materials = t->second_;
+    HashMap<int, SharedPtr<Material> >::Iterator b = materials.Find(blendMode);
+    if (b != materials.End())
+        return b->second_;
+
+    SharedPtr<Material> material(CreateMaterial(texture, blendMode));
+    materials[blendMode] = material;
+
+    return material;
+}
+
+void Renderer2D::OnWorldBoundingBoxUpdate()
+{
+    // Set a large dummy bounding box to ensure the renderer is rendered
     boundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
     worldBoundingBox_ = boundingBox_;
 }
 
 void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
 {
-    DrawableProxy2D* proxy = reinterpret_cast<DrawableProxy2D*>(item->aux_);
+    Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
     Drawable2D** end = reinterpret_cast<Drawable2D**>(item->end_);
 
     while (start != end)
     {
         Drawable2D* drawable = *start++;
-        if (proxy->CheckVisibility(drawable) && drawable->GetUsedMaterial() && drawable->GetVertices().Size())
+        if (renderer->CheckVisibility(drawable) && drawable->GetUsedMaterial() && drawable->GetVertices().Size())
             drawable->SetVisibility(true);
         else
             drawable->SetVisibility(false);
     }
 }
 
-void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
+static inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
+{
+    if (lhs->GetLayer() != rhs->GetLayer())
+        return lhs->GetLayer() < rhs->GetLayer();
+
+    if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
+        return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
+
+    Material* lhsUsedMaterial = lhs->GetUsedMaterial();
+    Material* rhsUsedMaterial = rhs->GetUsedMaterial();
+    if (lhsUsedMaterial != rhsUsedMaterial)
+        return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
+
+    return lhs->GetID() < rhs->GetID();
+}
+
+void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace BeginViewUpdate;
 
@@ -218,7 +259,7 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
     if (GetScene() != eventData[P_SCENE].GetPtr())
         return;
 
-    PROFILE(UpdateDrawableProxy2D);
+    PROFILE(UpdateRenderer2D);
 
     if (orderDirty_)
     {
@@ -322,7 +363,7 @@ void DrawableProxy2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& ev
     }
 }
 
-void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
+void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
 {
     if (!material || indexCount == 0 || vertexCount == 0)
         return;
@@ -339,6 +380,34 @@ void DrawableProxy2D::AddBatch(Material* material, unsigned indexStart, unsigned
     }
 
     geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
+}
+
+Material* Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
+{
+    Material* material = new Material(context_);
+    if (texture)
+        material->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
+    else
+        material->SetName(blendModeNames[blendMode]);
+
+    Technique* tech = new Technique(context_);
+    Pass* pass = tech->CreatePass(PASS_ALPHA);
+    pass->SetBlendMode(blendMode);
+
+    pass->SetVertexShader("Basic");
+    pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
+
+    pass->SetPixelShader("Basic");
+    pass->SetPixelShaderDefines("DIFFMAP VERTEXCOLOR");
+
+    pass->SetDepthWrite(false);
+
+    material->SetTechnique(0, tech);
+    material->SetCullMode(CULL_NONE);
+
+    material->SetTexture(TU_DIFFUSE, texture);
+
+    return material;
 }
 
 }

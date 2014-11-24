@@ -29,18 +29,19 @@ namespace Urho3D
 
 class Drawable2D;
 class IndexBuffer;
+class Material;
 class VertexBuffer;
 
-/// Proxy for 2D visible components.
-class URHO3D_API DrawableProxy2D : public Drawable
+/// 2D renderer components.
+class URHO3D_API Renderer2D : public Drawable
 {
-    OBJECT(DrawableProxy2D);
+    OBJECT(Renderer2D);
 
 public:
     /// Construct.
-    DrawableProxy2D(Context* context);
+    Renderer2D(Context* context);
     /// Destruct.
-    ~DrawableProxy2D();
+    ~Renderer2D();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -59,6 +60,8 @@ public:
     void MarkOrderDirty() { orderDirty_ = true; }
     /// Check visibility.
     bool CheckVisibility(Drawable2D* drawable) const;
+    /// Return material by texture and blend mode.
+    Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
 
 private:
     /// Recalculate the world-space bounding box.
@@ -67,6 +70,8 @@ private:
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
+    /// Create material by texture and blend mode.
+    Material* CreateMaterial(Texture2D* Texture, BlendMode blendMode);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
@@ -88,6 +93,8 @@ private:
     unsigned indexCount_;
     /// Total vertex count for the current frame.
     unsigned vertexCount_;
+    /// Materials.
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
 };
 
 }

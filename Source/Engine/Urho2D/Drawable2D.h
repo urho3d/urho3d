@@ -23,14 +23,12 @@
 #pragma once
 
 #include "Drawable.h"
-#include "Material.h"
 #include "Sprite2D.h"
 
 namespace Urho3D
 {
 
-class DrawableProxy2D;
-class MaterialCache2D;
+class Renderer2D;
 class VertexBuffer;
 
 /// Pixel size (equal 0.01f).
@@ -127,28 +125,10 @@ protected:
     bool materialUpdatePending_;
     /// Default material.
     SharedPtr<Material> defaultMaterial_;
-    /// Material cache.
-    WeakPtr<MaterialCache2D> materialCache_;
-    /// Drawable proxy.
-    WeakPtr<DrawableProxy2D> drawableProxy_;
+    /// 2D rendererer.
+    WeakPtr<Renderer2D> renderer_;
     /// Test visible.
     bool visibility_;
 };
-
-inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
-{
-    if (lhs->GetLayer() != rhs->GetLayer())
-        return lhs->GetLayer() < rhs->GetLayer();
-
-    if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
-        return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
-
-    Material* lhsUsedMaterial = lhs->GetUsedMaterial();
-    Material* rhsUsedMaterial = rhs->GetUsedMaterial();
-    if (lhsUsedMaterial != rhsUsedMaterial)
-        return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
-
-    return lhs->GetID() < rhs->GetID();
-}
 
 }

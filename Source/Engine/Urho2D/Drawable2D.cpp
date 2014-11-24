@@ -24,12 +24,11 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable2D.h"
-#include "DrawableProxy2D.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Material.h"
-#include "MaterialCache2D.h"
 #include "Node.h"
+#include "Renderer2D.h"
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "Sprite2D.h"
@@ -59,8 +58,8 @@ Drawable2D::Drawable2D(Context* context) :
 
 Drawable2D::~Drawable2D()
 {
-    if (drawableProxy_)
-        drawableProxy_->RemoveDrawable(this);
+    if (renderer_)
+        renderer_->RemoveDrawable(this);
 }
 
 void Drawable2D::RegisterObject(Context* context)
@@ -84,13 +83,13 @@ void Drawable2D::ApplyAttributes()
 
 void Drawable2D::OnSetEnabled()
 {
-    if (!drawableProxy_)
+    if (!renderer_)
         return;
 
     if (IsEnabledEffective())
-        drawableProxy_->AddDrawable(this);
+        renderer_->AddDrawable(this);
     else
-        drawableProxy_->RemoveDrawable(this);
+        renderer_->RemoveDrawable(this);
 }
 
 void Drawable2D::SetLayer(int layer)
@@ -100,8 +99,8 @@ void Drawable2D::SetLayer(int layer)
 
     layer_ = layer;
 
-    if (drawableProxy_)
-        drawableProxy_->MarkOrderDirty();
+    if (renderer_)
+        renderer_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -113,8 +112,8 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
 
     orderInLayer_ = orderInLayer;
 
-    if (drawableProxy_)
-        drawableProxy_->MarkOrderDirty();
+    if (renderer_)
+        renderer_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -150,8 +149,8 @@ void Drawable2D::SetMaterial(Material* material)
 
     material_ = material;
 
-    if (drawableProxy_)
-        drawableProxy_->MarkOrderDirty();
+    if (renderer_)
+        renderer_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -248,10 +247,9 @@ void Drawable2D::OnNodeSet(Node* node)
         Scene* scene = GetScene();
         if (scene)
         {
-            materialCache_ = scene->GetOrCreateComponent<MaterialCache2D>();
-            drawableProxy_ = scene->GetOrCreateComponent<DrawableProxy2D>();
+            renderer_ = scene->GetOrCreateComponent<Renderer2D>();
             if (IsEnabledEffective())
-                drawableProxy_->AddDrawable(this);
+                renderer_->AddDrawable(this);
         }
     }
 }
@@ -269,10 +267,10 @@ void Drawable2D::UpdateDefaultMaterial()
     if (materialUpdatePending_)
         return;
 
-    defaultMaterial_ = materialCache_->GetMaterial(GetTexture(), blendMode_);
+    defaultMaterial_ = renderer_->GetMaterial(GetTexture(), blendMode_);
 
-    if (drawableProxy_)
-        drawableProxy_->MarkOrderDirty();
+    if (renderer_)
+        renderer_->MarkOrderDirty();
 }
 
 }
