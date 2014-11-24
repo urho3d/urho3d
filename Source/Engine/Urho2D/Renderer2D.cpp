@@ -81,7 +81,7 @@ void Renderer2D::UpdateBatches(const FrameInfo& frame)
 void Renderer2D::UpdateGeometry(const FrameInfo& frame)
 {
     // Fill index buffer
-    if (indexBuffer_->GetIndexCount() < indexCount_)
+    if (indexBuffer_->GetIndexCount() < indexCount_ || indexBuffer_->IsDataLost())
     {
         bool largeIndices = vertexCount_ > 0xffff;
         indexBuffer_->SetSize(indexCount_, largeIndices);
