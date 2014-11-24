@@ -24,18 +24,10 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable2D.h"
-#include "Geometry.h"
-#include "Log.h"
 #include "Material.h"
-#include "Node.h"
 #include "Renderer2D.h"
-#include "ResourceCache.h"
 #include "Scene.h"
-#include "Sprite2D.h"
-#include "SpriteSheet2D.h"
-#include "Technique.h"
 #include "Texture2D.h"
-#include "VertexBuffer.h"
 
 #include "DebugNew.h"
 
@@ -51,7 +43,6 @@ Drawable2D::Drawable2D(Context* context) :
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
     verticesDirty_(true),
-    materialUpdatePending_(false),
     visibility_(true)
 {
 }
@@ -64,7 +55,7 @@ void Drawable2D::RegisterObject(Context* context)
 {
     ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
 }
 
@@ -96,7 +87,7 @@ void Drawable2D::SetTexture(Texture2D* texture)
     texture_ = texture;
 
     verticesDirty_ = true;
-    defaultMaterial_ = 0;
+    material_ = 0;
     
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
@@ -108,7 +99,7 @@ void Drawable2D::SetBlendMode(BlendMode blendMode)
         return;
 
     blendMode_ = blendMode;
-    defaultMaterial_ = 0;
+    material_ = 0;
 
     MarkNetworkUpdate();
 }
@@ -118,14 +109,14 @@ Texture2D* Drawable2D::GetTexture() const
     return texture_;
 }
 
-void Drawable2D::SetDefaultMaterial(Material* material)
+void Drawable2D::SetMaterial(Material* material)
 {
-    defaultMaterial_ = material;
+    material_ = material;
 }
 
-Material* Drawable2D::GetDefaultMaterial() const
+Material* Drawable2D::GetMaterial() const
 {
-    return defaultMaterial_;
+    return material_;
 }
 
 const Vector<Vertex2D>& Drawable2D::GetVertices()
@@ -133,14 +124,6 @@ const Vector<Vertex2D>& Drawable2D::GetVertices()
     if (verticesDirty_)
         UpdateVertices();
     return vertices_;
-}
-
-void Drawable2D::SetBlendModeAttr(BlendMode mode)
-{
-    // Delay applying material update
-    materialUpdatePending_ = true;
-
-    SetBlendMode(mode);
 }
 
 void Drawable2D::OnNodeSet(Node* node)

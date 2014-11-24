@@ -79,19 +79,16 @@ public:
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
 
-    /// Set default material.
-    void SetDefaultMaterial(Material* material);
-    /// Return default material.
-    Material* GetDefaultMaterial() const;
-    /// Set visibility.
+    /// Set material (called by Renderer2D).
+    void SetMaterial(Material* material);
+    /// Return material (called by Renderer2D).
+    Material* GetMaterial() const;
+    /// Set visibility (called by Renderer2D).
     void SetVisibility(bool visibility) { visibility_ = visibility; }
-    /// Return visibility.
+    /// Return visibility (called by Renderer2D).
     bool GetVisibility() const { return visibility_; }
-    /// Return all vertices.
+    /// Return all vertices (called by Renderer2D).
     const Vector<Vertex2D>& GetVertices();
-
-    /// Set blend mode attribute.
-    void SetBlendModeAttr(BlendMode mode);
 
 protected:
     /// Handle node being assigned.
@@ -114,10 +111,8 @@ protected:
     Vector<Vertex2D> vertices_;
     /// Vertices dirty flag.
     bool verticesDirty_;
-    /// Material update pending flag.
-    bool materialUpdatePending_;
-    /// Default material.
-    SharedPtr<Material> defaultMaterial_;
+    /// Material.
+    SharedPtr<Material> material_;
     /// Test visible.
     bool visibility_;
 };

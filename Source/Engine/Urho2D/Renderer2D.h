@@ -62,12 +62,12 @@ private:
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
     /// Get all drawables in node.
     void GetDrawables(PODVector<Drawable2D*>& drawables, Node* node);
-    /// Add batch.
-    void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
     /// Return material by texture and blend mode.
     Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
-    /// Create material by texture and blend mode.
+    /// Create new material by texture and blend mode.
     Material* CreateMaterial(Texture2D* Texture, BlendMode blendMode);
+    /// Add batch.
+    void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

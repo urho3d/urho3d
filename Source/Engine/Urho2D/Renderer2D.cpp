@@ -34,10 +34,10 @@
 #include "Renderer2D.h"
 #include "Scene.h"
 #include "Sort.h"
+#include "Technique.h"
+#include "Texture2D.h"
 #include "VertexBuffer.h"
 #include "WorkQueue.h"
-#include "Texture2D.h"
-#include "Technique.h"
 
 #include "DebugNew.h"
 
@@ -185,7 +185,7 @@ static void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable2D* drawable = *start++;
-        if (renderer->CheckVisibility(drawable) && drawable->GetDefaultMaterial() && drawable->GetVertices().Size())
+        if (renderer->CheckVisibility(drawable) && drawable->GetMaterial() && drawable->GetVertices().Size())
             drawable->SetVisibility(true);
         else
             drawable->SetVisibility(false);
@@ -200,8 +200,8 @@ static inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
     if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
         return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
 
-    Material* lhsUsedMaterial = lhs->GetDefaultMaterial();
-    Material* rhsUsedMaterial = rhs->GetDefaultMaterial();
+    Material* lhsUsedMaterial = lhs->GetMaterial();
+    Material* rhsUsedMaterial = rhs->GetMaterial();
     if (lhsUsedMaterial != rhsUsedMaterial)
         return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
 
@@ -222,12 +222,12 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     drawables_.Clear();
     GetDrawables(drawables_, scene);
 
-    // Set default material for Drawable2D.
+    // Check and set default material
     for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
         Drawable2D* drawable = drawables_[i];
-        if (!drawable->GetDefaultMaterial())
-            drawable->SetDefaultMaterial(GetMaterial(drawable->GetTexture(), drawable->GetBlendMode()));
+        if (!drawable->GetMaterial())
+            drawable->SetMaterial(GetMaterial(drawable->GetTexture(), drawable->GetBlendMode()));
     }
 
     Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
@@ -241,6 +241,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         frustum_ = 0;
     }
 
+    // Check visibility
     {
         PROFILE(CheckDrawableVisibility);
 
@@ -292,7 +293,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         if (!drawables_[d]->GetVisibility())
             continue;
 
-        Material* usedMaterial = drawables_[d]->GetDefaultMaterial();
+        Material* usedMaterial = drawables_[d]->GetMaterial();
         const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
 
         if (material != usedMaterial)
@@ -346,25 +347,6 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
         GetDrawables(dest, i->Get());
 }
 
-void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
-{
-    if (!material || indexCount == 0 || vertexCount == 0)
-        return;
-
-    materials_.Push(SharedPtr<Material>(material));
-
-    unsigned batchSize = materials_.Size();
-    if (geometries_.Size() < batchSize)
-    {
-        SharedPtr<Geometry> geometry(new Geometry(context_));
-        geometry->SetIndexBuffer(indexBuffer_);
-        geometry->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
-        geometries_.Push(geometry);
-    }
-
-    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
-}
-
 Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 {
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
@@ -412,6 +394,25 @@ Material* Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
     material->SetTexture(TU_DIFFUSE, texture);
 
     return material;
+}
+
+void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
+{
+    if (!material || indexCount == 0 || vertexCount == 0)
+        return;
+
+    materials_.Push(SharedPtr<Material>(material));
+
+    unsigned batchSize = materials_.Size();
+    if (geometries_.Size() < batchSize)
+    {
+        SharedPtr<Geometry> geometry(new Geometry(context_));
+        geometry->SetIndexBuffer(indexBuffer_);
+        geometry->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
+        geometries_.Push(geometry);
+    }
+
+    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
 }
 
 }
