@@ -124,7 +124,7 @@ task :ci_site_update do
   else
     instruction = 'package'
   end
-  # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if detached HEAD is not a fast forward of remote master)
+  # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if remote master has already diverged)
   system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
   if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
     bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
@@ -137,7 +137,8 @@ end
 desc 'Rebase all CI mirror branches'
 task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
-  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |branch| system "git fetch origin #{branch}:#{branch} && git rebase #{ENV['TRAVIS_BRANCH']} #{branch} && git push -qf -u origin #{branch} >/dev/null 2>&1" or abort "Failed to rebase #{branch} mirror branch" }
+  head = `git rev-parse --short HEAD`
+  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |branch| system "git fetch origin #{branch}:#{branch} && git rebase HEAD #{branch} && git push -qf -u origin #{branch} >/dev/null 2>&1 && git checkout -q #{head}" or abort "Failed to rebase #{branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
