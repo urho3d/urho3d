@@ -227,7 +227,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     {
         Drawable2D* drawable = drawables_[i];
         if (!drawable->GetDefaultMaterial())
-            drawable->SetDefaultMaterial(CreateMaterial(drawable->GetTexture(), drawable->GetBlendMode()));
+            drawable->SetDefaultMaterial(GetMaterial(drawable->GetTexture(), drawable->GetBlendMode()));
     }
 
     Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
