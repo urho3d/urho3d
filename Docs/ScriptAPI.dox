@@ -90,6 +90,10 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
+### DeviceLost
+
+### DeviceReset
+
 ## %IO events
 
 ### LogMessage
