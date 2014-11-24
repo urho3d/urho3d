@@ -1852,24 +1852,19 @@ Methods:
 
 - void SetLayer(int layer)
 - void SetOrderInLayer(int orderInLayer)
-- void SetSprite(Sprite2D* sprite)
+- void SetTexture(Texture2D* texture)
 - void SetBlendMode(BlendMode mode)
-- void SetMaterial(Material* material)
 - int GetLayer() const
 - int GetOrderInLayer() const
-- Sprite2D* GetSprite() const
 - Texture2D* GetTexture() const
 - BlendMode GetBlendMode() const
-- Material* GetMaterial() const
 
 Properties:
 
 - int layer
 - int orderInLayer
-- Sprite2D* sprite
-- Texture2D* texture (readonly)
+- Texture2D* texture
 - BlendMode blendMode
-- Material* material
 
 <a name="Class_DropDownList"></a>
 ### DropDownList : Menu
@@ -3752,10 +3747,13 @@ Methods:
 
 - void SetEffect(ParticleEffect2D* effect)
 - ParticleEffect2D* GetEffect() const
+- void SetSprite(Sprite2D* sprite)
+- Sprite2D* GetSprite() const
 
 Properties:
 
 - ParticleEffect2D* effect
+- Sprite2D* sprite
 
 <a name="Class_Pass"></a>
 ### Pass : RefCounted
@@ -5167,16 +5165,19 @@ Properties:
 
 Methods:
 
+- void SetSprite(Sprite2D* sprite)
 - void SetFlip(bool flipX, bool flipY)
 - void SetFlipX(bool flipX)
 - void SetFlipY(bool flipY)
 - void SetColor(const Color& color)
+- Sprite2D* GetSprite() const
 - bool GetFlipX() const
 - bool GetFlipY() const
 - const Color& GetColor() const
 
 Properties:
 
+- Sprite2D* sprite
 - bool flipX
 - bool flipY
 - Color& color
@@ -7349,7 +7350,7 @@ Properties:
 - unsigned DRAWABLE_ANY
 - unsigned DRAWABLE_GEOMETRY
 - unsigned DRAWABLE_LIGHT
-- unsigned DRAWABLE_PROXYGEOMETRY
+- unsigned DRAWABLE_RENDERER2D
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID

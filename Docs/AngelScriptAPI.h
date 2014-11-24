@@ -3681,7 +3681,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -3695,8 +3694,8 @@ int orderInLayer;
 int refs;
 float shadowDistance;
 uint shadowMask;
-Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -6571,7 +6570,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -6587,6 +6585,7 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -9366,7 +9365,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -9382,6 +9380,7 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
