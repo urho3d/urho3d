@@ -69,12 +69,14 @@ void Renderer2D::RegisterObject(Context* context)
 void Renderer2D::UpdateBatches(const FrameInfo& frame)
 {
     unsigned count = batches_.Size();
+    bool hasShaderParameters = HasShaderParameters();
 
     // Update non-thread critical parts of the source batches
     for (unsigned i = 0; i < count; ++i)
     {
         batches_[i].distance_ = 10.0f + (count - i) * 0.001f;
         batches_[i].worldTransform_ = &Matrix3x4::IDENTITY;
+        batches_[i].shaderParameters_ = hasShaderParameters ? &shaderParameters_ : 0;
     }
 }
 
