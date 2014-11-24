@@ -95,8 +95,8 @@ template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "int get_layer() const", asMETHOD(T, GetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_orderInLayer(int)", asMETHOD(T, SetOrderInLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_orderInLayer() const", asMETHOD(T, GetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_sprite(Sprite2D@+)", asMETHOD(T, SetSprite), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Sprite2D@+ get_sprite() const", asMETHOD(T, GetSprite), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_texture(Texture2D@+)", asMETHOD(T, SetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Texture2D@+ get_texture() const", asMETHOD(T, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(BlendMode)", asMETHOD(T, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "BlendMode get_blendMode() const", asMETHOD(T, GetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHOD(T, SetMaterial), asCALL_THISCALL);
@@ -115,6 +115,8 @@ template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const ch
 {
     RegisterDrawable2D<T>(engine, className);
     RegisterSubclass<StaticSprite2D, T>(engine, "StaticSprite2D", className);
+    engine->RegisterObjectMethod(className, "void set_sprite(Sprite2D@+)", asMETHOD(T, SetSprite), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Sprite2D@+ get_sprite() const", asMETHOD(T, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFlip(bool, bool)", asMETHOD(T, SetFlip), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_flipX(bool)", asMETHOD(T, SetFlipX), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_flipX() const", asMETHOD(T, GetFlipX), asCALL_THISCALL);
@@ -192,6 +194,8 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     RegisterDrawable2D<ParticleEmitter2D>(engine, "ParticleEmitter2D");
     engine->RegisterObjectMethod("ParticleEmitter2D", "void set_effect(ParticleEffect2D@+)", asMETHOD(ParticleEmitter2D, SetEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleEffect2D@+ get_effect() const", asMETHOD(ParticleEmitter2D, GetEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "void set_sprite(Sprite2D@+)", asMETHOD(ParticleEmitter2D, SetSprite), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "Sprite2D@+ get_sprite() const", asMETHOD(ParticleEmitter2D, GetSprite), asCALL_THISCALL);
 }
 
 static void FakeAddRef(void* ptr)

@@ -66,7 +66,6 @@ void Drawable2D::RegisterObject(Context* context)
 {
     ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
@@ -118,12 +117,12 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
     MarkNetworkUpdate();
 }
 
-void Drawable2D::SetSprite(Sprite2D* sprite)
+void Drawable2D::SetTexture(Texture2D* texture)
 {
-    if (sprite == sprite_)
+    if (texture == texture_)
         return;
 
-    sprite_ = sprite;
+    texture_ = texture;
 
     verticesDirty_ = true;
     OnMarkedDirty(node_);
@@ -155,6 +154,11 @@ void Drawable2D::SetMaterial(Material* material)
     MarkNetworkUpdate();
 }
 
+Texture2D* Drawable2D::GetTexture() const
+{
+    return texture_;
+}
+
 Material* Drawable2D::GetMaterial() const
 {
     return material_;
@@ -170,50 +174,6 @@ const Vector<Vertex2D>& Drawable2D::GetVertices()
     if (verticesDirty_)
         UpdateVertices();
     return vertices_;
-}
-
-void Drawable2D::SetSpriteAttr(const ResourceRef& value)
-{
-    // Delay applying material update
-    materialUpdatePending_ = true;
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    if (value.type_ == Sprite2D::GetTypeStatic())
-    {
-        SetSprite(cache->GetResource<Sprite2D>(value.name_));
-        return;
-    }
-
-    if (value.type_ == SpriteSheet2D::GetTypeStatic())
-    {
-        // value.name_ include sprite speet name and sprite name.
-        Vector<String> names = value.name_.Split('@');
-        if (names.Size() != 2)
-            return;
-
-        const String& spriteSheetName = names[0];
-        const String& spriteName = names[1];
-
-        SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName);
-        if (!spriteSheet)
-            return;
-
-        SetSprite(spriteSheet->GetSprite(spriteName));
-    }
-}
-
-ResourceRef Drawable2D::GetSpriteAttr() const
-{
-    SpriteSheet2D* spriteSheet = 0;
-    if (sprite_)
-        spriteSheet = sprite_->GetSpriteSheet();
-
-    if (!spriteSheet)
-        return GetResourceRef(sprite_, Sprite2D::GetTypeStatic());
-
-    // Combine sprite sheet name and sprite name as resource name.
-    return ResourceRef(spriteSheet->GetType(), spriteSheet->GetName() + "@" + sprite_->GetName());
 }
 
 void Drawable2D::SetBlendModeAttr(BlendMode mode)

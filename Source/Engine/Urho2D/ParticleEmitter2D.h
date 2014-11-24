@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 class ParticleEffect2D;
+class Sprite2D;
 
 /// 2D particle.
  struct Particle2D
@@ -91,10 +92,15 @@ public:
 
     /// Set particle effect.
     void SetEffect(ParticleEffect2D* effect);
+    /// Set sprite.
+    void SetSprite(Sprite2D* sprite);
     /// Set max particles.
     void SetMaxParticles(unsigned maxParticles);
+
     /// Return particle effect.
     ParticleEffect2D* GetEffect() const;
+    /// Return sprite.
+    Sprite2D* GetSprite() const;
     /// Return max particles.
     unsigned GetMaxParticles() const { return particles_.Size(); }
 
@@ -102,6 +108,10 @@ public:
     void SetParticleEffectAttr(const ResourceRef& value);
     /// Return particle model attr.
     ResourceRef GetParticleEffectAttr() const;
+    /// Set sprite attribute.
+    void SetSpriteAttr(const ResourceRef& value);
+    /// Return sprite attribute.
+    ResourceRef GetSpriteAttr() const;
 
 private:
     /// Handle node being assigned.
@@ -119,6 +129,8 @@ private:
 
     /// Particle effect.
     SharedPtr<ParticleEffect2D> effect_;
+    /// Sprite.
+    SharedPtr<Sprite2D> sprite_;
     /// Num particles.
     int numParticles_;
     /// Emission time.

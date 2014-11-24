@@ -23,13 +23,27 @@
 #pragma once
 
 #include "Drawable.h"
-#include "Sprite2D.h"
+#include "GraphicsDefs.h"
 
 namespace Urho3D
 {
 
 class Renderer2D;
+class Texture2D;
 class VertexBuffer;
+
+/// 2D vertex.
+struct Vertex2D
+{
+    /// Position.
+    Vector3 position_;
+    /// Color.
+    unsigned color_;
+    /// UV.
+    Vector2 uv_;
+};
+
+static const unsigned MASK_VERTEX2D = MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1;
 
 /// Pixel size (equal 0.01f).
 extern URHO3D_API const float PIXEL_SIZE;
@@ -56,8 +70,8 @@ public:
     void SetLayer(int layer);
     /// Set order in layer.
     void SetOrderInLayer(int orderInLayer);
-    /// Set sprite.
-    void SetSprite(Sprite2D* sprite);
+    /// Set texture.
+    void SetTexture(Texture2D* texture);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
     /// Set material.
@@ -67,10 +81,8 @@ public:
     int GetLayer() const { return layer_; }
     /// Return order in layer.
     int GetOrderInLayer() const { return orderInLayer_; }
-    /// Return sprite.
-    Sprite2D* GetSprite() const { return sprite_; }
     /// Return texture.
-    Texture2D* GetTexture() const { return sprite_ ? sprite_->GetTexture() : 0; }
+    Texture2D* GetTexture() const;
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return material.
@@ -85,10 +97,6 @@ public:
     /// Return visibility.
     bool GetVisibility() const { return visibility_; }
 
-    /// Set sprite attribute.
-    void SetSpriteAttr(const ResourceRef& value);
-    /// Return sprite attribute.
-    ResourceRef GetSpriteAttr() const;
     /// Set blend mode attribute.
     void SetBlendModeAttr(BlendMode mode);
     /// Set material attribute.
@@ -110,8 +118,8 @@ protected:
     int layer_;
     /// Order in layer.
     int orderInLayer_;
-    /// Sprite.
-    SharedPtr<Sprite2D> sprite_;
+    /// Texture.
+    SharedPtr<Texture2D> texture_;
     /// Material. If null, use a default material. If non-null, use a clone of this for updating the diffuse texture.
     SharedPtr<Material> material_;
     /// Blend mode.

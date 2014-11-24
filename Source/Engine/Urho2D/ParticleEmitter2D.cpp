@@ -28,6 +28,7 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "Sprite2D.h"
 
 #include "DebugNew.h"
 
@@ -55,6 +56,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEmitter2D>(URHO2D_CATEGORY);
 
     MIXED_ACCESSOR_ATTRIBUTE("Particle Effect", GetParticleEffectAttr, SetParticleEffectAttr, ResourceRef, ResourceRef(ParticleEffect2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Sprite ", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable2D);
 }
 
@@ -144,6 +146,16 @@ void ParticleEmitter2D::SetEffect(ParticleEffect2D* model)
     emissionTime_ = effect_->GetDuration();
 }
 
+void ParticleEmitter2D::SetSprite(Sprite2D* sprite)
+{
+    if (sprite == sprite_)
+        return;
+
+    sprite_ = sprite;
+
+    SetTexture(sprite_ ? sprite_->GetTexture() : 0);
+}
+
 void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
 {
     maxParticles = Max(maxParticles, 1);
@@ -159,6 +171,11 @@ ParticleEffect2D* ParticleEmitter2D::GetEffect() const
     return effect_;
 }
 
+Sprite2D* ParticleEmitter2D::GetSprite() const
+{
+    return sprite_;
+}
+
 void ParticleEmitter2D::SetParticleEffectAttr(const ResourceRef& value)
 {
     materialUpdatePending_ = true;
@@ -170,6 +187,18 @@ void ParticleEmitter2D::SetParticleEffectAttr(const ResourceRef& value)
 ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
 {
     return GetResourceRef(effect_, ParticleEffect2D::GetTypeStatic());
+}
+
+void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
+{
+    Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
+    if (sprite)
+        SetSprite(sprite);
+}
+
+ResourceRef ParticleEmitter2D::GetSpriteAttr() const
+{
+    return Sprite2D::SaveToResourceRef(sprite_);
 }
 
 void ParticleEmitter2D::OnNodeSet(Node* node)
