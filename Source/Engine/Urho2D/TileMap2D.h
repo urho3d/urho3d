@@ -71,6 +71,9 @@ public:
     ResourceRef GetTmxFileAttr() const;
 
 private:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
+
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
     /// Tile map information.

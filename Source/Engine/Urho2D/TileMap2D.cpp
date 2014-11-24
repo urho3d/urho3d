@@ -170,4 +170,13 @@ ResourceRef TileMap2D::GetTmxFileAttr() const
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
 }
 
+void TileMap2D::OnNodeSet(Node* node)
+{
+    if (!node)
+    {
+        for (unsigned i = 0; i < layers_.Size(); ++i)
+            layers_[i]->GetNode()->Remove();
+    }
+}
+
 }
