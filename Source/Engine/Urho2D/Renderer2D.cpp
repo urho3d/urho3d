@@ -47,7 +47,7 @@ namespace Urho3D
 extern const char* blendModeNames[];
 
 Renderer2D::Renderer2D(Context* context) :
-    Drawable(context, DRAWABLE_PROXYGEOMETRY),
+    Drawable(context, DRAWABLE_RENDERER2D),
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
     frustum_(0),
