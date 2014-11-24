@@ -59,7 +59,7 @@ static const unsigned MAX_BILLBOARDS = 65536 / 4;
 class URHO3D_API BillboardSet : public Drawable
 {
     OBJECT(BillboardSet);
-    
+
 public:
     /// Construct.
     BillboardSet(Context* context);
@@ -67,7 +67,7 @@ public:
     virtual ~BillboardSet();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -76,7 +76,7 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
-    
+
     /// Set material.
     void SetMaterial(Material* material);
     /// Set number of billboards.
@@ -93,7 +93,7 @@ public:
     void SetAnimationLodBias(float bias);
     /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
     void Commit();
-    
+
     /// Return material.
     Material* GetMaterial() const;
     /// Return number of billboards.
@@ -112,11 +112,11 @@ public:
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
-    
+
     /// Set material attribute.
-    void SetMaterialAttr(ResourceRef value);
+    void SetMaterialAttr(const ResourceRef& value);
     /// Set billboards attribute.
-    void SetBillboardsAttr(VariantVector value);
+    void SetBillboardsAttr(const VariantVector& value);
     /// Set billboards attribute for network replication.
     void SetNetBillboardsAttr(const PODVector<unsigned char>& value);
     /// Return material attribute.
@@ -125,13 +125,13 @@ public:
     VariantVector GetBillboardsAttr() const;
     /// Return billboards attribute for network replication.
     const PODVector<unsigned char>& GetNetBillboardsAttr() const;
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Mark billboard vertex buffer to need an update.
     void MarkPositionsDirty();
-    
+
     /// Billboards.
     PODVector<Billboard> billboards_;
     /// Coordinate axes on which camera facing is done.
@@ -148,13 +148,13 @@ protected:
     bool sorted_;
     /// Billboard rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
-    
+
 private:
     /// Resize billboard vertex and index buffers.
     void UpdateBufferSize();
     /// Rewrite billboard vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
-    
+
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.

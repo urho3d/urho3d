@@ -45,14 +45,14 @@ void ConstraintRevolute2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintRevolute2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_VECTOR2, "Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_BOOL, "Enable Limit", GetEnableLimit, SetEnableLimit, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_FLOAT, "Lower Angle", GetLowerAngle, SetLowerAngle, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_FLOAT, "Upper Angle", GetUpperAngle, SetUpperAngle, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_BOOL, "Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_FLOAT, "Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintRevolute2D, VAR_FLOAT, "Max Motor Torque", GetMaxMotorTorque, SetMaxMotorTorque, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ConstraintRevolute2D, Constraint2D);
+    ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Enable Limit", GetEnableLimit, SetEnableLimit, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Lower Angle", GetLowerAngle, SetLowerAngle, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Upper Angle", GetUpperAngle, SetUpperAngle, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Motor Torque", GetMaxMotorTorque, SetMaxMotorTorque, float, 0.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintRevolute2D::SetAnchor(const Vector2& anchor)

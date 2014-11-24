@@ -2322,6 +2322,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
             // We are not shutting down, but recreating the context: mark GPU objects lost
             for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->OnDeviceLost();
+
+            SendEvent(E_DEVICELOST);
         }
     }
     
@@ -2399,6 +2401,8 @@ void Graphics::Restore()
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceReset();
     }
+
+    SendEvent(E_DEVICERESET);
 }
 
 void Graphics::Maximize()

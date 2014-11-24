@@ -66,11 +66,14 @@ public:
     bool PositionToTileIndex(int& x, int& y, const Vector2& position) const;
 
     /// Set tile map file attribute.
-    void SetTmxFileAttr(ResourceRef value);
+    void SetTmxFileAttr(const ResourceRef& value);
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
 
 private:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
+
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
     /// Tile map information.

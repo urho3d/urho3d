@@ -144,9 +144,9 @@ public:
     /// Update patch based on LOD and neighbor LOD.
     void UpdatePatchLod(TerrainPatch* patch);
     /// Set heightmap attribute.
-    void SetHeightMapAttr(ResourceRef value);
+    void SetHeightMapAttr(const ResourceRef& value);
     /// Set material attribute.
-    void SetMaterialAttr(ResourceRef value);
+    void SetMaterialAttr(const ResourceRef& value);
     /// Set patch size attribute.
     void SetPatchSizeAttr(int value);
     /// Return heightmap attribute.
@@ -177,7 +177,7 @@ private:
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Mark patch(es) dirty based on location. Used when checking the heightmap image for changes.
     void MarkPatchesDirty(PODVector<bool>& dirtyPatches, int x, int z);
-    
+
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Heightmap image.

@@ -39,7 +39,7 @@ static const int STREAM_BUFFER_LENGTH = 100;
 class URHO3D_API SoundSource : public Component
 {
     OBJECT(SoundSource);
-    
+
 public:
     /// Construct.
     SoundSource(Context* context);
@@ -47,7 +47,7 @@ public:
     virtual ~SoundSource();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Play a sound.
     void Play(Sound* sound);
     /// Play a sound with specified frequency.
@@ -74,7 +74,7 @@ public:
     void SetAutoRemove(bool enable);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
-    
+
     /// Return sound.
     Sound* GetSound() const { return sound_; }
     /// Return playback position.
@@ -95,14 +95,14 @@ public:
     bool GetAutoRemove() const { return autoRemove_; }
     /// Return whether is playing.
     bool IsPlaying() const;
-    
+
     /// Update the sound source. Perform subclass specific operations. Called by Audio.
     virtual void Update(float timeStep);
     /// Mix sound source output to a 32-bit clipping buffer. Called by Audio.
     void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation);
-    
+
     /// Set sound attribute.
-    void SetSoundAttr(ResourceRef value);
+    void SetSoundAttr(const ResourceRef& value);
     /// Set sound position attribute.
     void SetPositionAttr(int value);
     /// Return sound attribute.
@@ -111,7 +111,7 @@ public:
     void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;
-    
+
 protected:
     /// Audio subsystem.
     WeakPtr<Audio> audio_;
@@ -129,7 +129,7 @@ protected:
     float autoRemoveTimer_;
     /// Autoremove flag.
     bool autoRemove_;
-    
+
 private:
     /// Play a sound without locking the audio mutex. Called internally.
     void PlayLockless(Sound* sound);
@@ -159,7 +159,7 @@ private:
     void MixZeroVolume(Sound* sound, unsigned samples, int mixRate);
     /// Advance playback pointer to simulate audio playback in headless mode.
     void MixNull(float timeStep);
-    
+
     /// Sound that is being played.
     SharedPtr<Sound> sound_;
     /// Sound stream that is being played.

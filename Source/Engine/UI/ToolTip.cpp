@@ -47,8 +47,8 @@ void ToolTip::RegisterObject(Context* context)
 {
     context->RegisterFactory<ToolTip>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(ToolTip, UIElement);
-    ACCESSOR_ATTRIBUTE(ToolTip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 0.0f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(UIElement);
+    ACCESSOR_ATTRIBUTE("Delay", GetDelay, SetDelay, float, 0.0f, AM_FILE);
 }
 
 void ToolTip::Update(float timeStep)

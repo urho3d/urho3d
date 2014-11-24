@@ -86,11 +86,11 @@ void LuaScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<LuaScriptInstance>(LOGIC_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_STRING, "Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(LuaScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -157,7 +157,7 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
                 Vector4* value = new Vector4(src.GetVector4());
                 tolua_pushusertype(luaState_, value, "Vector4");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
-            }            
+            }
             break;
         case VAR_QUATERNION:
             {
@@ -165,7 +165,7 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
                 tolua_pushusertype(luaState_, value, "Quaternion");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
-            
+
             break;
         case VAR_COLOR:
             {
@@ -344,7 +344,7 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
     FindScriptObjectMethodRefs();
 }
 
-void LuaScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
+void LuaScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
@@ -358,7 +358,7 @@ void LuaScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
     }
 }
 
-void LuaScriptInstance::SetScriptNetworkDataAttr(PODVector<unsigned char> data)
+void LuaScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>& data)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
@@ -767,7 +767,7 @@ WeakPtr<LuaFunction> LuaScriptInstance::GetScriptObjectFunction(const String& fu
     return luaScript_->GetFunction(scriptObjectType_ + "." + functionName, true);
 }
 
-void LuaScriptInstance::SetScriptFileAttr(ResourceRef value)
+void LuaScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetScriptFile(cache->GetResource<LuaFile>(value.name_));

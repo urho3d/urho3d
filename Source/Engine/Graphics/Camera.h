@@ -44,7 +44,7 @@ static const unsigned VO_DISABLE_OCCLUSION = 0x4;
 class URHO3D_API Camera : public Component
 {
     OBJECT(Camera);
-    
+
 public:
     /// Construct.
     Camera(Context* context);
@@ -52,10 +52,10 @@ public:
     virtual ~Camera();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set near clip distance.
     void SetNearClip(float nearClip);
     /// Set far clip distance.
@@ -94,7 +94,7 @@ public:
     void SetClipPlane(const Plane& plane);
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
-    
+
     /// Return far clip distance.
     float GetFarClip() const { return farClip_; }
     /// Return near clip distance.
@@ -102,7 +102,7 @@ public:
     /// Return vertical field of view in degrees.
     float GetFov() const { return fov_; }
     /// Return orthographic mode size.
-    float GetOrthoSize() const { return orthoSize_; } 
+    float GetOrthoSize() const { return orthoSize_; }
     /// Return aspect ratio.
     float GetAspectRatio() const { return aspectRatio_; }
     /// Return zoom.
@@ -169,24 +169,24 @@ public:
     Matrix3x4 GetEffectiveWorldTransform() const;
     /// Return if projection parameters are valid for rendering and raycasting.
     bool IsProjectionValid() const;
-    
+
     /// Set aspect ratio without disabling the "auto aspect ratio" mode. Called internally by View.
     void SetAspectRatioInternal(float aspectRatio);
     /// Set reflection plane attribute.
-    void SetReflectionPlaneAttr(Vector4 value);
+    void SetReflectionPlaneAttr(const Vector4& value);
     /// Return reflection plane attribute.
     Vector4 GetReflectionPlaneAttr() const;
     /// Set clipping plane attribute.
-    void SetClipPlaneAttr(Vector4 value);
+    void SetClipPlaneAttr(const Vector4& value);
     /// Return clipping plane attribute.
     Vector4 GetClipPlaneAttr() const;
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    
+
 private:
     /// Cached view matrix.
     mutable Matrix3x4 view_;

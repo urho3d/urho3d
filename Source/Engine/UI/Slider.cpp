@@ -39,11 +39,6 @@ const char* orientations[] =
     0
 };
 
-template<> Orientation Variant::Get<Orientation>() const
-{
-    return (Orientation)GetInt();
-}
-
 extern const char* UI_CATEGORY;
 
 Slider::Slider(Context* context) :
@@ -69,12 +64,12 @@ void Slider::RegisterObject(Context* context)
 {
     context->RegisterFactory<Slider>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(Slider, BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Slider, "Is Enabled", true);
-    ENUM_ACCESSOR_ATTRIBUTE(Slider, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(BorderImage);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
 }
 
 void Slider::Update(float timeStep)

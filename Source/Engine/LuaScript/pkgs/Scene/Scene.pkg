@@ -70,7 +70,7 @@ class Scene : public Node
     void NodeRemoved(Node* node);
     void ComponentAdded(Component* component);
     void ComponentRemoved(Component* component);
-    void SetVarNamesAttr(String value);
+    void SetVarNamesAttr(const String value);
     String GetVarNamesAttr() const;
     void PrepareNetworkUpdate();
     void CleanupConnection(Connection* connection);

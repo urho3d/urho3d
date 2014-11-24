@@ -117,15 +117,15 @@ void SoundSource3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundSource3D>(AUDIO_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(SoundSource3D, SoundSource);
+    COPY_BASE_ATTRIBUTES(SoundSource);
     // Remove Attenuation and Panning as attribute as they are constantly being updated
-    REMOVE_ATTRIBUTE(SoundSource3D, "Attenuation");
-    REMOVE_ATTRIBUTE(SoundSource3D, "Panning");
-    ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Near Distance", nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
-    ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Far Distance", farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
-    ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Inner Angle", innerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
-    ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Outer Angle", outerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
-    ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Rolloff Factor", rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);
+    REMOVE_ATTRIBUTE("Attenuation");
+    REMOVE_ATTRIBUTE("Panning");
+    ATTRIBUTE("Near Distance", float, nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
+    ATTRIBUTE("Far Distance", float, farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
+    ATTRIBUTE("Inner Angle", float, innerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
+    ATTRIBUTE("Outer Angle", float, outerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
+    ATTRIBUTE("Rolloff Factor", float, rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);
 }
 
 void SoundSource3D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

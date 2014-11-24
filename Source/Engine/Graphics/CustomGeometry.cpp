@@ -63,41 +63,41 @@ CustomGeometry::~CustomGeometry()
 void CustomGeometry::RegisterObject(Context* context)
 {
     context->RegisterFactory<CustomGeometry>(GEOMETRY_CATEGORY);
-    
-    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE(CustomGeometry, VAR_BOOL, "Dynamic Vertex Buffer", dynamic_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BUFFER, "Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE(CustomGeometry, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CustomGeometry, Drawable);
+
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Dynamic Vertex Buffer", bool, dynamic_, false, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Drawable);
 }
 
 void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     RayQueryLevel level = query.level_;
-    
+
     switch (level)
     {
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         break;
-        
+
     case RAY_OBB:
     case RAY_TRIANGLE:
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
-        
+
         if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
             distance = M_INFINITY;
-            
+
             for (unsigned i = 0; i < batches_.Size(); ++i)
             {
                 Geometry* geometry = batches_[i].geometry_;
@@ -113,7 +113,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
                 }
             }
         }
-        
+
         if (distance < query.maxDistance_)
         {
             RayQueryResult result;
@@ -137,34 +137,34 @@ Geometry* CustomGeometry::GetLodGeometry(unsigned batchIndex, unsigned level)
 unsigned CustomGeometry::GetNumOccluderTriangles()
 {
     unsigned triangles = 0;
-    
+
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, 0);
         if (!geometry)
             continue;
-        
+
         // Check that the material is suitable for occlusion (default material always is)
         Material* mat = batches_[i].material_;
         if (mat && !mat->GetOcclusion())
             continue;
-        
+
         triangles += geometry->GetVertexCount() / 3;
     }
-    
+
     return triangles;
 }
 
 bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
 {
     bool success = true;
-    
+
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, 0);
         if (!geometry)
             continue;
-        
+
         // Check that the material is suitable for occlusion (default material always is) and set culling mode
         Material* material = batches_[i].material_;
         if (material)
@@ -175,25 +175,25 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
         }
         else
             buffer->SetCullMode(CULL_CCW);
-        
+
         const unsigned char* vertexData;
         unsigned vertexSize;
         const unsigned char* indexData;
         unsigned indexSize;
         unsigned elementMask;
-        
+
         geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         // Check for valid geometry data
         if (!vertexData)
             continue;
-        
+
         // Draw and check for running out of triangles
         success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(), geometry->GetVertexCount());
-        
+
         if (!success)
             break;
     }
-    
+
     return success;
 }
 
@@ -212,12 +212,12 @@ void CustomGeometry::SetNumGeometries(unsigned num)
     geometries_.Resize(num);
     primitiveTypes_.Resize(num);
     vertices_.Resize(num);
-    
+
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         if (!geometries_[i])
             geometries_[i] = new Geometry(context_);
-        
+
         batches_[i].geometry_ = geometries_[i];
     }
 }
@@ -236,7 +236,7 @@ void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
         LOGERROR("Geometry index out of bounds");
         return;
     }
-    
+
     geometryIndex_ = index;
     primitiveTypes_[index] = type;
     vertices_[index].Clear();
@@ -250,7 +250,7 @@ void CustomGeometry::DefineVertex(const Vector3& position)
 {
     if (vertices_.Size() < geometryIndex_)
         return;
-    
+
     vertices_[geometryIndex_].Resize(vertices_[geometryIndex_].Size() + 1);
     vertices_[geometryIndex_].Back().position_ = position;
 }
@@ -259,7 +259,7 @@ void CustomGeometry::DefineNormal(const Vector3& normal)
 {
     if (vertices_.Size() < geometryIndex_ || vertices_[geometryIndex_].Empty())
         return;
-    
+
     vertices_[geometryIndex_].Back().normal_ = normal;
     elementMask_ |= MASK_NORMAL;
 }
@@ -268,7 +268,7 @@ void CustomGeometry::DefineColor(const Color& color)
 {
     if (vertices_.Size() < geometryIndex_ || vertices_[geometryIndex_].Empty())
         return;
-    
+
     vertices_[geometryIndex_].Back().color_ = color.ToUInt();
     elementMask_ |= MASK_COLOR;
 }
@@ -277,7 +277,7 @@ void CustomGeometry::DefineTexCoord(const Vector2& texCoord)
 {
     if (vertices_.Size() < geometryIndex_ || vertices_[geometryIndex_].Empty())
         return;
-    
+
     vertices_[geometryIndex_].Back().texCoord_ = texCoord;
     elementMask_ |= MASK_TEXCOORD1;
 }
@@ -286,7 +286,7 @@ void CustomGeometry::DefineTangent(const Vector4& tangent)
 {
     if (vertices_.Size() < geometryIndex_ || vertices_[geometryIndex_].Empty())
         return;
-    
+
     vertices_[geometryIndex_].Back().tangent_ = tangent;
     elementMask_ |= MASK_TANGENT;
 }
@@ -319,18 +319,18 @@ void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned
 void CustomGeometry::Commit()
 {
     PROFILE(CommitCustomGeometry);
-    
+
     unsigned totalVertices = 0;
     boundingBox_.Clear();
-    
+
     for (unsigned i = 0; i < vertices_.Size(); ++i)
     {
         totalVertices += vertices_[i].Size();
-        
+
         for (unsigned j = 0; j < vertices_[i].Size(); ++j)
             boundingBox_.Merge(vertices_[i][j].position_);
     }
-    
+
     // Resize (recreate) the vertex buffer only if necessary
     if (vertexBuffer_->GetVertexCount() != totalVertices || vertexBuffer_->GetElementMask() != elementMask_ ||
         vertexBuffer_->IsDynamic() != dynamic_)
@@ -342,16 +342,16 @@ void CustomGeometry::Commit()
         if (dest)
         {
             unsigned vertexStart = 0;
-            
+
             for (unsigned i = 0; i < vertices_.Size(); ++i)
             {
                 unsigned vertexCount = 0;
-                
+
                 for (unsigned j = 0; j < vertices_[i].Size(); ++j)
                 {
                     *((Vector3*)dest) = vertices_[i][j].position_;
                     dest += sizeof(Vector3);
-                    
+
                     if (elementMask_ & MASK_NORMAL)
                     {
                         *((Vector3*)dest) = vertices_[i][j].normal_;
@@ -372,15 +372,15 @@ void CustomGeometry::Commit()
                         *((Vector4*)dest) = vertices_[i][j].tangent_;
                         dest += sizeof(Vector4);
                     }
-                    
+
                     ++vertexCount;
                 }
-                
+
                 geometries_[i]->SetVertexBuffer(0, vertexBuffer_, elementMask_);
                 geometries_[i]->SetDrawRange(primitiveTypes_[i], 0, 0, vertexStart, vertexCount);
                 vertexStart += vertexCount;
             }
-            
+
             vertexBuffer_->Unlock();
         }
         else
@@ -394,7 +394,7 @@ void CustomGeometry::Commit()
             geometries_[i]->SetDrawRange(primitiveTypes_[i], 0, 0, 0, 0);
         }
     }
-    
+
     vertexBuffer_->ClearDataLost();
 }
 
@@ -402,7 +402,7 @@ void CustomGeometry::SetMaterial(Material* material)
 {
     for (unsigned i = 0; i < batches_.Size(); ++i)
         batches_[i].material_ = material;
-    
+
     MarkNetworkUpdate();
 }
 
@@ -413,7 +413,7 @@ bool CustomGeometry::SetMaterial(unsigned index, Material* material)
         LOGERROR("Material index out of bounds");
         return false;
     }
-    
+
     batches_[index].material_ = material;
     MarkNetworkUpdate();
     return true;
@@ -435,22 +435,22 @@ CustomGeometryVertex* CustomGeometry::GetVertex(unsigned geometryIndex, unsigned
         &vertices_[geometryIndex][vertexNum] : (CustomGeometryVertex*)0;
 }
 
-void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> value)
+void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
 {
     if (value.Empty())
         return;
-    
+
     MemoryBuffer buffer(value);
-    
+
     SetNumGeometries(buffer.ReadVLE());
     elementMask_ = buffer.ReadUInt();
-    
+
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         unsigned numVertices = buffer.ReadVLE();
         vertices_[i].Resize(numVertices);
         primitiveTypes_[i] = (PrimitiveType)buffer.ReadUByte();
-        
+
         for (unsigned j = 0; j < numVertices; ++j)
         {
              if (elementMask_ & MASK_POSITION)
@@ -465,7 +465,7 @@ void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> value)
                 vertices_[i][j].tangent_ = buffer.ReadVector4();
         }
     }
-    
+
     Commit();
 }
 
@@ -479,16 +479,16 @@ void CustomGeometry::SetMaterialsAttr(const ResourceRefList& value)
 PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
 {
     VectorBuffer ret;
-    
+
     ret.WriteVLE(geometries_.Size());
     ret.WriteUInt(elementMask_);
-    
+
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         unsigned numVertices = vertices_[i].Size();
         ret.WriteVLE(numVertices);
         ret.WriteUByte(primitiveTypes_[i]);
-        
+
         for (unsigned j = 0; j < numVertices; ++j)
         {
              if (elementMask_ & MASK_POSITION)
@@ -503,7 +503,7 @@ PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
                 ret.WriteVector4(vertices_[i][j].tangent_);
         }
     }
-    
+
     return ret.GetBuffer();
 }
 
@@ -512,7 +512,7 @@ const ResourceRefList& CustomGeometry::GetMaterialsAttr() const
     materialsAttr_.names_.Resize(batches_.Size());
     for (unsigned i = 0; i < batches_.Size(); ++i)
         materialsAttr_.names_[i] = GetResourceName(batches_[i].material_);
-    
+
     return materialsAttr_;
 }
 

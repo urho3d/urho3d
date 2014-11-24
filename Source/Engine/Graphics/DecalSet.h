@@ -40,14 +40,14 @@ struct DecalVertex
     DecalVertex()
     {
     }
-    
+
     /// Construct with position and normal.
     DecalVertex(const Vector3& position, const Vector3& normal) :
         position_(position),
         normal_(normal)
     {
     }
-    
+
     // Construct with position, normal and skinning information.
     DecalVertex(const Vector3& position, const Vector3& normal, const float* blendWeights, const unsigned char* blendIndices) :
         position_(position),
@@ -59,7 +59,7 @@ struct DecalVertex
             blendIndices_[i] = blendIndices[i];
         }
     }
-    
+
     /// Position.
     Vector3 position_;
     /// Normal.
@@ -83,12 +83,12 @@ struct Decal
         timeToLive_(0.0f)
     {
     }
-    
+
     /// Add a vertex.
     void AddVertex(const DecalVertex& vertex);
     /// Calculate local-space bounding box.
     void CalculateBoundingBox();
-    
+
     /// Decal age timer.
     float timer_;
     /// Maximum time to live in seconds (0 = infinite)
@@ -105,7 +105,7 @@ struct Decal
 class URHO3D_API DecalSet : public Drawable
 {
     OBJECT(DecalSet);
-    
+
 public:
     /// Construct.
     DecalSet(Context* context);
@@ -113,7 +113,7 @@ public:
     virtual ~DecalSet();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -126,7 +126,7 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
-    
+
     /// Set material. The material should use a small negative depth bias to avoid Z-fighting.
     void SetMaterial(Material* material);
     /// Set maximum number of decal vertices.
@@ -139,7 +139,7 @@ public:
     void RemoveDecals(unsigned num);
     /// Remove all decals.
     void RemoveAllDecals();
-    
+
     /// Return material.
     Material* GetMaterial() const;
     /// Return number of decals.
@@ -152,22 +152,22 @@ public:
     unsigned GetMaxVertices() const { return maxVertices_; }
     /// Return maximum number of decal vertex indices.
     unsigned GetMaxIndices() const { return maxIndices_; }
-    
+
     /// Set material attribute.
-    void SetMaterialAttr(ResourceRef value);
+    void SetMaterialAttr(const ResourceRef& value);
     /// Set decals attribute.
-    void SetDecalsAttr(PODVector<unsigned char> value);
+    void SetDecalsAttr(const PODVector<unsigned char>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return decals attribute.
     PODVector<unsigned char> GetDecalsAttr() const;
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    
+
 private:
     /// Get triangle faces from the target geometry.
     void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
@@ -199,7 +199,7 @@ private:
     void UpdateEventSubscription(bool checkAllDecals);
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.

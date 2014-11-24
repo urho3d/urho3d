@@ -46,10 +46,10 @@ void ConstraintFriction2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintFriction2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_VECTOR2, "Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_FLOAT, "Max Force", GetMaxForce, SetMaxForce, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintFriction2D, VAR_FLOAT, "Max Torque", GetMaxTorque, SetMaxTorque, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ConstraintFriction2D, Constraint2D);
+    ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Force", GetMaxForce, SetMaxForce, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Torque", GetMaxTorque, SetMaxTorque, float, 0.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintFriction2D::SetAnchor(const Vector2& anchor)

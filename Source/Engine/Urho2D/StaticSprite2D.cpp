@@ -52,10 +52,22 @@ StaticSprite2D::~StaticSprite2D()
 void StaticSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<StaticSprite2D>(URHO2D_CATEGORY);
-    ACCESSOR_ATTRIBUTE(StaticSprite2D, VAR_BOOL, "Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(StaticSprite2D, VAR_BOOL, "Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(StaticSprite2D, VAR_COLOR, "Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(StaticSprite2D, Drawable2D);
+
+    MIXED_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Drawable2D);
+}
+
+void StaticSprite2D::SetSprite(Sprite2D* sprite)
+{
+    if (sprite == sprite_)
+        return;
+
+    sprite_ = sprite;
+
+    SetTexture(sprite_ ? sprite_->GetTexture() : 0);
 }
 
 void StaticSprite2D::SetFlip(bool flipX, bool flipY)
@@ -111,6 +123,23 @@ void StaticSprite2D::SetHotSpot(const Vector2& hotspot)
         verticesDirty_ = true;
         MarkNetworkUpdate();
     }
+}
+
+Sprite2D* StaticSprite2D::GetSprite() const
+{
+    return sprite_;
+}
+
+void StaticSprite2D::SetSpriteAttr(const ResourceRef& value)
+{
+    Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
+    if (sprite)
+        SetSprite(sprite);
+}
+
+ResourceRef StaticSprite2D::GetSpriteAttr() const
+{
+    return Sprite2D::SaveToResourceRef(sprite_);
 }
 
 void StaticSprite2D::OnWorldBoundingBoxUpdate()

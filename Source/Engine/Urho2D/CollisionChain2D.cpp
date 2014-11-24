@@ -44,8 +44,8 @@ CollisionChain2D::~CollisionChain2D()
 void CollisionChain2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionChain2D>();
-    ACCESSOR_ATTRIBUTE(CollisionChain2D, VAR_BOOL, "Loop", GetLoop, SetLoop, bool, false, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CollisionChain2D, CollisionShape2D);
+    ACCESSOR_ATTRIBUTE("Loop", GetLoop, SetLoop, bool, false, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionChain2D::SetLoop(bool loop)

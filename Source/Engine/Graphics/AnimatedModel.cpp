@@ -91,21 +91,21 @@ void AnimatedModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedModel>(GEOMETRY_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE(AnimatedModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(AnimatedModel, Drawable);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Drawable);
+    MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT | AM_NOEDIT);
 }
 
 bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
@@ -271,7 +271,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (morphsDirty_)
         UpdateMorphs();
-    
+
     if (skinningDirty_)
         UpdateSkinning();
 }
@@ -757,21 +757,21 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
     assignBonesPending_ = !createBones;
 }
 
-void AnimatedModel::SetModelAttr(ResourceRef value)
+void AnimatedModel::SetModelAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // When loading a scene, set model without creating the bone nodes (will be assigned later during post-load)
     SetModel(cache->GetResource<Model>(value.name_), !loading_);
 }
 
-void AnimatedModel::SetBonesEnabledAttr(VariantVector value)
+void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value)
 {
     Vector<Bone>& bones = skeleton_.GetModifiableBones();
     for (unsigned i = 0; i < bones.Size() && i < value.Size(); ++i)
         bones[i].animated_ = value[i].GetBool();
 }
 
-void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
+void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     RemoveAllAnimationStates();
@@ -782,7 +782,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
         numStates = 0;
     if (numStates > MAX_ANIMATION_STATES)
         numStates = MAX_ANIMATION_STATES;
-    
+
     animationStates_.Reserve(numStates);
     while (numStates--)
     {
@@ -1152,14 +1152,14 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
         skeleton_.ResetSilent();
         for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
             (*i)->Apply();
-        
+
         // Skeleton reset and animations apply the node transforms "silently" to avoid repeated marking dirty. Mark dirty now
         node_->MarkDirty();
 
         // Calculate new bone bounding box
         UpdateBoneBoundingBox();
     }
-    
+
     animationDirty_ = false;
 }
 
@@ -1170,7 +1170,7 @@ void AnimatedModel::UpdateBoneBoundingBox()
         // The bone bounding box is in local space, so need the node's inverse transform
         boneBoundingBox_.defined_ = false;
         Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
-        
+
         const Vector<Bone>& bones = skeleton_.GetBones();
         for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
         {
@@ -1186,7 +1186,7 @@ void AnimatedModel::UpdateBoneBoundingBox()
                 boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
         }
     }
-    
+
     boneBoundingBoxDirty_ = false;
     worldBoundingBoxDirty_ = true;
 }
