@@ -52,24 +52,20 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
 
-    /// Add drawable.
-    void AddDrawable(Drawable2D* drawable);
-    /// Remove drawable.
-    void RemoveDrawable(Drawable2D* drawable);
-    /// Mark order dirty.
-    void MarkOrderDirty() { orderDirty_ = true; }
     /// Check visibility.
     bool CheckVisibility(Drawable2D* drawable) const;
-    /// Return material by texture and blend mode.
-    Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
 
 private:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle view update begin event. Determine Drawable2D's and their batches here.
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
+    /// Get all drawables in node.
+    void GetDrawables(PODVector<Drawable2D*>& drawables, Node* node);
     /// Add batch.
     void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
+    /// Return material by texture and blend mode.
+    Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
     /// Create material by texture and blend mode.
     Material* CreateMaterial(Texture2D* Texture, BlendMode blendMode);
 
@@ -77,14 +73,12 @@ private:
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Drawables.
+    PODVector<Drawable2D*> drawables_;
     /// Materials.
     Vector<SharedPtr<Material> > materials_;
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
-    /// Drawables.
-    PODVector<Drawable2D*> drawables_;
-    /// Order dirty.
-    bool orderDirty_;
     /// Frustum for current frame.
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.
@@ -93,7 +87,7 @@ private:
     unsigned indexCount_;
     /// Total vertex count for the current frame.
     unsigned vertexCount_;
-    /// Materials.
+    /// Cached materials.
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
 };
 

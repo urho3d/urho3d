@@ -50,7 +50,6 @@ Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_PROXYGEOMETRY),
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
-    orderDirty_(true),
     frustum_(0),
     indexCount_(0),
     vertexCount_(0)
@@ -161,27 +160,6 @@ UpdateGeometryType Renderer2D::GetUpdateGeometryType()
     return UPDATE_MAIN_THREAD;
 }
 
-void Renderer2D::AddDrawable(Drawable2D* drawable)
-{
-    if (!drawable)
-        return;
-
-    if (drawables_.Contains(drawable))
-        return;
-
-    drawables_.Push(drawable);
-    orderDirty_ = true;
-}
-
-void Renderer2D::RemoveDrawable(Drawable2D* drawable)
-{
-    if (!drawable)
-        return;
-
-    drawables_.Remove(drawable);
-    orderDirty_ = true;
-}
-
 bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
 {
     const BoundingBox& box = drawable->GetWorldBoundingBox();
@@ -191,27 +169,6 @@ bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
     return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
 }
 
-Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
-{
-    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
-    if (t == cachedMaterials_.End())
-    {
-        SharedPtr<Material> material(CreateMaterial(texture, blendMode));
-        cachedMaterials_[texture][blendMode] = material;
-        return material;
-    }
-
-    HashMap<int, SharedPtr<Material> >& materials = t->second_;
-    HashMap<int, SharedPtr<Material> >::Iterator b = materials.Find(blendMode);
-    if (b != materials.End())
-        return b->second_;
-
-    SharedPtr<Material> material(CreateMaterial(texture, blendMode));
-    materials[blendMode] = material;
-
-    return material;
-}
-
 void Renderer2D::OnWorldBoundingBoxUpdate()
 {
     // Set a large dummy bounding box to ensure the renderer is rendered
@@ -219,7 +176,7 @@ void Renderer2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_;
 }
 
-void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
+static void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
 {
     Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
@@ -228,7 +185,7 @@ void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable2D* drawable = *start++;
-        if (renderer->CheckVisibility(drawable) && drawable->GetUsedMaterial() && drawable->GetVertices().Size())
+        if (renderer->CheckVisibility(drawable) && drawable->GetDefaultMaterial() && drawable->GetVertices().Size())
             drawable->SetVisibility(true);
         else
             drawable->SetVisibility(false);
@@ -243,8 +200,8 @@ static inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
     if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
         return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
 
-    Material* lhsUsedMaterial = lhs->GetUsedMaterial();
-    Material* rhsUsedMaterial = rhs->GetUsedMaterial();
+    Material* lhsUsedMaterial = lhs->GetDefaultMaterial();
+    Material* rhsUsedMaterial = rhs->GetDefaultMaterial();
     if (lhsUsedMaterial != rhsUsedMaterial)
         return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
 
@@ -255,18 +212,26 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 {
     using namespace BeginViewUpdate;
 
+    Scene* scene = GetScene();
     // Check that we are updating the correct scene
-    if (GetScene() != eventData[P_SCENE].GetPtr())
+    if (scene != eventData[P_SCENE].GetPtr())
         return;
 
     PROFILE(UpdateRenderer2D);
 
-    if (orderDirty_)
+    drawables_.Clear();
+    GetDrawables(drawables_, scene);
+
+    // Set default material for Drawable2D.
+    for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
-        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
-        orderDirty_ = false;
+        Drawable2D* drawable = drawables_[i];
+        if (!drawable->GetDefaultMaterial())
+            drawable->SetDefaultMaterial(CreateMaterial(drawable->GetTexture(), drawable->GetBlendMode()));
     }
 
+    Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
+    
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = &camera->GetFrustum();
     if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
@@ -327,7 +292,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         if (!drawables_[d]->GetVisibility())
             continue;
 
-        Material* usedMaterial = drawables_[d]->GetUsedMaterial();
+        Material* usedMaterial = drawables_[d]->GetDefaultMaterial();
         const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
 
         if (material != usedMaterial)
@@ -363,6 +328,24 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     }
 }
 
+void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
+{
+    if (!node)
+        return;
+
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    {
+        Drawable2D* drawable = dynamic_cast<Drawable2D*>(i->Get());
+        if (drawable)
+            dest.Push(drawable);
+    }
+
+    const Vector<SharedPtr<Node> >& children = node->GetChildren();
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        GetDrawables(dest, i->Get());
+}
+
 void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
 {
     if (!material || indexCount == 0 || vertexCount == 0)
@@ -380,6 +363,27 @@ void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned inde
     }
 
     geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
+}
+
+Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
+{
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
+    if (t == cachedMaterials_.End())
+    {
+        SharedPtr<Material> material(CreateMaterial(texture, blendMode));
+        cachedMaterials_[texture][blendMode] = material;
+        return material;
+    }
+
+    HashMap<int, SharedPtr<Material> >& materials = t->second_;
+    HashMap<int, SharedPtr<Material> >::Iterator b = materials.Find(blendMode);
+    if (b != materials.End())
+        return b->second_;
+
+    SharedPtr<Material> material(CreateMaterial(texture, blendMode));
+    materials[blendMode] = material;
+
+    return material;
 }
 
 Material* Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)

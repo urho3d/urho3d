@@ -99,8 +99,6 @@ template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "Texture2D@+ get_texture() const", asMETHOD(T, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(BlendMode)", asMETHOD(T, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "BlendMode get_blendMode() const", asMETHOD(T, GetBlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHOD(T, SetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Material@+ get_material() const", asMETHOD(T, GetMaterial), asCALL_THISCALL);
 }
 
 static void RegisterDrawable2D(asIScriptEngine* engine)

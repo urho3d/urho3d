@@ -58,8 +58,6 @@ Drawable2D::Drawable2D(Context* context) :
 
 Drawable2D::~Drawable2D()
 {
-    if (renderer_)
-        renderer_->RemoveDrawable(this);
 }
 
 void Drawable2D::RegisterObject(Context* context)
@@ -67,28 +65,7 @@ void Drawable2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendModeAttr, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
-}
-
-void Drawable2D::ApplyAttributes()
-{
-    if (materialUpdatePending_)
-    {
-        materialUpdatePending_ = false;
-        UpdateDefaultMaterial();
-    }
-}
-
-void Drawable2D::OnSetEnabled()
-{
-    if (!renderer_)
-        return;
-
-    if (IsEnabledEffective())
-        renderer_->AddDrawable(this);
-    else
-        renderer_->RemoveDrawable(this);
 }
 
 void Drawable2D::SetLayer(int layer)
@@ -97,9 +74,6 @@ void Drawable2D::SetLayer(int layer)
         return;
 
     layer_ = layer;
-
-    if (renderer_)
-        renderer_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -110,9 +84,6 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
         return;
 
     orderInLayer_ = orderInLayer;
-
-    if (renderer_)
-        renderer_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -125,8 +96,9 @@ void Drawable2D::SetTexture(Texture2D* texture)
     texture_ = texture;
 
     verticesDirty_ = true;
+    defaultMaterial_ = 0;
+    
     OnMarkedDirty(node_);
-    UpdateDefaultMaterial();
     MarkNetworkUpdate();
 }
 
@@ -136,20 +108,7 @@ void Drawable2D::SetBlendMode(BlendMode blendMode)
         return;
 
     blendMode_ = blendMode;
-
-    UpdateDefaultMaterial();
-    MarkNetworkUpdate();
-}
-
-void Drawable2D::SetMaterial(Material* material)
-{
-    if (material == material_)
-        return;
-
-    material_ = material;
-
-    if (renderer_)
-        renderer_->MarkOrderDirty();
+    defaultMaterial_ = 0;
 
     MarkNetworkUpdate();
 }
@@ -159,14 +118,14 @@ Texture2D* Drawable2D::GetTexture() const
     return texture_;
 }
 
-Material* Drawable2D::GetMaterial() const
+void Drawable2D::SetDefaultMaterial(Material* material)
 {
-    return material_;
+    defaultMaterial_ = material;
 }
 
-Material* Drawable2D::GetUsedMaterial() const
+Material* Drawable2D::GetDefaultMaterial() const
 {
-    return material_ ? material_ : defaultMaterial_;
+    return defaultMaterial_;
 }
 
 const Vector<Vertex2D>& Drawable2D::GetVertices()
@@ -184,20 +143,6 @@ void Drawable2D::SetBlendModeAttr(BlendMode mode)
     SetBlendMode(mode);
 }
 
-void Drawable2D::SetMaterialAttr(const ResourceRef& value)
-{
-    // Delay applying material update
-    materialUpdatePending_ = true;
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.name_));
-}
-
-ResourceRef Drawable2D::GetMaterialAttr() const
-{
-    return GetResourceRef(material_, Material::GetTypeStatic());
-}
-
 void Drawable2D::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
@@ -206,11 +151,7 @@ void Drawable2D::OnNodeSet(Node* node)
     {
         Scene* scene = GetScene();
         if (scene)
-        {
-            renderer_ = scene->GetOrCreateComponent<Renderer2D>();
-            if (IsEnabledEffective())
-                renderer_->AddDrawable(this);
-        }
+            scene->GetOrCreateComponent<Renderer2D>();
     }
 }
 
@@ -219,18 +160,6 @@ void Drawable2D::OnMarkedDirty(Node* node)
     Drawable::OnMarkedDirty(node);
 
     verticesDirty_ = true;
-}
-
-void Drawable2D::UpdateDefaultMaterial()
-{
-    // Delay the material update
-    if (materialUpdatePending_)
-        return;
-
-    defaultMaterial_ = renderer_->GetMaterial(GetTexture(), blendMode_);
-
-    if (renderer_)
-        renderer_->MarkOrderDirty();
 }
 
 }

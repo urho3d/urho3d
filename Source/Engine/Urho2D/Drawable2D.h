@@ -61,11 +61,6 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
-    /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
-
     /// Set layer.
     void SetLayer(int layer);
     /// Set order in layer.
@@ -74,9 +69,7 @@ public:
     void SetTexture(Texture2D* texture);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
-    /// Set material.
-    void SetMaterial(Material* material);
-
+    
     /// Return layer.
     int GetLayer() const { return layer_; }
     /// Return order in layer.
@@ -85,24 +78,20 @@ public:
     Texture2D* GetTexture() const;
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return material.
-    Material* GetMaterial() const;
 
-    /// Return used material.
-    Material* GetUsedMaterial() const;
-    /// Return all vertices.
-    const Vector<Vertex2D>& GetVertices();
+    /// Set default material.
+    void SetDefaultMaterial(Material* material);
+    /// Return default material.
+    Material* GetDefaultMaterial() const;
     /// Set visibility.
     void SetVisibility(bool visibility) { visibility_ = visibility; }
     /// Return visibility.
     bool GetVisibility() const { return visibility_; }
+    /// Return all vertices.
+    const Vector<Vertex2D>& GetVertices();
 
     /// Set blend mode attribute.
     void SetBlendModeAttr(BlendMode mode);
-    /// Set material attribute.
-    void SetMaterialAttr(const ResourceRef& value);
-    /// Return material attribute.
-    ResourceRef GetMaterialAttr() const;
 
 protected:
     /// Handle node being assigned.
@@ -111,17 +100,13 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Update vertices.
     virtual void UpdateVertices() = 0;
-    /// Update the material's properties (blend mode and texture).
-    void UpdateDefaultMaterial();
-
+    
     /// Layer.
     int layer_;
     /// Order in layer.
     int orderInLayer_;
     /// Texture.
     SharedPtr<Texture2D> texture_;
-    /// Material. If null, use a default material. If non-null, use a clone of this for updating the diffuse texture.
-    SharedPtr<Material> material_;
     /// Blend mode.
     BlendMode blendMode_;
 
@@ -133,8 +118,6 @@ protected:
     bool materialUpdatePending_;
     /// Default material.
     SharedPtr<Material> defaultMaterial_;
-    /// 2D rendererer.
-    WeakPtr<Renderer2D> renderer_;
     /// Test visible.
     bool visibility_;
 };
