@@ -795,6 +795,16 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool&
         list.viewPosition = oldViewPos;
 }
 
+void EditScriptAttributes(Component@ component, uint index)
+{
+    if (component !is null && component.typeName.Contains("ScriptInstance"))
+    {
+        String hash = GetComponentAttributeHash(component, index);
+        if (!hash.empty)
+            scriptAttributes[hash] = component.attributes[index];
+    }
+}
+
 void CreateDragSlider(LineEdit@ parent)
 {
     Button@ dragSld = Button();
@@ -851,6 +861,9 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 	    // Do the editor post logic after attribute has been modified.
 	    PostEditAttribute(serializables, index, oldValues);
     }
+
+    // Update the stored script attributes if this is a ScriptInstance
+    EditScriptAttributes(serializables[0], index);
 
     inEditAttribute = false;
 
@@ -1096,6 +1109,8 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             target.attributes[resourcePickIndex] = Variant(attrs);
             target.ApplyAttributes();
         }
+
+        EditScriptAttributes(target, resourcePickIndex);
     }
 
     PostEditAttribute(resourceTargets, resourcePickIndex, oldValues);
