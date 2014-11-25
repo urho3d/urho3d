@@ -331,14 +331,14 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
 void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
 {
-    if (!node)
+    if (!node || !node->IsEnabled())
         return;
 
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         Drawable2D* drawable = dynamic_cast<Drawable2D*>(i->Get());
-        if (drawable)
+        if (drawable && drawable->IsEnabled())
             dest.Push(drawable);
     }
 
