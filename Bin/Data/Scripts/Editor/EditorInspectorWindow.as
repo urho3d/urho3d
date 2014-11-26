@@ -373,6 +373,7 @@ void UpdateScriptAttributes(Component@ component)
             component.attributes[i] = scriptAttributes[hash];
         }
     }
+    component.ApplyAttributes();
 }
 
 /// Update the attribute list of the node container.
