@@ -125,7 +125,7 @@ if (ANDROID)
     cmake_dependent_option (ANDROID_NDK_GDB "Enable ndk-gdb for debugging (Android build only)" FALSE "CMAKE_BUILD_TYPE STREQUAL Debug" FALSE)
 else ()
     unset (ANDROID_NDK_GDB CACHE)
-    if (ANDROID_ABI)
+    if (ANDROID_ABI AND ANDROID_NATIVE_API_LEVEL)
         # Just reference it to suppress "unused variable" CMake warning on non-Android project
         # Due to the design of cmake_gcc.sh currently, the script can be used to configure/generate Android project and other non-Android projects in one go
     endif ()
