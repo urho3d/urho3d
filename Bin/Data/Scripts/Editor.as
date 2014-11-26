@@ -66,6 +66,8 @@ void FirstFrame()
     ParseArguments();
     // Switch to real frame handler after initialization
     SubscribeToEvent("Update", "HandleUpdate");
+    SubscribeToEvent("ReloadFinished", "HandleReloadFinished");
+    SubscribeToEvent("ReloadFailed", "HandleReloadFailed");
 }
 
 void Stop()
@@ -107,6 +109,16 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateTestAnimation(timeStep);
     UpdateGizmo();
     UpdateDirtyUI();
+}
+
+void HandleReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    attributesFullDirty = true;
+}
+
+void HandleReloadFailed(StringHash eventType, VariantMap& eventData)
+{
+    attributesFullDirty = true;
 }
 
 void LoadConfig()
