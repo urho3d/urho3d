@@ -370,7 +370,7 @@ class ResetAttributesAction : EditAction
             for (uint i = 0; i < keys.length; ++i)
             {
                 // If variable name is empty (or unregistered) then it is an internal variable and should be preserved
-                String name = GetVariableName(keys[i]);
+                String name = GetVarName(keys[i]);
                 if (name.empty)
                     internalVars[keys[i]] = element.vars[keys[i]];
             }

@@ -359,7 +359,15 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         Array<StringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
-            String varName = GetVariableName(keys[i]);
+            String varName = GetVarName(keys[i]);
+            if (varName.empty)
+            {
+                // UIElements will contain internal vars, which do not have known mappings. Skip these
+                if (cast<UIElement>(serializables[0]) !is null)
+                    continue;
+                // Else, for scene nodes, show as hexadecimal hashes if nothing else is available
+                varName = keys[i].ToString();
+            }
             Variant value = map[keys[i]];
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
@@ -565,9 +573,9 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             if (parent is null)
                 break;
 
-            String varName = GetVariableName(keys[subIndex]);
+            String varName = GetVarName(keys[subIndex]);
             if (varName.empty)
-                continue;
+                varName = keys[subIndex].ToString(); // Use hexadecimal if nothing else is available
 
             Variant firstValue = map[keys[subIndex]];
             bool sameValue = true;

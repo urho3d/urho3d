@@ -29,6 +29,9 @@ VariantMap scriptAttributes;
 const uint SCRIPTINSTANCE_ATTRIBUTE_IGNORE = 5;
 const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
 
+// Node or UIElement hash-to-varname reverse mapping
+VariantMap globalVarNames;
+
 void InitXMLResources()
 {
     String[] resources = { "UI/EditorInspector_Attribute.xml", "UI/EditorInspector_Variable.xml", "UI/EditorInspector_Style.xml" };
@@ -635,6 +638,7 @@ void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
 
     // Create scene variable
     editorScene.RegisterVar(newName);
+    globalVarNames[newName] = newName;
 
     Variant newValue = ExtractVariantType(eventData);
 
@@ -684,7 +688,7 @@ void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
         return;
 
     // Create UIElement variable
-    uiElementVarNames[newName] = newName;
+    globalVarNames[newName] = newName;
 
     Variant newValue = ExtractVariantType(eventData);
 
@@ -754,16 +758,13 @@ Variant ExtractVariantType(VariantMap& eventData)
 }
 
 /// Get back the human-readable variable name from the StringHash.
-String GetVariableName(StringHash hash)
+String GetVarName(StringHash hash)
 {
     // First try to get it from scene
     String name = editorScene.GetVarName(hash);
-    // Then from the UIElement variable names
-    if (name.empty && uiElementVarNames.Contains(hash))
-        name = uiElementVarNames[hash].ToString();
-    // Finally just convert to hexadecimal
-    if (name.empty)
-        name = hash.ToString();
+    // Then from the global variable reverse mappings
+    if (name.empty && globalVarNames.Contains(hash))
+        name = globalVarNames[hash].ToString();
     return name;
 }
 

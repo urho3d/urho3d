@@ -12,9 +12,6 @@ Array<XMLFile@> uiElementCopyBuffer;
 
 bool suppressUIElementChanges = false;
 
-// Registered UIElement user variable reverse mappings
-VariantMap uiElementVarNames;
-
 const StringHash FILENAME_VAR("FileName");
 const StringHash MODIFIED_VAR("Modified");
 const StringHash CHILD_ELEMENT_FILENAME_VAR("ChildElemFileName");
@@ -419,7 +416,7 @@ void FilterInternalVars(XMLElement source)
     XMLElement resultElem = resultSet.firstResult;
     while (resultElem.notNull)
     {
-        String name = GetVariableName(resultElem.GetUInt("hash"));
+        String name = GetVarName(resultElem.GetUInt("hash"));
         if (name.empty)
         {
             XMLElement parent = resultElem.parent;
@@ -448,7 +445,7 @@ void RegisterUIElementVar(XMLElement source)
     while (resultAttr.notNull)
     {
         String name = resultAttr.GetAttribute();
-        uiElementVarNames[name] = name;
+        globalVarNames[name] = name;
         resultAttr = resultAttr.nextResult;
     }
 }
