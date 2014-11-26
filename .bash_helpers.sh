@@ -34,7 +34,7 @@ post_cmake() {
         if [ $HAS_XMLSTARLET ]; then
             # Common fixes for all builds
             #
-            # Remove build type from project name
+            # Remove build configuration from project name
             # Replace deprecated GNU gmake Error Parser with newer version (6.0 -> 7.0) and add GCC Error Parser
             #
             xmlstarlet ed -P -L \

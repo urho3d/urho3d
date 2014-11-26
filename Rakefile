@@ -89,6 +89,7 @@ task :ci do
   $build_options = "-DURHO3D_64BIT=#{ENV['URHO3D_64BIT']}" if ENV['URHO3D_64BIT']
   $build_options = "#{$build_options} -DURHO3D_OPENGL=#{ENV['URHO3D_OPENGL']}" if ENV['URHO3D_OPENGL']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
+  $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
   if ENV['XCODE']
     # xctool or xcodebuild
     xcode_ci
@@ -280,9 +281,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
   if ENV['OS']
-    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   else
-    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh Rakefile; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   end
 end
 
@@ -310,7 +311,7 @@ def makefile_ci
   end
   system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
-    if ENV['AVD']
+    if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
       android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
     end
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
@@ -345,7 +346,7 @@ def makefile_ci
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   # Make, deploy, and test run Android APK in an Android (virtual) device
-  if ENV['AVD']
+  if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     if android_wait_for_device ENV['CI'] ? 1 : 10 # minutes
       system "cd #{platform_prefix}Build && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
@@ -544,5 +545,8 @@ RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 EOF" or abort 'Failed to create user private key to id_rsa'
   system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
 end
+
+# Load custom rake scripts
+Dir['.rake/*.rake'].each { |r| load r }
 
 # vi: set ts=2 sw=2 expandtab:

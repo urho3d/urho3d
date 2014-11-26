@@ -266,7 +266,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Define post build steps
-if (URHO3D_NDK_GDB)
+if (ANDROID_NDK_GDB)
     # Copy the library while it still has debug symbols for ndk-gdb
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
         COMMENT "Copying Urho3D library with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")

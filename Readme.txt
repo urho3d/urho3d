@@ -247,54 +247,61 @@ to first clean the CMake cache by invoking cmake_clean.bat or cmake_clean.sh.
 Android build process
 ---------------------
 
-First, if you are building under Windows platform without MKLINK support then
-copy Bin/Data and Bin/CoreData directories to the Source/Android/assets
-directory (you can use the provided batch file CopyData.bat). This step is not
-necessary for Windows with MKLINK support and non-Windows platforms because the
-build script uses symbolic links for platforms that support it.
+First, if you are building under Windows host without MKLINK support then copy
+Bin/Data and Bin/CoreData directories to the Source/Android/assets directory
+(you can use the provided batch file CopyData.bat). This step is not necessary
+for Windows with MKLINK support and non-Windows host because the build script
+uses symbolic links for host development environments that support it.
 
-Set the ANDROID_NDK environment variable to point to your Android NDK. On 
+Set the ANDROID_NDK environment variable to point to your Android NDK. On
 Windows, ensure that make.exe from the Android NDK is included in the path and
 is executable from the command line.
 
-On Windows, execute cmake_android.bat. If MKLINK support is available, provide
-build option "-DURHO3D_MKLINK=1" to generate out-of-source build. Then go to the
-build directory Source/Android (or android-Build if out-of-source build) and
-execute the following commands. On OS X or Linux, execute cmake_gcc.sh (the
-ANDROID_NDK environment variable distinguishes from a normal desktop build) then
-go to the android-Build directory (always an out-of-source build) and execute
-the following commands.
+On Windows, execute cmake_android.bat. If your user account has privilege to use
+MKLINK then you have the option to provide the build option "-DURHO3D_MKLINK=1"
+when invoking the cmake_android.bat to generate out-of-source build tree. Then
+go to the build tree directory which could be either 'Source/Android' or
+'android-Build' (when using MKLINK) and execute the below commands to start the
+build.
 
-- android update project -p . -t 1 (only needed on the first time,
-                                    replace '-t 1' with desired target-id)
-- make -j8 (replace '-j8' with the number of logical CPU cores of the 
-            host/build system)
+- android update project -p . -t 1 (replace id to match the desired target API)
+- make -j8 (replace the number to match your host's number of logical CPU cores)
 - ant debug
 
-After the commands finish successfully, the APK should have been generated to
-the build's "bin" subdirectory, from where it can be installed on a device or an
-emulator. The command "ant installd" can be used for this.
+On OS X or Linux, execute cmake_gcc.sh (the presence of ANDROID_NDK environment
+variable instructs the shell script to also generate project file for Android
+build besides normal desktop build). Then go to the build tree (which is
+currently defaulted to 'android-Build' directory) and execute the same commands
+as above.
+
+After the commands finish successfully, the APK should have been generated in
+the build tree's "bin" subdirectory, from where it can be installed on a device
+or an emulator. The command "ant installd" can be used for this. After the debug
+APK has been installed, you can use "rake android" command to automate the test
+running of the APK on the attached Android device.
 
 For a release build, use the "ant release" command instead of "ant debug" and
 follow the Android SDK instructions on how to sign your APK properly.
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real
 application you must replace this with your own package name. The Urho3D
-activity subclasses the SDLActivity from org.libsdl.app package, whose name
-(or the JNI code from SDL library) does not have to be changed.
+activity subclasses the SDLActivity from org.libsdl.app package, whose name (or
+the JNI code from SDL library) does not have to be changed.
 
 Note that the native code is built by default for armeabi-v7a ABI. To make your
 program compatible also with old Android devices, build also an armeabi version
-by executing the CMake batch file again with the parameter -DANDROID_ABI=armeabi
-added, then execute make again in the build directory. See "Build options" for
-all the possible values.
+by executing the CMake batch file or shell script again with the build option
+"-DANDROID_ABI=armeabi" added, then execute make again in the build directory.
+Similarly, the native code can be built using 64-bit ABI by changing the value
+of this build option. See \ref Build_Options "Build options" for all the
+possible values.
 
 You can also build and deploy using Eclipse IDE with ADT plugin. To do that,
-after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh.
-Import "Existing Android Code into Workspace" from the CMake generated Eclipse's
-project found in the android-Build directory. Switch Eclipse IDE to use Java
-Perspective. Update project properties to choose the desired Android API target
-and that's it. Just choose "Run" to let ADT automatically build and deploy the
+after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh
+instead of cmake_gcc.sh. Import "Existing Android Code into Workspace" from the
+CMake generated Eclipse project file in the build tree. Switch Eclipse IDE to
+use Java Perspective. Update project properties to choose the desired Android
+API target. Choose "Run" to let ADT automatically build and deploy the
 application to Android (virtual) device.
 
 
@@ -489,18 +496,22 @@ cmake_xxxx batch files or shell scripts.
 |                     | | Android cross-compiling build only), SSH digital key |
 |                     | | must be setup first for this to work, typical value  |
 |                     | | has a pattern of usr@tgt:remote-loc                  |
-|URHO3D_NDK_GDB       |0|Enable ndk-gdb for debugging (Android build only)     |
-|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration to be generated     |
-|                     | | (Makefile generator only), possible values are       |
-|                     | | Release (*default), Debug, and RelWithDebInfo        |
+|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-            |
+|                     | | configuration generator only), possible values are   |
+|                     | | Release (*default), RelWithDebInfo, and Debug        |
 |CMAKE_OSX_           |-|Specify Mac OS X deployment target (OSX build only);  |
 | DEPLOYMENT_TARGET   | | default to current running OS X if not specified     |
 |IPHONEOS_            |-|Specify iPhone OS deployment target (iOS build only); |
 | DEPLOYMENT_TARGET   | | default to latest installed iOS SDK if not specified |
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible     |
-|                     | | values are armeabi, armeabi-v7a (*default),          |
-|                     | | armeabi-v7a with NEON, armeabi-v7a with VFPV3,       |
-|                     | | armeabi-v6 with VFP, arm64-v8a, x86, and x86_64      |
+|                     | | values are arm64-v8a, armeabi, armeabi-v6 with VFP,  |
+|                     | | armeabi-v7a (*default), armeabi-v7a with NEON,       |
+|                     | | armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
+|ANDROID_NATIVE_API   |*|Specify target API level (Android build only),        |
+| _LEVEL              | | possible values depends on installed NDK version,    |
+|                     | | default to API level 12 on 32-bit ABIs,              |
+|                     | | default to API level 21 on 64-bit ABIs               |
+|ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)     |
 |---------------------|-|------------------------------------------------------|
 
 Note that build option values specified via command line are cached by CMake.
