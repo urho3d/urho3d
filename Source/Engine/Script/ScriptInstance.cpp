@@ -80,12 +80,12 @@ void ScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -353,13 +353,13 @@ void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exce
     UnsubscribeFromAllEventsExcept(exceptions, true);
 }
 
-void ScriptInstance::SetScriptFileAttr(ResourceRef value)
+void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
-void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)
+void ScriptInstance::SetDelayedCallsAttr(const PODVector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
     delayedCalls_.Resize(buf.ReadVLE());
@@ -376,7 +376,7 @@ void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)
         UpdateEventSubscription();
 }
 
-void ScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
+void ScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
 {
     if (scriptObject_ && methods_[METHOD_LOAD])
     {
@@ -387,7 +387,7 @@ void ScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
     }
 }
 
-void ScriptInstance::SetScriptNetworkDataAttr(PODVector<unsigned char> data)
+void ScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>& data)
 {
     if (scriptObject_ && methods_[METHOD_READNETWORKUPDATE])
     {

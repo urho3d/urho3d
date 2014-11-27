@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "ResourceCache.h"
 #include "Sprite2D.h"
 #include "SpriteSheet2D.h"
 #include "Texture2D.h"
@@ -107,6 +108,49 @@ void Sprite2D::SetOffset(const IntVector2& offset)
 void Sprite2D::SetSpriteSheet(SpriteSheet2D* spriteSheet)
 {
     spriteSheet_ = spriteSheet;
+}
+
+ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite)
+{
+    SpriteSheet2D* spriteSheet = 0;
+    if (sprite)
+        spriteSheet = sprite->GetSpriteSheet();
+
+    if (!spriteSheet)
+        return GetResourceRef(sprite, Sprite2D::GetTypeStatic());
+
+    // Combine sprite sheet name and sprite name as resource name.
+    return ResourceRef(spriteSheet->GetType(), spriteSheet->GetName() + "@" + sprite->GetName());
+}
+
+Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value)
+{
+    if (!object)
+        return 0;
+
+    ResourceCache* cache = object->GetSubsystem<ResourceCache>();
+
+    if (value.type_ == Sprite2D::GetTypeStatic())
+        return cache->GetResource<Sprite2D>(value.name_);
+
+    if (value.type_ == SpriteSheet2D::GetTypeStatic())
+    {
+        // value.name_ include sprite sheet name and sprite name.
+        Vector<String> names = value.name_.Split('@');
+        if (names.Size() != 2)
+            return 0;
+
+        const String& spriteSheetName = names[0];
+        const String& spriteName = names[1];
+
+        SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName);
+        if (!spriteSheet)
+            return 0;
+
+        return spriteSheet->GetSprite(spriteName);
+    }
+
+    return 0;
 }
 
 }

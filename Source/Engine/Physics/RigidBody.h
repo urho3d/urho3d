@@ -50,7 +50,7 @@ enum CollisionEventMode
 class URHO3D_API RigidBody : public Component, public btMotionState
 {
     OBJECT(RigidBody);
-    
+
 public:
     /// Construct.
     RigidBody(Context* context);
@@ -58,7 +58,7 @@ public:
     virtual ~RigidBody();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
@@ -71,27 +71,27 @@ public:
     virtual void setWorldTransform(const btTransform &worldTrans);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set mass. Zero mass makes the body static.
     void SetMass(float mass);
     /// Set rigid body position in world space.
-    void SetPosition(Vector3 position);
+    void SetPosition(const Vector3& position);
     /// Set rigid body rotation in world space.
-    void SetRotation(Quaternion rotation);
+    void SetRotation(const Quaternion& rotation);
     /// Set rigid body position and rotation in world space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set linear velocity.
-    void SetLinearVelocity(Vector3 velocity);
+    void SetLinearVelocity(const Vector3& velocity);
     /// Set linear degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
-    void SetLinearFactor(Vector3 factor);
+    void SetLinearFactor(const Vector3& factor);
     /// Set linear velocity deactivation threshold.
     void SetLinearRestThreshold(float threshold);
     /// Set linear velocity damping factor.
     void SetLinearDamping(float damping);
     /// Set angular velocity.
-    void SetAngularVelocity(Vector3 angularVelocity);
+    void SetAngularVelocity(const Vector3& angularVelocity);
     /// Set angular degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
-    void SetAngularFactor(Vector3 factor);
+    void SetAngularFactor(const Vector3& factor);
     /// Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
     /// Set angular velocity damping factor.
@@ -99,7 +99,7 @@ public:
     /// Set friction coefficient.
     void SetFriction(float friction);
     /// Set anisotropic friction.
-    void SetAnisotropicFriction(Vector3 friction);
+    void SetAnisotropicFriction(const Vector3& friction);
     /// Set rolling friction coefficient.
     void SetRollingFriction(float friction);
     /// Set restitution coefficient.
@@ -148,7 +148,7 @@ public:
     void DisableMassUpdate();
     /// Re-enable mass update and recalculate the mass/inertia by calling UpdateMass(). Call when collision shape changes are finished.
     void EnableMassUpdate();
-    
+
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return Bullet rigid body.
@@ -213,7 +213,7 @@ public:
     CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
     /// Return colliding rigid bodies from the last simulation step.
     void GetCollidingBodies(PODVector<RigidBody*>& result) const;
-    
+
     /// Apply new world transform after a simulation step. Called internally.
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
     /// Update mass and inertia to the Bullet rigid body.
@@ -230,13 +230,13 @@ public:
     void RemoveConstraint(Constraint* constraint);
     /// Remove the rigid body.
     void ReleaseBody();
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    
+
 private:
     /// Create the rigid body, or re-add to the physics world with changed flags. Calls UpdateMass().
     void AddBodyToWorld();
@@ -246,7 +246,7 @@ private:
     void HandleTargetPosition(StringHash eventType, VariantMap& eventData);
     /// Handle SmoothedTransform target rotation update.
     void HandleTargetRotation(StringHash eventType, VariantMap& eventData);
-    
+
     /// Bullet rigid body.
     btRigidBody* body_;
     /// Bullet compound collision shape.

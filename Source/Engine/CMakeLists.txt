@@ -226,9 +226,7 @@ endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
-if (NOT ANDROID AND NOT IOS)
-    set (SYSROOT ${RASPI_SYSROOT} ${MINGW_SYSROOT})  # SYSROOT is empty for native build
-    string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+if (NOT IOS)
     get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
     list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
     if (ABSOLUTE_PATH_LIBS)
@@ -277,7 +275,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Define post build steps
-if (URHO3D_NDK_GDB)
+if (ANDROID_NDK_GDB)
     # Copy the library while it still has debug symbols for ndk-gdb
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
         COMMENT "Copying Urho3D library with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")

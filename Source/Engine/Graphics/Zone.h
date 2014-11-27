@@ -33,7 +33,7 @@ namespace Urho3D
 class URHO3D_API Zone : public Drawable
 {
     OBJECT(Zone);
-    
+
 public:
     /// Construct.
     Zone(Context* context);
@@ -41,12 +41,12 @@ public:
     virtual ~Zone();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
     /// Set ambient color
@@ -71,7 +71,7 @@ public:
     void SetAmbientGradient(bool enable);
     /// Set zone texture. This will be bound to the zone texture unit when rendering objects inside the zone. Note that the default shaders do not use it.
     void SetZoneTexture(Texture* texture);
-    
+
     /// Return inverse world transform.
     const Matrix3x4& GetInverseWorldTransform() const;
     /// Return zone's own ambient color, disregarding gradient mode.
@@ -100,14 +100,14 @@ public:
     bool GetAmbientGradient() const { return ambientGradient_; }
     /// Return zone texture.
     Texture* GetZoneTexture() const { return zoneTexture_; }
-    
+
     /// Check whether a point is inside.
     bool IsInside(const Vector3& point) const;
     /// Set zone texture attribute.
-    void SetZoneTextureAttr(ResourceRef value);
+    void SetZoneTextureAttr(const ResourceRef& value);
     /// Return zone texture attribute.
     ResourceRef GetZoneTextureAttr() const;
-    
+
 protected:
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
@@ -119,7 +119,7 @@ protected:
     void UpdateAmbientGradient();
     /// Clear zone reference from drawables inside the bounding box.
     void ClearDrawablesZone();
-    
+
     /// Cached inverse world transform matrix.
     mutable Matrix3x4 inverseWorld_;
     /// Inverse transform dirty flag.

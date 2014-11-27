@@ -853,9 +853,14 @@ else()
   unset( __realApiLevel )
  endif()
  set( ANDROID_NATIVE_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}" CACHE STRING "Android API level for native code" FORCE )
- if( CMAKE_VERSION VERSION_GREATER "2.8" )
-  list( SORT ANDROID_SUPPORTED_NATIVE_API_LEVELS )
-  set_property( CACHE ANDROID_NATIVE_API_LEVEL PROPERTY STRINGS ${ANDROID_SUPPORTED_NATIVE_API_LEVELS} )
+ # Urho3D: Sort in numerical order instead of alphabetical order
+ if( CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8 )  # Feature avaiable starting from CMake 2.8
+  string(REGEX REPLACE ";([1-9]);" ";0\\1;" PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS ";${ANDROID_SUPPORTED_NATIVE_API_LEVELS};")
+  string(REGEX REPLACE ";([1-9]);" ";0\\1;" PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS "${PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS}")
+  list( SORT PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS )
+  string(REGEX REPLACE ";0([1-9]);" ";\\1;" PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS "${PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS}")
+  string(REGEX REPLACE ";0([1-9]);" ";\\1;" PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS "${PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS}")
+  set_property( CACHE ANDROID_NATIVE_API_LEVEL PROPERTY STRINGS ${PADDED_ANDROID_SUPPORTED_NATIVE_API_LEVELS} )
  endif()
 endif()
 unset( __levelIdx )
@@ -863,9 +868,10 @@ unset( __levelIdx )
 
 # remember target ABI
 set( ANDROID_ABI "${ANDROID_ABI}" CACHE STRING "The target ABI for Android. If arm, then armeabi-v7a is recommended for hardware floating point." FORCE )
-if( CMAKE_VERSION VERSION_GREATER "2.8" )
- list( SORT ANDROID_SUPPORTED_ABIS_${ANDROID_ARCH_NAME} )
- set_property( CACHE ANDROID_ABI PROPERTY STRINGS ${ANDROID_SUPPORTED_ABIS_${ANDROID_ARCH_NAME}} )
+# Urho3D: fix to present the full list of supported ABIs initially
+if( CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8 )
+ list( SORT ANDROID_SUPPORTED_ABIS )
+ set_property( CACHE ANDROID_ABI PROPERTY STRINGS ${ANDROID_SUPPORTED_ABIS} )
 endif()
 
 
@@ -1527,7 +1533,8 @@ if( ANDROID_EXPLICIT_CRT_LINK )
 endif()
 
 # setup output directories
-set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_SOURCE_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
+# Urho3D: Prefer binary dir over source dir, which is anyway equal to source dir when not using out-of-source build tree
+set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_BINARY_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
 set( CMAKE_INSTALL_PREFIX "${ANDROID_TOOLCHAIN_ROOT}/user" CACHE STRING "path for installing" )
 
 if(NOT _CMAKE_IN_TRY_COMPILE)
@@ -1538,6 +1545,7 @@ if(NOT _CMAKE_IN_TRY_COMPILE)
  endif()
  # Urho3D: All libraries are first generated in CMake default binary directory and only the main target library is later copied to below output path by Urho3D own build script
  set( ANDROID_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" FORCE )
+ mark_as_advanced (ANDROID_LIBRARY_OUTPUT_PATH)
 endif()
 
 # Urho3D: Copy shared STL library to final Android library output path pointed by ANDROID_LIBRARY_OUTPUT_PATH variable as CMake's LIBRARY_OUTPUT_PATH still points to its default

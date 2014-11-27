@@ -52,10 +52,10 @@ void OffMeshConnection::RegisterObject(Context* context)
 {
     context->RegisterFactory<OffMeshConnection>(NAVIGATION_CATEGORY);
     
-    ACCESSOR_ATTRIBUTE(OffMeshConnection, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE(OffMeshConnection, VAR_INT, "Endpoint NodeID", endPointID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(OffMeshConnection, VAR_FLOAT, "Radius", radius_, DEFAULT_RADIUS, AM_DEFAULT);
-    ATTRIBUTE(OffMeshConnection, VAR_BOOL, "Bidirectional", bidirectional_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Endpoint NodeID", int, endPointID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Radius", float, radius_, DEFAULT_RADIUS, AM_DEFAULT);
+    ATTRIBUTE("Bidirectional", bool, bidirectional_, true, AM_DEFAULT);
 }
 
 void OffMeshConnection::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

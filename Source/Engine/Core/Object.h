@@ -33,6 +33,7 @@ class EventHandler;
 
 #define OBJECT(typeName) \
     public: \
+        typedef typeName ClassName; \
         virtual Urho3D::StringHash GetType() const { return GetTypeStatic(); } \
         virtual Urho3D::StringHash GetBaseType() const { return GetBaseTypeStatic(); } \
         virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \

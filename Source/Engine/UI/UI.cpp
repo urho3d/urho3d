@@ -1078,7 +1078,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
 
         bool newButton;
         if (usingTouchInput_)
-            newButton = !((bool)(button & buttons));
+            newButton = (button & buttons) == 0;
         else
             newButton = true;
         buttons |= button;

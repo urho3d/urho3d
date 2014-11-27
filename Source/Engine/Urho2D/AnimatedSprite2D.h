@@ -56,7 +56,7 @@ public:
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    
+
     /// Set layer.
     void SetLayer(int layer);
     /// Set order in layer.
@@ -106,7 +106,7 @@ public:
     Node* GetRootNode() const;
 
     /// Set animation set attribute.
-    void SetAnimationSetAttr(ResourceRef value);
+    void SetAnimationSetAttr(const ResourceRef& value);
     /// Return animation set attribute.
     ResourceRef GetAnimationSetAttr() const;
     /// Set anmiation by name.

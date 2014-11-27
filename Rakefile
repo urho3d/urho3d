@@ -73,11 +73,11 @@ end
 desc 'Configure, build, and test Urho3D project'
 task :ci do
   # Unshallow the clone's history when necessary
-  if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && ENV['RELEASE_TAG'].empty?
+  if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
   end
-  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also always use Release configuration for MinGW and Android build)
-  if ENV['PACKAGE_UPLOAD'] || (ENV['CI'] && (ENV['WINDOWS'] || ENV['ANDROID']))
+  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also use Release configuration when CI build runs on a bad VM)
+  if ENV['PACKAGE_UPLOAD'] || ENV['BAD_VM']
     $configuration = 'Release'
     $testing = 0
   else
@@ -89,6 +89,7 @@ task :ci do
   $build_options = "-DURHO3D_64BIT=#{ENV['URHO3D_64BIT']}" if ENV['URHO3D_64BIT']
   $build_options = "#{$build_options} -DURHO3D_OPENGL=#{ENV['URHO3D_OPENGL']}" if ENV['URHO3D_OPENGL']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
+  $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
   if ENV['XCODE']
     # xctool or xcodebuild
     xcode_ci
@@ -108,7 +109,7 @@ task :ci_site_update do
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
-  release = ENV['RELEASE_TAG'].empty? ? 'HEAD' : ENV['RELEASE_TAG'];
+  release = ENV['RELEASE_TAG'] || 'HEAD'
   unless release == 'HEAD'
     system "mkdir -p doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
@@ -124,21 +125,23 @@ task :ci_site_update do
   else
     instruction = 'package'
   end
-  # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if detached HEAD is not a fast forward of remote master)
-  system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
-  if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
-    bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
-    system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
+  if !ENV['RELEASE_TAG']
+    # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if remote master has already diverged)
+    system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
+    if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
+      bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
+      system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
+    end
+    system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
   end
-  system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
-desc 'Rebase Android-CI and OSX-CI mirror branches'
+desc 'Rebase all CI mirror branches'
 task :ci_rebase do
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin Android-CI:Android-CI && git rebase origin/master Android-CI && git push -qf -u origin Android-CI >/dev/null 2>&1' or abort 'Failed to rebase Android-CI mirror branch'
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin RPI-CI:RPI-CI && git rebase origin/master RPI-CI && git push -qf -u origin RPI-CI >/dev/null 2>&1' or abort 'Failed to rebase RPI-CI mirror branch'
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git fetch origin OSX-CI:OSX-CI && git rebase origin/master OSX-CI && git push -qf -u origin OSX-CI >/dev/null 2>&1' or abort 'Failed to rebase OSX-CI mirror branch'
+  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
+  baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
+  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |branch| system "git fetch origin #{branch}:#{branch} && git rebase #{baseline} #{branch} && git push -qf -u origin #{branch} >/dev/null 2>&1" or abort "Failed to rebase #{branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
@@ -192,7 +195,7 @@ task :ci_package_upload do
   end
   # Determine the upload location
   setup_digital_keys
-  if ENV['RELEASE_TAG'].empty?
+  if !ENV['RELEASE_TAG']
     upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/Snapshots"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
@@ -280,9 +283,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
   if ENV['OS']
-    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   else
-    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh Rakefile; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   end
 end
 
@@ -310,7 +313,7 @@ def makefile_ci
   end
   system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE -DURHO3D_MODERN_CPP=1 #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
-    if ENV['AVD']
+    if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
       android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
     end
     # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
@@ -345,7 +348,7 @@ def makefile_ci
   scaffolding "#{platform_prefix}Build/generated/externallib"
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DURHO3D_MODERN_CPP=1 #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   # Make, deploy, and test run Android APK in an Android (virtual) device
-  if ENV['AVD']
+  if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     if android_wait_for_device ENV['CI'] ? 1 : 10 # minutes
       system "cd #{platform_prefix}Build && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
@@ -544,5 +547,8 @@ RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 EOF" or abort 'Failed to create user private key to id_rsa'
   system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
 end
+
+# Load custom rake scripts
+Dir['.rake/*.rake'].each { |r| load r }
 
 # vi: set ts=2 sw=2 expandtab:

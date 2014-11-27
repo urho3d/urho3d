@@ -83,20 +83,19 @@ void PhysicsWorld2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld2D>(SUBSYSTEM_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Shape", GetDrawShape, SetDrawShape, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Joint", GetDrawJoint, SetDrawJoint, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Aabb", GetDrawAabb, SetDrawAabb, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw Pair", GetDrawPair, SetDrawPair, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Draw CenterOfMass", GetDrawCenterOfMass, SetDrawCenterOfMass, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Allow Sleeping", GetAllowSleeping, SetAllowSleeping, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_VECTOR2, "Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_BOOL, "Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, DEFAULT_VELOCITY_ITERATIONS, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld2D, VAR_INT, "Position Iterations", GetPositionIterations, SetPositionIterations, int, DEFAULT_POSITION_ITERATIONS, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(PhysicsWorld2D, Component);
+    ACCESSOR_ATTRIBUTE("Draw Shape", GetDrawShape, SetDrawShape, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Joint", GetDrawJoint, SetDrawJoint, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Aabb", GetDrawAabb, SetDrawAabb, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Pair", GetDrawPair, SetDrawPair, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw CenterOfMass", GetDrawCenterOfMass, SetDrawCenterOfMass, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Allow Sleeping", GetAllowSleeping, SetAllowSleeping, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, DEFAULT_VELOCITY_ITERATIONS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Position Iterations", GetPositionIterations, SetPositionIterations, int, DEFAULT_POSITION_ITERATIONS, AM_DEFAULT);
 }
 
 void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

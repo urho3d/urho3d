@@ -90,6 +90,10 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
+### DeviceLost
+
+### DeviceReset
+
 ## %IO events
 
 ### LogMessage
@@ -1368,11 +1372,10 @@ namespace Urho3D
 
 ### ParticleEmitter2D
 - %Particle %Effect : ResourceRef
+- %Sprite : ResourceRef
 - %Layer : int
 - %Order %in %Layer : int
-- %Sprite : ResourceRef
 - %Blend %Mode : int
-- %Material : ResourceRef
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
@@ -1701,14 +1704,13 @@ namespace Urho3D
 - %Instance %Nodes : VariantVector
 
 ### StaticSprite2D
+- %Sprite : ResourceRef
 - %Flip X : bool
 - %Flip Y : bool
 - %Color : Color
 - %Layer : int
 - %Order %in %Layer : int
-- %Sprite : ResourceRef
 - %Blend %Mode : int
-- %Material : ResourceRef
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
@@ -5368,7 +5370,6 @@ Properties:
 - int layer
 - uint lightMask
 - float lodBias
-- Material@ material
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -5379,8 +5380,8 @@ Properties:
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
-- Sprite2D@ sprite
 - bool temporary
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
@@ -7845,7 +7846,6 @@ Properties:
 - int layer
 - uint lightMask
 - float lodBias
-- Material@ material
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -7858,6 +7858,7 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
@@ -10298,7 +10299,6 @@ Properties:
 - int layer
 - uint lightMask
 - float lodBias
-- Material@ material
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -10311,6 +10311,7 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask

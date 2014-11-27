@@ -44,7 +44,7 @@ void SoundListener::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundListener>(AUDIO_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(SoundListener, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 }
 
 }

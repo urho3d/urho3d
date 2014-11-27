@@ -100,4 +100,15 @@ EVENT(E_ENDVIEWRENDER, EndViewRender)
     PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
+/// Graphics context has been lost. Some or all (depending on the API) GPU objects have lost their contents.
+EVENT(E_DEVICELOST, DeviceLost)
+{
+}
+
+/// Graphics context has been recreated after being lost. GPU objects in the "data lost" state can be restored now.
+EVENT(E_DEVICERESET, DeviceReset)
+{
+}
+
+
 }

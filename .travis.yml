@@ -53,6 +53,7 @@ matrix:
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
 before_install:
   - free -tm
+  - mem=($(free -m |head -2 |tail -1)); if [ ${mem[6]} -eq 0 ]; then export BAD_VM=1; fi
   - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export REBASE_ON_MASTER_COMMIT=$REBASE; fi
   - travis_retry sudo apt-get update -q -y
 install:

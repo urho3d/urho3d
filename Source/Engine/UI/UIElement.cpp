@@ -87,26 +87,6 @@ static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
     return lhs->GetPriority() < rhs->GetPriority();
 }
 
-template<> HorizontalAlignment Variant::Get<HorizontalAlignment>() const
-{
-    return (HorizontalAlignment)GetInt();
-}
-
-template<> VerticalAlignment Variant::Get<VerticalAlignment>() const
-{
-    return (VerticalAlignment)GetInt();
-}
-
-template<> FocusMode Variant::Get<FocusMode>() const
-{
-    return (FocusMode)GetInt();
-}
-
-template<> LayoutMode Variant::Get<LayoutMode>() const
-{
-    return (LayoutMode)GetInt();
-}
-
 XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
 
 UIElement::UIElement(Context* context) :
@@ -171,38 +151,38 @@ void UIElement::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIElement>(UI_CATEGORY);
 
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Priority", GetPriority, SetPriority, int, 0, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_FLOAT, "Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_COLOR, "Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Top Left Color", color_[0], Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_VECTOR2, "Layout Flex Scale", GetLayoutFlexScale, SetLayoutFlexScale, Vector2, Vector2::ONE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent", GetIndent, SetIndent, int, 0, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
+    ATTRIBUTE("Top Left Color", Color, color_[0], Color::WHITE, AM_FILE);
+    ATTRIBUTE("Top Right Color", Color, color_[1], Color::WHITE, AM_FILE);
+    ATTRIBUTE("Bottom Left Color", Color, color_[2], Color::WHITE, AM_FILE);
+    ATTRIBUTE("Bottom Right Color", Color, color_[3], Color::WHITE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Layout Flex Scale", GetLayoutFlexScale, SetLayoutFlexScale, Vector2, Vector2::ONE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Indent", GetIndent, SetIndent, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
+    ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE);
 }
 
 void UIElement::ApplyAttributes()

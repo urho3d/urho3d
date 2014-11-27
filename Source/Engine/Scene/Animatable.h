@@ -98,7 +98,7 @@ public:
     float GetAttributeAnimationSpeed(const String& name) const;
 
     /// Set object animation attribute.
-    void SetObjectAnimationAttr(ResourceRef value);
+    void SetObjectAnimationAttr(const ResourceRef& value);
     /// Return object animation attribute.
     ResourceRef GetObjectAnimationAttr() const;
 

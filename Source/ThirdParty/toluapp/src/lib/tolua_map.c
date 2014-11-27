@@ -394,8 +394,9 @@ TOLUA_API void tolua_usertype (lua_State* L, const char* type)
  char ctype[128] = "const ";
  strncat(ctype,type,120);
 
-	/* create both metatables */
- if (tolua_newmetatable(L,ctype) && tolua_newmetatable(L,type))
+ /* create both metatables */
+ // Modified by Aster Jian for Urho3D.
+ if (tolua_newmetatable(L,ctype) && tolua_newmetatable(L,(char*)type))
 	 mapsuper(L,type,ctype);             /* 'type' is also a 'const type' */
 }
 

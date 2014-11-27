@@ -20,18 +20,24 @@
 # THE SOFTWARE.
 #
 
-# Set the build type if not explicitly set, for single-configuration generator only
+# Limit the supported build configurations
+set (URHO3D_BUILD_CONFIGURATIONS Release RelWithDebInfo Debug)
+set (DOC_STRING "Choose the build configuration, possible options are: ${URHO3D_BUILD_CONFIGURATIONS}")
+if (CMAKE_CONFIGURATION_TYPES)
+    # For multi-configurations generator, such as VS and Xcode
+    set (CMAKE_CONFIGURATION_TYPES ${URHO3D_BUILD_CONFIGURATIONS} CACHE STRING "${DOC_STRING}" FORCE)
+else ()
+    # For single-configuration generator, such as Unix Makefile generator
+    if (CMAKE_BUILD_TYPE STREQUAL "")
+        # If not specified then default to Release
+        set (CMAKE_BUILD_TYPE Release)
+    endif ()
+    set (CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "${DOC_STRING}" FORCE)
+endif ()
+
+# Define other useful variables not defined by CMake
 if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
-endif ()
-if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release)
-endif ()
-if (CMAKE_HOST_WIN32)
-    execute_process (COMMAND uname -o RESULT_VARIABLE UNAME_EXIT_CODE OUTPUT_VARIABLE UNAME_OPERATING_SYSTEM ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (UNAME_EXIT_CODE EQUAL 0 AND UNAME_OPERATING_SYSTEM STREQUAL Msys)
-        set (MSYS 1)
-    endif ()
 endif ()
 
 # Define all supported build options
@@ -55,7 +61,7 @@ if (NOT MSVC)
         string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
         if (matched)
             # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too
-            set (RASPI TRUE CACHE STRING "Setup build for Raspberry Pi platform")
+            set (RASPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
         endif ()
     endif ()
 endif ()
@@ -117,17 +123,22 @@ else ()
     unset (URHO3D_SCP_TO_TARGET CACHE)
 endif ()
 if (ANDROID)
-    set (ANDROID TRUE CACHE STRING "Setup build for Android platform")  # Cache the CMake variable
-    set (ANDROID_ABI armeabi-v7a CACHE STRING "Specify ABI for native code (Android build only), possible values are armeabi, armeabi-v7a (default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, armeabi-v6 with VFP, arm64-v8a, x86, and x86_64")
-    cmake_dependent_option (URHO3D_NDK_GDB "Enable ndk-gdb for debugging (Android build only)" FALSE "CMAKE_BUILD_TYPE STREQUAL Debug" FALSE)
+    set (ANDROID TRUE CACHE INTERNAL "Setup build for Android platform")
+    cmake_dependent_option (ANDROID_NDK_GDB "Enable ndk-gdb for debugging (Android build only)" FALSE "CMAKE_BUILD_TYPE STREQUAL Debug" FALSE)
 else ()
-    unset (ANDROID_ABI CACHE)
-    unset (URHO3D_NDK_GDB CACHE)
-    if (ANDROID_ABI)
+    unset (ANDROID_NDK_GDB CACHE)
+    if (ANDROID_ABI AND ANDROID_NATIVE_API_LEVEL)
         # Just reference it to suppress "unused variable" CMake warning on non-Android project
         # Due to the design of cmake_gcc.sh currently, the script can be used to configure/generate Android project and other non-Android projects in one go
     endif ()
 endif ()
+# Constrain the build option values in cmake-gui, if applicable
+if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
+    set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED)
+    if (NOT CMAKE_CONFIGURATION_TYPES)
+        set_property (CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${URHO3D_BUILD_CONFIGURATIONS})
+    endif ()
+endif()
 
 # Enable testing
 if (URHO3D_TESTING)
@@ -385,7 +396,7 @@ else ()
             # Additional compiler flags for Windows ports of GCC
             set (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
-            # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build type
+            # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build configuration
             set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
         endif ()
@@ -437,7 +448,7 @@ endif ()
 set_output_directories (${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Bin RUNTIME PDB)
 
 # Enable Android ndk-gdb
-if (URHO3D_NDK_GDB)
+if (ANDROID_NDK_GDB)
     set (NDK_GDB_SOLIB_PATH ${PROJECT_BINARY_DIR}/obj/local/${ANDROID_NDK_ABI_NAME}/)
     file (MAKE_DIRECTORY ${NDK_GDB_SOLIB_PATH})
     set (NDK_GDB_JNI ${PROJECT_BINARY_DIR}/jni)
@@ -452,6 +463,8 @@ if (URHO3D_NDK_GDB)
     set (NDK_GDB_SETUP "# This is a generated file. DO NOT EDIT!\n\nset solib-search-path ${NDK_GDB_SOLIB_PATH}\ndirectory ${INCLUDE_DIRECTORIES}\n")
     file (WRITE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdb.setup ${NDK_GDB_SETUP})
     file (COPY ${ANDROID_NDK}/prebuilt/android-${ANDROID_ARCH_NAME}/gdbserver/gdbserver DESTINATION ${ANDROID_LIBRARY_OUTPUT_PATH})
+elseif (ANDROID)
+    file (REMOVE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdbserver)
 endif ()
 
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
@@ -676,6 +689,7 @@ macro (add_android_native_init)
         # Search using Urho3D SDK installation location which could be rooted
         find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c")
     endif ()
+    mark_as_advanced (ANDROID_MAIN_C_PATH)  # Hide it from cmake-gui in non-advanced mode
     if (ANDROID_MAIN_C_PATH)
         list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
     else ()
@@ -720,7 +734,7 @@ macro (setup_main_executable)
                     COMMENT "Copying ${NAME} to library output directory")
             endif ()
         endforeach ()
-        if (URHO3D_NDK_GDB)
+        if (ANDROID_NDK_GDB)
             # Copy the library while it still has debug symbols for ndk-gdb
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}

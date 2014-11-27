@@ -50,7 +50,7 @@ TileMap2D::~TileMap2D()
 void TileMap2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<TileMap2D>(URHO2D_CATEGORY);
-    ACCESSOR_ATTRIBUTE(TileMap2D, VAR_RESOURCEREF, "Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()), AM_DEFAULT);
 }
 
 void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -159,7 +159,7 @@ bool TileMap2D::PositionToTileIndex(int& x, int& y, const Vector2& position) con
     return info_.PositionToTileIndex(x, y, position);
 }
 
-void TileMap2D::SetTmxFileAttr(ResourceRef value)
+void TileMap2D::SetTmxFileAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetTmxFile(cache->GetResource<TmxFile2D>(value.name_));
@@ -168,6 +168,15 @@ void TileMap2D::SetTmxFileAttr(ResourceRef value)
 ResourceRef TileMap2D::GetTmxFileAttr() const
 {
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
+}
+
+void TileMap2D::OnNodeSet(Node* node)
+{
+    if (!node)
+    {
+        for (unsigned i = 0; i < layers_.Size(); ++i)
+            layers_[i]->GetNode()->Remove();
+    }
 }
 
 }
