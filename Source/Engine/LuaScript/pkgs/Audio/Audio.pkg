@@ -16,6 +16,7 @@ class Audio : public Object
     bool Play();
     void Stop();
     void SetMasterGain(SoundType type, float gain);
+    void SetMasterGain(const StringHash& type, float gain);
     void SetListener(SoundListener* listener);
     void StopSound(Sound* sound);
 
@@ -25,13 +26,16 @@ class Audio : public Object
     bool IsStereo() const;
     bool IsPlaying() const;
     bool IsInitialized() const;
+    bool IsMasterGain(const StringHash& type) const;
     float GetMasterGain(SoundType type) const;
+    float GetMasterGain(const StringHash& type) const;
     SoundListener* GetListener() const;
     const PODVector<SoundSource*>& GetSoundSources() const;
 
     void AddSoundSource(SoundSource* soundSource);
     void RemoveSoundSource(SoundSource* soundSource);
     float GetSoundSourceMasterGain(SoundType type) const;
+    float GetSoundSourceMasterGain(const StringHash& type) const;
     void MixOutput(void *dest, unsigned samples);
 
     tolua_readonly tolua_property__get_set unsigned sampleSize;
