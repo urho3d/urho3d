@@ -63,7 +63,7 @@ if (URHO3D_HOME)
     if (URHO3D_SOURCE_TREE)
         get_filename_component (URHO3D_SOURCE_TREE ${URHO3D_SOURCE_TREE} PATH)
         set (URHO3D_INCLUDE_DIRS ${URHO3D_SOURCE_TREE})
-        foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI Urho2D)
+        foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI UIX Urho2D)
             list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_SOURCE_TREE}/${DIR})     # Note: variable change to list context after this
         endforeach ()
         set (DIRS SDL/include)

@@ -81,6 +81,7 @@ endif ()
 
 if (URHO3D_URHO2D)
     list (APPEND SOURCES Urho2D)
+    list (APPEND SOURCES UIX)
 endif ()
 
 foreach (SOURCE ${SOURCES})

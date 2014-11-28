@@ -51,6 +51,7 @@
 #include "UI.h"
 #ifdef URHO3D_URHO2D
 #include "Urho2D.h"
+#include "UIX.h"
 #endif
 #include "WorkQueue.h"
 #include "XMLFile.h"
@@ -166,6 +167,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 #ifdef URHO3D_URHO2D
     // 2D graphics library is dependent on 3D graphics library
     RegisterUrho2DLibrary(context_);
+    // UIX library is dependent on Urho2D library
+    RegisterUIXLibrary(context_);
 #endif
 
     // Start logging

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<scene id="1">
+	<attribute name="Name" value="" />
+	<attribute name="Time Scale" value="1" />
+	<attribute name="Smoothing Constant" value="50" />
+	<attribute name="Snap Threshold" value="5" />
+	<attribute name="Elapsed Time" value="261.324" />
+	<attribute name="Next Replicated Node ID" value="1" />
+	<attribute name="Next Replicated Component ID" value="5" />
+	<attribute name="Next Local Node ID" value="16777219" />
+	<attribute name="Next Local Component ID" value="16777221" />
+	<attribute name="Variables" />
+	<attribute name="Variable Names" value="" />
+	<component type="Octree" id="1" />
+	<component type="DebugRenderer" id="2" />
+	<component type="UIRoot" id="3" />
+	<component type="Renderer2D" id="4" />
+	<node id="16777216">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="UIRect" id="16777216">
+			<attribute name="Layout Mode" value="Anchor" />
+			<attribute name="Left Anchor Pivot" value="Left" />
+			<attribute name="Right Anchor Pivot" value="Right" />
+			<attribute name="Top Anchor Pivot" value="Top" />
+			<attribute name="Bottom Anchor Pivot" value="Bottom" />
+			<attribute name="Left Offset" value="0" />
+			<attribute name="Right Offset" value="0" />
+			<attribute name="Right Offset" value="0" />
+			<attribute name="Bottom Offset" value="0" />
+		</component>
+		<component type="UIImage" id="16777217">
+			<attribute name="Sprite" value="Sprite2D;Urho2D/GoldIcon/1.png" />
+			<attribute name="Draw Mode" value="Tiled" />
+		</component>
+		<node id="16777217">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<component type="UIRect" id="16777218">
+				<attribute name="Size" value="4 2" />
+			</component>
+			<component type="UIImage" id="16777219">
+				<attribute name="Sprite" value="Sprite2D;Urho2D/Box.png" />
+				<attribute name="Draw Mode" value="Sliced" />
+				<attribute name="X Slice Size" value="9" />
+				<attribute name="Y Slice Size" value="9" />
+				<attribute name="Layer" value="1" />
+			</component>
+			<component type="UIText" id="16777220">
+				<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+				<attribute name="Font Size" value="32" />
+				<attribute name="Text" value="Hello UI X" />
+				<attribute name="Text Alignment" value="Center" />
+				<attribute name="Text Effect" value="Stroke" />
+				<attribute name="Effect Color" value="1 0 0 1" />
+				<attribute name="Layer" value="1" />
+				<attribute name="Order in Layer" value="1" />
+			</component>
+			<node id="16777218">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="" />
+				<attribute name="Position" value="0 -3.94427 7.88854" />
+				<attribute name="Rotation" value="1 0 0 0" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+		</node>
+	</node>
+</scene>
