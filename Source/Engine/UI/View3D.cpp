@@ -85,10 +85,21 @@ void View3D::OnResize()
     }
 }
 
-void View3D::SetView(Scene* scene, Camera* camera)
+void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
 {
     scene_ = scene;
     cameraNode_ = camera ? camera->GetNode() : 0;
+
+    if (ownScene)
+    {
+        ownedScene_ = scene_;
+        ownedCameraNode_ = cameraNode_;
+    }
+    else
+    {
+        ownedScene_ = 0;
+        ownedCameraNode_ = 0;
+    }
     
     viewport_->SetScene(scene_);
     viewport_->SetCamera(camera);

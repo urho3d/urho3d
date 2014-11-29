@@ -528,7 +528,7 @@ static void RegisterWindow(asIScriptEngine* engine)
 static void RegisterView3D(asIScriptEngine* engine)
 {
     RegisterWindow<View3D>(engine, "View3D");
-    engine->RegisterObjectMethod("View3D", "void SetView(Scene@+, Camera@+)", asMETHOD(View3D, SetView), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "void SetView(Scene@+, Camera@+, bool ownScene=true)", asMETHOD(View3D, SetView), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "void QueueUpdate()", asMETHOD(View3D, QueueUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "void set_format(uint)", asMETHOD(View3D, SetFormat), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "uint get_format() const", asMETHOD(View3D, GetFormat), asCALL_THISCALL);

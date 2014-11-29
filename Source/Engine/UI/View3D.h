@@ -49,8 +49,8 @@ public:
     /// React to resize.
     virtual void OnResize();
 
-    /// Define the scene and camera to use in rendering. The View3D will take ownership of them with shared pointers.
-    void SetView(Scene* scene, Camera* camera);
+    /// Define the scene and camera to use in rendering. When ownScene is true the View3D will take ownership of them with shared pointers.
+    void SetView(Scene* scene, Camera* camera, bool ownScene = true);
     /// Set render texture pixel format. Default is RGB.
     void SetFormat(unsigned format);
     /// Set render target auto update mode. Default is true.
@@ -80,9 +80,13 @@ public:
     /// Viewport.
     SharedPtr<Viewport> viewport_;
     /// Scene.
-    SharedPtr<Scene> scene_;
+    WeakPtr<Scene> scene_;
     /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
+    WeakPtr<Node> cameraNode_;
+    /// Owned scene.
+    SharedPtr<Scene> ownedScene_;
+    /// Owned camera scene node.
+    SharedPtr<Node> ownedCameraNode_;
     /// Render texture format.
     unsigned rttFormat_;
     /// Render texture auto update mode.
