@@ -478,7 +478,7 @@ int SoundSource::GetPositionAttr() const
 
 SoundType SoundSource::GetSoundTypeAttr() const
 {
-    for (int i; i < MAX_SOUND_TYPES; i++)
+    for (int i = 0; i < MAX_SOUND_TYPES; i++)
     {
         if (soundType_ == soundTypeHashes[i])
             return static_cast<SoundType>(i);
