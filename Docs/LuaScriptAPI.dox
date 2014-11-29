@@ -6461,7 +6461,7 @@ Methods:
 - View3D() (GC)
 - View3D* new()
 - void delete()
-- void SetView(Scene* scene, Camera* camera)
+- void SetView(Scene* scene, Camera* camera, bool ownScene = false)
 - void SetFormat(unsigned format)
 - void SetAutoUpdate(bool enable)
 - void QueueUpdate()
