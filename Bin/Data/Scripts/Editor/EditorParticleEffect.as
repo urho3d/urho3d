@@ -3,7 +3,7 @@
 Window@ particleEffectWindow;
 ParticleEffect@ editParticleEffect;
 XMLFile@ oldParticleEffectState;
-bool inParticleEffectRefresh = true;
+bool inParticleEffectRefresh = false;
 View3D@ particleEffectPreview;
 Scene@ particlePreviewScene;
 Node@ particleEffectPreviewNode;
@@ -120,6 +120,9 @@ void CreateParticleEffectEditor()
 
 void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -134,6 +137,9 @@ void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData
 
 void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -148,6 +154,9 @@ void EditParticleEffectTextureFrameNew(StringHash eventType, VariantMap& eventDa
 
 void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -167,6 +176,9 @@ void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventD
 
 void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -245,6 +257,9 @@ void InitParticleEffectBasicAttributes()
 
 void EditParticleEffectConstantForce(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -268,6 +283,9 @@ void EditParticleEffectConstantForce(StringHash eventType, VariantMap& eventData
 
 void EditParticleEffectDirection(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -301,6 +319,9 @@ void EditParticleEffectDirection(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectDampingForce(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -315,6 +336,9 @@ void EditParticleEffectDampingForce(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectActiveTime(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -333,6 +357,9 @@ void EditParticleEffectActiveTime(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectInactiveTime(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -351,6 +378,9 @@ void EditParticleEffectInactiveTime(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectParticleSize(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -378,6 +408,9 @@ void EditParticleEffectParticleSize(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectTimeToLive(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -399,6 +432,9 @@ void EditParticleEffectTimeToLive(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectVelocity(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -420,6 +456,9 @@ void EditParticleEffectVelocity(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectRotation(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -441,6 +480,9 @@ void EditParticleEffectRotation(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectRotationSpeed(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -462,6 +504,9 @@ void EditParticleEffectRotationSpeed(StringHash eventType, VariantMap& eventData
 
 void EditParticleEffectSizeAdd(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -476,6 +521,9 @@ void EditParticleEffectSizeAdd(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectSizeMultiply(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -490,6 +538,9 @@ void EditParticleEffectSizeMultiply(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectAnimationLodBias(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -504,6 +555,9 @@ void EditParticleEffectAnimationLodBias(StringHash eventType, VariantMap& eventD
 
 void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -522,6 +576,9 @@ void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectEmitterSize(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -545,6 +602,9 @@ void EditParticleEffectEmitterSize(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectEmissionRate(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -563,6 +623,9 @@ void EditParticleEffectEmissionRate(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -586,6 +649,9 @@ void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -645,6 +711,9 @@ void PickEditParticleEffectMaterialDone(StringHash eventType, VariantMap& eventD
 
 void EditParticleEffectScaled(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -663,6 +732,9 @@ void EditParticleEffectScaled(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectSorted(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -681,6 +753,9 @@ void EditParticleEffectSorted(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -789,12 +864,16 @@ void EditParticleEffect(ParticleEffect@ effect)
 
 void RefreshParticleEffectEditor()
 {
+    inParticleEffectRefresh = true;
+
     RefreshParticleEffectPreview();
     RefreshParticleEffectName();
     RefreshParticleEffectBasicAttributes();
     RefreshParticleEffectMaterial();
     RefreshParticleEffectColorFrames();
     RefreshParticleEffectTextureFrames();
+
+    inParticleEffectRefresh = false;
 }
 
 void RefreshParticleEffectColorFrames()
@@ -1038,6 +1117,9 @@ void RefreshParticleEffectTextureFrames()
 
 void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -1073,6 +1155,9 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
 
 void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -1298,6 +1383,9 @@ void NewParticleEffect()
 
 void RevertParticleEffect()
 {
+    if (inParticleEffectRefresh)
+        return;
+
     if (editParticleEffect is null)
         return;
 
@@ -1384,6 +1472,8 @@ void BeginParticleEffectEdit()
     if (editParticleEffect is null)
         return;
 
+    inParticleEffectRefresh = true;
+
     oldParticleEffectState = XMLFile();
     XMLElement particleElem = oldParticleEffectState.CreateRoot("particleeffect");
     editParticleEffect.Save(particleElem);
@@ -1393,13 +1483,15 @@ void EndParticleEffectEdit()
 {
     if (editParticleEffect is null)
         return;
-        
+
     if (!dragEditAttribute)
     {
         EditParticleEffectAction@ action = EditParticleEffectAction();
         action.Define(particleEffectEmitter, editParticleEffect, oldParticleEffectState);
         SaveEditAction(action);
     }
+
+    inParticleEffectRefresh = false;
     
     particleEffectPreview.QueueUpdate();
 }
