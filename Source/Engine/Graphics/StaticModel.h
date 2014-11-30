@@ -42,7 +42,7 @@ struct StaticModelGeometryData
 class URHO3D_API StaticModel : public Drawable
 {
     OBJECT(StaticModel);
-    
+
 public:
     /// Construct.
     StaticModel(Context* context);
@@ -50,7 +50,7 @@ public:
     ~StaticModel();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -61,7 +61,7 @@ public:
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
-    
+
     /// Set model.
     void SetModel(Model* model);
     /// Set material on all geometries.
@@ -72,7 +72,7 @@ public:
     void SetOcclusionLodLevel(unsigned level);
     /// Apply default materials from a material list file. If filename is empty (default), the model's resource name with extension .txt will be used.
     void ApplyMaterialList(const String& fileName = String::EMPTY);
-    
+
     /// Return model.
     Model* GetModel() const { return model_; }
     /// Return number of geometries.
@@ -85,16 +85,16 @@ public:
     bool IsInside(const Vector3& point) const;
     /// Determines if the given local space point is within the model geometry.
     bool IsInsideLocal(const Vector3& point) const;
-    
+
     /// Set model attribute.
-    void SetModelAttr(ResourceRef value);
+    void SetModelAttr(const ResourceRef& value);
     /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
@@ -106,7 +106,7 @@ protected:
     void ResetLodLevels();
     /// Choose LOD levels based on distance.
     void CalculateLodLevels();
-    
+
     /// Extra per-geometry data.
     PODVector<StaticModelGeometryData> geometryData_;
     /// All geometries.
@@ -117,7 +117,7 @@ protected:
     unsigned occlusionLodLevel_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
-    
+
 private:
     /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);

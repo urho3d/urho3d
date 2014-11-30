@@ -49,12 +49,12 @@ void ConstraintPulley2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintPulley2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_VECTOR2, "Owner Body Ground Anchor", GetOwnerBodyGroundAnchor, SetOwnerBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_VECTOR2, "Other Body Ground Anchor", GetOtherBodyGroundAnchor, SetOtherBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_VECTOR2, "Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_VECTOR2, "Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);    
-    ACCESSOR_ATTRIBUTE(ConstraintPulley2D, VAR_FLOAT, "Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ConstraintPulley2D, Constraint2D);
+    ACCESSOR_ATTRIBUTE("Owner Body Ground Anchor", GetOwnerBodyGroundAnchor, SetOwnerBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Other Body Ground Anchor", GetOtherBodyGroundAnchor, SetOtherBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);    
+    ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintPulley2D::SetOwnerBodyGroundAnchor(const Vector2& groundAnchor)

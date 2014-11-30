@@ -56,11 +56,11 @@ void View3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<View3D>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(View3D, Window);
+    COPY_BASE_ATTRIBUTES(Window);
     // The texture format is API specific, so do not register it as a serializable attribute
-    ACCESSOR_ATTRIBUTE(View3D, VAR_BOOL, "Auto Update", GetAutoUpdate, SetAutoUpdate, bool, true, AM_FILE);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(View3D, "Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE(View3D, "Is Enabled", true);
+    ACCESSOR_ATTRIBUTE("Auto Update", GetAutoUpdate, SetAutoUpdate, bool, true, AM_FILE);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
 }
 
 void View3D::OnResize()
@@ -85,10 +85,21 @@ void View3D::OnResize()
     }
 }
 
-void View3D::SetView(Scene* scene, Camera* camera)
+void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
 {
     scene_ = scene;
     cameraNode_ = camera ? camera->GetNode() : 0;
+
+    if (ownScene)
+    {
+        ownedScene_ = scene_;
+        ownedCameraNode_ = cameraNode_;
+    }
+    else
+    {
+        ownedScene_ = 0;
+        ownedCameraNode_ = 0;
+    }
     
     viewport_->SetScene(scene_);
     viewport_->SetCamera(camera);

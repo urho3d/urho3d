@@ -71,15 +71,15 @@ void Node::RegisterObject(Context* context)
 {
     context->RegisterFactory<Node>();
 
-    ACCESSOR_ATTRIBUTE(Node, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
-    ATTRIBUTE(Node, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO, AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
+    ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
+    ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO, AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 bool Node::Load(Deserializer& source, bool setInstanceDefault)
@@ -582,11 +582,35 @@ void Node::AddChild(Node* node, unsigned index)
         parent = parent->parent_;
     }
 
-    // Add first, then remove from old parent, to ensure the node does not get deleted
-    children_.Insert(index, SharedPtr<Node>(node));
-    node->Remove();
+    // Keep a shared ptr to the node while transfering
+    SharedPtr<Node> nodeShared(node);
+    Node* oldParent = node->parent_;
+    if (oldParent)
+    {
+        // If old parent is in different scene, perform the full removal
+        if (oldParent->GetScene() != scene_)
+            oldParent->RemoveChild(node);
+        else
+        {
+            if (scene_)
+            {
+                // Otherwise do not remove from the scene during reparenting, just send the necessary change event
+                using namespace NodeRemoved;
+    
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_SCENE] = scene_;
+                eventData[P_PARENT] = oldParent;
+                eventData[P_NODE] = node;
+                
+                scene_->SendEvent(E_NODEREMOVED, eventData);
+            }
+            
+            oldParent->children_.Remove(nodeShared);
+        }
+    }
 
-    // Add to the scene if not added yet
+    // Add to the child vector, then add to the scene if not added yet
+    children_.Insert(index, nodeShared);
     if (scene_ && node->GetScene() != scene_)
         scene_->NodeAdded(node);
 
@@ -1648,6 +1672,8 @@ void Node::UpdateWorldTransform() const
 void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
     // Send change event. Do not send when already being destroyed
+    Node* child = *i;
+    
     if (Refs() > 0 && scene_)
     {
         using namespace NodeRemoved;
@@ -1655,14 +1681,18 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
         VariantMap& eventData = GetEventDataMap();
         eventData[P_SCENE] = scene_;
         eventData[P_PARENT] = this;
-        eventData[P_NODE] = (*i).Get();
-
+        eventData[P_NODE] = child;
+        
         scene_->SendEvent(E_NODEREMOVED, eventData);
     }
 
-    (*i)->parent_ = 0;
-    (*i)->MarkDirty();
-    (*i)->MarkNetworkUpdate();
+    child->parent_ = 0;
+    child->MarkDirty();
+    child->MarkNetworkUpdate();
+    // Remove the child from the scene already at this point, in case it is not destroyed immediately
+    if (scene_)
+        scene_->NodeRemoved(child);
+
     children_.Erase(i);
 }
 

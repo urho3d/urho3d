@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "GraphicsDefs.h"
 #include "Resource.h"
 
 namespace Urho3D
@@ -30,19 +29,6 @@ namespace Urho3D
 
 class SpriteSheet2D;
 class Texture2D;
-
-/// 2D vertex.
-struct Vertex2D
-{
-    /// Position.
-    Vector3 position_;
-    /// Color.
-    unsigned color_;
-    /// UV.
-    Vector2 uv_;
-};
-
-static const unsigned MASK_VERTEX2D = MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1;
 
 /// Sprite.
 class URHO3D_API Sprite2D : public Resource
@@ -83,6 +69,11 @@ public:
     const IntVector2& GetOffset() const { return offset_; }
     /// Return sprite sheet.
     SpriteSheet2D* GetSpriteSheet() const { return spriteSheet_; }
+
+    /// Save sprite to ResourceRef.
+    static ResourceRef SaveToResourceRef(Sprite2D* sprite);
+    /// Load sprite from ResourceRef.
+    static Sprite2D* LoadFromResourceRef(Object* object, const ResourceRef& value);
 
 private:
     /// Texture.

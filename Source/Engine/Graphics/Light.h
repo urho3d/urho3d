@@ -57,17 +57,17 @@ struct URHO3D_API BiasParameters
     BiasParameters()
     {
     }
-    
+
     /// Construct with initial values.
     BiasParameters(float constantBias, float slopeScaledBias) :
         constantBias_(constantBias),
         slopeScaledBias_(slopeScaledBias)
     {
     }
-    
+
     /// Validate parameters.
     void Validate();
-    
+
     /// Constant bias.
     float constantBias_;
     /// Slope scaled bias.
@@ -81,7 +81,7 @@ struct URHO3D_API CascadeParameters
     CascadeParameters()
     {
     }
-    
+
     /// Construct with initial values.
     CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) :
         fadeStart_(fadeStart),
@@ -92,20 +92,20 @@ struct URHO3D_API CascadeParameters
         splits_[2] = split3;
         splits_[3] = split4;
     }
-    
+
     /// Validate parameters.
     void Validate();
-    
+
     /// Return shadow maximum range.
     float GetShadowRange() const
     {
         float ret = 0.0f;
         for (unsigned i = 0; i < MAX_CASCADE_SPLITS; ++i)
             ret = Max(ret, splits_[i]);
-        
+
         return ret;
     }
-    
+
     /// Far clip values of the splits.
     float splits_[4];
     /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
@@ -121,7 +121,7 @@ struct URHO3D_API FocusParameters
     FocusParameters()
     {
     }
-    
+
     /// Construct with initial values.
     FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) :
         focus_(focus),
@@ -131,10 +131,10 @@ struct URHO3D_API FocusParameters
         minView_(minView)
     {
     }
-    
+
     /// Validate parameters.
     void Validate();
-    
+
     /// Focus flag.
     bool focus_;
     /// Non-uniform focusing flag.
@@ -151,7 +151,7 @@ struct URHO3D_API FocusParameters
 class URHO3D_API Light : public Drawable
 {
     OBJECT(Light);
-    
+
 public:
     /// Construct.
     Light(Context* context);
@@ -159,7 +159,7 @@ public:
     virtual ~Light();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute change.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Process octree raycast. May be called from a worker thread.
@@ -168,7 +168,7 @@ public:
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set light type.
     void SetLightType(LightType type);
     /// Set vertex lighting mode.
@@ -205,7 +205,7 @@ public:
     void SetRampTexture(Texture* texture);
     /// Set spotlight attenuation texture.
     void SetShapeTexture(Texture* texture);
-    
+
     /// Return light type.
     LightType GetLightType() const { return lightType_; }
     /// Return vertex lighting mode.
@@ -252,7 +252,7 @@ public:
     int GetNumShadowSplits() const;
     /// Return whether light has negative (darkening) color.
     bool IsNegative() const { return GetEffectiveColor().SumRGB() < 0.0f; }
-    
+
     /// Set sort value based on intensity and view distance.
     void SetIntensitySortValue(float distance);
     /// Set sort value based on overall intensity over a bounding box.
@@ -267,20 +267,20 @@ public:
     LightBatchQueue* GetLightQueue() const { return lightQueue_; }
     /// Return a divisor value based on intensity for calculating the sort value.
     float GetIntensityDivisor(float attenuation = 1.0f) const { return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + M_EPSILON; }
-    
+
     /// Set ramp texture attribute.
-    void SetRampTextureAttr(ResourceRef value);
+    void SetRampTextureAttr(const ResourceRef& value);
     /// Set shape texture attribute.
-    void SetShapeTextureAttr(ResourceRef value);
+    void SetShapeTextureAttr(const ResourceRef& value);
     /// Return ramp texture attribute.
     ResourceRef GetRampTextureAttr() const;
     /// Return shape texture attribute.
     ResourceRef GetShapeTextureAttr() const;
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
 private:
     /// Light type.
     LightType lightType_;

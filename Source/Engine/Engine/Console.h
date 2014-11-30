@@ -149,8 +149,6 @@ private:
     bool printing_;
     /// Flag for automatically focusing the line edit on showing the console.
     bool focusOnShow_;
-    /// Saved OS mouse visiblity flag. Used internally to save and restore OS mouse visibility.
-    bool savedMouseVisibility_;
 };
 
 }

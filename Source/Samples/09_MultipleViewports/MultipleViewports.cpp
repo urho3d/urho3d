@@ -283,5 +283,5 @@ void MultipleViewports::HandlePostRenderUpdate(StringHash eventType, VariantMap&
     // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
     // bones. Disable depth test so that we can see the effect of occlusion
     if (drawDebug_)
-        GetSubsystem<Renderer>()->DrawDebugGeometry(true);
+        GetSubsystem<Renderer>()->DrawDebugGeometry(false);
 }

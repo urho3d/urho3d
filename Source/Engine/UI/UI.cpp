@@ -359,7 +359,7 @@ void UI::Update(float timeStep)
     for (unsigned i = 0; i < numTouches; ++i)
     {
         TouchState* touch = input->GetTouch(i);
-        ProcessHover(touch->position_, TOUCHID_MASK(i), 0, 0);
+        ProcessHover(touch->position_, TOUCHID_MASK(touch->touchID_), 0, 0);
     }
 
     // End hovers that expired without refreshing
@@ -908,11 +908,11 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                     {
                         int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
                             element->GetScreenPosition().y_;
-                        int layoutMinSize = current->GetLayoutMinSize();
+                        int layoutMaxSize = current->GetLayoutMaxSize();
 
-                        if (screenPos < 0 && layoutMinSize > 0)
+                        if (screenPos < 0 && layoutMaxSize > 0)
                         {
-                            unsigned toSkip = -screenPos / layoutMinSize;
+                            unsigned toSkip = -screenPos / layoutMaxSize;
                             if (toSkip > 0)
                                 i += (toSkip - 1);
                         }
@@ -952,6 +952,8 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
         pos = cursor_->GetPosition();
         visible = true;
     }
+    else if (GetSubsystem<Input>()->GetMouseMode() == MM_RELATIVE)
+        visible = true;
     else
     {
         Input* input = GetSubsystem<Input>();
@@ -1076,7 +1078,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
 
         bool newButton;
         if (usingTouchInput_)
-            newButton = !((bool)(button & buttons));
+            newButton = (button & buttons) == 0;
         else
             newButton = true;
         buttons |= button;
@@ -1481,7 +1483,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
+    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
@@ -1498,7 +1500,9 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     using namespace TouchEnd;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
+
+    // Get the touch index
+    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));
@@ -1527,7 +1531,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(GetTouchIndexFromID(eventData[P_TOUCHID].GetInt()));
+    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
 
     ProcessMove(pos, deltaPos, touchId, 0, 0, true);
 }
@@ -1734,19 +1738,6 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
         sendPos.y_ = dragData->sumPos.y_ / dragData->numDragButtons;
     }
     return sendPos;
-}
-
-unsigned UI::GetTouchIndexFromID(int touchID)
-{
-    Input* input = GetSubsystem<Input>();
-    unsigned numTouches = input->GetNumTouches();
-    for (unsigned i = 0; i < numTouches; ++i)
-    {
-        TouchState* touch = input->GetTouch(i);
-        if (touch->touchID_ == touchID)
-            return i;
-    }
-    return 0; // Should not happen
 }
 
 void RegisterUILibrary(Context* context)

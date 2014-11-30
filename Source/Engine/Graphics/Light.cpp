@@ -81,11 +81,6 @@ void FocusParameters::Validate()
     minView_ = Max(minView_, SHADOW_MIN_VIEW);
 }
 
-template<> LightType Variant::Get<LightType>() const
-{
-    return (LightType)GetInt();
-}
-
 Light::Light(Context* context) :
     Drawable(context, DRAWABLE_LIGHT),
     lightType_(DEFAULT_LIGHTTYPE),
@@ -115,38 +110,38 @@ void Light::RegisterObject(Context* context)
 {
     context->RegisterFactory<Light>(SCENE_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(Light, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Light, VAR_COLOR, "Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Per Vertex", perVertex_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Fade Distance", GetFadeDistance, SetFadeDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Bias Auto Adjust", shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    ATTRIBUTE("Per Vertex", bool, perVertex_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Fade Distance", GetFadeDistance, SetFadeDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
+    ATTRIBUTE("Focus To Scene", bool, shadowFocus_.focus_, true, AM_DEFAULT);
+    ATTRIBUTE("Non-uniform View", bool, shadowFocus_.nonUniform_, true, AM_DEFAULT);
+    ATTRIBUTE("Auto-Reduce Size", bool, shadowFocus_.autoSize_, true, AM_DEFAULT);
+    ATTRIBUTE("CSM Splits", Vector4, shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ATTRIBUTE("CSM Fade Start", float, shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
+    ATTRIBUTE("CSM Bias Auto Adjust", float, shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
+    ATTRIBUTE("View Size Quantize", float, shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
+    ATTRIBUTE("View Size Minimum", float, shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
+    ATTRIBUTE("Depth Constant Bias", float, shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
+    ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
+    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
 
 void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -230,7 +225,7 @@ void Light::UpdateBatches(const FrameInfo& frame)
 void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     Color color = GetEffectiveColor();
-    
+
     if (debug && IsEnabledEffective())
     {
         switch (lightType_)
@@ -390,7 +385,7 @@ Frustum Light::GetFrustum() const
 int Light::GetNumShadowSplits() const
 {
     int ret = 1;
-    
+
     if (shadowCascade_.splits_[1] > shadowCascade_.splits_[0])
     {
         ++ret;
@@ -401,7 +396,7 @@ int Light::GetNumShadowSplits() const
                 ++ret;
         }
     }
-    
+
     ret = Min(ret, MAX_CASCADE_SPLITS);
     // Shader Model 2 can only support 3 splits max. due to pixel shader instruction count limits
     if (ret == 4)
@@ -410,7 +405,7 @@ int Light::GetNumShadowSplits() const
         if (graphics && !graphics->GetSM3Support())
             --ret;
     }
-    
+
     return ret;
 }
 
@@ -441,7 +436,7 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 {
     if (!node_)
         return Matrix3x4::IDENTITY;
-    
+
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
@@ -464,13 +459,13 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
     return volumeTransform_;
 }
 
-void Light::SetRampTextureAttr(ResourceRef value)
+void Light::SetRampTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
-void Light::SetShapeTextureAttr(ResourceRef value)
+void Light::SetShapeTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));

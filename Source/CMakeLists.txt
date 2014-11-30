@@ -56,7 +56,7 @@ if (CMAKE_HOST_WIN32)
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (PATH_SUFFIX /Urho3D)
-    if (URHO3D_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores URHO3D_64BIT build option
+    if (URHO3D_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
             # Probably target system is a RedHat-based distro
             set (LIB_SUFFIX 64)
@@ -73,6 +73,8 @@ set (DEST_SHARE_DIR share${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
 # Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desirable, but if so then the RPATH setting below needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
+set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RASPI_SYSROOT} ${MINGW_SYSROOT})       # SYSROOT is empty for native build
+string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})    # Our CMAKE_INSTALL_PREFIX is rooted, use DEST_INSTALL_PREFIX for the non-rooted version
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 # Install application launcher scripts
@@ -105,9 +107,6 @@ set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set (CPACK_GENERATOR TGZ)
 if (ANDROID)
     set (CPACK_SYSTEM_NAME Android)
-elseif (RASPI)
-    set (CPACK_SYSTEM_NAME Raspberry-Pi)
-    list (APPEND CPACK_GENERATOR RPM DEB)
 elseif (IOS)
     set (CPACK_SYSTEM_NAME iOS)
 elseif (APPLE)
@@ -115,22 +114,28 @@ elseif (APPLE)
 elseif (WIN32)
     set (CPACK_GENERATOR ZIP)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
+    if (RASPI)
+        set (CPACK_SYSTEM_NAME Raspberry-Pi)
+    endif ()
     list (APPEND CPACK_GENERATOR RPM DEB)
+    set (CPACK_PACKAGING_INSTALL_PREFIX ${DEST_INSTALL_PREFIX})
 endif ()
 if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
 endif ()
 set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
 if (WIN32 AND NOT URHO3D_OPENGL)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)    # Stands for Direct 3D
+elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
 endif ()
-if ("$ENV{RELEASE_TAG}" STREQUAL "")
+if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
 endif ()
 include (CPack)
 
 # Setup RPATH settings
-if (NOT WIN32)
+if (NOT WIN32 AND NOT ANDROID)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree
@@ -153,7 +158,7 @@ if (NOT WIN32)
 endif ()
 
 # Add targets
-foreach (TARGET Box2D Civetweb FreeType JO LZ4 PugiXml SDL StanHull STB)
+foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -168,6 +173,7 @@ if (URHO3D_LUA)
 endif ()
 
 if (URHO3D_NETWORK)
+    add_subdirectory (ThirdParty/Civetweb)
     add_subdirectory (ThirdParty/kNet)
 endif ()
 
@@ -178,6 +184,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
+endif ()
+
+if (URHO3D_URHO2D)
+    add_subdirectory (ThirdParty/Box2D)
 endif ()
 
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)

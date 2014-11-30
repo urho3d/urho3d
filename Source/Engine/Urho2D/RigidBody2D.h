@@ -63,7 +63,7 @@ public:
     /// Set inertia.
     void SetInertia(float inertia);
     /// Set mass center.
-    void SetMassCenter(Vector2 center);
+    void SetMassCenter(const Vector2& center);
     /// Use fixture mass (default is true).
     void SetUseFixtureMass(bool useFixtureMass);
     /// Set linear damping.
@@ -81,7 +81,7 @@ public:
     /// Set awake.
     void SetAwake(bool awake);
     /// Set linear velocity.
-    void SetLinearVelocity(Vector2 linearVelocity);
+    void SetLinearVelocity(const Vector2& linearVelocity);
     /// Set angular velocity.
     void SetAngularVelocity(float angularVelocity);
     /// Apply force.
@@ -99,7 +99,7 @@ public:
     void CreateBody();
     /// Release body.
     void ReleaseBody();
-    
+
     /// Apply world transform.
     void ApplyWorldTransform();
     /// Add collision shape.
@@ -156,7 +156,7 @@ private:
     /// Box2D mass data.
     b2MassData massData_;
     /// Use fixture mass.
-    bool useFixtureMass_; 
+    bool useFixtureMass_;
     /// Box2D body.
     b2Body* body_;
     /// Collision shapes.

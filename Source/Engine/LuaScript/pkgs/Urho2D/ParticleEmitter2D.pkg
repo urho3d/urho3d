@@ -5,6 +5,9 @@ class ParticleEmitter2D : public Drawable2D
 public:
     void SetEffect(ParticleEffect2D* effect);
     ParticleEffect2D* GetEffect() const;
+    void SetSprite(Sprite2D* sprite);
+    Sprite2D* GetSprite() const;
 
     tolua_property__get_set ParticleEffect2D* effect;
+    tolua_property__get_set Sprite2D* sprite;
 };

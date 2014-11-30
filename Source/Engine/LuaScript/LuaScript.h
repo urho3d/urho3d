@@ -55,15 +55,28 @@ public:
     /// Script send event.
     void ScriptSendEvent(const String& eventName, VariantMap& eventData);
     /// Script subscribe to an event that can by send by any sender.
+    void ScriptSubscribeToEvent(const String& eventName, int functionIndex);
+    /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
     /// Script unsubscribe from an event.
-    void ScriptUnsubscribeFromEvent(const String& eventName, const String& functionName = String::EMPTY);
+    void ScriptUnsubscribeFromEvent(const String& eventName);
+    /// Script unsubscribe from an event.
+    void ScriptUnsubscribeFromEvent(const String& eventName, int functionIndex);
+    /// Script unsubscribe from an event.
+    void ScriptUnsubscribeFromEvent(const String& eventName, const String& functionName);
     /// Script unsubscribe from all events.
     void ScriptUnsubscribeFromAllEvents();
     /// Script subscribe to a specific sender's event.
+    void ScriptSubscribeToEvent(void* sender, const String& eventName, int functionIndex);
+    /// Script subscribe to a specific sender's event.
     void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
     /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName = String::EMPTY);
+    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
+    /// Script unsubscribe from a specific sender's event.
+    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, int functionIndex);
+    /// Script unsubscribe from a specific sender's event.
+    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName);
+
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
     /// Set whether to execute engine console commands as script code.
@@ -71,11 +84,13 @@ public:
 
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
-    /// Return Lua function.
+    /// Return Lua function by function stack index.
+    WeakPtr<LuaFunction> GetFunction(int functionIndex);
+    /// Return Lua function by function name.
     WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
-    
+
 private:
     /// Register loader.
     void RegisterLoader();
@@ -103,6 +118,8 @@ private:
     lua_State* luaState_;
     /// Coroutine update function.
     WeakPtr<LuaFunction> coroutineUpdate_;
+    /// Function pointer to function map.
+    HashMap<const void*, SharedPtr<LuaFunction> > functionPointerToFunctionMap_;
     /// Function name to function map.
     HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
     /// Typedef Lua function vector.

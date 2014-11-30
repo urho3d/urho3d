@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#ifdef URHO3D_URHO2D
 #include "AnimatedSprite2D.h"
 #include "Animation2D.h"
 #include "AnimationSet2D.h"
@@ -94,12 +95,10 @@ template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "int get_layer() const", asMETHOD(T, GetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_orderInLayer(int)", asMETHOD(T, SetOrderInLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_orderInLayer() const", asMETHOD(T, GetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_sprite(Sprite2D@+)", asMETHOD(T, SetSprite), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Sprite2D@+ get_sprite() const", asMETHOD(T, GetSprite), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_texture(Texture2D@+)", asMETHOD(T, SetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Texture2D@+ get_texture() const", asMETHOD(T, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(BlendMode)", asMETHOD(T, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "BlendMode get_blendMode() const", asMETHOD(T, GetBlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHOD(T, SetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Material@+ get_material() const", asMETHOD(T, GetMaterial), asCALL_THISCALL);
 }
 
 static void RegisterDrawable2D(asIScriptEngine* engine)
@@ -114,6 +113,8 @@ template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const ch
 {
     RegisterDrawable2D<T>(engine, className);
     RegisterSubclass<StaticSprite2D, T>(engine, "StaticSprite2D", className);
+    engine->RegisterObjectMethod(className, "void set_sprite(Sprite2D@+)", asMETHOD(T, SetSprite), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Sprite2D@+ get_sprite() const", asMETHOD(T, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFlip(bool, bool)", asMETHOD(T, SetFlip), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_flipX(bool)", asMETHOD(T, SetFlipX), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_flipX() const", asMETHOD(T, GetFlipX), asCALL_THISCALL);
@@ -191,6 +192,8 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     RegisterDrawable2D<ParticleEmitter2D>(engine, "ParticleEmitter2D");
     engine->RegisterObjectMethod("ParticleEmitter2D", "void set_effect(ParticleEffect2D@+)", asMETHOD(ParticleEmitter2D, SetEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter2D", "ParticleEffect2D@+ get_effect() const", asMETHOD(ParticleEmitter2D, GetEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "void set_sprite(Sprite2D@+)", asMETHOD(ParticleEmitter2D, SetSprite), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "Sprite2D@+ get_sprite() const", asMETHOD(ParticleEmitter2D, GetSprite), asCALL_THISCALL);
 }
 
 static void FakeAddRef(void* ptr)
@@ -284,7 +287,7 @@ static void RegisterTileMapLayer2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapLayer2D", "uint get_numObjects() const", asMETHOD(TileMapLayer2D, GetNumObjects), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "TileMapObject2D@ GetObject(uint) const", asMETHOD(TileMapLayer2D, GetObject), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "Node@ GetObjectNode(uint) const", asMETHOD(TileMapLayer2D, GetObjectNode), asCALL_THISCALL);
-    
+
     // For image layer only
     engine->RegisterObjectMethod("TileMapLayer2D", "Node@ get_imageNode() const", asMETHOD(TileMapLayer2D, GetImageNode), asCALL_THISCALL);
 }
@@ -314,7 +317,7 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody2D", "float get_mass() const", asMETHOD(RigidBody2D, GetMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void set_inertia(float)", asMETHOD(RigidBody2D, SetInertia), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "float get_inertia() const", asMETHOD(RigidBody2D, GetInertia), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RigidBody2D", "void set_massCenter(Vector2)", asMETHOD(RigidBody2D, SetMassCenter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody2D", "void set_massCenter(const Vector2&in)", asMETHOD(RigidBody2D, SetMassCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "Vector2 get_massCenter() const", asMETHOD(RigidBody2D, GetMassCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void set_useFixtureMass(bool)", asMETHOD(RigidBody2D, SetUseFixtureMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "bool get_useFixtureMass() const", asMETHOD(RigidBody2D, GetUseFixtureMass), asCALL_THISCALL);
@@ -332,7 +335,7 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody2D", "float get_gravityScale() const", asMETHOD(RigidBody2D, GetGravityScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void set_awake(bool)", asMETHOD(RigidBody2D, SetAwake), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "bool get_awake() const", asMETHOD(RigidBody2D, IsAwake), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RigidBody2D", "void set_linearVelocity(Vector2)", asMETHOD(RigidBody2D, SetLinearVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody2D", "void set_linearVelocity(const Vector2&in)", asMETHOD(RigidBody2D, SetLinearVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "Vector2 get_linearVelocity() const", asMETHOD(RigidBody2D, GetLinearVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyForce(const Vector2&in, const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyForce), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyForceToCenter(const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyForceToCenter), asCALL_THISCALL);
@@ -767,3 +770,4 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
 }
 
 }
+#endif

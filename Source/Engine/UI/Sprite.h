@@ -32,7 +32,7 @@ namespace Urho3D
 class URHO3D_API Sprite : public UIElement
 {
     OBJECT(Sprite);
-    
+
 public:
     /// Construct.
     Sprite(Context* context);
@@ -40,7 +40,7 @@ public:
     virtual ~Sprite();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Return whether is visible and inside a scissor rectangle and should be rendered.
     virtual bool IsWithinScissor(const IntRect& currentScissor);
     /// Update and return screen position.
@@ -49,7 +49,7 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to position change.
     virtual void OnPositionSet();
-    
+
     /// Set floating point position.
     void SetPosition(const Vector2& position);
     /// Set floating point position.
@@ -74,7 +74,7 @@ public:
     void SetFullImageRect();
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
-    
+
     /// Return floating point position.
     const Vector2& GetPosition() const { return floatPosition_; }
     /// Return hotspot.
@@ -89,14 +89,14 @@ public:
     const IntRect& GetImageRect() const { return imageRect_; }
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
-    
+
     /// Set texture attribute.
-    void SetTextureAttr(ResourceRef value);
+    void SetTextureAttr(const ResourceRef& value);
     /// Return texture attribute.
     ResourceRef GetTextureAttr() const;
     /// Update and return rendering transform, also used to transform child sprites.
     const Matrix3x4& GetTransform() const;
-    
+
 protected:
     /// Floating point position.
     Vector2 floatPosition_;

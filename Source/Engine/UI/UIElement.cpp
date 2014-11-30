@@ -87,26 +87,6 @@ static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
     return lhs->GetPriority() < rhs->GetPriority();
 }
 
-template<> HorizontalAlignment Variant::Get<HorizontalAlignment>() const
-{
-    return (HorizontalAlignment)GetInt();
-}
-
-template<> VerticalAlignment Variant::Get<VerticalAlignment>() const
-{
-    return (VerticalAlignment)GetInt();
-}
-
-template<> FocusMode Variant::Get<FocusMode>() const
-{
-    return (FocusMode)GetInt();
-}
-
-template<> LayoutMode Variant::Get<LayoutMode>() const
-{
-    return (LayoutMode)GetInt();
-}
-
 XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
 
 UIElement::UIElement(Context* context) :
@@ -129,9 +109,11 @@ UIElement::UIElement(Context* context) :
     layoutMode_(LM_FREE),
     layoutSpacing_(0),
     layoutBorder_(IntRect::ZERO),
+    layoutFlexScale_(Vector2::ONE),
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
     layoutMinSize_(0),
+    layoutMaxSize_(0),
     indent_(0),
     indentSpacing_(16),
     position_(IntVector2::ZERO),
@@ -169,37 +151,38 @@ void UIElement::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIElement>(UI_CATEGORY);
 
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Priority", GetPriority, SetPriority, int, 0, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_FLOAT, "Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_COLOR, "Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Top Left Color", color_[0], Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent", GetIndent, SetIndent, int, 0, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
+    ATTRIBUTE("Top Left Color", Color, color_[0], Color::WHITE, AM_FILE);
+    ATTRIBUTE("Top Right Color", Color, color_[1], Color::WHITE, AM_FILE);
+    ATTRIBUTE("Bottom Left Color", Color, color_[2], Color::WHITE, AM_FILE);
+    ATTRIBUTE("Bottom Right Color", Color, color_[3], Color::WHITE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Layout Flex Scale", GetLayoutFlexScale, SetLayoutFlexScale, Vector2, Vector2::ONE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Indent", GetIndent, SetIndent, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
+    ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE);
 }
 
 void UIElement::ApplyAttributes()
@@ -248,6 +231,9 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         }
     }
 
+    // Prevent updates while loading attributes
+    DisableLayoutUpdate();
+
     // Then load rest of the attributes from the source
     if (!Animatable::LoadXML(source, setInstanceDefault))
         return false;
@@ -295,6 +281,9 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     }
 
     ApplyAttributes();
+
+    EnableLayoutUpdate();
+    UpdateLayout();
 
     return true;
 }
@@ -1003,6 +992,11 @@ void UIElement::SetLayoutBorder(const IntRect& border)
     UpdateLayout();
 }
 
+void UIElement::SetLayoutFlexScale(const Vector2& scale)
+{
+    layoutFlexScale_ = Vector2(Max(scale.x_, 0.0f), Max(scale.y_, 0.0f));
+}
+
 void UIElement::SetIndent(int indent)
 {
     indent_ = indent;
@@ -1033,6 +1027,7 @@ void UIElement::UpdateLayout()
     PODVector<int> sizes;
     PODVector<int> minSizes;
     PODVector<int> maxSizes;
+    PODVector<float> flexScales;
 
     int baseIndentWidth = GetIndentWidth();
 
@@ -1049,10 +1044,11 @@ void UIElement::UpdateLayout()
             sizes.Push(children_[i]->GetWidth() + indent);
             minSizes.Push(children_[i]->GetMinWidth() + indent);
             maxSizes.Push(children_[i]->GetMaxWidth() + indent);
+            flexScales.Push(children_[i]->GetLayoutFlexScale().x_);
             minChildHeight = Max(minChildHeight, children_[i]->GetMinHeight());
         }
 
-        CalculateLayout(positions, sizes, minSizes, maxSizes, GetWidth(), layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
+        CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetWidth(), layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
 
         int width = CalculateLayoutParentSize(sizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
         int height = Max(GetHeight(), minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_);
@@ -1090,10 +1086,11 @@ void UIElement::UpdateLayout()
             sizes.Push(children_[i]->GetHeight());
             minSizes.Push(children_[i]->GetMinHeight());
             maxSizes.Push(children_[i]->GetMaxHeight());
+            flexScales.Push(children_[i]->GetLayoutFlexScale().y_);
             minChildWidth = Max(minChildWidth, children_[i]->GetMinWidth() + children_[i]->GetIndentWidth());
         }
 
-        CalculateLayout(positions, sizes, minSizes, maxSizes, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
+        CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
 
         int height = CalculateLayoutParentSize(sizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
         int width = Max(GetWidth(), minChildWidth + layoutBorder_.left_ + layoutBorder_.right_);
@@ -1842,7 +1839,7 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
 }
 
 void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
-        const PODVector<int>& maxSizes, int targetSize, int begin, int end, int spacing)
+        const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
     int numChildren = sizes.Size();
     if (!numChildren)
@@ -1858,7 +1855,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     // Initial pass
     for (int i = 0; i < numChildren; ++i)
     {
-        int targetSize = targetChildSize;
+        int targetSize = (int)(targetChildSize * flexScales[i]);
         if (remainder)
         {
             acc += add;
@@ -1922,6 +1919,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
 
     // Calculate final positions and store the minimum child element size
     layoutMinSize_ = M_MAX_INT;
+    layoutMaxSize_ = 0;
     int position = begin;
     for (int i = 0; i < numChildren; ++i)
     {
@@ -1929,6 +1927,8 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         position += sizes[i] + spacing;
         if (sizes[i] < layoutMinSize_)
             layoutMinSize_ = sizes[i];
+        if (sizes[i] > layoutMaxSize_)
+            layoutMaxSize_ = sizes[i];
     }
 }
 

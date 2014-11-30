@@ -54,15 +54,13 @@ CollisionShape2D::~CollisionShape2D()
 
 void CollisionShape2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_BOOL, "Trigger", IsTrigger, SetTrigger, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Category Bits", GetCategoryBits, SetCategoryBits, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Mask Bits", GetMaskBits, SetMaskBits, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_INT, "Group Index", GetGroupIndex, SetGroupIndex, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_FLOAT, "Density", GetDensity, SetDensity, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, 0.2f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape2D, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, 0.0f, AM_DEFAULT);
-
-    COPY_BASE_ATTRIBUTES(CollisionShape2D, Component);
+    ACCESSOR_ATTRIBUTE("Trigger", IsTrigger, SetTrigger, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Category Bits", GetCategoryBits, SetCategoryBits, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Mask Bits", GetMaskBits, SetMaskBits, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Group Index", GetGroupIndex, SetGroupIndex, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Density", GetDensity, SetDensity, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Friction", GetFriction, SetFriction, float, 0.2f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Restitution", GetRestitution, SetRestitution, float, 0.0f, AM_DEFAULT);
 }
 
 void CollisionShape2D::OnSetEnabled()

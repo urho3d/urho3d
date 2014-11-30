@@ -57,7 +57,7 @@ struct NavigationGeometryInfo
 class URHO3D_API NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
-    
+
 public:
     /// Construct.
     NavigationMesh(Context* context);
@@ -65,10 +65,10 @@ public:
     virtual ~NavigationMesh();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set tile size.
     void SetTileSize(int size);
     /// Set cell size.
@@ -117,7 +117,7 @@ public:
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    
+
     /// Return tile size.
     int GetTileSize() const { return tileSize_; }
     /// Return cell size.
@@ -154,12 +154,12 @@ public:
     BoundingBox GetWorldBoundingBox() const;
     /// Return number of tiles.
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
-    
+
     /// Set navigation data attribute.
-    void SetNavigationDataAttr(PODVector<unsigned char> value);
+    void SetNavigationDataAttr(const PODVector<unsigned char>& value);
     /// Return navigation data attribute.
     PODVector<unsigned char> GetNavigationDataAttr() const;
-    
+
 private:
     /// Collect geometry from under Navigable components.
     void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList);
@@ -175,7 +175,7 @@ private:
     bool InitializeQuery();
     /// Release the navigation mesh and the query.
     void ReleaseNavigationMesh();
-    
+
     /// Detour navigation mesh.
     dtNavMesh* navMesh_;
     /// Detour navigation mesh query.

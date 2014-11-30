@@ -5,18 +5,21 @@ class ParticleEmitter : public BillboardSet
     void SetEffect(ParticleEffect* effect);
     void SetNumParticles(unsigned num);
     void SetEmitting(bool enable);
+    void SetSerializeParticles(bool enable);
     void ResetEmissionTimer();
     void RemoveAllParticles();
     void Reset();
     void ApplyEffect();
 
-    ParticleEffect* GetEffect() const { return effect_; }
-    unsigned GetNumParticles() const { return particles_.Size(); }
-    bool IsEmitting() const { return emitting_; }
+    ParticleEffect* GetEffect() const;
+    unsigned GetNumParticles() const;
+    bool IsEmitting() const;
+    bool GetSerializeParticles() const;
 
     tolua_property__get_set ParticleEffect* effect;
     tolua_property__get_set unsigned numParticles;
     tolua_property__is_set bool emitting;
+    tolua_property__get_set bool serializeParticles;
 };
 
 ${

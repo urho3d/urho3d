@@ -10,19 +10,19 @@ enum CollisionEventMode
 class RigidBody : public Component
 {
     void SetMass(float mass);
-    void SetPosition(Vector3 position);
-    void SetRotation(Quaternion rotation);
+    void SetPosition(const Vector3& position);
+    void SetRotation(const Quaternion& rotation);
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    void SetLinearVelocity(Vector3 velocity);
-    void SetLinearFactor(Vector3 factor);
+    void SetLinearVelocity(const Vector3& velocity);
+    void SetLinearFactor(const Vector3& factor);
     void SetLinearRestThreshold(float threshold);
     void SetLinearDamping(float damping);
-    void SetAngularVelocity(Vector3 angularVelocity);
-    void SetAngularFactor(Vector3 factor);
+    void SetAngularVelocity(const Vector3& angularVelocity);
+    void SetAngularFactor(const Vector3& factor);
     void SetAngularRestThreshold(float threshold);
     void SetAngularDamping(float factor);
     void SetFriction(float friction);
-    void SetAnisotropicFriction(Vector3 friction);
+    void SetAnisotropicFriction(const Vector3& friction);
     void SetRollingFriction(float friction);
     void SetRestitution(float restitution);
     void SetContactProcessingThreshold(float threshold);

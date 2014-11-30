@@ -46,15 +46,15 @@ void ConstraintWheel2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintWheel2D>();
     
-    REF_ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_VECTOR2, "Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_VECTOR2, "Axis", GetAxis, SetAxis, Vector2, Vector2::RIGHT, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_BOOL, "Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_FLOAT, "Max Motor Torque", GetMaxMotorTorque, SetMaxMotorTorque, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_FLOAT, "Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_FLOAT, "Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 2.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ConstraintWheel2D, VAR_FLOAT, "Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.7f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Axis", GetAxis, SetAxis, Vector2, Vector2::RIGHT, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Motor Torque", GetMaxMotorTorque, SetMaxMotorTorque, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 2.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.7f, AM_DEFAULT);
 
-    COPY_BASE_ATTRIBUTES(ConstraintWheel2D, Constraint2D);
+    COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 void ConstraintWheel2D::SetAnchor(const Vector2& anchor)
 {

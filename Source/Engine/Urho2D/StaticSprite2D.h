@@ -27,6 +27,8 @@
 namespace Urho3D
 {
 
+class Sprite2D;
+
 /// Static sprite component.
 class URHO3D_API StaticSprite2D : public Drawable2D
 {
@@ -40,6 +42,8 @@ public:
     /// Register object factory. Drawable2D must be registered first.
     static void RegisterObject(Context* context);
 
+    /// Set sprite.
+    void SetSprite(Sprite2D* sprite);
     /// Set flip.
     void SetFlip(bool flipX, bool flipY);
     /// Set flip X.
@@ -52,7 +56,9 @@ public:
     void SetUseHotSpot(bool useHotSpot);
     /// Set hot spot.
     void SetHotSpot(const Vector2& hotspot);
-
+    
+    /// Return sprite.
+    Sprite2D* GetSprite() const;
     /// Return flip X.
     bool GetFlipX() const { return flipX_; }
     /// Return flip Y.
@@ -64,12 +70,19 @@ public:
     /// Return hot spot.
     const Vector2& GetHotSpot() const { return hotSpot_; }
 
+    /// Set sprite attribute.
+    void SetSpriteAttr(const ResourceRef& value);
+    /// Return sprite attribute.
+    ResourceRef GetSpriteAttr() const;
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices();
 
+    /// Sprite.
+    SharedPtr<Sprite2D> sprite_;
     /// Flip X.
     bool flipX_;
     /// Flip Y.

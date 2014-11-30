@@ -46,11 +46,6 @@ static const char* bodyTypeNames[] =
     0
 };
 
-template<> BodyType2D Variant::Get<BodyType2D>() const
-{
-    return (BodyType2D)GetInt();
-}
-
 RigidBody2D::RigidBody2D(Context* context) :
     Component(context),
     massData_(),    // b2MassData structure does not have a constructor so need to zero-initialize all its members
@@ -75,22 +70,20 @@ void RigidBody2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody2D>(URHO2D_CATEGORY);
 
-    ENUM_ACCESSOR_ATTRIBUTE(RigidBody2D, "Body Type", GetBodyType, SetBodyType, BodyType2D, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Mass", GetMass, SetMass, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Inertia", GetInertia, SetInertia, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_VECTOR2, "Mass Center", GetMassCenter, SetMassCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Allow Sleep", IsAllowSleep, SetAllowSleep, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Fixed Rotation", IsFixedRotation, SetFixedRotation, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Bullet", IsBullet, SetBullet, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Gravity Scale", GetGravityScale, SetGravityScale, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_BOOL, "Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_VECTOR2, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody2D, VAR_FLOAT, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
-
-    COPY_BASE_ATTRIBUTES(RigidBody2D, Component);
+    ENUM_ACCESSOR_ATTRIBUTE("Body Type", GetBodyType, SetBodyType, BodyType2D, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Mass", GetMass, SetMass, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Inertia", GetInertia, SetInertia, float, 0.0f, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Mass Center", GetMassCenter, SetMassCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Allow Sleep", IsAllowSleep, SetAllowSleep, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Fixed Rotation", IsFixedRotation, SetFixedRotation, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Bullet", IsBullet, SetBullet, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Gravity Scale", GetGravityScale, SetGravityScale, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
 }
 
 
@@ -148,7 +141,7 @@ void RigidBody2D::SetInertia(float inertia)
     MarkNetworkUpdate();
 }
 
-void RigidBody2D::SetMassCenter(Vector2 center)
+void RigidBody2D::SetMassCenter(const Vector2& center)
 {
     b2Vec2 b2Center = ToB2Vec2(center);
     if (massData_.center == b2Center)
@@ -271,7 +264,7 @@ void RigidBody2D::SetAwake(bool awake)
     MarkNetworkUpdate();
 }
 
-void RigidBody2D::SetLinearVelocity(Vector2 linearVelocity)
+void RigidBody2D::SetLinearVelocity(const Vector2& linearVelocity)
 {
     b2Vec2 b2linearVelocity = ToB2Vec2(linearVelocity);
     if (bodyDef_.linearVelocity == b2linearVelocity)
@@ -486,7 +479,7 @@ void RigidBody2D::OnNodeSet(Node* node)
         node->AddListener(this);
         Scene* scene = GetScene();
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
-        
+
         CreateBody();
         physicsWorld_->AddRigidBody(this);
     }

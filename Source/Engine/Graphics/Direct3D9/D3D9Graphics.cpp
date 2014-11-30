@@ -2724,6 +2724,8 @@ void Graphics::OnDeviceLost()
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceLost();
     }
+    
+    SendEvent(E_DEVICELOST);
 }
 
 void Graphics::OnDeviceReset()
@@ -2743,6 +2745,8 @@ void Graphics::OnDeviceReset()
     impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQuery_);
     
     ResetCachedState();
+    
+    SendEvent(E_DEVICERESET);
 }
 
 void Graphics::ResetCachedState()

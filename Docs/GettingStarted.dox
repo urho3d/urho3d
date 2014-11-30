@@ -63,27 +63,27 @@ CMake caches some internal variables to speed up the subsequent invocation of th
 
 \section Building_Android Android build process
 
-First, if you are building under Windows platform without MKLINK support then copy Bin/Data and Bin/CoreData directories to the Source/Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for Windows with MKLINK support and non-Windows platforms because the build script uses symbolic links for platforms that support it.
+First, if you are building under Windows host without MKLINK support then copy Bin/Data and Bin/CoreData directories to the Source/Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for Windows with MKLINK support and non-Windows host because the build script uses symbolic links for host development environments that support it.
 
 Set the ANDROID_NDK environment variable to point to your Android NDK. On Windows, ensure that make.exe from the Android NDK is included in the path and is executable from the command line.
 
-On Windows, execute cmake_android.bat. If MKLINK support is available, provide build option "-DURHO3D_MKLINK=1" to generate out-of-source build. Then go to the build directory Source/Android (or android-Build if out-of-source build) and execute the following commands. On OS X or Linux, execute cmake_gcc.sh (the ANDROID_NDK environment variable distinguishes from a normal desktop build) then go to the android-Build directory (always an out-of-source build) and execute the following commands.
+On Windows, execute cmake_android.bat. If your user account has privilege to use MKLINK then you have the option to provide the build option "-DURHO3D_MKLINK=1" when invoking the cmake_android.bat to generate out-of-source build tree. Then go to the build tree directory which could be either 'Source/Android' or 'android-Build' (when using MKLINK) and execute the below commands to start the build.
 
-- android update project -p . -t 1 (only needed on the first time,
-                                    replace '-t 1' with desired target-id)
-- make -j8 (replace '-j8' with the number of logical CPU cores of the
-            host/build system)
+- android update project -p . -t 1 (replace id to match the desired target API)
+- make -j8 (replace the number to match your host's number of logical CPU cores)
 - ant debug
 
-After the commands finish successfully, the APK should have been generated to the build's "bin" subdirectory, from where it can be installed on a device or an emulator. The command "ant installd" can be used for this.
+On OS X or Linux, execute cmake_gcc.sh (the presence of ANDROID_NDK environment variable instructs the shell script to also generate project file for Android build besides normal desktop build). Then go to the build tree (which is currently defaulted to 'android-Build' directory) and execute the same commands as above.
+
+After the commands finish successfully, the APK should have been generated in the build tree's "bin" subdirectory, from where it can be installed on a device or an emulator. The command "ant installd" can be used for this. After the debug APK has been installed, you can use "rake android" command to automate the test running of the APK on the attached Android device.
 
 For a release build, use the "ant release" command instead of "ant debug" and follow the Android SDK instructions on how to sign your APK properly.
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
 
-Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by executing the CMake batch file again with the parameter -DANDROID_ABI=armeabi added, then execute make again in the build directory.
+Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by executing the CMake batch file or shell script again with the build option "-DANDROID_ABI=armeabi" added, then execute make again in the build directory. Similarly, the native code can be built using 64-bit ABI by changing the value of this build option. See \ref Build_Options "Build options" for all the possible values.
 
-You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh. Import "Existing Android Code into Workspace" from the CMake generated Eclipse's project found in the android-Build directory. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target and that's it. Just choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
+You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh instead of cmake_gcc.sh. Import "Existing Android Code into Workspace" from the CMake generated Eclipse project file in the build tree. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target. Choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
 
 \section Building_Ios iOS build process
 
@@ -154,6 +154,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |URHO3D_NETWORK       |1|Enable Networking support|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
+|URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
 |URHO3D_SAMPLES       |0|Build sample applications|
 |URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only; on Android only build Lua standalone tools)|
 |URHO3D_EXTRAS        |0|Build extras (Desktop and RPI only)|
@@ -171,10 +172,12 @@ A number of build options can be defined explicitly when invoking the above cmak
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
-|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration to be generated (Makefile generator only), possible values are Release (\*default), Debug, and RelWithDebInfo|
+|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
-|ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are armeabi-v7a (\*default) and armeabi|
+|ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (\*default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
+|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
+|ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
 
 Note that build option values specified via command line are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. Once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly setting it via command line. That is, simply by NOT passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
@@ -196,7 +199,7 @@ Steps to configure:
 -# In the Urho3D project root directory, invoke "cmake-gui Source".
 -# Set the build directory name.
 -# Configure and update the build options as many times as necessary until there are no more new options in red. For the first configuration, choose the generator you like to use. Click the Group check box to group the build options.
-    - In the Ungrouped Entries: only check one of these options (ANDROID, IOS, RASPI) when you target the platform, leave them unchecked for dekstop/native build.
+    - In the Ungrouped Entries: check IOS option when targeting it on Xcode.
     - In the URHO3D group: check any of the options you desire. Some of the options when checked may cause new options to be made available in the subsequent configuration loop.
 -# Generate when all the configurations are done.
 
@@ -425,7 +428,9 @@ set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules CACHE 
 
 \subsection FromSDKWithPkgConfig Using pkg-config instead of CMake
 
-If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
+If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of 'Urho3D.pc' configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. The 'Urho3D.pc' file contains important information on how to configure your compiler and linker correctly. You can use that information as a reference to configure your own project even when you do not use 'pkg-config' tool.
+
+Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
 
 \code
 # To get installed Urho3D version
@@ -445,23 +450,23 @@ export PKG_CONFIG_SYSROOT_DIR=${RASPI_ROOT}
 export PKG_CONFIG_PATH=${RASPI_ROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
 
-# To cross-compile and link for Windows platform using MinGW cross compiler (in DEBUG configuration)
+# To cross-compile and link for Windows platform using MinGW cross-compiler (in Debug configuration)
 export CC=${MINGW_PREFIX}-c++
 export PKG_CONFIG_SYSROOT_DIR=${MINGW_ROOT}
 export PKG_CONFIG_PATH=${MINGW_ROOT}/usr/local/lib/pkgconfig
-$CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D |sed 's/-lUrho3D/-lUrho3D_d.dll/g'`
+$CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --variable CFLAGS_DEBUG Urho3D` `pkg-config --cflags --libs Urho3D`
 \endcode
 
 \section Scaffolding Project scaffolding
 
-On Unix-like build/host system (Linux, Mac, Raspberry-Pi) with [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
+With [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
 \verbatim
 Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
 \endverbatim
 
 As its name implies, this task just creates a basic project structure for your new project. You may also pass optional "project" and "target" parameters besides the "dir" parameter. Otherwise, you will get the default project name (Scaffolding) and target name (Main) in the main CMakeLists.txt. This task copies the Urho3DPlayer.cpp and Urho3DPlayer.h as placeholders for the source files. Normally, you should replace these two files with your own project source files before invoking one of the CMake *.bat or *.sh script.
 
-Unfortunately, all our rake tasks are currently not supported on Windows build/host system yet.
+On Windows host system, this task requires privilege to create symlinks by using mklink command. The task would fail when the Windows user account does not have that privilege.
 
 \page Structure Overall structure
 

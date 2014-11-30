@@ -37,7 +37,7 @@ class URHO3D_API LuaFunction : public RefCounted
 {
 public:
     /// Construct.
-    LuaFunction(lua_State* lusState, int functionRef);
+    LuaFunction(lua_State* lusState, int functionRef, bool needUnref = true);
     /// Destruct.
     ~LuaFunction();
 
@@ -92,6 +92,8 @@ private:
     lua_State* luaState_;
     /// Function ref.
     int functionRef_;
+    /// Need unref.
+    bool needUnref_;
     /// Lua stack top.
     int stackTop_;
     /// Number of arguments.

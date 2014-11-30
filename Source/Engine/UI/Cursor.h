@@ -56,7 +56,7 @@ struct URHO3D_API CursorShapeInfo
         systemDefined_(false)
     {
     }
-    
+
     /// Image.
     SharedPtr<Image> image_;
     /// Texture.
@@ -75,7 +75,7 @@ struct URHO3D_API CursorShapeInfo
 class URHO3D_API Cursor : public BorderImage
 {
     OBJECT(Cursor);
-    
+
 public:
     /// Construct.
     Cursor(Context* context);
@@ -83,10 +83,10 @@ public:
     virtual ~Cursor();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
-    
+
     /// Define a shape.
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     /// Set current shape.
@@ -97,18 +97,18 @@ public:
     CursorShape GetShape() const { return shape_; }
     /// Return whether is using system default shapes.
     bool GetUseSystemShapes() const { return useSystemShapes_; }
-    
+
     /// Set shapes attribute.
-    void SetShapesAttr(VariantVector value);
+    void SetShapesAttr(const VariantVector& value);
     /// Return shapes attribute.
     VariantVector GetShapesAttr() const;
     /// Apply pending OS cursor shape. Called by UI. No-op when the OS mouse pointer is not used.
     void ApplyOSCursorShape();
-    
+
 protected:
     /// Handle operating system mouse cursor visibility change event.
     void HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData);
-    
+
     /// Current shape index.
     CursorShape shape_;
     /// Shape definitions.

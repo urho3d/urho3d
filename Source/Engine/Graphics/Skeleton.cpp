@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Deserializer.h"
+#include "Log.h"
 #include "Serializer.h"
 #include "Skeleton.h"
 
@@ -112,6 +113,14 @@ void Skeleton::Define(const Skeleton& src)
     for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
         i->node_.Reset();
     rootBoneIndex_ = src.rootBoneIndex_;
+}
+
+void Skeleton::SetRootBoneIndex(unsigned index)
+{
+    if (index < bones_.Size())
+        rootBoneIndex_ = index;
+    else
+        LOGERROR("Root bone index out of bounds");
 }
 
 void Skeleton::ClearBones()

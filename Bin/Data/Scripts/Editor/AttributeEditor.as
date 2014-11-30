@@ -359,7 +359,15 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         Array<StringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
-            String varName = GetVariableName(keys[i]);
+            String varName = GetVarName(keys[i]);
+            if (varName.empty)
+            {
+                // UIElements will contain internal vars, which do not have known mappings. Skip these
+                if (cast<UIElement>(serializables[0]) !is null)
+                    continue;
+                // Else, for scene nodes, show as hexadecimal hashes if nothing else is available
+                varName = keys[i].ToString();
+            }
             Variant value = map[keys[i]];
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
@@ -533,7 +541,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             bool sameValue = true;
             Array<Variant> varValues;
 
-            // Reevaluate aach variant in the vector
+            // Reevaluate each variant in the vector
             for (uint i = 0; i < values.length; ++i)
             {
                 Array<Variant>@ vector = values[i].GetVariantVector();
@@ -565,9 +573,9 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             if (parent is null)
                 break;
 
-            String varName = GetVariableName(keys[subIndex]);
+            String varName = GetVarName(keys[subIndex]);
             if (varName.empty)
-                continue;
+                varName = keys[subIndex].ToString(); // Use hexadecimal if nothing else is available
 
             Variant firstValue = map[keys[subIndex]];
             bool sameValue = true;
@@ -795,6 +803,16 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool&
         list.viewPosition = oldViewPos;
 }
 
+void EditScriptAttributes(Component@ component, uint index)
+{
+    if (component !is null && component.typeName.Contains("ScriptInstance"))
+    {
+        String hash = GetComponentAttributeHash(component, index);
+        if (!hash.empty)
+            scriptAttributes[hash] = component.attributes[index];
+    }
+}
+
 void CreateDragSlider(LineEdit@ parent)
 {
     Button@ dragSld = Button();
@@ -806,6 +824,8 @@ void CreateDragSlider(LineEdit@ parent)
 
     SubscribeToEvent(dragSld, "DragBegin", "LineDragBegin");
     SubscribeToEvent(dragSld, "DragMove", "LineDragMove");
+    SubscribeToEvent(dragSld, "DragEnd", "LineDragEnd");
+    SubscribeToEvent(dragSld, "DragCancel", "LineDragCancel");
 }
 
 void EditAttribute(StringHash eventType, VariantMap& eventData)
@@ -832,6 +852,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     inEditAttribute = true;
 
     Array<Variant> oldValues;
+
     if (!dragEditAttribute)
     {
 	    // Store old values so that PostEditAttribute can create undo actions
@@ -842,13 +863,15 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)
 	    serializables[i].ApplyAttributes();
-
-    //disable undo 
+    
     if (!dragEditAttribute)
     {
 	    // Do the editor post logic after attribute has been modified.
 	    PostEditAttribute(serializables, index, oldValues);
     }
+
+    // Update the stored script attributes if this is a ScriptInstance    
+    EditScriptAttributes(serializables[0], index);
 
     inEditAttribute = false;
 
@@ -863,33 +886,73 @@ void LineDragBegin(StringHash eventType, VariantMap& eventData)
     UIElement@ label = eventData["Element"].GetPtr();
     int x = eventData["X"].GetInt();
     label.vars["posX"] = x;
-    
-    //store value old value before dragging 
+
+    // Store the old value before dragging
     dragEditAttribute = false;
     LineEdit@ selectedNumEditor = label.parent;
-    //not convenient way to trigger EditAttribute event
-    selectedNumEditor.text = selectedNumEditor.text;
+
+    selectedNumEditor.vars["DragBeginValue"] = selectedNumEditor.text;
+    selectedNumEditor.cursorPosition = 0;
+
+    // Set mouse mode to user preference
+    SetMouseMode(true);
 }
-
-
 
 void LineDragMove(StringHash eventTypem, VariantMap& eventData)
 {
     UIElement@ label = eventData["Element"].GetPtr();
     LineEdit@ selectedNumEditor = label.parent;
-    
+
+    // Prevent undo
+    dragEditAttribute = true;
+
     int x = eventData["X"].GetInt();
     int posx = label.vars["posX"].GetInt();
-    float val = x - posx;
-    
-    float fieldVal = selectedNumEditor.text.ToFloat(); 
+    float val = input.mouseMoveX;
+
+    float fieldVal = selectedNumEditor.text.ToFloat();
     fieldVal += val/100;
     label.vars["posX"] = x;
     selectedNumEditor.text = fieldVal;
-    //disable storing undo 
-    dragEditAttribute = true;
+    selectedNumEditor.cursorPosition = 0;
 }
 
+void LineDragEnd(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ label = eventData["Element"].GetPtr();
+    LineEdit@ selectedNumEditor = label.parent;
+
+    // Prepare the attributes to store an undo with:
+    // - old value = drag begin value
+    // - new value = final value
+
+    String finalValue = selectedNumEditor.text;
+    // Reset attribute to begin value, and prevent undo
+    dragEditAttribute = true;
+    selectedNumEditor.text = selectedNumEditor.vars["DragBeginValue"].GetString();
+
+    // Store final value, allow undo
+    dragEditAttribute = false;
+    selectedNumEditor.text = finalValue;
+    selectedNumEditor.cursorPosition = 0;
+
+    // Revert mouse to normal behaviour
+    SetMouseMode(false);
+}
+
+void LineDragCancel(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ label = eventData["Element"].GetPtr();
+
+    // Reset value to what it was when drag edit began, preventing undo.
+    dragEditAttribute = true;
+    LineEdit@ selectedNumEditor = label.parent;
+    selectedNumEditor.text = selectedNumEditor.vars["DragBeginValue"].GetString();
+    selectedNumEditor.cursorPosition = 0;
+
+    // Revert mouse to normal behaviour
+    SetMouseMode(false);
+}
 
 // Resource picker functionality
 const uint ACTION_PICK = 1;
@@ -1074,6 +1137,8 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             target.attributes[resourcePickIndex] = Variant(attrs);
             target.ApplyAttributes();
         }
+
+        EditScriptAttributes(target, resourcePickIndex);
     }
 
     PostEditAttribute(resourceTargets, resourcePickIndex, oldValues);

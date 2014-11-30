@@ -50,7 +50,6 @@ void Start()
     input.mouseVisible = true;
     // Use system clipboard to allow transport of text in & out from the editor
     ui.useSystemClipboard = true;
-
 }
 
 void FirstFrame()
@@ -67,6 +66,8 @@ void FirstFrame()
     ParseArguments();
     // Switch to real frame handler after initialization
     SubscribeToEvent("Update", "HandleUpdate");
+    SubscribeToEvent("ReloadFinished", "HandleReloadFinished");
+    SubscribeToEvent("ReloadFailed", "HandleReloadFailed");
 }
 
 void Stop()
@@ -110,6 +111,16 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateDirtyUI();
 }
 
+void HandleReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    attributesFullDirty = true;
+}
+
+void HandleReloadFailed(StringHash eventType, VariantMap& eventData)
+{
+    attributesFullDirty = true;
+}
+
 void LoadConfig()
 {
     if (!fileSystem.FileExists(configFileName))
@@ -131,6 +142,7 @@ void LoadConfig()
     XMLElement viewElem = configElem.GetChild("view");
     XMLElement resourcesElem = configElem.GetChild("resources");
     XMLElement consoleElem = configElem.GetChild("console");
+    XMLElement varNamesElem = configElem.GetChild("varnames");
 
     if (!cameraElem.isNull)
     {
@@ -141,6 +153,7 @@ void LoadConfig()
         if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
         if (cameraElem.HasAttribute("mousewheelcameraposition")) mouseWheelCameraPosition = cameraElem.GetBool("mousewheelcameraposition");
         if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
+        if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetInt("mouseorbitmode");
         UpdateViewParameters();
     }
 
@@ -235,6 +248,9 @@ void LoadConfig()
         // Console does not exist yet at this point, so store the string in a global variable
         if (consoleElem.HasAttribute("commandinterpreter")) consoleCommandInterpreter = consoleElem.GetAttribute("commandinterpreter");
     }
+    
+    if (!varNamesElem.isNull)
+        globalVarNames = varNamesElem.GetVariantMap();
 }
 
 void SaveConfig()
@@ -250,6 +266,7 @@ void SaveConfig()
     XMLElement viewElem = configElem.CreateChild("view");
     XMLElement resourcesElem = configElem.CreateChild("resources");
     XMLElement consoleElem = configElem.CreateChild("console");
+    XMLElement varNamesElem = configElem.CreateChild("varnames");
 
     cameraElem.SetFloat("nearclip", viewNearClip);
     cameraElem.SetFloat("farclip", viewFarClip);
@@ -258,6 +275,7 @@ void SaveConfig()
     cameraElem.SetBool("limitrotation", limitRotation);
     cameraElem.SetBool("mousewheelcameraposition", mouseWheelCameraPosition);
     cameraElem.SetUInt("viewportmode", viewportMode);
+    cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
@@ -318,5 +336,18 @@ void SaveConfig()
 
     consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
+    varNamesElem.SetVariantMap(globalVarNames);
+
     config.Save(File(configFileName, FILE_WRITE));
+}
+
+void MakeBackup(const String&in fileName)
+{
+    fileSystem.Rename(fileName, fileName + ".old");
+}
+
+void RemoveBackup(bool success, const String&in fileName)
+{
+    if (success)
+        fileSystem.Delete(fileName + ".old");
 }

@@ -503,21 +503,13 @@ inline Vector4 OcclusionBuffer::ClipEdge(const Vector4& v0, const Vector4& v1, f
     return v0 + t * (v1 - v0);
 }
 
-inline bool OcclusionBuffer::CheckFacing(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
+inline float OcclusionBuffer::SignedArea(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 {
-    if (cullMode_ == CULL_NONE)
-        return true;
-    
     float aX = v0.x_ - v1.x_;
     float aY = v0.y_ - v1.y_;
     float bX = v2.x_ - v1.x_;
     float bY = v2.y_ - v1.y_;
-    float signedArea = aX * bY - aY * bX;
-    
-    if (cullMode_ == CULL_CCW)
-        return signedArea < 0.0f;
-    else
-        return signedArea > 0.0f;
+    return aX * bY - aY * bX;
 }
 
 void OcclusionBuffer::CalculateViewport()
@@ -575,9 +567,10 @@ void OcclusionBuffer::DrawTriangle(Vector4* vertices)
         projected[1] = ViewportTransform(vertices[1]);
         projected[2] = ViewportTransform(vertices[2]);
         
-        if (CheckFacing(projected[0], projected[1], projected[2]))
+        bool clockwise = SignedArea(projected[0], projected[1], projected[2]) < 0.0f;
+        if (cullMode_ == CULL_NONE || (cullMode_ == CULL_CCW && clockwise) || (cullMode_ == CULL_CW && !clockwise))
         {
-            DrawTriangle2D(projected);
+            DrawTriangle2D(projected, clockwise);
             drawOk = true;
         }
     }
@@ -612,9 +605,10 @@ void OcclusionBuffer::DrawTriangle(Vector4* vertices)
                 projected[1] = ViewportTransform(vertices[index + 1]);
                 projected[2] = ViewportTransform(vertices[index + 2]);
                 
-                if (CheckFacing(projected[0], projected[1], projected[2]))
+                bool clockwise = SignedArea(projected[0], projected[1], projected[2]) < 0.0f;
+                if (cullMode_ == CULL_NONE || (cullMode_ == CULL_CCW && clockwise) || (cullMode_ == CULL_CW && !clockwise))
                 {
-                    DrawTriangle2D(projected);
+                    DrawTriangle2D(projected, clockwise);
                     drawOk = true;
                 }
             }
@@ -734,7 +728,8 @@ struct Edge
     /// Construct from gradients and top & bottom vertices.
     Edge(const Gradients& gradients, const Vector3& top, const Vector3& bottom, int topY)
     {
-        float slope = (bottom.x_ - top.x_) / (bottom.y_ - top.y_);
+        float height = (bottom.y_ - top.y_);
+        float slope = (height != 0.0f) ? (bottom.x_ - top.x_) / height : 0.0f;
         float yPreStep = (float)(topY + 1) - top.y_;
         float xPreStep = slope * yPreStep;
         
@@ -754,7 +749,7 @@ struct Edge
     int invZStep_;
 };
 
-void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
+void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise)
 {
     int top, middle, bottom;
     bool middleIsRight;
@@ -804,7 +799,7 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
             }
         }
     }
-    
+
     int topY = (int)vertices[top].y_;
     int middleY = (int)vertices[middle].y_;
     int bottomY = (int)vertices[bottom].y_;
@@ -813,12 +808,15 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
     if (topY == bottomY)
         return;
     
+    // Reverse middleIsRight test if triangle is counterclockwise
+    if (!clockwise)
+        middleIsRight = !middleIsRight;
+
     Gradients gradients(vertices);
     Edge topToMiddle(gradients, vertices[top], vertices[middle], topY);
     Edge topToBottom(gradients, vertices[top], vertices[bottom], topY);
     Edge middleToBottom(gradients, vertices[middle], vertices[bottom], middleY);
     
-    // The triangle is clockwise, so if bottom > middle then middle is right
     if (middleIsRight)
     {
         // Top half

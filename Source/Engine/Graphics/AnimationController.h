@@ -89,10 +89,10 @@ public:
     virtual ~AnimationController();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    
+
     /// Update the animations. Is called from HandleScenePostUpdate().
     void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success.
@@ -109,7 +109,7 @@ public:
     bool Fade(const String& name, float targetWeight, float fadeTime);
     /// Fade other animations on the same layer to target weight. Return true on success.
     bool FadeOthers(const String& name, float targetWeight, float fadeTime);
-    
+
     /// Set animation blending layer priority. Return true on success.
     bool SetLayer(const String& name, unsigned char layer);
     /// Set animation start bone. Return true on success.
@@ -124,7 +124,7 @@ public:
     bool SetSpeed(const String& name, float speed);
     /// Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success.
     bool SetAutoFade(const String& name, float fadeOutTime);
-    
+
     /// Return whether an animation is active.
     bool IsPlaying(const String& name) const;
     /// Return whether an animation is fading in.
@@ -157,24 +157,24 @@ public:
     AnimationState* GetAnimationState(const String& name) const;
     /// Find an animation state by animation name hash
     AnimationState* GetAnimationState(StringHash nameHash) const;
-    
+
     /// Set animation control structures attribute.
-    void SetAnimationsAttr(VariantVector value);
+    void SetAnimationsAttr(const VariantVector& value);
     /// Set animations attribute for network replication.
     void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
     /// Set node animation states attribute.
-    void SetNodeAnimationStatesAttr(VariantVector value);
+    void SetNodeAnimationStatesAttr(const VariantVector& value);
     /// Return animation control structures attribute.
     VariantVector GetAnimationsAttr() const;
     /// Return animations attribute for network replication.
     const PODVector<unsigned char>& GetNetAnimationsAttr() const;
     /// Return node animation states attribute.
     VariantVector GetNodeAnimationStatesAttr() const;
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    
+
 private:
     /// Add an animation state either to AnimatedModel or as a node animation.
     AnimationState* AddAnimationState(Animation* animation);
@@ -184,7 +184,7 @@ private:
     void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Animation control structures.
     Vector<AnimationControl> animations_;
     /// Node hierarchy mode animation states.

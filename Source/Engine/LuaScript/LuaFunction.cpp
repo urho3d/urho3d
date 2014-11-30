@@ -41,18 +41,18 @@ extern "C"
 namespace Urho3D
 {
 
-LuaFunction::LuaFunction(lua_State* luaState, int functionRef) : 
+LuaFunction::LuaFunction(lua_State* luaState, int functionRef, bool needUnref) : 
     luaState_(luaState),
-    functionRef_(functionRef)
-{
+    functionRef_(functionRef),
+    needUnref_(needUnref)
+{   
 }
 
 LuaFunction::~LuaFunction()
 {
-    if (functionRef_ != LUA_REFNIL)
+    if (needUnref_ && functionRef_ != LUA_REFNIL)
         luaL_unref(luaState_, LUA_REGISTRYINDEX, functionRef_);
 }
-
 
 bool LuaFunction::IsValid() const
 {

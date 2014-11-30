@@ -809,6 +809,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -1033,6 +1034,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -1330,6 +1332,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -3124,6 +3127,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -3677,7 +3681,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -3691,8 +3694,8 @@ int orderInLayer;
 int refs;
 float shadowDistance;
 uint shadowMask;
-Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -3856,6 +3859,7 @@ bool internal;
 /* readonly */
 Array<UIElement> items;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 /* readonly */
@@ -4443,11 +4447,13 @@ bool RecordGesture();
 void RemoveAllGestures();
 bool RemoveGesture(uint);
 bool RemoveScreenJoystick(int);
+void ResetMouseVisible();
 bool SaveGesture(File, uint);
 bool SaveGesture(VectorBuffer&, uint);
 bool SaveGestures(File);
 bool SaveGestures(VectorBuffer&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetMouseVisible(bool, bool = false);
 
 // Properties:
 /* readonly */
@@ -4471,6 +4477,7 @@ Array<bool> mouseButtonDown;
 /* readonly */
 Array<bool> mouseButtonPress;
 bool mouseGrabbed;
+MouseMode mouseMode;
 /* readonly */
 IntVector2 mouseMove;
 /* readonly */
@@ -4944,6 +4951,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -5155,6 +5163,7 @@ bool internal;
 /* readonly */
 Array<UIElement> items;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -5292,6 +5301,7 @@ uint numTechniques;
 bool occlusion;
 /* readonly */
 int refs;
+Scene scene;
 /* readonly */
 Array<String> shaderParameterNames;
 Array<Variant> shaderParameters;
@@ -5548,6 +5558,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -6486,6 +6497,7 @@ bool occluder;
 int refs;
 bool relative;
 bool scaled;
+bool serializeParticles;
 float shadowDistance;
 uint shadowMask;
 bool sorted;
@@ -6558,7 +6570,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -6574,6 +6585,7 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -7873,6 +7885,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -8060,6 +8073,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -8429,6 +8443,7 @@ bool internal;
 /* readonly */
 BorderImage knob;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -9350,7 +9365,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -9366,6 +9380,7 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -9801,6 +9816,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -10619,6 +10635,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -10862,6 +10879,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -11218,7 +11236,7 @@ void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
-void SetView(Scene, Camera);
+void SetView(Scene, Camera, bool = true);
 void UpdateLayout();
 const Variant& GetVar(const StringHash&);
 
@@ -11287,6 +11305,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -11519,6 +11538,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -12027,6 +12047,13 @@ enum LoopMode2D
 LM_DEFAULT,
 LM_FORCE_LOOPED,
 LM_FORCE_CLAMPED,
+};
+
+enum MouseMode
+{
+MM_ABSOLUTE,
+MM_RELATIVE,
+MM_WRAP,
 };
 
 enum Orientation

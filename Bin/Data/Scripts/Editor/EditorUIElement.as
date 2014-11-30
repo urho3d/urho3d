@@ -12,9 +12,6 @@ Array<XMLFile@> uiElementCopyBuffer;
 
 bool suppressUIElementChanges = false;
 
-// Registered UIElement user variable reverse mappings
-VariantMap uiElementVarNames;
-
 const StringHash FILENAME_VAR("FileName");
 const StringHash MODIFIED_VAR("Modified");
 const StringHash CHILD_ELEMENT_FILENAME_VAR("ChildElemFileName");
@@ -246,6 +243,7 @@ bool SaveUILayout(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     if (!file.open)
     {
@@ -260,6 +258,8 @@ bool SaveUILayout(const String&in fileName)
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
     bool success = element.SaveXML(rootElem);
+    RemoveBackup(success, fileName);
+
     if (success)
     {
         FilterInternalVars(rootElem);
@@ -349,6 +349,7 @@ bool SaveChildUIElement(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     if (!file.open)
     {
@@ -359,6 +360,8 @@ bool SaveChildUIElement(const String&in fileName)
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
     bool success = editUIElement.SaveXML(rootElem);
+    RemoveBackup(success, fileName);
+    
     if (success)
     {
         FilterInternalVars(rootElem);
@@ -413,7 +416,7 @@ void FilterInternalVars(XMLElement source)
     XMLElement resultElem = resultSet.firstResult;
     while (resultElem.notNull)
     {
-        String name = GetVariableName(resultElem.GetUInt("hash"));
+        String name = GetVarName(resultElem.GetUInt("hash"));
         if (name.empty)
         {
             XMLElement parent = resultElem.parent;
@@ -442,7 +445,7 @@ void RegisterUIElementVar(XMLElement source)
     while (resultAttr.notNull)
     {
         String name = resultAttr.GetAttribute();
-        uiElementVarNames[name] = name;
+        globalVarNames[name] = name;
         resultAttr = resultAttr.nextResult;
     }
 }

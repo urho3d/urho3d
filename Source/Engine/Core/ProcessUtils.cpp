@@ -85,14 +85,14 @@ static String currentLine;
 static Vector<String> arguments;
 
 #if defined(IOS)
-void GetCPUData(host_basic_info_data_t* data)
+static void GetCPUData(host_basic_info_data_t* data)
 {
     mach_msg_type_number_t infoCount;
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
 #elif !defined(ANDROID) && !defined(RASPI)
-void GetCPUData(struct cpu_id_t* data)
+static void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
     {
@@ -356,6 +356,30 @@ String GetPlatform()
     #endif
 }
 
+#ifdef ANDROID
+static unsigned GetAndroidCPUCount()
+{
+    FILE* fp;
+    int res, i = -1, j = -1;
+
+    fp = fopen("/sys/devices/system/cpu/present", "r");
+    // If failed, return at least 1
+    if (fp == 0)
+        return 1;
+
+    res = fscanf(fp, "%d-%d", &i, &j);
+    fclose(fp);
+
+    if (res == 1 && i == 0)
+        return 1;
+    else if (res == 2 && i == 0)
+        return j + 1;
+
+    // If failed, return at least 1
+    return 1;
+}
+#endif
+
 unsigned GetNumPhysicalCPUs()
 {
     #if defined(IOS)
@@ -367,6 +391,8 @@ unsigned GetNumPhysicalCPUs()
     #else
     return data.physical_cpu;
     #endif
+    #elif defined(ANDROID)
+    return GetAndroidCPUCount();
     #elif !defined(ANDROID) && !defined(RASPI)
     struct cpu_id_t data;
     GetCPUData(&data);
@@ -387,6 +413,8 @@ unsigned GetNumLogicalCPUs()
     #else
     return data.logical_cpu;
     #endif
+    #elif defined(ANDROID)
+    return GetAndroidCPUCount();
     #elif !defined(ANDROID) && !defined(RASPI)
     struct cpu_id_t data;
     GetCPUData(&data);

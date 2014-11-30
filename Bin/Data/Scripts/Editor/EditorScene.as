@@ -80,6 +80,9 @@ bool ResetScene()
     }
     else
         messageBoxCallback = null;
+        
+    // Clear stored script attributes
+    scriptAttributes.Clear();
 
     suppressSceneChanges = true;
 
@@ -180,6 +183,9 @@ bool LoadScene(const String&in fileName)
         MessageBox("Could not open file.\n" + fileName);
         return false;
     }
+    
+    // Reset stored script attributes.
+    scriptAttributes.Clear();
 
     // Add the scene's resource path in case it's necessary
     String newScenePath = GetPath(fileName);
@@ -221,6 +227,15 @@ bool LoadScene(const String&in fileName)
     CreateGrid();
     SetActiveViewport(viewports[0]);
 
+    // Store all ScriptInstance and LuaScriptInstance attributes
+    Array<Component@>@ components = scene.GetComponents("ScriptInstance", true);
+    for (uint i = 0; i < components.length; i++)
+        UpdateScriptAttributes(components[i]);
+
+    components = scene.GetComponents("LuaScriptInstance", true);
+    for (uint i = 0; i < components.length; i++)
+        UpdateScriptAttributes(components[i]);
+
     return loaded;
 }
 
@@ -234,9 +249,11 @@ bool SaveScene(const String&in fileName)
     // Unpause when saving so that the scene will work properly when loaded outside the editor
     editorScene.updateEnabled = true;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
     bool success = (extension != ".xml" ? editorScene.Save(file) : editorScene.SaveXML(file));
+    RemoveBackup(success, fileName);
 
     editorScene.updateEnabled = false;
 
@@ -418,6 +435,7 @@ bool SaveNode(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
+    MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     if (!file.open)
     {
@@ -427,6 +445,8 @@ bool SaveNode(const String&in fileName)
 
     String extension = GetExtension(fileName);
     bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
+    RemoveBackup(success, fileName);
+
     if (success)
         instantiateFileName = fileName;
     else

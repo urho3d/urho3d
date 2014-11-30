@@ -62,7 +62,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI Urho2D)
+set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI)
 if (URHO3D_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
@@ -77,6 +77,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     list (APPEND SOURCES Physics)
+endif ()
+
+if (URHO3D_URHO2D)
+    list (APPEND SOURCES Urho2D)
 endif ()
 
 foreach (SOURCE ${SOURCES})
@@ -213,21 +217,39 @@ endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
-if (NOT ANDROID AND NOT IOS)
-    set (SYSROOT ${RASPI_SYSROOT} ${MINGW_SYSROOT})  # SYSROOT is empty for native build
-    string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+if (NOT IOS)
     get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
     list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
-    string (REPLACE ";" " -D" URHO3D_COMPILE_DEFINITIONS ";${URHO3D_COMPILE_DEFINITIONS}")
-    string (REPLACE ";" " " URHO3D_ABS_PATH_LIBS "${ABSOLUTE_PATH_LIBS}")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
-    string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}") 
-    string (REPLACE ";" " -l" URHO3D_LIBS "-lUrho3D;${LINK_LIBS_ONLY}")
+    if (ABSOLUTE_PATH_LIBS)
+        string (REPLACE ";" "\" \"" URHO3D_ABS_PATH_LIBS "\"${ABSOLUTE_PATH_LIBS}\"")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
+        string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}")
+    endif ()
+    set (LIB_NAME Urho3D)
+    if (MINGW)
+        if (CMAKE_BUILD_TYPE STREQUAL Debug)
+            set (LIB_NAME ${LIB_NAME}_d)
+        endif ()
+        if (URHO3D_LIB_TYPE STREQUAL SHARED)
+            set (LIB_NAME ${LIB_NAME}.dll)
+        endif ()
+    endif ()
+    if (MSVC)
+        # todo: Add a post build command to adjust the LIB_NAME when in Debug configuration
+        set (DASH /)
+        set (LIB_DIR "/LIBPATH:\"\${libdir}\"")
+        string (REPLACE ";" ".lib\" \"" URHO3D_LIBS "\"${LIB_NAME};${LINK_LIBS_ONLY}.lib\"")
+    else ()
+        set (DASH -)
+        set (LIB_DIR "-L\"\${libdir}\"")
+        string (REPLACE ";" " -l" URHO3D_LIBS "-l${LIB_NAME};${LINK_LIBS_ONLY}")
+    endif ()
+    string (REPLACE ";" " ${DASH}D" URHO3D_COMPILE_DEFINITIONS ";${URHO3D_COMPILE_DEFINITIONS}")
     get_directory_property (GLOBAL_INCLUDE_DIRS DIRECTORY ${CMAKE_SOURCE_DIR} INCLUDE_DIRECTORIES)
     if (GLOBAL_INCLUDE_DIRS)
-        string (REPLACE ";" " -I" GLOBAL_INCLUDE_DIRS ";${GLOBAL_INCLUDE_DIRS}")
+        string (REPLACE ";" "\" ${DASH}I\"" GLOBAL_INCLUDE_DIRS "${DASH}I\"${GLOBAL_INCLUDE_DIRS}\"")
         string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
     endif ()
-    string (REPLACE ";" " -I\${includedir}/" ENGINE_INCLUDE_DIRS "-I\${includedir};${INSTALL_INCLUDE_DIRS}")
+    string (REPLACE ";" "\" ${DASH}I\"\${includedir}/" ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir};${INSTALL_INCLUDE_DIRS}\"")
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
     install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR})
 endif ()
@@ -244,13 +266,18 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Define post build steps
-# Strip the output shared library for embedded devices
-if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
-        COMMENT "Stripping shared library")
+if (ANDROID_NDK_GDB)
+    # Copy the library while it still has debug symbols for ndk-gdb
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
+        COMMENT "Copying Urho3D library with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
 endif ()
-if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND URHO3D_SCP_TO_TARGET)
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND (ANDROID OR RASPI OR IOS))
+    # Strip the output shared library for embedded devices
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
+        COMMENT "Stripping Urho3D shared library")
+endif ()
+if (URHO3D_SCP_TO_TARGET)
     # Ensure SCP is the last command
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
-        COMMENT "Scp-ing library to target system")
+        COMMENT "Scp-ing Urho3D library to target system")
 endif ()

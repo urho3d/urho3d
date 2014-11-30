@@ -115,8 +115,8 @@ private:
     inline Vector3 ViewportTransform(const Vector4& vertex) const;
     /// Clip an edge.
     inline Vector4 ClipEdge(const Vector4& v0, const Vector4& v1, float d0, float d1) const;
-    /// Check facing of a triangle.
-    inline bool CheckFacing(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
+    /// Return signed area of a triangle. If negative, is clockwise.
+    inline float SignedArea(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
     /// Calculate viewport transform.
     void CalculateViewport();
     /// Draw a triangle.
@@ -124,7 +124,7 @@ private:
     /// Clip vertices against a plane.
     void ClipVertices(const Vector4& plane, Vector4* vertices, bool* triangles, unsigned& numTriangles);
     /// Draw a clipped triangle.
-    void DrawTriangle2D(const Vector3* vertices);
+    void DrawTriangle2D(const Vector3* vertices, bool clockwise);
     
     /// Highest level depth buffer.
     int* buffer_;

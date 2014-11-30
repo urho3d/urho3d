@@ -45,15 +45,15 @@ void Vehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Vehicle>();
     
-    ATTRIBUTE(Vehicle, VAR_FLOAT, "Controls Yaw", controls_.yaw_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Vehicle, VAR_FLOAT, "Controls Pitch", controls_.pitch_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Vehicle, VAR_FLOAT, "Steering", steering_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Steering", float, steering_, 0.0f, AM_DEFAULT);
     // Register wheel node IDs as attributes so that the wheel nodes can be reaquired on deserialization. They need to be tagged
     // as node ID's so that the deserialization code knows to rewrite the IDs in case they are different on load than on save
-    ATTRIBUTE(Vehicle, VAR_INT, "Front Left Node", frontLeftID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Vehicle, VAR_INT, "Front Right Node", frontRightID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Vehicle, VAR_INT, "Rear Left Node", rearLeftID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Vehicle, VAR_INT, "Rear Right Node", rearRightID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Front Left Node", int, frontLeftID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Front Right Node", int, frontRightID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Rear Left Node", int, rearLeftID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Rear Right Node", int, rearRightID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void Vehicle::ApplyAttributes()
