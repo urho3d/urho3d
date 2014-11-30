@@ -11236,7 +11236,7 @@ void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
-void SetView(Scene, Camera);
+void SetView(Scene, Camera, bool = true);
 void UpdateLayout();
 const Variant& GetVar(const StringHash&);
 

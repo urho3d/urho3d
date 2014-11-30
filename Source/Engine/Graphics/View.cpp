@@ -2707,7 +2707,21 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
     {
         renderer_->SetBatchShaders(batch, tech, allowShadows);
         batch.CalculateSortKey();
-        batchQueue.batches_.Push(batch);
+        
+        // If batch is static with multiple world transforms and cannot instance, we must push copies of the batch individually
+        if (batch.geometryType_ == GEOM_STATIC && batch.numWorldTransforms_ > 1)
+        {
+            unsigned numTransforms = batch.numWorldTransforms_;
+            batch.numWorldTransforms_ = 1;
+            for (unsigned i = 0; i < numTransforms; ++i)
+            {
+                // Move the transform pointer to generate copies of the batch which only refer to 1 world transform
+                batchQueue.batches_.Push(batch);
+                ++batch.worldTransform_;
+            }
+        }
+        else
+            batchQueue.batches_.Push(batch);
     }
 }
 

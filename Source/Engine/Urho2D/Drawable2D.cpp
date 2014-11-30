@@ -104,9 +104,24 @@ void Drawable2D::SetBlendMode(BlendMode blendMode)
     MarkNetworkUpdate();
 }
 
+void Drawable2D::SetCustomMaterial(Material* customMaterial)
+{
+    if (customMaterial == customMaterial_)
+        return;
+
+    customMaterial_ = customMaterial;
+    material_ = 0;
+    MarkNetworkUpdate();
+}
+
 Texture2D* Drawable2D::GetTexture() const
 {
     return texture_;
+}
+
+Material* Drawable2D::GetCustomMaterial() const
+{
+    return customMaterial_;
 }
 
 void Drawable2D::SetMaterial(Material* material)
@@ -116,7 +131,7 @@ void Drawable2D::SetMaterial(Material* material)
 
 Material* Drawable2D::GetMaterial() const
 {
-    return material_;
+    return customMaterial_ ? customMaterial_ : material_;
 }
 
 const Vector<Vertex2D>& Drawable2D::GetVertices()

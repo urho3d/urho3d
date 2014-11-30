@@ -69,6 +69,8 @@ public:
     void SetTexture(Texture2D* texture);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
+    /// Set custom material. 
+    void SetCustomMaterial(Material* customMaterial);
     
     /// Return layer.
     int GetLayer() const { return layer_; }
@@ -78,10 +80,12 @@ public:
     Texture2D* GetTexture() const;
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+    /// Return custom material.
+    Material* GetCustomMaterial() const;
 
     /// Set material (called by Renderer2D).
     void SetMaterial(Material* material);
-    /// Return material (called by Renderer2D).
+    /// Return custom material or material (called by Renderer2D).
     Material* GetMaterial() const;
     /// Set visibility (called by Renderer2D).
     void SetVisibility(bool visibility) { visibility_ = visibility; }
@@ -97,7 +101,7 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Update vertices.
     virtual void UpdateVertices() = 0;
-    
+
     /// Layer.
     int layer_;
     /// Order in layer.
@@ -106,6 +110,8 @@ protected:
     SharedPtr<Texture2D> texture_;
     /// Blend mode.
     BlendMode blendMode_;
+    /// Custom material.
+    SharedPtr<Material> customMaterial_;
 
     /// Vertices.
     Vector<Vertex2D> vertices_;
