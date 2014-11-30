@@ -25,7 +25,6 @@
 #include "Animation2D.h"
 #include "AnimationSet2D.h"
 #include "Context.h"
-#include "Drawable2D.h"
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -49,13 +48,7 @@ const char* loopModeNames[] =
 };
 
 AnimatedSprite2D::AnimatedSprite2D(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
-    layer_(0),
-    orderInLayer_(0),
-    blendMode_(BLEND_ALPHA),
-    flipX_(false),
-    flipY_(false),
-    color_(Color::WHITE),
+    StaticSprite2D(context),
     speed_(1.0f),
     loopMode_(LM_DEFAULT),
     looped_(false),
@@ -70,22 +63,18 @@ AnimatedSprite2D::~AnimatedSprite2D()
 void AnimatedSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
-    ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+
+    COPY_BASE_ATTRIBUTES(StaticSprite2D);
+    REMOVE_ATTRIBUTE("Sprite");
     ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef, ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable);
 }
 
 void AnimatedSprite2D::OnSetEnabled()
 {
-    Drawable::OnSetEnabled();
+    StaticSprite2D::OnSetEnabled();
 
     Scene* scene = GetScene();
     if (scene)
@@ -95,84 +84,6 @@ void AnimatedSprite2D::OnSetEnabled()
         else
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
     }
-}
-
-void AnimatedSprite2D::SetLayer(int layer)
-{
-    if (layer == layer_)
-        return;
-
-    layer_ = layer;
-
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
-    {
-        if (!timelineNodes_[i])
-            continue;
-
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetLayer(layer_);
-    }
-}
-
-void AnimatedSprite2D::SetOrderInLayer(int orderInLayer)
-{
-    orderInLayer_ = orderInLayer;
-}
-
-void AnimatedSprite2D::SetBlendMode(BlendMode blendMode)
-{
-    if (blendMode == blendMode_)
-        return;
-
-    blendMode_ = blendMode;
-
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
-    {
-        if (!timelineNodes_[i])
-            continue;
-
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetBlendMode(blendMode_);
-    }
-}
-
-void AnimatedSprite2D::SetFlip(bool flipX, bool flipY)
-{
-    if (flipX == flipX_ && flipY == flipY_)
-        return;
-
-    flipX_ = flipX;
-    flipY_ = flipY;
-
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
-    {
-        if (!timelineNodes_[i])
-            continue;
-
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetFlip(flipX_, flipY_);
-    }
-
-    // For editor paused mode
-    UpdateAnimation(0.0f);
-
-    MarkNetworkUpdate();
-}
-
-void AnimatedSprite2D::SetFlipX(bool flipX)
-{
-    SetFlip(flipX, flipY_);
-}
-
-void AnimatedSprite2D::SetFlipY(bool flipY)
-{
-    SetFlip(flipX_, flipY);
-}
-
-void AnimatedSprite2D::SetColor(const Color& color)
-{
-    color_ = color;
-    MarkNetworkUpdate();
 }
 
 void AnimatedSprite2D::SetSpeed(float speed)
@@ -252,7 +163,7 @@ ResourceRef AnimatedSprite2D::GetAnimationSetAttr() const
 
 void AnimatedSprite2D::OnNodeSet(Node* node)
 {
-    Drawable::OnNodeSet(node);
+    StaticSprite2D::OnNodeSet(node);
 
     if (node)
     {
@@ -294,6 +205,50 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
     }
 
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
+}
+
+void AnimatedSprite2D::OnLayerChanged()
+{
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    {
+        if (!timelineNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        staticSprite->SetLayer(layer_);
+    }
+}
+
+void AnimatedSprite2D::OnBlendModeChanged()
+{
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    {
+        if (!timelineNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        staticSprite->SetBlendMode(blendMode_);
+    }
+}
+
+void AnimatedSprite2D::OnFlipChanged()
+{
+    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    {
+        if (!timelineNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        staticSprite->SetFlip(flipX_, flipY_);
+    }
+
+    // For editor paused mode
+    UpdateAnimation(0.0f);
+}
+
+void AnimatedSprite2D::UpdateVertices()
+{
+    verticesDirty_ = false;
 }
 
 void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
@@ -350,6 +305,8 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
         {
             // Create new timeline node
             timelineNode = rootNode_->CreateChild(timeline.name_, LOCAL);
+            timelineNode->SetTemporary(true);
+
             // Create StaticSprite2D component
             if (timeline.type_ == OT_SPRITE)
                 staticSprite = timelineNode->CreateComponent<StaticSprite2D>();

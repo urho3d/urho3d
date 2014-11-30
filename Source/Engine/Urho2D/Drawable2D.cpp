@@ -66,6 +66,8 @@ void Drawable2D::SetLayer(int layer)
 
     layer_ = layer;
 
+    OnLayerChanged();
+
     MarkNetworkUpdate();
 }
 
@@ -75,6 +77,8 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
         return;
 
     orderInLayer_ = orderInLayer;
+    
+    OnLayerChanged();
 
     MarkNetworkUpdate();
 }
@@ -90,6 +94,7 @@ void Drawable2D::SetTexture(Texture2D* texture)
     material_ = 0;
     
     OnMarkedDirty(node_);
+
     MarkNetworkUpdate();
 }
 
@@ -100,6 +105,8 @@ void Drawable2D::SetBlendMode(BlendMode blendMode)
 
     blendMode_ = blendMode;
     material_ = 0;
+
+    OnBlendModeChanged();
 
     MarkNetworkUpdate();
 }
@@ -158,6 +165,14 @@ void Drawable2D::OnMarkedDirty(Node* node)
     Drawable::OnMarkedDirty(node);
 
     verticesDirty_ = true;
+}
+
+void Drawable2D::OnLayerChanged()
+{
+}
+
+void Drawable2D::OnBlendModeChanged()
+{
 }
 
 }
