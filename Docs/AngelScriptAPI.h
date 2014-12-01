@@ -6328,15 +6328,25 @@ int weakRefs;
 class ParticleEffect
 {
 // Methods:
+void AddColorFrame(ColorFrame);
+void AddColorTime(Color&, float);
+void AddTextureFrame(TextureFrame);
+void AddTextureTime(Rect&, float);
 ColorFrame GetColorFrame(uint) const;
 TextureFrame GetTextureFrame(uint) const;
 bool Load(File);
 bool Load(VectorBuffer&);
+bool Load(const XMLElement&);
+void RemoveColorFrame(uint);
+void RemoveTextureFrame(uint);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool Save(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetColorFrame(uint, ColorFrame) const;
-void SetTextureFrame(uint, TextureFrame) const;
+void SetColorFrame(uint, ColorFrame);
+void SetTextureFrame(uint, TextureFrame);
+void SortColorFrames();
+void SortTextureFrames();
 
 // Properties:
 float activeTime;
@@ -6353,7 +6363,7 @@ float inactiveTime;
 Material material;
 Vector3 maxDirection;
 float maxEmissionRate;
-Vector3 maxParticleSize;
+Vector2 maxParticleSize;
 float maxRotation;
 float maxRotationSpeed;
 float maxTimeToLive;
@@ -6368,10 +6378,8 @@ float minRotationSpeed;
 float minTimeToLive;
 float minVelocity;
 String name;
-/* readonly */
 uint numColorFrames;
 uint numParticles;
-/* readonly */
 uint numTextureFrames;
 /* readonly */
 int refs;
