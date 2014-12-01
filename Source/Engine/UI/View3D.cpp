@@ -40,6 +40,7 @@ extern const char* UI_CATEGORY;
 
 View3D::View3D(Context* context) :
     Window(context),
+    ownScene_(true),
     rttFormat_(Graphics::GetRGBFormat()),
     autoUpdate_(true)
 {
@@ -50,6 +51,7 @@ View3D::View3D(Context* context) :
 
 View3D::~View3D()
 {
+    ResetScene();
 }
 
 void View3D::RegisterObject(Context* context)
@@ -87,20 +89,12 @@ void View3D::OnResize()
 
 void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
 {
+    ResetScene();
+    
     scene_ = scene;
     cameraNode_ = camera ? camera->GetNode() : 0;
+    ownScene_ = ownScene;
 
-    if (ownScene)
-    {
-        ownedScene_ = scene_;
-        ownedCameraNode_ = cameraNode_;
-    }
-    else
-    {
-        ownedScene_ = 0;
-        ownedCameraNode_ = 0;
-    }
-    
     viewport_->SetScene(scene_);
     viewport_->SetCamera(camera);
     QueueUpdate();
@@ -159,6 +153,22 @@ Texture2D* View3D::GetDepthTexture() const
 Viewport* View3D::GetViewport() const
 {
     return viewport_;
+}
+
+void View3D::ResetScene()
+{
+    if (!scene_)
+        return;
+
+    if (!ownScene_)
+    {
+        RefCount* refCount = scene_->RefCountPtr();
+        ++refCount->refs_;
+        scene_ = 0;
+        --refCount->refs_;
+    }
+    else
+        scene_ = 0;
 }
 
 }
