@@ -80,6 +80,8 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     /// Update vertices.
     virtual void UpdateVertices();
+    /// Handle flip changed.
+    virtual void OnFlipChanged();
 
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;

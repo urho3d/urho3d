@@ -152,20 +152,7 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     engine->RegisterEnumValue("LoopMode2D", "LM_FORCE_LOOPED", LM_FORCE_LOOPED);
     engine->RegisterEnumValue("LoopMode2D", "LM_FORCE_CLAMPED", LM_FORCE_CLAMPED);
 
-    RegisterDrawable<AnimatedSprite2D>(engine, "AnimatedSprite2D");
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_layer(int)", asMETHOD(AnimatedSprite2D, SetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "int get_layer() const", asMETHOD(AnimatedSprite2D, GetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_orderInLayer(int)", asMETHOD(AnimatedSprite2D, SetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "int get_orderInLayer() const", asMETHOD(AnimatedSprite2D, GetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_blendMode(BlendMode)", asMETHOD(AnimatedSprite2D, SetBlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "BlendMode get_blendMode() const", asMETHOD(AnimatedSprite2D, GetBlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void SetFlip(bool, bool)", asMETHOD(AnimatedSprite2D, SetFlip), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_flipX(bool)", asMETHOD(AnimatedSprite2D, SetFlipX), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "bool get_flipX() const", asMETHOD(AnimatedSprite2D, GetFlipX), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_flipY(bool)", asMETHOD(AnimatedSprite2D, SetFlipY), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "bool get_flipY() const", asMETHOD(AnimatedSprite2D, GetFlipY), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_color(const Color&in)", asMETHOD(AnimatedSprite2D, SetColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedSprite2D", "const Color& get_color() const", asMETHOD(AnimatedSprite2D, GetColor), asCALL_THISCALL);
+    RegisterStaticSprite2D<AnimatedSprite2D>(engine, "AnimatedSprite2D");
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(AnimationSet2D@+, const String&, LoopMode2D loopMode=LM_DEFAULT)", asMETHODPR(AnimatedSprite2D, SetAnimation, (AnimationSet2D*, const String&, LoopMode2D), void), asCALL_THISCALL);

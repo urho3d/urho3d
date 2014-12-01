@@ -99,8 +99,13 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Handle layer changed.
+    virtual void OnLayerChanged();
+    /// Handle blend mode changed.
+    virtual void OnBlendModeChanged();
     /// Update vertices.
     virtual void UpdateVertices() = 0;
+    
 
     /// Layer.
     int layer_;
