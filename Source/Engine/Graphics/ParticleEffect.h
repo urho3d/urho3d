@@ -117,6 +117,10 @@ public:
     virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
+    /// Save resource to XMLElement. Return true if successful.
+    virtual bool Save(XMLElement& dest) const;
+    /// Load resource from XMLElement synchronously. Return true if successful.
+    virtual bool Load(const XMLElement& source);
 
     /// Set material.
     void SetMaterial(Material* material);
@@ -176,14 +180,36 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
+
+    /// Add a color frame sorted in the correct position based on time.
+    void AddColorTime(const Color& color, const float time);
+    /// Add a color frame sorted in the correct position based on time.
+    void AddColorFrame(const ColorFrame& colorFrame);
+    /// Remove color frame at index
+    void RemoveColorFrame(unsigned index);
     /// Set color animation of particles.
     void SetColorFrames(const Vector<ColorFrame>& colorFrames);
-    /// Set number of color animation frames.
+    /// Set color animation frame at index. If index is greater than number of color frames, new color frames are added.
     void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
+    /// Set number of color frames.
+    void SetNumColorFrames(unsigned number);
+    /// Sort the list of color frames based on time.
+    void SortColorFrames();
+
+    /// Add a texture frame sorted in the correct position based on time.
+    void AddTextureTime(const Rect& uv, const float time);
+    /// Add a texture frame sorted in the correct position based on time.
+    void AddTextureFrame(const TextureFrame& textureFrame);
+    /// Remove texture frame at index
+    void RemoveTextureFrame(unsigned index);
     /// Set particle texture animation.
     void SetTextureFrames(const Vector<TextureFrame>& animation);
     /// Set number of texture animation frames.
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
+    /// Set number of texture frames.
+    void SetNumTextureFrames(unsigned number);
+    /// Sort the list of texture frames based on time.
+    void SortTextureFrames();
 
     /// Return material.
     Material* GetMaterial() const { return material_; }

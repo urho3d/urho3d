@@ -292,85 +292,274 @@ bool ParticleEffect::EndLoad()
     return true;
 }
 
+bool ParticleEffect::Load(const XMLElement& source)
+{
+    // Reset to defaults first so that missing parameters in case of a live reload behave as expected
+    material_.Reset();
+    numParticles_ = DEFAULT_NUM_PARTICLES;
+    updateInvisible_ = false;
+    relative_ = true;
+    scaled_ = true;
+    sorted_ = false;
+    animationLodBias_ = 0.0f;
+    emitterType_ = EMITTER_SPHERE;
+    emitterSize_ = Vector3::ZERO;
+    directionMin_ = DEFAULT_DIRECTION_MIN;
+    directionMax_ = DEFAULT_DIRECTION_MAX;
+    constantForce_ = Vector3::ZERO;
+    dampingForce_ = 0.0f;
+    activeTime_ = 0.0f;
+    inactiveTime_ = 0.0;
+    emissionRateMin_ = DEFAULT_EMISSION_RATE;
+    emissionRateMax_ = DEFAULT_EMISSION_RATE;
+    sizeMin_ = DEFAULT_PARTICLE_SIZE;
+    sizeMax_ = DEFAULT_PARTICLE_SIZE;
+    timeToLiveMin_ = DEFAULT_TIME_TO_LIVE;
+    timeToLiveMax_ = DEFAULT_TIME_TO_LIVE;
+    velocityMin_ = DEFAULT_VELOCITY;
+    velocityMax_ = DEFAULT_VELOCITY;
+    rotationMin_ = 0.0f;
+    rotationMax_ = 0.0f;
+    rotationSpeedMin_ = 0.0f;
+    rotationSpeedMax_ = 0.0f;
+    sizeAdd_ = 0.0f;
+    sizeMul_ = 1.0f;
+    colorFrames_.Clear();
+    textureFrames_.Clear();
+
+    if (source.IsNull())
+    {
+        LOGERROR("Can not load particle effect from null XML element");
+        return false;
+    }
+
+    if (source.HasChild("material"))
+    {
+        material_ = GetSubsystem<ResourceCache>()->GetResource<Material>(source.GetChild("material").GetAttribute("name"));
+    }
+
+    if (source.HasChild("numparticles"))
+        SetNumParticles(source.GetChild("numparticles").GetInt("value"));
+
+    if (source.HasChild("updateinvisible"))
+        updateInvisible_ = source.GetChild("updateinvisible").GetBool("enable");
+
+    if (source.HasChild("relative"))
+        relative_ = source.GetChild("relative").GetBool("enable");
+
+    if (source.HasChild("scaled"))
+        scaled_ = source.GetChild("scaled").GetBool("enable");
+
+    if (source.HasChild("sorted"))
+        sorted_ = source.GetChild("sorted").GetBool("enable");
+
+    if (source.HasChild("animlodbias"))
+        SetAnimationLodBias(source.GetChild("animlodbias").GetFloat("value"));
+
+    if (source.HasChild("emittertype"))
+    {
+        String type = source.GetChild("emittertype").GetAttributeLower("value");
+        if (type == "point")
+        {
+            // Point emitter type is deprecated, handled as zero sized sphere
+            emitterType_ = EMITTER_SPHERE;
+            emitterSize_ = Vector3::ZERO;
+        }
+        else if (type == "box")
+            emitterType_ = EMITTER_BOX;
+        else if (type == "sphere")
+            emitterType_ = EMITTER_SPHERE;
+        else
+            LOGERROR("Unknown particle emitter type " + type);
+    }
+
+    if (source.HasChild("emittersize"))
+        emitterSize_ = source.GetChild("emittersize").GetVector3("value");
+
+    if (source.HasChild("emitterradius"))
+        emitterSize_.x_ = emitterSize_.y_ = emitterSize_.z_ = source.GetChild("emitterradius").GetFloat("value");
+
+    if (source.HasChild("direction"))
+        GetVector3MinMax(source.GetChild("direction"), directionMin_, directionMax_);
+
+    if (source.HasChild("constantforce"))
+        constantForce_ = source.GetChild("constantforce").GetVector3("value");
+
+    if (source.HasChild("dampingforce"))
+        dampingForce_ = source.GetChild("dampingforce").GetFloat("value");
+
+    if (source.HasChild("activetime"))
+        activeTime_ = source.GetChild("activetime").GetFloat("value");
+    if (activeTime_ < 0.0f)
+        activeTime_ = M_INFINITY;
+
+    if (source.HasChild("inactivetime"))
+        inactiveTime_ = source.GetChild("inactivetime").GetFloat("value");
+    if (inactiveTime_ < 0.0f)
+        inactiveTime_ = M_INFINITY;
+
+    if (source.HasChild("emissionrate"))
+        GetFloatMinMax(source.GetChild("emissionrate"), emissionRateMin_, emissionRateMax_);
+
+    if (source.HasChild("interval"))
+    {
+        float intervalMin = 0.0f;
+        float intervalMax = 0.0f;
+        GetFloatMinMax(source.GetChild("interval"), intervalMin, intervalMax);
+        emissionRateMax_ = 1.0f / intervalMin;
+        emissionRateMin_ = 1.0f / intervalMax;
+    }
+
+    if (source.HasChild("particlesize"))
+        GetVector2MinMax(source.GetChild("particlesize"), sizeMin_, sizeMax_);
+
+    if (source.HasChild("timetolive"))
+        GetFloatMinMax(source.GetChild("timetolive"), timeToLiveMin_, timeToLiveMax_);
+
+    if (source.HasChild("velocity"))
+        GetFloatMinMax(source.GetChild("velocity"), velocityMin_, velocityMax_);
+
+    if (source.HasChild("rotation"))
+        GetFloatMinMax(source.GetChild("rotation"), rotationMin_, rotationMax_);
+
+    if (source.HasChild("rotationspeed"))
+        GetFloatMinMax(source.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
+
+    if (source.HasChild("sizedelta"))
+    {
+        XMLElement deltaElem = source.GetChild("sizedelta");
+        if (deltaElem.HasAttribute("add"))
+            sizeAdd_ = deltaElem.GetFloat("add");
+        if (deltaElem.HasAttribute("mul"))
+            sizeMul_ = deltaElem.GetFloat("mul");
+    }
+
+    if (source.HasChild("color"))
+    {
+        ColorFrame colorFrame(source.GetChild("color").GetColor("value"));
+        SetColorFrame(0, colorFrame);
+    }
+
+    if (source.HasChild("colorfade"))
+    {
+        Vector<ColorFrame> fades;
+        for (XMLElement colorFadeElem = source.GetChild("colorfade"); colorFadeElem; colorFadeElem = colorFadeElem.GetNext("colorfade"))
+            fades.Push(ColorFrame(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
+
+        SetColorFrames(fades);
+    }
+
+    if (colorFrames_.Empty())
+        colorFrames_.Push(ColorFrame(Color::WHITE));
+
+    if (source.HasChild("texanim"))
+    {
+        Vector<TextureFrame> animations;
+        for (XMLElement animElem = source.GetChild("texanim"); animElem; animElem = animElem.GetNext("texanim"))
+        {
+            TextureFrame animation;
+            animation.uv_ = animElem.GetRect("uv");
+            animation.time_ = animElem.GetFloat("time");
+            animations.Push(animation);
+        }
+
+        SetTextureFrames(animations);
+    }
+
+    return true;
+}
+
 bool ParticleEffect::Save(Serializer& dest) const
 {
-    XMLFile file(context_);
-    XMLElement rootElem = file.CreateRoot("particleeffect");
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    XMLElement materialElem = xml->CreateRoot("particleeffect");
 
-    XMLElement childElem = rootElem.CreateChild("material");
+    Save(materialElem);
+    return xml->Save(dest);
+}
+
+bool ParticleEffect::Save(XMLElement& dest) const
+{
+    if (dest.IsNull())
+    {
+        LOGERROR("Can not save particle effect to null XML element");
+        return false;
+    }
+
+    XMLElement childElem = dest.CreateChild("material");
     childElem.SetAttribute("name", GetResourceName(material_));
 
-    childElem = rootElem.CreateChild("numparticles");
+    childElem = dest.CreateChild("numparticles");
     childElem.SetInt("value", numParticles_);
 
-    childElem = rootElem.CreateChild("updateinvisible");
+    childElem = dest.CreateChild("updateinvisible");
     childElem.SetBool("enable", updateInvisible_);
 
-    childElem = rootElem.CreateChild("relative");
+    childElem = dest.CreateChild("relative");
     childElem.SetBool("enable", relative_);
 
-    childElem = rootElem.CreateChild("scaled");
+    childElem = dest.CreateChild("scaled");
     childElem.SetBool("enable", scaled_);
 
-    childElem = rootElem.CreateChild("sorted");
+    childElem = dest.CreateChild("sorted");
     childElem.SetBool("enable", sorted_);
 
-    childElem = rootElem.CreateChild("animlodbias");
+    childElem = dest.CreateChild("animlodbias");
     childElem.SetFloat("value", animationLodBias_);
 
-    childElem = rootElem.CreateChild("emittertype");
+    childElem = dest.CreateChild("emittertype");
     childElem.SetAttribute("value", emitterTypeNames[emitterType_]);
 
-    childElem = rootElem.CreateChild("emittersize");
+    childElem = dest.CreateChild("emittersize");
     childElem.SetVector3("value", emitterSize_);
 
-    childElem = rootElem.CreateChild("direction");
+    childElem = dest.CreateChild("direction");
     childElem.SetVector3("min", directionMin_);
     childElem.SetVector3("max", directionMax_);
 
-    childElem = rootElem.CreateChild("constantforce");
+    childElem = dest.CreateChild("constantforce");
     childElem.SetVector3("value", constantForce_);
 
-    childElem = rootElem.CreateChild("dampingforce");
+    childElem = dest.CreateChild("dampingforce");
     childElem.SetFloat("value", dampingForce_);
 
-    childElem = rootElem.CreateChild("activetime");
+    childElem = dest.CreateChild("activetime");
     childElem.SetFloat("value", activeTime_);
 
-    childElem = rootElem.CreateChild("inactivetime");
+    childElem = dest.CreateChild("inactivetime");
     childElem.SetFloat("value", inactiveTime_);
 
-    childElem = rootElem.CreateChild("emissionrate");
+    childElem = dest.CreateChild("emissionrate");
     childElem.SetFloat("min", emissionRateMin_);
     childElem.SetFloat("max", emissionRateMax_);
 
-    childElem = rootElem.CreateChild("particlesize");
+    childElem = dest.CreateChild("particlesize");
     childElem.SetVector2("min", sizeMin_);
     childElem.SetVector2("max", sizeMax_);
 
-    childElem = rootElem.CreateChild("timetolive");
+    childElem = dest.CreateChild("timetolive");
     childElem.SetFloat("min", timeToLiveMin_);
     childElem.SetFloat("max", timeToLiveMax_);
 
-    childElem = rootElem.CreateChild("velocity");
+    childElem = dest.CreateChild("velocity");
     childElem.SetFloat("min", velocityMin_);
     childElem.SetFloat("max", velocityMax_);
 
-    childElem = rootElem.CreateChild("rotation");
+    childElem = dest.CreateChild("rotation");
     childElem.SetFloat("min", rotationMin_);
     childElem.SetFloat("max", rotationMax_);
 
-    childElem = rootElem.CreateChild("rotationspeed");
+    childElem = dest.CreateChild("rotationspeed");
     childElem.SetFloat("min", rotationSpeedMin_);
     childElem.SetFloat("max", rotationSpeedMax_);
 
-    childElem = rootElem.CreateChild("sizedelta");
+    childElem = dest.CreateChild("sizedelta");
     childElem.SetFloat("add", sizeAdd_);
     childElem.SetFloat("mul", sizeMul_);
 
     if (colorFrames_.Size() == 1)
     {
-        childElem = rootElem.CreateChild("color");
+        childElem = dest.CreateChild("color");
         childElem.SetColor("value", colorFrames_[0].color_);
     }
 
@@ -378,7 +567,7 @@ bool ParticleEffect::Save(Serializer& dest) const
     {
         for (unsigned i = 0; i < colorFrames_.Size(); ++i)
         {
-            childElem = rootElem.CreateChild("colorfade");
+            childElem = dest.CreateChild("colorfade");
             childElem.SetColor("color", colorFrames_[i].color_);
             childElem.SetFloat("time", colorFrames_[i].time_);
         }
@@ -386,12 +575,12 @@ bool ParticleEffect::Save(Serializer& dest) const
 
     for (unsigned i = 0; i < textureFrames_.Size(); ++i)
     {
-        childElem = rootElem.CreateChild("texanim");
+        childElem = dest.CreateChild("texanim");
         childElem.SetRect("uv", textureFrames_[i].uv_);
         childElem.SetFloat("time", textureFrames_[i].time_);
     }
 
-    return file.Save(dest);
+    return true;
 }
 
 void ParticleEffect::SetMaterial(Material* material)
@@ -540,6 +729,49 @@ void ParticleEffect::SetSizeMul(float sizeMul)
     sizeMul_ = sizeMul;
 }
 
+void ParticleEffect::AddColorTime(const Color& color, const float time)
+{
+    unsigned s = colorFrames_.Size();
+    colorFrames_.Resize(s + 1);
+
+    for (unsigned i = 0; i < s; i++)
+    {
+        if (colorFrames_[i].time_ > time)
+        {
+            for (unsigned j = s; j > i; j--)
+            {
+                colorFrames_[j].color_ = colorFrames_[j - 1].color_;
+                colorFrames_[j].time_ = colorFrames_[j - 1].time_;
+            }
+            colorFrames_[i].color_ = color;
+            colorFrames_[i].time_ = time;
+            return;
+        }
+    }
+
+    // highest time, add last:
+    colorFrames_[s].color_ = color;
+    colorFrames_[s].time_ = time;
+}
+
+void ParticleEffect::AddColorFrame(const ColorFrame& colorFrame)
+{
+    AddColorTime(colorFrame.color_, colorFrame.time_);
+}
+
+void ParticleEffect::RemoveColorFrame(unsigned index)
+{
+    unsigned s = colorFrames_.Size();
+
+    for (unsigned i = index; i < s - 1 ; i++)
+    {
+        colorFrames_[i].color_ = colorFrames_[i + 1].color_;
+        colorFrames_[i].time_ = colorFrames_[i + 1].time_;
+    }
+
+    colorFrames_.Resize(s - 1);
+}
+
 void ParticleEffect::SetColorFrames(const Vector<ColorFrame>& colorFrames)
 {
     colorFrames_ = colorFrames;
@@ -550,6 +782,64 @@ void ParticleEffect::SetColorFrame(unsigned index, const ColorFrame& colorFrame)
     if (colorFrames_.Size() < index + 1)
          colorFrames_.Resize(index + 1);
     colorFrames_[index] = colorFrame;
+}
+
+void ParticleEffect::SetNumColorFrames(unsigned number)
+{
+    unsigned s = colorFrames_.Size();
+    if (s != number)
+         colorFrames_.Resize(number);
+}
+
+void ParticleEffect::SortColorFrames()
+{
+    Vector<ColorFrame> cf = colorFrames_;
+    colorFrames_.Clear();
+    for (unsigned i = 0; i < cf.Size(); i++)
+        AddColorFrame(cf[i]);
+}
+
+void ParticleEffect::AddTextureTime(const Rect& uv, const float time)
+{
+    unsigned s = textureFrames_.Size();
+    textureFrames_.Resize(s + 1);
+
+    for (unsigned i = 0; i < s; i++)
+    {
+        if (textureFrames_[i].time_ > time)
+        {
+            for (unsigned j = s; j > i; j--)
+            {
+                textureFrames_[j].uv_ = textureFrames_[j - 1].uv_;
+                textureFrames_[j].time_ = textureFrames_[j - 1].time_;
+            }
+            textureFrames_[i].uv_ = uv;
+            textureFrames_[i].time_ = time;
+            return;
+        }
+    }
+
+    // highest time, add last:
+    textureFrames_[s].uv_ = uv;
+    textureFrames_[s].time_ = time;
+}
+
+void ParticleEffect::AddTextureFrame(const TextureFrame& textureFrame)
+{
+    AddTextureTime(textureFrame.uv_, textureFrame.time_);
+}
+
+void ParticleEffect::RemoveTextureFrame(unsigned index)
+{
+    unsigned s = textureFrames_.Size();
+
+    for (unsigned i = index; i < s - 1 ; i++)
+    {
+        textureFrames_[i].uv_ = textureFrames_[i + 1].uv_;
+        textureFrames_[i].time_ = textureFrames_[i + 1].time_;
+    }
+
+    textureFrames_.Resize(s - 1);
 }
 
 void ParticleEffect::SetTextureFrames(const Vector<TextureFrame>& textureFrames)
@@ -564,6 +854,21 @@ void ParticleEffect::SetTextureFrame(unsigned index, const TextureFrame& texture
     textureFrames_[index] = textureFrame;
 }
 
+void ParticleEffect::SetNumTextureFrames(unsigned number)
+{
+    unsigned s = textureFrames_.Size();
+    if (s != number)
+         textureFrames_.Resize(number);
+}
+
+void ParticleEffect::SortTextureFrames()
+{
+    Vector<TextureFrame> tf = textureFrames_;
+    textureFrames_.Clear();
+    for (unsigned i = 0; i < tf.Size(); i++)
+        AddTextureFrame(tf[i]);
+}
+
 const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 {
     return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0;
@@ -571,7 +876,7 @@ const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 
 const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
 {
-    return index < colorFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
+    return index < textureFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
 }
 
 Vector3 ParticleEffect::GetRandomDirection() const
