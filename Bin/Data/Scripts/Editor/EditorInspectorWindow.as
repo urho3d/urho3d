@@ -203,6 +203,9 @@ void UpdateAttributeInspector(bool fullUpdate = true)
     if (fullUpdate)
         DeleteAllContainers();
 
+    // Update all ScriptInstances/LuaScriptInstances
+    UpdateScriptInstances();
+
     if (!editNodes.empty)
     {
         UIElement@ container = GetNodeContainer();
@@ -263,10 +266,6 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             for (uint i = 0; i < numEditableComponents; ++i)
             {
                 Component@ component = editComponents[j * numEditableComponents + i];
-
-                if (component.typeName.Contains("ScriptInstance"))
-                    UpdateScriptAttributes(component);
-                    
                 components.Push(component);
             }
 
@@ -333,6 +332,17 @@ void UpdateAttributeInspector(bool fullUpdate = true)
     // Adjust size and position of manual-layout UI-elements, e.g. icons panel
     if (fullUpdate)
         HandleWindowLayoutUpdated();
+}
+
+void UpdateScriptInstances()
+{
+    Array<Component@>@ components = scene.GetComponents("ScriptInstance", true);
+    for (uint i = 0; i < components.length; i++)
+        UpdateScriptAttributes(components[i]);
+
+    components = scene.GetComponents("LuaScriptInstance", true);
+    for (uint i = 0; i < components.length; i++)
+        UpdateScriptAttributes(components[i]);
 }
 
 String GetComponentAttributeHash(Component@ component, uint index)

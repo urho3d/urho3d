@@ -228,13 +228,7 @@ bool LoadScene(const String&in fileName)
     SetActiveViewport(viewports[0]);
 
     // Store all ScriptInstance and LuaScriptInstance attributes
-    Array<Component@>@ components = scene.GetComponents("ScriptInstance", true);
-    for (uint i = 0; i < components.length; i++)
-        UpdateScriptAttributes(components[i]);
-
-    components = scene.GetComponents("LuaScriptInstance", true);
-    for (uint i = 0; i < components.length; i++)
-        UpdateScriptAttributes(components[i]);
+    UpdateScriptInstances();
 
     return loaded;
 }
