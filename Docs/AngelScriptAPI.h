@@ -244,7 +244,9 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 float speed;
+Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
