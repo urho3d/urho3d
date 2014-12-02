@@ -73,6 +73,10 @@ public:
     /// Return viewport.
     Viewport* GetViewport() const;
     
+private:
+    /// Reset scene.
+    void ResetScene();
+
     /// Renderable texture.
     SharedPtr<Texture2D> renderTexture_;
     /// Depth stencil texture.
@@ -80,13 +84,11 @@ public:
     /// Viewport.
     SharedPtr<Viewport> viewport_;
     /// Scene.
-    WeakPtr<Scene> scene_;
+    SharedPtr<Scene> scene_;
     /// Camera scene node.
-    WeakPtr<Node> cameraNode_;
-    /// Owned scene.
-    SharedPtr<Scene> ownedScene_;
-    /// Owned camera scene node.
-    SharedPtr<Node> ownedCameraNode_;
+    SharedPtr<Node> cameraNode_;
+    /// Own scene.
+    bool ownScene_;
     /// Render texture format.
     unsigned rttFormat_;
     /// Render texture auto update mode.
