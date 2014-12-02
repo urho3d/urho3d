@@ -55,6 +55,7 @@ const char* logLevelPrefixes[] =
 };
 
 static Log* logInstance = 0;
+static bool threadErrorDisplayed = false;
 
 Log::Log(Context* context) :
     Object(context),
@@ -251,6 +252,17 @@ void Log::WriteRaw(const String& message, bool error)
 
 void Log::HandleEndFrame(StringHash eventType, VariantMap& eventData)
 {
+    // If the MainThreadID is not valid, processing this loop can potentially be endless
+    if (!Thread::IsMainThread())
+    {
+        if (!threadErrorDisplayed)
+        {
+            fprintf(stderr, "Thread::mainThreadID is not setup correctly! Threaded log handling disabled\n");
+            threadErrorDisplayed = true;
+        }
+        return;
+    }
+
     MutexLock lock(logMutex_);
     
     // Process messages accumulated from other threads (if any)
