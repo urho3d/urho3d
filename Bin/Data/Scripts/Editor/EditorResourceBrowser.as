@@ -849,7 +849,6 @@ void HandleBrowserEditResource(StringHash eventType, VariantMap& eventData)
 
     if (file.resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
     {
-        Print("Resource Browser Particle Effect");
         ParticleEffect@ particleEffect = cache.GetResource("ParticleEffect", file.resourceKey);
         if (particleEffect !is null)
             EditParticleEffect(particleEffect);
