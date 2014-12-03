@@ -136,12 +136,12 @@ task :ci_site_update do
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=... rake ci_rebase)
 desc 'Rebase all CI mirror branches'
 task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
-  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |branch| system "git fetch origin #{branch}:#{branch} && git rebase #{baseline} #{branch} && git push -qf -u origin #{branch} >/dev/null 2>&1" or abort "Failed to rebase #{branch} mirror branch" }
+  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |ci| branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{branch}:#{branch} 2>/dev/null; then git rebase #{baseline} #{branch} && git push -qf -u origin #{branch} >/dev/null 2>&1; fi" or abort "Failed to rebase #{branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)

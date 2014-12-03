@@ -67,7 +67,7 @@ install:
   - free -tm
 script: rake ci
 after_success:
-  - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake ci_site_update && rake ci_rebase; fi
+  - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake ci_site_update; fi && if [ $SITE_UPDATE ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
 
 # vi: set ts=2 sw=2 expandtab:
