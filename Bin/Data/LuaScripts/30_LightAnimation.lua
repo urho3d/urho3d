@@ -8,11 +8,11 @@ function Start()
     -- Execute the common startup for samples
     SampleStart()
 
-    -- Create the scene content
-    CreateScene()
-
     -- Create the UI content
     CreateInstructions()
+
+    -- Create the scene content
+    CreateScene()
 
     -- Setup the viewport for displaying the scene
     SetupViewport()
@@ -53,6 +53,15 @@ function CreateScene()
     colorAnimation:SetKeyFrame(3.0, Variant(Color.GREEN))
     colorAnimation:SetKeyFrame(4.0, Variant(Color.WHITE))
     light:SetAttributeAnimation("Color", colorAnimation)
+
+    -- Create text animation
+    local textAnimation = ValueAnimation:new()
+    textAnimation:SetKeyFrame(0.0, Variant("WHITE"))
+    textAnimation:SetKeyFrame(1.0, Variant("RED"))
+    textAnimation:SetKeyFrame(2.0, Variant("YELLOW"))
+    textAnimation:SetKeyFrame(3.0, Variant("GREEN"))
+    textAnimation:SetKeyFrame(4.0, Variant("WHITE"))
+    ui.root:GetChild("animatingText"):SetAttributeAnimation("Text", textAnimation)
 
     -- Create light position animation
     local positionAnimation = ValueAnimation:new()
@@ -97,12 +106,20 @@ function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText:SetText("Use WASD keys and mouse to move")
-    instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
+    local font = cache:GetResource("Font", "Fonts/Anonymous Pro.ttf")
+    instructionText:SetFont(font, 15)
 
     -- Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER
     instructionText.verticalAlignment = VA_CENTER
     instructionText:SetPosition(0, ui.root.height / 4)
+
+    -- Animating text
+    local text = ui.root:CreateChild("Text", "animatingText")
+    text:SetFont(font, 15)
+    text.horizontalAlignment = HA_CENTER
+    text.verticalAlignment = VA_CENTER
+    text:SetPosition(0, ui.root.height / 4 + 20)
 end
 
 function SetupViewport()
