@@ -211,6 +211,8 @@ public:
     
     /// Invoke event handler function.
     virtual void Invoke(VariantMap& eventData) = 0;
+    /// Return a unique copy of the event handler.
+    virtual EventHandler* Clone() const = 0;
     
     /// Return event receiver.
     Object* GetReceiver() const { return receiver_; }
@@ -259,6 +261,12 @@ public:
     {
         T* receiver = static_cast<T*>(receiver_);
         (receiver->*function_)(eventType_, eventData);
+    }
+    
+    /// Return a unique copy of the event handler.
+    virtual EventHandler* Clone() const
+    {
+        return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
     }
     
 private:
