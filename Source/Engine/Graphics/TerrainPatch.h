@@ -58,6 +58,8 @@ public:
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// Set owner terrain.
     void SetOwner(Terrain* terrain);

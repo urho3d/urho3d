@@ -206,6 +206,12 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
         minLodGeometry_->GetIndexCount());
 }
 
+void TerrainPatch::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    // Intentionally no action
+}
+
+
 void TerrainPatch::SetOwner(Terrain* terrain)
 {
     owner_ = terrain;
