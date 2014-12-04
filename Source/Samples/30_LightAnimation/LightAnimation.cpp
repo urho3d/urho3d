@@ -54,11 +54,11 @@ void LightAnimation::Start()
     // Execute base class startup
     Sample::Start();
 
-    // Create the scene content
-    CreateScene();
-    
     // Create the UI content
     CreateInstructions();
+
+    // Create the scene content
+    CreateScene();
     
     // Setup the viewport for displaying the scene
     SetupViewport();
@@ -111,6 +111,15 @@ void LightAnimation::CreateScene()
     // Set position animation
     lightAnimation->AddAttributeAnimation("Position", positionAnimation);
 
+    // Create text animation
+    SharedPtr<ValueAnimation> textAnimation(new ValueAnimation(context_));
+    textAnimation->SetKeyFrame(0.0f, "WHITE");
+    textAnimation->SetKeyFrame(1.0f, "RED");
+    textAnimation->SetKeyFrame(2.0f, "YELLOW");
+    textAnimation->SetKeyFrame(3.0f, "GREEN");
+    textAnimation->SetKeyFrame(4.0f, "WHITE");
+    GetSubsystem<UI>()->GetRoot()->GetChild(String("animatingText"))->SetAttributeAnimation("Text", textAnimation);
+
     // Create light color animation
     SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
     colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
@@ -159,12 +168,20 @@ void LightAnimation::CreateInstructions()
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move");
-    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    instructionText->SetFont(font, 15);
     
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+
+    // Animating text
+    Text* text = ui->GetRoot()->CreateChild<Text>("animatingText");
+    text->SetFont(font, 15);
+    text->SetHorizontalAlignment(HA_CENTER);
+    text->SetVerticalAlignment(VA_CENTER);
+    text->SetPosition(0, ui->GetRoot()->GetHeight() / 4 + 20);
 }
 
 void LightAnimation::SetupViewport()

@@ -54,7 +54,7 @@ matrix:
 before_install:
   - free -tm
   - mem=($(free -m |head -2 |tail -1)); if [ ${mem[6]} -eq 0 ]; then export BAD_VM=1; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export REBASE_ON_MASTER_COMMIT=$REBASE; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - travis_retry sudo apt-get update -q -y
 install:
   - travis_retry sudo apt-get install -q -y --no-install-recommends libasound2-dev
@@ -62,6 +62,6 @@ install:
   - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64-i686 g++-mingw-w64-i686 binutils-mingw-w64-i686 && export ARCH=i686; else travis_retry sudo apt-get install -q -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64 && export ARCH=x86_64; fi && travis_retry sudo apt-get install -q -y g++-multilib && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   - free -tm
 script: rake ci
-after_success: if [ $REBASE_ON_MASTER_COMMIT ]; then rake ci_rebase; fi
+after_success: if [ $REBASE ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
 
 # vi: set ts=2 sw=2 expandtab:

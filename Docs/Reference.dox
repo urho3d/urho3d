@@ -21,7 +21,7 @@ The list, set and map classes use a fixed-size allocator internally. This can al
 In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<StringHash, Variant>.
 
 
-\page ObjectTypes %Object types and factories
+\page ObjectTypes Object types and factories
 
 Classes that derive from Object contain type-identification, they can be created through object factories, and they can send and receive \ref Events "events". Examples of these are all Component, Resource and UIElement subclasses. To be able to be constructed by a factory, they need to have a constructor that takes a Context pointer as the only parameter.
 
@@ -117,7 +117,7 @@ SendEvent("Update", eventData);
 Because the \ref Object::SendEvent "SendEvent()" function is public, an event can be "masqueraded" as originating from any object, even when not actually sent by that object's member function code. This can be used to simplify communication, particularly between components in the scene. For example, the \ref Physics "physics simulation" signals collision events by using the participating \ref Node "scene nodes" as senders. This means that any component can easily subscribe to its own node's collisions without having to know of the actual physics components involved. The same principle can also be used in any game-specific messaging, for example making a "damage received" event originate from the scene node, though it itself has no concept of damage or health.
 
 
-\page MainLoop %Engine initialization and main loop
+\page MainLoop Engine initialization and main loop
 
 Before a Urho3D application can enter its main loop, the Engine subsystem object must be created and initialized by calling its \ref Engine::Initialize "Initialize()" function. Parameters sent in a VariantMap can be used to direct how the Engine initializes itself and the subsystems. One way to configure the parameters is to parse them from the command line like the Urho3DPlayer application does: this is accomplished by the helper function \ref Engine::ParseParameters "ParseParameters()".
 
@@ -249,7 +249,7 @@ public:
 DEFINE_APPLICATION_MAIN(MyApp)
 \endcode
 
-\page SceneModel %Scene model
+\page SceneModel Scene model
 
 Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID, and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
 
@@ -1336,7 +1336,7 @@ Like with skeletal animations, there are two ways to play back node animations:
 %Node animations do not support blending, as there is no initial pose to blend from. Instead they are always played back with full weight. Note that the scene node names in the animation and in the scene must match exactly, otherwise the animation will not play.
 
 
-\page Particles %Particle systems
+\page Particles Particle systems
 
 The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically. 
 
@@ -1411,7 +1411,7 @@ Rendering detailed auxiliary views can easily have a large performance impact. S
 The surface can also be configured to always update its viewports, or to only update when manually requested. See \ref RenderSurface::SetUpdateMode "SetUpdateMode()". For example an editor widget showing a rendered texture might use either of those modes. Call \ref RenderSurface::QueueUpdate "QueueUpdate()" to request a manual update of the surface on the current frame.
 
 
-\page Input %Input
+\page Input Input
 
 The Input subsystem provides keyboard, mouse, joystick and touch input both via a polled interface and events. This subsystem is also used for querying whether the application window has input focus or is minimized.
 
@@ -1498,7 +1498,7 @@ On platforms that support it (such as Android) an on-screen virtual keyboard can
 
 On Windows the user must first touch the screen once before touch input is activated. Trying to record or load touch gestures will fail before that.
 
-\page Audio %Audio
+\page Audio Audio
 
 The Audio subsystem implements an audio output stream. Once it has been initialized, the following operations are supported:
 
@@ -2153,8 +2153,9 @@ When making your own work functions or threads, observe that the following thing
 
 Using the Profiler is treated as a no-op when called from outside the main thread. Trying to send an event or get a resource from the ResourceCache when not in the main thread will cause an error to be logged. %Log messages from other threads are collected and handled in the main thread at the end of the frame.
 
-\page AttributeAnimation %Attribute animation
-Attribute animation is a new system for Urho3D, With it user can apply animation to object's attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
+\page AttributeAnimation Attribute animation
+
+Attribute animation is mechanism to apply animation to an object's attribute. All objects derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
 
 These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object's attribute. Here is a simple code for light color animation:
 \code

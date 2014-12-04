@@ -1015,7 +1015,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("LuaFile", luaFileFilters));
     resourcePickers.Push(ResourcePicker("Material", materialFilters, ACTION_PICK | ACTION_OPEN | ACTION_EDIT));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl", ACTION_PICK));
-    resourcePickers.Push(ResourcePicker("ParticleEffect", "*.xml", ACTION_PICK | ACTION_OPEN));
+    resourcePickers.Push(ResourcePicker("ParticleEffect", "*.xml", ACTION_PICK | ACTION_OPEN | ACTION_EDIT));
     resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
     resourcePickers.Push(ResourcePicker("Technique", "*.xml"));
@@ -1241,6 +1241,8 @@ void EditResource(StringHash eventType, VariantMap& eventData)
         // For now only Materials can be edited
         if (resource.typeName == "Material")
             EditMaterial(cast<Material>(resource));
+        else if (resource.typeName == "ParticleEffect")
+            EditParticleEffect(cast<ParticleEffect>(resource));
     }
 }
 
