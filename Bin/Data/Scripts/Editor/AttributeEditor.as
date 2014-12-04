@@ -28,6 +28,15 @@ bool rememberResourcePath = true;
 // Exceptions for string attributes that should not be continuously edited
 Array<String> noTextChangedAttrs = {"Script File", "Class Name", "Script Object Type", "Script File Name"};
 
+// List of attributes that should be created with a bit selection editor
+const Array<String> bitSelectionAttrs = {"Collision Mask", "Collision Layer", "Light Mask", "Zone Mask", "View Mask", "Shadow Mask"};
+
+// Number of editable bits for bit selection editor
+const int MAX_BITMASK_BITS = 8;
+const int MAX_BITMASK_VALUE = (1 << MAX_BITMASK_BITS) - 1;
+Color nonEditableBitSelectorColor(0.5f, 0.5f, 0.5f);
+Color editableBitSelectorColor(1.0f, 1.0f, 1.0f);
+
 WeakHandle testAnimState;
 
 bool dragEditAttribute = false;
@@ -133,7 +142,7 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
     return attrEdit;
 }
 
-UIElement@ CreateAttributeBitSelector(UIElement@ parent, Array<Serializable@>@ serializables, uint index, uint subIndex)
+LineEdit@ CreateAttributeBitSelector(UIElement@ parent, Array<Serializable@>@ serializables, uint index, uint subIndex)
 {
     UIElement@ container = UIElement();
     parent.AddChild(container);
@@ -165,14 +174,13 @@ UIElement@ CreateAttributeBitSelector(UIElement@ parent, Array<Serializable@>@ s
 void UpdateBitSelection(UIElement@ parent)
 {
     int mask = 0;
-    const int MAX_MASK_BITS = 8;
-    for (int i = 0; i < MAX_MASK_BITS; i++)
+    for (int i = 0; i < MAX_BITMASK_BITS; i++)
     {
         CheckBox@ bitBox = parent.GetChild("BitSelect_" + String(i), true);
         mask = mask | (bitBox.checked ? 1 << i : 0);
     }
 
-    if (mask == (1 << MAX_MASK_BITS) - 1 )
+    if (mask == MAX_BITMASK_VALUE)
         mask = -1;
 
     inUpdateBitSelection = true;
@@ -184,13 +192,21 @@ void UpdateBitSelection(UIElement@ parent)
 void SetBitSelection(UIElement@ parent, int value)
 {
     int mask = value;
-    const int MAX_MASK_BITS = 8;
-    if (mask ==  -1)
-        mask = (1 << MAX_MASK_BITS) - 1;
+    bool enabled = true;
 
-    for (int i = 0; i < MAX_MASK_BITS; i++)
+    if (mask ==  -1)
+        mask = MAX_BITMASK_VALUE;
+    else if (mask > MAX_BITMASK_VALUE)
+        enabled = false;
+
+    for (int i = 0; i < MAX_BITMASK_BITS; i++)
     {
         CheckBox@ bitBox = parent.GetChild("BitSelect_" + String(i), true);
+        bitBox.enabled = enabled;
+        if (!enabled)
+            bitBox.color = nonEditableBitSelectorColor;
+        else
+            bitBox.color = editableBitSelectorColor;
 
         if ((1 << i) & mask != 0)
             bitBox.checked = true;
@@ -286,10 +302,10 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
 {
     UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
 
-    // Check for masks
-    if (info.name.Contains("Mask", false))
+    // Check for masks and layers
+    if (bitSelectionAttrs.Find(info.name) > -1)
     {
-        UIElement@ attrEdit = CreateAttributeBitSelector(parent, serializables, index, subIndex);
+        LineEdit@ attrEdit = CreateAttributeBitSelector(parent, serializables, index, subIndex);
     }
     // Check for enums
     else if (info.enumNames is null || info.enumNames.empty)
@@ -584,7 +600,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
         SetEditable(SetValue(parent.children[1], value.GetBool(), sameValue), editable && sameValue);
     else if (type == VAR_INT)
     {
-        if (info.name.Contains("Mask", false))
+        if (bitSelectionAttrs.Find(info.name) > -1)
             SetEditable(SetValue(parent.GetChild("LineEdit", true), value.ToString(), sameValue), editable && sameValue);
         else if (info.enumNames is null || info.enumNames.empty)
             SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
