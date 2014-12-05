@@ -549,7 +549,7 @@ macro (check_source_files)
             "CMakeLists.txt where the macro is being called and the macro would set the SOURCE_FILES variable automatically. "
             "If your source files are not located in the same directory as the CMakeLists.txt or your source files are "
             "more than just C++ language then you probably have to pass in extra arguments when calling the macro in order to make it works. "
-            "See the define_source_files() macro definition in the Source/CMake/Modules/Urho3D-CMake-common.cmake for more detail.")
+            "See the define_source_files() macro definition in the CMake/Modules/Urho3D-CMake-common.cmake for more detail.")
     endif ()
 endmacro ()
 

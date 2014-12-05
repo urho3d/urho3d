@@ -83,7 +83,7 @@ install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_
 # Install resource directories required by applications built with Urho3D library
 install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} ${DEST_PERMISSIONS})
 # Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake ${DEST_PERMISSIONS})    # Note: the trailing slash is significant
+install (DIRECTORY ${PROJECT_ROOT_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake ${DEST_PERMISSIONS})    # Note: the trailing slash is significant
 # Install CMake launcher scripts
 file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
 install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
