@@ -948,6 +948,9 @@ void UpdateViewParameters()
 
 void CreateGrid()
 {
+    if (gridNode !is null)
+        gridNode.Remove();
+
     gridNode = Node();
     grid = gridNode.CreateComponent("CustomGeometry");
     grid.numGeometries = 1;

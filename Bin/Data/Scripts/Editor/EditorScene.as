@@ -467,6 +467,7 @@ void StopSceneUpdate()
         suppressSceneChanges = true;
         editorScene.Clear();
         editorScene.LoadXML(revertData.GetRoot());
+        CreateGrid();
         UpdateHierarchyItem(editorScene, true);
         ClearEditActions();
         suppressSceneChanges = false;
