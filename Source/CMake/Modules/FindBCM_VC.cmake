@@ -61,4 +61,4 @@ else ()
     endif ()
 endif ()
 
-mark_as_advanced (BCM_VC_INCLUDE_DIRS BCM_VC_LIBRARIES)
+mark_as_advanced (BCM_VC_INCLUDE_DIRS BCM_VC_LIBRARIES BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2)
