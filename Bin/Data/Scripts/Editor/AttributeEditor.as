@@ -15,6 +15,7 @@ const StringHash TEXT_CHANGED_EVENT_TYPE("TextChanged");
 
 bool inLoadAttributeEditor = false;
 bool inEditAttribute = false;
+bool inUpdateBitSelection = false;
 bool showNonEditableAttribute = false;
 
 Color normalTextColor(1.0f, 1.0f, 1.0f);
@@ -26,6 +27,15 @@ bool rememberResourcePath = true;
 
 // Exceptions for string attributes that should not be continuously edited
 Array<String> noTextChangedAttrs = {"Script File", "Class Name", "Script Object Type", "Script File Name"};
+
+// List of attributes that should be created with a bit selection editor
+const Array<String> bitSelectionAttrs = {"Collision Mask", "Collision Layer", "Light Mask", "Zone Mask", "View Mask", "Shadow Mask"};
+
+// Number of editable bits for bit selection editor
+const int MAX_BITMASK_BITS = 8;
+const int MAX_BITMASK_VALUE = (1 << MAX_BITMASK_BITS) - 1;
+Color nonEditableBitSelectorColor(0.5f, 0.5f, 0.5f);
+Color editableBitSelectorColor(1.0f, 1.0f, 1.0f);
 
 WeakHandle testAnimState;
 
@@ -132,6 +142,103 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
     return attrEdit;
 }
 
+LineEdit@ CreateAttributeBitSelector(UIElement@ parent, Array<Serializable@>@ serializables, uint index, uint subIndex)
+{
+    UIElement@ container = UIElement();
+    parent.AddChild(container);
+    parent.SetFixedHeight(38);
+    container.SetFixedWidth(16 * 4 + 4);
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            CheckBox@ bitBox = CheckBox();
+            bitBox.name = "BitSelect_" + String(i * 4 + j);
+            container.AddChild(bitBox);
+            bitBox.position = IntVector2(16 * j, 16 * i);
+            bitBox.style = "CheckBox";
+            bitBox.SetFixedHeight(16);
+
+            SubscribeToEvent(bitBox,"Toggled", "HandleBitSelectionToggled");
+        }
+    }
+
+    LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
+    attrEdit.name = "LineEdit";
+    SubscribeToEvent(attrEdit, "TextChanged", "HandleBitSelectionEdit");
+    SubscribeToEvent(attrEdit, "TextFinished", "HandleBitSelectionEdit");
+    return attrEdit;
+}
+
+void UpdateBitSelection(UIElement@ parent)
+{
+    int mask = 0;
+    for (int i = 0; i < MAX_BITMASK_BITS; i++)
+    {
+        CheckBox@ bitBox = parent.GetChild("BitSelect_" + String(i), true);
+        mask = mask | (bitBox.checked ? 1 << i : 0);
+    }
+
+    if (mask == MAX_BITMASK_VALUE)
+        mask = -1;
+
+    inUpdateBitSelection = true;
+    LineEdit@ attrEdit = parent.parent.GetChild("LineEdit", true);
+    attrEdit.text = String(mask);
+    inUpdateBitSelection = false;
+}
+
+void SetBitSelection(UIElement@ parent, int value)
+{
+    int mask = value;
+    bool enabled = true;
+
+    if (mask ==  -1)
+        mask = MAX_BITMASK_VALUE;
+    else if (mask > MAX_BITMASK_VALUE)
+        enabled = false;
+
+    for (int i = 0; i < MAX_BITMASK_BITS; i++)
+    {
+        CheckBox@ bitBox = parent.GetChild("BitSelect_" + String(i), true);
+        bitBox.enabled = enabled;
+        if (!enabled)
+            bitBox.color = nonEditableBitSelectorColor;
+        else
+            bitBox.color = editableBitSelectorColor;
+
+        if ((1 << i) & mask != 0)
+            bitBox.checked = true;
+        else
+            bitBox.checked = false;
+    }
+}
+
+void HandleBitSelectionToggled(StringHash eventType, VariantMap& eventData)
+{
+    if (inUpdateBitSelection)
+        return;
+
+    CheckBox@ bitBox = eventData["Element"].GetPtr();
+
+    UpdateBitSelection(bitBox.parent);
+}
+
+void HandleBitSelectionEdit(StringHash eventType, VariantMap& eventData)
+{
+    if (!inUpdateBitSelection)
+    {
+        LineEdit@ attrEdit = eventData["Element"].GetPtr();
+
+        inUpdateBitSelection = true;
+        SetBitSelection(attrEdit.parent, attrEdit.text.ToInt());
+        inUpdateBitSelection = false;
+    }
+
+    EditAttribute(eventType, eventData);
+}
+
 UIElement@ CreateStringAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
     UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
@@ -194,8 +301,14 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
 UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
     UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
+
+    // Check for masks and layers
+    if (bitSelectionAttrs.Find(info.name) > -1)
+    {
+        LineEdit@ attrEdit = CreateAttributeBitSelector(parent, serializables, index, subIndex);
+    }
     // Check for enums
-    if (info.enumNames is null || info.enumNames.empty)
+    else if (info.enumNames is null || info.enumNames.empty)
     {
         // No enums, create a numeric editor
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
@@ -487,7 +600,9 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
         SetEditable(SetValue(parent.children[1], value.GetBool(), sameValue), editable && sameValue);
     else if (type == VAR_INT)
     {
-        if (info.enumNames is null || info.enumNames.empty)
+        if (bitSelectionAttrs.Find(info.name) > -1)
+            SetEditable(SetValue(parent.GetChild("LineEdit", true), value.ToString(), sameValue), editable && sameValue);
+        else if (info.enumNames is null || info.enumNames.empty)
             SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
         else
             SetEditable(SetValue(parent.children[1], value.GetInt(), sameValue), editable && sameValue);
@@ -706,6 +821,10 @@ void SanitizeNumericalValue(VariantType type, String& value)
 void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumNames, uint coordinate, Array<Variant>& values)
 {
     LineEdit@ attrEdit = parent.children[coordinate + 1];
+
+    if (attrEdit is null)
+        attrEdit = parent.GetChild("LineEdit", true);
+
     if (type == VAR_STRING)
         FillValue(values, Variant(attrEdit.text.Trimmed()));
     else if (type == VAR_BOOL)
