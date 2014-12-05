@@ -46,7 +46,13 @@ if (NOT MINGW_SYSROOT)
     file (TO_CMAKE_PATH "$ENV{MINGW_ROOT}" MINGW_ROOT)
     if (NOT MINGW_ROOT)
         get_filename_component (MINGW_PREFIX ${MINGW_PREFIX} NAME)
-        set (MINGW_ROOT /usr/${MINGW_PREFIX}/sys-root)
+        if (EXISTS /usr/${MINGW_PREFIX}/sys-root)
+            # Redhat based system
+            set (MINGW_ROOT /usr/${MINGW_PREFIX}/sys-root)
+        else ()
+            # Debian based system
+            set (MINGW_ROOT /usr/${MINGW_PREFIX})
+        endif ()
     endif ()
     if (NOT EXISTS ${MINGW_ROOT})
         message (FATAL_ERROR "Could not find MinGW system root. "
