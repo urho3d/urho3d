@@ -43,6 +43,15 @@ static const char* uiImageDrawModes[] =
     "Simple",
     "Tiled",
     "Sliced",
+    "Filled",
+    0
+};
+
+static const char* uiFillTypes[] = 
+{
+    "Horizontal",
+    "Vertical",
+    "Radial",
     0
 };
 
@@ -51,7 +60,10 @@ UIImage::UIImage(Context* context) :
     color_(Color::WHITE),
     drawMode_(UIIDM_SIMPLE),
     xSliceSize_(4),
-    ySliceSize_(4)
+    ySliceSize_(4),
+    fillType_(UIFT_HORIZONTAL),
+    fillAmount_(1.0f),
+    fillInverse_(false)
 {
 }
 
@@ -69,6 +81,9 @@ void UIImage::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE("Draw Mode", GetDrawMode, SetDrawMode, UIImageDrawMode, uiImageDrawModes, UIIDM_SIMPLE, AM_FILE);
     ACCESSOR_ATTRIBUTE("X Slice Size", GetXSliceSize, SetXSliceSize, int, 4, AM_FILE);
     ACCESSOR_ATTRIBUTE("Y Slice Size", GetYSliceSize, SetYSliceSize, int, 4, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Fill Type", GetFillType, SetFillType, UIFillType, uiFillTypes, UIFT_HORIZONTAL, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Fill Amount", GetFillAmount, SetFillAmount, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Fill Inverse", IsFillInverse, SetFillInverse, bool, false, AM_FILE);
     COPY_BASE_ATTRIBUTES(Drawable2D);
 }
 
@@ -120,6 +135,41 @@ void UIImage::SetYSliceSize(int size)
     ySliceSize_ = size;
 
     if (drawMode_ == UIIDM_SLICED)
+        verticesDirty_ = true;
+}
+
+void UIImage::SetFillType(UIFillType fillType)
+{
+    if (fillType == fillType_)
+        return;
+
+    fillType_ = fillType;
+
+    if (drawMode_ == UIIDM_FILLED)
+        verticesDirty_ = true;
+}
+
+void UIImage::SetFillAmount(float amount)
+{
+    amount = Clamp(amount, 0.0f, 1.0f);
+
+    if (amount == fillAmount_)
+        return;
+
+    fillAmount_ = amount;
+
+    if (drawMode_ == UIIDM_FILLED)
+        verticesDirty_ = true;
+}
+
+void UIImage::SetFillInverse(bool inverse)
+{
+    if (inverse == fillInverse_)
+        return;
+
+    fillInverse_ = inverse;
+
+    if (drawMode_ == UIIDM_FILLED)
         verticesDirty_ = true;
 }
 
@@ -196,6 +246,9 @@ void UIImage::UpdateVertices()
     case UIIDM_SLICED:
         UpdateVerticesSlicedMode();
         break;
+        case UIIDM_FILLED:
+        UpdateVerticesFilledMode();
+        break;
     }
 
     verticesDirty_ = false;
@@ -267,7 +320,15 @@ void UIImage::UpdateVerticesSlicedMode()
 {
     if (xSliceSize_ == 0 && ySliceSize_ == 0)
     {
-        UpdateVerticesSimpleMode();
+        float left = uiRect_->GetLeft();
+        float right = uiRect_->GetRight();
+        float top = uiRect_->GetTop();
+        float bottom = uiRect_->GetBottom();
+
+        float uLeft, uRight, vTop, vBottom;
+        GetSpriteTextureCoords(uLeft, uRight, vTop, vBottom);
+
+        AddQuad(left, right, top, bottom, uLeft, uRight, vTop, vBottom);
         return;
     }
 
@@ -310,6 +371,211 @@ void UIImage::UpdateVerticesSlicedMode()
     AddQuad(left, x1   , y2, bottom, uLeft, u1    , v2, vBottom);
     AddQuad(x1  , x2   , y2, bottom, u1   , u2    , v2, vBottom);
     AddQuad(x2  , right, y2, bottom, u2   , uRight, v2, vBottom);
+}
+
+void UIImage::UpdateVerticesFilledMode()
+{
+    if (fillType_ != UIFT_RADIAL)
+    {
+        float left = uiRect_->GetLeft();
+        float right = uiRect_->GetRight();
+        float top = uiRect_->GetTop();
+        float bottom = uiRect_->GetBottom();
+
+        float uLeft, uRight, vTop, vBottom;
+        GetSpriteTextureCoords(uLeft, uRight, vTop, vBottom);
+
+        if (fillType_ == UIFT_HORIZONTAL)
+        {
+            if (!fillInverse_)
+            {
+                right = left + (right - left) * fillAmount_;
+                uRight = uLeft + (uRight - uLeft) * fillAmount_;
+            }
+            else
+            {
+                left = right - (right - left) * fillAmount_;
+                uLeft = uRight - (uRight - uLeft) * fillAmount_;
+            }
+        }
+        else
+        {
+            if (!fillInverse_)
+            {
+                top = bottom + (top - bottom) * fillAmount_;
+                vTop = vBottom + (vTop - vBottom) * fillAmount_;
+            }
+            else
+            {
+                bottom = top - (top - bottom) * fillAmount_;
+                vBottom = vTop - (vTop - vBottom) * fillAmount_;
+            }
+        }
+        AddQuad(left, right, top, bottom, uLeft, uRight, vTop, vBottom);
+    }
+    else
+        UpdateVerticesFilledModeRadial();
+}
+
+void UIImage::UpdateVerticesFilledModeRadial()
+{
+    float x = uiRect_->GetX();
+    float y = uiRect_->GetY();
+    float left = uiRect_->GetLeft();
+    float right = uiRect_->GetRight();
+    float top = uiRect_->GetTop();
+    float bottom = uiRect_->GetBottom();
+
+    unsigned color = color_.ToUInt();
+
+    float uLeft, uRight, vTop, vBottom;
+    GetSpriteTextureCoords(uLeft, uRight, vTop, vBottom);
+    float u = (uLeft + uRight) * 0.5f;
+    float v = (vTop + vBottom) * 0.5f;
+
+    //  5----1----2
+    //  | \  |a1 /|
+    //  |  \ | /  |
+    //  |    0 ---| 
+    //  |  /   \  |
+    //  |/       \|
+    //  4---------3
+    Vertex2D vertices[6] = 
+    {
+        { Vector3(x    , y     ),  color, Vector2(u     , v      ) }, // 0
+        { Vector3(x    , top   ),  color, Vector2(u     , vTop   ) }, // 1
+        { Vector3(right, top   ),  color, Vector2(uRight, vTop   ) }, // 2
+        { Vector3(right, bottom),  color, Vector2(uRight, vBottom) }, // 3
+        { Vector3(left , bottom),  color, Vector2(uLeft , vBottom) }, // 4
+        { Vector3(left , top   ),  color, Vector2(uLeft , vTop   ) }, // 5
+    };
+
+    float angle = 360.0f * fillAmount_;
+    float width = uiRect_->GetWidth();
+    float height = uiRect_->GetHeight();
+    float angle1 = Atan2(width, height);
+
+    if (angle <= angle1)
+    {
+        float x1 = x + height * 0.5f * Tan(angle);
+        if (fillInverse_)
+            x1 = x + x1;
+        else
+            x1 = x - x1;
+        float u1 = uLeft + (uRight - uLeft) /  width * (x1 - left);
+        Vertex2D vertex = {Vector3(x1, top), color, Vector2(u1, vTop) };
+        vertices_.Push(vertices[0]);
+        vertices_.Push(vertices[1]);
+        vertices_.Push(vertex);
+        vertices_.Push(vertex);
+        return;
+    }
+
+    if (angle <= 180.0f - angle1)
+    {
+        float y1 = y + width * 0.5f * Tan(90.0f - angle);
+        float v1 = vBottom + (vTop - vBottom) / height * (y1 - bottom);
+        vertices_.Push(vertices[0]);
+        vertices_.Push(vertices[1]);
+        if (fillInverse_)
+        {
+            Vertex2D vertex = { Vector3(right, y1), color, Vector2(uRight, v1) };
+            vertices_.Push(vertices[2]);
+            vertices_.Push(vertex);
+        }
+        else
+        {
+            Vertex2D vertex = { Vector3(left, y1), color, Vector2(uLeft, v1) };
+            vertices_.Push(vertices[5]);
+            vertices_.Push(vertex);
+        }
+        return;
+    }
+    
+    vertices_.Push(vertices[0]);
+    vertices_.Push(vertices[1]);
+    if (fillInverse_)
+    {
+        vertices_.Push(vertices[2]);
+        vertices_.Push(vertices[3]);
+    }
+    else
+    {
+        vertices_.Push(vertices[5]);
+        vertices_.Push(vertices[4]);
+    }
+
+    if (angle <= 180.0f + angle1)
+    {
+        float x1 = height * 0.5f * Tan(180.0f - angle);
+        if (fillInverse_)
+            x1 = x + x1;
+        else
+            x1 = x - x1;
+        float u1 = uLeft + (uRight - uLeft) /  width * (x1 - left);
+        Vertex2D vertex = { Vector3(x1, bottom), color, Vector2(u1, vBottom) };
+        vertices_.Push(vertices[0]);
+        if (fillInverse_)
+            vertices_.Push(vertices[3]);
+        else
+            vertices_.Push(vertices[4]);
+        vertices_.Push(vertex);
+        vertices_.Push(vertex);
+        return;
+    }
+
+    if (angle <= 360.0f - angle1)
+    {
+        float y1 = y + width * 0.5f * Tan(angle - 270.0f);
+        float v1 = vBottom + (vTop - vBottom) / height * (y1 - bottom);
+        if (fillInverse_)
+        {
+            Vertex2D vertex = { Vector3(left, y1), color, Vector2(uLeft, v1) };
+            vertices_.Push(vertices[0]);
+            vertices_.Push(vertices[3]);
+            vertices_.Push(vertices[4]);
+            vertices_.Push(vertex);
+        }
+        else
+        {
+            Vertex2D vertex = { Vector3(right, y1), color, Vector2(uRight, v1) };
+            vertices_.Push(vertices[0]);
+            vertices_.Push(vertices[4]);
+            vertices_.Push(vertices[3]);
+            vertices_.Push(vertex);
+        }
+        return;
+    }
+
+    if (fillInverse_)
+    {
+        vertices_.Push(vertices[0]);
+        vertices_.Push(vertices[3]);
+        vertices_.Push(vertices[4]);
+        vertices_.Push(vertices[5]);
+    }
+    else
+    {
+        vertices_.Push(vertices[0]);
+        vertices_.Push(vertices[4]);
+        vertices_.Push(vertices[3]);        
+        vertices_.Push(vertices[2]);
+    }
+
+    float x1 = height * 0.5f * Tan(angle - 360.0f);
+    if (fillInverse_)
+        x1 = x + x1;
+    else
+        x1 = x - x1;
+    float u1 = uLeft + (uRight - uLeft) /  width * (x1 - left);
+    Vertex2D vertex = { Vector3(x1, top), color, Vector2(u1, vTop) };
+    vertices_.Push(vertices[0]);
+    if (fillInverse_)
+        vertices_.Push(vertices[5]);
+    else
+        vertices_.Push(vertices[2]);
+    vertices_.Push(vertex);
+    vertices_.Push(vertex);
 }
 
 void UIImage::GetSpriteTextureCoords(float& left, float& right, float& top, float& bottom) const

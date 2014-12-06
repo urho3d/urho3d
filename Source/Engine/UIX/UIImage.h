@@ -36,6 +36,15 @@ enum UIImageDrawMode
     UIIDM_SIMPLE = 0,
     UIIDM_TILED,
     UIIDM_SLICED,
+    UIIDM_FILLED,
+};
+
+/// UI image fill type.
+enum UIFillType
+{
+    UIFT_HORIZONTAL = 0,
+    UIFT_VERTICAL,
+    UIFT_RADIAL,
 };
 
 /// UI drawable component.
@@ -57,10 +66,16 @@ public:
     void SetColor(const Color& color);
     /// Set draw mode.
     void SetDrawMode(UIImageDrawMode mode);
-    /// Set X slice size.
+    /// Set X slice size (for sliced mode).
     void SetXSliceSize(int size);
-    /// Set Y slice size.
+    /// Set Y slice size (for sliced mode).
     void SetYSliceSize(int size);
+    /// Set fill type (for fill mode).
+    void SetFillType(UIFillType fillType);
+    /// Set fill amount (for fill mode).
+    void SetFillAmount(float amount);
+    /// Set Fill inverse (for fill mode).
+    void SetFillInverse(bool inverse);
 
     /// Return sprite.
     Sprite2D* GetSprite() const;
@@ -68,10 +83,16 @@ public:
     const Color& GetColor() const { return color_; }
     /// Return draw mode.
     UIImageDrawMode GetDrawMode() const { return drawMode_; }
-    /// Return X slice size.
+    /// Return X slice size (for sliced mode).
     int GetXSliceSize() const { return xSliceSize_;}
-    /// Return Y slice size.
+    /// Return Y slice size (for sliced mode).
     int GetYSliceSize() const { return ySliceSize_;}
+    /// Return fill type (for filled mode).
+    UIFillType GetFillType() const { return fillType_; }
+    /// Return fill amount (for fill mode).
+    float GetFillAmount() const { return fillAmount_; }
+    /// Return is fill inverse (for fill mode).
+    bool IsFillInverse() const { return fillInverse_; }
 
     /// Set sprite attribute.
     void SetSpriteAttr(const ResourceRef& value);
@@ -91,6 +112,10 @@ private:
     void UpdateVerticesTiledMode();
     /// Update vertices sliced mode.
     void UpdateVerticesSlicedMode();
+    /// Update vertices filled mode.
+    void UpdateVerticesFilledMode();
+    /// Update vertices filled  mode radial.
+    void UpdateVerticesFilledModeRadial();
     /// Return sprite texture coords.
     void GetSpriteTextureCoords(float& left, float& right, float& top, float& bottom) const;
     /// Add quad.
@@ -110,6 +135,12 @@ private:
     int xSliceSize_;
     /// Y slice size.
     int ySliceSize_;
+    /// Fill type.
+    UIFillType fillType_;
+    /// Fill amount.
+    float fillAmount_;
+    /// Fill inverse.
+    bool fillInverse_;
 };
 
 }

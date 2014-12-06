@@ -120,6 +120,8 @@ public:
     float GetX() const { return GetRect().Center().x_; }
     /// Get y.
     float GetY() const { return GetRect().Center().y_; }
+    /// Get center.
+    Vector2 GetCenter() const { return GetRect().Center(); }
     /// Return left.
     float GetLeft() const { return GetRect().min_.x_; }
     /// Return right.
