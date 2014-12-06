@@ -169,6 +169,8 @@ private:
     bool bufferDirty_;
     /// Force update flag (ignore animation LOD momentarily.)
     bool forceUpdate_;
+    /// Sorting flag. Triggers a vertex buffer rewrite for each view this billboard set is rendered from.
+    bool sortThisFrame_;
     /// Frame number on which was last sorted.
     unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.
