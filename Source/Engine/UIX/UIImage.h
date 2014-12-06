@@ -114,7 +114,7 @@ private:
     void UpdateVerticesSlicedMode();
     /// Update vertices filled mode.
     void UpdateVerticesFilledMode();
-    /// Update vertices filled  mode radial.
+    /// Update vertices filled mode radial.
     void UpdateVerticesFilledModeRadial();
     /// Return sprite texture coords.
     void GetSpriteTextureCoords(float& left, float& right, float& top, float& bottom) const;
