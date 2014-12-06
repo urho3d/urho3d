@@ -41,7 +41,7 @@ namespace Urho3D
 
 class AnimationSet2D;
 
-/// Spriter animation component.
+/// Animated sprite component, it uses to play animation created by Spriter (http://www.brashmonkey.com/).
 class URHO3D_API AnimatedSprite2D : public StaticSprite2D
 {
     OBJECT(AnimatedSprite2D);
