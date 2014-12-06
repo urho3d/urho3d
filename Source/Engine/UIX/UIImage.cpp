@@ -433,13 +433,13 @@ void UIImage::UpdateVerticesFilledModeRadial()
     float u = (uLeft + uRight) * 0.5f;
     float v = (vTop + vBottom) * 0.5f;
 
-    //  5----1----2
-    //  | \  |a1 /|
-    //  |  \ | /  |
-    //  |    0 ---| 
-    //  |  /   \  |
-    //  |/       \|
-    //  4---------3
+    // 5----1----2
+    // | \  |a1 /|
+    // |  \ | /  |
+    // |    0    | 
+    // |  /   \  |
+    // |/       \|
+    // 4---------3
     Vertex2D vertices[6] = 
     {
         { Vector3(x    , y     ),  color, Vector2(u     , v      ) }, // 0
@@ -457,7 +457,7 @@ void UIImage::UpdateVerticesFilledModeRadial()
 
     if (angle <= angle1)
     {
-        float x1 = x + height * 0.5f * Tan(angle);
+        float x1 = height * 0.5f * Tan(angle);
         if (fillInverse_)
             x1 = x + x1;
         else
@@ -596,15 +596,14 @@ void UIImage::AddQuad(float left, float right, float top, float bottom, float uL
     if (right - left <= 0.005f || top - bottom <= 0.005f)
         return;
 
-    /*
-    V1---------V2
-    |         / |
-    |       /   |
-    |     /     |
-    |   /       |
-    | /         |
-    V0---------V3
-    */
+    
+    // V1---------V2
+    // |         / |
+    // |       /   |
+    // |     /     |
+    // |   /       |
+    // | /         |
+    // V0---------V3
     Vertex2D vertex0;
     Vertex2D vertex1;
     Vertex2D vertex2;
