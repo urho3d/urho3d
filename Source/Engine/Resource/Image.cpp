@@ -245,8 +245,19 @@ bool Image::BeginLoad(Deserializer& source)
             components_ = 4;
             break;
 
+        case 0:
+            if (ddsd.ddpfPixelFormat_.dwRGBBitCount_ != 32 && ddsd.ddpfPixelFormat_.dwRGBBitCount_ != 24 &&
+                ddsd.ddpfPixelFormat_.dwRGBBitCount_ != 16)
+            {
+                LOGERROR("Unsupported DDS pixel byte size");
+                return false;
+            }
+            compressedFormat_ = CF_RGBA;
+            components_ = 4;
+            break;
+            
         default:
-            LOGERROR("Unsupported DDS format");
+            LOGERROR("Unrecognized DDS image format");
             return false;
         }
 
@@ -260,6 +271,96 @@ bool Image::BeginLoad(Deserializer& source)
             numCompressedLevels_ = 1;
         SetMemoryUse(dataSize);
         source.Read(data_.Get(), dataSize);
+        
+        // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
+        if (compressedFormat_ == CF_RGBA)
+        {
+            PROFILE(ConvertDDSToRGBA);
+            
+            unsigned sourcePixelByteSize = ddsd.ddpfPixelFormat_.dwRGBBitCount_ >> 3;
+            unsigned numPixels = dataSize / sourcePixelByteSize;
+            
+            #define ADJUSTSHIFT(mask, l, r) \
+                if (mask && mask >= 0x100) \
+                { \
+                    while ((mask >> r) >= 0x100) \
+                        ++r; \
+                } \
+                else if (mask && mask < 0x80) \
+                { \
+                    while ((mask << l) < 0x80) \
+                        ++l; \
+                }
+            
+            unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
+            unsigned rShiftR = 0, gShiftR = 0, bShiftR = 0, aShiftR = 0;
+            unsigned rMask = ddsd.ddpfPixelFormat_.dwRBitMask_;
+            unsigned gMask = ddsd.ddpfPixelFormat_.dwGBitMask_;
+            unsigned bMask = ddsd.ddpfPixelFormat_.dwBBitMask_;
+            unsigned aMask = ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_;
+            ADJUSTSHIFT(rMask, rShiftL, rShiftR)
+            ADJUSTSHIFT(gMask, gShiftL, gShiftR)
+            ADJUSTSHIFT(bMask, bShiftL, bShiftR)
+            ADJUSTSHIFT(aMask, aShiftL, aShiftR)
+            
+            SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
+            SetMemoryUse(numPixels * 4);
+            
+            switch (sourcePixelByteSize)
+            {
+            case 4:
+                {
+                    unsigned* src = (unsigned*)data_.Get();
+                    unsigned char* dest = rgbaData.Get();
+                    
+                    while (numPixels--)
+                    {
+                        unsigned pixels = *src++;
+                        *dest++ = ((pixels & rMask) << rShiftL) >> rShiftR;
+                        *dest++ = ((pixels & gMask) << gShiftL) >> gShiftR;
+                        *dest++ = ((pixels & bMask) << bShiftL) >> bShiftR;
+                        *dest++ = ((pixels & aMask) << aShiftL) >> aShiftR;
+                    }
+                }
+                break;
+                
+            case 3:
+                {
+                    unsigned char* src = data_.Get();
+                    unsigned char* dest = rgbaData.Get();
+                    
+                    while (numPixels--)
+                    {
+                        unsigned pixels = src[0] | (src[1] << 8) | (src[2] << 16);
+                        src += 3;
+                        *dest++ = ((pixels & rMask) << rShiftL) >> rShiftR;
+                        *dest++ = ((pixels & gMask) << gShiftL) >> gShiftR;
+                        *dest++ = ((pixels & bMask) << bShiftL) >> bShiftR;
+                        *dest++ = ((pixels & aMask) << aShiftL) >> aShiftR;
+                    }
+                }
+                break;
+                
+            default:
+                {
+                    unsigned short* src = (unsigned short*)data_.Get();
+                    unsigned char* dest = rgbaData.Get();
+                    
+                    while (numPixels--)
+                    {
+                        unsigned short pixels = *src++;
+                        *dest++ = ((pixels & rMask) << rShiftL) >> rShiftR;
+                        *dest++ = ((pixels & gMask) << gShiftL) >> gShiftR;
+                        *dest++ = ((pixels & bMask) << bShiftL) >> bShiftR;
+                        *dest++ = ((pixels & aMask) << aShiftL) >> aShiftR;
+                    }
+                }
+                break;
+            }
+            
+            // Replace with converted data
+            data_ = rgbaData;
+        }
     }
     else if (fileID == "\253KTX")
     {
@@ -680,7 +781,7 @@ bool Image::FlipHorizontal()
     {
         if (compressedFormat_ > CF_DXT5)
         {
-            LOGERROR("FlipHorizontal not yet implemented for other compressed formats than DXT1,3,5");
+            LOGERROR("FlipHorizontal not yet implemented for other compressed formats than RGBA & DXT1,3,5");
             return false;
         }
         
@@ -1345,7 +1446,45 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     level.height_ = height_;
     level.depth_ = depth_;
 
-    if (compressedFormat_ < CF_PVRTC_RGB_2BPP)
+    if (compressedFormat_ == CF_RGBA)
+    {
+        level.blockSize_ = 4;
+        unsigned i = 0;
+        unsigned offset = 0;
+
+        for (;;)
+        {
+            if (!level.width_)
+                level.width_ = 1;
+            if (!level.height_)
+                level.height_ = 1;
+            if (!level.depth_)
+                level.depth_ = 1;
+
+            level.rowSize_ = level.width_ * level.blockSize_;
+            level.rows_ = level.height_;
+            level.data_ = data_.Get() + offset;
+            level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
+
+            if (offset + level.dataSize_ > GetMemoryUse())
+            {
+                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                    " Datasize: " + String(GetMemoryUse()));
+                level.data_ = 0;
+                return level;
+            }
+
+            if (i == index)
+                return level;
+
+            offset += level.dataSize_;
+            level.width_ /= 2;
+            level.height_ /= 2;
+            level.depth_ /= 2;
+            ++i;
+        }
+    }
+    else if (compressedFormat_ < CF_PVRTC_RGB_2BPP)
     {
         level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
         unsigned i = 0;

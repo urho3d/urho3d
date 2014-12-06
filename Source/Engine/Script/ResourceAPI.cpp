@@ -154,6 +154,18 @@ static bool ImageLoadColorLUTVectorBuffer(VectorBuffer& buffer, Image* ptr)
 
 static void RegisterImage(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("CompressedFormat");
+    engine->RegisterEnumValue("CompressedFormat", "CF_NONE", 0);
+    engine->RegisterEnumValue("CompressedFormat", "CF_RGBA", 1);
+    engine->RegisterEnumValue("CompressedFormat", "CF_DXT1", 2);
+    engine->RegisterEnumValue("CompressedFormat", "CF_DXT3", 3);
+    engine->RegisterEnumValue("CompressedFormat", "CF_DXT5", 4);
+    engine->RegisterEnumValue("CompressedFormat", "CF_ETC1", 5);
+    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGB_2BPP", 6);
+    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGBA_2BPP", 7);
+    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGB_4BPP", 8);
+    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGBA_4BPP", 9);
+    
     RegisterResource<Image>(engine, "Image");
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
@@ -183,6 +195,8 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "int get_depth() const", asMETHOD(Image, GetDepth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_components() const", asMETHOD(Image, GetComponents), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool get_compressed() const", asMETHOD(Image, IsCompressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "CompressedFormat get_compressedFormat() const", asMETHOD(Image, GetCompressedFormat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint get_numCompressedLevels() const", asMETHOD(Image, GetNumCompressedLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHOD(Image, GetSubimage), asCALL_THISCALL);
 }
 

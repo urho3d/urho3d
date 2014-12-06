@@ -947,6 +947,11 @@ void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat
 {
     switch (format)
     {
+    case CF_RGBA:
+        for (unsigned i = 0; i < 4; ++i)
+            dest[i] = src[i];
+        break;
+        
     case CF_DXT1:
         for (unsigned i = 0; i < 4; ++i)
         {

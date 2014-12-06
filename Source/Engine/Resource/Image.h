@@ -36,6 +36,7 @@ static const int COLOR_LUT_SIZE = 16;
 enum CompressedFormat
 {
     CF_NONE = 0,
+    CF_RGBA,
     CF_DXT1,
     CF_DXT3,
     CF_DXT5,
