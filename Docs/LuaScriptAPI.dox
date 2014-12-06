@@ -2331,7 +2331,6 @@ Methods:
 - bool IsCompressed() const
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
-- CompressedLevel GetCompressedLevel(unsigned index) const
 - Image* GetSubimage(const IntRect& rect) const
 
 Properties:
@@ -6729,6 +6728,7 @@ Properties:
 ### CompressedFormat
 
 - int CF_NONE
+- int CF_RGBA
 - int CF_DXT1
 - int CF_DXT3
 - int CF_DXT5

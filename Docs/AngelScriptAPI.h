@@ -4413,12 +4413,16 @@ uint components;
 /* readonly */
 bool compressed;
 /* readonly */
+CompressedFormat compressedFormat;
+/* readonly */
 int depth;
 /* readonly */
 int height;
 /* readonly */
 uint memoryUse;
 String name;
+/* readonly */
+uint numCompressedLevels;
 /* readonly */
 int refs;
 /* readonly */
@@ -11882,6 +11886,20 @@ CMP_LESS,
 CMP_LESSEQUAL,
 CMP_GREATER,
 CMP_GREATEREQUAL,
+};
+
+enum CompressedFormat
+{
+CF_NONE,
+CF_RGBA,
+CF_DXT1,
+CF_DXT3,
+CF_DXT5,
+CF_ETC1,
+CF_PVRTC_RGB_2BPP,
+CF_PVRTC_RGBA_2BPP,
+CF_PVRTC_RGB_4BPP,
+CF_PVRTC_RGBA_4BPP,
 };
 
 enum ConstraintType
