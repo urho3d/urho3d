@@ -420,11 +420,9 @@ void UIImage::UpdateVerticesFilledMode()
 void UIImage::UpdateVerticesFilledModeRadial()
 {
     float angle = 360.0f * fillAmount_;
-
-    // When angle too small
     if (angle < 1.0f)
         return;
-
+    
     float x = uiRect_->GetX();
     float y = uiRect_->GetY();
     float left = uiRect_->GetLeft();
@@ -463,7 +461,7 @@ void UIImage::UpdateVerticesFilledModeRadial()
     // 2----1----5
     // | \a1|   /|
     // |  \ | /  |
-    // |    0    | 
+    // |    0    |
     // |  /   \  |
     // |/       \|
     // 3---------4
@@ -562,7 +560,6 @@ void UIImage::AddQuad(float left, float right, float top, float bottom, float uL
     if (right - left <= 0.005f || top - bottom <= 0.005f)
         return;
 
-    
     // V1---------V2
     // |         / |
     // |       /   |
