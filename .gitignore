@@ -1,7 +1,3 @@
-# Build directories
-Build/
-*-Build/
-
 # Output directories
 Bin/*
 !Bin/**/
@@ -11,9 +7,7 @@ Bin/*.app/
 Bin/*.app.dSYM/
 Bin/Data/LuaScripts/jit/
 Bin/Screenshots
-*-Bin/
 Lib/
-*-Lib/
 
 # Compiled shaders
 *.vs2
@@ -43,17 +37,17 @@ Source/.settings
 # Qt Creator project settings
 Source/CMakeLists.txt.user
 
-# Android in-the-source project settings
-Source/Android/project.properties
-Source/Android/local.properties
-Source/Android/proguard-project.txt
+# Android non out-of-source project settings
+Android/project.properties
+Android/local.properties
+Android/proguard-project.txt
 
-# Android in-the-source build and output directories
-Source/Android/Engine
-Source/Android/ThirdParty
-Source/Android/libs
+# Android non out-of-source build and output directories
+Android/Engine
+Android/ThirdParty
+Android/libs
 
-# Android in-the-source CMake build files
+# Non out-of-source CMake generated build files
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
@@ -61,7 +55,7 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
-# GCC PCH files that are some-how ending up in the Source tree instead of the Build directory
+# GCC PCH files
 *.gch
 
 # Misc.

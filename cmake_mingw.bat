@@ -20,10 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@echo off
-pushd %~dp0
-cmake -E make_directory Build
-echo on
-@set "OPT="
-cmake -E chdir Build cmake %OPT% -G "MinGW Makefiles" %* ..\Source
-@popd
+@%~dp0\cmake_generic.bat %* -G "MinGW Makefiles"

@@ -21,6 +21,6 @@
 # THE SOFTWARE.
 #
 
-$( dirname $0 )/cmake_gcc.sh codeblocks $@
+$(dirname $0)/cmake_generic.sh $@ -G "CodeBlocks - Unix Makefiles"
 
 # vi: set ts=4 sw=4 expandtab:

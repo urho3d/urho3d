@@ -21,40 +21,6 @@
 # THE SOFTWARE.
 #
 
-# Ensure we are in project root directory
-cd $( dirname $0 )
-
-# Create out-of-source build directory
-SOURCE=`pwd`/Source
-BUILD=Build
-if [ "$1" == "-DIOS=1" ]; then
-    BUILD=ios-Build
-fi
-cmake -E make_directory $BUILD
-
-# Create project with the Xcode generator
-OPT=
-cmake -E chdir $BUILD cmake $OPT -G "Xcode" $@ $SOURCE
-
-# Temporary fix: can be removed when CMake minimum required has reached 2.8.12
-if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make ]; then
-    # Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
-    # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
-    # Since version 2.8.12 CMake does not generate XCODE_DEPEND_HELPER.make script anymore, so we skip this fix when the script does not exist
-    sed -i '' 's/\/Contents\/MacOS//g' $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make
-fi
-
-# Temporary fix: known CMake bug (still exists in 2.8.12)
-if [ "$1" == "-DIOS=1" -a -e $BUILD/CMakeScripts/install_postBuildPhase.makeDebug ]; then
-    # Due to a bug in the CMake/Xcode generator that prevents iOS targets (library and bundle) to be installed correctly
-    # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
-    # below temporary fix is required to work around the bug
-    sed -i '' 's/$(EFFECTIVE_PLATFORM_NAME)//g' $BUILD/CMakeScripts/install_postBuildPhase.make*
-fi
-
-# Set Xcode build settings to skip dSYM file generation for Debug configuration (other configurations still use the default dwarf-with-dsym)
-if [ "$1" == "-DIOS=1" -a -e $BUILD/*.xcodeproj/project.pbxproj ] && perl -v >/dev/null 2>&1; then
-    perl -i -pe 'BEGIN {$/=undef} s/(Begin XCBuildConfiguration.*?Debug.*?Settings = {\n)/\1DEBUG_INFORMATION_FORMAT = dwarf;\n/s' $BUILD/*.xcodeproj/project.pbxproj
-fi
+$(dirname $0)/cmake_generic.sh $@ -G Xcode
 
 # vi: set ts=4 sw=4 expandtab:

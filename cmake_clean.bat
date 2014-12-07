@@ -21,16 +21,17 @@
 ::
 
 @echo off
-pushd %~dp0
 
-:: Clean all the CMake cache
-if exist Build\CMakeCache.txt. del /F Build\CMakeCache.txt
-if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
-if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
+:: Clean the CMake cache and CMake generated files
+set "BUILD="
+if not "%~1" == "" if exist "%~1\CMakeCache.txt" set "BUILD=%~1"
+if "%BUILD%" == "" if exist "%cd%\CMakeCache.txt" (set "BUILD=%cd%") else (goto :error)
+del /F "%BUILD%\CMakeCache.txt"
+if exist "%BUILD%\CMakeFiles" rd /S /Q "%BUILD%\CMakeFiles"
+cmake -E touch "%BUILD%\CMakeCache.txt"
 
-:: Clean CMakeFiles directories
-if exist Build\CMakeFiles. rd /S /Q Build\CMakeFiles
-if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
-if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
-
-popd
+goto :eof
+:error
+echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself
+exit /B 1
+:eof

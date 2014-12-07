@@ -20,4 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@%~dp0\cmake_vs2008.bat VERSION=12 %*
+@%~dp0\cmake_generic.bat %* -VS=12
