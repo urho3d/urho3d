@@ -58,9 +58,9 @@ static const char* uiFillTypes[] =
 UIImage::UIImage(Context* context) :
     Drawable2D(context),
     color_(Color::WHITE),
-    drawMode_(UIIDM_SIMPLE),
-    xSliceSize_(4),
-    ySliceSize_(4),
+    drawMode_(UIDM_SIMPLE),
+    horizontalSliceSize_(0),
+    verticalSliceSize_(0),
     fillType_(UIFT_HORIZONTAL),
     fillAmount_(1.0f),
     fillInverse_(false)
@@ -78,9 +78,9 @@ void UIImage::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE("Draw Mode", GetDrawMode, SetDrawMode, UIImageDrawMode, uiImageDrawModes, UIIDM_SIMPLE, AM_FILE);
-    ACCESSOR_ATTRIBUTE("X Slice Size", GetXSliceSize, SetXSliceSize, int, 4, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Y Slice Size", GetYSliceSize, SetYSliceSize, int, 4, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Draw Mode", GetDrawMode, SetDrawMode, UIDrawMode, uiImageDrawModes, UIDM_SIMPLE, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Horizontal Slice Size", GetHorizontalSliceSize, SetHorizontalSliceSize, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Vertical Slice Size", GetVerticalSliceSize, SetVerticalSliceSize, int, 0, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE("Fill Type", GetFillType, SetFillType, UIFillType, uiFillTypes, UIFT_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE("Fill Amount", GetFillAmount, SetFillAmount, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE("Fill Inverse", IsFillInverse, SetFillInverse, bool, false, AM_FILE);
@@ -107,7 +107,7 @@ void UIImage::SetColor(const Color& color)
     verticesDirty_ = true;
 }
 
-void UIImage::SetDrawMode(UIImageDrawMode mode)
+void UIImage::SetDrawMode(UIDrawMode mode)
 {
     if (mode == drawMode_)
         return;
@@ -116,25 +116,25 @@ void UIImage::SetDrawMode(UIImageDrawMode mode)
     verticesDirty_ = true;
 }
 
-void UIImage::SetXSliceSize(int size)
+void UIImage::SetHorizontalSliceSize(int size)
 {
-    if (size < 0 || size == xSliceSize_)
+    if (size < 0 || size == horizontalSliceSize_)
         return;
 
-    xSliceSize_ = size;
+    horizontalSliceSize_ = size;
 
-    if (drawMode_ == UIIDM_SLICED)
+    if (drawMode_ == UIDM_SLICED)
         verticesDirty_ = true;
 }
 
-void UIImage::SetYSliceSize(int size)
+void UIImage::SetVerticalSliceSize(int size)
 {
-    if (size < 0 || size == ySliceSize_)
+    if (size < 0 || size == verticalSliceSize_)
         return;
 
-    ySliceSize_ = size;
+    verticalSliceSize_ = size;
 
-    if (drawMode_ == UIIDM_SLICED)
+    if (drawMode_ == UIDM_SLICED)
         verticesDirty_ = true;
 }
 
@@ -145,7 +145,7 @@ void UIImage::SetFillType(UIFillType fillType)
 
     fillType_ = fillType;
 
-    if (drawMode_ == UIIDM_FILLED)
+    if (drawMode_ == UIDM_FILLED)
         verticesDirty_ = true;
 }
 
@@ -158,7 +158,7 @@ void UIImage::SetFillAmount(float amount)
 
     fillAmount_ = amount;
 
-    if (drawMode_ == UIIDM_FILLED)
+    if (drawMode_ == UIDM_FILLED)
         verticesDirty_ = true;
 }
 
@@ -169,7 +169,7 @@ void UIImage::SetFillInverse(bool inverse)
 
     fillInverse_ = inverse;
 
-    if (drawMode_ == UIIDM_FILLED)
+    if (drawMode_ == UIDM_FILLED)
         verticesDirty_ = true;
 }
 
@@ -237,16 +237,16 @@ void UIImage::UpdateVertices()
 
     switch (drawMode_)
     {
-    case UIIDM_SIMPLE:
+    case UIDM_SIMPLE:
         UpdateVerticesSimpleMode();
         break;
-    case UIIDM_TILED:
+    case UIDM_TILED:
         UpdateVerticesTiledMode();
         break;
-    case UIIDM_SLICED:
+    case UIDM_SLICED:
         UpdateVerticesSlicedMode();
         break;
-        case UIIDM_FILLED:
+        case UIDM_FILLED:
         UpdateVerticesFilledMode();
         break;
     }
@@ -318,7 +318,7 @@ void UIImage::UpdateVerticesTiledMode()
 
 void UIImage::UpdateVerticesSlicedMode()
 {
-    if (xSliceSize_ == 0 && ySliceSize_ == 0)
+    if (horizontalSliceSize_ == 0 && verticalSliceSize_ == 0)
     {
         float left = uiRect_->GetLeft();
         float right = uiRect_->GetRight();
@@ -333,8 +333,8 @@ void UIImage::UpdateVerticesSlicedMode()
     }
 
     const IntRect& intRect = sprite_->GetRectangle();
-    int xSliceSize = Min(xSliceSize_, intRect.Width() / 2);
-    int ySliceSize = Min(ySliceSize_, intRect.Height() / 2);
+    int xSliceSize = Min(horizontalSliceSize_, intRect.Width() / 2);
+    int ySliceSize = Min(verticalSliceSize_, intRect.Height() / 2);
 
     float left = uiRect_->GetLeft();
     float right = uiRect_->GetRight();

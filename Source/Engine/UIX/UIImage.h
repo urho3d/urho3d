@@ -31,12 +31,12 @@ class Sprite2D;
 class UIRect;
 
 /// UI image draw mode.
-enum UIImageDrawMode
+enum UIDrawMode
 {
-    UIIDM_SIMPLE = 0,
-    UIIDM_TILED,
-    UIIDM_SLICED,
-    UIIDM_FILLED,
+    UIDM_SIMPLE = 0,
+    UIDM_TILED,
+    UIDM_SLICED,
+    UIDM_FILLED,
 };
 
 /// UI image fill type.
@@ -65,11 +65,11 @@ public:
     /// Set color.
     void SetColor(const Color& color);
     /// Set draw mode.
-    void SetDrawMode(UIImageDrawMode mode);
-    /// Set X slice size (for sliced mode).
-    void SetXSliceSize(int size);
-    /// Set Y slice size (for sliced mode).
-    void SetYSliceSize(int size);
+    void SetDrawMode(UIDrawMode mode);
+    /// Set horizontal slice size (for sliced mode).
+    void SetHorizontalSliceSize(int size);
+    /// Set vertical slice size (for sliced mode).
+    void SetVerticalSliceSize(int size);
     /// Set fill type (for fill mode).
     void SetFillType(UIFillType fillType);
     /// Set fill amount (for fill mode).
@@ -82,11 +82,11 @@ public:
     /// Return color.
     const Color& GetColor() const { return color_; }
     /// Return draw mode.
-    UIImageDrawMode GetDrawMode() const { return drawMode_; }
-    /// Return X slice size (for sliced mode).
-    int GetXSliceSize() const { return xSliceSize_;}
-    /// Return Y slice size (for sliced mode).
-    int GetYSliceSize() const { return ySliceSize_;}
+    UIDrawMode GetDrawMode() const { return drawMode_; }
+    /// Return horizontal slice size (for sliced mode).
+    int GetHorizontalSliceSize() const { return horizontalSliceSize_;}
+    /// Return vertical slice size (for sliced mode).
+    int GetVerticalSliceSize() const { return verticalSliceSize_;}
     /// Return fill type (for filled mode).
     UIFillType GetFillType() const { return fillType_; }
     /// Return fill amount (for fill mode).
@@ -130,11 +130,11 @@ private:
     /// Color.
     Color color_;
     /// Draw mode.
-    UIImageDrawMode drawMode_;
+    UIDrawMode drawMode_;
     /// X slice size.
-    int xSliceSize_;
+    int horizontalSliceSize_;
     /// Y slice size.
-    int ySliceSize_;
+    int verticalSliceSize_;
     /// Fill type.
     UIFillType fillType_;
     /// Fill amount.
