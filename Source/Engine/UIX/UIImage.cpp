@@ -419,6 +419,12 @@ void UIImage::UpdateVerticesFilledMode()
 
 void UIImage::UpdateVerticesFilledModeRadial()
 {
+    float angle = 360.0f * fillAmount_;
+
+    // When angle too small
+    if (angle < 1.0f)
+        return;
+
     float x = uiRect_->GetX();
     float y = uiRect_->GetY();
     float left = uiRect_->GetLeft();
@@ -433,149 +439,109 @@ void UIImage::UpdateVerticesFilledModeRadial()
     float u = (uLeft + uRight) * 0.5f;
     float v = (vTop + vBottom) * 0.5f;
 
-    // 5----1----2
-    // | \  |a1 /|
+    // Calculate vertex
+    float realAngle = fillInverse_ ? -angle : angle;
+    float s = Sin(realAngle);
+    float c = Cos(realAngle);
+
+    float width = uiRect_->GetWidth();
+    float height = uiRect_->GetHeight();
+    float halfWidth = width * 0.5f;
+    float halfHeight = height * 0.5f;
+
+    float dx = -halfHeight * s / Max(Abs(c), M_EPSILON);
+    dx = Clamp(dx, -halfWidth, halfWidth);
+
+    float dy = halfWidth * c / Max(Abs(s), M_EPSILON);
+    dy = Clamp(dy, -halfHeight, halfHeight);
+
+    Vertex2D vertex;
+    vertex.position_ = Vector3(x + dx, y + dy);
+    vertex.color_ = color;
+    vertex.uv_ = Vector2(uLeft + (uRight - uLeft) /  width * (vertex.position_.x_ - left), vBottom + (vTop - vBottom) / height * (vertex.position_.y_ - bottom));
+
+    // 2----1----5
+    // | \a1|   /|
     // |  \ | /  |
     // |    0    | 
     // |  /   \  |
     // |/       \|
-    // 4---------3
+    // 3---------4
     Vertex2D vertices[6] = 
     {
         { Vector3(x    , y     ),  color, Vector2(u     , v      ) }, // 0
         { Vector3(x    , top   ),  color, Vector2(u     , vTop   ) }, // 1
-        { Vector3(right, top   ),  color, Vector2(uRight, vTop   ) }, // 2
-        { Vector3(right, bottom),  color, Vector2(uRight, vBottom) }, // 3
-        { Vector3(left , bottom),  color, Vector2(uLeft , vBottom) }, // 4
-        { Vector3(left , top   ),  color, Vector2(uLeft , vTop   ) }, // 5
+        { Vector3(left , top   ),  color, Vector2(uLeft , vTop   ) }, // 2
+        { Vector3(left , bottom),  color, Vector2(uLeft , vBottom) }, // 3
+        { Vector3(right, bottom),  color, Vector2(uRight, vBottom) }, // 4
+        { Vector3(right, top   ),  color, Vector2(uRight, vTop   ) }, // 5
     };
+    
+    // Swap vertices when fillInverse_ is true
+    if (fillInverse_)
+    {
+        Swap(vertices[2], vertices[5]);
+        Swap(vertices[3], vertices[4]);
+    }
 
-    float angle = 360.0f * fillAmount_;
-    float width = uiRect_->GetWidth();
-    float height = uiRect_->GetHeight();
+    // Calculate value of a1
     float angle1 = Atan2(width, height);
+
+    // Begin build quad0
+    vertices_.Push(vertices[0]);
+    vertices_.Push(vertices[1]);
 
     if (angle <= angle1)
     {
-        float x1 = height * 0.5f * Tan(angle);
-        if (fillInverse_)
-            x1 = x + x1;
-        else
-            x1 = x - x1;
-        float u1 = uLeft + (uRight - uLeft) /  width * (x1 - left);
-        Vertex2D vertex = {Vector3(x1, top), color, Vector2(u1, vTop) };
-        vertices_.Push(vertices[0]);
-        vertices_.Push(vertices[1]);
         vertices_.Push(vertex);
         vertices_.Push(vertex);
+
+        // End build quad0 (v0, v1, vertex, vertex)
         return;
     }
 
     if (angle <= 180.0f - angle1)
     {
-        float y1 = y + width * 0.5f * Tan(90.0f - angle);
-        float v1 = vBottom + (vTop - vBottom) / height * (y1 - bottom);
-        vertices_.Push(vertices[0]);
-        vertices_.Push(vertices[1]);
-        if (fillInverse_)
-        {
-            Vertex2D vertex = { Vector3(right, y1), color, Vector2(uRight, v1) };
-            vertices_.Push(vertices[2]);
-            vertices_.Push(vertex);
-        }
-        else
-        {
-            Vertex2D vertex = { Vector3(left, y1), color, Vector2(uLeft, v1) };
-            vertices_.Push(vertices[5]);
-            vertices_.Push(vertex);
-        }
+        vertices_.Push(vertices[2]);
+        vertices_.Push(vertex);
+        // End build quad0 (v0, v1, v2, vertex)
         return;
     }
-    
+
+    vertices_.Push(vertices[2]);
+    vertices_.Push(vertices[3]);
+    // End build quad0 (v0, v1, v2, v3)
+
+    // Begin build quad1
     vertices_.Push(vertices[0]);
-    vertices_.Push(vertices[1]);
-    if (fillInverse_)
-    {
-        vertices_.Push(vertices[2]);
-        vertices_.Push(vertices[3]);
-    }
-    else
-    {
-        vertices_.Push(vertices[5]);
-        vertices_.Push(vertices[4]);
-    }
+    vertices_.Push(vertices[3]);
 
     if (angle <= 180.0f + angle1)
     {
-        float x1 = height * 0.5f * Tan(180.0f - angle);
-        if (fillInverse_)
-            x1 = x + x1;
-        else
-            x1 = x - x1;
-        float u1 = uLeft + (uRight - uLeft) /  width * (x1 - left);
-        Vertex2D vertex = { Vector3(x1, bottom), color, Vector2(u1, vBottom) };
-        vertices_.Push(vertices[0]);
-        if (fillInverse_)
-            vertices_.Push(vertices[3]);
-        else
-            vertices_.Push(vertices[4]);
         vertices_.Push(vertex);
         vertices_.Push(vertex);
+        // End build quad1 (v0, v3, vertex, vertex)
         return;
     }
+
+    vertices_.Push(vertices[4]);
 
     if (angle <= 360.0f - angle1)
     {
-        float y1 = y + width * 0.5f * Tan(angle - 270.0f);
-        float v1 = vBottom + (vTop - vBottom) / height * (y1 - bottom);
-        if (fillInverse_)
-        {
-            Vertex2D vertex = { Vector3(left, y1), color, Vector2(uLeft, v1) };
-            vertices_.Push(vertices[0]);
-            vertices_.Push(vertices[3]);
-            vertices_.Push(vertices[4]);
-            vertices_.Push(vertex);
-        }
-        else
-        {
-            Vertex2D vertex = { Vector3(right, y1), color, Vector2(uRight, v1) };
-            vertices_.Push(vertices[0]);
-            vertices_.Push(vertices[4]);
-            vertices_.Push(vertices[3]);
-            vertices_.Push(vertex);
-        }
+        vertices_.Push(vertex);
+        // End build quad1 (v0, v3, v4, vertex)
         return;
     }
 
-    if (fillInverse_)
-    {
-        vertices_.Push(vertices[0]);
-        vertices_.Push(vertices[3]);
-        vertices_.Push(vertices[4]);
-        vertices_.Push(vertices[5]);
-    }
-    else
-    {
-        vertices_.Push(vertices[0]);
-        vertices_.Push(vertices[4]);
-        vertices_.Push(vertices[3]);        
-        vertices_.Push(vertices[2]);
-    }
-
-    float x1 = height * 0.5f * Tan(angle - 360.0f);
-    if (fillInverse_)
-        x1 = x + x1;
-    else
-        x1 = x - x1;
-    float u1 = uLeft + (uRight - uLeft) /  width * (x1 - left);
-    Vertex2D vertex = { Vector3(x1, top), color, Vector2(u1, vTop) };
+    vertices_.Push(vertices[5]);
+    // End build quad1 (v0, v3, v4, v5)
+    
+    // Begin build quad2
     vertices_.Push(vertices[0]);
-    if (fillInverse_)
-        vertices_.Push(vertices[5]);
-    else
-        vertices_.Push(vertices[2]);
+    vertices_.Push(vertices[5]);
     vertices_.Push(vertex);
     vertices_.Push(vertex);
+    // End build quad2 (v0, v5, vertex, vertex)
 }
 
 void UIImage::GetSpriteTextureCoords(float& left, float& right, float& top, float& bottom) const
