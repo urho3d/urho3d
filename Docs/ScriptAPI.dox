@@ -6592,6 +6592,8 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- bool autoDisableChildren
+- float autoDisableThreshold
 - int baseIndent
 - StringHash baseType // readonly
 - bool bringToBack
