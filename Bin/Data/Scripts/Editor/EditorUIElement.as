@@ -533,7 +533,7 @@ void ResetDuplicateID(UIElement@ element)
         ResetDuplicateID(element.children[i]);
 }
 
-bool UIElementPaste()
+bool UIElementPaste(bool duplication = false)
 {
     ui.cursor.shape = CS_BUSY;
 
@@ -546,12 +546,26 @@ bool UIElementPaste()
     for (uint i = 0; i < uiElementCopyBuffer.length; ++i)
     {
         XMLElement rootElem = uiElementCopyBuffer[i].root;
-        if (editUIElement.LoadChildXML(rootElem, null))
+
+        UIElement@ pasteElement;
+
+        if (!duplication)
+            pasteElement = editUIElement;
+        else
         {
-            UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
+            if (editUIElement.parent !is null)
+                pasteElement = editUIElement.parent;
+            else
+                pasteElement = editUIElement;
+        }
+
+        if (pasteElement.LoadChildXML(rootElem, null))
+        {
+            UIElement@ element = pasteElement.children[pasteElement.numChildren - 1];
+
             ResetDuplicateID(element);
             UpdateHierarchyItem(element);
-            SetUIElementModified(editUIElement);
+            SetUIElementModified(pasteElement);
 
             // Create an undo action
             CreateUIElementAction action;
@@ -563,6 +577,18 @@ bool UIElementPaste()
     SaveEditActionGroup(group);
 
     suppressUIElementChanges = false;
+
+    return true;
+}
+
+bool UIElementDuplicate()
+{
+    ui.cursor.shape = CS_BUSY;
+
+    Array<XMLFile@> copy = uiElementCopyBuffer;
+    UIElementCopy();
+    UIElementPaste(true);
+    uiElementCopyBuffer = copy;
 
     return true;
 }

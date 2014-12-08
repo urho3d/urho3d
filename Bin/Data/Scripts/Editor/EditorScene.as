@@ -627,7 +627,7 @@ bool SceneCopy()
     return true;
 }
 
-bool ScenePaste()
+bool ScenePaste(bool pasteRoot = false, bool duplication = false)
 {
     ui.cursor.shape = CS_BUSY;
 
@@ -660,9 +660,28 @@ bool ScenePaste()
         }
         else if (mode == "node")
         {
-            // Make the paste go always to the root node, no matter of the selected node
             // If copied node was local, make the new local too
-            Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+            Node@ newNode;
+            // Are we pasting into the root node?
+            if (pasteRoot)
+                newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+            else
+            {
+                // If we are duplicating, paste into the selected nodes parent
+                if (duplication)
+                {
+                    if (editNode.parent !is null)
+                        newNode = editNode.parent.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+                    else
+                        newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+                }
+                // If we aren't duplicating, paste into the selected node
+                else
+                {
+                    newNode = editNode.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+                }
+            }
+
             newNode.LoadXML(rootElem);
 
             // Create an undo action
@@ -674,6 +693,25 @@ bool ScenePaste()
 
     SaveEditActionGroup(group);
     SetSceneModified();
+    return true;
+}
+
+bool SceneDuplicate()
+{
+    Array<XMLFile@> copy = sceneCopyBuffer;
+
+    if (!SceneCopy())
+    {
+        sceneCopyBuffer = copy;
+        return false;
+    }
+    if (!ScenePaste(false, true))
+    {
+        sceneCopyBuffer = copy;
+        return false;
+    }
+
+    sceneCopyBuffer = copy;
     return true;
 }
 
@@ -977,7 +1015,7 @@ void AssignMaterial(StaticModel@ model, String materialPath)
     action.Define(model, oldMaterials, material);
     SaveEditAction(action);
     SetSceneModified();
-    FocusComponent(model); 
+    FocusComponent(model);
 }
 
 void UpdateSceneMru(String filename)
