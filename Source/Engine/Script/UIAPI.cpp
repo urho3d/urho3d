@@ -323,6 +323,10 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "float get_scrollDeceleration() const", asMETHOD(ListView, GetScrollDeceleration), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_scrollSnapEpsilon(float)", asMETHOD(ListView, SetScrollSnapEpsilon), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float get_scrollSnapEpsilon() const", asMETHOD(ListView, GetScrollSnapEpsilon), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_autoDisableChildren(bool)", asMETHOD(ListView, SetAutoDisableChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool get_autoDisableChildren() const", asMETHOD(ListView, GetAutoDisableChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_autoDisableThreshold(float)", asMETHOD(ListView, SetAutoDisableThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "float get_autoDisableThreshold() const", asMETHOD(ListView, GetAutoDisableThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "uint get_numItems() const", asMETHOD(ListView, GetNumItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ get_items(uint) const", asMETHOD(ListView, GetItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_selection(uint)", asMETHOD(ListView, SetSelection), asCALL_THISCALL);

@@ -542,13 +542,15 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
         // Auto disable children
         touchDistanceSum_ += dX * dX + dY * dY;
-        if (touchDistanceSum_ >= autoDisableThreshold_)
-            if (visible_ && autoDisableChildren_ && !scrollChildrenDisable_)
+        if (autoDisableChildren_ && touchDistanceSum_ >= autoDisableThreshold_)
+        {
+            if (visible_ && !scrollChildrenDisable_)
             {
                 scrollChildrenDisable_ = true;
                 scrollPanel_->SetDeepEnabled(false);
             }
-            
+        }
+
         touchScrollSpeedMax_.x_ = dX;
         touchScrollSpeedMax_.y_ = dY;
     }
