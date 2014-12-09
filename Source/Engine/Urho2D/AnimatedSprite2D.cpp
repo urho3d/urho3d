@@ -420,7 +420,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
             node->SetEnabled(false);
         else
         {
-            node->SetEnabled(true);            
+            node->SetEnabled(true);
 
             // Calculate world transform.
             CalculateTimelineWorldTransform(i);
