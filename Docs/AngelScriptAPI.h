@@ -6912,6 +6912,7 @@ void Define(const Vector3&, const Vector3&);
 float Distance(const Vector3&) const;
 float HitDistance(const BoundingBox&) const;
 float HitDistance(const Frustum&, bool = true) const;
+float HitDistance(const Plane&) const;
 float HitDistance(const Sphere&) const;
 float HitDistance(const Vector3&, const Vector3&, const Vector3&) const;
 Vector3 Project(const Vector3&) const;
