@@ -58,19 +58,23 @@ public:
     Animation2D* GetAnimation(const String& name) const;
 
 private:
-    /// Load folders.
-    bool LoadFolders(const XMLElement& rootElem);
     /// Return sprite by folder id and file id.
     Sprite2D* GetSprite(unsigned folderId, unsigned fileId) const;
-    /// Load animation.
-    bool LoadAnimation(const XMLElement& animationElem);
+    /// Begin load scml.
+    bool BeginLoadSpriter(Deserializer &source);
+    /// Finish load scml.
+    bool EndLoadSpriter();
+    /// Load spriter folders.
+    bool LoadSpriterFolders(const XMLElement& rootElem);
+    /// Load spriter animation.
+    bool LoadSpriterAnimation(const XMLElement& animationElem);
 
     /// Sprites.
     HashMap<unsigned, SharedPtr<Sprite2D> > sprites_;
     /// Animations.
     Vector<SharedPtr<Animation2D> > animations_;
-    /// XML file used during loading.
-    SharedPtr<XMLFile> loadXMLFile_;
+    /// Spriter file.
+    SharedPtr<XMLFile> spriterFile_;
 };
 
 }

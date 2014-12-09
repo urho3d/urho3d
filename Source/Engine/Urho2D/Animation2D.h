@@ -32,45 +32,6 @@ namespace Urho3D
 class AnimationSet2D;
 class Sprite2D;
 
-/// Object type.
-enum ObjectType2D
-{
-    /// Bone.
-    OT_BONE = 0,
-    /// Sprite.
-    OT_SPRITE,
-};
-
-/// Reference.
-struct Reference2D
-{
-    /// Construct.
-    Reference2D();
-
-    /// Object type.
-    ObjectType2D type_;
-    /// Timeline.
-    int timeline_;
-    /// Z index (draw order).
-    int zIndex_;
-};
-
-/// Mainline Key.
-struct MainlineKey2D
-{
-public:
-    /// Construct.
-    MainlineKey2D();
-
-    /// Return reference by timeline.
-    const Reference2D* GetReference(int timeline) const;
-
-    /// Time.
-    float time_;
-    /// References.
-    Vector<Reference2D> references_;
-};
-
 /// 2D Transform class for spriter animation.
 struct Transform2D
 {
@@ -96,43 +57,48 @@ struct Transform2D
     Vector2 scale_;
 };
 
-/// Timeline key.
-struct TimelineKey2D
+/// 2D animation key frame.
+struct AnimationKeyFrame2D
 {
     /// Construct.
-    TimelineKey2D();
-
+    AnimationKeyFrame2D();
+    
     /// Time.
     float time_;
-    /// Spin direction.
-    int spin_;
+
+    /// Enabled (2D animation may disable node on fly).
+    bool enabled_;
+    /// Parent (2D animation may change parent on fly).
+    int parent_;
     /// Transform.
     Transform2D transform_;
+    /// Spin direction.
+    int spin_;
+
+    /// Draw order.
+    int zIndex_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
-    /// Hot spot (pivot).
-    Vector2 hotSpot_;
     /// Alpha.
     float alpha_;
+    /// Use hot spot.
+    bool useHotSpot_;
+    /// Hot spot.
+    Vector2 hotSpot_;
 };
 
-/// Timeline.
-struct Timeline2D
+/// 2D animation track.
+struct AnimationTrack2D
 {
-    /// Construct.
-    Timeline2D();
-
     /// Name.
     String name_;
-    /// Parent.
-    int parent_;
-    /// Object type.
-    ObjectType2D type_;
-    /// Object keys.
-    Vector<TimelineKey2D> timelineKeys_;
+    /// Is sprite track.
+    bool hasSprite_;
+    /// Animation key frames.
+    Vector<AnimationKeyFrame2D> keyFrames_;
 };
 
-/// Spriter animation. for more information please refer to http://www.brashmonkey.com/spriter.htm.
+/// 2D Animation.
 class URHO3D_API Animation2D : public RefCounted
 {
 public:
@@ -147,13 +113,7 @@ public:
     void SetLength(float length);
     /// Set looped.
     void SetLooped(bool looped);
-    /// Add mainline key.
-    void AddMainlineKey(const MainlineKey2D& mainlineKey);
-    /// Add timeline.
-    void AddTimeline(const Timeline2D& timeline);
-    /// Set timeline parent.
-    void SetTimelineParent(int timeline, int timelineParent);
-
+    
     /// Return animation set.
     AnimationSet2D* GetAnimationSet() const;
     /// Return name.
@@ -162,12 +122,13 @@ public:
     float GetLength() const { return length_; }
     /// Return looped.
     bool IsLooped() const { return looped_; }
-    /// Return all mainline keys.
-    const Vector<MainlineKey2D>& GetMainlineKeys() const { return mainlineKeys_; }
-    /// Return number of timelines.
-    unsigned GetNumTimelines() const { return timelines_.Size();}
-    /// Return timeline by index.
-    const Timeline2D& GetTimeline(unsigned index) const { return timelines_[index]; }
+    /// Return number of animation tracks.
+    unsigned GetNumTracks() const { return tracks_.Size(); }
+    /// Return animation track.
+    const AnimationTrack2D& GetTrack(unsigned index) const;
+
+    /// Return all animation tracks (internal use only).
+    Vector<AnimationTrack2D>& GetAllTracks() { return tracks_; }
 
 private:
     /// Animation set.
@@ -178,10 +139,8 @@ private:
     float length_;
     /// Looped.
     bool looped_;
-    /// All mainline Keys.
-    Vector<MainlineKey2D> mainlineKeys_;
-    /// All timelines.
-    Vector<Timeline2D> timelines_;
+    /// Animation tracks.
+    Vector<AnimationTrack2D> tracks_;
 };
 
 }

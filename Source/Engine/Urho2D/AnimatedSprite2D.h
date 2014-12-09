@@ -124,27 +124,22 @@ protected:
     float currentTime_;
     /// Root node.
     SharedPtr<Node> rootNode_;
-    /// Timeline nodes.
-    Vector<SharedPtr<Node> > timelineNodes_;
-    /// Transform info.
-    struct TransformInfo
+    /// Number of tracks.
+    unsigned numTracks_;
+    /// Track nodes.
+    Vector<SharedPtr<Node> > trackNodes_;
+    /// Track node info.
+    struct TrackNodeInfo
     {
-        /// Construct.
-        TransformInfo() :
-            parent_(-1),
-            worldSpace_(false)
-        {
-        }
-
-        /// Parent.
-        int parent_;
+        /// Has sprite.
+        bool hasSprite;
         /// World space.
-        bool worldSpace_;
-        /// Transform.
-        Transform2D transform_;
+        bool worldSpace;
+        /// Current value.
+        AnimationKeyFrame2D value;
     };
-    /// Timeline transform infos.
-    Vector<TransformInfo> timelineTransformInfos_;
+    /// Track node infos.
+    Vector<TrackNodeInfo> trackNodeInfos_;
 };
 
 }

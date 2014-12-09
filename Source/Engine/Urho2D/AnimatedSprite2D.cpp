@@ -52,7 +52,8 @@ AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     speed_(1.0f),
     loopMode_(LM_DEFAULT),
     looped_(false),
-    currentTime_(0.0f)
+    currentTime_(0.0f),
+    numTracks_(0)
 {
 }
 
@@ -177,7 +178,9 @@ void AnimatedSprite2D::OnNodeSet(Node* node)
             rootNode_->Remove();
 
         rootNode_ = 0;
-        timelineNodes_.Clear();
+        numTracks_ = 0;
+        trackNodes_.Clear();
+        trackNodeInfos_.Clear();
     }
 }
 
@@ -194,12 +197,12 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
     boundingBox_.Clear();
     worldBoundingBox_.Clear();
 
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        if (!timelineNodes_[i])
+        if (!trackNodes_[i])
             continue;
 
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
         if (staticSprite)
             worldBoundingBox_.Merge(staticSprite->GetWorldBoundingBox());
     }
@@ -209,36 +212,36 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
 
 void AnimatedSprite2D::OnLayerChanged()
 {
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        if (!timelineNodes_[i])
+        if (!trackNodes_[i])
             continue;
 
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
         staticSprite->SetLayer(layer_);
     }
 }
 
 void AnimatedSprite2D::OnBlendModeChanged()
 {
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        if (!timelineNodes_[i])
+        if (!trackNodes_[i])
             continue;
 
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
         staticSprite->SetBlendMode(blendMode_);
     }
 }
 
 void AnimatedSprite2D::OnFlipChanged()
 {
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        if (!timelineNodes_[i])
+        if (!trackNodes_[i])
             continue;
 
-        StaticSprite2D* staticSprite = timelineNodes_[i]->GetComponent<StaticSprite2D>();
+        StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
         staticSprite->SetFlip(flipX_, flipY_);
     }
 
@@ -262,13 +265,15 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
         return;
     }
 
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        if (timelineNodes_[i])
-            timelineNodes_[i]->SetEnabled(false);
+        if (trackNodes_[i])
+            trackNodes_[i]->SetEnabled(false);
     }
 
-    timelineNodes_.Clear();
+    numTracks_ = 0;
+    trackNodes_.Clear();
+    trackNodeInfos_.Clear();
 
     animation_ = animation;
 
@@ -283,33 +288,34 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
         rootNode_->SetTemporary(true);
     }
 
-    timelineNodes_.Resize(animation_->GetNumTimelines());
-    timelineTransformInfos_.Resize(animation_->GetNumTimelines());
+    numTracks_ = animation_->GetNumTracks();
+    trackNodes_.Resize(numTracks_);
+    trackNodeInfos_.Resize(numTracks_);
 
-    for (unsigned i = 0; i < animation_->GetNumTimelines(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        const Timeline2D& timeline = animation->GetTimeline(i);
-        SharedPtr<Node> timelineNode(rootNode_->GetChild(timeline.name_));
+        const AnimationTrack2D& track = animation->GetTrack(i);
+        SharedPtr<Node> trackNode(rootNode_->GetChild(track.name_));
 
         StaticSprite2D* staticSprite = 0;
-
-        if (timelineNode)
+        if (trackNode)
         {
-            // Enable timeline node
-            timelineNode->SetEnabled(true);
+            // Enable track node
+            trackNode->SetEnabled(true);
+            
             // Get StaticSprite2D component
-            if (timeline.type_ == OT_SPRITE)
-                staticSprite = timelineNode->GetComponent<StaticSprite2D>();
+            if (track.hasSprite_)
+                staticSprite = trackNode->GetComponent<StaticSprite2D>();
         }
         else
         {
-            // Create new timeline node
-            timelineNode = rootNode_->CreateChild(timeline.name_, LOCAL);
-            timelineNode->SetTemporary(true);
+            // Create new track node
+            trackNode = rootNode_->CreateChild(track.name_, LOCAL);
+            trackNode->SetTemporary(true);
 
             // Create StaticSprite2D component
-            if (timeline.type_ == OT_SPRITE)
-                staticSprite = timelineNode->CreateComponent<StaticSprite2D>();
+            if (track.hasSprite_)
+                staticSprite = trackNode->CreateComponent<StaticSprite2D>();
         }
 
         if (staticSprite)
@@ -320,9 +326,9 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
             staticSprite->SetUseHotSpot(true);
         }
 
-        timelineNodes_[i] = timelineNode;
+        trackNodes_[i] = trackNode;
 
-        timelineTransformInfos_[i].parent_ = timeline.parent_;
+        trackNodeInfos_[i].hasSprite = track.hasSprite_;
     }
 
     SetLoopMode(loopMode);
@@ -350,121 +356,100 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     else
         time = Clamp(currentTime_, 0.0f, animtationLength);
 
-    // Update timeline's local transform
-    for (unsigned i = 0; i < timelineTransformInfos_.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        const Timeline2D& timeline = animation_->GetTimeline(i);
+        trackNodeInfos_[i].worldSpace = false;
+        
+        const AnimationTrack2D& track = animation_->GetTrack(i);        
+        const Vector<AnimationKeyFrame2D>& keyFrames = track.keyFrames_;
 
-        const Vector<TimelineKey2D>& objectKeys = timeline.timelineKeys_;
-        unsigned index = objectKeys.Size() - 1;
-        for (unsigned j = 0; j < objectKeys.Size() - 1; ++j)
-        {
-            if (time <= objectKeys[j + 1].time_)
-            {
-                index = j;
-                break;
-            }
-        }
-
-        const TimelineKey2D& currKey = objectKeys[index];
-        if (index < objectKeys.Size() - 1)
-        {
-            const TimelineKey2D& nextKey = objectKeys[index + 1];
-            float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
-            timelineTransformInfos_[i].worldSpace_ = false;
-            timelineTransformInfos_[i].transform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
-            // Update sprite's sprite and hot spot and color
-            Node* timelineNode = timelineNodes_[i];
-            if (timelineNode)
-            {
-                StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-                if (staticSprite)
-                {
-                    staticSprite->SetSprite(currKey.sprite_);
-                    staticSprite->SetHotSpot(currKey.hotSpot_.Lerp(nextKey.hotSpot_, t));
-                    float alpha = Lerp(currKey.alpha_, nextKey.alpha_, t);
-                    staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * alpha));
-                }
-            }
-        }
+        // Time out of range
+        if (time < keyFrames[0].time_ || time > keyFrames.Back().time_)
+            trackNodeInfos_[i].value.enabled_ = false;
         else
         {
-            timelineTransformInfos_[i].worldSpace_ = false;
-            timelineTransformInfos_[i].transform_ = currKey.transform_;
-            // Update sprite's sprite and hot spot and color
-            Node* timelineNode = timelineNodes_[i];
-            if (timelineNode)
+            unsigned index = keyFrames.Size() - 1;
+            for (unsigned j = 0; j < keyFrames.Size() - 1; ++j)
             {
-                StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-                if (staticSprite)
+                if (time <= keyFrames[j + 1].time_)
                 {
-                    staticSprite->SetSprite(currKey.sprite_);
-                    staticSprite->SetHotSpot(currKey.hotSpot_);
-                    staticSprite->SetColor(Color(color_.r_, color_.g_, color_.b_, color_.a_ * currKey.alpha_));
+                    index = j;
+                    break;
                 }
+            }
+
+            const AnimationKeyFrame2D& currKey = keyFrames[index];
+            AnimationKeyFrame2D& value = trackNodeInfos_[i].value;
+
+            value.enabled_ = currKey.enabled_;
+            value.parent_ = currKey.parent_;
+
+            if (index < keyFrames.Size() - 1)
+            {
+                const AnimationKeyFrame2D& nextKey = keyFrames[index + 1];
+                float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
+                value.transform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
+
+                if (trackNodeInfos_[i].hasSprite)
+                    value.alpha_ = Urho3D::Lerp(currKey.alpha_, nextKey.alpha_, t);
+            }
+            else
+            {
+                value.transform_ = currKey.transform_;
+
+                if (trackNodeInfos_[i].hasSprite)
+                    value.alpha_ = currKey.alpha_;
+            }
+
+            if (trackNodeInfos_[i].hasSprite)
+            {
+                value.zIndex_ = currKey.zIndex_;
+                value.sprite_ = currKey.sprite_;
+                value.useHotSpot_ = currKey.useHotSpot_;
+                value.hotSpot_ = currKey.hotSpot_;
             }
         }
     }
 
-    // Calculate timeline world transform.
-    for (unsigned i = 0; i < timelineTransformInfos_.Size(); ++i)
-        CalculateTimelineWorldTransform(i);
-
-    // Get mainline key
-    const Vector<MainlineKey2D>& mainlineKeys = animation_->GetMainlineKeys();
-    const MainlineKey2D* mainlineKey = 0;
-    for (unsigned i = 1; i < mainlineKeys.Size(); ++i)
+    for (unsigned i = 0; i < numTracks_; ++i)
     {
-        if (time < mainlineKeys[i].time_)
-        {
-            mainlineKey = &mainlineKeys[i - 1];
-            break;
-        }
-    }
+        Node* node = trackNodes_[i];
+        TrackNodeInfo& nodeInfo = trackNodeInfos_[i];
 
-    if (!mainlineKey)
-        mainlineKey = &mainlineKeys.Back();
-
-    // Update node's transform and sprite's z order
-    for (unsigned i = 0; i < timelineNodes_.Size(); ++i)
-    {
-        Node* timelineNode = timelineNodes_[i];
-        if (!timelineNode)
-            continue;
-
-        const Reference2D* ref = mainlineKey->GetReference(i);
-        if (!ref)
-        {
-            // Disable node
-            if (timelineNode->IsEnabled())
-                timelineNode->SetEnabled(false);
-        }
+        if (!nodeInfo.value.enabled_)
+            node->SetEnabled(false);
         else
         {
-            // Enable node
-            if (!timelineNode->IsEnabled())
-                timelineNode->SetEnabled(true);
+            node->SetEnabled(true);            
+
+            // Calculate world transform.
+            CalculateTimelineWorldTransform(i);
 
             // Update node's transform
-            const Transform2D& transform = timelineTransformInfos_[i].transform_;
-            Vector2 position = transform.position_ * PIXEL_SIZE;
+            Vector2 position = nodeInfo.value.transform_.position_ * PIXEL_SIZE;
             if (flipX_)
                 position.x_ = -position.x_;
             if (flipY_)
                 position.y_ = -position.y_;
-            timelineNode->SetPosition(position);
+            node->SetPosition(position);
 
-            float angle = transform.angle_;
+            float angle = nodeInfo.value.transform_.angle_;
             if (flipX_ != flipY_)
                 angle = -angle;
-            timelineNode->SetRotation(angle);
+            node->SetRotation(angle);
+            node->SetScale(nodeInfo.value.transform_.scale_);
 
-            timelineNode->SetScale(transform.scale_);
-
-            // Update sprite's z order
-            StaticSprite2D* staticSprite = timelineNode->GetComponent<StaticSprite2D>();
-            if (staticSprite)
-                staticSprite->SetOrderInLayer(orderInLayer_ + ref->zIndex_);
+            if (nodeInfo.hasSprite)
+            {
+                StaticSprite2D* staticSprite = node->GetComponent<StaticSprite2D>();
+                if (staticSprite)
+                {
+                    staticSprite->SetOrderInLayer(orderInLayer_ + nodeInfo.value.zIndex_);
+                    staticSprite->SetSprite(nodeInfo.value.sprite_);
+                    staticSprite->SetUseHotSpot(nodeInfo.value.useHotSpot_);
+                    staticSprite->SetHotSpot(nodeInfo.value.hotSpot_);
+                }
+            }
         }
     }
 
@@ -473,16 +458,17 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
 
 void AnimatedSprite2D::CalculateTimelineWorldTransform(unsigned index)
 {
-    TransformInfo& info = timelineTransformInfos_[index];
-    if (info.worldSpace_)
+    TrackNodeInfo& info = trackNodeInfos_[index];
+    if (info.worldSpace)
         return;
 
-    info.worldSpace_ = true;
+    info.worldSpace = true;
 
-    if (info.parent_ != -1)
+    int parent = info.value.parent_;
+    if (parent != -1)
     {
-        CalculateTimelineWorldTransform(info.parent_);
-        info.transform_ = timelineTransformInfos_[info.parent_].transform_ * info.transform_;
+        CalculateTimelineWorldTransform(parent);
+        info.value.transform_ = trackNodeInfos_[parent].value.transform_ * info.value.transform_;
     }
 }
 
