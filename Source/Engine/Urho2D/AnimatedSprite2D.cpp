@@ -284,7 +284,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
 
     if (!rootNode_)
     {
-        rootNode_ = GetNode()->CreateChild("RootNode", LOCAL);
+        rootNode_ = GetNode()->CreateChild("_root_", LOCAL);
         rootNode_->SetTemporary(true);
     }
 
