@@ -286,7 +286,7 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
         enable = false;
 
     // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
-    #ifndef RASPI
+    #ifndef RPI
     if (enable != mouseVisible_)
     {
         mouseVisible_ = enable;

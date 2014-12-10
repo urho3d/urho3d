@@ -274,7 +274,7 @@ if (ANDROID_NDK_GDB)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
         COMMENT "Copying Urho3D library with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
 endif ()
-if (URHO3D_LIB_TYPE STREQUAL SHARED AND (ANDROID OR RASPI OR IOS))
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND (ANDROID OR RPI OR IOS))
     # Strip the output shared library for embedded devices
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
         COMMENT "Stripping Urho3D shared library")

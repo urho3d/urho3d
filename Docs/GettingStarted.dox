@@ -38,7 +38,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |Build Option         |V|Description          |
 |---------------------|-|---------------------|
 |ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
-|RASPI                |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
+|RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
 |WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only)|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only); use cmake_ios.sh as shortcut|
 |URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the installed toolchain on host system|
@@ -140,11 +140,11 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Linux native build" described above.
 
-For cross-compiling build on an Linux host system, firstly set the RASPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RASPI_ROOT environment variable to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size.
+For cross-compiling build on an Linux host system, firstly set the RPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_ROOT environment variable to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size.
 
 Execute cmake_raspi.sh then go to the build tree to execute make command. After the build is complete, the ARM executables can be found in the build tree's "Bin" subdirectory.
 
-You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DRASPI=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target Raspberry Pi device as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target Raspberry Pi device.
+You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DRPI=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target Raspberry Pi device as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target Raspberry Pi device.
 
 \section Building_MinGW MinGW cross-compile build process
 
@@ -424,9 +424,9 @@ c++ -c Urho3DPlayer.cpp `pkg-config --cflags Urho3D`
 c++ -o Urho3DPlayer Urho3DPlayer.o `pkg-config --libs Urho3D`
 
 # To cross-compile and link for Raspberry Pi platform
-export CC=${RASPI_TOOL}/arm-linux-gnueabihf-c++
-export PKG_CONFIG_SYSROOT_DIR=${RASPI_ROOT}
-export PKG_CONFIG_PATH=${RASPI_ROOT}/usr/local/lib/pkgconfig
+export CC=${RPI_TOOL}/arm-linux-gnueabihf-c++
+export PKG_CONFIG_SYSROOT_DIR=${RPI_ROOT}
+export PKG_CONFIG_PATH=${RPI_ROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
 
 # To cross-compile and link for Windows platform using MinGW cross-compiler (in Debug configuration)

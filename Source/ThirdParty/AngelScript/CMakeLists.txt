@@ -9,7 +9,7 @@ file (GLOB H_FILES
     include/*.h source/*.h
 )
 
-if (IOS OR ANDROID OR RASPI)
+if (IOS OR ANDROID OR RPI)
     enable_language (ASM)
     if (IOS)
         set (ASM_FILES source/as_callfunc_arm_xcode.S)

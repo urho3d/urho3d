@@ -27,7 +27,7 @@
 #  BCM_VC_LIBRARIES
 #
 
-if (NOT RASPI)
+if (NOT RPI)
     return ()
 endif ()
 if (BCM_VC_FOUND)

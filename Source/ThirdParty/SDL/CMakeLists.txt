@@ -49,7 +49,7 @@ elseif (ANDROID)
     )
 else ()
     # On Linux, make sure development libraries exist, and use their include file directories  
-    if (RASPI)
+    if (RPI)
         file (GLOB VIDEO_DRIVER_C_FILES src/video/raspberry/*.c src/core/linux/*.c)
     else ()
         find_package (OpenGL REQUIRED)

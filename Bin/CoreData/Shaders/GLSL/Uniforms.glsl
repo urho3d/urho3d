@@ -24,7 +24,7 @@ uniform mat4 cZone;
     uniform mat4 cLightMatrices[2];
 #endif
 #ifdef SKINNED
-    #ifdef RASPI
+    #ifdef RPI
         uniform vec4 cSkinMatrices[32*3];
     #else
         uniform vec4 cSkinMatrices[64*3];

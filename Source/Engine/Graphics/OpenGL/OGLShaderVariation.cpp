@@ -145,9 +145,9 @@ bool ShaderVariation::Create()
         #endif
     }
     
-    #ifdef RASPI
+    #ifdef RPI
     if (type_ == VS)
-        shaderCode += "#define RASPI\n";
+        shaderCode += "#define RPI\n";
     #endif
 
     // When version define found, do not insert it a second time

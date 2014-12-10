@@ -44,7 +44,7 @@ enum LightType
 static const float SHADOW_MIN_QUANTIZE = 0.1f;
 static const float SHADOW_MIN_VIEW = 1.0f;
 static const int MAX_LIGHT_SPLITS = 6;
-#if !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
+#if !defined(ANDROID) && !defined(IOS) && !defined(RPI)
 static const int MAX_CASCADE_SPLITS = 4;
 #else
 static const int MAX_CASCADE_SPLITS = 1;

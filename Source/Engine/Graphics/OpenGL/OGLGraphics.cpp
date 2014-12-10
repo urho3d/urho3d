@@ -355,7 +355,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     }
     
     // Check fullscreen mode validity (desktop only). Use a closest match if not found
-    #if !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
+    #if !defined(ANDROID) && !defined(IOS) && !defined(RPI)
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();

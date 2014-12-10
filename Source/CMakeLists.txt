@@ -83,7 +83,7 @@ if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
 endif ()
 
-if (NOT IOS AND NOT ANDROID AND NOT RASPI)
+if (NOT IOS AND NOT ANDROID AND NOT RPI)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
     else ()
