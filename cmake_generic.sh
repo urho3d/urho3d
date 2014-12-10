@@ -47,7 +47,7 @@ for a in $@; do
             ECLIPSE=1 && if xmlstarlet --version >/dev/null 2>&1; then HAS_XMLSTARLET=1; fi
             ;;
         -DIOS=1)
-            IOS=1 && OPTS="-G Xcode"
+            IOS=1
             ;;
         -DANDROID=1)
             ANDROID=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/android.toolchain.cmake"

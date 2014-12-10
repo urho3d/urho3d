@@ -451,7 +451,9 @@ def xcode_ci
 #  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
 # Temporarily create a symlink to Urho3D asset dir
-system "export ASSET_DIR=`pwd`/Bin; bash -c \"if cd ../Build/Bin 2>/dev/null; then ln -sf $ASSET_DIR/{CoreData,Data} .; fi\"" or abort 'Failed to create symlink to Urho3D asset directory'
+unless ENV['IOS']
+  system "export ASSET_DIR=`pwd`/Bin; bash -c \"mkdir -p ../Build/Bin && cd ../Build/Bin && ln -sf $ASSET_DIR/{CoreData,Data} .\"" or abort 'Failed to create symlink to Urho3D asset directory'
+end
   xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "../Build/generated/UsingSourceAndBuildTrees"
