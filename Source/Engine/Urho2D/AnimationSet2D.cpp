@@ -94,10 +94,9 @@ Animation2D* AnimationSet2D::GetAnimation(const String& name) const
     return 0;
 }
 
-Sprite2D* AnimationSet2D::GetSprite(unsigned folderId, unsigned fileId) const
+Sprite2D* AnimationSet2D::GetSprite(const StringHash& hash) const
 {
-    unsigned key = (folderId << 16) + fileId;
-    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(key);
+    HashMap<StringHash, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(hash);
     if (i != sprites_.End())
         return i->second_;
     return 0;
@@ -244,7 +243,7 @@ bool AnimationSet2D::LoadSpriterFolders(const XMLElement& rootElem)
 
                 sprite->SetHotSpot(hotSpot);
 
-                sprites_[(folderId << 16) + fileId] = sprite;
+                sprites_[StringHash((folderId << 16) + fileId)] = sprite;
             }
             else if (!hasSpriteSheet)
                 cache->BackgroundLoadResource<Sprite2D>(parentPath + fileName, true, this);
@@ -368,7 +367,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             {
                 int folder = childElem.GetUInt("folder");
                 int file = childElem.GetUInt("file");
-                key.sprite_ = GetSprite(folder, file);
+                key.sprite_ = GetSprite(StringHash((folder << 16) + file));
                 if (!key.sprite_)
                 {
                     LOGERROR("Could not find sprite");

@@ -58,8 +58,8 @@ public:
     Animation2D* GetAnimation(const String& name) const;
 
 private:
-    /// Return sprite by folder id and file id.
-    Sprite2D* GetSprite(unsigned folderId, unsigned fileId) const;
+    /// Return sprite by hash.
+    Sprite2D* GetSprite(const StringHash& hash) const;
     /// Begin load scml.
     bool BeginLoadSpriter(Deserializer &source);
     /// Finish load scml.
@@ -70,7 +70,7 @@ private:
     bool LoadSpriterAnimation(const XMLElement& animationElem);
 
     /// Sprites.
-    HashMap<unsigned, SharedPtr<Sprite2D> > sprites_;
+    HashMap<StringHash, SharedPtr<Sprite2D> > sprites_;
     /// Animations.
     Vector<SharedPtr<Animation2D> > animations_;
     /// Spriter file.
