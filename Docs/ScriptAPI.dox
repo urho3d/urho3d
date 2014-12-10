@@ -660,21 +660,21 @@ namespace Urho3D
 - %Animation %States : VariantVector
 
 ### AnimatedSprite2D
-- %Layer : int
-- %Order %in %Layer : int
-- %Blend %Mode : int
 - %Flip X : bool
 - %Flip Y : bool
 - %Color : Color
-- %Speed : float
-- %Animation %Set : ResourceRef
-- %Animation : String
-- %Loop %Mode : int
+- %Layer : int
+- %Order %in %Layer : int
+- %Blend %Mode : int
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
 - %Shadow %Mask : int
 - %Zone %Mask : int
+- %Speed : float
+- %Animation %Set : ResourceRef
+- %Animation : String
+- %Loop %Mode : int
 
 ### AnimationController
 - %Is %Enabled : bool
@@ -2404,7 +2404,9 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - float speed
+- Sprite2D@ sprite
 - bool temporary
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
@@ -5985,10 +5987,12 @@ Properties:
 - String category // readonly
 - uint components // readonly
 - bool compressed // readonly
+- CompressedFormat compressedFormat // readonly
 - int depth // readonly
 - int height // readonly
 - uint memoryUse // readonly
 - String name
+- uint numCompressedLevels // readonly
 - int refs // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -6588,6 +6592,8 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- bool autoDisableChildren
+- float autoDisableThreshold
 - int baseIndent
 - StringHash baseType // readonly
 - bool bringToBack
@@ -7637,15 +7643,25 @@ Properties:
 
 Methods:
 
+- void AddColorFrame(ColorFrame@)
+- void AddColorTime(Color&, float)
+- void AddTextureFrame(TextureFrame@)
+- void AddTextureTime(Rect&, float)
 - ColorFrame@ GetColorFrame(uint) const
 - TextureFrame@ GetTextureFrame(uint) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
+- bool Load(const XMLElement&)
+- void RemoveColorFrame(uint)
+- void RemoveTextureFrame(uint)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool Save(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetColorFrame(uint, ColorFrame@) const
-- void SetTextureFrame(uint, TextureFrame@) const
+- void SetColorFrame(uint, ColorFrame@)
+- void SetTextureFrame(uint, TextureFrame@)
+- void SortColorFrames()
+- void SortTextureFrames()
 
 Properties:
 
@@ -7661,7 +7677,7 @@ Properties:
 - Material@ material
 - Vector3 maxDirection
 - float maxEmissionRate
-- Vector3 maxParticleSize
+- Vector2 maxParticleSize
 - float maxRotation
 - float maxRotationSpeed
 - float maxTimeToLive
@@ -7675,9 +7691,9 @@ Properties:
 - float minTimeToLive
 - float minVelocity
 - String name
-- uint numColorFrames // readonly
+- uint numColorFrames
 - uint numParticles
-- uint numTextureFrames // readonly
+- uint numTextureFrames
 - int refs // readonly
 - bool relative
 - bool scaled
@@ -8151,6 +8167,7 @@ Methods:
 - float Distance(const Vector3&) const
 - float HitDistance(const BoundingBox&) const
 - float HitDistance(const Frustum&, bool = true) const
+- float HitDistance(const Plane&) const
 - float HitDistance(const Sphere&) const
 - float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
 - Vector3 Project(const Vector3&) const
@@ -12462,6 +12479,20 @@ Properties:
 - CMP_LESSEQUAL
 - CMP_GREATER
 - CMP_GREATEREQUAL
+
+
+### CompressedFormat
+
+- CF_NONE
+- CF_RGBA
+- CF_DXT1
+- CF_DXT3
+- CF_DXT5
+- CF_ETC1
+- CF_PVRTC_RGB_2BPP
+- CF_PVRTC_RGBA_2BPP
+- CF_PVRTC_RGB_4BPP
+- CF_PVRTC_RGBA_4BPP
 
 
 ### ConstraintType

@@ -264,28 +264,15 @@ Properties:
 - bool master (readonly)
 
 <a name="Class_AnimatedSprite2D"></a>
-### AnimatedSprite2D : Drawable
+### AnimatedSprite2D : StaticSprite2D
 
 Methods:
 
-- void SetLayer(int layer)
-- void SetOrderInLayer(int orderInLayer)
-- void SetBlendMode(BlendMode mode)
-- void SetFlip(bool flipX, bool flipY)
-- void SetFlipX(bool flipX)
-- void SetFlipY(bool flipY)
-- void SetColor(const Color& color)
 - void SetSpeed(float speed)
 - void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetAnimationSet(AnimationSet2D* animationSet)
 - void SetLoopMode(LoopMode2D loopMode)
-- int GetLayer() const
-- int GetOrderInLayer() const
-- BlendMode GetBlendMode() const
-- bool GetFlipX() const
-- bool GetFlipY() const
-- const Color& GetColor() const
 - float GetSpeed() const
 - const String GetAnimation() const
 - AnimationSet2D* GetAnimationSet() const
@@ -293,12 +280,6 @@ Methods:
 
 Properties:
 
-- int layer
-- int orderInLayer
-- BlendMode blendMode
-- bool flipX
-- bool flipY
-- Color& color
 - float speed
 - String animation
 - AnimationSet2D* animationSet
@@ -2350,7 +2331,6 @@ Methods:
 - bool IsCompressed() const
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
-- CompressedLevel GetCompressedLevel(unsigned index) const
 - Image* GetSubimage(const IntRect& rect) const
 
 Properties:
@@ -6461,7 +6441,7 @@ Methods:
 - View3D() (GC)
 - View3D* new()
 - void delete()
-- void SetView(Scene* scene, Camera* camera, bool ownScene = false)
+- void SetView(Scene* scene, Camera* camera, bool ownScene = true)
 - void SetFormat(unsigned format)
 - void SetAutoUpdate(bool enable)
 - void QueueUpdate()
@@ -6748,6 +6728,7 @@ Properties:
 ### CompressedFormat
 
 - int CF_NONE
+- int CF_RGBA
 - int CF_DXT1
 - int CF_DXT3
 - int CF_DXT5

@@ -211,6 +211,8 @@ public:
     
     /// Invoke event handler function.
     virtual void Invoke(VariantMap& eventData) = 0;
+    /// Return a unique copy of the event handler.
+    virtual EventHandler* Clone() const = 0;
     
     /// Return event receiver.
     Object* GetReceiver() const { return receiver_; }
@@ -261,14 +263,24 @@ public:
         (receiver->*function_)(eventType_, eventData);
     }
     
+    /// Return a unique copy of the event handler.
+    virtual EventHandler* Clone() const
+    {
+        return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
+    }
+    
 private:
     /// Class-specific pointer to handler function.
     HandlerFunctionPtr function_;
 };
 
+/// Describe an event's hash ID and begin a namespace in which to define its parameters.
 #define EVENT(eventID, eventName) static const Urho3D::StringHash eventID(#eventName); namespace eventName
+/// Describe an event's parameter hash ID. Should be used inside an event namespace.
 #define PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
+/// Convenience macro to construct an EventHandler that points to a receiver object and its member function.
 #define HANDLER(className, function) (new Urho3D::EventHandlerImpl<className>(this, &className::function))
+/// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
 #define HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
 
 }

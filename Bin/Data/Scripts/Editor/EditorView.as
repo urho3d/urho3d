@@ -153,7 +153,7 @@ class ViewportContext
         cameraPosText.textEffect = TE_SHADOW;
         cameraPosText.priority = -100;
 
-        settingsWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorViewport.xml"));
+        settingsWindow = LoadEditorUI("UI/EditorViewport.xml");
         settingsWindow.opacity = uiMaxOpacity;
         settingsWindow.visible = false;
         viewportContextUI.AddChild(settingsWindow);
@@ -948,6 +948,9 @@ void UpdateViewParameters()
 
 void CreateGrid()
 {
+    if (gridNode !is null)
+        gridNode.Remove();
+
     gridNode = Node();
     grid = gridNode.CreateComponent("CustomGeometry");
     grid.numGeometries = 1;
@@ -1397,8 +1400,9 @@ void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
         debug.AddNode(node, 1.0, false);
 
     // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
-    // components can have a large performance hit
-    if (node !is editorScene)
+    // components can have a large performance hit. Also do not draw terrain child nodes due to their large amount
+    // (TerrainPatch component itself draws nothing as debug geometry)
+    if (node !is editorScene && node.GetComponent("Terrain") is null)
     {
         for (uint j = 0; j < node.numComponents; ++j)
             node.components[j].DrawDebugGeometry(debug, false);

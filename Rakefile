@@ -136,12 +136,17 @@ task :ci_site_update do
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_rebase)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=... rake ci_rebase)
 desc 'Rebase all CI mirror branches'
 task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
-  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |branch| system "git fetch origin #{branch}:#{branch} && git rebase #{baseline} #{branch} && git push -qf -u origin #{branch} >/dev/null 2>&1" or abort "Failed to rebase #{branch} mirror branch" }
+  enable = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
+  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
+This is a mirror branch which is constantly being \"rebased\" from #{ENV['TRAVIS_BRANCH']} branch. Please DO NOT checkout from this mirror branch! The purpose of this mirror branch is to perform CI build using #{ci.split('-').first} build environment on Travis-CI.org. See #{ENV['TRAVIS_BRANCH']} branch for CI build result using Ubuntu Linux build environment.
+
+[![Build Status](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}.png?branch=#{ci_branch})](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}?branch=#{ci_branch})
+EOF" or abort "Failed to rebase #{ci_branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
@@ -232,6 +237,7 @@ EOF" or abort 'Failed to create release directory remotely'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
+  path_suffix = ENV['OS'] ? '' : 'Urho3D/'
   build_script = <<EOF
 # Set project name
 project (#{project})
@@ -253,8 +259,8 @@ endif ()
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH
     $ENV{URHO3D_HOME}/Source/CMake/Modules
-    $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules
-    ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
+    $ENV{CMAKE_PREFIX_PATH}/share/#{path_suffix}CMake/Modules
+    ${CMAKE_INSTALL_PREFIX}/share/#{path_suffix}CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
 # Include Urho3D CMake common module

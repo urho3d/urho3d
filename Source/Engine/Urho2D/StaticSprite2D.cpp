@@ -81,6 +81,9 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
     flipX_ = flipX;
     flipY_ = flipY;
     verticesDirty_ = true;
+
+    OnFlipChanged();
+
     MarkNetworkUpdate();
 }
 
@@ -270,6 +273,11 @@ void StaticSprite2D::UpdateVertices()
     vertices_.Push(vertex3);
 
     verticesDirty_ = false;
+}
+
+void StaticSprite2D::OnFlipChanged()
+{
+
 }
 
 }

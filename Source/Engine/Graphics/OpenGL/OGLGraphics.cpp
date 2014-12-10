@@ -2046,6 +2046,9 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
 {
     switch (format)
     {
+    case CF_RGBA:
+        return GL_RGBA;
+        
     case CF_DXT1:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : 0;
 

@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Animation2D.h"
-#include "Drawable.h"
+#include "StaticSprite2D.h"
 
 /// Loop mode.
 enum LoopMode2D
@@ -41,8 +41,8 @@ namespace Urho3D
 
 class AnimationSet2D;
 
-/// Spriter animation component.
-class URHO3D_API AnimatedSprite2D : public Drawable
+/// Animated sprite component, it uses to play animation created by Spriter (http://www.brashmonkey.com/).
+class URHO3D_API AnimatedSprite2D : public StaticSprite2D
 {
     OBJECT(AnimatedSprite2D);
 
@@ -57,20 +57,6 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
-    /// Set layer.
-    void SetLayer(int layer);
-    /// Set order in layer.
-    void SetOrderInLayer(int orderInLayer);
-    /// Set blend mode.
-    void SetBlendMode(BlendMode mode);
-    /// Set flip.
-    void SetFlip(bool flipX, bool flipY);
-    /// Set flip X.
-    void SetFlipX(bool flipX);
-    /// Set flip Y.
-    void SetFlipY(bool flipY);
-    /// Set color.
-    void SetColor(const Color& color);
     /// Set speed.
     void SetSpeed(float speed);
     /// Set animation by animation set, name and loop mode.
@@ -82,18 +68,6 @@ public:
     /// Set loop mode.
     void SetLoopMode(LoopMode2D loopMode);
 
-    /// Return layer.
-    int GetLayer() const { return layer_; }
-    /// Return order in layer.
-    int GetOrderInLayer() const { return orderInLayer_; }
-    /// Return blend mode.
-    BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return flip X.
-    bool GetFlipX() const { return flipX_; }
-    /// Return flip Y.
-    bool GetFlipY() const { return flipY_; }
-    /// Return color.
-    const Color& GetColor() const { return color_; }
     /// Return speed.
     float GetSpeed() const { return speed_; }
     /// Return animation name.
@@ -117,27 +91,23 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Handle layer changed.
+    virtual void OnLayerChanged();
+    /// Handle blend mode changed.
+    virtual void OnBlendModeChanged();
+    /// Handle update vertices.
+    virtual void UpdateVertices();
+    /// Handle flip changed.
+    virtual void OnFlipChanged();
     /// Set animation.
     void SetAnimation(Animation2D* animation, LoopMode2D loopMode);
     /// Update animation.
     void UpdateAnimation(float timeStep);
-    /// Calculate timeline world world transform.
+    /// Calculate time line world world transform.
     void CalculateTimelineWorldTransform(unsigned index);
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Layer.
-    int layer_;
-    /// Order in layer.
-    int orderInLayer_;
-    /// Blend mode.
-    BlendMode blendMode_;
-    /// Flip X.
-    bool flipX_;
-    /// Flip Y.
-    bool flipY_;
-    /// Color.
-    Color color_;
     /// Speed.
     float speed_;
     /// Animation set.
@@ -154,27 +124,22 @@ protected:
     float currentTime_;
     /// Root node.
     SharedPtr<Node> rootNode_;
-    /// Timeline nodes.
-    Vector<SharedPtr<Node> > timelineNodes_;
-    /// Transform info.
-    struct TransformInfo
+    /// Number of tracks.
+    unsigned numTracks_;
+    /// Track nodes.
+    Vector<SharedPtr<Node> > trackNodes_;
+    /// Track node info.
+    struct TrackNodeInfo
     {
-        /// Construct.
-        TransformInfo() :
-            parent_(-1),
-            worldSpace_(false)
-        {
-        }
-
-        /// Parent.
-        int parent_;
+        /// Has sprite.
+        bool hasSprite;
         /// World space.
-        bool worldSpace_;
-        /// Transform.
-        Transform2D transform_;
+        bool worldSpace;
+        /// Current value.
+        AnimationKeyFrame2D value;
     };
-    /// Timeline transform infos.
-    Vector<TransformInfo> timelineTransformInfos_;
+    /// Track node infos.
+    Vector<TrackNodeInfo> trackNodeInfos_;
 };
 
 }

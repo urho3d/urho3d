@@ -43,27 +43,31 @@ endif ()
 # Define all supported build options
 include (CMakeDependentOption)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
-if (NOT MSVC)
+if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
     execute_process (COMMAND echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
-    string (REGEX MATCH "#define +__x86_64__ +1" matched "${PREDEFINED_MACROS}")
-    if (NOT matched)
-        string (REGEX MATCH "#define +__aarch64__ +1" matched "${PREDEFINED_MACROS}")
-    endif ()
+    string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
     if (matched)
-        set (URHO3D_DEFAULT_64BIT TRUE)
+        set (URHO3D_DEFAULT_64BIT TRUE CACHE INTERNAL "Default value for URHO3D_64BIT build option")
+    else ()
+        set (URHO3D_DEFAULT_64BIT FALSE CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     endif ()
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
     # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
     if (NOT ANDROID)
         string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
         if (matched)
-            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too
+            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
             set (RASPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
         endif ()
     endif ()
 endif ()
-option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
+if (ANDROID OR RASPI)
+    # This build option is not available on Android and Raspberry-Pi platforms as its value is preset by the toolchain being used in the build
+    set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
+else ()
+    option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
+endif ()
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support")
 option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)")
@@ -112,7 +116,7 @@ elseif (WIN32)
     # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
     option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" TRUE)
 endif ()
-cmake_dependent_option (URHO3D_MKLINK "Use mklink command to create symbolic links (Windows Vista and above only)" FALSE "WIN32" FALSE)
+cmake_dependent_option (URHO3D_MKLINK "Use mklink command to create symbolic links (Windows Vista and above only)" FALSE "CMAKE_HOST_WIN32" FALSE)
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
 if (CMAKE_CROSSCOMPILING AND NOT ANDROID)

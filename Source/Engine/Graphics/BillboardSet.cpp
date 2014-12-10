@@ -75,6 +75,7 @@ BillboardSet::BillboardSet(Context* context) :
     bufferSizeDirty_(true),
     bufferDirty_(true),
     forceUpdate_(false),
+    sortThisFrame_(false),
     sortFrameNumber_(0),
     previousOffset_(Vector3::ZERO)
 {
@@ -156,24 +157,19 @@ void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
 
 void BillboardSet::UpdateBatches(const FrameInfo& frame)
 {
-    // Check if position relative to camera has changed, and re-sort in that case
+    // If beginning a new frame, assume no sorting first
+    if (frame.frameNumber_ != sortFrameNumber_)
+    {
+        sortThisFrame_ = false;
+        sortFrameNumber_ = frame.frameNumber_;
+    }
+    
     Vector3 worldPos = node_->GetWorldPosition();
     Vector3 offset = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
-    if (offset != previousOffset_)
-    {
-        previousOffset_ = offset;
-        if (sorted_)
-        {
-            // Sort billboards only once per frame. This means that secondary views will get
-            // the same sorting as the main view
-            if (frame.frameNumber_ != sortFrameNumber_)
-            {
-                sortFrameNumber_ = frame.frameNumber_;
-                bufferDirty_ = true;
-            }
-        }
-    }
-
+    // Sort if position relative to camera has changed
+    if (offset != previousOffset_ & sorted_)
+        sortThisFrame_ = true;
+    
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
     // Calculate scaled distance for animation LOD
@@ -198,14 +194,24 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
     if (bufferSizeDirty_ || indexBuffer_->IsDataLost())
         UpdateBufferSize();
 
-    if (bufferDirty_ || vertexBuffer_->IsDataLost())
+    if (bufferDirty_ || sortThisFrame_ || vertexBuffer_->IsDataLost())
         UpdateVertexBuffer(frame);
+    
+    // If using camera facing, re-update the rotation for the current view now
+    if (faceCameraMode_ != FC_NONE)
+    {
+        transforms_[1] = Matrix3x4(Vector3::ZERO, frame.camera_->GetFaceCameraRotation(node_->GetWorldPosition(),
+            node_->GetWorldRotation(), faceCameraMode_), Vector3::ONE);
+    }
 }
 
 UpdateGeometryType BillboardSet::GetUpdateGeometryType()
 {
-    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
+    // If using camera facing, always need some kind of geometry update, in case the billboard set is rendered from several views
+    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost() || sortThisFrame_)
         return UPDATE_MAIN_THREAD;
+    else if (faceCameraMode_ != FC_NONE)
+        return UPDATE_WORKER_THREAD;
     else
         return UPDATE_NONE;
 }
@@ -490,8 +496,13 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         return;
 
     if (sorted_)
+    {
         Sort(sortedBillboards_.Begin(), sortedBillboards_.End(), CompareBillboards);
-
+        Vector3 worldPos = node_->GetWorldPosition();
+        // Store the "last sorted position" now
+        previousOffset_ = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
+    }
+    
     float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
     if (!dest)
         return;

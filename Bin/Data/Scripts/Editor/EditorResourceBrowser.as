@@ -50,6 +50,10 @@ const int RESOURCE_TYPE_2D_PARTICLE_EFFECT = 18;
 const int RESOURCE_TYPE_TEXTURE_3D = 19;
 const int RESOURCE_TYPE_CUBEMAP = 20;
 const int RESOURCE_TYPE_PARTICLEEMITTER = 21;
+const int RESOURCE_TYPE_2D_ANIMATION_SET = 22;
+
+// any resource type > 0 is valid
+const int NUMBER_OF_VALID_RESOURCE_TYPES = 22;
 
 const StringHash XML_TYPE_SCENE("scene");
 const StringHash XML_TYPE_NODE("node");
@@ -66,6 +70,7 @@ const StringHash XML_TYPE_TEXTURE_ATLAS("TextureAtlas");
 const StringHash XML_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
 const StringHash XML_TYPE_TEXTURE_3D("texture3d");
 const StringHash XML_TYPE_CUBEMAP("cubemap");
+const StringHash XML_TYPE_SPRITER_DATA("spriter_data");
 
 const StringHash BINARY_TYPE_SCENE("USCN");
 const StringHash BINARY_TYPE_PACKAGE("UPAK");
@@ -187,7 +192,7 @@ void DoResourceBrowserWork()
 
 void CreateResourceBrowserUI()
 {
-    browserWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorResourceBrowser.xml"));
+    browserWindow = LoadEditorUI("UI/EditorResourceBrowser.xml");
     browserDirList = browserWindow.GetChild("DirectoryList", true);
     browserFileList = browserWindow.GetChild("FileList", true);
     browserSearch = browserWindow.GetChild("Search", true);
@@ -196,7 +201,7 @@ void CreateResourceBrowserUI()
     // browserWindow.visible = false;
     browserWindow.opacity = uiMaxOpacity;
 
-    browserFilterWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorResourceFilterWindow.xml"));
+    browserFilterWindow = LoadEditorUI("UI/EditorResourceFilterWindow.xml");
     CreateResourceFilterUI();
     HideResourceFilterWindow();
 
@@ -227,31 +232,42 @@ void CreateResourceFilterUI()
     SubscribeToEvent(toggleAllResourceDirs, "Toggled", "HandleResourceDirFilterToggleAllTypesToggled");
     SubscribeToEvent(browserFilterWindow.GetChild("CloseButton", true), "Released", "HideResourceFilterWindow");
 
+    int columns = 2;
     UIElement@ col1 = browserFilterWindow.GetChild("TypeFilterColumn1", true);
     UIElement@ col2 = browserFilterWindow.GetChild("TypeFilterColumn2", true);
-    for (int i=-2; i < 22; ++i)
-    {
-        if (i == RESOURCE_TYPE_NOTSET)
-            continue;
 
+    // use array to get sort of items
+    Array<ResourceType@> sorted;
+    for (int i=1; i <= NUMBER_OF_VALID_RESOURCE_TYPES; ++i)
+        sorted.Push(ResourceType(i, ResourceTypeName(i)));
+        
+    // 2 unknown types are reserved for the top, the rest are alphabetized
+    sorted.Sort();
+    sorted.Insert(0, ResourceType(RESOURCE_TYPE_UNKNOWN, ResourceTypeName(RESOURCE_TYPE_UNKNOWN)) );
+    sorted.Insert(0, ResourceType(RESOURCE_TYPE_UNUSABLE,  ResourceTypeName(RESOURCE_TYPE_UNUSABLE)) );
+    int halfColumns = Ceil( float(sorted.length) / float(columns) );
+
+    for (uint i = 0; i < sorted.length; ++i)
+    {
+        ResourceType@ type = sorted[i];
         UIElement@ resourceTypeHolder = UIElement();
-        if (i < 10)
+        if (i < halfColumns)
             col1.AddChild(resourceTypeHolder);
         else
             col2.AddChild(resourceTypeHolder);
+
         resourceTypeHolder.layoutMode = LM_HORIZONTAL;
         resourceTypeHolder.layoutSpacing = 4;
 
         Text@ label = Text();
         label.style = "EditorAttributeText";
-        label.text = ResourceTypeName(i);
+        label.text = type.name;
         CheckBox@ checkbox = CheckBox();
-        checkbox.name = i;
+        checkbox.name = type.id;
         checkbox.SetStyleAuto();
         checkbox.vars[TEXT_VAR_RESOURCE_TYPE] = i;
         checkbox.checked = true;
         SubscribeToEvent(checkbox, "Toggled", "HandleResourceTypeFilterToggled");
-
 
         resourceTypeHolder.AddChild(checkbox);
         resourceTypeHolder.AddChild(label);
@@ -408,6 +424,10 @@ void HandleBrowserFileClick(StringHash eventType, VariantMap& eventData)
     else if (file.resourceType == RESOURCE_TYPE_SCRIPTFILE)
     {
         actions.Push(CreateBrowserFileActionMenu("Execute Script", "HandleBrowserRunScript", file));
+    }
+    else if (file.resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
+    {
+        actions.Push(CreateBrowserFileActionMenu("Edit", "HandleBrowserEditResource", file));
     }
 
     actions.Push(CreateBrowserFileActionMenu("Open", "HandleBrowserOpenResource", file));
@@ -842,6 +862,13 @@ void HandleBrowserEditResource(StringHash eventType, VariantMap& eventData)
         if (material !is null)
             EditMaterial(material);
     }
+
+    if (file.resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
+    {
+        ParticleEffect@ particleEffect = cache.GetResource("ParticleEffect", file.resourceKey);
+        if (particleEffect !is null)
+            EditParticleEffect(particleEffect);
+    }
 }
 
 void HandleBrowserOpenResource(StringHash eventType, VariantMap& eventData)
@@ -1047,6 +1074,8 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_TEXTURE_3D;
     else if (fileType == XML_TYPE_CUBEMAP)
         return RESOURCE_TYPE_CUBEMAP;
+    else if (fileType == XML_TYPE_SPRITER_DATA)
+        return RESOURCE_TYPE_2D_ANIMATION_SET;
 
     // extension fileTypes
     else if (fileType == EXTENSION_TYPE_TTF)
@@ -1248,6 +1277,8 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
             fileType = XML_TYPE_TEXTURE_3D;
         else if (type == XML_TYPE_CUBEMAP)
             fileType = XML_TYPE_CUBEMAP;
+        else if (type == XML_TYPE_SPRITER_DATA)
+            fileType = XML_TYPE_SPRITER_DATA;
         else
             found = false;
     }
@@ -1304,6 +1335,8 @@ String ResourceTypeName(int resourceType)
         return "Texture 3D";
     else if (resourceType == RESOURCE_TYPE_CUBEMAP)
         return "Cubemap";
+    else if (resourceType == RESOURCE_TYPE_2D_ANIMATION_SET)
+        return "2D Animation Set";
     else
         return "";
 }
@@ -1419,6 +1452,7 @@ class BrowserFile
 
 void CreateResourcePreview(String path, Node@ previewNode)
 {
+    resourceBrowserPreview.autoUpdate = false;
     int resourceType = GetResourceType(path); 
     if (resourceType > 0)
     {
@@ -1478,6 +1512,19 @@ void CreateResourcePreview(String path, Node@ previewNode)
             previewNode.RemoveAllChildren();
             previewNode.RemoveAllComponents();
         }
+        else if (resourceType == RESOURCE_TYPE_PARTICLEEFFECT)
+        {
+            ParticleEffect@ particleEffect = ParticleEffect();
+            if (particleEffect.Load(file))
+            {
+                ParticleEmitter@ particleEmitter = previewNode.CreateComponent("ParticleEmitter");
+                particleEmitter.effect = particleEffect;
+                particleEffect.activeTime = 0.0;
+                particleEmitter.Reset();
+                resourceBrowserPreview.autoUpdate = true;
+                return;
+            }
+        }
     }
 
     StaticModel@ staticModel = previewNode.CreateComponent("StaticModel");
@@ -1512,3 +1559,17 @@ void RefreshBrowserPreview()
     resourceBrowserPreview.QueueUpdate();
 }
 
+class ResourceType
+{
+    int id;
+    String name;
+    ResourceType(int id_, String name_)
+    {
+        id = id_;
+        name = name_;
+    }
+    int opCmp(ResourceType@ b)
+    {
+        return name.opCmp(b.name);
+    }
+}

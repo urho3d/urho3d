@@ -171,21 +171,21 @@ template<typename T> struct AttributeTrait
     /// Get function return type.
     typedef const T& ReturnType;
     /// Set function parameter type.
-    typedef const T& ParameterType;    
+    typedef const T& ParameterType;
 };
 
 /// Int attribute trait.
 template<> struct AttributeTrait<int>
 {
     typedef int ReturnType;
-    typedef int ParameterType;    
+    typedef int ParameterType;
 };
 
 /// unsigned attribute trait.
 template<> struct AttributeTrait<unsigned>
 {
     typedef unsigned ReturnType;
-    typedef unsigned ParameterType;    
+    typedef unsigned ParameterType;
 };
 
 /// Bool attribute trait.
@@ -199,14 +199,14 @@ template<> struct AttributeTrait<bool>
 template<> struct AttributeTrait<float>
 {
     typedef float ReturnType;
-    typedef float ParameterType;    
+    typedef float ParameterType;
 };
 
 /// Mixed attribute trait (use const reference for set function only).
 template<typename T> struct MixedAttributeTrait
 {
     typedef T ReturnType;
-    typedef const T& ParameterType; 
+    typedef const T& ParameterType;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.
@@ -247,13 +247,24 @@ public:
     SetFunctionPtr setFunction_;
 };
 
+// The following macros need to be used within a class member function such as ClassName::RegisterObject().
+// A variable called "context" needs to exist in the current scope and point to a valid Context object.
+
+/// Copy attributes from a base class.
 #define COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
+/// Remove attribute by name.
 #define REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
-#define ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, offsetof(ClassName, variable), enumNames, defaultValue, mode))
+/// Define an attribute that points to a memory offset in the object.
 #define ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName >(), name, offsetof(ClassName, variable), defaultValue, mode))
-#define ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, new Urho3D::EnumAttributeAccessorImpl<ClassName, typeName >(&ClassName::getFunction, &ClassName::setFunction), enumNames, defaultValue, mode))
+/// Define an attribute that points to a memory offset in the object, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
+#define ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, offsetof(ClassName, variable), enumNames, defaultValue, mode))
+/// Define an attribute that uses get and set functions.
 #define ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, AttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+/// Define an attribute that uses get and set functions, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
+#define ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, new Urho3D::EnumAttributeAccessorImpl<ClassName, typeName >(&ClassName::getFunction, &ClassName::setFunction), enumNames, defaultValue, mode))
+/// Define an attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
 #define MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+/// Update the default value of an already registered attribute.
 #define UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
 
 }

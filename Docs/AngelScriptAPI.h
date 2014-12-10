@@ -244,7 +244,9 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 float speed;
+Sprite2D sprite;
 bool temporary;
+Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -4411,12 +4413,16 @@ uint components;
 /* readonly */
 bool compressed;
 /* readonly */
+CompressedFormat compressedFormat;
+/* readonly */
 int depth;
 /* readonly */
 int height;
 /* readonly */
 uint memoryUse;
 String name;
+/* readonly */
+uint numCompressedLevels;
 /* readonly */
 int refs;
 /* readonly */
@@ -5103,6 +5109,8 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+bool autoDisableChildren;
+float autoDisableThreshold;
 int baseIndent;
 /* readonly */
 StringHash baseType;
@@ -6328,15 +6336,25 @@ int weakRefs;
 class ParticleEffect
 {
 // Methods:
+void AddColorFrame(ColorFrame);
+void AddColorTime(Color&, float);
+void AddTextureFrame(TextureFrame);
+void AddTextureTime(Rect&, float);
 ColorFrame GetColorFrame(uint) const;
 TextureFrame GetTextureFrame(uint) const;
 bool Load(File);
 bool Load(VectorBuffer&);
+bool Load(const XMLElement&);
+void RemoveColorFrame(uint);
+void RemoveTextureFrame(uint);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool Save(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetColorFrame(uint, ColorFrame) const;
-void SetTextureFrame(uint, TextureFrame) const;
+void SetColorFrame(uint, ColorFrame);
+void SetTextureFrame(uint, TextureFrame);
+void SortColorFrames();
+void SortTextureFrames();
 
 // Properties:
 float activeTime;
@@ -6353,7 +6371,7 @@ float inactiveTime;
 Material material;
 Vector3 maxDirection;
 float maxEmissionRate;
-Vector3 maxParticleSize;
+Vector2 maxParticleSize;
 float maxRotation;
 float maxRotationSpeed;
 float maxTimeToLive;
@@ -6368,10 +6386,8 @@ float minRotationSpeed;
 float minTimeToLive;
 float minVelocity;
 String name;
-/* readonly */
 uint numColorFrames;
 uint numParticles;
-/* readonly */
 uint numTextureFrames;
 /* readonly */
 int refs;
@@ -6896,6 +6912,7 @@ void Define(const Vector3&, const Vector3&);
 float Distance(const Vector3&) const;
 float HitDistance(const BoundingBox&) const;
 float HitDistance(const Frustum&, bool = true) const;
+float HitDistance(const Plane&) const;
 float HitDistance(const Sphere&) const;
 float HitDistance(const Vector3&, const Vector3&, const Vector3&) const;
 Vector3 Project(const Vector3&) const;
@@ -11872,6 +11889,20 @@ CMP_LESS,
 CMP_LESSEQUAL,
 CMP_GREATER,
 CMP_GREATEREQUAL,
+};
+
+enum CompressedFormat
+{
+CF_NONE,
+CF_RGBA,
+CF_DXT1,
+CF_DXT3,
+CF_DXT5,
+CF_ETC1,
+CF_PVRTC_RGB_2BPP,
+CF_PVRTC_RGBA_2BPP,
+CF_PVRTC_RGB_4BPP,
+CF_PVRTC_RGBA_4BPP,
 };
 
 enum ConstraintType

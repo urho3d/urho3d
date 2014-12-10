@@ -56,7 +56,7 @@ void CreateHierarchyWindow()
     if (hierarchyWindow !is null)
         return;
 
-    hierarchyWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorHierarchyWindow.xml"));
+    hierarchyWindow = LoadEditorUI("UI/EditorHierarchyWindow.xml");
     hierarchyList = hierarchyWindow.GetChild("HierarchyList");
     ui.root.AddChild(hierarchyWindow);
     int height = Min(ui.root.height - 60, 460);
@@ -787,6 +787,7 @@ void HandleHierarchyItemClick(StringHash eventType, VariantMap& eventData)
     {
         actions.Push(CreateContextMenuItem("Create Replicated Node", "HandleHierarchyContextCreateReplicatedNode"));
         actions.Push(CreateContextMenuItem("Create Local Node", "HandleHierarchyContextCreateLocalNode"));
+        actions.Push(CreateContextMenuItem("Duplicate", "HandleHierarchyContextDuplicate"));
         actions.Push(CreateContextMenuItem("Copy", "HandleHierarchyContextCopy"));
         actions.Push(CreateContextMenuItem("Cut", "HandleHierarchyContextCut"));
         actions.Push(CreateContextMenuItem("Delete", "HandleHierarchyContextDelete"));
@@ -1478,6 +1479,22 @@ bool Cut()
     return false;
 }
 
+bool Duplicate()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        bool ret = true;
+        if (!selectedNodes.empty || !selectedComponents.empty)
+            ret = ret && (selectedNodes.empty || selectedComponents.empty ? SceneDuplicate() : false);   // Node and component is mutually exclusive for copy action
+        // Not mutually exclusive
+        if (!selectedUIElements.empty)
+            ret = ret && UIElementDuplicate();
+        return ret;
+    }
+
+    return false;
+}
+
 bool Copy()
 {
     if (CheckHierarchyWindowFocus())
@@ -1613,6 +1630,11 @@ void HandleHierarchyContextCreateReplicatedNode()
 void HandleHierarchyContextCreateLocalNode()
 {
     CreateNode(LOCAL);
+}
+
+void HandleHierarchyContextDuplicate()
+{
+    Duplicate();
 }
 
 void HandleHierarchyContextCopy()

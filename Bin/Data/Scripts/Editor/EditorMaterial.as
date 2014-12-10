@@ -17,7 +17,7 @@ void CreateMaterialEditor()
     if (materialWindow !is null)
         return;
 
-    materialWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorMaterialWindow.xml"));
+    materialWindow = LoadEditorUI("UI/EditorMaterialWindow.xml");
     ui.root.AddChild(materialWindow);
     materialWindow.opacity = uiMaxOpacity;
 

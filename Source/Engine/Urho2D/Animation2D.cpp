@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Animation2D.h"
 #include "AnimationSet2D.h"
+#include "Log.h"
 #include "Sprite2D.h"
 
 #include "DebugNew.h"
@@ -30,22 +31,10 @@
 namespace Urho3D
 {
 
-Reference2D::Reference2D() :
-    type_(OT_BONE),
-    timeline_(0),
-    zIndex_(0)
-{
-}
-
-MainlineKey2D::MainlineKey2D() :
-    time_(0)
-{
-}
-
 Transform2D::Transform2D() :
     position_(Vector2::ZERO),
     angle_(0.0f),
-    scale_(Vector2::ONE)
+    scale_(1.0f, 1.0f)
 {
 }
 
@@ -105,27 +94,14 @@ Transform2D Transform2D::Lerp(const Transform2D& other, float t, int spin) const
     return ret;
 }
 
-const Reference2D* MainlineKey2D::GetReference(int timeline) const
-{
-    for (unsigned i = 0; i < references_.Size(); ++i)
-    {
-        if (references_[i].timeline_ == timeline)
-            return &references_[i];
-    }
-    return 0;
-}
-
-TimelineKey2D::TimelineKey2D() :
-    time_(0.0f),
-    spin_(1),
-    hotSpot_(0.0f, 1.0f),
-    alpha_(1.0f)
-{
-}
-
-Timeline2D::Timeline2D() :
+AnimationKeyFrame2D::AnimationKeyFrame2D() : 
+    time_(0.0f), 
+    enabled_(false),
     parent_(-1),
-    type_(OT_BONE)
+    spin_(1),
+    zIndex_(0),
+    alpha_(1.0f),
+    useHotSpot_(false)
 {
 }
 
@@ -155,26 +131,20 @@ void Animation2D::SetLooped(bool looped)
     looped_ = looped;
 }
 
-void Animation2D::AddMainlineKey(const MainlineKey2D& mainlineKey)
-{
-    mainlineKeys_.Push(mainlineKey);
-}
-
-void Animation2D::AddTimeline(const Timeline2D& timeline)
-{
-    timelines_.Push(timeline);
-}
-
-void Animation2D::SetTimelineParent(int timeline, int timelineParent)
-{
-    if (timeline == timelineParent)
-        return;
-    timelines_[timeline].parent_ = timelineParent;
-}
-
 AnimationSet2D* Animation2D::GetAnimationSet() const
 {
     return animationSet_;
+}
+
+const AnimationTrack2D& Animation2D::GetTrack(unsigned index) const
+{
+    if (index >= tracks_.Size())
+    {
+        LOGWARNING("Index out of range");
+        index = 0;
+    }
+
+    return tracks_[index];
 }
 
 }

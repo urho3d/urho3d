@@ -54,7 +54,12 @@ AttributeAnimationInfo::~AttributeAnimationInfo()
 
 void AttributeAnimationInfo::ApplyValue(const Variant& newValue)
 {
-    static_cast<Animatable*>(target_.Get())->OnSetAttribute(attributeInfo_, newValue);
+    Animatable* animatable = static_cast<Animatable*>(target_.Get());
+    if (animatable)
+    {
+        animatable->OnSetAttribute(attributeInfo_, newValue);
+        animatable->ApplyAttributes();
+    }
 }
 
 Animatable::Animatable(Context* context) :

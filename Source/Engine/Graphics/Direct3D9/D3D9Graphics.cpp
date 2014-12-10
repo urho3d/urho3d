@@ -2096,6 +2096,9 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
 {
     switch (format)
     {
+    case CF_RGBA:
+        return D3DFMT_A8R8G8B8;
+
     case CF_DXT1:
         return D3DFMT_DXT1;
         

@@ -139,7 +139,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         {
             for (unsigned d = 0; d < drawables_.Size(); ++d)
             {
-                if (!drawables_[d]->GetVisibility())
+                if (!drawables_[d]->GetVisibility() || drawables_[d]->GetVertices().Empty())
                     continue;
 
                 const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();

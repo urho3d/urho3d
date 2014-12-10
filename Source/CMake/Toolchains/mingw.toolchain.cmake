@@ -26,33 +26,45 @@ if (CMAKE_TOOLCHAIN_FILE)
     # Reference toolchain variable to suppress "unused variable" warning
 endif ()
 
-# Target operating system and architecture
+# this one is important
 set (CMAKE_SYSTEM_NAME Windows)
+#this one not so much
 set (CMAKE_SYSTEM_PROCESSOR x86)
 
-# Sanitate the path
+# specify the cross compiler
 file (TO_CMAKE_PATH "$ENV{MINGW_PREFIX}" MINGW_PREFIX)
-
-# C/C++ compilers
+if (NOT EXISTS ${MINGW_PREFIX}-gcc)
+    message (FATAL_ERROR "Could not find MinGW cross compilation tool. "
+        "Use MINGW_PREFIX environment variable to specify the location of the toolchain.")
+endif ()
 set (CMAKE_C_COMPILER ${MINGW_PREFIX}-gcc      CACHE PATH "C compiler")
 set (CMAKE_CXX_COMPILER ${MINGW_PREFIX}-g++    CACHE PATH "C++ compiler")
 set (CMAKE_RC_COMPILER ${MINGW_PREFIX}-windres CACHE PATH "RC compiler")
 
 # specify the system root
-file (TO_CMAKE_PATH "$ENV{MINGW_ROOT}" MINGW_ROOT)
-if (NOT MINGW_ROOT)
-    get_filename_component (MINGW_PREFIX ${MINGW_PREFIX} NAME)
-    set (MINGW_ROOT /usr/${MINGW_PREFIX}/sys-root)
+if (NOT MINGW_SYSROOT)
+    file (TO_CMAKE_PATH "$ENV{MINGW_ROOT}" MINGW_ROOT)
+    if (NOT MINGW_ROOT)
+        get_filename_component (MINGW_PREFIX ${MINGW_PREFIX} NAME)
+        if (EXISTS /usr/${MINGW_PREFIX}/sys-root)
+            # Redhat based system
+            set (MINGW_ROOT /usr/${MINGW_PREFIX}/sys-root)
+        else ()
+            # Debian based system
+            set (MINGW_ROOT /usr/${MINGW_PREFIX})
+        endif ()
+    endif ()
+    if (NOT EXISTS ${MINGW_ROOT})
+        message (FATAL_ERROR "Could not find MinGW system root. "
+            "Use MINGW_ROOT environment variable to specify the location of system root.")
+    endif ()
+    set (MINGW_SYSROOT ${MINGW_ROOT} CACHE PATH "Path to MinGW SYSROOT")
+    mark_as_advanced (MINGW_SYSROOT CMAKE_TOOLCHAIN_FILE)
+    set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
+    set (CMAKE_INSTALL_PREFIX "${MINGW_SYSROOT}/usr/local" CACHE PATH "Install path prefix, prepended onto install directories.")
 endif ()
-set (MINGW_SYSROOT ${MINGW_ROOT} CACHE PATH "Path to MinGW SYSROOT")
-set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
 
 # only search libraries and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
-# setup install destination prefix path only when cross-compiling
-if (CMAKE_CROSSCOMPILING)
-    set (CMAKE_INSTALL_PREFIX "${MINGW_SYSROOT}/usr/local" CACHE PATH "Install path prefix, prepended onto install directories.")
-endif ()

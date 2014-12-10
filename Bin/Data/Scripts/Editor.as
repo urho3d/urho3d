@@ -7,6 +7,7 @@
 #include "Scripts/Editor/EditorUIElement.as"
 #include "Scripts/Editor/EditorGizmo.as"
 #include "Scripts/Editor/EditorMaterial.as"
+#include "Scripts/Editor/EditorParticleEffect.as"
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorPreferences.as"
 #include "Scripts/Editor/EditorToolBar.as"
@@ -109,6 +110,25 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateTestAnimation(timeStep);
     UpdateGizmo();
     UpdateDirtyUI();
+
+    // Handle Particle Editor looping.
+    if (particleEffectWindow !is null and particleEffectWindow.visible)
+    {
+        if (!particleEffectEmitter.emitting)
+        {
+            if (particleResetTimer == 0.0f)
+                particleResetTimer = editParticleEffect.maxTimeToLive + 0.2f;
+            else
+            {
+                particleResetTimer = Max(particleResetTimer - timeStep, 0.0f);
+                if (particleResetTimer <= 0.0001f)
+                {
+                    particleEffectEmitter.Reset();
+                    particleResetTimer = 0.0f;
+                }
+            }
+        }
+    }
 }
 
 void HandleReloadFinished(StringHash eventType, VariantMap& eventData)

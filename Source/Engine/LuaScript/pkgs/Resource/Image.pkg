@@ -3,6 +3,7 @@ $#include "Image.h"
 enum CompressedFormat
 {
     CF_NONE = 0,
+    CF_RGBA,
     CF_DXT1,
     CF_DXT3,
     CF_DXT5,
@@ -49,7 +50,6 @@ class Image : public Resource
     bool IsCompressed() const;
     CompressedFormat GetCompressedFormat() const;
     unsigned GetNumCompressedLevels() const;
-    CompressedLevel GetCompressedLevel(unsigned index) const;
     Image* GetSubimage(const IntRect& rect) const;
 
     tolua_readonly tolua_property__get_set int width;
