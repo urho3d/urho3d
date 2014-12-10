@@ -10,8 +10,19 @@
         <attribute name="Min Size" value="0 16" />
         <attribute name="Max Size" value="2147483647 16" />
         <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="4" />
         <element type="Text">
             <attribute name="Text" value="Attribute inspector" />
+        </element>
+        <element type="Button" style="Button">
+                <attribute name="Name" value="LockButton" />
+                <attribute name="Min Size" value="16 16" />
+                <attribute name="Max Size" value="16 16" />
+                <attribute name="Layout Mode" value="Horizontal" />
+                <element type="BorderImage">
+                        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                        <attribute name="Image Rect" value="224 80 238 94" />
+                </element>
         </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />

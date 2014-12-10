@@ -99,6 +99,7 @@ bool ResetScene()
     StopSceneUpdate();
 
     UpdateWindowTitle();
+    DisableInspectorLock();
     UpdateHierarchyItem(editorScene, true);
     ClearEditActions();
 
@@ -211,6 +212,7 @@ bool LoadScene(const String&in fileName)
     editorScene.updateEnabled = false;
 
     UpdateWindowTitle();
+    DisableInspectorLock();
     UpdateHierarchyItem(editorScene, true);
     ClearEditActions();
 
