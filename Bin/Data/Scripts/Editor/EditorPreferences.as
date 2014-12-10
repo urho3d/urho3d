@@ -39,7 +39,7 @@ void CreateEditorPreferencesDialog()
     if (preferencesDialog !is null)
         return;
 
-    preferencesDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorPreferencesDialog.xml"));
+    preferencesDialog = LoadEditorUI("UI/EditorPreferencesDialog.xml");
     ui.root.AddChild(preferencesDialog);
     preferencesDialog.opacity = uiMaxOpacity;
     preferencesDialog.height = 440;

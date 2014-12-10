@@ -192,7 +192,7 @@ void DoResourceBrowserWork()
 
 void CreateResourceBrowserUI()
 {
-    browserWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorResourceBrowser.xml"));
+    browserWindow = LoadEditorUI("UI/EditorResourceBrowser.xml");
     browserDirList = browserWindow.GetChild("DirectoryList", true);
     browserFileList = browserWindow.GetChild("FileList", true);
     browserSearch = browserWindow.GetChild("Search", true);
@@ -201,7 +201,7 @@ void CreateResourceBrowserUI()
     // browserWindow.visible = false;
     browserWindow.opacity = uiMaxOpacity;
 
-    browserFilterWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorResourceFilterWindow.xml"));
+    browserFilterWindow = LoadEditorUI("UI/EditorResourceFilterWindow.xml");
     CreateResourceFilterUI();
     HideResourceFilterWindow();
 

@@ -56,7 +56,7 @@ void CreateHierarchyWindow()
     if (hierarchyWindow !is null)
         return;
 
-    hierarchyWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorHierarchyWindow.xml"));
+    hierarchyWindow = LoadEditorUI("UI/EditorHierarchyWindow.xml");
     hierarchyList = hierarchyWindow.GetChild("HierarchyList");
     ui.root.AddChild(hierarchyWindow);
     int height = Min(ui.root.height - 60, 460);

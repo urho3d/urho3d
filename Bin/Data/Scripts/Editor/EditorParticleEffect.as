@@ -18,7 +18,7 @@ void CreateParticleEffectEditor()
     if (particleEffectWindow !is null)
         return;
 
-    particleEffectWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorParticleEffectWindow.xml"));
+    particleEffectWindow = LoadEditorUI("UI/EditorParticleEffectWindow.xml");
     ui.root.AddChild(particleEffectWindow);
     particleEffectWindow.opacity = uiMaxOpacity;
 

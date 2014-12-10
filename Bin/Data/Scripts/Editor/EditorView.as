@@ -153,7 +153,7 @@ class ViewportContext
         cameraPosText.textEffect = TE_SHADOW;
         cameraPosText.priority = -100;
 
-        settingsWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorViewport.xml"));
+        settingsWindow = LoadEditorUI("UI/EditorViewport.xml");
         settingsWindow.opacity = uiMaxOpacity;
         settingsWindow.visible = false;
         viewportContextUI.AddChild(settingsWindow);

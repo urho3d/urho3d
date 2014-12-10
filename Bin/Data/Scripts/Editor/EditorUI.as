@@ -60,9 +60,9 @@ void CreateUI()
     /// \todo The console will not be properly recreated as it has already been created once
     ui.root.RemoveAllChildren();
 
-    uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
+    uiStyle = GetEditorUIXMLFile("UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
-    iconStyle = cache.GetResource("XMLFile", "UI/EditorIcons.xml");
+    iconStyle = GetEditorUIXMLFile("UI/EditorIcons.xml");
 
     CreateCursor();
     CreateMenuBar();
@@ -240,7 +240,7 @@ void CreateQuickMenu()
     if (quickMenu !is null)
         return;
 
-    quickMenu = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorQuickMenu.xml"));
+    quickMenu = LoadEditorUI("UI/EditorQuickMenu.xml");
     quickMenu.enabled = false;
     quickMenu.visible = false;
     quickMenu.opacity = uiMaxOpacity;
@@ -929,7 +929,7 @@ void CenterDialog(UIElement@ element)
 
 void CreateContextMenu()
 {
-    contextMenu = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorContextMenu.xml"));
+    contextMenu = LoadEditorUI("UI/EditorContextMenu.xml");
     ui.root.AddChild(contextMenu);
 }
 
@@ -1442,4 +1442,30 @@ void ContextMenuEventWrapper(StringHash eventType, VariantMap& eventData)
         uiElement.SendEvent("Released", eventData);
     }
     CloseContextMenu();
+}
+
+/// Load a UI XML file used by the editor
+XMLFile@ GetEditorUIXMLFile(const String&in fileName)
+{
+    // Prefer the executable path to avoid using the user's resource path, which may point
+    // to an outdated Urho installation
+    String fullFileName = fileSystem.programDir + "Data/" + fileName;
+    if (fileSystem.FileExists(fullFileName))
+    {
+        File@ file = File(fullFileName, FILE_READ);
+        XMLFile@ xml = XMLFile();
+        xml.name = fileName;
+        if (xml.Load(file))
+            return xml;
+    }
+
+    // Fallback to resource system
+    return cache.GetResource("XMLFile", fileName);
+}
+
+
+/// Load an UI layout used by the editor
+UIElement@ LoadEditorUI(const String&in fileName)
+{
+    return ui.LoadLayout(GetEditorUIXMLFile(fileName));
 }

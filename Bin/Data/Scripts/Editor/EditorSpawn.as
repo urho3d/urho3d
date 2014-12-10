@@ -26,7 +26,7 @@ void CreateSpawnEditor()
     if (spawnWindow !is null)
         return;
 
-    spawnWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSpawnWindow.xml"));
+    spawnWindow = LoadEditorUI("UI/EditorSpawnWindow.xml");
     ui.root.AddChild(spawnWindow);
     spawnWindow.opacity = uiMaxOpacity;
 
