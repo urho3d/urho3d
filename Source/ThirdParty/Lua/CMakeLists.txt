@@ -32,9 +32,8 @@ set (SOURCE_FILES ${C_FILES} ${H_FILES})
 # Setup target
 setup_library ()
 
-# On Android platform, use 'adb push' to copy the tool(s) from android-Bin to Android (virtual) device; use 'adb shell' to login into a remote shell to execute the tool in the (virtual) device
-# The tools are not built on iOS platform as there is no (easy) way to execute them on the iOS device
-if (NOT IOS AND URHO3D_TOOLS)
+# Setup additional Lua standalone targets (these targets can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
+if (NOT IOS)
     # Define target name for Lua interpreter
     set (TARGET_NAME lua_interpreter)   # Note: intended target name is 'lua' which clashes with 'Lua' library target above for case-insensitive platform
 

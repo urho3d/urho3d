@@ -42,12 +42,12 @@ task :scaffolding do
   scaffolding(abs_path, project, target)
   abs_path = Pathname.new(abs_path).realpath
   puts "\nNew project created in #{abs_path}\n\n"
-  puts "To build the new project, you may need to first set and export either 'URHO3D_HOME' or 'CMAKE_PREFIX_PATH' environment variable"
-  puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example:\n\n"
+  puts "To build the new project, you may need to first set and export either 'URHO3D_HOME' and 'URHO3D_BUILD_TREE'; or 'CMAKE_PREFIX_PATH' environment variable"
+  puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example of using Urho3D source and build trees directly:\n\n"
   if ENV['OS']
-    puts "set URHO3D_HOME=#{Dir.pwd}\ncd #{abs_path}\ncmake_vs2013.bat -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n\n"
+    puts "set URHO3D_HOME=#{Dir.pwd}\nset URHO3D_BUILD_TREE=/path/to/your/build/tree\ncd #{abs_path}\ncmake_vs2013.bat -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n\n"
   else
-    puts "export URHO3D_HOME=#{Dir.pwd}\ncd #{abs_path}\n./cmake_gcc.sh -DURHO3D_LUAJIT=1\ncd Build\nmake\n\n"
+    puts "export URHO3D_HOME=#{Dir.pwd} URHO3D_BUILD_TREE=/path/to/your/build/tree\ncd #{abs_path}\n./cmake_generic.sh -DURHO3D_LUAJIT=1\ncd Build\nmake\n\n"
   end
 end
 
@@ -90,8 +90,11 @@ task :ci do
   $build_options = "#{$build_options} -DURHO3D_OPENGL=#{ENV['URHO3D_OPENGL']}" if ENV['URHO3D_OPENGL']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
+  $build_options = "#{$build_options} -DANDROID=#{ENV['ANDROID']}" if ENV['ANDROID']
+  $build_options = "#{$build_options} -DRPI=#{ENV['RPI']}" if ENV['RPI']
+  $build_options = "#{$build_options} -DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   if ENV['XCODE']
-    # xctool or xcodebuild
+    # xcodebuild
     xcode_ci
   else
     # GCC or Clang
@@ -103,22 +106,22 @@ end
 desc 'Update site documentation to GitHub Pages'
 task :ci_site_update do
   # Pull or clone
-  system 'cd doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git doc-Build' or abort 'Failed to pull/clone'
+  system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Update credits from Readme.txt to about.md
-  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.txt |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' doc-Build/about.md" or abort 'Failed to update credits'
+  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.txt |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' ../doc-Build/about.md" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
-  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
-  system 'cp doc-Build/_includes/Doxygen/minimal-* Docs' or abort 'Failed to copy minimal-themed template'
+  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' ../Build/Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
+  system 'cp ../doc-Build/_includes/Doxygen/minimal-* ../Build/Docs' or abort 'Failed to copy minimal-themed template'
   release = ENV['RELEASE_TAG'] || 'HEAD'
   unless release == 'HEAD'
-    system "mkdir -p doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
-    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
-    append_new_release release, 'doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
+    system "mkdir -p ../doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
+    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' ../Build/Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
+    append_new_release release, '../doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
-  system "cd Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' ../Docs/html/_*.html && rsync -a --delete ../Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  system "cd ../Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
-  system "cd doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
+  system "cd ../doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
   # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
   if ENV['PACKAGE_UPLOAD']
     instruction = 'skip'
@@ -156,24 +159,13 @@ task :ci_package_upload do
     $configuration = 'Release'
     $testing = 0
   end
-  if ENV['ANDROID']
-    platform_prefix = 'android-'
-  elsif ENV['WINDOWS']
-    platform_prefix = 'mingw-'
-  elsif ENV['IOS']
-    platform_prefix = 'ios-'
-  elsif ENV['RPI']
-    platform_prefix = 'raspi-'
-  else
-    platform_prefix = ''
-  end
   # Generate the documentation if necessary
   unless ENV['SITE_UPDATE']
     system 'echo Generate documentation'
     if ENV['XCODE']
-      xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'doc', '>/dev/null') or abort 'Failed to generate documentation'
+      xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj", 'doc', '>/dev/null') or abort 'Failed to generate documentation'
     else
-      system "cd #{platform_prefix}Build && make -j$NUMJOBS doc >/dev/null" or abort 'Failed to generate documentation'
+      system "cd ../Build && make -j$NUMJOBS doc >/dev/null" or abort 'Failed to generate documentation'
     end
   end
   # Make the package
@@ -186,17 +178,17 @@ task :ci_package_upload do
     if !ENV['CI_START_TIME'] || elapsed_time < 15 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
       system 'echo Rebuild Urho3D library as Mach-O universal binary'
-      xcode_build(0, "#{platform_prefix}Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
+      xcode_build(0, "../Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
     end
     # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
-    system "cd #{platform_prefix}Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
+    system "cd ../Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
   elsif ENV['XCODE']
-    xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
+    xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
   else
     if ENV['ANDROID'] && !ENV['NO_SDK_SYSIMG']
-      system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
+      system "cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     end
-    system "cd #{platform_prefix}Build && make package" or abort 'Failed to make binary package'
+    system "cd ../Build && make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
   setup_digital_keys
@@ -233,7 +225,7 @@ EOF" or abort 'Failed to create release directory remotely'
     system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
   end
   # Upload the package
-  system "scp #{platform_prefix}Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
+  system "scp ../Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
@@ -289,9 +281,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
   if ENV['OS']
-    system("@echo off && (for %d in (Source,Bin) do mkdir #{dir}\\%d) && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir}\\Source >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("@echo off && mkdir #{dir}\\Bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir} >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   else
-    system("bash -c \"mkdir -p #{dir}/{Source,Bin} && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir}/Source && for f in {.,}*.sh Rakefile; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/Source/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("bash -c \"mkdir -p #{dir}/Bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir} && for f in {.,}*.sh Rakefile; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   end
 end
 
@@ -305,10 +297,9 @@ def makefile_ci
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
     amalg = ''
-    # Lua on MinGW build requires tolua++ tool to be built natively first
-    system "MINGW_PREFIX= ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
-    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-    ENV['SKIP_NATIVE'] = '1'
+#    # Lua on MinGW build requires tolua++ tool to be built natively first
+#    system "MINGW_PREFIX= ./cmake_generic.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
+#    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
   elsif ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a'
     # The upstream LuaJIT library does not support this Android ABI at the moment, fallback to use Lua library instead
     jit = ''
@@ -317,47 +308,45 @@ def makefile_ci
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
   end
-  system "./cmake_gcc.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
+# Temporarily not using any build options that require native tool building
+#  system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['ANDROID']
     if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
       android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
     end
-    # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
-    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-    if !jit.empty?
-      system "cd Build/ThirdParty/Lua#{jit}/generated/buildvm-android-#{ENV['ABI']} && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
-    end
-    # Reconfigure Android build one more time now that we have the tools built
-    ENV['SKIP_NATIVE'] = '1'
-    system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
-    platform_prefix = 'android-'
-  elsif ENV['RPI']
-    # LuaJIT on Raspberry Pi build requires tolua++ and buildvm-raspi tools to be built natively first
-    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-    system "cd Build/ThirdParty/LuaJIT/generated/buildvm-raspi && make -j$NUMJOBS" or abort 'Failed to build buildvm-raspi tool'
-    # Reconfigure Raspberry Pi build one more time now that we have the tools built
-    ENV['SKIP_NATIVE'] = '1'
-    system './cmake_gcc.sh' or abort 'Failed to reconfigure Urho3D library for Raspberry Pi build'
-    platform_prefix = 'raspi-'
-  elsif ENV['WINDOWS']
-    platform_prefix = 'mingw-'
-  else
-    platform_prefix = ''
+#    # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
+#    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
+#    if !jit.empty?
+#      system "cd Build/ThirdParty/Lua#{jit}/generated/buildvm-android-#{ENV['ABI']} && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
+#    end
+#    # Reconfigure Android build one more time now that we have the tools built
+#    system './cmake_generic.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
+#  elsif ENV['RPI']
+#    # LuaJIT on Raspberry Pi build requires tolua++ and buildvm-raspi tools to be built natively first
+#    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
+#    system "cd Build/ThirdParty/LuaJIT/generated/buildvm-raspi && make -j$NUMJOBS" or abort 'Failed to build buildvm-raspi tool'
+#    # Reconfigure Raspberry Pi build one more time now that we have the tools built
+#    system './cmake_generic.sh' or abort 'Failed to reconfigure Urho3D library for Raspberry Pi build'
   end
   if $testing == 1
     test = '&& make test'
   else
     test = ''
   end
-  system "cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
+# Temporarily create a symlink to Urho3D asset dir
+system "ASSET_DIR=`pwd`/Bin; cd ../Build/Bin && ln -sf $ASSET_DIR/{CoreData,Data} ." or abort 'Failed to create symlink to Urho3D asset directory'
+  system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
-  scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && cd #{platform_prefix}Build && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  scaffolding "../Build/generated/UsingSourceAndBuildTrees"
+# Temporarily not using any build options that require native tool building
+#  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_generic.sh . #{$build_options} -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
-    system "cd #{platform_prefix}Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
+    system "echo '\nTest deploying and running Urho3D Samples APK...' && cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     if android_wait_for_device ENV['CI'] ? 1 : 10 # minutes
-      system "cd #{platform_prefix}Build && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
+      system "cd ../Build && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
       android_test_run or abort 'Failed to test run Urho3D Samples APK'
     else
       puts 'Skipped test running Urho3D Samples APK as emulator failed to start in time'
@@ -449,23 +438,24 @@ def xcode_ci
     # IOS platform does not support LuaJIT
     jit = ''
     amalg = ''
-    platform_prefix = 'ios-'
     deployment_target = "-DIPHONEOS_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
-    # Lua on IOS build requires tolua++ tool to be built natively first
-    system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
-    xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
+#    # Lua on IOS build requires tolua++ tool to be built natively first
+#    system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
+#    xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
   else
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
-    platform_prefix = ''
     deployment_target = "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
   end
-  system "./cmake_macosx.sh -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
-  xcode_build(ENV['IOS'], "#{platform_prefix}Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
+# Temporarily not using any build options that require native tool building
+#  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
+  xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
-  scaffolding "#{platform_prefix}Build/generated/externallib"
-  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd #{platform_prefix}Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_macosx.sh -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-  xcode_build(ENV['IOS'], "#{platform_prefix}Build/generated/externallib/#{platform_prefix}Build/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+  scaffolding "../Build/generated/UsingSourceAndBuildTrees"
+#  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  xcode_build(ENV['IOS'], "../Build/generated/UsingSourceAndBuildTrees/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 
 def xcode_build(ios, project, target = 'ALL_BUILD', extras = '')

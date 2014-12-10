@@ -163,9 +163,9 @@ if (CMAKE_CROSSCOMPILING OR IOS)
     else ()
         message (FATAL_ERROR "Unsupported cross-compiling target") 
     endif ()
-    execute_process (COMMAND ${PROJECT_ROOT_DIR}/Bin/${BUILDVM_X} RESULT_VARIABLE BUILDVM_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/${BUILDVM_X} RESULT_VARIABLE BUILDVM_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
     if (NOT BUILDVM_EXIT_CODE EQUAL 1)
-        file (WRITE ${PROJECT_ROOT_DIR}/Bin/${BUILDVM_X}-arch.txt ${TARGET_TESTARCH})
+        file (WRITE ${CMAKE_BINARY_DIR}/Bin/tool/${BUILDVM_X}-arch.txt ${TARGET_TESTARCH})
         message (FATAL_ERROR
             "The configuration cannot be done now because the target-specific '${BUILDVM_X}' tool has not been built yet. "
             "However, the specific target architecture information is now saved. "
@@ -188,7 +188,7 @@ else ()
     set (BUILDVM_X buildvm)
     
     # Also build variants for the supported target architectures
-    file (GLOB VARIANT_ARCHS ${PROJECT_ROOT_DIR}/Bin/buildvm-*-arch.txt)
+    file (GLOB VARIANT_ARCHS ${CMAKE_BINARY_DIR}/Bin/tool/buildvm-*-arch.txt)
     foreach (VARIANT_ARCH ${VARIANT_ARCHS})
         string (REGEX REPLACE "^.*buildvm(-.*)-arch\\.txt$" \\1 VARIANT ${VARIANT_ARCH})
         file (READ ${VARIANT_ARCH} TARGET_TESTARCH)
@@ -213,7 +213,7 @@ macro (generate_source name mode)
     set (GEN_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/${name})
     set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC})
     add_custom_command (OUTPUT ${GEN_SRC}
-        COMMAND ${PROJECT_ROOT_DIR}/Bin/${BUILDVM_X} -m ${mode} -o ${GEN_SRC} ${ARGN}
+        COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/${BUILDVM_X} -m ${mode} -o ${GEN_SRC} ${ARGN}
         DEPENDS ${BUILDVM_DEP} ${ARGN}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating buildvm output: ${name}")
@@ -274,9 +274,8 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 # Setup target
 setup_library ()
 
-# On Android platform, use 'adb push' to copy the tool(s) from android-Bin to Android (virtual) device; use 'adb shell' to login into a remote shell to execute the tool in the (virtual) device
-# The tools are not built on iOS platform as there is no (easy) way to execute them on the iOS device
-if (NOT IOS AND URHO3D_TOOLS)
+# Setup additional Lua standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
+if (NOT IOS)
     # Define target name for LuaJIT interpreter cum compiler
     set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
 
@@ -291,7 +290,7 @@ if (NOT IOS AND URHO3D_TOOLS)
     adjust_target_name ()   # Adjust to intended target output name
 
     # Define post build steps
-    set (LUAJIT_DEP_DIR ${PROJECT_ROOT_DIR}/Bin/Data/LuaScripts/jit)
+    set (LUAJIT_DEP_DIR ${CMAKE_BINARY_DIR}/Bin/Data/LuaScripts/jit)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/jit ${LUAJIT_DEP_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/vmdef.lua ${LUAJIT_DEP_DIR}

@@ -30,7 +30,51 @@ To run Urho3D, the minimum system requirements are:
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-SSE requirement can be eliminated by disabling the use of SSE instruction set, see \ref Build_Options "Build options" below.
+SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
+
+\section Build_Options Build options
+
+A number of build options can be defined explicitly when invoking the above cmake_xxxx batch files or shell scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes.\n
+|Build Option         |V|Description          |
+|---------------------|-|---------------------|
+|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
+|RASPI                |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
+|WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only)|
+|IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only); use cmake_ios.sh as shortcut|
+|URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the installed toolchain on host system|
+|URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
+|URHO3D_LUA           |0|Enable Lua scripting support|
+|URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
+|URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
+|URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua scripting support is enabled only)|
+|URHO3D_NETWORK       |1|Enable Networking support|
+|URHO3D_PHYSICS       |1|Enable Physics support|
+|URHO3D_NAVIGATION    |1|Enable Navigation support|
+|URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
+|URHO3D_SAMPLES       |0|Build sample applications|
+|URHO3D_TOOLS         |1|Build tools (native and RPI only)|
+|URHO3D_EXTRAS        |0|Build extras (native and RPI only)|
+|URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
+|URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
+|URHO3D_SSE           |1|Enable SSE instruction set|
+|URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
+|URHO3D_FILEWATCHER   |1|Enable filewatcher support|
+|URHO3D_PROFILING     |1|Enable profiling support|
+|URHO3D_LOGGING       |1|Enable logging support|
+|URHO3D_TESTING       |0|Enable testing support|
+|URHO3D_TEST_TIME_OUT |5|Number of seconds to test run the executables (when testing support is enabled only)|
+|URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
+|URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
+|URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
+|URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
+|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
+|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
+|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
+|ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (\*default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
+|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
+|ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
+
+Note that the specified build option values are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
 \section Building_Native Native build process
 
@@ -137,50 +181,6 @@ The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "An
 When building with the Windows 8 SDK, copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "Bin" directory so that Urho3D executables will run correctly.
 
 Note that you can also force an OpenGL mode build on Windows platform by using the "URHO3D_OPENGL" build option in the table below; OpenGL does not depend on a separate shader compiler DLL.
-
-\section Build_Options Build options
-
-A number of build options can be defined explicitly when invoking the above cmake_xxxx batch files or shell scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes.\n
-|Build Option         |V|Description          |
-|---------------------|-|---------------------|
-|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
-|RASPI                |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
-|WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only)|
-|IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only); use cmake_ios.sh as shortcut|
-|URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the installed toolchain on host system|
-|URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
-|URHO3D_LUA           |0|Enable Lua scripting support|
-|URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
-|URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
-|URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua scripting support is enabled only)|
-|URHO3D_NETWORK       |1|Enable Networking support|
-|URHO3D_PHYSICS       |1|Enable Physics support|
-|URHO3D_NAVIGATION    |1|Enable Navigation support|
-|URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
-|URHO3D_SAMPLES       |0|Build sample applications|
-|URHO3D_TOOLS         |1|Build standalone tools (Desktop and RPI only; on Android only build Lua standalone tools)|
-|URHO3D_EXTRAS        |0|Build extras (Desktop and RPI only)|
-|URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
-|URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
-|URHO3D_SSE           |1|Enable SSE instruction set|
-|URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
-|URHO3D_FILEWATCHER   |1|Enable filewatcher support|
-|URHO3D_PROFILING     |1|Enable profiling support|
-|URHO3D_LOGGING       |1|Enable logging support|
-|URHO3D_TESTING       |0|Enable testing support|
-|URHO3D_TEST_TIME_OUT |5|Number of seconds to test run the executables (when testing support is enabled only)|
-|URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
-|URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
-|URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
-|URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
-|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
-|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
-|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
-|ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (\*default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
-|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
-|ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
-
-Note that the specified build option values are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
 \page Running Running Urho3D player application
 

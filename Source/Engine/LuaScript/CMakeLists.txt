@@ -30,7 +30,7 @@ endif ()
 
 # The host tool must be built natively and would be used when cross-compiling
 if (CMAKE_CROSSCOMPILING OR IOS)
-    execute_process (COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -v RESULT_VARIABLE TOLUA_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/tolua++ -v RESULT_VARIABLE TOLUA_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
     if (NOT TOLUA_EXIT_CODE EQUAL 0)
         message (WARNING "For cross-compiling build to be successful, the 'tolua++' tool must be built natively first and present in the 'Bin' folder." )
     endif ()
@@ -70,7 +70,7 @@ foreach (API_PKG_FILE ${API_PKG_FILES})
     set (GEN_CPP_FILES ${GEN_CPP_FILES} ${GEN_CPP_FILE})
     file (GLOB PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/${API}/*.pkg)
     add_custom_command (OUTPUT ${GEN_CPP_FILE} 
-        COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
+        COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/tolua++ -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
         DEPENDS ${TOLUADEP} ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/ToCppHook.lua
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pkgs
         COMMENT "Generating tolua++ API binding on the fly for ${API}")

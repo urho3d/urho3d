@@ -107,7 +107,7 @@ list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ../ThirdParty/SDL/inc
 if (ANDROID)
     set (OUTPUT_PATH ${ANDROID_LIBRARY_OUTPUT_PATH})
 else ()
-    set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Lib)     # ${PLATFORM_PREFIX} is empty for native build
+    set (OUTPUT_PATH ${CMAKE_BINARY_DIR}/Lib)
 endif ()
 set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
@@ -251,7 +251,10 @@ if (NOT IOS)
     endif ()
     string (REPLACE ";" "\" ${DASH}I\"\${includedir}/" ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir};${INSTALL_INCLUDE_DIRS}\"")
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
-    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR})
+    if (ANDROID)
+        set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)
+    endif ()
+    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
 endif ()
 
 # Setup the compiler flags for building shared library (do this here so that it does not interfere with the pkg-config file generation above)
@@ -260,7 +263,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
     add_compiler_export_flags ()
     # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
-    if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # \todo Remove this when CMake minimum version is 2.8.9
+    if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
         set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
     endif ()
 endif ()

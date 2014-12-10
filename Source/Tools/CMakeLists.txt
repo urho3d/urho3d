@@ -27,11 +27,13 @@ project (Urho3D-Tools)
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
-# Urho3DPlayer application
+# Urho3DPlayer target is rather special, although it is here, it is not a tool because it builds into platform-specific binary
 add_subdirectory (Urho3DPlayer)
 
 # Do not build tools for iOS and Android regardless of the URHO3D_TOOLS build option
 if (NOT IOS AND NOT ANDROID AND URHO3D_TOOLS)
+    # All tools must be natively built and output to Bin/tool subdir to differentiate them from platform-specific binaries in the Bin directory
+    set_output_directories (${CMAKE_BINARY_DIR}/Bin/tool RUNTIME PDB)
     # Urho3D tools
     add_subdirectory (AssetImporter)
     add_subdirectory (OgreImporter)

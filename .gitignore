@@ -1,4 +1,4 @@
-# Output directories
+# Output directories (in case of non out-of-source)
 Bin/*
 !Bin/**/
 !Bin/*.bat
@@ -6,7 +6,9 @@ Bin/*
 Bin/*.app/
 Bin/*.app.dSYM/
 Bin/Data/LuaScripts/jit/
-Bin/Screenshots
+Bin/Screenshots/
+Bin/tool/
+generated/
 Lib/
 
 # Compiled shaders
@@ -21,11 +23,10 @@ Lib/
 # Compiled Lua script
 *.luc
 
-# Generated documentation
+# Generated documentation (in case of non out-of-source)
 Docs/html/
 Docs/qch/
 Docs/Doxyfile
-Docs/minimal-*
 
 # Eclipse project settings
 Source/.*project

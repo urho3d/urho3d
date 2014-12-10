@@ -23,9 +23,6 @@
 # Define helpers
 post_cmake() {
     if [ $ECLIPSE ]; then
-        # Integrate Urho3D documentation into Eclipse IDE
-        ln -snf $SOURCE/Docs/html ~/.eclipse/$(ls -1t ~/.eclipse |grep org.eclipse.platform_ |head -1)/plugins
-
         # Check if xmlstarlet software package is available for fixing the generated Eclipse project setting
         if [ $HAS_XMLSTARLET ]; then
             # Common fixes for all builds
@@ -63,7 +60,7 @@ post_cmake() {
                         $BUILD/.project
                 done
 
-            elif [ $RASPI ]; then
+            elif [ $RPI ]; then
                 # For Raspberry Pi build, add [Bin] linked resource
                 #
                 # Replace [Subprojects]/Urho3D linked resource to [Targets]/[Bin] instead

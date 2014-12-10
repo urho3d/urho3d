@@ -92,8 +92,8 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua scripting only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     option (URHO3D_SAMPLES "Build sample applications")
-    cmake_dependent_option (URHO3D_TOOLS "Build standalone tools (Desktop and RPI only; on Android only build Lua standalone tools)" TRUE "NOT IOS;NOT ANDROID OR URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-    cmake_dependent_option (URHO3D_EXTRAS "Build extras (Desktop and RPI only)" FALSE "NOT IOS AND NOT ANDROID" FALSE)
+    cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID" FALSE)
+    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
@@ -372,9 +372,6 @@ endif ()
 # Include CMake builtin module for building shared library support
 include (GenerateExportHeader)
 
-# Determine the project root directory
-get_filename_component (PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR} PATH)
-
 # Macro for setting common output directories
 macro (set_output_directories OUTPUT_PATH)
     foreach (TYPE ${ARGN})
@@ -387,18 +384,7 @@ macro (set_output_directories OUTPUT_PATH)
 endmacro ()
 
 # Set common binary output directory for all platforms
-if (IOS)
-    set (PLATFORM_PREFIX ios-)
-elseif (CMAKE_CROSSCOMPILING)
-    if (RASPI)
-        set (PLATFORM_PREFIX raspi-)
-    elseif (ANDROID)
-        set (PLATFORM_PREFIX android-)      # Note: this is for Android tools (ARM arch) runtime binaries, Android libs output directory is not affected by this
-    elseif (MINGW)
-        set (PLATFORM_PREFIX mingw-)
-    endif ()
-endif ()
-set_output_directories (${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Bin RUNTIME PDB)
+set_output_directories (${CMAKE_BINARY_DIR}/Bin RUNTIME PDB)
 
 # Macro for setting symbolic link on platform that supports it
 macro (create_symlink SOURCE DESTINATION)
@@ -443,10 +429,10 @@ if (ANDROID)
     endif ()
     # Create symbolic links in the build tree
     foreach (I CoreData Data)
-        create_symlink (../../Bin/${I} Android/assets/${I})
+        create_symlink (../../Bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I})
     endforeach ()
     foreach (I AndroidManifest.xml build.xml src res assets jni)
-        if (EXISTS Android/${I})
+        if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I})
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I})
         endif ()
     endforeach ()
@@ -679,7 +665,7 @@ endmacro ()
 macro (setup_main_executable)
     # Define resource files
     if (XCODE)
-        set (RESOURCE_FILES ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data)
+        set (RESOURCE_FILES ${CMAKE_BINARY_DIR}/Bin/CoreData ${CMAKE_SOURCE_DIR}/Bin/Data)
         set_source_files_properties (${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         list (APPEND SOURCE_FILES ${RESOURCE_FILES})
     endif ()

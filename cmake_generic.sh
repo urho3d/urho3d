@@ -24,6 +24,8 @@
 # Determine source tree and build tree
 if [ $1 ] && [[ ! $1 =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself; exit 1; fi
 SOURCE=$(dirname $0)
+if [ "$SOURCE" == "." ]; then SOURCE=$(pwd); fi
+if [ "$BUILD" == "." ]; then BUILD=$(pwd); fi
 
 # Define helpers
 . $SOURCE/.bash_helpers.sh
@@ -34,13 +36,14 @@ SOURCE=$(dirname $0)
 [ ! -d $TOOLCHAINS -a -d $CMAKE_PREFIX_PATH/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS=$CMAKE_PREFIX_PATH/share/Urho3D/CMake/Toolchains
 
 # Default to native generator and toolchain if none is specified explicitly
+IFS=#
 OPTS=
 for a in $@; do
     case $a in
         --fix-scm)
             FIX_SCM=1
             ;;
-        Eclipse CDT4 - Unix Makefiles)
+        Eclipse\ CDT4\ -\ Unix\ Makefiles)
             ECLIPSE=1 && if xmlstarlet --version >/dev/null 2>&1; then HAS_XMLSTARLET=1; fi
             ;;
         -DIOS=1)
@@ -49,8 +52,8 @@ for a in $@; do
         -DANDROID=1)
             ANDROID=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/android.toolchain.cmake"
             ;;
-        -DRASPI=1)
-            RASPI=1 && if [[ ! $(uname -m) =~ ^armv6 ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake"; fi
+        -DRPI=1)
+            RPI=1 && if [[ ! $(uname -m) =~ ^armv6 ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake"; fi
             ;;
         -DWIN32=1)
             WINDOWS=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake"
@@ -60,5 +63,6 @@ done
 
 # Create project with the chosen CMake generator and toolchain
 cmake -E make_directory $BUILD && cmake -E chdir $BUILD cmake $OPTS $@ $SOURCE && post_cmake
+unset IFS
 
 # vi: set ts=4 sw=4 expandtab:
