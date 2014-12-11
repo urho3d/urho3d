@@ -2872,6 +2872,7 @@ Methods:
 - CullMode GetShadowCullMode() const
 - const BiasParameters& GetDepthBias() const
 - unsigned GetAuxViewFrameNumber() const
+- unsigned GetNumUsedTextureUnits() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
 - Scene* GetScene() const
@@ -2881,6 +2882,7 @@ Properties:
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
 - unsigned auxViewFrameNumber (readonly)
+- unsigned numUsedTextureUnits (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
 - Scene* scene
@@ -7060,6 +7062,7 @@ Properties:
 - int TU_LIGHTBUFFER
 - int TU_VOLUMEMAP
 - int TU_ZONE
+- int MAX_NAMED_TEXTURE_UNITS
 - int MAX_TEXTURE_UNITS
 
 ### TextureUsage

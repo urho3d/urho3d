@@ -6749,6 +6749,7 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - uint numTechniques
+- uint numUsedTextureUnits // readonly
 - bool occlusion // readonly
 - int refs // readonly
 - Scene@ scene
@@ -12816,6 +12817,7 @@ Properties:
 - TU_VOLUMEMAP
 - TU_ZONE
 - MAX_MATERIAL_TEXTURE_UNITS
+- MAX_NAMED_TEXTURE_UNITS
 - MAX_TEXTURE_UNITS
 
 

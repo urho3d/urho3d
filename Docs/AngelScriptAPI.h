@@ -5306,6 +5306,8 @@ uint memoryUse;
 String name;
 uint numTechniques;
 /* readonly */
+uint numUsedTextureUnits;
+/* readonly */
 bool occlusion;
 /* readonly */
 int refs;
@@ -12226,6 +12228,7 @@ TU_LIGHTBUFFER,
 TU_VOLUMEMAP,
 TU_ZONE,
 MAX_MATERIAL_TEXTURE_UNITS,
+MAX_NAMED_TEXTURE_UNITS,
 MAX_TEXTURE_UNITS,
 };
 
