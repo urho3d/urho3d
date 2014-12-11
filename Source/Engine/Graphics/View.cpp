@@ -2637,8 +2637,9 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
 void View::CheckMaterialForAuxView(Material* material)
 {
     const SharedPtr<Texture>* textures = material->GetTextures();
-    
-    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+    unsigned numTextures = material->GetNumUsedTextureUnits();
+
+    for (unsigned i = 0; i < numTextures; ++i)
     {
         Texture* texture = textures[i];
         if (texture && texture->GetUsage() == TEXTURE_RENDERTARGET)

@@ -32,6 +32,7 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -92,7 +93,7 @@ TextureUnit ParseTextureUnitName(String name)
             unit = TU_ENVIRONMENT;
         // Finally check for specifying the texture unit directly as a number
         else if (name.Length() < 3)
-            unit = (TextureUnit)Clamp(ToInt(name), 0, MAX_TEXTURE_UNITS);
+            unit = (TextureUnit)Clamp(ToInt(name), 0, MAX_TEXTURE_UNITS - 1);
     }
 
     if (unit == MAX_TEXTURE_UNITS)
@@ -152,6 +153,7 @@ void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 Material::Material(Context* context) :
     Resource(context),
     auxViewFrameNumber_(0),
+    numUsedTextureUnits_(0),
     occlusion_(true),
     specular_(false),
     subscribed_(false)
@@ -284,7 +286,7 @@ bool Material::Load(const XMLElement& source)
         TextureUnit unit = TU_DIFFUSE;
         if (textureElem.HasAttribute("unit"))
             unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
-        if (unit < MAX_MATERIAL_TEXTURE_UNITS)
+        if (unit < MAX_TEXTURE_UNITS)
         {
             String name = textureElem.GetAttribute("name");
             // Detect cube maps by file extension: they are defined by an XML file
@@ -372,13 +374,13 @@ bool Material::Save(XMLElement& dest) const
     }
 
     // Write texture units
-    for (unsigned j = 0; j < MAX_MATERIAL_TEXTURE_UNITS; ++j)
+    for (unsigned j = 0; j < MAX_TEXTURE_UNITS; ++j)
     {
         Texture* texture = GetTexture((TextureUnit)j);
         if (texture)
         {
             XMLElement textureElem = dest.CreateChild("texture");
-            textureElem.SetString("unit", textureUnitNames[j]);
+            textureElem.SetString("unit", j < MAX_NAMED_TEXTURE_UNITS ? textureUnitNames[j] : String(j).CString());
             textureElem.SetString("name", texture->GetName());
         }
     }
@@ -513,8 +515,19 @@ void Material::SetShaderParameterAnimationSpeed(const String& name, float speed)
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
 {
-    if (unit < MAX_MATERIAL_TEXTURE_UNITS)
+    if (unit < MAX_TEXTURE_UNITS)
+    {
         textures_[unit] = texture;
+
+        // Update the number of used texture units
+        if (texture && (unsigned)unit >= numUsedTextureUnits_)
+            numUsedTextureUnits_ = unit + 1;
+        else if (!texture)
+        {
+            if (unit == numUsedTextureUnits_ - 1)
+                --numUsedTextureUnits_;
+        }
+    }
 }
 
 void Material::SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat)
@@ -603,12 +616,13 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
     ret->shaderParameters_ = shaderParameters_;
-    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         ret->textures_[i] = textures_[i];
     ret->occlusion_ = occlusion_;
     ret->specular_ = specular_;
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
+    ret->numUsedTextureUnits_ = numUsedTextureUnits_;
     ret->RefreshMemoryUse();
 
     return ret;
@@ -642,7 +656,7 @@ Pass* Material::GetPass(unsigned index, StringHash passType) const
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
-    return unit < MAX_MATERIAL_TEXTURE_UNITS ? textures_[unit] : (Texture*)0;
+    return unit < MAX_TEXTURE_UNITS ? textures_[unit] : (Texture*)0;
 }
 
 const Variant& Material::GetShaderParameter(const String& name) const
@@ -713,7 +727,7 @@ void Material::ResetToDefaults()
     SetNumTechniques(1);
     SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 
-    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         textures_[i] = 0;
 
     shaderParameters_.Clear();
@@ -737,7 +751,7 @@ void Material::RefreshMemoryUse()
     unsigned memoryUse = sizeof(Material);
 
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
-    memoryUse += MAX_MATERIAL_TEXTURE_UNITS * sizeof(SharedPtr<Texture>);
+    memoryUse += MAX_TEXTURE_UNITS * sizeof(SharedPtr<Texture>);
     memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
 
     SetMemoryUse(memoryUse);

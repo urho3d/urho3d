@@ -557,7 +557,9 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         }
         
         const SharedPtr<Texture>* textures = material_->GetTextures();
-        for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+        unsigned numTextures = material_->GetNumUsedTextureUnits();
+
+        for (unsigned i = 0; i < numTextures; ++i)
         {
             TextureUnit unit = (TextureUnit)i;
             if (textures[i] && graphics->HasTextureUnit(unit))

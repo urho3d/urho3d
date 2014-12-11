@@ -294,6 +294,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
     engine->RegisterEnumValue("TextureUnit", "TU_ZONE", TU_ZONE);
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
+    engine->RegisterEnumValue("TextureUnit", "MAX_NAMED_TEXTURE_UNITS", MAX_NAMED_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -684,6 +685,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_depthBias(const BiasParameters&in)", asMETHOD(Material, SetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "uint get_numUsedTextureUnits() const", asMETHOD(Material, GetNumUsedTextureUnits), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_scene(Scene@+)", asMETHOD(Material, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Scene@+ get_scene() const", asMETHOD(Material, GetScene), asCALL_THISCALL);
     

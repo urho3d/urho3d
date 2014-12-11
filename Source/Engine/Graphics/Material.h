@@ -189,6 +189,8 @@ public:
     bool GetSpecular() const { return specular_; }
     /// Return the scene associated with the material for shader parameter animation updates.
     Scene* GetScene() const;
+    /// Return the last non-null texture unit + 1. Used as an optimization when applying the material to render state.
+    unsigned GetNumUsedTextureUnits() const { return numUsedTextureUnits_; }
 
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);
@@ -212,7 +214,7 @@ private:
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
     /// Textures.
-    SharedPtr<Texture> textures_[MAX_MATERIAL_TEXTURE_UNITS];
+    SharedPtr<Texture> textures_[MAX_TEXTURE_UNITS];
     /// %Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// %Shader parameters animation infos.
@@ -225,6 +227,8 @@ private:
     BiasParameters depthBias_;
     /// Last auxiliary view rendered frame number.
     unsigned auxViewFrameNumber_;
+    /// Number of maximum non-null texture unit + 1.
+    unsigned numUsedTextureUnits_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.
