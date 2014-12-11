@@ -28,15 +28,15 @@ Docs/html/
 Docs/qch/
 Docs/Doxyfile
 
-# Eclipse project settings
-Source/.*project
-Source/.settings
+# Eclipse project settings (in case of non out-of-source)
+.*project
+.settings
 
 # KDevelop project settings
 *.kdev?
 
 # Qt Creator project settings
-Source/CMakeLists.txt.user
+CMakeLists.txt.user
 
 # Android non out-of-source project settings
 Android/project.properties

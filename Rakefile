@@ -29,7 +29,7 @@ end
 # Usage: rake sync (only intended to be used in a fork with remote 'upstream' set to urho3d/Urho3D)
 desc 'Fetch and merge upstream urho3d/Urho3D to a Urho3D fork'
 task :sync do
-  system "cwb=`git symbolic-ref -q --short HEAD || git rev-parse --short HEAD`; export cwb && git fetch upstream && git checkout master && git pull && git merge -m 'Sync at #{Time.now.localtime}.' upstream/master && git push && git checkout $cwb"
+  system "cwb=`git symbolic-ref -q --short HEAD || git rev-parse --short HEAD`; export cwb && git fetch upstream && git checkout master && git pull && git merge -m 'Sync at #{Time.now.localtime}.' upstream/master && git push && git checkout $cwb" or abort
 end
 
 # Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
@@ -49,6 +49,53 @@ task :scaffolding do
   else
     puts "export URHO3D_HOME=#{Dir.pwd} URHO3D_BUILD_TREE=/path/to/your/build/tree\ncd #{abs_path}\n./cmake_generic.sh -DURHO3D_LUAJIT=1\ncd Build\nmake\n\n"
   end
+end
+
+# Usage: rake cmake [prefix_path=..] [fix_scm] (only intended to be used by lazy man =), e.g. rake cmake android URHO3D_LIB_TYPE=SHARED; rake cmake clean android
+desc 'Invoke cmake shell script with the build tree location predetermined based on the target platform'
+task :cmake do
+  prefix_path = ENV['prefix_path'] || '..'
+  script = 'cmake_generic.sh'
+  platform = 'native'
+  build_options = ''
+  ARGV.each { |option|
+    task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
+    case option
+    when 'cmake'
+      # do nothing
+    when 'clean', 'codeblocks', 'eclipse', 'generic', 'macosx'
+      script = "cmake_#{option}.sh" unless script == 'cmake_clean.sh'
+    when 'android', 'ios', 'mingw', 'rpi'
+      platform = option
+      build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean.sh'
+      script = 'cmake_macosx.sh' if option == 'ios'
+    when 'fix_scm'
+      build_options = "#{build_options} --fix-scm" if script == 'cmake_eclipse.sh'
+    else
+      build_options = "#{build_options} -D#{option}" unless /prefix_path=.*/ =~ option || script == 'cmake_clean.sh'
+    end
+  }
+  system "./#{script} #{prefix_path}/#{platform}-Build #{build_options}" or abort
+end
+
+# Usage: rake make [prefix_path=..] [num_jobs=8] (only intended to be used by lazy man =), e.g. rake make android
+desc 'Invoke make command in the build tree location predetermined based on the target platform'
+task :make do
+  prefix_path = ENV['prefix_path'] || '..'
+  build_options = '-j' + (ENV['num_jobs'] || '8')
+  platform = 'native'
+  ARGV.each { |option|
+    task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
+    case option
+    when 'make'
+      # do nothing
+    when 'android', 'ios', 'mingw', 'rpi'
+      platform = option
+    else
+      build_options = "#{build_options} -#{option}" unless /(?:prefix_path|num_jobs)=.*/ =~ option
+    end
+  }
+  system "cd #{prefix_path}/#{platform}-Build && make #{build_options}" or abort
 end
 
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
