@@ -31,10 +31,15 @@ setup_main_executable ()
 
 # Setup test cases
 if (URHO3D_ANGELSCRIPT)
-    add_test (NAME Editor COMMAND ${TARGET_NAME} Data/Scripts/Editor.as -w -timeout ${URHO3D_TEST_TIME_OUT})
-    add_test (NAME NinjaSnowWar COMMAND ${TARGET_NAME} Data/Scripts/NinjaSnowWar.as -w -timeout ${URHO3D_TEST_TIME_OUT})
-    add_test (NAME SpritesAS COMMAND ${TARGET_NAME} Data/Scripts/03_Sprites.as -w -timeout ${URHO3D_TEST_TIME_OUT})
+    add_test (NAME Editor COMMAND ${TARGET_NAME} Scripts/Editor.as -w -timeout ${URHO3D_TEST_TIME_OUT})
+    add_test (NAME NinjaSnowWar COMMAND ${TARGET_NAME} Scripts/NinjaSnowWar.as -w -timeout ${URHO3D_TEST_TIME_OUT})
+    add_test (NAME SpritesAS COMMAND ${TARGET_NAME} Scripts/03_Sprites.as -w -timeout ${URHO3D_TEST_TIME_OUT})
 endif ()
 if (URHO3D_LUA)
-    add_test (NAME SpritesLua COMMAND ${TARGET_NAME} Data/LuaScripts/03_Sprites.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
+    add_test (NAME SpritesLua COMMAND ${TARGET_NAME} LuaScripts/03_Sprites.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
 endif ()
+
+# Symlink/copy helper shell scripts or batch files to invoke Urho3DPlayer
+foreach (FILE Editor NinjaSnowWar)
+    create_symlink (${CMAKE_SOURCE_DIR}/Bin/${FILE}${SCRIPT_EXT} ${CMAKE_BINARY_DIR}/Bin/${FILE}${SCRIPT_EXT} FALLBACK_TO_COPY)
+endforeach () 

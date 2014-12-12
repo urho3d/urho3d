@@ -198,11 +198,14 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Add resource paths
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    String exePath = fileSystem->GetProgramDir();
 
+    String defaultPrefixPath(AddTrailingSlash(getenv("URHO3D_PREFIX_PATH")));
+    if (defaultPrefixPath.Empty())
+        defaultPrefixPath = fileSystem->GetProgramDir();
+    String resourcePrefixPath = GetParameter(parameters, "ResourcePrefixPath", defaultPrefixPath).GetString();
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "Data;CoreData").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
-    Vector<String> autoloadPaths = GetParameter(parameters, "AutoloadPaths", "Extra").GetString().Split(';');
+    Vector<String> autoLoadPaths = GetParameter(parameters, "AutoloadPaths", "Autoload").GetString().Split(';');
 
     for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
@@ -211,20 +214,13 @@ bool Engine::Initialize(const VariantMap& parameters)
         // If path is not absolute, prefer to add it as a package if possible
         if (!IsAbsolutePath(resourcePaths[i]))
         {
-            String packageName = exePath + resourcePaths[i] + ".pak";
+            String packageName = resourcePrefixPath + resourcePaths[i] + ".pak";
             if (fileSystem->FileExists(packageName))
-            {
-                SharedPtr<PackageFile> package(new PackageFile(context_));
-                if (package->Open(packageName))
-                {
-                    cache->AddPackageFile(package);
-                    success = true;
-                }
-            }
+                success = cache->AddPackageFile(packageName);
 
             if (!success)
             {
-                String pathName = exePath + resourcePaths[i];
+                String pathName = resourcePrefixPath + resourcePaths[i];
                 if (fileSystem->DirExists(pathName))
                     success = cache->AddResourceDir(pathName);
             }
@@ -238,7 +234,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (!success)
         {
-            LOGERROR("Failed to add resource path " + resourcePaths[i]);
+            LOGERRORF("Failed to add resource path %s", resourcePaths[i].CString());
             return false;
         }
     }
@@ -246,85 +242,64 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Then add specified packages
     for (unsigned i = 0; i < resourcePackages.Size(); ++i)
     {
-        bool success = false;
-
-        String packageName = exePath + resourcePackages[i];
+        String packageName = resourcePrefixPath + resourcePackages[i];
         if (fileSystem->FileExists(packageName))
         {
-            SharedPtr<PackageFile> package(new PackageFile(context_));
-            if (package->Open(packageName))
+            if (!cache->AddPackageFile(packageName))
             {
-                cache->AddPackageFile(package);
-                success = true;
+                LOGERRORF("Failed to add resource package %s", resourcePackages[i].CString());
+                return false;
             }
         }
-
-        if (!success)
-        {
-            LOGERROR("Failed to add resource package " + resourcePackages[i]);
-            return false;
-        }
+        else
+            LOGDEBUGF("Skip specified resource package %s as it does not exist", resourcePackages[i].CString());
     }
     
     // Add auto load folders. Prioritize these (if exist) before the default folders
-    for (unsigned i = 0; i < autoloadPaths.Size(); ++i)
+    for (unsigned i = 0; i < autoLoadPaths.Size(); ++i)
     {
-        bool success = true;
-        String autoloadPath = autoloadPaths[i];
-        if (!IsAbsolutePath(autoloadPath))
-            autoloadPath = exePath + autoloadPath;
+        String autoLoadPath(autoLoadPaths[i]);
+        if (!IsAbsolutePath(autoLoadPath))
+            autoLoadPath = resourcePrefixPath + autoLoadPath;
 
-        String badResource;
-        if (fileSystem->DirExists(autoloadPath))
+        if (fileSystem->DirExists(autoLoadPath))
         {
-            Vector<String> folders;
-            fileSystem->ScanDir(folders, autoloadPath, "*", SCAN_DIRS, false);
-            for (unsigned y = 0; y < folders.Size(); ++y)
+            // Add all the subdirs (non-recursive) as resource directory
+            Vector<String> subdirs;
+            fileSystem->ScanDir(subdirs, autoLoadPath, "*", SCAN_DIRS, false);
+            for (unsigned y = 0; y < subdirs.Size(); ++y)
             {
-                String folder = folders[y];
-                if (folder.StartsWith("."))
+                String dir = subdirs[y];
+                if (dir.StartsWith("."))
                     continue;
 
-                String autoResourceDir = autoloadPath + "/" + folder;
-                success = cache->AddResourceDir(autoResourceDir, 0);
-                if (!success)
+                String autoResourceDir = autoLoadPath + "/" + dir;
+                if (!cache->AddResourceDir(autoResourceDir, 0))
                 {
-                    badResource = folder;
-                    break;
+                    LOGERRORF("Failed to add resource directory %s in autoload path %s", dir.CString(), autoLoadPaths[i].CString());
+                    return false;
                 }
             }
 
-            if (success)
+            // Add all the found package files (non-recursive)
+            Vector<String> paks;
+            fileSystem->ScanDir(paks, autoLoadPath, "*.pak", SCAN_FILES, false);
+            for (unsigned y = 0; y < paks.Size(); ++y)
             {
-                Vector<String> paks;
-                fileSystem->ScanDir(paks, autoloadPath, "*.pak", SCAN_FILES, false);
-                for (unsigned y = 0; y < paks.Size(); ++y)
-                {
-                    String pak = paks[y];
-                    if (pak.StartsWith("."))
-                        continue;
+                String pak = paks[y];
+                if (pak.StartsWith("."))
+                    continue;
 
-                    String autoResourcePak = autoloadPath + "/" + pak;
-                    SharedPtr<PackageFile> package(new PackageFile(context_));
-                    if (package->Open(autoResourcePak))
-                        cache->AddPackageFile(package, 0);
-                    else
-                    {
-                        badResource = autoResourcePak;
-                        success = false;
-                        break;
-                    }
+                String autoPackageName = autoLoadPath + "/" + pak;
+                if (!cache->AddPackageFile(autoPackageName, 0))
+                {
+                    LOGERRORF("Failed to add package file %s in autoload path %s", pak.CString(), autoLoadPaths[i].CString());
+                    return false;
                 }
             }
         }
         else
-            LOGWARNING("Skipped autoload folder " + autoloadPaths[i] + " as it does not exist");
-
-        if (!success)
-        {
-            LOGERROR("Failed to add resource " + badResource + " in autoload folder " + autoloadPaths[i]);
-            return false;
-        }
+            LOGDEBUGF("Skipped autoload path %s as it does not exist", autoLoadPaths[i].CString());
     }
 
     // Initialize graphics & audio output
@@ -814,9 +789,19 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["SoundMixRate"] = ToInt(value);
                 ++i;
             }
+            else if (argument == "pp" && !value.Empty())
+            {
+                ret["ResourcePrefixPath"] = value;
+                ++i;
+            }
             else if (argument == "p" && !value.Empty())
             {
                 ret["ResourcePaths"] = value;
+                ++i;
+            }
+            else if (argument == "pf" && !value.Empty())
+            {
+                ret["ResourcePackages"] = value;
                 ++i;
             }
             else if (argument == "ap" && !value.Empty())

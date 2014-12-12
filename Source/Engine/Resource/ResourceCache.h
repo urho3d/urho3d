@@ -89,9 +89,11 @@ public:
     virtual ~ResourceCache();
     
     /// Add a resource load directory. Optional priority parameter which will control search order.
-    bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST );
+    bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST);
     /// Add a package file for loading resources from. Optional priority parameter which will control search order.
-    void AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST );
+    bool AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST);
+    /// Add a package file for loading resources from by name. Optional priority parameter which will control search order.
+    bool AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST);
     /// Add a manually created resource. Must be uniquely named.
     bool AddManualResource(Resource* resource);
     /// Remove a resource load directory.

@@ -131,6 +131,9 @@ task :ci do
     $configuration = 'Debug'
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
     $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
+    if $testing
+      ENV['URHO3D_PREFIX_PATH'] = `pwd`.chomp + '/Bin'
+    end
   end
   # Define the build option string only when the override environment variable is given
   $build_options = "-DURHO3D_64BIT=#{ENV['URHO3D_64BIT']}" if ENV['URHO3D_64BIT']
@@ -320,10 +323,10 @@ setup_main_executable ()
 
 # Setup test cases
 if (URHO3D_ANGELSCRIPT)
-    add_test (NAME ExternalLibAS COMMAND ${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout ${URHO3D_TEST_TIME_OUT})
+    add_test (NAME ExternalLibAS COMMAND ${TARGET_NAME} Scripts/12_PhysicsStressTest.as -w -timeout ${URHO3D_TEST_TIME_OUT})
 endif ()
 if (URHO3D_LUA)
-    add_test (NAME ExternalLibLua COMMAND ${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
+    add_test (NAME ExternalLibLua COMMAND ${TARGET_NAME} LuaScripts/12_PhysicsStressTest.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
 endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
@@ -381,8 +384,6 @@ def makefile_ci
   else
     test = ''
   end
-# Temporarily create a symlink to Urho3D asset dir
-system "export ASSET_DIR=`pwd`/Bin; bash -c \"if cd ../Build/Bin 2>/dev/null; then ln -sf $ASSET_DIR/{CoreData,Data} .; fi\"" or abort 'Failed to create symlink to Urho3D asset directory'
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "../Build/generated/UsingSourceAndBuildTrees"
@@ -497,10 +498,6 @@ def xcode_ci
 # Temporarily not using any build options that require native tool building
 #  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
-# Temporarily create a symlink to Urho3D asset dir
-unless ENV['IOS']
-  system "export ASSET_DIR=`pwd`/Bin; bash -c \"mkdir -p ../Build/Bin && cd ../Build/Bin && ln -sf $ASSET_DIR/{CoreData,Data} .\"" or abort 'Failed to create symlink to Urho3D asset directory'
-end
   xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "../Build/generated/UsingSourceAndBuildTrees"

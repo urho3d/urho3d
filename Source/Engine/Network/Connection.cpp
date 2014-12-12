@@ -821,8 +821,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 
                 // Instantiate the package and add to the resource system, as we will need it to load the scene
                 download.file_->Close();
-                SharedPtr<PackageFile> newPackage(new PackageFile(context_, download.file_->GetName()));
-                GetSubsystem<ResourceCache>()->AddPackageFile(newPackage, true);
+                GetSubsystem<ResourceCache>()->AddPackageFile(download.file_->GetName(), true);
                 
                 // Then start the next download if there are more
                 downloads_.Erase(i);

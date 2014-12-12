@@ -124,13 +124,13 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     return true;
 }
 
-void ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
+bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
     
     // Do not add packages that failed to load
     if (!package || !package->GetNumFiles())
-        return;
+        return false;
     
     if (priority < packages_.Size())
         packages_.Insert(priority, SharedPtr<PackageFile>(package));
@@ -138,6 +138,13 @@ void ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
         packages_.Push(SharedPtr<PackageFile>(package));
     
     LOGINFO("Added resource package " + package->GetName());
+    return true;
+}
+
+bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
+{
+    SharedPtr<PackageFile> package(new PackageFile(context_));
+    return package->Open(fileName) && AddPackageFile(fileName);
 }
 
 bool ResourceCache::AddManualResource(Resource* resource)

@@ -9,4 +9,6 @@
 ::   Start the server with "NinjaSnowWar -w -server"
 ::   Start the client on the same host with "NinjaSnowWar -w -nobgm -address <put-your-host-name-here>"
 ::
-"%~dp0Urho3DPlayer" Scripts/NinjaSnowWar.as %*
+@echo off
+if exist "%~dp0Urho3DPlayer.exe" (set "DEBUG=") else (set "DEBUG=_d")
+"%~dp0Urho3DPlayer%DEBUG%" Scripts/NinjaSnowWar.as %*
