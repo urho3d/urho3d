@@ -54,7 +54,6 @@ struct URHO3D_API CursorShapeInfo
 {
     /// Construct with defaults.
     CursorShapeInfo() :
-    name_(String::EMPTY),
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
         osCursor_(0),
@@ -63,20 +62,8 @@ struct URHO3D_API CursorShapeInfo
     {
     }
 
-    /// Construct with name.
-    CursorShapeInfo(const String& name) :
-        name_(name),
-        imageRect_(IntRect::ZERO),
-        hotSpot_(IntVector2::ZERO),
-        osCursor_(0),
-        systemDefined_(false),
-        systemCursor_(-1)
-    {
-    }
-
-    /// Construct with name.
-    CursorShapeInfo(const String& name, int systemCursor) :
-        name_(name),
+    /// Construct with system cursor.
+    CursorShapeInfo(int systemCursor) :
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
         osCursor_(0),
@@ -85,8 +72,6 @@ struct URHO3D_API CursorShapeInfo
     {
     }
 
-    /// Name.
-    String name_;
     /// Image.
     SharedPtr<Image> image_;
     /// Texture.
@@ -124,7 +109,7 @@ public:
     /// Define a shape.
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     /// Set current shape.
-    void SetShape(const StringHash& shape);
+    void SetShape(const String& shape);
     /// Set current shape.
     void SetShape(CursorShape shape);
     /// Set whether to use system default shapes. Is only possible when the OS mouse cursor has been set visible from the Input subsystem.
@@ -146,9 +131,9 @@ protected:
     void HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData);
 
     /// Current shape index.
-    StringHash shape_;
+    String shape_;
     /// Shape definitions.
-    HashMap<StringHash, CursorShapeInfo> shapeInfos_;
+    HashMap<String, CursorShapeInfo> shapeInfos_;
     /// Use system default shapes flag.
     bool useSystemShapes_;
     /// OS cursor shape needs update flag.

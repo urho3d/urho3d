@@ -97,23 +97,10 @@ static const int STREAM_SAFETY_SAMPLES = 4;
 
 extern const char* AUDIO_CATEGORY;
 
-static const char* typeNames[MAX_SOUND_TYPES] =
-{
-    "Effect",
-    "Ambient",
-    "Voice",
-    "Music",
-    0
-};
-
-template<> SoundType Variant::Get<SoundType>() const
-{
-    return static_cast<SoundType>(GetInt());
-}
 
 SoundSource::SoundSource(Context* context) :
     Component(context),
-    soundType_(soundTypeHashes[SOUND_EFFECT]),
+    soundType_(String::EMPTY),
     frequency_(0.0f),
     gain_(1.0f),
     attenuation_(1.0f),
@@ -143,8 +130,7 @@ void SoundSource::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Sound Type", GetSoundTypeAttr, SetSoundTypeAttr, SoundType, typeNames, SOUND_MASTER, AM_EDIT | AM_READ);
-    ATTRIBUTE("Type", StringHash, soundType_, soundTypeHashes[SOUND_EFFECT], AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, "Effect", AM_DEFAULT);
     ATTRIBUTE("Frequency", float, frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE("Gain", float, gain_, 1.0f, AM_DEFAULT);
     ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
@@ -241,18 +227,9 @@ void SoundSource::Stop()
     MarkNetworkUpdate();
 }
 
-void SoundSource::SetSoundType(SoundType type)
+void SoundSource::SetSoundType(const String& type)
 {
-    if (type == SOUND_MASTER || type >= MAX_SOUND_TYPES)
-        return;
-
-    soundType_ = soundTypeHashes[type];
-    MarkNetworkUpdate();
-}
-
-void SoundSource::SetSoundType(const StringHash& type)
-{
-    if (type == soundTypeHashes[SOUND_MASTER])
+    if (type == SOUND_MASTER)
         return;
 
     if (!audio_->IsMasterGain(type))
@@ -475,26 +452,6 @@ int SoundSource::GetPositionAttr() const
     else
         return 0;
 }
-
-SoundType SoundSource::GetSoundTypeAttr() const
-{
-    for (int i = 0; i < MAX_SOUND_TYPES; i++)
-    {
-        if (soundType_ == soundTypeHashes[i])
-            return static_cast<SoundType>(i);
-    }
-
-    // Valid as this defaults to 0 in type names.
-    return SOUND_MASTER;
-}
-
-void SoundSource::SetSoundTypeAttr(SoundType type)
-{
-    // Ensure that we don't set twice via normal attribute and backwards compatibility attribute.
-    if (soundType_ == StringHash::ZERO)
-        SetSoundType(type);
-}
-
 
 void SoundSource::PlayLockless(Sound* sound)
 {

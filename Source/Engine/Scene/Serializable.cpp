@@ -319,7 +319,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         while (attempts)
         {
             const AttributeInfo& attr = attributes->At(i);
-            if (((attr.mode_ & AM_FILE) || (attr.mode_ & AM_READ)) && !attr.name_.Compare(name, true))
+            if ((attr.mode_ & AM_FILE) && !attr.name_.Compare(name, true))
             {
                 Variant varValue;
 

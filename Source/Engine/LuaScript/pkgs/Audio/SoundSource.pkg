@@ -9,8 +9,7 @@ class SoundSource : public Component
     void Play(Sound* sound, float frequency, float gain);
     void Play(Sound* sound, float frequency, float gain, float panning);
     void Stop();
-    void SetSoundType(SoundType type);
-    void SetSoundType(const StringHash& type);
+    void SetSoundType(const String& type);
     void SetFrequency(float frequency);
     void SetGain(float gain);
     void SetAttenuation(float attenuation);
@@ -18,7 +17,7 @@ class SoundSource : public Component
     void SetAutoRemove(bool enable);
 
     Sound* GetSound() const;
-    StringHash GetSoundType() const;
+    String GetSoundType() const;
     float GetTimePosition() const;
     float GetFrequency() const;
     float GetGain() const;
@@ -28,7 +27,7 @@ class SoundSource : public Component
     bool IsPlaying() const;
     
     tolua_readonly tolua_property__get_set Sound* sound;
-    tolua_property__get_set StringHash soundType;
+    tolua_property__get_set String soundType;
     tolua_readonly tolua_property__get_set float timePosition;
     tolua_property__get_set float frequency;
     tolua_property__get_set float gain;

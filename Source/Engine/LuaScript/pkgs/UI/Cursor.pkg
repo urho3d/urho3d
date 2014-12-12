@@ -26,12 +26,12 @@ class Cursor : public BorderImage
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     
     void SetShape(CursorShape shape);
-    void SetShape(const StringHash& shape);
+    void SetShape(const String& shape);
     void SetUseSystemShapes(bool enable);
-    StringHash GetShape() const;
+    String GetShape() const;
     bool GetUseSystemShapes() const;
 
-    tolua_property__get_set StringHash shape;
+    tolua_property__get_set String shape;
     tolua_property__get_set bool useSystemShapes;
 };
 

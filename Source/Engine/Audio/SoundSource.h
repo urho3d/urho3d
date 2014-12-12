@@ -60,10 +60,8 @@ public:
     void Play(SoundStream* stream);
     /// Stop playback.
     void Stop();
-    /// Set sound type, determines the master gain group by enum.
-    void SetSoundType(SoundType type);   
     /// Set sound type, determines the master gain group.
-    void SetSoundType(const StringHash& type);
+    void SetSoundType(const String& type);
     /// Set frequency.
     void SetFrequency(float frequency);
     /// Set gain. 0.0 is silence, 1.0 is full volume.
@@ -82,7 +80,7 @@ public:
     /// Return playback position.
     volatile signed char* GetPlayPosition() const { return position_; }
     /// Return sound type, determines the master gain group.
-    StringHash GetSoundType() const { return soundType_; }
+    String GetSoundType() const { return soundType_; }
     /// Return playback time position.
     float GetTimePosition() const { return timePosition_; }
     /// Return frequency.
@@ -113,16 +111,12 @@ public:
     void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;
-    /// Set sound type attribute for backwards compatibility.
-    void SetSoundTypeAttr(SoundType type);
-    /// Return sound type attribute for backwards compatibility.
-    SoundType GetSoundTypeAttr() const;
     
 protected:
     /// Audio subsystem.
     WeakPtr<Audio> audio_;
     /// SoundSource type, determines the master gain group.
-    StringHash soundType_;
+    String soundType_;
     /// Frequency.
     float frequency_;
     /// Gain.

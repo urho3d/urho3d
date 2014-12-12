@@ -53,8 +53,8 @@ Audio::Audio(Context* context) :
     sampleSize_(0),
     playing_(false)
 {
-    for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
-        masterGain_[soundTypeHashes[i]] = 1.0f;
+    // Set the master to the default value
+    masterGain_[SOUND_MASTER] = 1.0f;
     
     // Register Audio library object factories
     RegisterAudioLibrary(context_);
@@ -149,15 +149,7 @@ void Audio::Stop()
     playing_ = false;
 }
 
-void Audio::SetMasterGain(SoundType type, float gain)
-{
-    if (type >= MAX_SOUND_TYPES)
-        return;
-
-    SetMasterGain(soundTypeHashes[type], gain);
-}
-
-void Audio::SetMasterGain(const StringHash& type, float gain)
+void Audio::SetMasterGain(const String& type, float gain)
 {
     masterGain_[type] = Clamp(gain, 0.0f, 1.0f);
 }
@@ -176,19 +168,9 @@ void Audio::StopSound(Sound* soundClip)
     }
 }
 
-
-float Audio::GetMasterGain(SoundType type) const
+float Audio::GetMasterGain(const String& type) const
 {
-    if (type >= MAX_SOUND_TYPES)
-        return 0.0f;
-
-    return GetMasterGain(soundTypeHashes[type]);
-}
-
-
-float Audio::GetMasterGain(const StringHash& type) const
-{
-    VariantMap::ConstIterator findIt = masterGain_.Find(type);
+    HashMap<String, Variant>::ConstIterator findIt = masterGain_.Find(type);
     if (findIt == masterGain_.End())
         return 0.0f;
 
@@ -216,18 +198,14 @@ void Audio::RemoveSoundSource(SoundSource* channel)
     }
 }
 
-float Audio::GetSoundSourceMasterGain(SoundType type) const
+float Audio::GetSoundSourceMasterGain(const String& type) const
 {
-    if (type >= MAX_SOUND_TYPES)
-        return 0.0f;
-    
-    return GetSoundSourceMasterGain(soundTypeHashes[type]);
-}
+    HashMap<String, Variant>::ConstIterator masterIt = masterGain_.Find(SOUND_MASTER);
 
-float Audio::GetSoundSourceMasterGain(const StringHash& type) const
-{
-    VariantMap::ConstIterator masterIt = masterGain_.Find(soundTypeHashes[SOUND_MASTER]);
-    VariantMap::ConstIterator typeIt = masterGain_.Find(type);
+    if (type == String::EMPTY)
+        return masterIt->second_.GetFloat();
+
+    HashMap<String, Variant>::ConstIterator typeIt = masterGain_.Find(type);
 
     if (typeIt == masterGain_.End() || typeIt == masterIt)
         return masterIt->second_.GetFloat();

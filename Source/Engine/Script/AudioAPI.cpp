@@ -45,12 +45,7 @@ void RegisterSound(asIScriptEngine* engine)
 
 void RegisterSoundSources(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("SoundType");
-    engine->RegisterEnumValue("SoundType", "SOUND_EFFECT", SOUND_EFFECT);
-    engine->RegisterEnumValue("SoundType", "SOUND_AMBIENT", SOUND_AMBIENT);
-    engine->RegisterEnumValue("SoundType", "SOUND_VOICE", SOUND_VOICE);
-    engine->RegisterEnumValue("SoundType", "SOUND_MUSIC", SOUND_MUSIC);
-    engine->RegisterEnumValue("SoundType", "SOUND_MASTER", SOUND_MASTER);
+    engine->RegisterGlobalProperty("const String SOUND_MASTER", (void*) &SOUND_MASTER);
     
     RegisterSoundSource<SoundSource>(engine, "SoundSource");
     RegisterSoundSource<SoundSource3D>(engine, "SoundSource3D");
@@ -80,34 +75,15 @@ static Audio* GetAudio()
     return GetScriptContext()->GetSubsystem<Audio>();
 }
 
-static float GetMasterGainFromEnum(SoundType type, Audio* audio)
-{
-    return audio->GetMasterGain(type);
-}
-
-static float GetMasterGainFromHash(const StringHash& type, Audio* audio)
-{
-    return audio->GetMasterGain(type);
-}
-
-static StringHash GetHashFromType(SoundType type)
-{
-    return soundTypeHashes[type];
-}
-
 void RegisterAudio(asIScriptEngine* engine)
 {
     RegisterObject<Audio>(engine, "Audio");
     engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool interpolate = true)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool Play()", asMETHOD(Audio, Play), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void SetMasterGain(SoundType, float)", asMETHODPR(Audio, SetMasterGain, (SoundType, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "float GetMasterGain(SoundType) const", asFUNCTION(GetMasterGainFromEnum), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Audio", "void SetMasterGain(const StringHash&in, float)", asMETHODPR(Audio, SetMasterGain, (const StringHash&, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "float GetMasterGain(const StringHash&in) const", asFUNCTION(GetMasterGainFromHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Audio", "void set_masterGain(const StringHash&in, float)", asMETHODPR(Audio, SetMasterGain, (const StringHash&, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "float get_masterGain(const StringHash&in) const", asFUNCTION(GetMasterGainFromHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Audio", "bool IsMasterGain(const StringHash&in) const", asMETHOD(Audio, IsMasterGain), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void set_masterGain(const String&in, float)", asMETHOD(Audio, SetMasterGain), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "float get_masterGain(const String&in) const", asMETHOD(Audio, GetMasterGain), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "bool IsMasterGain(const String&in) const", asMETHOD(Audio, IsMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_listener(SoundListener@+)", asMETHOD(Audio, SetListener), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "SoundListener@+ get_listener() const", asMETHOD(Audio, GetListener), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "uint get_sampleSize() const", asMETHOD(Audio, GetSampleSize), asCALL_THISCALL);
@@ -117,7 +93,6 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "bool get_playing() const", asMETHOD(Audio, IsPlaying), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_initialized() const", asMETHOD(Audio, IsInitialized), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(GetAudio), asCALL_CDECL);
-    engine->RegisterGlobalFunction("StringHash GetHashFromSoundType(SoundType type)", asFUNCTION(GetHashFromType), asCALL_CDECL);
 }
 
 void RegisterAudioAPI(asIScriptEngine* engine)

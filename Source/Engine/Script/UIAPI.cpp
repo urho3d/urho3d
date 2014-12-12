@@ -169,10 +169,10 @@ static void RegisterCursor(asIScriptEngine* engine)
     RegisterBorderImage<Cursor>(engine, "Cursor");
     engine->RegisterObjectMethod("Cursor", "void DefineShape(const String&in, Texture@+, const IntRect&in, const IntVector2&in)", asMETHODPR(Cursor, DefineShape, (CursorShape, Image*, const IntRect&, const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in)", asMETHODPR(Cursor, DefineShape, (const String&, Image*, const IntRect&, const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "void SetShape(const StringHash&in)", asMETHODPR(Cursor, SetShape, (const StringHash&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void SetShape(const String&in)", asMETHODPR(Cursor, SetShape, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void SetShape(CursorShape)", asMETHODPR(Cursor, SetShape, (CursorShape), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "void set_shape(const StringHash&in)", asMETHODPR(Cursor, SetShape, (const StringHash&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "StringHash get_shape() const", asMETHOD(Cursor, GetShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void set_shape(const String&in)", asMETHODPR(Cursor, SetShape, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "String get_shape() const", asMETHOD(Cursor, GetShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void set_useSystemShapes(bool)", asMETHOD(Cursor, SetUseSystemShapes), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "bool get_useSystemShapes() const", asMETHOD(Cursor, GetUseSystemShapes), asCALL_THISCALL);
 }

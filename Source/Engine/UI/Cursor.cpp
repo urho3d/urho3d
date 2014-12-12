@@ -52,22 +52,6 @@ static const char* shapeNames[] =
     "BusyArrow"
 };
 
-static const StringHash shapeHashes[] =
-{
-    "Normal",
-    "IBeam",
-    "Cross",
-    "ResizeVertical",
-    "ResizeDiagonalTopRight",
-    "ResizeHorizontal",
-    "ResizeDiagonalTopLeft",
-    "ResizeAll",
-    "AcceptDrop",
-    "RejectDrop",
-    "Busy",
-    "BusyArrow"
-};
-
 /// OS cursor shape lookup table matching cursor shape enumeration
 static const int osCursorLookup[CS_MAX_SHAPES] =
 {
@@ -89,13 +73,13 @@ extern const char* UI_CATEGORY;
 
 Cursor::Cursor(Context* context) :
     BorderImage(context),
-    shape_(shapeHashes[CS_NORMAL]),
+    shape_(shapeNames[CS_NORMAL]),
     useSystemShapes_(false),
     osShapeDirty_(false)
 {
     // Define the defaults for system cursor usage.
     for (unsigned i = 0; i < CS_MAX_SHAPES; i++)
-        shapeInfos_[shapeHashes[i]] = CursorShapeInfo(shapeNames[i], i);
+        shapeInfos_[shapeNames[i]] = CursorShapeInfo(i);
 
     // Subscribe to OS mouse cursor visibility changes to be able to reapply the cursor shape
     SubscribeToEvent(E_MOUSEVISIBLECHANGED, HANDLER(Cursor, HandleMouseVisibleChanged));
@@ -103,7 +87,7 @@ Cursor::Cursor(Context* context) :
 
 Cursor::~Cursor()
 {
-    HashMap<StringHash, CursorShapeInfo>::Iterator iter = shapeInfos_.Begin();
+    HashMap<String, CursorShapeInfo>::Iterator iter = shapeInfos_.Begin();
     for (iter; iter != shapeInfos_.End(); iter++)
     {
         if (iter->second_.osCursor_)
@@ -157,7 +141,7 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
     if (!shapeInfos_.Contains(shape))
-        shapeInfos_[shape] = CursorShapeInfo(shape);
+        shapeInfos_[shape] = CursorShapeInfo();
 
     CursorShapeInfo& info = shapeInfos_[shape];
 
@@ -184,15 +168,15 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     // Reset current shape if it was edited
     if (shape_ == shape)
     {
-        shape_ = StringHash::ZERO;
+        shape_ = String::EMPTY;
         SetShape(shape);
     }
 }
 
 
-void Cursor::SetShape(const StringHash& shape)
+void Cursor::SetShape(const String& shape)
 {
-    if (shape_ == shape || !shapeInfos_.Contains(shape))
+    if (shape == String::EMPTY || shape.Empty() || shape_ == shape || !shapeInfos_.Contains(shape))
         return;
 
     shape_ = shape;
@@ -205,16 +189,16 @@ void Cursor::SetShape(const StringHash& shape)
     // To avoid flicker, the UI subsystem will apply the OS shape once per frame. Exception: if we are using the
     // busy shape, set it immediately as we may block before that
     osShapeDirty_ = true;
-    if (shape_ == shapeHashes[CS_BUSY])
+    if (shape_ == shapeNames[CS_BUSY])
         ApplyOSCursorShape();
 }
 
 void Cursor::SetShape(CursorShape shape)
 {
-    if (shape_ == shapeHashes[shape] || shape < CS_NORMAL || shape >= CS_MAX_SHAPES)
+    if (shape < CS_NORMAL || shape >= CS_MAX_SHAPES || shape_ == shapeNames[shape])
         return;
 
-    SetShape(shapeHashes[shape]);
+    SetShape(shapeNames[shape]);
 }
 
 void Cursor::SetUseSystemShapes(bool enable)
@@ -251,14 +235,14 @@ VariantVector Cursor::GetShapesAttr() const
 {
     VariantVector ret;
 
-    HashMap<StringHash, CursorShapeInfo>::ConstIterator iter = shapeInfos_.Begin();
+    HashMap<String, CursorShapeInfo>::ConstIterator iter = shapeInfos_.Begin();
     for (iter; iter != shapeInfos_.End(); iter++)
     {
         if (iter->second_.imageRect_ != IntRect::ZERO)
         {
             // Could use a map but this simplifies the UI xml.
             VariantVector shape;
-            shape.Push(iter->second_.name_);
+            shape.Push(iter->first_);
             shape.Push(GetResourceRef(iter->second_.texture_, Texture2D::GetTypeStatic()));
             shape.Push(iter->second_.imageRect_);
             shape.Push(iter->second_.hotSpot_);

@@ -28,58 +28,6 @@
 		<element type="BorderImage" internal="true" style="none">
 			<element internal="true" style="none">
 				<element style="ListRow">
-					<attribute name="Name" value="Effect" />
-					<attribute name="Layout Spacing" value="10" />
-					<element type="Text">
-						<attribute name="Text" value="Effect" />
-					</element>
-					<element type="LineEdit">
-						<attribute name="Name" value="EffectValue" />
-						<attribute name="Min Size" value="100 0" />
-						<attribute name="Max Size" value="2147483647 20" />
-						<attribute name="Max Length" value="4" />
-					</element>
-				</element>
-				<element style="ListRow">
-					<attribute name="Name" value="Ambient" />
-					<attribute name="Layout Spacing" value="10" />
-					<element type="Text">
-						<attribute name="Text" value="Ambient" />
-					</element>
-					<element type="LineEdit">
-						<attribute name="Name" value="AmbientValue" />
-						<attribute name="Min Size" value="100 0" />
-						<attribute name="Max Size" value="2147483647 20" />
-						<attribute name="Max Length" value="4" />
-					</element>
-				</element>
-				<element style="ListRow">
-					<attribute name="Name" value="Voice" />
-					<attribute name="Layout Spacing" value="10" />
-					<element type="Text">
-						<attribute name="Text" value="Voice" />
-					</element>
-					<element type="LineEdit">
-						<attribute name="Name" value="VoiceValue" />
-						<attribute name="Min Size" value="100 0" />
-						<attribute name="Max Size" value="2147483647 20" />
-						<attribute name="Max Length" value="4" />
-					</element>
-				</element>
-				<element style="ListRow">
-					<attribute name="Name" value="Music" />
-					<attribute name="Layout Spacing" value="10" />
-					<element type="Text">
-						<attribute name="Text" value="Music" />
-					</element>
-					<element type="LineEdit">
-						<attribute name="Name" value="MusicValue" />
-						<attribute name="Min Size" value="100 0" />
-						<attribute name="Max Size" value="2147483647 20" />
-						<attribute name="Max Length" value="4" />
-					</element>
-				</element>
-				<element style="ListRow">
 					<attribute name="Name" value="Master" />
 					<attribute name="Layout Spacing" value="10" />
 					<element type="Text">

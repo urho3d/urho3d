@@ -164,6 +164,7 @@ void LoadConfig()
     XMLElement resourcesElem = configElem.GetChild("resources");
     XMLElement consoleElem = configElem.GetChild("console");
     XMLElement varNamesElem = configElem.GetChild("varnames");
+    XMLElement soundTypesElem = configElem.GetChild("soundtypes");
 
     if (!cameraElem.isNull)
     {
@@ -272,6 +273,9 @@ void LoadConfig()
     
     if (!varNamesElem.isNull)
         globalVarNames = varNamesElem.GetVariantMap();
+        
+    if (!soundTypesElem.isNull)
+        LoadSoundTypes(soundTypesElem);
 }
 
 void SaveConfig()
@@ -288,6 +292,7 @@ void SaveConfig()
     XMLElement resourcesElem = configElem.CreateChild("resources");
     XMLElement consoleElem = configElem.CreateChild("console");
     XMLElement varNamesElem = configElem.CreateChild("varnames");
+    XMLElement soundTypesElem = configElem.CreateChild("soundtypes");
 
     cameraElem.SetFloat("nearclip", viewNearClip);
     cameraElem.SetFloat("farclip", viewFarClip);
@@ -358,6 +363,8 @@ void SaveConfig()
     consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
     varNamesElem.SetVariantMap(globalVarNames);
+    
+    SaveSoundTypes(soundTypesElem);
 
     config.Save(File(configFileName, FILE_WRITE));
 }
