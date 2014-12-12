@@ -522,9 +522,9 @@ void Material::SetTexture(TextureUnit unit, Texture* texture)
         // Update the number of used texture units
         if (texture && (unsigned)unit >= numUsedTextureUnits_)
             numUsedTextureUnits_ = unit + 1;
-        else if (!texture)
+        else if (!texture && unit == numUsedTextureUnits_ - 1)
         {
-            if (unit == numUsedTextureUnits_ - 1)
+            while (numUsedTextureUnits_ && !textures_[numUsedTextureUnits_ - 1])
                 --numUsedTextureUnits_;
         }
     }
