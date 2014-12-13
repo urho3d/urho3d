@@ -110,7 +110,7 @@ protected:
     virtual void OnNodeSet(Node* node);
 
     /// Create a new particle. Return true if there was room.
-    bool EmitNewParticle();
+    bool EmitNewParticle(const FrameInfo& frame);
     /// Return a free particle index.
     unsigned GetFreeParticle() const;
 
