@@ -218,6 +218,7 @@ void LoadConfig()
 
     if (!renderingElem.isNull)
     {
+        if (renderingElem.HasAttribute("renderpath")) renderPathName = renderingElem.GetAttribute("renderpath");
         if (renderingElem.HasAttribute("texturequality")) renderer.textureQuality = renderingElem.GetInt("texturequality");
         if (renderingElem.HasAttribute("materialquality")) renderer.materialQuality = renderingElem.GetInt("materialquality");
         if (renderingElem.HasAttribute("shadowresolution")) SetShadowResolution(renderingElem.GetInt("shadowresolution"));
@@ -270,12 +271,13 @@ void LoadConfig()
         // Console does not exist yet at this point, so store the string in a global variable
         if (consoleElem.HasAttribute("commandinterpreter")) consoleCommandInterpreter = consoleElem.GetAttribute("commandinterpreter");
     }
-    
+
     if (!varNamesElem.isNull)
         globalVarNames = varNamesElem.GetVariantMap();
-        
+
     if (!soundTypesElem.isNull)
         LoadSoundTypes(soundTypesElem);
+
 }
 
 void SaveConfig()
@@ -323,6 +325,7 @@ void SaveConfig()
 
     if (renderer !is null && graphics !is null)
     {
+        renderingElem.SetAttribute("renderpath", renderPathName);
         renderingElem.SetInt("texturequality", renderer.textureQuality);
         renderingElem.SetInt("materialquality", renderer.materialQuality);
         renderingElem.SetInt("shadowresolution", GetShadowResolution());
@@ -363,7 +366,7 @@ void SaveConfig()
     consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
     varNamesElem.SetVariantMap(globalVarNames);
-    
+
     SaveSoundTypes(soundTypesElem);
 
     config.Save(File(configFileName, FILE_WRITE));
