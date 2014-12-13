@@ -1147,6 +1147,9 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "float get_sizeAdd() const", asMETHOD(ParticleEffect, GetSizeAdd), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_sizeMul(float)", asMETHOD(ParticleEffect, SetSizeMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "float get_sizeMul() const", asMETHOD(ParticleEffect, GetSizeMul), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_rotateDirection(bool)", asMETHOD(ParticleEffect, SetRotateToDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool get_rotateDirection() const", asMETHOD(ParticleEffect, IsRotateToDirection), asCALL_THISCALL);
+
 
     engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(Color&, float)", asMETHOD(ParticleEffect, AddColorTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void AddColorFrame(ColorFrame@+)", asMETHOD(ParticleEffect, AddColorFrame), asCALL_THISCALL);

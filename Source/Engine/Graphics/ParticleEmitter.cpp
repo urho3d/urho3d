@@ -483,27 +483,31 @@ bool ParticleEmitter::EmitNewParticle(const FrameInfo& frame)
     billboard.size_ = particles_[index].size_;
     const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrames();
     billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
-//    billboard.rotation_ = effect_->GetRandomRotation();
-    Matrix4 viwProj = frame.camera_->GetProjection() * frame.camera_->GetView();
 
-    Vector3 pos1 = viwProj * startPos;
-    Vector3 pos2 = viwProj * (startPos + startDir);
-    //get direction in projection space
-    Vector3 dirParticle = pos2 - pos1;
-    dirParticle.Normalize();
+    if (effect_->IsRotateToDirection())
+    {
+    	Matrix4 viwProj = frame.camera_->GetProjection() * frame.camera_->GetView();
 
-    // vector::right is 0 degree
-    float angle = dirParticle.Angle(Vector3::RIGHT);
+    	Vector3 pos1 = viwProj * startPos;
+    	Vector3 pos2 = viwProj * (startPos + startDir);
+    	//get direction in projection space
+    	Vector3 dirParticle = pos2 - pos1;
+    	dirParticle.Normalize();
 
-    bool up = dirParticle.DotProduct(Vector3::UP) > 0;
-    if (up){
-    	angle *= -1;
+    	// vector::right is 0 degree
+    	float angle = dirParticle.Angle(Vector3::RIGHT);
+
+    	bool up = dirParticle.DotProduct(Vector3::UP) > 0;
+    	if (up){
+    		angle *= -1;
+    	}
+    	billboard.rotation_ = angle;
+
     }
-
-
-    billboard.rotation_ = angle;
-
-
+    else
+    {
+    	billboard.rotation_ = effect_->GetRandomRotation();
+    }
 
     const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
     billboard.color_ = colorFrames_[0].color_;

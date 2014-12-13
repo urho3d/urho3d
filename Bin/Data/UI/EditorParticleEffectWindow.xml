@@ -308,6 +308,24 @@
                         </element>
                     </element>
                 </element>
+				<element>
+                    <attribute name="Min Size" value="0 16" />
+                    <attribute name="Max Size" value="2147483647 16" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Spacing" value="10" />
+                    <element type="Text" style="EditorAttributeText">
+                        <attribute name="Text" value="Rotate Direction" />
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="1" />
+                        <element type="CheckBox">
+                            <attribute name="Name" value="RotateDirection" />
+                        </element>
+                    </element>
+                </element>
                     <!-- End of Initial Attributes -->
                 <element type="BorderImage" style="EditorDivider" />
                 <element style="Panel">
