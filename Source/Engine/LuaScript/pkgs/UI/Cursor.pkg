@@ -22,11 +22,11 @@ class Cursor : public BorderImage
     Cursor();
     virtual ~Cursor();
 
-    void DefineShape(const String& shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
+    void DefineShape(const String shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     
     void SetShape(CursorShape shape);
-    void SetShape(const String& shape);
+    void SetShape(const String shape);
     void SetUseSystemShapes(bool enable);
     String GetShape() const;
     bool GetUseSystemShapes() const;

@@ -115,7 +115,7 @@ public:
     /// Set whether to use system default shapes. Is only possible when the OS mouse cursor has been set visible from the Input subsystem.
     void SetUseSystemShapes(bool enable);
     /// Get current shape.
-    StringHash GetShape() const { return shape_; }
+    const String& GetShape() const { return shape_; }
     /// Return whether is using system default shapes.
     bool GetUseSystemShapes() const { return useSystemShapes_; }
 
@@ -130,7 +130,7 @@ protected:
     /// Handle operating system mouse cursor visibility change event.
     void HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData);
 
-    /// Current shape index.
+    /// Current shape definition.
     String shape_;
     /// Shape definitions.
     HashMap<String, CursorShapeInfo> shapeInfos_;

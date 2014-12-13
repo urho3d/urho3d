@@ -117,6 +117,8 @@ protected:
     WeakPtr<Audio> audio_;
     /// SoundSource type, determines the master gain group.
     String soundType_;
+    /// SoundSource type hash.
+    StringHash soundTypeHash_;
     /// Frequency.
     float frequency_;
     /// Gain.

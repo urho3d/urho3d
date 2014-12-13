@@ -44,6 +44,7 @@ const char* AUDIO_CATEGORY = "Audio";
 static const int MIN_BUFFERLENGTH = 20;
 static const int MIN_MIXRATE = 11025;
 static const int MAX_MIXRATE = 48000;
+static const StringHash SOUND_MASTER_HASH("MASTER");
 
 static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
 
@@ -54,7 +55,7 @@ Audio::Audio(Context* context) :
     playing_(false)
 {
     // Set the master to the default value
-    masterGain_[SOUND_MASTER] = 1.0f;
+    masterGain_[SOUND_MASTER_HASH] = 1.0f;
     
     // Register Audio library object factories
     RegisterAudioLibrary(context_);
@@ -170,9 +171,10 @@ void Audio::StopSound(Sound* soundClip)
 
 float Audio::GetMasterGain(const String& type) const
 {
-    HashMap<String, Variant>::ConstIterator findIt = masterGain_.Find(type);
+    // By definition previously unknown types return full volume
+    HashMap<StringHash, Variant>::ConstIterator findIt = masterGain_.Find(type);
     if (findIt == masterGain_.End())
-        return 0.0f;
+        return 1.0f;
 
     return findIt->second_.GetFloat();
 }
@@ -198,14 +200,14 @@ void Audio::RemoveSoundSource(SoundSource* channel)
     }
 }
 
-float Audio::GetSoundSourceMasterGain(const String& type) const
+float Audio::GetSoundSourceMasterGain(StringHash typeHash) const
 {
-    HashMap<String, Variant>::ConstIterator masterIt = masterGain_.Find(SOUND_MASTER);
+    HashMap<StringHash, Variant>::ConstIterator masterIt = masterGain_.Find(SOUND_MASTER_HASH);
 
-    if (type == String::EMPTY)
+    if (!typeHash)
         return masterIt->second_.GetFloat();
 
-    HashMap<String, Variant>::ConstIterator typeIt = masterGain_.Find(type);
+    HashMap<StringHash, Variant>::ConstIterator typeIt = masterGain_.Find(typeHash);
 
     if (typeIt == masterGain_.End() || typeIt == masterIt)
         return masterIt->second_.GetFloat();

@@ -221,13 +221,15 @@ void Cursor::SetShapesAttr(const VariantVector& value)
     for (iter; iter != value.End(); iter++)
     {
         VariantVector shapeVector = iter->GetVariantVector();
+        if (shapeVector.Size() >= 4)
+        {
+            String shape = shapeVector[0].GetString();
+            ResourceRef ref = shapeVector[1].GetResourceRef();
+            IntRect imageRect = shapeVector[2].GetIntRect();
+            IntVector2 hotSpot = shapeVector[3].GetIntVector2();
 
-        String shape = shapeVector[0].GetString();
-        ResourceRef ref = shapeVector[1].GetResourceRef();
-        IntRect imageRect = shapeVector[2].GetIntRect();
-        IntVector2 hotSpot = shapeVector[3].GetIntVector2();
-
-        DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.name_), imageRect, hotSpot);
+            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.name_), imageRect, hotSpot);
+        }
     }
 }
 

@@ -100,7 +100,7 @@ extern const char* AUDIO_CATEGORY;
 
 SoundSource::SoundSource(Context* context) :
     Component(context),
-    soundType_(String::EMPTY),
+    soundType_(SOUND_EFFECT),
     frequency_(0.0f),
     gain_(1.0f),
     attenuation_(1.0f),
@@ -130,7 +130,7 @@ void SoundSource::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, "Effect", AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, SOUND_EFFECT, AM_DEFAULT);
     ATTRIBUTE("Frequency", float, frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE("Gain", float, gain_, 1.0f, AM_DEFAULT);
     ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
@@ -232,10 +232,11 @@ void SoundSource::SetSoundType(const String& type)
     if (type == SOUND_MASTER)
         return;
 
-    if (!audio_->IsMasterGain(type))
+    if (!audio_->HasMasterGain(type))
         audio_->SetMasterGain(type, 1.0f);
 
     soundType_ = type;
+    soundTypeHash_ = StringHash(type);
     MarkNetworkUpdate();
 }
 

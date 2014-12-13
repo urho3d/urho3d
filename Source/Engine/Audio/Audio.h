@@ -81,7 +81,7 @@ public:
     const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
 
     /// Return whether the specified master gain has been defined.
-    bool IsMasterGain(const String& type) const { return masterGain_.Contains(type); }
+    bool HasMasterGain(const String& type) const { return masterGain_.Contains(type); }
 
     /// Add a sound source to keep track of. Called by SoundSource.
     void AddSoundSource(SoundSource* soundSource);
@@ -90,7 +90,7 @@ public:
     /// Return audio thread mutex.
     Mutex& GetMutex() { return audioMutex_; }
     /// Return sound type specific gain multiplied by master gain.
-    float GetSoundSourceMasterGain(const String& type) const;
+    float GetSoundSourceMasterGain(StringHash typeHash) const;
 
     /// Mix sound sources into the buffer.
     void MixOutput(void *dest, unsigned samples);
@@ -119,7 +119,7 @@ private:
     /// Playing flag.
     bool playing_;
     /// Master gain by sound source type.
-    HashMap<String, Variant> masterGain_;
+    HashMap<StringHash, Variant> masterGain_;
     /// Sound sources.
     PODVector<SoundSource*> soundSources_;
     /// Sound listener.

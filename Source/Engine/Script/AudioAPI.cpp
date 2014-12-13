@@ -46,6 +46,10 @@ void RegisterSound(asIScriptEngine* engine)
 void RegisterSoundSources(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const String SOUND_MASTER", (void*) &SOUND_MASTER);
+    engine->RegisterGlobalProperty("const String SOUND_EFFECT", (void*) &SOUND_EFFECT);
+    engine->RegisterGlobalProperty("const String SOUND_AMBIENT", (void*) &SOUND_AMBIENT);
+    engine->RegisterGlobalProperty("const String SOUND_VOICE", (void*) &SOUND_VOICE);
+    engine->RegisterGlobalProperty("const String SOUND_MUSIC", (void*) &SOUND_MUSIC);
     
     RegisterSoundSource<SoundSource>(engine, "SoundSource");
     RegisterSoundSource<SoundSource3D>(engine, "SoundSource3D");
@@ -83,7 +87,7 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_masterGain(const String&in, float)", asMETHOD(Audio, SetMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "float get_masterGain(const String&in) const", asMETHOD(Audio, GetMasterGain), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "bool IsMasterGain(const String&in) const", asMETHOD(Audio, IsMasterGain), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "bool HasMasterGain(const String&in) const", asMETHOD(Audio, HasMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_listener(SoundListener@+)", asMETHOD(Audio, SetListener), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "SoundListener@+ get_listener() const", asMETHOD(Audio, GetListener), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "uint get_sampleSize() const", asMETHOD(Audio, GetSampleSize), asCALL_THISCALL);
