@@ -73,7 +73,7 @@ public:
     bool IsPlaying() const { return playing_; }
     /// Return whether an audio stream has been reserved.
     bool IsInitialized() const { return deviceID_ != 0; }
-    /// Return master gain for a specific sound source type.
+    /// Return master gain for a specific sound source type. Unknown sound types will return full gain (1).
     float GetMasterGain(const String& type) const;
     /// Return active sound listener.
     SoundListener* GetListener() const;

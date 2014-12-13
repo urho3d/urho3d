@@ -100,6 +100,8 @@ public:
     virtual void Update(float timeStep);
     /// Mix sound source output to a 32-bit clipping buffer. Called by Audio.
     void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation);
+    /// Update the effective master gain. Called internally and by Audio when the master gain changes.
+    void UpdateMasterGain();
     
     /// Set sound attribute.
     void SetSoundAttr(const ResourceRef& value);
@@ -129,6 +131,8 @@ protected:
     float panning_;
     /// Autoremove timer.
     float autoRemoveTimer_;
+    /// Effective master gain.
+    float masterGain_;
     /// Autoremove flag.
     bool autoRemove_;
     

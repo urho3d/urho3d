@@ -153,6 +153,9 @@ void Audio::Stop()
 void Audio::SetMasterGain(const String& type, float gain)
 {
     masterGain_[type] = Clamp(gain, 0.0f, 1.0f);
+
+    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+        (*i)->UpdateMasterGain();
 }
 
 void Audio::SetListener(SoundListener* listener)
