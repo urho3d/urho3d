@@ -102,8 +102,8 @@ static void RegisterResourceCache(asIScriptEngine* engine)
 {
     RegisterObject<ResourceCache>(engine, "ResourceCache");
     engine->RegisterObjectMethod("ResourceCache", "bool AddResourceDir(const String&in, uint priority = M_MAX_UNSIGNED)", asMETHOD(ResourceCache, AddResourceDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "bool AddPackageFile(PackageFile@+, uint priority = M_MAX_UNSIGNED)", asMETHODPR(ResourceCache, AddPackageFile, (PackageFile*, uint), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "bool AddPackageFile(const String&in, uint priority = M_MAX_UNSIGNED)", asMETHODPR(ResourceCache, AddPackageFile, (const String&, uint), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "bool AddPackageFile(PackageFile@+, uint priority = M_MAX_UNSIGNED)", asMETHODPR(ResourceCache, AddPackageFile, (PackageFile*, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "bool AddPackageFile(const String&in, uint priority = M_MAX_UNSIGNED)", asMETHODPR(ResourceCache, AddPackageFile, (const String&, unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool AddManualResource(Resource@+)", asMETHOD(ResourceCache, AddManualResource), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemoveResourceDir(const String&in)", asMETHOD(ResourceCache, RemoveResourceDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);

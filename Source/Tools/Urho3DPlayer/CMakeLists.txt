@@ -42,4 +42,4 @@ endif ()
 # Symlink/copy helper shell scripts or batch files to invoke Urho3DPlayer
 foreach (FILE Editor NinjaSnowWar)
     create_symlink (${CMAKE_SOURCE_DIR}/Bin/${FILE}${SCRIPT_EXT} ${CMAKE_BINARY_DIR}/Bin/${FILE}${SCRIPT_EXT} FALLBACK_TO_COPY)
-endforeach () 
+endforeach ()

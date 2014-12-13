@@ -327,16 +327,17 @@ First of all, structure your project similar to Urho3D project as below, althoug
 \code
 PROJECT_ROOT/
  ┝ Android/             if you target Android platform as well
- ┝ Docs/                if you do documentation at all
- ┝ Source/              if you have large project with sources arranged in hierarchy
  ┝ Bin/
  ╎  ┝ Data/
  ╎  ┕ CoreData/
+ ┝ Docs/                if you do documentation at all
+ ┝ Source/              if you have large project with sources arranged in hierarchy
  ┝ CMakeListst.txt
+ ┝ *.cpp and *.h
  ┕ *.bat or *.sh
 \endcode
 
-The physical project root directory is also now the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The Bin directory should contain the Data and CoreData resource subdirs. Unless you have configured CMake to use your project root directory as your project build tree as well, all the executables will not be actually generated in this Bin directory. The executables will always be generated in the Bin directory in the project build tree which is now fully user defined. Therefore, in order to run the executable in the build tree's Bin directory, you need to copy (or symlink) the resource directories (Data and CoreData) from source tree's Bin directory (or from Urho3D SDK installation) to there. Alternatively, you can use URHO3D_PREFIX_PATH environment variable to point to a prefix path containing the resource dirs. You may also want to copy (or symlink) the batch files or shell script files and/or Rakefile from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The *.bat or *.sh scripts work together with the Urho3D CMake module to configure and generate build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are now supported. Note that when you invoke one the *.bat or *.sh script for your project, you can also pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass the similar build options that you use when building the Urho3D library to avoid any conflict.
+The physical project root directory is also now the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The Bin directory should contain the Data and CoreData resource subdirs. Unless you intend to configure to use your project root directory as your project build tree as well, all the executables will not be actually generated in this Bin directory. However, the executables will always be generated in the Bin directory in the project build tree (which is now fully user defined). Therefore, in order to run the executable in the build tree's Bin directory, you need to copy (or symlink) the resource directories (Data and CoreData) from your source tree to your build tree. Alternatively, you can use URHO3D_PREFIX_PATH environment variable to point to a prefix path containing the resource dirs. You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The *.bat or *.sh scripts work together with the Urho3D CMake module to configure and generate the initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are now supported. Note that when you invoke one the *.bat or *.sh script for your project, you can also pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass the similar build options that you use when building the Urho3D library to avoid any conflict.
 
 \section UsingLibraryFromProjectSourceAndBuildTrees From Urho3D project source tree and build tree
 
@@ -354,16 +355,21 @@ cmake_minimum_required (VERSION 2.8.6)
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        cmake_policy (SET CMP0022 NEW) # INTERFACE_LINK_LIBRARIES defines the link interface
+        # INTERFACE_LINK_LIBRARIES defines the link interface
+        cmake_policy (SET CMP0022 NEW)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        cmake_policy (SET CMP0026 OLD) # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
-        cmake_policy (SET CMP0042 NEW) # MACOSX_RPATH is enabled by default
+        # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        cmake_policy (SET CMP0026 OLD)
+        # MACOSX_RPATH is enabled by default
+        cmake_policy (SET CMP0042 NEW)
     endif ()
 endif ()
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{URHO3D_HOME}/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+set (CMAKE_MODULE_PATH
+    $ENV{URHO3D_HOME}/CMake/Modules
+    CACHE PATH "Path to Urho3D-specific CMake modules")
 
 # Include Urho3D Cmake common module
 include (Urho3D-CMake-common)
@@ -400,21 +406,20 @@ The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variabl
 
 This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "CMAKE_PREFIX_PATH" environment variable to specify the prefix path of the non-default installation location.
 
-In your own project root directory, create a main CMakeLists.txt file similar to the first approach but change the CMake module search path setup to read as follows on Windows host:
+In your own project root directory, create a main CMakeLists.txt file similar to the first approach but change the CMake module search path setup to read as follows:
 
 \code
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+if (NOT CMAKE_HOST_WIN32)
+    set (MODULE_PATH_SUFFIX Urho3D/)
+endif ()
+set (CMAKE_MODULE_PATH
+    $ENV{CMAKE_PREFIX_PATH}/share/${MODULE_PATH_SUFFIX}CMake/Modules
+    ${CMAKE_INSTALL_PREFIX}/share/${MODULE_PATH_SUFFIX}CMake/Modules
+    CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
-On non-Windows host:
-
-\code
-# Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{CMAKE_PREFIX_PATH}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
-\endcode
-
-It differs from Windows version because on Windows host the Urho3D SDK is installed to a location with 'Urho3D' already prepended into the installed path. On non-Windows host, the SDK is installed to /usr/local by default, so we need to append 'Urho3D' to the path in the latter.  
+The MODULE_PATH_SUFFIX CMake variable is not required on Windows host because CMake already prepends 'Urho3D' into CMAKE_INSTALL_PREFIX path by default. Adjust this accordingly if you don't use this convention.
 
 \subsection FromSDKWithPkgConfig Using pkg-config instead of CMake
 
@@ -456,7 +461,7 @@ Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [tar
 
 As its name implies, this task just creates a basic project structure for your new project. You may also pass optional "project" and "target" parameters besides the "dir" parameter. Otherwise, you will get the default project name (Scaffolding) and target name (Main) in the main CMakeLists.txt. This task copies the Urho3DPlayer.cpp and Urho3DPlayer.h as placeholders for the source files. Normally, you should replace these two files with your own project source files before invoking one of the CMake *.bat or *.sh script.
 
-On Windows host system, this task requires privilege to create symlinks by using mklink command. The task would fail when the Windows user account does not have that privilege.
+On Windows host system, this task requires privilege to create symlinks by using mklink command. The task would fail when the Windows user account does not have that privilege. We strongly advise you not to use "Administrator" account just for this purpose. Instead, grant your "normal" user account to have the privilege correctly.
 
 
 \page Structure Overall structure

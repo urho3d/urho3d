@@ -279,7 +279,6 @@ EOF" or abort 'Failed to create release directory remotely'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
-  path_suffix = ENV['OS'] ? '' : 'Urho3D/'
   build_script = <<EOF
 # Set project name
 project (#{project})
@@ -290,19 +289,25 @@ cmake_minimum_required (VERSION 2.8.6)
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        cmake_policy (SET CMP0022 NEW) # INTERFACE_LINK_LIBRARIES defines the link interface
+        # INTERFACE_LINK_LIBRARIES defines the link interface
+        cmake_policy (SET CMP0022 NEW)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        cmake_policy (SET CMP0026 OLD) # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
-        cmake_policy (SET CMP0042 NEW) # MACOSX_RPATH is enabled by default
+        # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        cmake_policy (SET CMP0026 OLD)
+        # MACOSX_RPATH is enabled by default
+        cmake_policy (SET CMP0042 NEW)
     endif ()
 endif ()
 
 # Set CMake modules search path
+if (NOT CMAKE_HOST_WIN32)
+    set (MODULE_PATH_SUFFIX Urho3D/)
+endif ()
 set (CMAKE_MODULE_PATH
     $ENV{URHO3D_HOME}/CMake/Modules
-    $ENV{CMAKE_PREFIX_PATH}/share/#{path_suffix}CMake/Modules
-    ${CMAKE_INSTALL_PREFIX}/share/#{path_suffix}CMake/Modules
+    $ENV{CMAKE_PREFIX_PATH}/share/${MODULE_PATH_SUFFIX}CMake/Modules
+    ${CMAKE_INSTALL_PREFIX}/share/${MODULE_PATH_SUFFIX}CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
 # Include Urho3D CMake common module
