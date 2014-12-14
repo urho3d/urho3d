@@ -10995,6 +10995,7 @@ VectorBuffer GetBuffer() const;
 float GetFloat() const;
 int GetInt() const;
 RefCounted GetPtr() const;
+ScriptObject GetScriptObject() const;
 StringHash GetStringHash() const;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
