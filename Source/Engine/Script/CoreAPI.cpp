@@ -255,11 +255,16 @@ static void ConstructVariantPtr(RefCounted* value, Variant* ptr)
 
 static void ConstructVariantScriptObject(asIScriptObject* value, Variant* ptr)
 {
-    asIObjectType* scriptObjectInterface = value->GetEngine()->GetObjectTypeByName("ScriptObject");
-    if (!value->GetObjectType()->Implements(scriptObjectInterface))
+    if (value)
+    {
+        asIObjectType* scriptObjectInterface = value->GetEngine()->GetObjectTypeByName("ScriptObject");
+        if (value->GetObjectType()->Implements(scriptObjectInterface))
+            new(ptr) Variant(value);
+        else
+            new(ptr) Variant();
+    }
+    else
         new(ptr) Variant();
-
-    new(ptr) Variant(value);
 }
 
 static void ConstructVariantMatrix3(const Matrix3& value, Variant* ptr)
@@ -315,12 +320,12 @@ static CScriptArray* VariantGetVariantVector(Variant* ptr)
 static asIScriptObject* VariantGetScriptObject(Variant* ptr)
 {
     asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
-    if (object == NULL)
-        return NULL;
+    if (!object)
+        return 0;
 
     asIObjectType* scriptObjectInterface = object->GetEngine()->GetObjectTypeByName("ScriptObject");
     if (!object->GetObjectType()->Implements(scriptObjectInterface))
-        return NULL;
+        return 0;
 
     return object;
 }
