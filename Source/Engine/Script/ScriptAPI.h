@@ -59,6 +59,8 @@ void RegisterNavigationAPI(asIScriptEngine* engine);
 #endif
 /// Register the Urho2D library to script.
 void RegisterUrho2DAPI(asIScriptEngine* engine);
+/// Register the Script interfaces to script.
+void RegisterScriptInterfaceAPI(asIScriptEngine* engine);
 /// Register the Script library to script.
 void RegisterScriptAPI(asIScriptEngine* engine);
 /// Register the Engine library to script.
